@@ -1,54 +1,94 @@
-import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { Button, Searchbar } from "react-native-paper";
 
-import {
-  MD3LightTheme as DefaultTheme,
-  PaperProvider,
-} from "react-native-paper";
+import { PaperProvider } from "react-native-paper";
 
-const theme = {
-  ...DefaultTheme,
-  // Specify custom property
-  myOwnProperty: true,
-  // Specify custom property in nested object
-  colors: {
-    ...DefaultTheme.colors,
-    primary: "#0096fe",
-  },
-};
+import { CommonActions } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { BottomNavigation } from "react-native-paper";
+import { NavigationContainer } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+
+import HomeScreen from "./src/pages/HomeScreen";
+import SettingsScreen from "./src/pages/SettingsScreen";
+
+import theme from "./src/ui/theme";
+
+const Tab = createBottomTabNavigator();
 
 export default function App() {
-  const [searchQuery, setSearchQuery] = React.useState('');
   return (
     <PaperProvider theme={theme}>
-      <View style={styles.container}>
-        <Searchbar
-          placeholder="Search"
-          onChangeText={setSearchQuery}
-          value={searchQuery}
-        />
-        <Text>Open up App.tsx to start working on your app!</Text>
-        <StatusBar style="auto" />
-        <Button
-          icon="camera"
-          mode="contained"
-          onPress={() => location.reload()}
+      <NavigationContainer>
+        <Tab.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}
+          tabBar={({ navigation, state, descriptors, insets }) => (
+            <BottomNavigation.Bar
+              navigationState={state}
+              safeAreaInsets={insets}
+              onTabPress={({ route, preventDefault }) => {
+                const event = navigation.emit({
+                  type: "tabPress",
+                  target: route.key,
+                  canPreventDefault: true,
+                });
+
+                if (event.defaultPrevented) {
+                  preventDefault();
+                } else {
+                  navigation.dispatch({
+                    ...CommonActions.navigate(route.name, route.params),
+                    target: state.key,
+                  });
+                }
+              }}
+              renderIcon={({ route, focused, color }) => {
+                const { options } = descriptors[route.key];
+                if (options.tabBarIcon) {
+                  return options.tabBarIcon({ focused, color, size: 24 });
+                }
+
+                return null;
+              }}
+              getLabelText={({ route }) => {
+                const { options } = descriptors[route.key];
+
+                let label: string = "test";
+
+                if (options.title !== undefined) {
+                  label = options.title;
+                }
+
+                return label;
+              }}
+            />
+          )}
         >
-          Press me please
-        </Button>
-        <ActivityIndicator animating={true} size={'large'}/>
-      </View>
+          <Tab.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{
+              tabBarLabel: "Home",
+              title: "Home",
+              tabBarIcon: ({ color, size }) => {
+                return <Icon name="home" size={size} color={color} />;
+              },
+            }}
+          />
+          <Tab.Screen
+            name="Settings"
+            component={SettingsScreen}
+            options={{
+              tabBarLabel: "Settings",
+              title: "Settings",
+              tabBarIcon: ({ color, size }) => {
+                return <Icon name="cog" size={size} color={color} />;
+              },
+            }}
+          />
+        </Tab.Navigator>
+      </NavigationContainer>
     </PaperProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
