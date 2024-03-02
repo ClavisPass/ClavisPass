@@ -6,20 +6,29 @@ import { CommonActions } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { BottomNavigation } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+
+import "react-native-gesture-handler";
 
 import HomeScreen from "./src/pages/HomeScreen";
 import SettingsScreen from "./src/pages/SettingsScreen";
 
 import theme from "./src/ui/theme";
+import EditScreen from "./src/pages/EditScreen";
+import AnalysisScreen from "./src/pages/AnalysisScreen";
 
 const Tab = createBottomTabNavigator();
+
+const Stack = createStackNavigator();
 
 export default function App() {
   return (
     <PaperProvider theme={theme}>
       <NavigationContainer>
         <Tab.Navigator
+          initialRouteName="HomeStack"
           screenOptions={{
             headerShown: false,
           }}
@@ -66,8 +75,19 @@ export default function App() {
           )}
         >
           <Tab.Screen
-            name="Home"
-            component={HomeScreen}
+            name="Analysis"
+            component={AnalysisScreen}
+            options={{
+              tabBarLabel: "Analysis",
+              title: "Analysis",
+              tabBarIcon: ({ color, size }) => {
+                return <Icon name="shield-search" size={size} color={color} />;
+              },
+            }}
+          />
+          <Tab.Screen
+            name="HomeStack"
+            component={HomeStack}
             options={{
               tabBarLabel: "Home",
               title: "Home",
@@ -90,5 +110,18 @@ export default function App() {
         </Tab.Navigator>
       </NavigationContainer>
     </PaperProvider>
+  );
+}
+
+function HomeStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="Edit" component={EditScreen} />
+    </Stack.Navigator>
   );
 }

@@ -2,13 +2,51 @@ import { MD3LightTheme as DefaultTheme } from "react-native-paper";
 
 const theme = {
   ...DefaultTheme,
-  // Specify custom property
-  myOwnProperty: true,
+  dark: false,
+  roundness: 4,
   // Specify custom property in nested object
   colors: {
     ...DefaultTheme.colors,
-    primary: "#0096fe",
+    primary: "#2196F3",
+    primaryContainer: "#90CAF9",
+    secondary: "#00FF00",
+    secondaryContainer: "#E3F2FD",
+    elevation: {
+      "level0": "transparent",
+      "level1": "#FAFAFA",
+      "level2": "#F5F5F5",
+      "level3": "#EEEEEE",
+      "level4": "#E0E0E0",
+      "level5": "#BDBDBD"
+    },
+    //tertiary: "#800080",
+    //tertiaryContainer: "#FFA500",
+    surface: "#FFC0CB",
+    surfaceVariant: "#008080",
+    onSurfaceVariant: "#808080",
+    surfaceDisabled: "#808080",
+    background: "#FFFFFF",
+    error: "#A52A2A",
+    //errorContainer: "#808080",
+    //onPrimary: "#00FFFF",
+    //onPrimaryContainer: "#FFFFFF",
+    //onSecondary: "#00FF00",
+    //onSecondaryContainer: "#808000",
+    //onTertiary: "#800000",
+    //onTertiaryContainer: "#000080",
+    //onSurface: "#C0C0C0",
+    //onSurfaceDisabled: "#808080",
+    //onError: "#4B0082",
+    //onErrorContainer: "#FF7F50",
+    //onBackground: "#F5F5DC",
+    //outline: "#CD853F",
+    //outlineVariant: "#708090",
+    //inverseSurface: "#7FFFD4",
+    //inverseOnSurface: "#BDB76B",
+    //inversePrimary: "#DA70D6",
+    //shadow: "#DA70D6",
+    //scrim: "#D8BFD8",
+    //backdrop: "#808080",
   },
 };
-
 export default theme;
