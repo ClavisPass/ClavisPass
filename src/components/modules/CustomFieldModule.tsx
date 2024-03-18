@@ -27,6 +27,7 @@ function CustomFieldModule(props: CustomFieldModuleType) {
         value={text}
         mode="outlined"
         onChangeText={(text) => setText(text)}
+        autoCapitalize="none"
       />
     </ModuleContainer>
   );

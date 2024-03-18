@@ -27,6 +27,7 @@ function NoteModule(props: NoteModuleType) {
         value={value}
         mode="outlined"
         onChangeText={(text) => setValue(text)}
+        autoCapitalize="none"
       />
     </ModuleContainer>
   );

@@ -27,6 +27,9 @@ function UsernameModule(props: UsernameModuleType) {
         value={value}
         mode="outlined"
         onChangeText={(text) => setValue(text)}
+        autoCapitalize="none"
+        autoComplete="username"
+        textContentType="username"
       />
     </ModuleContainer>
   );

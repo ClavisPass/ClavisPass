@@ -29,6 +29,9 @@ function PasswordModule(props: PasswordModuleType) {
         mode="outlined"
         onChangeText={(text) => setValue(text)}
         secureTextEntry={secureTextEntry}
+        autoCapitalize="none"
+        autoComplete="password"
+        textContentType="password"
         right={
           <TextInput.Icon
             icon="eye"

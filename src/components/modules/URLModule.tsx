@@ -27,6 +27,10 @@ function URLModule(props: URLModuleType) {
         value={value}
         mode="outlined"
         onChangeText={(text) => setValue(text)}
+        autoCapitalize="none"
+        autoComplete="url"
+        textContentType="URL"
+        keyboardType="url"
       />
     </ModuleContainer>
   );

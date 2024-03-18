@@ -27,6 +27,8 @@ function KeyModule(props: KeyModuleType) {
         value={value}
         mode="outlined"
         onChangeText={(text) => setValue(text)}
+        autoComplete="one-time-code"
+        keyboardType="visible-password"
       />
     </ModuleContainer>
   );
