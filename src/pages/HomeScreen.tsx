@@ -1,6 +1,6 @@
 import React from "react";
-import { View, StyleSheet, Dimensions } from "react-native";
-import { Searchbar, Text, Button, Divider } from "react-native-paper";
+import { View, StyleSheet } from "react-native";
+import { Searchbar, Divider, IconButton } from "react-native-paper";
 
 import { Chip } from "react-native-paper";
 
@@ -8,8 +8,11 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 import { List } from "react-native-paper";
 
-import { StatusBar } from "expo-status-bar";
 import { FlashList } from "@shopify/flash-list";
+
+import { getData } from "../api/getData";
+
+const DATA = getData();
 
 import Animated, {
   useSharedValue,
@@ -18,45 +21,6 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import globalStyles from "../ui/globalStyles";
-
-const DATA = [
-  {
-    title: "First Item",
-    icon: "wifi",
-  },
-  {
-    title: "Second Item",
-    icon: "lock",
-  },
-  {
-    title: "3 Item",
-    icon: "wifi",
-  },
-  {
-    title: "4 Item",
-    icon: "wifi",
-  },
-  {
-    title: "5 Item",
-    icon: "wifi",
-  },
-  {
-    title: "6 Item",
-    icon: "wifi",
-  },
-  {
-    title: "7 Item",
-    icon: "wifi",
-  },
-  {
-    title: "8 Item",
-    icon: "wifi",
-  },
-  {
-    title: "9 Item",
-    icon: "wifi",
-  },
-];
 
 const FILTER = [
   {
@@ -69,6 +33,18 @@ const FILTER = [
   },
   {
     title: "KP",
+    icon: "folder",
+  },
+  {
+    title: "ggggggggeefefeg",
+    icon: "folder",
+  },
+  {
+    title: "ggggggggeefefeg",
+    icon: "folder",
+  },
+  {
+    title: "ggggggggeefefeg",
     icon: "folder",
   },
 ];
@@ -112,17 +88,44 @@ function HomeScreen({ navigation }: { navigation: any }) {
           //mode={"view"}
         />
   </Animated.View>*/}
-      <Searchbar
-        placeholder="Search"
-        onChangeText={setSearchQuery}
-        value={searchQuery}
-        loading={true}
-        //mode={"view"}
-      />
-      <View style={{ height: 40, width: "100%" }}>
+      <View
+        style={{
+          height: 40,
+          width: "100%",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <IconButton
+          icon="plus"
+          //mode="contained"
+          //iconColor={MD3Colors.error50}
+          size={25}
+          onPress={() => console.log("Pressed")}
+        />
+        <Searchbar
+          inputStyle={{ height: 40, minHeight: 40 }}
+          style={{ height: 40, flex: 1 }}
+          placeholder="Search"
+          onChangeText={setSearchQuery}
+          value={searchQuery}
+          loading={true}
+          //mode={"view"}
+        />
+        <IconButton
+          icon="dots-vertical"
+          //iconColor={MD3Colors.error50}
+          size={25}
+          onPress={() => console.log("Pressed")}
+        />
+      </View>
+      <View style={{ padding: 4, width: "100%", maxHeight: 50 }}>
         <FlashList
           data={FILTER}
           horizontal={true}
+          showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
             <Chip
               icon={item.icon}
@@ -137,15 +140,19 @@ function HomeScreen({ navigation }: { navigation: any }) {
       </View>
       <View style={{ flex: 1, width: "100%" }}>
         <FlashList
-          data={DATA}
+          data={DATA.values}
           renderItem={({ item }) => (
             <>
               <List.Item
-                title={item.title}
+                title={item.modules[0].value}
                 description="Item description"
-                left={(props) => <Icon name={item.icon} size={30} />}
-                right={(props) => <Icon name={"chevron-right"} size={30} />}
-                onPress={() => navigation.navigate("Edit")}
+                left={(props) => (
+                  <Icon color={"#808080"} name={item.icon} size={30} />
+                )}
+                right={(props) => (
+                  <Icon color={"#808080"} name={"chevron-right"} size={30} />
+                )}
+                onPress={() => navigation.navigate("Edit", { modules: item.modules } )}
               />
               <Divider />
             </>

@@ -1,13 +1,14 @@
 import { z } from "zod";
-import { ValuesTypeSchema } from "./ValuesType";
+import { ValuesListTypeSchema } from "./ValuesType";
 
 export const DataTypeSchema = z.object({
+  version: z.string(),
   lastUpdated: z.string(),
   master: z.string(),
   folder: z.array(z.string()),
-  values: z.array(ValuesTypeSchema),
+  values: ValuesListTypeSchema,
 });
 
-type ValuesType = z.infer<typeof DataTypeSchema>;
+type DataType = z.infer<typeof DataTypeSchema>;
 
-export default ValuesType;
+export default DataType;

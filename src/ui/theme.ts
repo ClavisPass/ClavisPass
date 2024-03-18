@@ -22,7 +22,7 @@ const theme = {
     //tertiary: "#800080",
     //tertiaryContainer: "#FFA500",
     surface: "#FFC0CB",
-    surfaceVariant: "#008080",
+    surfaceVariant: "#F5F5F5",
     onSurfaceVariant: "#808080",
     surfaceDisabled: "#808080",
     background: "#FFFFFF",
