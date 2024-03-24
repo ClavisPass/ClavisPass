@@ -121,7 +121,9 @@ function HomeScreen({ navigation }: { navigation: any }) {
           onPress={() => console.log("Pressed")}
         />
       </View>
-      <View style={{ padding: 4, width: "100%", maxHeight: 50 }}>
+      <View
+        style={{ padding: 4, width: "100%", maxHeight: 50 }}
+      >
         <FlashList
           data={FILTER}
           horizontal={true}
@@ -152,7 +154,9 @@ function HomeScreen({ navigation }: { navigation: any }) {
                 right={(props) => (
                   <Icon color={"#808080"} name={"chevron-right"} size={30} />
                 )}
-                onPress={() => navigation.navigate("Edit", { modules: item.modules } )}
+                onPress={() =>
+                  navigation.navigate("Edit", { modules: item.modules })
+                }
               />
               <Divider />
             </>

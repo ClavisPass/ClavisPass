@@ -10,7 +10,7 @@ export function getData() {
       {
         id: "123345346672345",
         modules: [
-          { id: "123312542345", module: "TITLE", value: "TestTitel" },
+          { id: "123312542345", module: "TITLE", value: "PWTestDataUSERNAME" },
           { id: "123312363655", module: "USERNAME", value: "TestUsername" },
           { id: "123312387755", module: "PASSWORD", value: "TestPassword" },
           { id: "123325634355", module: "NOTE", value: "Notiz" },
@@ -19,12 +19,12 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "",
-        icon: "password",
+        icon: "lock",
       },
       {
         id: "123243245436672345",
         modules: [
-          { id: "1233ewwq2345", module: "TITLE", value: "TestTitel" },
+          { id: "1233ewwq2345", module: "TITLE", value: "PWTestDataEMAIL" },
           { id: "12weqweeew45", module: "E_MAIL", value: "TestEmail" },
           { id: "1233zzere345", module: "PASSWORD", value: "TestPassword" },
           { id: "123312553435", module: "URL", value: "www.google.de" },
@@ -34,17 +34,17 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "",
-        icon: "password",
+        icon: "lock",
       },
       {
         id: "12334634534536734345",
         modules: [
-          { id: "123878908345", module: "TITLE", value: "TestTitel" },
+          { id: "123878908345", module: "TITLE", value: "WIFITESTDATA" },
           {
             id: "12399796495",
             module: "WIFI",
             value: "2342637423735324",
-            wifiName: "",
+            wifiName: "wifiname",
             wifiType: "wpa",
           },
           { id: "123o777609nh45", module: "NOTE", value: "Notiz" },
@@ -58,7 +58,7 @@ export function getData() {
       {
         id: "12323423532566745",
         modules: [
-          { id: "1233ew96855443345", module: "TITLE", value: "TestTitel" },
+          { id: "1233ew96855443345", module: "TITLE", value: "KEYTESTDATA" },
           {
             id: "1233ew6784534545",
             module: "KEY",
@@ -70,12 +70,12 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "wifi",
-        icon: "wifi",
+        icon: "key-variant",
       },
       {
         id: "123234235325455266745",
         modules: [
-          { id: "1233ew96223855443345", module: "TITLE", value: "TestTitel" },
+          { id: "1233ew96223855443345", module: "TITLE", value: "CUSTOMFIELDTESTDATA" },
           {
             id: "1233ew676784534545",
             module: "CUSTOM_FIELD",
@@ -88,7 +88,7 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "wifi",
-        icon: "wifi",
+        icon: "lock",
       },
     ],
   };

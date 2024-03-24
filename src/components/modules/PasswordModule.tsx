@@ -22,6 +22,17 @@ const styles = StyleSheet.create({
 function PasswordModule(props: PasswordModuleType) {
   const [value, setValue] = React.useState(props.value);
   const [secureTextEntry, setSecureTextEntry] = React.useState(true);
+
+  const [eyeIcon, setEyeIcon] = React.useState("eye");
+
+  React.useEffect(() => {
+    if (secureTextEntry) {
+      setEyeIcon("eye")
+    }
+    else{
+      setEyeIcon("eye-off")
+    }
+  }, [secureTextEntry]);
   return (
     <ModuleContainer title={"Password"}>
       <TextInput
@@ -34,7 +45,7 @@ function PasswordModule(props: PasswordModuleType) {
         textContentType="password"
         right={
           <TextInput.Icon
-            icon="eye"
+            icon={eyeIcon}
             onPress={() => setSecureTextEntry(!secureTextEntry)}
           />
         }

@@ -4,7 +4,7 @@ import { Divider, Text } from "react-native-paper";
 
 const styles = StyleSheet.create({
   container: {
-    padding: 4,
+    padding: 8,
   },
 });
 
@@ -19,7 +19,7 @@ function ModuleContainer(props: Props) {
       <View style={styles.container}>
         <Text variant="bodyMedium">{props.title}</Text>
         {props.children}
-        <Divider />
+        
       </View>
     </>
   );

@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
     "beforeBuildCommand": "npx expo export --platform web",
-
+    "beforeDevCommand": "npm run web",
     "devPath": "http://localhost:8081",
     "distDir": "../build"
   },
