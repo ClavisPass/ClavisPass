@@ -1,10 +1,11 @@
 import React from "react";
 import { StyleSheet } from "react-native";
 
-import { Text, TextInput } from "react-native-paper";
+import { Snackbar, Text, TextInput } from "react-native-paper";
 
 import UsernameModuleType from "../../types/modules/UsernameModuleType";
 import ModuleContainer from "../ModuleContainer";
+import CopyToClipboard from "../CopyToClipboard";
 
 const styles = StyleSheet.create({
   container: {
@@ -31,6 +32,7 @@ function UsernameModule(props: UsernameModuleType) {
         autoComplete="username"
         textContentType="username"
       />
+      <CopyToClipboard value={value} />
     </ModuleContainer>
   );
 }

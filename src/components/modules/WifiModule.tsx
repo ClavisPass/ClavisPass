@@ -1,13 +1,15 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
-import { IconButton, Text, TextInput } from "react-native-paper";
+import { IconButton, Modal, Portal, Text, TextInput } from "react-native-paper";
 
 import WifiModuleType from "../../types/modules/WifiModuleType";
 import ModuleContainer from "../ModuleContainer";
 import { Picker } from "@react-native-picker/picker";
 
 import { Keyboard } from "react-native";
+import QRCode from "react-qr-code";
+import CopyToClipboard from "../CopyToClipboard";
 
 const styles = StyleSheet.create({
   container: {
@@ -20,10 +22,21 @@ const styles = StyleSheet.create({
     width: "100%",
     flex: 1,
   },
+  box: {
+    width: 60,
+    height: 60,
+    marginVertical: 20,
+  },
 });
 
 function WifiModule(props: WifiModuleType) {
   const [secureTextEntry, setSecureTextEntry] = React.useState(true);
+
+  const [visible, setVisible] = React.useState(false);
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+  const containerStyle = { backgroundColor: "white", padding: 20 };
 
   const [name, setName] = React.useState(props.wifiName);
   const [value, setValue] = React.useState(props.value);
@@ -58,11 +71,7 @@ function WifiModule(props: WifiModuleType) {
             mode="outlined"
             onChangeText={(text) => setName(text)}
           />
-          <IconButton
-            icon="qrcode"
-            size={20}
-            onPress={() => console.log("Pressed")}
-          />
+          <IconButton icon="qrcode" size={20} onPress={showModal} />
         </View>
         <View style={{ display: "flex", flexDirection: "row" }}>
           <TextInput
@@ -84,13 +93,23 @@ function WifiModule(props: WifiModuleType) {
               />
             }
           />
-          <IconButton
-            icon="content-copy"
-            size={20}
-            onPress={() => console.log("Pressed")}
-          />
+          <CopyToClipboard value={value} />
         </View>
       </View>
+      <Portal>
+        <Modal
+          visible={visible}
+          onDismiss={hideModal}
+          contentContainerStyle={containerStyle}
+        >
+          <QRCode
+            size={256}
+            style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+            value={"test"}
+            viewBox={`0 0 256 256`}
+          />
+        </Modal>
+      </Portal>
     </ModuleContainer>
   );
 }
