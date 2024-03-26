@@ -27,6 +27,21 @@ const styles = StyleSheet.create({
     height: 60,
     marginVertical: 20,
   },
+  textInput: {
+    flex: 1,
+    //backgroundColor: "fefefe",
+    color: "white",
+    //borderWidth: 1,
+    fontSize: 15,
+    //borderColor: "#444444",
+    //padding: 2,
+    //margin: 5,
+    //width: 50,
+    height: 30,
+    borderRadius: 10,
+    backgroundColor: '#3a3a3a',
+    //paddingHorizontal: 5,
+  },
 });
 
 function WifiModule(props: WifiModuleType) {
@@ -75,7 +90,9 @@ function WifiModule(props: WifiModuleType) {
         </View>
         <View style={{ display: "flex", flexDirection: "row" }}>
           <TextInput
-            style={{ flex: 1 }}
+            outlineStyle={{ minHeight: 42, height: 42, borderRadius: 10 }}
+            style={{ flex: 1, minHeight: 42, height: 42 }}
+            
             value={value}
             mode="outlined"
             onChangeText={(text) => setValue(text)}
