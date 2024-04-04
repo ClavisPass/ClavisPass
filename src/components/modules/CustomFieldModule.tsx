@@ -5,6 +5,7 @@ import { Text, TextInput } from "react-native-paper";
 
 import CustomFieldModuleType from "../../types/modules/CustomFieldModuleType";
 import ModuleContainer from "../ModuleContainer";
+import globalStyles from "../../ui/globalStyles";
 
 const styles = StyleSheet.create({
   container: {
@@ -24,6 +25,8 @@ function CustomFieldModule(props: CustomFieldModuleType) {
   return (
     <ModuleContainer title={props.title}>
       <TextInput
+        outlineStyle={globalStyles.outlineStyle}
+        style={globalStyles.textInputStyle}
         value={text}
         mode="outlined"
         onChangeText={(text) => setText(text)}

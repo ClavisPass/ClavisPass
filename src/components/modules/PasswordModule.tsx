@@ -5,6 +5,7 @@ import { TextInput } from "react-native-paper";
 
 import PasswordModuleType from "../../types/modules/PasswordModuleType";
 import ModuleContainer from "../ModuleContainer";
+import globalStyles from "../../ui/globalStyles";
 
 const styles = StyleSheet.create({
   container: {
@@ -27,15 +28,16 @@ function PasswordModule(props: PasswordModuleType) {
 
   React.useEffect(() => {
     if (secureTextEntry) {
-      setEyeIcon("eye")
-    }
-    else{
-      setEyeIcon("eye-off")
+      setEyeIcon("eye");
+    } else {
+      setEyeIcon("eye-off");
     }
   }, [secureTextEntry]);
   return (
     <ModuleContainer title={"Password"}>
       <TextInput
+        outlineStyle={globalStyles.outlineStyle}
+        style={globalStyles.textInputStyle}
         value={value}
         mode="outlined"
         onChangeText={(text) => setValue(text)}

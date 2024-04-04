@@ -5,6 +5,7 @@ import { Text, TextInput } from "react-native-paper";
 
 import NoteModuleType from "../../types/modules/NoteModuleType";
 import ModuleContainer from "../ModuleContainer";
+import globalStyles from "../../ui/globalStyles";
 
 const styles = StyleSheet.create({
   container: {
@@ -24,6 +25,8 @@ function NoteModule(props: NoteModuleType) {
   return (
     <ModuleContainer title={"Note"}>
       <TextInput
+        outlineStyle={globalStyles.outlineStyle}
+        style={globalStyles.textInputStyle}
         value={value}
         mode="outlined"
         onChangeText={(text) => setValue(text)}

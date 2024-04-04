@@ -1,15 +1,13 @@
+import { Picker } from "@react-native-picker/picker";
 import React from "react";
-import { StyleSheet, View } from "react-native";
-
+import { StyleSheet, View, Keyboard } from "react-native";
 import { IconButton, Modal, Portal, Text, TextInput } from "react-native-paper";
+import QRCode from "react-qr-code";
 
 import WifiModuleType from "../../types/modules/WifiModuleType";
-import ModuleContainer from "../ModuleContainer";
-import { Picker } from "@react-native-picker/picker";
-
-import { Keyboard } from "react-native";
-import QRCode from "react-qr-code";
 import CopyToClipboard from "../CopyToClipboard";
+import ModuleContainer from "../ModuleContainer";
+import globalStyles from "../../ui/globalStyles";
 
 const styles = StyleSheet.create({
   container: {
@@ -39,7 +37,7 @@ const styles = StyleSheet.create({
     //width: 50,
     height: 30,
     borderRadius: 10,
-    backgroundColor: '#3a3a3a',
+    backgroundColor: "#3a3a3a",
     //paddingHorizontal: 5,
   },
 });
@@ -51,7 +49,6 @@ function WifiModule(props: WifiModuleType) {
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
-  const containerStyle = { backgroundColor: "white", padding: 20 };
 
   const [name, setName] = React.useState(props.wifiName);
   const [value, setValue] = React.useState(props.value);
@@ -68,7 +65,7 @@ function WifiModule(props: WifiModuleType) {
     }
   }, [secureTextEntry]);
   return (
-    <ModuleContainer title={"Wifi"}>
+    <ModuleContainer title="Wifi">
       <View style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <Picker
           selectedValue={wifiType}
@@ -81,7 +78,8 @@ function WifiModule(props: WifiModuleType) {
 
         <View style={{ display: "flex", flexDirection: "row" }}>
           <TextInput
-            style={{ flex: 1 }}
+            outlineStyle={globalStyles.outlineStyle}
+            style={globalStyles.textInputStyle}
             value={name}
             mode="outlined"
             onChangeText={(text) => setName(text)}
@@ -90,9 +88,8 @@ function WifiModule(props: WifiModuleType) {
         </View>
         <View style={{ display: "flex", flexDirection: "row" }}>
           <TextInput
-            outlineStyle={{ minHeight: 42, height: 42, borderRadius: 10 }}
-            style={{ flex: 1, minHeight: 42, height: 42 }}
-            
+            outlineStyle={globalStyles.outlineStyle}
+            style={globalStyles.textInputStyle}
             value={value}
             mode="outlined"
             onChangeText={(text) => setValue(text)}
@@ -117,13 +114,21 @@ function WifiModule(props: WifiModuleType) {
         <Modal
           visible={visible}
           onDismiss={hideModal}
-          contentContainerStyle={containerStyle}
+          contentContainerStyle={{
+            backgroundColor: "white",
+            padding: 20,
+            margin: 6,
+            borderRadius: 20,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           <QRCode
             size={256}
-            style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-            value={"test"}
-            viewBox={`0 0 256 256`}
+            style={{ height: "auto" }}
+            value="test"
+            viewBox="0 0 256 256"
           />
         </Modal>
       </Portal>

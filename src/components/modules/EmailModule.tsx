@@ -5,6 +5,7 @@ import { IconButton, Text, TextInput } from "react-native-paper";
 
 import EmailModuleType from "../../types/modules/EmailModuleType";
 import ModuleContainer from "../ModuleContainer";
+import globalStyles from "../../ui/globalStyles";
 
 const styles = StyleSheet.create({
   container: {
@@ -25,7 +26,8 @@ function EmailModule(props: EmailModuleType) {
     <ModuleContainer title={"E-Mail"}>
       <View style={{ display: "flex", flexDirection: "row" }}>
         <TextInput
-          style={{ flex: 1 }}
+          outlineStyle={globalStyles.outlineStyle}
+          style={globalStyles.textInputStyle}
           value={value}
           mode="outlined"
           onChangeText={(text) => setValue(text)}
