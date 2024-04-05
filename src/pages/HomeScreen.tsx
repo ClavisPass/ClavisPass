@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { Searchbar, Divider, IconButton } from "react-native-paper";
 
@@ -21,6 +21,7 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import globalStyles from "../ui/globalStyles";
+import { useData } from "../contexts/DataProvider";
 
 const FILTER = [
   {
@@ -65,6 +66,8 @@ const styles = StyleSheet.create({
 function HomeScreen({ navigation }: { navigation: any }) {
   const [searchQuery, setSearchQuery] = React.useState("");
 
+  const data = useData();
+
   let animatedHeight = useSharedValue(0);
 
   const config = {
@@ -78,16 +81,12 @@ function HomeScreen({ navigation }: { navigation: any }) {
     };
   });
 
+  useEffect(() => {
+    data.setData(DATA);
+  }, []);
+
   return (
     <View style={globalStyles.container}>
-      {/*<Animated.View style={[styles.box, style]}>
-        <Searchbar
-          placeholder="Search"
-          onChangeText={setSearchQuery}
-          value={searchQuery}
-          //mode={"view"}
-        />
-  </Animated.View>*/}
       <View
         style={{
           height: 40,
@@ -100,8 +99,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
       >
         <IconButton
           icon="plus"
-          //mode="contained"
-          //iconColor={MD3Colors.error50}
           size={25}
           onPress={() => console.log("Pressed")}
         />
@@ -112,18 +109,14 @@ function HomeScreen({ navigation }: { navigation: any }) {
           onChangeText={setSearchQuery}
           value={searchQuery}
           loading={true}
-          //mode={"view"}
         />
         <IconButton
           icon="dots-vertical"
-          //iconColor={MD3Colors.error50}
           size={25}
           onPress={() => console.log("Pressed")}
         />
       </View>
-      <View
-        style={{ padding: 4, width: "100%", maxHeight: 50 }}
-      >
+      <View style={{ padding: 4, width: "100%", maxHeight: 50 }}>
         <FlashList
           data={FILTER}
           horizontal={true}
@@ -142,7 +135,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
       </View>
       <View style={{ flex: 1, width: "100%" }}>
         <FlashList
-          data={DATA.values}
+          data={data.data?.values}
           renderItem={({ item }) => (
             <>
               <List.Item

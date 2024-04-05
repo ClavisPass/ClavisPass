@@ -7,7 +7,7 @@ export const DataTypeSchema = z.object({
   master: z.string(),
   folder: z.array(z.string()),
   values: ValuesListTypeSchema,
-});
+}).nullable();
 
 type DataType = z.infer<typeof DataTypeSchema>;
 

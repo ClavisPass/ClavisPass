@@ -19,11 +19,11 @@ import WifiModuleType from "../types/modules/WifiModuleType";
 import KeyModule from "../components/modules/KeyModule";
 import NoteModule from "../components/modules/NoteModule";
 import PasswordModule from "../components/modules/PasswordModule";
-import { Title } from "react-native-paper";
 import TitleModule from "../components/modules/TitleModule";
 import URLModule from "../components/modules/URLModule";
 import UsernameModule from "../components/modules/UsernameModule";
 import WifiModule from "../components/modules/WifiModule";
+import { Button, IconButton } from "react-native-paper";
 
 const styles = StyleSheet.create({
   container: {
@@ -45,16 +45,22 @@ type RootStackParamList = {
 type Props = StackScreenProps<RootStackParamList>;
 
 function EditScreen({ route }: Props) {
+  const [edit, setEdit] = React.useState(false);
   return (
     <View style={styles.container}>
+      <IconButton
+        icon="square-edit-outline"
+        size={20}
+        onPress={() => setEdit(!edit)}
+      />
       <ScrollView style={styles.scrollView}>
-        {route.params.modules.map((module) => getModule(module))}
+        {route.params.modules.map((module) => getModule(module, edit))}
       </ScrollView>
     </View>
   );
 }
 
-function getModule(module: ModuleType): ReactNode {
+function getModule(module: ModuleType, edit: boolean): ReactNode {
   if (module.module === ModulesEnum.CUSTOM_FIELD) {
     let moduleObject = module as CustomFieldModuleType;
     return (
@@ -64,6 +70,7 @@ function getModule(module: ModuleType): ReactNode {
         module={moduleObject.module}
         title={moduleObject.title}
         value={moduleObject.value}
+        edit={edit}
       />
     );
   }
@@ -75,6 +82,7 @@ function getModule(module: ModuleType): ReactNode {
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
+        edit={edit}
       />
     );
   }
@@ -86,6 +94,7 @@ function getModule(module: ModuleType): ReactNode {
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
+        edit={edit}
       />
     );
   }
@@ -97,6 +106,7 @@ function getModule(module: ModuleType): ReactNode {
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
+        edit={edit}
       />
     );
   }
@@ -108,6 +118,7 @@ function getModule(module: ModuleType): ReactNode {
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
+        edit={edit}
       />
     );
   }
@@ -119,6 +130,7 @@ function getModule(module: ModuleType): ReactNode {
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
+        edit={edit}
       />
     );
   }
@@ -130,6 +142,7 @@ function getModule(module: ModuleType): ReactNode {
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
+        edit={edit}
       />
     );
   }
@@ -141,6 +154,7 @@ function getModule(module: ModuleType): ReactNode {
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
+        edit={edit}
       />
     );
   }
@@ -154,6 +168,7 @@ function getModule(module: ModuleType): ReactNode {
         wifiName={moduleObject.wifiName}
         wifiType={moduleObject.wifiType}
         value={moduleObject.value}
+        edit={edit}
       />
     );
   }

@@ -20,7 +20,11 @@ const styles = StyleSheet.create({
   },
 });
 
-function PasswordModule(props: PasswordModuleType) {
+type Props = {
+  edit: boolean;
+};
+
+function PasswordModule(props: PasswordModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
   const [secureTextEntry, setSecureTextEntry] = React.useState(true);
 
@@ -34,7 +38,7 @@ function PasswordModule(props: PasswordModuleType) {
     }
   }, [secureTextEntry]);
   return (
-    <ModuleContainer title={"Password"}>
+    <ModuleContainer title={"Password"} edit={props.edit}>
       <TextInput
         outlineStyle={globalStyles.outlineStyle}
         style={globalStyles.textInputStyle}

@@ -20,10 +20,14 @@ const styles = StyleSheet.create({
   },
 });
 
-function KeyModule(props: KeyModuleType) {
+type Props = {
+  edit: boolean;
+};
+
+function KeyModule(props: KeyModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
   return (
-    <ModuleContainer title={"Key"}>
+    <ModuleContainer title={"Key"} edit={props.edit}>
       <TextInput
         outlineStyle={globalStyles.outlineStyle}
         style={globalStyles.textInputStyle}

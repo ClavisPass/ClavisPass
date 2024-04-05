@@ -20,10 +20,14 @@ const styles = StyleSheet.create({
   },
 });
 
-function CustomFieldModule(props: CustomFieldModuleType) {
+type Props = {
+  edit: boolean;
+};
+
+function CustomFieldModule(props: CustomFieldModuleType & Props) {
   const [text, setText] = React.useState(props.value);
   return (
-    <ModuleContainer title={props.title}>
+    <ModuleContainer title={props.title} edit={props.edit}>
       <TextInput
         outlineStyle={globalStyles.outlineStyle}
         style={globalStyles.textInputStyle}

@@ -18,109 +18,110 @@ import SettingsScreen from "./src/pages/SettingsScreen";
 import theme from "./src/ui/theme";
 import EditScreen from "./src/pages/EditScreen";
 import AnalysisScreen from "./src/pages/AnalysisScreen";
+import { AuthProvider } from "./src/contexts/AuthProvider";
+import { DataProvider } from "./src/contexts/DataProvider";
+import ProtectedRoute from "./src/utils/ProtectedRoute";
+import LoginScreen from "./src/pages/LoginScreen";
+import transitionSpecConfig from "./src/configs/TransitionSpecConfig";
 
 const Tab = createBottomTabNavigator();
 
 const Stack = createStackNavigator();
 
-const config = {
-  animation: "spring",
-  config: {
-    stiffness: 1000,
-    damping: 500,
-    mass: 3,
-    overshootClamping: true,
-    restDisplacementThreshold: 0.01,
-    restSpeedThreshold: 0.01,
-  },
-};
-
 export default function App() {
   return (
     <PaperProvider theme={theme}>
-      <NavigationContainer>
-        <Tab.Navigator
-          initialRouteName="HomeStack"
-          screenOptions={{
-            headerShown: false,
-          }}
-          tabBar={({ navigation, state, descriptors, insets }) => (
-            <BottomNavigation.Bar
-              navigationState={state}
-              safeAreaInsets={insets}
-              onTabPress={({ route, preventDefault }) => {
-                const event = navigation.emit({
-                  type: "tabPress",
-                  target: route.key,
-                  canPreventDefault: true,
-                });
+      <AuthProvider>
+        <DataProvider>
+          <ProtectedRoute loginScreen={<LoginScreen />}>
+            <NavigationContainer>
+              <Tab.Navigator
+                initialRouteName="HomeStack"
+                screenOptions={{
+                  headerShown: false,
+                }}
+                tabBar={({ navigation, state, descriptors, insets }) => (
+                  <BottomNavigation.Bar
+                    navigationState={state}
+                    safeAreaInsets={insets}
+                    onTabPress={({ route, preventDefault }) => {
+                      const event = navigation.emit({
+                        type: "tabPress",
+                        target: route.key,
+                        canPreventDefault: true,
+                      });
 
-                if (event.defaultPrevented) {
-                  preventDefault();
-                } else {
-                  navigation.dispatch({
-                    ...CommonActions.navigate(route.name, route.params),
-                    target: state.key,
-                  });
-                }
-              }}
-              renderIcon={({ route, focused, color }) => {
-                const { options } = descriptors[route.key];
-                if (options.tabBarIcon) {
-                  return options.tabBarIcon({ focused, color, size: 24 });
-                }
+                      if (event.defaultPrevented) {
+                        preventDefault();
+                      } else {
+                        navigation.dispatch({
+                          ...CommonActions.navigate(route.name, route.params),
+                          target: state.key,
+                        });
+                      }
+                    }}
+                    renderIcon={({ route, focused, color }) => {
+                      const { options } = descriptors[route.key];
+                      if (options.tabBarIcon) {
+                        return options.tabBarIcon({ focused, color, size: 24 });
+                      }
 
-                return null;
-              }}
-              getLabelText={({ route }) => {
-                const { options } = descriptors[route.key];
+                      return null;
+                    }}
+                    getLabelText={({ route }) => {
+                      const { options } = descriptors[route.key];
 
-                let label: string = "test";
+                      let label: string = "test";
 
-                if (options.title !== undefined) {
-                  label = options.title;
-                }
+                      if (options.title !== undefined) {
+                        label = options.title;
+                      }
 
-                return label;
-              }}
-            />
-          )}
-        >
-          <Tab.Screen
-            name="Analysis"
-            component={AnalysisScreen}
-            options={{
-              tabBarLabel: "Analysis",
-              title: "Analysis",
-              tabBarIcon: ({ color, size }) => {
-                return <Icon name="shield-search" size={size} color={color} />;
-              },
-            }}
-          />
-          <Tab.Screen
-            name="HomeStack"
-            component={HomeStack}
-            options={{
-              tabBarLabel: "Home",
-              title: "Home",
-              tabBarIcon: ({ color, size }) => {
-                return <Icon name="home" size={size} color={color} />;
-              },
-            }}
-          />
-          <Tab.Screen
-            name="Settings"
-            component={SettingsScreen}
-            options={{
-              tabBarLabel: "Settings",
-              title: "Settings",
-              tabBarIcon: ({ color, size }) => {
-                return <Icon name="cog" size={size} color={color} />;
-              },
-            }}
-          />
-        </Tab.Navigator>
-      </NavigationContainer>
+                      return label;
+                    }}
+                  />
+                )}
+              >
+                <Tab.Screen
+                  name="Analysis"
+                  component={AnalysisScreen}
+                  options={{
+                    tabBarLabel: "Analysis",
+                    title: "Analysis",
+                    tabBarIcon: ({ color, size }) => {
+                      return (
+                        <Icon name="shield-search" size={size} color={color} />
+                      );
+                    },
+                  }}
+                />
+                <Tab.Screen
+                  name="HomeStack"
+                  component={HomeStack}
+                  options={{
+                    tabBarLabel: "Home",
+                    title: "Home",
+                    tabBarIcon: ({ color, size }) => {
+                      return <Icon name="home" size={size} color={color} />;
+                    },
+                  }}
+                />
+                <Tab.Screen
+                  name="Settings"
+                  component={SettingsScreen}
+                  options={{
+                    tabBarLabel: "Settings",
+                    title: "Settings",
+                    tabBarIcon: ({ color, size }) => {
+                      return <Icon name="cog" size={size} color={color} />;
+                    },
+                  }}
+                />
+              </Tab.Navigator>
+            </NavigationContainer>
+          </ProtectedRoute>
+        </DataProvider>
+      </AuthProvider>
     </PaperProvider>
   );
 }
@@ -139,13 +140,13 @@ function HomeStack() {
         component={HomeScreen}
         options={{
           headerShown: false,
-          transitionSpec: { open: config, close: config },
+          transitionSpec: { open: transitionSpecConfig, close: transitionSpecConfig },
         }}
       />
       <Stack.Screen
         name="Edit"
         component={EditScreen}
-        options={{ transitionSpec: { open: config, close: config } }}
+        options={{ transitionSpec: { open: transitionSpecConfig, close: transitionSpecConfig } }}
       />
     </Stack.Navigator>
   );

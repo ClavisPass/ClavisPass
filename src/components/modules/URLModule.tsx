@@ -20,10 +20,14 @@ const styles = StyleSheet.create({
   },
 });
 
-function URLModule(props: URLModuleType) {
+type Props = {
+  edit: boolean;
+};
+
+function URLModule(props: URLModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
   return (
-    <ModuleContainer title={"URL"}>
+    <ModuleContainer title={"URL"} edit={props.edit}>
       <TextInput
         outlineStyle={globalStyles.outlineStyle}
         style={globalStyles.textInputStyle}

@@ -20,10 +20,14 @@ const styles = StyleSheet.create({
   },
 });
 
-function EmailModule(props: EmailModuleType) {
+type Props = {
+  edit: boolean;
+};
+
+function EmailModule(props: EmailModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
   return (
-    <ModuleContainer title={"E-Mail"}>
+    <ModuleContainer title={"E-Mail"} edit={props.edit}>
       <View style={{ display: "flex", flexDirection: "row" }}>
         <TextInput
           outlineStyle={globalStyles.outlineStyle}

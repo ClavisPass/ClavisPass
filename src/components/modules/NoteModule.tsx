@@ -20,10 +20,14 @@ const styles = StyleSheet.create({
   },
 });
 
-function NoteModule(props: NoteModuleType) {
+type Props = {
+  edit: boolean;
+};
+
+function NoteModule(props: NoteModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
   return (
-    <ModuleContainer title={"Note"}>
+    <ModuleContainer title={"Note"} edit={props.edit}>
       <TextInput
         outlineStyle={globalStyles.outlineStyle}
         style={globalStyles.textInputStyle}

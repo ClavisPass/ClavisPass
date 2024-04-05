@@ -42,7 +42,11 @@ const styles = StyleSheet.create({
   },
 });
 
-function WifiModule(props: WifiModuleType) {
+type Props = {
+  edit: boolean;
+};
+
+function WifiModule(props: WifiModuleType & Props) {
   const [secureTextEntry, setSecureTextEntry] = React.useState(true);
 
   const [visible, setVisible] = React.useState(false);
@@ -65,7 +69,7 @@ function WifiModule(props: WifiModuleType) {
     }
   }, [secureTextEntry]);
   return (
-    <ModuleContainer title="Wifi">
+    <ModuleContainer title="Wifi" edit={props.edit}>
       <View style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <Picker
           selectedValue={wifiType}

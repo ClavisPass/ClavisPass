@@ -21,11 +21,15 @@ const styles = StyleSheet.create({
   },
 });
 
-function UsernameModule(props: UsernameModuleType) {
+type Props = {
+  edit: boolean;
+};
+
+function UsernameModule(props: UsernameModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
   return (
-    <ModuleContainer title={"Username"}>
-      <View style={{display:"flex"}}>
+    <ModuleContainer title={"Username"} edit={props.edit}>
+      <View style={{ display: "flex" }}>
         <TextInput
           outlineStyle={globalStyles.outlineStyle}
           style={globalStyles.textInputStyle}
