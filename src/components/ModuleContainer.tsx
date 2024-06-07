@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Divider, Icon, IconButton, Text } from "react-native-paper";
 
 const styles = StyleSheet.create({
@@ -7,10 +7,13 @@ const styles = StyleSheet.create({
     padding: 8,
     display: "flex",
     flexDirection: "row",
+    //backgroundColor: "green",
+    width: "100%",
   },
   draggable: {
     borderWidth: 1,
     borderRadius: 6,
+    borderColor: "lightgrey",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 6,
@@ -29,6 +32,8 @@ type Props = {
   children: ReactNode;
   title: string;
   edit: boolean;
+  onDragStart: () => void;
+  onDragEnd: () => void;
 };
 
 function ModuleContainer(props: Props) {
@@ -36,9 +41,14 @@ function ModuleContainer(props: Props) {
     <>
       <View style={styles.container}>
         {props.edit ? (
-          <View style={styles.draggable}>
+          <TouchableOpacity
+            key={props.title}
+            onPressIn={props.onDragStart}
+            onPressOut={props.onDragEnd}
+            style={styles.draggable}
+          >
             <Icon source="drag" size={20} />
-          </View>
+          </TouchableOpacity>
         ) : null}
 
         <View style={styles.content}>

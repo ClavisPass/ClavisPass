@@ -6,28 +6,12 @@ import { IconButton, Text, TextInput } from "react-native-paper";
 import EmailModuleType from "../../types/modules/EmailModuleType";
 import ModuleContainer from "../ModuleContainer";
 import globalStyles from "../../ui/globalStyles";
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  scrollView: {
-    width: "100%",
-    flex: 1,
-  },
-});
-
-type Props = {
-  edit: boolean;
-};
+import Props from "../../types/ModuleProps";
 
 function EmailModule(props: EmailModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
   return (
-    <ModuleContainer title={"E-Mail"} edit={props.edit}>
+    <ModuleContainer title={"E-Mail"} edit={props.edit} onDragStart={props.onDragStart} onDragEnd={props.onDragEnd}>
       <View style={{ display: "flex", flexDirection: "row" }}>
         <TextInput
           outlineStyle={globalStyles.outlineStyle}

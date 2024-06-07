@@ -20,12 +20,14 @@
     "@react-navigation/stack": "^6.3.25",
     "@shopify/flash-list": "1.6.3",
     "expo": "~50.0.8",
+    "expo-clipboard": "~5.0.1",
     "expo-constants": "~15.4.5",
     "expo-status-bar": "~1.11.1",
     "expo-system-ui": "~2.9.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.73.4",
+    "react-native-draglist": "^3.6.0",
     "react-native-gesture-handler": "~2.14.0",
     "react-native-paper": "^5.12.3",
     "react-native-reanimated": "~3.6.2",
@@ -35,8 +37,7 @@
     "react-native-vector-icons": "^10.0.3",
     "react-native-web": "~0.19.6",
     "react-qr-code": "^2.0.12",
-    "zod": "^3.22.4",
-    "expo-clipboard": "~5.0.1"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

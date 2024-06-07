@@ -7,28 +7,12 @@ import UsernameModuleType from "../../types/modules/UsernameModuleType";
 import ModuleContainer from "../ModuleContainer";
 import CopyToClipboard from "../CopyToClipboard";
 import globalStyles from "../../ui/globalStyles";
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  scrollView: {
-    width: "100%",
-    flex: 1,
-  },
-});
-
-type Props = {
-  edit: boolean;
-};
+import Props from "../../types/ModuleProps";
 
 function UsernameModule(props: UsernameModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
   return (
-    <ModuleContainer title={"Username"} edit={props.edit}>
+    <ModuleContainer title={"Username"} edit={props.edit} onDragStart={props.onDragStart} onDragEnd={props.onDragEnd}>
       <View style={{ display: "flex" }}>
         <TextInput
           outlineStyle={globalStyles.outlineStyle}

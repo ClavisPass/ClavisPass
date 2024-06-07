@@ -1,5 +1,11 @@
 import React, { ReactNode } from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import ModulesType, { ModuleType } from "../types/ModulesType";
 import CustomFieldModule from "../components/modules/CustomFieldModule";
 
@@ -23,17 +29,20 @@ import TitleModule from "../components/modules/TitleModule";
 import URLModule from "../components/modules/URLModule";
 import UsernameModule from "../components/modules/UsernameModule";
 import WifiModule from "../components/modules/WifiModule";
-import { Button, IconButton } from "react-native-paper";
+import { Button, IconButton, Text } from "react-native-paper";
+import DragList, { DragListRenderItemInfo } from "react-native-draglist";
+import { useData } from "../contexts/DataProvider";
+import DataType from "../types/DataType";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "center",
   },
   scrollView: {
-    width: "100%",
+    width: Dimensions.get("window").width,
+    //height: Dimensions.get('window').height,
     flex: 1,
   },
 });
@@ -44,8 +53,46 @@ type RootStackParamList = {
 
 type Props = StackScreenProps<RootStackParamList>;
 
+type DraggableListProps = {
+  data: ModulesType;
+  setData: (data: ModulesType) => void;
+  edit: boolean;
+};
+
+function DraggableList(props: DraggableListProps) {
+  function keyExtractor(str: ModuleType) {
+    return str.id;
+  }
+
+  function renderItem(info: DragListRenderItemInfo<ModuleType>) {
+    const { item, onDragStart, onDragEnd, isActive } = info;
+
+    return <>{getModule(item, props.edit, onDragStart, onDragEnd)}</>;
+  }
+
+  async function onReordered(fromIndex: number, toIndex: number) {
+    const copy = [...props.data]; // Don't modify react data in-place
+    const removed = copy.splice(fromIndex, 1);
+
+    copy.splice(toIndex, 0, removed[0]); // Now insert at the new pos
+    props.setData(copy);
+  }
+
+  return (
+    <DragList
+      style={styles.scrollView}
+      data={props.data}
+      keyExtractor={keyExtractor}
+      onReordered={onReordered}
+      renderItem={renderItem}
+    />
+  );
+}
+
 function EditScreen({ route }: Props) {
   const [edit, setEdit] = React.useState(false);
+  const [data, setData] = React.useState([...route.params.modules]);
+
   return (
     <View style={styles.container}>
       <IconButton
@@ -53,14 +100,17 @@ function EditScreen({ route }: Props) {
         size={20}
         onPress={() => setEdit(!edit)}
       />
-      <ScrollView style={styles.scrollView}>
-        {route.params.modules.map((module) => getModule(module, edit))}
-      </ScrollView>
+      <DraggableList data={data} setData={setData} edit={edit} />
     </View>
   );
 }
 
-function getModule(module: ModuleType, edit: boolean): ReactNode {
+function getModule(
+  module: ModuleType,
+  edit: boolean,
+  onDragStart: () => void,
+  onDragEnd: () => void
+): ReactNode {
   if (module.module === ModulesEnum.CUSTOM_FIELD) {
     let moduleObject = module as CustomFieldModuleType;
     return (
@@ -71,6 +121,8 @@ function getModule(module: ModuleType, edit: boolean): ReactNode {
         title={moduleObject.title}
         value={moduleObject.value}
         edit={edit}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
       />
     );
   }
@@ -83,6 +135,8 @@ function getModule(module: ModuleType, edit: boolean): ReactNode {
         module={moduleObject.module}
         value={moduleObject.value}
         edit={edit}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
       />
     );
   }
@@ -95,6 +149,8 @@ function getModule(module: ModuleType, edit: boolean): ReactNode {
         module={moduleObject.module}
         value={moduleObject.value}
         edit={edit}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
       />
     );
   }
@@ -107,6 +163,8 @@ function getModule(module: ModuleType, edit: boolean): ReactNode {
         module={moduleObject.module}
         value={moduleObject.value}
         edit={edit}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
       />
     );
   }
@@ -119,6 +177,8 @@ function getModule(module: ModuleType, edit: boolean): ReactNode {
         module={moduleObject.module}
         value={moduleObject.value}
         edit={edit}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
       />
     );
   }
@@ -131,6 +191,8 @@ function getModule(module: ModuleType, edit: boolean): ReactNode {
         module={moduleObject.module}
         value={moduleObject.value}
         edit={edit}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
       />
     );
   }
@@ -143,6 +205,8 @@ function getModule(module: ModuleType, edit: boolean): ReactNode {
         module={moduleObject.module}
         value={moduleObject.value}
         edit={edit}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
       />
     );
   }
@@ -155,6 +219,8 @@ function getModule(module: ModuleType, edit: boolean): ReactNode {
         module={moduleObject.module}
         value={moduleObject.value}
         edit={edit}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
       />
     );
   }
@@ -169,6 +235,8 @@ function getModule(module: ModuleType, edit: boolean): ReactNode {
         wifiType={moduleObject.wifiType}
         value={moduleObject.value}
         edit={edit}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
       />
     );
   }

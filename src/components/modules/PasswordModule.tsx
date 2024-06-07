@@ -6,23 +6,7 @@ import { TextInput } from "react-native-paper";
 import PasswordModuleType from "../../types/modules/PasswordModuleType";
 import ModuleContainer from "../ModuleContainer";
 import globalStyles from "../../ui/globalStyles";
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  scrollView: {
-    width: "100%",
-    flex: 1,
-  },
-});
-
-type Props = {
-  edit: boolean;
-};
+import Props from "../../types/ModuleProps";
 
 function PasswordModule(props: PasswordModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
@@ -38,7 +22,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
     }
   }, [secureTextEntry]);
   return (
-    <ModuleContainer title={"Password"} edit={props.edit}>
+    <ModuleContainer title={"Password"} edit={props.edit} onDragStart={props.onDragStart} onDragEnd={props.onDragEnd}>
       <TextInput
         outlineStyle={globalStyles.outlineStyle}
         style={globalStyles.textInputStyle}

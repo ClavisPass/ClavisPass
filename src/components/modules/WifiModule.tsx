@@ -8,43 +8,7 @@ import WifiModuleType from "../../types/modules/WifiModuleType";
 import CopyToClipboard from "../CopyToClipboard";
 import ModuleContainer from "../ModuleContainer";
 import globalStyles from "../../ui/globalStyles";
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  scrollView: {
-    width: "100%",
-    flex: 1,
-  },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
-  },
-  textInput: {
-    flex: 1,
-    //backgroundColor: "fefefe",
-    color: "white",
-    //borderWidth: 1,
-    fontSize: 15,
-    //borderColor: "#444444",
-    //padding: 2,
-    //margin: 5,
-    //width: 50,
-    height: 30,
-    borderRadius: 10,
-    backgroundColor: "#3a3a3a",
-    //paddingHorizontal: 5,
-  },
-});
-
-type Props = {
-  edit: boolean;
-};
+import Props from "../../types/ModuleProps";
 
 function WifiModule(props: WifiModuleType & Props) {
   const [secureTextEntry, setSecureTextEntry] = React.useState(true);
@@ -69,7 +33,7 @@ function WifiModule(props: WifiModuleType & Props) {
     }
   }, [secureTextEntry]);
   return (
-    <ModuleContainer title="Wifi" edit={props.edit}>
+    <ModuleContainer title="Wifi" edit={props.edit} onDragStart={props.onDragStart} onDragEnd={props.onDragEnd}>
       <View style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <Picker
           selectedValue={wifiType}
