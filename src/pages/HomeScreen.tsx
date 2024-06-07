@@ -148,7 +148,13 @@ function HomeScreen({ navigation }: { navigation: any }) {
                   <Icon color={"#808080"} name={"chevron-right"} size={30} />
                 )}
                 onPress={() =>
-                  navigation.navigate("Edit", { modules: item.modules })
+                  navigation.navigate("Edit", {
+                    modules: item.modules,
+                    fav: item.fav,
+                    created: item.created,
+                    lastUpdated: item.lastUpdated,
+                    folder: item.folder,
+                  })
                 }
               />
               <Divider />

@@ -11,7 +11,13 @@ import Props from "../../types/ModuleProps";
 function URLModule(props: URLModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
   return (
-    <ModuleContainer title={"URL"} edit={props.edit} onDragStart={props.onDragStart} onDragEnd={props.onDragEnd}>
+    <ModuleContainer
+      title={"URL"}
+      edit={props.edit}
+      delete={props.edit}
+      onDragStart={props.onDragStart}
+      onDragEnd={props.onDragEnd}
+    >
       <TextInput
         outlineStyle={globalStyles.outlineStyle}
         style={globalStyles.textInputStyle}

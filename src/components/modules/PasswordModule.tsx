@@ -22,7 +22,13 @@ function PasswordModule(props: PasswordModuleType & Props) {
     }
   }, [secureTextEntry]);
   return (
-    <ModuleContainer title={"Password"} edit={props.edit} onDragStart={props.onDragStart} onDragEnd={props.onDragEnd}>
+    <ModuleContainer
+      title={"Password"}
+      edit={props.edit}
+      delete={props.edit}
+      onDragStart={props.onDragStart}
+      onDragEnd={props.onDragEnd}
+    >
       <TextInput
         outlineStyle={globalStyles.outlineStyle}
         style={globalStyles.textInputStyle}

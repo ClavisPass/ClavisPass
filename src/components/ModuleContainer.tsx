@@ -32,6 +32,7 @@ type Props = {
   children: ReactNode;
   title: string;
   edit: boolean;
+  delete: boolean;
   onDragStart: () => void;
   onDragEnd: () => void;
 };
@@ -55,7 +56,7 @@ function ModuleContainer(props: Props) {
           <Text variant="bodyMedium">{props.title}</Text>
           {props.children}
         </View>
-        {props.edit ? (
+        {props.delete ? (
           <View style={styles.delete}>
             <IconButton
               icon="delete"

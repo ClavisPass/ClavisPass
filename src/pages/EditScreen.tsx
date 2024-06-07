@@ -29,26 +29,31 @@ import TitleModule from "../components/modules/TitleModule";
 import URLModule from "../components/modules/URLModule";
 import UsernameModule from "../components/modules/UsernameModule";
 import WifiModule from "../components/modules/WifiModule";
-import { Button, IconButton, Text } from "react-native-paper";
+import { Button, IconButton, Menu, Modal, Text } from "react-native-paper";
 import DragList, { DragListRenderItemInfo } from "react-native-draglist";
-import { useData } from "../contexts/DataProvider";
-import DataType from "../types/DataType";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
+    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: 30,
   },
   scrollView: {
     width: Dimensions.get("window").width,
-    //height: Dimensions.get('window').height,
     flex: 1,
   },
 });
 
 type RootStackParamList = {
-  params: { modules: ModulesType };
+  params: {
+    modules: ModulesType;
+    fav: boolean;
+    created: string;
+    lastUpdated: string;
+    folder: string;
+  };
 };
 
 type Props = StackScreenProps<RootStackParamList>;
@@ -93,15 +98,42 @@ function EditScreen({ route }: Props) {
   const [edit, setEdit] = React.useState(false);
   const [data, setData] = React.useState([...route.params.modules]);
 
+  const [visible, setVisible] = React.useState(false);
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+  const containerStyle = { backgroundColor: "white", padding: 20 };
+
   return (
-    <View style={styles.container}>
-      <IconButton
-        icon="square-edit-outline"
-        size={20}
-        onPress={() => setEdit(!edit)}
-      />
-      <DraggableList data={data} setData={setData} edit={edit} />
-    </View>
+    <>
+      <View style={styles.container}>
+        <IconButton
+          icon="square-edit-outline"
+          size={20}
+          onPress={() => setEdit(!edit)}
+        />
+        {edit ? <IconButton icon="plus" size={20} onPress={showModal} /> : null}
+        <DraggableList data={data} setData={setData} edit={edit} />
+      </View>
+      <View>
+        <Text>created: {route.params.created}</Text>
+        <Text>last updated: {route.params.lastUpdated}</Text>
+      </View>
+      <Modal
+        visible={visible}
+        onDismiss={hideModal}
+        contentContainerStyle={containerStyle}
+      >
+        <Menu.Item leadingIcon="account" onPress={() => {}} title="Username" />
+        <Menu.Item leadingIcon="email" onPress={() => {}} title="E-Mail" />
+        <Menu.Item leadingIcon="form-textbox-password" onPress={() => {}} title="Password" />
+        <Menu.Item leadingIcon="web" onPress={() => {}} title="URL" />
+        <Menu.Item leadingIcon="wifi" onPress={() => {}} title="Wifi" />
+        <Menu.Item leadingIcon="key-variant" onPress={() => {}} title="Key" />
+        <Menu.Item leadingIcon="pencil-box" onPress={() => {}} title="Custom Field" />
+        <Menu.Item leadingIcon="note" onPress={() => {}} title="Note" />
+      </Modal>
+    </>
   );
 }
 

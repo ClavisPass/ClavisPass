@@ -11,7 +11,13 @@ import Props from "../../types/ModuleProps";
 function TitleModule(props: TitleModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
   return (
-    <ModuleContainer title={"Title"} edit={props.edit} onDragStart={props.onDragStart} onDragEnd={props.onDragEnd}>
+    <ModuleContainer
+      title={"Title"}
+      edit={props.edit}
+      delete={false}
+      onDragStart={props.onDragStart}
+      onDragEnd={props.onDragEnd}
+    >
       <TextInput
         outlineStyle={globalStyles.outlineStyle}
         style={globalStyles.textInputStyle}

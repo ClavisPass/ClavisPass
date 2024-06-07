@@ -33,7 +33,13 @@ function WifiModule(props: WifiModuleType & Props) {
     }
   }, [secureTextEntry]);
   return (
-    <ModuleContainer title="Wifi" edit={props.edit} onDragStart={props.onDragStart} onDragEnd={props.onDragEnd}>
+    <ModuleContainer
+      title="Wifi"
+      edit={props.edit}
+      delete={props.edit}
+      onDragStart={props.onDragStart}
+      onDragEnd={props.onDragEnd}
+    >
       <View style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <Picker
           selectedValue={wifiType}

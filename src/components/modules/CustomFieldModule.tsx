@@ -11,7 +11,13 @@ import Props from "../../types/ModuleProps";
 function CustomFieldModule(props: CustomFieldModuleType & Props) {
   const [text, setText] = React.useState(props.value);
   return (
-    <ModuleContainer title={props.title} edit={props.edit} onDragStart={props.onDragStart} onDragEnd={props.onDragEnd}>
+    <ModuleContainer
+      title={props.title}
+      edit={props.edit}
+      delete={props.edit}
+      onDragStart={props.onDragStart}
+      onDragEnd={props.onDragEnd}
+    >
       <TextInput
         outlineStyle={globalStyles.outlineStyle}
         style={globalStyles.textInputStyle}

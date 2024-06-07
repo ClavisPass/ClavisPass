@@ -11,7 +11,13 @@ import Props from "../../types/ModuleProps";
 function EmailModule(props: EmailModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
   return (
-    <ModuleContainer title={"E-Mail"} edit={props.edit} onDragStart={props.onDragStart} onDragEnd={props.onDragEnd}>
+    <ModuleContainer
+      title={"E-Mail"}
+      edit={props.edit}
+      delete={props.edit}
+      onDragStart={props.onDragStart}
+      onDragEnd={props.onDragEnd}
+    >
       <View style={{ display: "flex", flexDirection: "row" }}>
         <TextInput
           outlineStyle={globalStyles.outlineStyle}

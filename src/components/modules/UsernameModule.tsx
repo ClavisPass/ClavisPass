@@ -12,8 +12,14 @@ import Props from "../../types/ModuleProps";
 function UsernameModule(props: UsernameModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
   return (
-    <ModuleContainer title={"Username"} edit={props.edit} onDragStart={props.onDragStart} onDragEnd={props.onDragEnd}>
-      <View style={{ display: "flex" }}>
+    <ModuleContainer
+      title={"Username"}
+      edit={props.edit}
+      delete={props.edit}
+      onDragStart={props.onDragStart}
+      onDragEnd={props.onDragEnd}
+    >
+      <View style={{ display: "flex", flexDirection: "row" }}>
         <TextInput
           outlineStyle={globalStyles.outlineStyle}
           style={globalStyles.textInputStyle}
