@@ -31,6 +31,7 @@ import UsernameModule from "../components/modules/UsernameModule";
 import WifiModule from "../components/modules/WifiModule";
 import { Button, IconButton, Menu, Modal, Text } from "react-native-paper";
 import DragList, { DragListRenderItemInfo } from "react-native-draglist";
+import WebSpecific from "../components/platformSpecific/WebSpecific";
 
 const styles = StyleSheet.create({
   container: {
@@ -107,6 +108,7 @@ function EditScreen({ route }: Props) {
   return (
     <>
       <View style={styles.container}>
+        <WebSpecific>WEB</WebSpecific>
         <IconButton
           icon="square-edit-outline"
           size={20}
@@ -126,11 +128,19 @@ function EditScreen({ route }: Props) {
       >
         <Menu.Item leadingIcon="account" onPress={() => {}} title="Username" />
         <Menu.Item leadingIcon="email" onPress={() => {}} title="E-Mail" />
-        <Menu.Item leadingIcon="form-textbox-password" onPress={() => {}} title="Password" />
+        <Menu.Item
+          leadingIcon="form-textbox-password"
+          onPress={() => {}}
+          title="Password"
+        />
         <Menu.Item leadingIcon="web" onPress={() => {}} title="URL" />
         <Menu.Item leadingIcon="wifi" onPress={() => {}} title="Wifi" />
         <Menu.Item leadingIcon="key-variant" onPress={() => {}} title="Key" />
-        <Menu.Item leadingIcon="pencil-box" onPress={() => {}} title="Custom Field" />
+        <Menu.Item
+          leadingIcon="pencil-box"
+          onPress={() => {}}
+          title="Custom Field"
+        />
         <Menu.Item leadingIcon="note" onPress={() => {}} title="Note" />
       </Modal>
     </>
