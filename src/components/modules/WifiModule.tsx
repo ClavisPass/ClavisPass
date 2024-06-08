@@ -9,6 +9,7 @@ import CopyToClipboard from "../CopyToClipboard";
 import ModuleContainer from "../ModuleContainer";
 import globalStyles from "../../ui/globalStyles";
 import Props from "../../types/ModuleProps";
+import theme from "../../ui/theme";
 
 function WifiModule(props: WifiModuleType & Props) {
   const [secureTextEntry, setSecureTextEntry] = React.useState(true);
@@ -58,7 +59,7 @@ function WifiModule(props: WifiModuleType & Props) {
             mode="outlined"
             onChangeText={(text) => setName(text)}
           />
-          <IconButton icon="qrcode" size={20} onPress={showModal} />
+          <IconButton iconColor={theme.colors.primary} icon="qrcode" size={20} onPress={showModal} />
         </View>
         <View style={{ display: "flex", flexDirection: "row" }}>
           <TextInput
@@ -74,6 +75,7 @@ function WifiModule(props: WifiModuleType & Props) {
             right={
               <TextInput.Icon
                 icon={eyeIcon}
+                color={theme.colors.primary}
                 onPress={() => {
                   Keyboard.dismiss();
                   setSecureTextEntry(!secureTextEntry);

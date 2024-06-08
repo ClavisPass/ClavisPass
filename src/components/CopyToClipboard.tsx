@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 import { IconButton, Snackbar } from "react-native-paper";
 
 import * as Clipboard from "expo-clipboard";
+import theme from "../ui/theme";
 
 const styles = StyleSheet.create({
   container: {
@@ -26,7 +27,7 @@ function CopyToClipboard(props: Props) {
   };
   return (
     <>
-      <IconButton icon="content-copy" size={20} onPress={copyToClipboard} />
+      <IconButton icon="content-copy" iconColor={theme.colors.primary} size={20} onPress={copyToClipboard} />
       <Snackbar visible={visible} onDismiss={onDismissSnackBar} duration={1000}>
         Copied
       </Snackbar>

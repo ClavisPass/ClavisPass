@@ -7,10 +7,10 @@ const theme = {
   // Specify custom property in nested object
   colors: {
     ...DefaultTheme.colors,
-    primary: "#2196F3",
-    primaryContainer: "#90CAF9",
-    secondary: "#00FF00",
-    secondaryContainer: "#E3F2FD",
+    primary: "#787FF6",
+    primaryContainer: "#97dede",
+    secondary: "#4ADEDE",
+    secondaryContainer: "rgba(120, 126, 245, 0.09)",
     elevation: {
       "level0": "transparent",
       "level1": "#FAFAFA",

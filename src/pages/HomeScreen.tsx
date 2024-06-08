@@ -22,6 +22,10 @@ import Animated, {
 } from "react-native-reanimated";
 import globalStyles from "../ui/globalStyles";
 import { useData } from "../contexts/DataProvider";
+import { LinearGradient } from "expo-linear-gradient";
+import { transparent } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
+import ListItem from "../components/ListItem";
+import theme from "../ui/theme";
 
 const FILTER = [
   {
@@ -87,24 +91,37 @@ function HomeScreen({ navigation }: { navigation: any }) {
 
   return (
     <View style={globalStyles.container}>
-      <View
+      <LinearGradient
+        colors={[theme.colors.primary, theme.colors.secondary]}
         style={{
-          height: 40,
+          height: 70,
           width: "100%",
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
+          padding: 10,
+          paddingTop: 20,
+          paddingBottom: 20,
+          borderBottomLeftRadius: 25,
+          borderBottomRightRadius: 25,
+          marginBottom: 10,
         }}
+        end={{ x: 0.1, y: 0.2 }}
       >
         <IconButton
           icon="plus"
           size={25}
           onPress={() => console.log("Pressed")}
+          iconColor="white"
         />
         <Searchbar
-          inputStyle={{ height: 40, minHeight: 40 }}
-          style={{ height: 40, flex: 1 }}
+          inputStyle={{ height: 40, minHeight: 40, color: "white" }}
+          style={{
+            height: 40,
+            flex: 1,
+            backgroundColor: "rgba(217, 217, 217, 0.21)",
+          }}
           placeholder="Search"
           onChangeText={setSearchQuery}
           value={searchQuery}
@@ -114,6 +131,27 @@ function HomeScreen({ navigation }: { navigation: any }) {
           icon="dots-vertical"
           size={25}
           onPress={() => console.log("Pressed")}
+          iconColor="white"
+        />
+      </LinearGradient>
+      <View style={{ flex: 1, width: "100%" }}>
+        <FlashList
+          data={data.data?.values}
+          renderItem={({ item }) => (
+            <ListItem
+              item={item}
+              onPress={() => {
+                navigation.navigate("Edit", {
+                  modules: item.modules,
+                  fav: item.fav,
+                  created: item.created,
+                  lastUpdated: item.lastUpdated,
+                  folder: item.folder,
+                });
+              }}
+            />
+          )}
+          estimatedItemSize={200}
         />
       </View>
       <View style={{ padding: 4, width: "100%", maxHeight: 50 }}>
@@ -131,36 +169,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
             </Chip>
           )}
           estimatedItemSize={5}
-        />
-      </View>
-      <View style={{ flex: 1, width: "100%" }}>
-        <FlashList
-          data={data.data?.values}
-          renderItem={({ item }) => (
-            <>
-              <List.Item
-                title={item.modules[0].value}
-                description="Item description"
-                left={(props) => (
-                  <Icon color={"#808080"} name={item.icon} size={30} />
-                )}
-                right={(props) => (
-                  <Icon color={"#808080"} name={"chevron-right"} size={30} />
-                )}
-                onPress={() =>
-                  navigation.navigate("Edit", {
-                    modules: item.modules,
-                    fav: item.fav,
-                    created: item.created,
-                    lastUpdated: item.lastUpdated,
-                    folder: item.folder,
-                  })
-                }
-              />
-              <Divider />
-            </>
-          )}
-          estimatedItemSize={200}
         />
       </View>
     </View>

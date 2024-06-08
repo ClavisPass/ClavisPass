@@ -140,13 +140,22 @@ function HomeStack() {
         component={HomeScreen}
         options={{
           headerShown: false,
-          transitionSpec: { open: transitionSpecConfig, close: transitionSpecConfig },
+          transitionSpec: {
+            open: transitionSpecConfig,
+            close: transitionSpecConfig,
+          },
         }}
       />
       <Stack.Screen
         name="Edit"
         component={EditScreen}
-        options={{ transitionSpec: { open: transitionSpecConfig, close: transitionSpecConfig } }}
+        options={{
+          headerShown: false,
+          transitionSpec: {
+            open: transitionSpecConfig,
+            close: transitionSpecConfig,
+          },
+        }}
       />
     </Stack.Navigator>
   );

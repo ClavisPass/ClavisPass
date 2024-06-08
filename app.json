@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -23,6 +21,9 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.ricirico.ClavisPass"
+    },
+    "androidStatusBar": {
+      "translucent": true
     },
     "web": {
       "favicon": "./assets/favicon.png"

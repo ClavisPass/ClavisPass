@@ -29,14 +29,16 @@ import TitleModule from "../components/modules/TitleModule";
 import URLModule from "../components/modules/URLModule";
 import UsernameModule from "../components/modules/UsernameModule";
 import WifiModule from "../components/modules/WifiModule";
-import { Button, IconButton, Menu, Modal, Text } from "react-native-paper";
+import { IconButton, Menu, Modal } from "react-native-paper";
 import DragList, { DragListRenderItemInfo } from "react-native-draglist";
-import WebSpecific from "../components/platformSpecific/WebSpecific";
+import Header from "../components/Header";
+import globalStyles from "../ui/globalStyles";
+import theme from "../ui/theme";
+import Button from "../components/Button";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     borderBottomRightRadius: 30,
     borderBottomLeftRadius: 30,
@@ -95,7 +97,7 @@ function DraggableList(props: DraggableListProps) {
   );
 }
 
-function EditScreen({ route }: Props) {
+function EditScreen({ route, navigation }: Props) {
   const [edit, setEdit] = React.useState(false);
   const [data, setData] = React.useState([...route.params.modules]);
 
@@ -106,21 +108,25 @@ function EditScreen({ route }: Props) {
   const containerStyle = { backgroundColor: "white", padding: 20 };
 
   return (
-    <>
-      <View style={styles.container}>
-        <WebSpecific>WEB</WebSpecific>
+    <View style={globalStyles.container}>
+      <Header
+        title={"Edit"}
+        onPress={() => {
+          navigation.goBack();
+        }}
+      >
+        {edit ? <IconButton icon="plus" size={20} onPress={showModal} /> : null}
         <IconButton
           icon="square-edit-outline"
+          iconColor={theme.colors.primary}
           size={20}
           onPress={() => setEdit(!edit)}
         />
-        {edit ? <IconButton icon="plus" size={20} onPress={showModal} /> : null}
+      </Header>
+      <View style={styles.container}>
         <DraggableList data={data} setData={setData} edit={edit} />
       </View>
-      <View>
-        <Text>created: {route.params.created}</Text>
-        <Text>last updated: {route.params.lastUpdated}</Text>
-      </View>
+      <Button text={"Save"} onPress={() => console.log("test")}></Button>
       <Modal
         visible={visible}
         onDismiss={hideModal}
@@ -143,7 +149,7 @@ function EditScreen({ route }: Props) {
         />
         <Menu.Item leadingIcon="note" onPress={() => {}} title="Note" />
       </Modal>
-    </>
+    </View>
   );
 }
 

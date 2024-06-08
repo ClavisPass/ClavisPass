@@ -1,8 +1,8 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { Button, Text } from "react-native-paper";
 import globalStyles from "../ui/globalStyles";
 import { useAuth } from "../contexts/AuthProvider";
+import Button from "../components/Button";
 
 const styles = StyleSheet.create({
   surface: {
@@ -23,7 +23,7 @@ function LoginScreen() {
   const auth = useAuth();
   return (
     <View style={globalStyles.container}>
-      <Button mode="contained" onPress={() => auth.login("1234")}>Login</Button>
+      <Button text={"Login"} onPress={() => auth.login("1234")}></Button>
     </View>
   );
 }

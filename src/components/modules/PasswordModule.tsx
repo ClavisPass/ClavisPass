@@ -7,6 +7,7 @@ import PasswordModuleType from "../../types/modules/PasswordModuleType";
 import ModuleContainer from "../ModuleContainer";
 import globalStyles from "../../ui/globalStyles";
 import Props from "../../types/ModuleProps";
+import theme from "../../ui/theme";
 
 function PasswordModule(props: PasswordModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
@@ -42,6 +43,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
         right={
           <TextInput.Icon
             icon={eyeIcon}
+            color={theme.colors.primary}
             onPress={() => setSecureTextEntry(!secureTextEntry)}
           />
         }
