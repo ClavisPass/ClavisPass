@@ -19,7 +19,6 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "",
-        icon: "lock",
       },
       {
         id: "123243245436672345",
@@ -34,7 +33,6 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "",
-        icon: "lock",
       },
       {
         id: "12334634534536734345",
@@ -53,7 +51,6 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "wifi",
-        icon: "wifi",
       },
       {
         id: "12323423532566745",
@@ -70,7 +67,6 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "wifi",
-        icon: "key-variant",
       },
       {
         id: "123234235325455266745",
@@ -92,7 +88,6 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "wifi",
-        icon: "lock",
       },
       {
         id: "123234235325455266745",
@@ -114,7 +109,6 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "wifi",
-        icon: "lock",
       },
       {
         id: "123234235325455266745",
@@ -136,7 +130,6 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "wifi",
-        icon: "lock",
       },
       {
         id: "123234235325455266745",
@@ -158,7 +151,6 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "wifi",
-        icon: "lock",
       },
       {
         id: "123234235325455266745",
@@ -180,7 +172,6 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "wifi",
-        icon: "lock",
       },
       {
         id: "123234235325455266745",
@@ -202,7 +193,6 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "wifi",
-        icon: "lock",
       },
       {
         id: "123234235325455266745",
@@ -224,7 +214,6 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "wifi",
-        icon: "lock",
       },
       {
         id: "123234235325455266745",
@@ -246,7 +235,6 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "wifi",
-        icon: "lock",
       },
       {
         id: "123234235325455266745",
@@ -268,7 +256,6 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "wifi",
-        icon: "lock",
       },
       {
         id: "123234235325455266745",
@@ -290,7 +277,6 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "wifi",
-        icon: "lock",
       },
       {
         id: "123234235325455266745",
@@ -312,7 +298,6 @@ export function getData() {
         created: "Date",
         lastUpdated: "Date",
         folder: "wifi",
-        icon: "lock",
       },
     ],
   };

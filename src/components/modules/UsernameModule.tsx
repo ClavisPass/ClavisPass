@@ -19,7 +19,7 @@ function UsernameModule(props: UsernameModuleType & Props) {
       onDragStart={props.onDragStart}
       onDragEnd={props.onDragEnd}
     >
-      <View style={{ display: "flex", flexDirection: "row" }}>
+      <View style={globalStyles.moduleView}>
         <TextInput
           outlineStyle={globalStyles.outlineStyle}
           style={globalStyles.textInputStyle}

@@ -8,7 +8,6 @@ export const ValuesTypeSchema = z.object({
   created: z.string(),
   lastUpdated: z.string(),
   folder: z.string(),
-  icon: z.string(),
 });
 
 export const ValuesListTypeSchema = z.array(ValuesTypeSchema);

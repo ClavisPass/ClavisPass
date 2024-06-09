@@ -53,7 +53,7 @@ function WifiModule(props: WifiModuleType & Props) {
           <Picker.Item label="blank" value="blank" />
         </Picker>
 
-        <View style={{ display: "flex", flexDirection: "row" }}>
+        <View style={globalStyles.moduleView}>
           <TextInput
             outlineStyle={globalStyles.outlineStyle}
             style={globalStyles.textInputStyle}
@@ -68,7 +68,7 @@ function WifiModule(props: WifiModuleType & Props) {
             onPress={showModal}
           />
         </View>
-        <View style={{ display: "flex", flexDirection: "row" }}>
+        <View style={globalStyles.moduleView}>
           <TextInput
             outlineStyle={globalStyles.outlineStyle}
             style={globalStyles.textInputStyle}

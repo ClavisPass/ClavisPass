@@ -1,14 +1,15 @@
-import React, { ReactNode } from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet } from "react-native";
 import {
-  Divider,
   Icon,
-  IconButton,
   Text,
   TouchableRipple,
 } from "react-native-paper";
 import ValuesType from "../types/ValuesType";
 import theme from "../ui/theme";
+import ModulesEnum from "../enums/ModulesEnum";
+
+import { Image } from "expo-image";
 
 const styles = StyleSheet.create({
   container: {
@@ -33,6 +34,53 @@ type Props = {
 };
 
 function ListItem(props: Props) {
+  const [title, setTitle] = useState("");
+  const [url, setUrl] = useState("");
+  const [icon, setIcon] = useState("lock");
+  useEffect(() => {
+    const titleResult = props.item.modules.filter(
+      (module) => module.module === ModulesEnum.TITLE
+    );
+    if (titleResult.length > 0) {
+      setTitle(titleResult[0].value);
+    }
+
+    const urlResult = props.item.modules.filter(
+      (module) => module.module === ModulesEnum.URL
+    );
+    if (urlResult.length > 0) {
+      if (urlResult[0].value !== "") {
+        const string =
+          "https://www.google.com/s2/favicons?domain=" +
+          urlResult[0].value +
+          "&sz=64";
+        setUrl(string);
+      } else {
+        determineIcon();
+      }
+    } else {
+      determineIcon();
+    }
+  }, [props.item]);
+
+  const determineIcon = () => {
+    setUrl("");
+    const keyResult = props.item.modules.filter(
+      (module) => module.module === ModulesEnum.KEY
+    );
+    if (keyResult.length > 0) {
+      setIcon("key-variant");
+    } else {
+      const wifiResult = props.item.modules.filter(
+        (module) => module.module === ModulesEnum.WIFI
+      );
+      if (wifiResult.length > 0) {
+        setIcon("wifi");
+      } else {
+        setIcon("lock");
+      }
+    }
+  };
   return (
     <View style={styles.container}>
       <TouchableRipple
@@ -49,9 +97,19 @@ function ListItem(props: Props) {
               alignItems: "center",
             }}
           >
-            <Icon color={"lightgray"} source={props.item.icon} size={20} />
+            {url !== "" ? (
+              <Image
+                style={{ width: 22, height: 22, margin: 0 }}
+                source={url}
+                //placeholder={{ blurhash }}
+                contentFit="cover"
+                transition={1000}
+              />
+            ) : (
+              <Icon color={"lightgray"} source={icon} size={20} />
+            )}
             <Text variant="bodyMedium" style={{ userSelect: "none" }}>
-              {"test"}
+              {title}
             </Text>
           </View>
           <Icon

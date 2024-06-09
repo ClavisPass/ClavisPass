@@ -13,6 +13,12 @@ const globalStyles = StyleSheet.create({
   },
   outlineStyle: { minHeight: 42, height: 42, borderRadius: 10 },
   textInputStyle: { flex: 1, minHeight: 42, height: 42 },
+  moduleView: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
 
 export default globalStyles;

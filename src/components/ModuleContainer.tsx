@@ -73,7 +73,7 @@ function ModuleContainer(props: Props) {
             <View style={styles.delete}>
               <IconButton
                 icon="close"
-                iconColor="#d91e18"
+                iconColor="#D2222D"
                 size={20}
                 onPress={() => console.log("Pressed")}
               />

@@ -21,7 +21,7 @@ function TypeWriterComponent() {
       }}
     >
       <TypeWriter
-        //style={globalStyles.titelAnfang}
+        style={{ fontSize: 24, userSelect: "none" }}
         minDelay={50}
         typing={1}
         onTypingEnd={() => setStartUsername(1)}
@@ -30,7 +30,7 @@ function TypeWriterComponent() {
       </TypeWriter>
       <TypeWriter
         style={[
-          //globalStyles.titelAnfang,
+          { fontSize: 24, userSelect: "none" },
           { color: theme.colors.primary, fontWeight: "bold" },
         ]}
         minDelay={50}
@@ -40,7 +40,7 @@ function TypeWriterComponent() {
         {Constants.deviceName}
       </TypeWriter>
       <TypeWriter
-        //style={globalStyles.titelAnfang}
+        style={{ fontSize: 24, userSelect: "none" }}
         minDelay={50}
         typing={startExclamationMark}
       >
