@@ -1,12 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { View, StyleSheet } from "react-native";
-import { Searchbar, Divider, IconButton } from "react-native-paper";
+import { Searchbar, IconButton } from "react-native-paper";
 
-import { Chip } from "react-native-paper";
-
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-
-import { List } from "react-native-paper";
+import { Chip, Text } from "react-native-paper";
 
 import { FlashList } from "@shopify/flash-list";
 
@@ -23,9 +19,14 @@ import Animated, {
 import globalStyles from "../ui/globalStyles";
 import { useData } from "../contexts/DataProvider";
 import { LinearGradient } from "expo-linear-gradient";
-import { transparent } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 import ListItem from "../components/ListItem";
 import theme from "../ui/theme";
+import { StatusBar } from "expo-status-bar";
+import Constants from "expo-constants";
+import getColors from "../ui/linearGradient";
+import { FlatList } from "react-native-gesture-handler";
+import WebSpecific from "../components/platformSpecific/WebSpecific";
+import FadeInView from "../components/FadeInView";
 
 const FILTER = [
   {
@@ -68,6 +69,8 @@ const styles = StyleSheet.create({
 });
 
 function HomeScreen({ navigation }: { navigation: any }) {
+  const flatListRef = useRef<FlatList>(null);
+  const [flatListOffset, setFlatListOffset] = React.useState(0);
   const [searchQuery, setSearchQuery] = React.useState("");
 
   const data = useData();
@@ -90,49 +93,85 @@ function HomeScreen({ navigation }: { navigation: any }) {
   }, []);
 
   return (
-    <View style={globalStyles.container}>
+    <View
+      style={[
+        globalStyles.container,
+        { display: "flex", justifyContent: "center" },
+      ]}
+    >
+      <StatusBar
+        animated={true}
+        style="light"
+        backgroundColor="transparent"
+        translucent={true}
+      />
       <LinearGradient
-        colors={[theme.colors.primary, theme.colors.secondary]}
+        colors={getColors()}
+        dither={true}
         style={{
-          height: 70,
           width: "100%",
           display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
+          flexDirection: "column",
           justifyContent: "space-between",
           padding: 10,
-          paddingTop: 20,
-          paddingBottom: 20,
-          borderBottomLeftRadius: 25,
-          borderBottomRightRadius: 25,
-          marginBottom: 10,
+          //paddingBottom: 22,
+          borderBottomLeftRadius: 20,
+          borderBottomRightRadius: 20,
+          marginBottom: 4,
+          paddingTop: Constants.statusBarHeight,
         }}
         end={{ x: 0.1, y: 0.2 }}
       >
-        <IconButton
-          icon="plus"
-          size={25}
-          onPress={() => console.log("Pressed")}
-          iconColor="white"
-        />
-        <Searchbar
-          inputStyle={{ height: 40, minHeight: 40, color: "white" }}
+        <View
+          data-tauri-drag-region
           style={{
-            height: 40,
-            flex: 1,
-            backgroundColor: "rgba(217, 217, 217, 0.21)",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
           }}
-          placeholder="Search"
-          onChangeText={setSearchQuery}
-          value={searchQuery}
-          loading={true}
-        />
-        <IconButton
-          icon="dots-vertical"
-          size={25}
-          onPress={() => console.log("Pressed")}
-          iconColor="white"
-        />
+        >
+          <Text
+            variant="titleMedium"
+            style={{ color: "white", userSelect: "none" }}
+          >
+            ClavisPass
+          </Text>
+          <View style={{ display: "flex", flexDirection: "row" }}>
+            <IconButton
+              icon="plus"
+              size={25}
+              onPress={() => console.log("Pressed")}
+              iconColor="white"
+            />
+            <IconButton
+              icon="logout"
+              size={25}
+              onPress={() => console.log("Pressed")}
+              iconColor="white"
+            />
+          </View>
+        </View>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <Searchbar
+            inputStyle={{ height: 40, minHeight: 40, color: "white" }}
+            style={{
+              height: 40,
+              flex: 1,
+              backgroundColor: "rgba(217, 217, 217, 0.21)",
+            }}
+            placeholder="Search"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            loading={false}
+          />
+        </View>
       </LinearGradient>
       <View style={{ flex: 1, width: "100%" }}>
         <FlashList
@@ -154,22 +193,64 @@ function HomeScreen({ navigation }: { navigation: any }) {
           estimatedItemSize={200}
         />
       </View>
-      <View style={{ padding: 4, width: "100%", maxHeight: 50 }}>
-        <FlashList
-          data={FILTER}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <Chip
-              icon={item.icon}
-              onPress={() => console.log("Pressed")}
-              style={styles.chip}
-            >
-              {item.title}
-            </Chip>
-          )}
-          estimatedItemSize={5}
-        />
+      <View
+        style={{
+          padding: 4,
+          maxHeight: 50,
+          width: "100%",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
+        <WebSpecific>
+          <IconButton
+            icon={"chevron-left"}
+            style={{ margin: 0 }}
+            onPress={() => {
+              const offset = flatListOffset - 200;
+              setFlatListOffset(offset);
+              flatListRef?.current?.scrollToOffset({
+                animated: true,
+                offset: offset,
+              });
+            }}
+            size={12}
+          />
+        </WebSpecific>
+        <View style={{ flexBasis: "auto", flexShrink: 1 }}>
+          <FlatList
+            ref={flatListRef}
+            data={FILTER}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            style={{ flexGrow: 1 }}
+            renderItem={({ item }) => (
+              <Chip
+                icon={item.icon}
+                onPress={() => console.log("Pressed")}
+                style={styles.chip}
+              >
+                {item.title}
+              </Chip>
+            )}
+          />
+        </View>
+        <WebSpecific>
+          <IconButton
+            icon={"chevron-right"}
+            style={{ margin: 0 }}
+            onPress={() => {
+              const offset = flatListOffset + 200;
+              setFlatListOffset(offset);
+              flatListRef?.current?.scrollToOffset({
+                animated: true,
+                offset: offset,
+              });
+            }}
+            size={12}
+          />
+        </WebSpecific>
       </View>
     </View>
   );

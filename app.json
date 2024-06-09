@@ -22,9 +22,6 @@
       },
       "package": "com.ricirico.ClavisPass"
     },
-    "androidStatusBar": {
-      "translucent": true
-    },
     "web": {
       "favicon": "./assets/favicon.png"
     }

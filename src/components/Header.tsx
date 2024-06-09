@@ -3,6 +3,8 @@ import { View, StyleSheet } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import theme from "../ui/theme";
 import { LinearGradient } from "expo-linear-gradient";
+import Constants from "expo-constants";
+import { StatusBar } from "expo-status-bar";
 
 type Props = {
   children?: ReactNode;
@@ -22,9 +24,16 @@ function Header(props: Props) {
         marginBottom: 4,
         borderBottomLeftRadius: 12,
         borderBottomRightRadius: 12,
+        paddingTop: Constants.statusBarHeight + 4,
       }}
       end={{ x: 0.1, y: 0.2 }}
     >
+      <StatusBar
+        animated={true}
+        style="dark"
+        backgroundColor="transparent"
+        translucent={true}
+      />
       <View
         style={{
           display: "flex",
@@ -39,7 +48,10 @@ function Header(props: Props) {
           size={20}
           onPress={props.onPress}
         />
-        <Text style={{ color: theme.colors.primary }} variant="bodyMedium">
+        <Text
+          style={{ color: theme.colors.primary, userSelect: "none" }}
+          variant="bodyMedium"
+        >
           {props.title}
         </Text>
       </View>

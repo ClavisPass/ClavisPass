@@ -1,6 +1,8 @@
 import React, { ReactNode } from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Divider, Icon, IconButton, Text } from "react-native-paper";
+import WebSpecific from "./platformSpecific/WebSpecific";
+import theme from "../ui/theme";
 
 const styles = StyleSheet.create({
   container: {
@@ -15,7 +17,7 @@ const styles = StyleSheet.create({
   },
   draggable: {
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 6,
     borderColor: "lightgrey",
     justifyContent: "center",
     alignItems: "center",
@@ -29,8 +31,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderLeftWidth: 1,
+    borderColor: "lightgrey",
     marginLeft: 6,
-    borderColor: "gray",
   },
 });
 
@@ -48,25 +50,30 @@ function ModuleContainer(props: Props) {
     <>
       <View style={styles.container}>
         {props.edit ? (
-          <TouchableOpacity
-            key={props.title}
-            onPressIn={props.onDragStart}
-            onPressOut={props.onDragEnd}
-            style={styles.draggable}
-          >
-            <Icon source="drag" size={20} />
-          </TouchableOpacity>
+          <WebSpecific notIn={true}>
+            <TouchableOpacity
+              key={props.title}
+              onPressIn={props.onDragStart}
+              onPressOut={props.onDragEnd}
+              style={styles.draggable}
+            >
+              <Icon source="drag" color={theme.colors.primary} size={20} />
+            </TouchableOpacity>
+          </WebSpecific>
         ) : null}
 
         <View style={styles.content}>
-          <Text variant="bodyMedium">{props.title}</Text>
+          <Text variant="bodyMedium" style={{ userSelect: "none" }}>
+            {props.title}
+          </Text>
           {props.children}
         </View>
         {props.delete ? (
           <>
             <View style={styles.delete}>
               <IconButton
-                icon="delete"
+                icon="close"
+                iconColor="#d91e18"
                 size={20}
                 onPress={() => console.log("Pressed")}
               />

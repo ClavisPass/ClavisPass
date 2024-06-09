@@ -42,6 +42,7 @@ export default function App() {
                 }}
                 tabBar={({ navigation, state, descriptors, insets }) => (
                   <BottomNavigation.Bar
+                    shifting={true}
                     navigationState={state}
                     safeAreaInsets={insets}
                     onTabPress={({ route, preventDefault }) => {
@@ -101,6 +102,7 @@ export default function App() {
                   options={{
                     tabBarLabel: "Home",
                     title: "Home",
+
                     tabBarIcon: ({ color, size }) => {
                       return <Icon name="home" size={size} color={color} />;
                     },

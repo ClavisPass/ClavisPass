@@ -12,7 +12,16 @@
   },
   "tauri": {
     "allowlist": {
-      "all": false
+      "all": false,
+      "window": {
+        "all": false,
+        "close": true,
+        "hide": true,
+        "show": true,
+        "minimize": true,
+        "unminimize": true,
+        "startDragging": true
+      }
     },
     "bundle": {
       "active": true,
@@ -60,7 +69,8 @@
         "resizable": true,
         "title": "ClavisPass",
         "width": 500,
-        "maxWidth": 500
+        "maxWidth": 500,
+        "decorations": true
       }
     ]
   }

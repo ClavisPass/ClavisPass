@@ -10,6 +10,8 @@ import ModuleContainer from "../ModuleContainer";
 import globalStyles from "../../ui/globalStyles";
 import Props from "../../types/ModuleProps";
 import theme from "../../ui/theme";
+import { LinearGradient } from "expo-linear-gradient";
+import getColors from "../../ui/linearGradient";
 
 function WifiModule(props: WifiModuleType & Props) {
   const [secureTextEntry, setSecureTextEntry] = React.useState(true);
@@ -59,7 +61,12 @@ function WifiModule(props: WifiModuleType & Props) {
             mode="outlined"
             onChangeText={(text) => setName(text)}
           />
-          <IconButton iconColor={theme.colors.primary} icon="qrcode" size={20} onPress={showModal} />
+          <IconButton
+            iconColor={theme.colors.primary}
+            icon="qrcode"
+            size={20}
+            onPress={showModal}
+          />
         </View>
         <View style={{ display: "flex", flexDirection: "row" }}>
           <TextInput
@@ -91,21 +98,37 @@ function WifiModule(props: WifiModuleType & Props) {
           visible={visible}
           onDismiss={hideModal}
           contentContainerStyle={{
-            backgroundColor: "white",
-            padding: 20,
-            margin: 6,
+            backgroundColor: "transparent",
+            margin: 26,
             borderRadius: 20,
             display: "flex",
-            alignItems: "center",
+            alignSelf: "center",
             justifyContent: "center",
+            width: 300,
+            height: 300,
           }}
         >
-          <QRCode
-            size={256}
-            style={{ height: "auto" }}
-            value="test"
-            viewBox="0 0 256 256"
-          />
+          <LinearGradient
+            colors={getColors()}
+            style={{ padding: 6, width: 300, height: 300, borderRadius: 20 }}
+            end={{ x: 0.1, y: 0.2 }}
+            dither={true}
+          >
+            <View
+              style={{
+                backgroundColor: "white",
+                padding: 20,
+                borderRadius: 20,
+              }}
+            >
+              <QRCode
+                size={256}
+                style={{ height: "auto", width: "auto" }}
+                value="test"
+                viewBox="0 0 256 256"
+              />
+            </View>
+          </LinearGradient>
         </Modal>
       </Portal>
     </ModuleContainer>

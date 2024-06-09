@@ -2,6 +2,7 @@ import React from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { Surface, Text } from "react-native-paper";
 import globalStyles from "../ui/globalStyles";
+import SettingsItem from "../components/SettingsItem";
 
 const styles = StyleSheet.create({
   surface: {
@@ -22,33 +23,27 @@ function SettingsScreen() {
   return (
     <View style={globalStyles.container}>
       <ScrollView style={styles.scrollView}>
-        <Surface style={styles.surface} elevation={1}>
+        <SettingsItem>
           <Text>Surface</Text>
-        </Surface>
-        <Surface style={styles.surface} elevation={1}>
+        </SettingsItem>
+        <SettingsItem>
           <Text>Surface</Text>
-        </Surface>
-        <Surface style={styles.surface} elevation={1}>
+        </SettingsItem>
+        <SettingsItem>
           <Text>Surface</Text>
-        </Surface>
-        <Surface style={styles.surface} elevation={1}>
+        </SettingsItem>
+        <SettingsItem>
           <Text>Surface</Text>
-        </Surface>
-        <Surface style={styles.surface} elevation={1}>
+        </SettingsItem>
+        <SettingsItem>
           <Text>Surface</Text>
-        </Surface>
-        <Surface style={styles.surface} elevation={1}>
+        </SettingsItem>
+        <SettingsItem>
           <Text>Surface</Text>
-        </Surface>
-        <Surface style={styles.surface} elevation={1}>
+        </SettingsItem>
+        <SettingsItem>
           <Text>Surface</Text>
-        </Surface>
-        <Surface style={styles.surface} elevation={1}>
-          <Text>Surface</Text>
-        </Surface>
-        <Surface style={styles.surface} elevation={1}>
-          <Text>Surface</Text>
-        </Surface>
+        </SettingsItem>
       </ScrollView>
     </View>
   );
