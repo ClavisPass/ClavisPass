@@ -37,12 +37,14 @@ const styles = StyleSheet.create({
 });
 
 type Props = {
+  id: string;
   children: ReactNode;
   title: string;
   edit: boolean;
   delete: boolean;
   onDragStart: () => void;
   onDragEnd: () => void;
+  deleteModule: (id: string) => void;
 };
 
 function ModuleContainer(props: Props) {
@@ -73,9 +75,9 @@ function ModuleContainer(props: Props) {
             <View style={styles.delete}>
               <IconButton
                 icon="close"
-                iconColor="#D2222D"
+                iconColor={theme.colors.error}
                 size={20}
-                onPress={() => console.log("Pressed")}
+                onPress={() => props.deleteModule(props.id)}
               />
             </View>
           </>

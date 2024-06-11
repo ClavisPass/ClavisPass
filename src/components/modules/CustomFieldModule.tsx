@@ -12,11 +12,13 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
   const [text, setText] = React.useState(props.value);
   return (
     <ModuleContainer
+      id={props.id}
       title={props.title}
       edit={props.edit}
       delete={props.edit}
       onDragStart={props.onDragStart}
       onDragEnd={props.onDragEnd}
+      deleteModule={props.deleteModule}
     >
       <TextInput
         outlineStyle={globalStyles.outlineStyle}

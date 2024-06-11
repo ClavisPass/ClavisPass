@@ -1,0 +1,91 @@
+import ModulesEnum from "../enums/ModulesEnum";
+import CustomFieldModuleType from "../types/modules/CustomFieldModuleType";
+import EmailModuleType from "../types/modules/EmailModuleType";
+import KeyModuleType from "../types/modules/KeyModuleType";
+import NoteModuleType from "../types/modules/NoteModuleType";
+import PasswordModuleType from "../types/modules/PasswordModuleType";
+import TitleModuleType from "../types/modules/TitleModuleType";
+import URLModuleType from "../types/modules/URLModuleType";
+import UsernameModuleType from "../types/modules/UsernameModuleType";
+import WifiModuleType from "../types/modules/WifiModuleType";
+
+function getModuleData(module: ModulesEnum) {
+  const id = "";
+  if (module === ModulesEnum.CUSTOM_FIELD) {
+    const moduleData: CustomFieldModuleType = {
+      id: id,
+      module: module,
+      title: "",
+      value: "",
+    };
+    return moduleData;
+  }
+  if (module === ModulesEnum.E_MAIL) {
+    const moduleData: EmailModuleType = {
+      id: id,
+      module: module,
+      value: "",
+    };
+    return moduleData;
+  }
+  if (module === ModulesEnum.KEY) {
+    const moduleData: KeyModuleType = {
+      id: id,
+      module: module,
+      value: "",
+    };
+    return moduleData;
+  }
+  if (module === ModulesEnum.NOTE) {
+    const moduleData: NoteModuleType = {
+      id: id,
+      module: module,
+      value: "",
+    };
+    return moduleData;
+  }
+  if (module === ModulesEnum.PASSWORD) {
+    const moduleData: PasswordModuleType = {
+      id: id,
+      module: module,
+      value: "",
+    };
+    return moduleData;
+  }
+  if (module === ModulesEnum.TITLE) {
+    const moduleData: TitleModuleType = {
+      id: id,
+      module: module,
+      value: "",
+    };
+    return moduleData;
+  }
+  if (module === ModulesEnum.URL) {
+    const moduleData: URLModuleType = {
+      id: id,
+      module: module,
+      value: "",
+    };
+    return moduleData;
+  }
+  if (module === ModulesEnum.USERNAME) {
+    const moduleData: UsernameModuleType = {
+      id: id,
+      module: module,
+      value: "",
+    };
+    return moduleData;
+  }
+  if (module === ModulesEnum.WIFI) {
+    const moduleData: WifiModuleType = {
+      id: id,
+      module: module,
+      value: "",
+      wifiName: "",
+      wifiType: "",
+    };
+    return moduleData;
+  }
+}
+
+export default getModuleData;

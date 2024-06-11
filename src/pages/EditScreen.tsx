@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -35,6 +35,9 @@ import Header from "../components/Header";
 import globalStyles from "../ui/globalStyles";
 import theme from "../ui/theme";
 import Button from "../components/Button";
+import EditMetaInfMenu from "../components/EditMetaInfMenu";
+import ValuesType, { ValuesListType } from "../types/ValuesType";
+import getModule from "../utils/getModule";
 
 const styles = StyleSheet.create({
   container: {
@@ -45,25 +48,22 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     width: Dimensions.get("window").width,
-    flex: 1,
+    flexGrow: 1,
   },
 });
 
 type RootStackParamList = {
   params: {
-    modules: ModulesType;
-    fav: boolean;
-    created: string;
-    lastUpdated: string;
-    folder: string;
+    item: ValuesType;
   };
 };
 
 type Props = StackScreenProps<RootStackParamList>;
 
 type DraggableListProps = {
-  data: ModulesType;
-  setData: (data: ModulesType) => void;
+  modules: ModulesType;
+  changeModules: (data: ModulesType) => void;
+  deleteModule: (id: string) => void;
   edit: boolean;
 };
 
@@ -75,21 +75,31 @@ function DraggableList(props: DraggableListProps) {
   function renderItem(info: DragListRenderItemInfo<ModuleType>) {
     const { item, onDragStart, onDragEnd, isActive } = info;
 
-    return <>{getModule(item, props.edit, onDragStart, onDragEnd)}</>;
+    return (
+      <>
+        {getModule(
+          item,
+          props.edit,
+          onDragStart,
+          onDragEnd,
+          props.deleteModule
+        )}
+      </>
+    );
   }
 
   async function onReordered(fromIndex: number, toIndex: number) {
-    const copy = [...props.data]; // Don't modify react data in-place
+    const copy = [...props.modules]; // Don't modify react data in-place
     const removed = copy.splice(fromIndex, 1);
 
     copy.splice(toIndex, 0, removed[0]); // Now insert at the new pos
-    props.setData(copy);
+    props.changeModules(copy);
   }
 
   return (
     <DragList
       style={styles.scrollView}
-      data={props.data}
+      data={props.modules}
       keyExtractor={keyExtractor}
       onReordered={onReordered}
       renderItem={renderItem}
@@ -99,13 +109,42 @@ function DraggableList(props: DraggableListProps) {
 
 function EditScreen({ route, navigation }: Props) {
   const [edit, setEdit] = React.useState(false);
-  const [data, setData] = React.useState([...route.params.modules]);
+  const [data, setData] = React.useState<ValuesType>({ ...route.params.item });
 
   const [visible, setVisible] = React.useState(false);
+
+  const [favIcon, setFavIcon] = React.useState("star-outline");
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
   const containerStyle = { backgroundColor: "white", padding: 20 };
+
+  const changeModules = (modules: ModulesType) => {
+    const newData = { ...data };
+    newData.modules = modules;
+    setData(newData);
+  };
+
+  const changeFav = () => {
+    const newData = { ...data };
+    newData.fav = !data.fav;
+    setData(newData);
+  };
+
+  const deleteModule = (id: string) => {
+    const newModules: ModulesType = [
+      ...data.modules.filter((item: ModuleType) => item.id !== id),
+    ];
+    changeModules(newModules);
+  };
+
+  useEffect(() => {
+    if (data.fav) {
+      setFavIcon("star");
+    } else {
+      setFavIcon("star-outline");
+    }
+  }, [data]);
 
   return (
     <View style={globalStyles.container}>
@@ -115,16 +154,39 @@ function EditScreen({ route, navigation }: Props) {
           navigation.goBack();
         }}
       >
-        {edit ? <IconButton icon="plus" size={20} onPress={showModal} /> : null}
+        <IconButton
+          icon={favIcon}
+          iconColor={theme.colors.primary}
+          size={20}
+          onPress={() => changeFav()}
+        />
         <IconButton
           icon="square-edit-outline"
           iconColor={theme.colors.primary}
           size={20}
+          selected={true}
           onPress={() => setEdit(!edit)}
+        />
+        <EditMetaInfMenu
+          created={route.params.item.created}
+          lastUpdated={route.params.item.lastUpdated}
         />
       </Header>
       <View style={styles.container}>
-        <DraggableList data={data} setData={setData} edit={edit} />
+        {edit ? (
+          <IconButton
+            icon="plus"
+            mode={"outlined"}
+            size={30}
+            onPress={showModal}
+          />
+        ) : null}
+        <DraggableList
+          modules={data.modules}
+          changeModules={changeModules}
+          deleteModule={deleteModule}
+          edit={edit}
+        />
       </View>
       <Button text={"Save"} onPress={() => console.log("test")}></Button>
       <Modal
@@ -151,144 +213,6 @@ function EditScreen({ route, navigation }: Props) {
       </Modal>
     </View>
   );
-}
-
-function getModule(
-  module: ModuleType,
-  edit: boolean,
-  onDragStart: () => void,
-  onDragEnd: () => void
-): ReactNode {
-  if (module.module === ModulesEnum.CUSTOM_FIELD) {
-    let moduleObject = module as CustomFieldModuleType;
-    return (
-      <CustomFieldModule
-        key={moduleObject.id}
-        id={moduleObject.id}
-        module={moduleObject.module}
-        title={moduleObject.title}
-        value={moduleObject.value}
-        edit={edit}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-      />
-    );
-  }
-  if (module.module === ModulesEnum.E_MAIL) {
-    let moduleObject = module as EmailModuleType;
-    return (
-      <EmailModule
-        key={moduleObject.id}
-        id={moduleObject.id}
-        module={moduleObject.module}
-        value={moduleObject.value}
-        edit={edit}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-      />
-    );
-  }
-  if (module.module === ModulesEnum.KEY) {
-    let moduleObject = module as KeyModuleType;
-    return (
-      <KeyModule
-        key={moduleObject.id}
-        id={moduleObject.id}
-        module={moduleObject.module}
-        value={moduleObject.value}
-        edit={edit}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-      />
-    );
-  }
-  if (module.module === ModulesEnum.NOTE) {
-    let moduleObject = module as NoteModuleType;
-    return (
-      <NoteModule
-        key={moduleObject.id}
-        id={moduleObject.id}
-        module={moduleObject.module}
-        value={moduleObject.value}
-        edit={edit}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-      />
-    );
-  }
-  if (module.module === ModulesEnum.PASSWORD) {
-    let moduleObject = module as PasswordModuleType;
-    return (
-      <PasswordModule
-        key={moduleObject.id}
-        id={moduleObject.id}
-        module={moduleObject.module}
-        value={moduleObject.value}
-        edit={edit}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-      />
-    );
-  }
-  if (module.module === ModulesEnum.TITLE) {
-    let moduleObject = module as TitleModuleType;
-    return (
-      <TitleModule
-        key={moduleObject.id}
-        id={moduleObject.id}
-        module={moduleObject.module}
-        value={moduleObject.value}
-        edit={edit}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-      />
-    );
-  }
-  if (module.module === ModulesEnum.URL) {
-    let moduleObject = module as URLModuleType;
-    return (
-      <URLModule
-        key={moduleObject.id}
-        id={moduleObject.id}
-        module={moduleObject.module}
-        value={moduleObject.value}
-        edit={edit}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-      />
-    );
-  }
-  if (module.module === ModulesEnum.USERNAME) {
-    let moduleObject = module as UsernameModuleType;
-    return (
-      <UsernameModule
-        key={moduleObject.id}
-        id={moduleObject.id}
-        module={moduleObject.module}
-        value={moduleObject.value}
-        edit={edit}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-      />
-    );
-  }
-  if (module.module === ModulesEnum.WIFI) {
-    let moduleObject = module as WifiModuleType;
-    return (
-      <WifiModule
-        key={moduleObject.id}
-        id={moduleObject.id}
-        module={moduleObject.module}
-        wifiName={moduleObject.wifiName}
-        wifiType={moduleObject.wifiType}
-        value={moduleObject.value}
-        edit={edit}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-      />
-    );
-  }
-  return <></>;
 }
 
 export default EditScreen;

@@ -13,11 +13,13 @@ function UsernameModule(props: UsernameModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
   return (
     <ModuleContainer
+      id={props.id}
       title={"Username"}
       edit={props.edit}
       delete={props.edit}
       onDragStart={props.onDragStart}
       onDragEnd={props.onDragEnd}
+      deleteModule={props.deleteModule}
     >
       <View style={globalStyles.moduleView}>
         <TextInput

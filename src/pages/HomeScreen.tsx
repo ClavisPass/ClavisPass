@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from "react";
-import { View, StyleSheet } from "react-native";
-import { Searchbar, IconButton } from "react-native-paper";
+import React, { useEffect, useRef, useState } from "react";
+import { View, StyleSheet, GestureResponderEvent } from "react-native";
+import { Searchbar, IconButton, FAB, Menu, Divider } from "react-native-paper";
 
 import { Chip, Text } from "react-native-paper";
 
@@ -27,6 +27,7 @@ import getColors from "../ui/linearGradient";
 import { FlatList } from "react-native-gesture-handler";
 import WebSpecific from "../components/platformSpecific/WebSpecific";
 import FadeInView from "../components/FadeInView";
+import HomeFilterMenu from "../components/HomeFilterMenu";
 
 const FILTER = [
   {
@@ -70,8 +71,8 @@ const styles = StyleSheet.create({
 
 function HomeScreen({ navigation }: { navigation: any }) {
   const flatListRef = useRef<FlatList>(null);
-  const [flatListOffset, setFlatListOffset] = React.useState(0);
-  const [searchQuery, setSearchQuery] = React.useState("");
+  const [flatListOffset, setFlatListOffset] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const data = useData();
 
@@ -114,7 +115,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 10,
-          //paddingBottom: 22,
           borderBottomLeftRadius: 20,
           borderBottomRightRadius: 20,
           marginBottom: 4,
@@ -144,12 +144,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
               onPress={() => console.log("Pressed")}
               iconColor="white"
             />
-            <IconButton
-              icon="logout"
-              size={25}
-              onPress={() => console.log("Pressed")}
-              iconColor="white"
-            />
+            <HomeFilterMenu values={data.data?.values} />
           </View>
         </View>
         <View
@@ -181,11 +176,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
               item={item}
               onPress={() => {
                 navigation.navigate("Edit", {
-                  modules: item.modules,
-                  fav: item.fav,
-                  created: item.created,
-                  lastUpdated: item.lastUpdated,
-                  folder: item.folder,
+                  item: item
                 });
               }}
             />

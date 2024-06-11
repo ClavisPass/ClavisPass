@@ -12,11 +12,13 @@ function KeyModule(props: KeyModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
   return (
     <ModuleContainer
+      id={props.id}
       title={"Key"}
       edit={props.edit}
       delete={props.edit}
       onDragStart={props.onDragStart}
       onDragEnd={props.onDragEnd}
+      deleteModule={props.deleteModule}
     >
       <TextInput
         outlineStyle={globalStyles.outlineStyle}

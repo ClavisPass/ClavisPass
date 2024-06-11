@@ -28,9 +28,9 @@ function CopyToClipboard(props: Props) {
   return (
     <>
       <IconButton icon="content-copy" iconColor={theme.colors.primary} size={20} onPress={copyToClipboard} />
-      <Snackbar visible={visible} onDismiss={onDismissSnackBar} duration={1000}>
+      {/*<Snackbar visible={visible} onDismiss={onDismissSnackBar} duration={1000}>
         Copied
-      </Snackbar>
+      </Snackbar>*/}
     </>
   );
 }

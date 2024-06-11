@@ -12,11 +12,13 @@ function TitleModule(props: TitleModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
   return (
     <ModuleContainer
+      id={props.id}
       title={"Title"}
       edit={props.edit}
       delete={false}
       onDragStart={props.onDragStart}
       onDragEnd={props.onDragEnd}
+      deleteModule={props.deleteModule}
     >
       <TextInput
         outlineStyle={globalStyles.outlineStyle}

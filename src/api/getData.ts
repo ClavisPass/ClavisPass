@@ -15,7 +15,7 @@ export function getData() {
           { id: "123312387755", module: "PASSWORD", value: "TestPassword" },
           { id: "123325634355", module: "NOTE", value: "Notiz" },
         ],
-        fav: true,
+        fav: false,
         created: "Date",
         lastUpdated: "Date",
         folder: "",
