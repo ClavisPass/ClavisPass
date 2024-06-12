@@ -1,13 +1,7 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 
-import {
-  IconButton,
-  Modal,
-  Portal,
-  Switch,
-  TextInput,
-} from "react-native-paper";
+import { IconButton, TextInput } from "react-native-paper";
 
 import PasswordModuleType from "../../types/modules/PasswordModuleType";
 import ModuleContainer from "../ModuleContainer";
@@ -17,8 +11,7 @@ import theme from "../../ui/theme";
 
 import { ProgressBar } from "react-native-paper";
 import passwordEntropy from "../../utils/Entropy";
-import { LinearGradient } from "expo-linear-gradient";
-import getColors from "../../ui/linearGradient";
+import PasswordGeneratorModal from "../modals/PasswordGeneratorModal";
 
 function PasswordModule(props: PasswordModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
@@ -30,11 +23,6 @@ function PasswordModule(props: PasswordModuleType & Props) {
   const [progressbarColor, setProgressbarColor] = React.useState("#238823");
 
   const [visible, setVisible] = React.useState(false);
-
-  const showModal = () => setVisible(true);
-  const hideModal = () => setVisible(false);
-
-  const [isSwitchOn, setIsSwitchOn] = React.useState(false);
 
   React.useEffect(() => {
     if (secureTextEntry) {
@@ -48,10 +36,10 @@ function PasswordModule(props: PasswordModuleType & Props) {
     const percentage = passwordEntropy(value) / 200;
     console.log("Entropy: " + percentage);
     setProgressbarColor("#238823");
-    if (percentage < 0.66) {
+    if (percentage < 0.55) {
       setProgressbarColor("#FFBF00");
     }
-    if (percentage < 0.33) {
+    if (percentage < 0.40) {
       setProgressbarColor("#D2222D");
     }
 
@@ -95,7 +83,14 @@ function PasswordModule(props: PasswordModuleType & Props) {
           iconColor={theme.colors.primary}
           icon="lock-check-outline"
           size={20}
-          onPress={showModal}
+          onPress={() => {
+            setVisible(true);
+          }}
+        />
+        <PasswordGeneratorModal
+          visible={visible}
+          setVisible={setVisible}
+          changePassword={setValue}
         />
       </View>
       <ProgressBar
@@ -103,69 +98,6 @@ function PasswordModule(props: PasswordModuleType & Props) {
         progress={entropyPercentage}
         color={progressbarColor}
       />
-      <Portal>
-        <Modal
-          visible={visible}
-          onDismiss={hideModal}
-          contentContainerStyle={{
-            backgroundColor: "transparent",
-            margin: 26,
-            borderRadius: 20,
-            display: "flex",
-            alignSelf: "center",
-            justifyContent: "center",
-            width: 300,
-          }}
-        >
-          <LinearGradient
-            colors={getColors()}
-            style={{ padding: 6, width: 300, borderRadius: 20 }}
-            end={{ x: 0.1, y: 0.2 }}
-            dither={true}
-          >
-            <View
-              style={{
-                backgroundColor: "white",
-                padding: 10,
-                borderRadius: 20,
-                marginBottom: 6,
-              }}
-            >
-              <TextInput
-                outlineStyle={globalStyles.outlineStyle}
-                style={globalStyles.textInputStyle}
-                value={value}
-                mode="outlined"
-                onChangeText={(text) => setValue(text)}
-                secureTextEntry={false}
-                autoCapitalize="none"
-                autoComplete="password"
-                textContentType="password"
-              />
-            </View>
-            <View
-              style={{
-                backgroundColor: "white",
-                padding: 10,
-                borderRadius: 20,
-              }}
-            >
-              <Switch
-                value={isSwitchOn}
-                onValueChange={() => setIsSwitchOn(!isSwitchOn)}
-              />
-              <Switch
-                value={isSwitchOn}
-                onValueChange={() => setIsSwitchOn(!isSwitchOn)}
-              />
-              <Switch
-                value={isSwitchOn}
-                onValueChange={() => setIsSwitchOn(!isSwitchOn)}
-              />
-            </View>
-          </LinearGradient>
-        </Modal>
-      </Portal>
     </ModuleContainer>
   );
 }

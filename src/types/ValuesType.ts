@@ -5,8 +5,8 @@ export const ValuesTypeSchema = z.object({
   id: z.string(),
   modules: ModulesTypeSchema,
   fav: z.boolean(),
-  created: z.string(),
-  lastUpdated: z.string(),
+  created: z.string().datetime(),
+  lastUpdated: z.string().datetime(),
   folder: z.string(),
 });
 

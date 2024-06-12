@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import ModulesType, { ModuleType } from "../types/ModulesType";
 
@@ -11,11 +11,13 @@ import Header from "../components/Header";
 import globalStyles from "../ui/globalStyles";
 import theme from "../ui/theme";
 import Button from "../components/Button";
-import EditMetaInfMenu from "../components/EditMetaInfMenu";
+import EditMetaInfMenu from "../components/menus/EditMetaInfMenu";
 import ValuesType from "../types/ValuesType";
 import getModule from "../utils/getModule";
 import getModuleData from "../utils/getModuleData";
 import { ScrollView } from "react-native-gesture-handler";
+import AddModuleModal from "../components/modals/AddModuleModal";
+import { formatDateTime, getDateTime } from "../utils/Timestamp";
 
 const styles = StyleSheet.create({
   container: {
@@ -75,28 +77,26 @@ function DraggableList(props: DraggableListProps) {
   }
 
   return (
-    <DragList
-      contentContainerStyle={styles.scrollView}
-      style={styles.scrollViewStyle}
-      data={props.modules}
-      keyExtractor={keyExtractor}
-      onReordered={onReordered}
-      renderItem={renderItem}
-    />
+    <View>
+      <DragList
+        contentContainerStyle={styles.scrollView}
+        style={styles.scrollViewStyle}
+        data={props.modules}
+        keyExtractor={keyExtractor}
+        onReordered={onReordered}
+        renderItem={renderItem}
+      />
+    </View>
   );
 }
 
 function EditScreen({ route, navigation }: Props) {
-  const [edit, setEdit] = React.useState(false);
-  const [data, setData] = React.useState<ValuesType>({ ...route.params.item });
+  const [edit, setEdit] = useState(false);
+  const [data, setData] = useState<ValuesType>({ ...route.params.item });
 
-  const [visible, setVisible] = React.useState(false);
+  const [addModuleModalVisible, setAddModuleModalVisible] = useState(false);
 
-  const [favIcon, setFavIcon] = React.useState("star-outline");
-
-  const showModal = () => setVisible(true);
-  const hideModal = () => setVisible(false);
-  const containerStyle = { backgroundColor: "white", padding: 20 };
+  const [favIcon, setFavIcon] = useState("star-outline");
 
   const addModule = (module: ModulesEnum) => {
     const newElement = getModuleData(module);
@@ -108,7 +108,7 @@ function EditScreen({ route, navigation }: Props) {
     const newData = { ...data };
     newData.modules = modules;
     setData(newData);
-    setVisible(false);
+    setAddModuleModalVisible(false);
   };
 
   const changeFav = () => {
@@ -132,20 +132,42 @@ function EditScreen({ route, navigation }: Props) {
     }
   }, [data]);
 
+  const [title, setTitle] = useState("Edit");
+
+  useEffect(() => {
+    if (edit) {
+      setTitle("Changing Modules..");
+    } else {
+      setTitle("Edit");
+    }
+  }, [edit]);
+
   return (
     <View style={globalStyles.container}>
       <Header
-        title={"Edit"}
+        title={title}
         onPress={() => {
           navigation.goBack();
         }}
       >
-        <IconButton
-          icon={favIcon}
-          iconColor={theme.colors.primary}
-          size={20}
-          onPress={() => changeFav()}
-        />
+        {edit ? (
+          <IconButton
+            icon="plus"
+            iconColor={theme.colors.primary}
+            size={20}
+            onPress={() => {
+              setAddModuleModalVisible(true);
+            }}
+          />
+        ) : (
+          <IconButton
+            icon={favIcon}
+            iconColor={theme.colors.primary}
+            size={20}
+            onPress={() => changeFav()}
+          />
+        )}
+
         <IconButton
           icon="square-edit-outline"
           iconColor={theme.colors.primary}
@@ -153,92 +175,41 @@ function EditScreen({ route, navigation }: Props) {
           selected={true}
           onPress={() => setEdit(!edit)}
         />
-        <EditMetaInfMenu
-          created={route.params.item.created}
-          lastUpdated={route.params.item.lastUpdated}
-        />
-      </Header>
-      {edit ? (
-        <View style={{ display: "flex", alignItems: "center", width: "100%" }}>
+        {edit ? (
           <IconButton
-            icon="plus"
-            mode={"outlined"}
-            size={30}
-            onPress={showModal}
+            icon="delete"
+            iconColor={theme.colors.error}
+            size={20}
+            selected={true}
+            onPress={() => console.log("test")}
           />
-        </View>
-      ) : null}
-      <ScrollView style={styles.container}>
-        <DraggableList
-          modules={data.modules}
-          changeModules={changeModules}
-          deleteModule={deleteModule}
-          edit={edit}
-        />
-      </ScrollView>
-      <Button text={"Save"} onPress={() => console.log("test")}></Button>
-      <Modal
-        visible={visible}
-        onDismiss={hideModal}
-        contentContainerStyle={containerStyle}
-      >
-        <Menu.Item
-          leadingIcon="account"
-          onPress={() => {
-            addModule(ModulesEnum.USERNAME);
-          }}
-          title="Username"
-        />
-        <Menu.Item
-          leadingIcon="email"
-          onPress={() => {
-            addModule(ModulesEnum.E_MAIL);
-          }}
-          title="E-Mail"
-        />
-        <Menu.Item
-          leadingIcon="form-textbox-password"
-          onPress={() => {
-            addModule(ModulesEnum.PASSWORD);
-          }}
-          title="Password"
-        />
-        <Menu.Item
-          leadingIcon="web"
-          onPress={() => {
-            addModule(ModulesEnum.URL);
-          }}
-          title="URL"
-        />
-        <Menu.Item
-          leadingIcon="wifi"
-          onPress={() => {
-            addModule(ModulesEnum.WIFI);
-          }}
-          title="Wifi"
-        />
-        <Menu.Item
-          leadingIcon="key-variant"
-          onPress={() => {
-            addModule(ModulesEnum.KEY);
-          }}
-          title="Key"
-        />
-        <Menu.Item
-          leadingIcon="pencil-box"
-          onPress={() => {
-            addModule(ModulesEnum.CUSTOM_FIELD);
-          }}
-          title="Custom Field"
-        />
-        <Menu.Item
-          leadingIcon="note"
-          onPress={() => {
-            addModule(ModulesEnum.NOTE);
-          }}
-          title="Note"
-        />
-      </Modal>
+        ) : (
+          <EditMetaInfMenu
+            created={route.params.item.created}
+            lastUpdated={route.params.item.lastUpdated}
+          />
+        )}
+      </Header>
+      <DraggableList
+        modules={data.modules}
+        changeModules={changeModules}
+        deleteModule={deleteModule}
+        edit={edit}
+      />
+
+      <Button
+        text={"Save"}
+        onPress={() => {
+          const dt = getDateTime();
+          console.log("no format: " + dt);
+          console.log(formatDateTime(dt));
+        }}
+      ></Button>
+      <AddModuleModal
+        addModule={addModule}
+        visible={addModuleModalVisible}
+        setVisible={setAddModuleModalVisible}
+      />
     </View>
   );
 }

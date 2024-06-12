@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { Divider, IconButton, Menu } from "react-native-paper";
-import { ValuesListType } from "../types/ValuesType";
-import theme from "../ui/theme";
+import { ValuesListType } from "../../types/ValuesType";
 
 type Props = {
-  created: string;
-  lastUpdated: string;
+  values?: ValuesListType;
 };
-function EditMetaInfMenu(props: Props) {
+function HomeFilterMenu(props: Props) {
   const [showMenu, setShowMenu] = useState(false);
   return (
     <Menu
@@ -25,12 +23,12 @@ function EditMetaInfMenu(props: Props) {
       anchorPosition={"bottom"}
       anchor={
         <IconButton
-          icon="dots-vertical"
+          icon="sort-variant"
           size={25}
-          iconColor={theme.colors.primary}
           onPress={() => {
             setShowMenu(true);
           }}
+          iconColor="white"
         />
       }
     >
@@ -40,22 +38,24 @@ function EditMetaInfMenu(props: Props) {
           borderTopRightRadius: 4,
           backgroundColor: "white",
         }}
-        leadingIcon={"folder"}
-        title={"change Folder"}
-        onPress={() => {}}
+        title={props.values?.length + " Entries"}
       />
       <Divider />
       <Menu.Item
         style={{
           backgroundColor: "white",
         }}
-        title={"created: " + props.created}
+        leadingIcon="sort-ascending"
+        onPress={() => {}}
+        title="sort ascending"
       />
       <Menu.Item
         style={{
           backgroundColor: "white",
         }}
-        title={"last updated: " + props.lastUpdated}
+        leadingIcon="sort-descending"
+        onPress={() => {}}
+        title="sort descending"
       />
       <Divider />
       <Menu.Item
@@ -64,13 +64,12 @@ function EditMetaInfMenu(props: Props) {
           borderBottomRightRadius: 20,
           backgroundColor: "white",
         }}
-        leadingIcon={"delete"}
+        leadingIcon="logout"
         onPress={() => {}}
-        title="Delete Entry"
-        titleStyle={{ color: theme.colors.error }}
+        title="Logout"
       />
     </Menu>
   );
 }
 
-export default EditMetaInfMenu;
+export default HomeFilterMenu;

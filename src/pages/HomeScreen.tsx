@@ -27,7 +27,7 @@ import getColors from "../ui/linearGradient";
 import { FlatList } from "react-native-gesture-handler";
 import WebSpecific from "../components/platformSpecific/WebSpecific";
 import FadeInView from "../components/FadeInView";
-import HomeFilterMenu from "../components/HomeFilterMenu";
+import HomeFilterMenu from "../components/menus/HomeFilterMenu";
 
 const FILTER = [
   {

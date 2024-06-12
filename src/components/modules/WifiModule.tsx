@@ -95,44 +95,7 @@ function WifiModule(props: WifiModuleType & Props) {
           <CopyToClipboard value={value} />
         </View>
       </View>
-      <Portal>
-        <Modal
-          visible={visible}
-          onDismiss={hideModal}
-          contentContainerStyle={{
-            backgroundColor: "transparent",
-            margin: 26,
-            borderRadius: 20,
-            display: "flex",
-            alignSelf: "center",
-            justifyContent: "center",
-            width: 300,
-            height: 300,
-          }}
-        >
-          <LinearGradient
-            colors={getColors()}
-            style={{ padding: 6, width: 300, height: 300, borderRadius: 20 }}
-            end={{ x: 0.1, y: 0.2 }}
-            dither={true}
-          >
-            <View
-              style={{
-                backgroundColor: "white",
-                padding: 20,
-                borderRadius: 20,
-              }}
-            >
-              <QRCode
-                size={256}
-                style={{ height: "auto", width: "auto" }}
-                value="test"
-                viewBox="0 0 256 256"
-              />
-            </View>
-          </LinearGradient>
-        </Modal>
-      </Portal>
+      
     </ModuleContainer>
   );
 }

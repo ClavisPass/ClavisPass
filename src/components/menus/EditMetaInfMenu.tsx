@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Divider, IconButton, Menu } from "react-native-paper";
-import { ValuesListType } from "../types/ValuesType";
+import { ValuesListType } from "../../types/ValuesType";
+import theme from "../../ui/theme";
+import { formatDateTime } from "../../utils/Timestamp";
 
 type Props = {
-  values?: ValuesListType;
+  created: string;
+  lastUpdated: string;
 };
-function HomeFilterMenu(props: Props) {
+function EditMetaInfMenu(props: Props) {
   const [showMenu, setShowMenu] = useState(false);
   return (
     <Menu
@@ -23,12 +26,12 @@ function HomeFilterMenu(props: Props) {
       anchorPosition={"bottom"}
       anchor={
         <IconButton
-          icon="sort-variant"
-          size={25}
+          icon="dots-vertical"
+          size={20}
+          iconColor={theme.colors.primary}
           onPress={() => {
             setShowMenu(true);
           }}
-          iconColor="white"
         />
       }
     >
@@ -38,38 +41,27 @@ function HomeFilterMenu(props: Props) {
           borderTopRightRadius: 4,
           backgroundColor: "white",
         }}
-        title={props.values?.length + " Entries"}
+        leadingIcon={"folder"}
+        title={"change Folder"}
+        onPress={() => {}}
       />
       <Divider />
       <Menu.Item
         style={{
           backgroundColor: "white",
         }}
-        leadingIcon="sort-ascending"
-        onPress={() => {}}
-        title="sort ascending"
+        title={"created: " + formatDateTime(props.created)}
       />
-      <Menu.Item
-        style={{
-          backgroundColor: "white",
-        }}
-        leadingIcon="sort-descending"
-        onPress={() => {}}
-        title="sort descending"
-      />
-      <Divider />
       <Menu.Item
         style={{
           borderBottomLeftRadius: 20,
           borderBottomRightRadius: 20,
           backgroundColor: "white",
         }}
-        leadingIcon="logout"
-        onPress={() => {}}
-        title="Logout"
+        title={"last updated: " + formatDateTime(props.lastUpdated)}
       />
     </Menu>
   );
 }
 
-export default HomeFilterMenu;
+export default EditMetaInfMenu;
