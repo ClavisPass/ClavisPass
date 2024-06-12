@@ -1,4 +1,5 @@
 import ModulesEnum from "../enums/ModulesEnum";
+import { ModuleType } from "../types/ModulesType";
 import CustomFieldModuleType from "../types/modules/CustomFieldModuleType";
 import EmailModuleType from "../types/modules/EmailModuleType";
 import KeyModuleType from "../types/modules/KeyModuleType";
@@ -8,17 +9,18 @@ import TitleModuleType from "../types/modules/TitleModuleType";
 import URLModuleType from "../types/modules/URLModuleType";
 import UsernameModuleType from "../types/modules/UsernameModuleType";
 import WifiModuleType from "../types/modules/WifiModuleType";
+import createUniqueID from "./createUniqueID";
 
 function getModuleData(module: ModulesEnum) {
-  const id = "";
+  const id = createUniqueID();
   if (module === ModulesEnum.CUSTOM_FIELD) {
     const moduleData: CustomFieldModuleType = {
       id: id,
       module: module,
-      title: "",
+      title: "Custom",
       value: "",
     };
-    return moduleData;
+    return moduleData as ModuleType;
   }
   if (module === ModulesEnum.E_MAIL) {
     const moduleData: EmailModuleType = {
@@ -26,7 +28,7 @@ function getModuleData(module: ModulesEnum) {
       module: module,
       value: "",
     };
-    return moduleData;
+    return moduleData as ModuleType;
   }
   if (module === ModulesEnum.KEY) {
     const moduleData: KeyModuleType = {
@@ -34,7 +36,7 @@ function getModuleData(module: ModulesEnum) {
       module: module,
       value: "",
     };
-    return moduleData;
+    return moduleData as ModuleType;
   }
   if (module === ModulesEnum.NOTE) {
     const moduleData: NoteModuleType = {
@@ -42,7 +44,7 @@ function getModuleData(module: ModulesEnum) {
       module: module,
       value: "",
     };
-    return moduleData;
+    return moduleData as ModuleType;
   }
   if (module === ModulesEnum.PASSWORD) {
     const moduleData: PasswordModuleType = {
@@ -50,7 +52,7 @@ function getModuleData(module: ModulesEnum) {
       module: module,
       value: "",
     };
-    return moduleData;
+    return moduleData as ModuleType;
   }
   if (module === ModulesEnum.TITLE) {
     const moduleData: TitleModuleType = {
@@ -58,7 +60,7 @@ function getModuleData(module: ModulesEnum) {
       module: module,
       value: "",
     };
-    return moduleData;
+    return moduleData as ModuleType;
   }
   if (module === ModulesEnum.URL) {
     const moduleData: URLModuleType = {
@@ -66,7 +68,7 @@ function getModuleData(module: ModulesEnum) {
       module: module,
       value: "",
     };
-    return moduleData;
+    return moduleData as ModuleType;
   }
   if (module === ModulesEnum.USERNAME) {
     const moduleData: UsernameModuleType = {
@@ -74,7 +76,7 @@ function getModuleData(module: ModulesEnum) {
       module: module,
       value: "",
     };
-    return moduleData;
+    return moduleData as ModuleType;
   }
   if (module === ModulesEnum.WIFI) {
     const moduleData: WifiModuleType = {
@@ -84,7 +86,7 @@ function getModuleData(module: ModulesEnum) {
       wifiName: "",
       wifiType: "",
     };
-    return moduleData;
+    return moduleData as ModuleType;
   }
 }
 

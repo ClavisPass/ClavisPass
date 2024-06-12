@@ -1,34 +1,10 @@
-import React, { ReactNode, useEffect } from "react";
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-} from "react-native";
+import React, { useEffect } from "react";
+import { View, StyleSheet, Dimensions } from "react-native";
 import ModulesType, { ModuleType } from "../types/ModulesType";
-import CustomFieldModule from "../components/modules/CustomFieldModule";
 
 import ModulesEnum from "../enums/ModulesEnum";
-import CustomFieldModuleType from "../types/modules/CustomFieldModuleType";
 
 import type { StackScreenProps } from "@react-navigation/stack";
-import EmailModuleType from "../types/modules/EmailModuleType";
-import EmailModule from "../components/modules/EmailModule";
-import KeyModuleType from "../types/modules/KeyModuleType";
-import NoteModuleType from "../types/modules/NoteModuleType";
-import PasswordModuleType from "../types/modules/PasswordModuleType";
-import TitleModuleType from "../types/modules/TitleModuleType";
-import URLModuleType from "../types/modules/URLModuleType";
-import UsernameModuleType from "../types/modules/UsernameModuleType";
-import WifiModuleType from "../types/modules/WifiModuleType";
-import KeyModule from "../components/modules/KeyModule";
-import NoteModule from "../components/modules/NoteModule";
-import PasswordModule from "../components/modules/PasswordModule";
-import TitleModule from "../components/modules/TitleModule";
-import URLModule from "../components/modules/URLModule";
-import UsernameModule from "../components/modules/UsernameModule";
-import WifiModule from "../components/modules/WifiModule";
 import { IconButton, Menu, Modal } from "react-native-paper";
 import DragList, { DragListRenderItemInfo } from "react-native-draglist";
 import Header from "../components/Header";
@@ -36,19 +12,21 @@ import globalStyles from "../ui/globalStyles";
 import theme from "../ui/theme";
 import Button from "../components/Button";
 import EditMetaInfMenu from "../components/EditMetaInfMenu";
-import ValuesType, { ValuesListType } from "../types/ValuesType";
+import ValuesType from "../types/ValuesType";
 import getModule from "../utils/getModule";
+import getModuleData from "../utils/getModuleData";
+import { ScrollView } from "react-native-gesture-handler";
 
 const styles = StyleSheet.create({
   container: {
+    display: "flex",
     flex: 1,
-    alignItems: "center",
-    borderBottomRightRadius: 30,
-    borderBottomLeftRadius: 30,
   },
   scrollView: {
     width: Dimensions.get("window").width,
-    flexGrow: 1,
+  },
+  scrollViewStyle: {
+    overflow: "visible",
   },
 });
 
@@ -98,7 +76,8 @@ function DraggableList(props: DraggableListProps) {
 
   return (
     <DragList
-      style={styles.scrollView}
+      contentContainerStyle={styles.scrollView}
+      style={styles.scrollViewStyle}
       data={props.modules}
       keyExtractor={keyExtractor}
       onReordered={onReordered}
@@ -119,10 +98,17 @@ function EditScreen({ route, navigation }: Props) {
   const hideModal = () => setVisible(false);
   const containerStyle = { backgroundColor: "white", padding: 20 };
 
+  const addModule = (module: ModulesEnum) => {
+    const newElement = getModuleData(module);
+    const newModules: ModulesType = [...data.modules, newElement as ModuleType];
+    changeModules(newModules);
+  };
+
   const changeModules = (modules: ModulesType) => {
     const newData = { ...data };
     newData.modules = modules;
     setData(newData);
+    setVisible(false);
   };
 
   const changeFav = () => {
@@ -172,44 +158,86 @@ function EditScreen({ route, navigation }: Props) {
           lastUpdated={route.params.item.lastUpdated}
         />
       </Header>
-      <View style={styles.container}>
-        {edit ? (
+      {edit ? (
+        <View style={{ display: "flex", alignItems: "center", width: "100%" }}>
           <IconButton
             icon="plus"
             mode={"outlined"}
             size={30}
             onPress={showModal}
           />
-        ) : null}
+        </View>
+      ) : null}
+      <ScrollView style={styles.container}>
         <DraggableList
           modules={data.modules}
           changeModules={changeModules}
           deleteModule={deleteModule}
           edit={edit}
         />
-      </View>
+      </ScrollView>
       <Button text={"Save"} onPress={() => console.log("test")}></Button>
       <Modal
         visible={visible}
         onDismiss={hideModal}
         contentContainerStyle={containerStyle}
       >
-        <Menu.Item leadingIcon="account" onPress={() => {}} title="Username" />
-        <Menu.Item leadingIcon="email" onPress={() => {}} title="E-Mail" />
+        <Menu.Item
+          leadingIcon="account"
+          onPress={() => {
+            addModule(ModulesEnum.USERNAME);
+          }}
+          title="Username"
+        />
+        <Menu.Item
+          leadingIcon="email"
+          onPress={() => {
+            addModule(ModulesEnum.E_MAIL);
+          }}
+          title="E-Mail"
+        />
         <Menu.Item
           leadingIcon="form-textbox-password"
-          onPress={() => {}}
+          onPress={() => {
+            addModule(ModulesEnum.PASSWORD);
+          }}
           title="Password"
         />
-        <Menu.Item leadingIcon="web" onPress={() => {}} title="URL" />
-        <Menu.Item leadingIcon="wifi" onPress={() => {}} title="Wifi" />
-        <Menu.Item leadingIcon="key-variant" onPress={() => {}} title="Key" />
+        <Menu.Item
+          leadingIcon="web"
+          onPress={() => {
+            addModule(ModulesEnum.URL);
+          }}
+          title="URL"
+        />
+        <Menu.Item
+          leadingIcon="wifi"
+          onPress={() => {
+            addModule(ModulesEnum.WIFI);
+          }}
+          title="Wifi"
+        />
+        <Menu.Item
+          leadingIcon="key-variant"
+          onPress={() => {
+            addModule(ModulesEnum.KEY);
+          }}
+          title="Key"
+        />
         <Menu.Item
           leadingIcon="pencil-box"
-          onPress={() => {}}
+          onPress={() => {
+            addModule(ModulesEnum.CUSTOM_FIELD);
+          }}
           title="Custom Field"
         />
-        <Menu.Item leadingIcon="note" onPress={() => {}} title="Note" />
+        <Menu.Item
+          leadingIcon="note"
+          onPress={() => {
+            addModule(ModulesEnum.NOTE);
+          }}
+          title="Note"
+        />
       </Modal>
     </View>
   );

@@ -11,8 +11,15 @@ const globalStyles = StyleSheet.create({
     //paddingRight: 8,
     //marginTop: Constants.statusBarHeight,
   },
-  outlineStyle: { borderRadius: 10, padding: 0 },
-  textInputStyle: { flex: 1, maxHeight: 40, height: 40, minHeight: 40 },
+  outlineStyle: {
+    borderRadius: 10,
+    padding: 0,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  textInputStyle: { flex: 1, height: 40, lineHeight: 16 },
+  textInputNoteStyle: { flex: 1, lineHeight: 16, margin: 4 },
   moduleView: {
     display: "flex",
     flexDirection: "row",

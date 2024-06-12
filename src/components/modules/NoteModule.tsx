@@ -22,11 +22,13 @@ function NoteModule(props: NoteModuleType & Props) {
     >
       <TextInput
         outlineStyle={globalStyles.outlineStyle}
-        style={globalStyles.textInputStyle}
+        style={globalStyles.textInputNoteStyle}
         value={value}
         mode="outlined"
         onChangeText={(text) => setValue(text)}
         autoCapitalize="none"
+        multiline={true}
+        numberOfLines={4}
       />
     </ModuleContainer>
   );

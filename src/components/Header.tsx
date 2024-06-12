@@ -49,7 +49,12 @@ function Header(props: Props) {
           onPress={props.onPress}
         />
         <Text
-          style={{ color: theme.colors.primary, userSelect: "none", fontWeight: "bold", fontSize: 15 }}
+          style={{
+            color: theme.colors.primary,
+            userSelect: "none",
+            fontWeight: "bold",
+            fontSize: 15,
+          }}
           variant="bodyMedium"
         >
           {props.title}
@@ -61,6 +66,7 @@ function Header(props: Props) {
           flexDirection: "row",
           gap: 2,
           alignItems: "center",
+          paddingLeft: 16,
         }}
       >
         {props.children}

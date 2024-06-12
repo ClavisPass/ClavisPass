@@ -25,7 +25,7 @@ function EditMetaInfMenu(props: Props) {
       anchorPosition={"bottom"}
       anchor={
         <IconButton
-          icon="menu"
+          icon="dots-vertical"
           size={25}
           iconColor={theme.colors.primary}
           onPress={() => {
