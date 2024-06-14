@@ -70,7 +70,8 @@
         "title": "ClavisPass",
         "width": 500,
         "maxWidth": 500,
-        "decorations": true
+        "decorations": false,
+        "transparent": true
       }
     ]
   }

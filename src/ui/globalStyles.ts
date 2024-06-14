@@ -4,12 +4,13 @@ import { StyleSheet } from "react-native";
 const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
-    //backgroundColor: "#fff",
+    backgroundColor: "white",
     alignItems: "center",
     display: "flex",
     //paddingLeft: 8,
     //paddingRight: 8,
     //marginTop: Constants.statusBarHeight,
+    borderRadius: 10,
   },
   outlineStyle: {
     borderRadius: 10,

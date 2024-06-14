@@ -18,6 +18,7 @@ import getModuleData from "../utils/getModuleData";
 import { ScrollView } from "react-native-gesture-handler";
 import AddModuleModal from "../components/modals/AddModuleModal";
 import { formatDateTime, getDateTime } from "../utils/Timestamp";
+import CustomTitlebar from "../components/CustomTitlebar";
 
 const styles = StyleSheet.create({
   container: {
@@ -144,6 +145,7 @@ function EditScreen({ route, navigation }: Props) {
 
   return (
     <View style={globalStyles.container}>
+      <CustomTitlebar />
       <Header
         title={title}
         onPress={() => {

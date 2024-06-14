@@ -28,6 +28,7 @@ import { FlatList } from "react-native-gesture-handler";
 import WebSpecific from "../components/platformSpecific/WebSpecific";
 import FadeInView from "../components/FadeInView";
 import HomeFilterMenu from "../components/menus/HomeFilterMenu";
+import CustomTitlebar from "../components/CustomTitlebar";
 
 const FILTER = [
   {
@@ -110,6 +111,8 @@ function HomeScreen({ navigation }: { navigation: any }) {
         colors={getColors()}
         dither={true}
         style={{
+          borderTopLeftRadius: 10,
+          borderTopRightRadius: 10,
           width: "100%",
           display: "flex",
           flexDirection: "column",
@@ -123,12 +126,14 @@ function HomeScreen({ navigation }: { navigation: any }) {
         end={{ x: 0.1, y: 0.2 }}
       >
         <View
-          data-tauri-drag-region
+          id={"titlebar"}
           style={{
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
           }}
         >
           <Text
@@ -145,6 +150,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
               iconColor="white"
             />
             <HomeFilterMenu values={data.data?.values} />
+            <CustomTitlebar />
           </View>
         </View>
         <View
@@ -176,7 +182,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
               item={item}
               onPress={() => {
                 navigation.navigate("Edit", {
-                  item: item
+                  item: item,
                 });
               }}
             />
