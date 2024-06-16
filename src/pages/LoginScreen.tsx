@@ -22,22 +22,10 @@ const styles = StyleSheet.create({
   },
 });
 
-function LoginScreen({ navigation }: { navigation: any }) {
+function LoginScreen() {
   const auth = useAuth();
   return (
     <View style={globalStyles.container}>
-      <View
-        id={"titlebar"}
-        style={{
-          width: "100%",
-          display: "flex",
-          flexDirection:"row",
-          justifyContent: "space-between",
-        }}
-      >
-        <View></View>
-        <CustomTitlebar />
-      </View>
       <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
         <TypeWriterComponent />
         <Button text={"Login"} onPress={() => auth.login("1234")}></Button>

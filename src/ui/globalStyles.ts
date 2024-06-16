@@ -4,13 +4,11 @@ import { StyleSheet } from "react-native";
 const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#f5f5f5",
     alignItems: "center",
     display: "flex",
-    //paddingLeft: 8,
-    //paddingRight: 8,
-    //marginTop: Constants.statusBarHeight,
-    borderRadius: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
   },
   outlineStyle: {
     borderRadius: 10,
@@ -18,14 +16,17 @@ const globalStyles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    width: "100%",
+    flexGrow: 1,
   },
-  textInputStyle: { flex: 1, height: 40, lineHeight: 16 },
-  textInputNoteStyle: { flex: 1, lineHeight: 16, margin: 4 },
+  textInputStyle: { height: 40, lineHeight: 16, flex: 1, },
+  textInputNoteStyle: { lineHeight: 16, padding: 4 },
   moduleView: {
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    width: "100%",
   },
   fab: {
     position: "absolute",

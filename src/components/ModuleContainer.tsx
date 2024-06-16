@@ -14,6 +14,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     display: "flex",
     flexDirection: "row",
+    flex: 1,
   },
   draggable: {
     borderWidth: 1,

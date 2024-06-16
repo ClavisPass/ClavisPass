@@ -26,6 +26,7 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
         value={text}
         mode="outlined"
         onChangeText={(text) => setText(text)}
+        onEndEditing={() => console.log("der bro ist fertig")}
         autoCapitalize="none"
       />
     </ModuleContainer>

@@ -3,6 +3,9 @@ import { View, StyleSheet, ScrollView } from "react-native";
 import { Surface, Text } from "react-native-paper";
 import globalStyles from "../ui/globalStyles";
 import SettingsItem from "../components/SettingsItem";
+import { TitlebarHeight } from "../components/CustomTitlebar";
+import Constants from "expo-constants";
+import { StatusBar } from "expo-status-bar";
 
 const styles = StyleSheet.create({
   surface: {
@@ -21,7 +24,16 @@ const styles = StyleSheet.create({
 
 function SettingsScreen() {
   return (
-    <View style={globalStyles.container}>
+    <View
+      style={[globalStyles.container, { marginTop: Constants.statusBarHeight }]}
+    >
+      <StatusBar
+        animated={true}
+        style="dark"
+        backgroundColor="transparent"
+        translucent={true}
+      />
+      <TitlebarHeight />
       <ScrollView style={styles.scrollView}>
         <SettingsItem>
           <Text>Surface</Text>

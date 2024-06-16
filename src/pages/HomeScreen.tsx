@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, StyleSheet, GestureResponderEvent } from "react-native";
-import { Searchbar, IconButton, FAB, Menu, Divider } from "react-native-paper";
+import { View, StyleSheet } from "react-native";
+import { Searchbar, IconButton } from "react-native-paper";
 
 import { Chip, Text } from "react-native-paper";
 
@@ -10,7 +10,7 @@ import { getData } from "../api/getData";
 
 const DATA = getData();
 
-import Animated, {
+import {
   useSharedValue,
   withTiming,
   useAnimatedStyle,
@@ -20,42 +20,12 @@ import globalStyles from "../ui/globalStyles";
 import { useData } from "../contexts/DataProvider";
 import { LinearGradient } from "expo-linear-gradient";
 import ListItem from "../components/ListItem";
-import theme from "../ui/theme";
 import { StatusBar } from "expo-status-bar";
 import Constants from "expo-constants";
 import getColors from "../ui/linearGradient";
 import { FlatList } from "react-native-gesture-handler";
 import WebSpecific from "../components/platformSpecific/WebSpecific";
-import FadeInView from "../components/FadeInView";
 import HomeFilterMenu from "../components/menus/HomeFilterMenu";
-import CustomTitlebar from "../components/CustomTitlebar";
-
-const FILTER = [
-  {
-    title: "Fav",
-    icon: "star",
-  },
-  {
-    title: "YEE",
-    icon: "folder",
-  },
-  {
-    title: "KP",
-    icon: "folder",
-  },
-  {
-    title: "ggggggggeefefeg",
-    icon: "folder",
-  },
-  {
-    title: "ggggggggeefefeg",
-    icon: "folder",
-  },
-  {
-    title: "ggggggggeefefeg",
-    icon: "folder",
-  },
-];
 
 const styles = StyleSheet.create({
   box: {
@@ -111,29 +81,25 @@ function HomeScreen({ navigation }: { navigation: any }) {
         colors={getColors()}
         dither={true}
         style={{
-          borderTopLeftRadius: 10,
-          borderTopRightRadius: 10,
           width: "100%",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 10,
-          borderBottomLeftRadius: 20,
-          borderBottomRightRadius: 20,
           marginBottom: 4,
           paddingTop: Constants.statusBarHeight,
+          borderBottomLeftRadius: 20,
+          borderBottomRightRadius: 20,
         }}
         end={{ x: 0.1, y: 0.2 }}
       >
         <View
-          id={"titlebar"}
           style={{
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            borderTopLeftRadius: 10,
-            borderTopRightRadius: 10,
+            marginTop: 16,
           }}
         >
           <Text
@@ -143,14 +109,15 @@ function HomeScreen({ navigation }: { navigation: any }) {
             ClavisPass
           </Text>
           <View style={{ display: "flex", flexDirection: "row" }}>
-            <IconButton
-              icon="plus"
-              size={25}
-              onPress={() => console.log("Pressed")}
-              iconColor="white"
-            />
-            <HomeFilterMenu values={data.data?.values} />
-            <CustomTitlebar />
+            <WebSpecific notIn={true}>
+              <IconButton
+                icon="plus"
+                size={25}
+                onPress={() => console.log("Pressed")}
+                iconColor="white"
+              />
+              <HomeFilterMenu values={data.data?.values} />
+            </WebSpecific>
           </View>
         </View>
         <View
@@ -172,6 +139,15 @@ function HomeScreen({ navigation }: { navigation: any }) {
             value={searchQuery}
             loading={false}
           />
+          <WebSpecific>
+            <IconButton
+              icon="plus"
+              size={25}
+              onPress={() => console.log("Pressed")}
+              iconColor="white"
+            />
+            <HomeFilterMenu values={data.data?.values} />
+          </WebSpecific>
         </View>
       </LinearGradient>
       <View style={{ flex: 1, width: "100%" }}>
@@ -182,7 +158,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
               item={item}
               onPress={() => {
                 navigation.navigate("Edit", {
-                  item: item,
+                  value: item,
                 });
               }}
             />
@@ -218,17 +194,28 @@ function HomeScreen({ navigation }: { navigation: any }) {
         <View style={{ flexBasis: "auto", flexShrink: 1 }}>
           <FlatList
             ref={flatListRef}
-            data={FILTER}
+            data={data.data?.folder}
             horizontal={true}
             showsHorizontalScrollIndicator={false}
             style={{ flexGrow: 1 }}
+            ListHeaderComponent={() => {
+              return (
+                <Chip
+                  icon={"star"}
+                  onPress={() => console.log("Pressed")}
+                  style={styles.chip}
+                >
+                  {"Favorite"}
+                </Chip>
+              );
+            }}
             renderItem={({ item }) => (
               <Chip
-                icon={item.icon}
+                icon={"folder"}
                 onPress={() => console.log("Pressed")}
                 style={styles.chip}
               >
-                {item.title}
+                {item}
               </Chip>
             )}
           />

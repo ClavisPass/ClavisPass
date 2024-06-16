@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
-import {
-  Icon,
-  Text,
-  TouchableRipple,
-} from "react-native-paper";
+import { Icon, Text, TouchableRipple } from "react-native-paper";
 import ValuesType from "../types/ValuesType";
 import theme from "../ui/theme";
 import ModulesEnum from "../enums/ModulesEnum";
 
 import { Image } from "expo-image";
+import FastAccess, { openFastAccess } from "../utils/FastAccess";
 
 const styles = StyleSheet.create({
   container: {
@@ -87,8 +84,12 @@ function ListItem(props: Props) {
         style={styles.ripple}
         onPress={props.onPress}
         rippleColor="rgba(0, 0, 0, .32)"
+        onLongPress={() => {
+          openFastAccess();
+        }}
       >
         <>
+          <FastAccess />
           <View
             style={{
               display: "flex",
@@ -101,9 +102,8 @@ function ListItem(props: Props) {
               <Image
                 style={{ width: 22, height: 22, margin: 0 }}
                 source={url}
-                //placeholder={{ blurhash }}
                 contentFit="cover"
-                transition={1000}
+                transition={250}
               />
             ) : (
               <Icon color={"lightgray"} source={icon} size={20} />

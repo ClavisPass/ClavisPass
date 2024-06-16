@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import ModulesType, { ModuleType } from "../types/ModulesType";
 
@@ -18,15 +18,14 @@ import getModuleData from "../utils/getModuleData";
 import { ScrollView } from "react-native-gesture-handler";
 import AddModuleModal from "../components/modals/AddModuleModal";
 import { formatDateTime, getDateTime } from "../utils/Timestamp";
-import CustomTitlebar from "../components/CustomTitlebar";
+import { TitlebarHeight } from "../components/CustomTitlebar";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useData } from "../contexts/DataProvider";
+import DataType from "../types/DataType";
 
 const styles = StyleSheet.create({
-  container: {
-    display: "flex",
-    flex: 1,
-  },
   scrollView: {
-    width: Dimensions.get("window").width,
+    minWidth: 0,
   },
   scrollViewStyle: {
     overflow: "visible",
@@ -35,7 +34,7 @@ const styles = StyleSheet.create({
 
 type RootStackParamList = {
   params: {
-    item: ValuesType;
+    value: ValuesType;
   };
 };
 
@@ -78,60 +77,81 @@ function DraggableList(props: DraggableListProps) {
   }
 
   return (
-    <View>
-      <DragList
-        contentContainerStyle={styles.scrollView}
-        style={styles.scrollViewStyle}
-        data={props.modules}
-        keyExtractor={keyExtractor}
-        onReordered={onReordered}
-        renderItem={renderItem}
-      />
+    <View style={{ flex: 1 }}>
+      <ScrollView style={{ width: Dimensions.get("window").width, flex: 1 }}>
+        <DragList
+          contentContainerStyle={styles.scrollView}
+          style={styles.scrollViewStyle}
+          data={props.modules}
+          keyExtractor={keyExtractor}
+          onReordered={onReordered}
+          renderItem={renderItem}
+        />
+      </ScrollView>
     </View>
   );
 }
 
+//<ScrollView style={{ width: Dimensions.get("window").width }}>
+
 function EditScreen({ route, navigation }: Props) {
+  const data = useData();
+
   const [edit, setEdit] = useState(false);
-  const [data, setData] = useState<ValuesType>({ ...route.params.item });
+  const [value, setValue] = useState<ValuesType>({ ...route.params.value });
 
   const [addModuleModalVisible, setAddModuleModalVisible] = useState(false);
 
   const [favIcon, setFavIcon] = useState("star-outline");
 
+  const saveValue = () => {
+    let newData = { ...data.data } as DataType;
+    let valueToChange: any = newData?.values.find(
+      (x: ValuesType) => x.id === route.params.value.id
+    );
+    valueToChange.fav = value.fav;
+    valueToChange.folder = value.folder;
+    valueToChange.modules = value.modules;
+    valueToChange.lastUpdated = getDateTime();
+    data.setData(newData);
+  };
+
   const addModule = (module: ModulesEnum) => {
     const newElement = getModuleData(module);
-    const newModules: ModulesType = [...data.modules, newElement as ModuleType];
+    const newModules: ModulesType = [
+      ...value.modules,
+      newElement as ModuleType,
+    ];
     changeModules(newModules);
   };
 
   const changeModules = (modules: ModulesType) => {
-    const newData = { ...data };
-    newData.modules = modules;
-    setData(newData);
+    const newValue = { ...value };
+    newValue.modules = modules;
+    setValue(newValue);
     setAddModuleModalVisible(false);
   };
 
   const changeFav = () => {
-    const newData = { ...data };
-    newData.fav = !data.fav;
-    setData(newData);
+    const newValue = { ...value };
+    newValue.fav = !value.fav;
+    setValue(newValue);
   };
 
   const deleteModule = (id: string) => {
     const newModules: ModulesType = [
-      ...data.modules.filter((item: ModuleType) => item.id !== id),
+      ...value.modules.filter((item: ModuleType) => item.id !== id),
     ];
     changeModules(newModules);
   };
 
   useEffect(() => {
-    if (data.fav) {
+    if (value.fav) {
       setFavIcon("star");
     } else {
       setFavIcon("star-outline");
     }
-  }, [data]);
+  }, [value]);
 
   const [title, setTitle] = useState("Edit");
 
@@ -145,7 +165,7 @@ function EditScreen({ route, navigation }: Props) {
 
   return (
     <View style={globalStyles.container}>
-      <CustomTitlebar />
+      <TitlebarHeight />
       <Header
         title={title}
         onPress={() => {
@@ -187,13 +207,14 @@ function EditScreen({ route, navigation }: Props) {
           />
         ) : (
           <EditMetaInfMenu
-            created={route.params.item.created}
-            lastUpdated={route.params.item.lastUpdated}
+            created={route.params.value.created}
+            lastUpdated={route.params.value.lastUpdated}
+            folder={route.params.value.folder}
           />
         )}
       </Header>
       <DraggableList
-        modules={data.modules}
+        modules={value.modules}
         changeModules={changeModules}
         deleteModule={deleteModule}
         edit={edit}
@@ -201,11 +222,7 @@ function EditScreen({ route, navigation }: Props) {
 
       <Button
         text={"Save"}
-        onPress={() => {
-          const dt = getDateTime();
-          console.log("no format: " + dt);
-          console.log(formatDateTime(dt));
-        }}
+        onPress={saveValue}
       ></Button>
       <AddModuleModal
         addModule={addModule}

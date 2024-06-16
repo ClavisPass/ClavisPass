@@ -8,6 +8,7 @@ import ModuleContainer from "../ModuleContainer";
 import globalStyles from "../../ui/globalStyles";
 import Props from "../../types/ModuleProps";
 import theme from "../../ui/theme";
+import CopyToClipboard from "../CopyToClipboard";
 
 function EmailModule(props: EmailModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
@@ -33,12 +34,7 @@ function EmailModule(props: EmailModuleType & Props) {
           textContentType="emailAddress"
           keyboardType="email-address"
         />
-        <IconButton
-          icon="content-copy"
-          iconColor={theme.colors.primary}
-          size={20}
-          onPress={() => console.log("Pressed")}
-        />
+        <CopyToClipboard value={value} />
       </View>
     </ModuleContainer>
   );

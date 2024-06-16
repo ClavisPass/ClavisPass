@@ -34,6 +34,7 @@ function HomeFilterMenu(props: Props) {
     >
       <Menu.Item
         style={{
+          cursor: "auto",
           borderTopLeftRadius: 22,
           borderTopRightRadius: 4,
           backgroundColor: "white",

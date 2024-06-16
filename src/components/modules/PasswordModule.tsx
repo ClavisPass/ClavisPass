@@ -12,6 +12,7 @@ import theme from "../../ui/theme";
 import { ProgressBar } from "react-native-paper";
 import passwordEntropy from "../../utils/Entropy";
 import PasswordGeneratorModal from "../modals/PasswordGeneratorModal";
+import CopyToClipboard from "../CopyToClipboard";
 
 function PasswordModule(props: PasswordModuleType & Props) {
   const [value, setValue] = React.useState(props.value);
@@ -39,7 +40,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
     if (percentage < 0.55) {
       setProgressbarColor("#FFBF00");
     }
-    if (percentage < 0.40) {
+    if (percentage < 0.4) {
       setProgressbarColor("#D2222D");
     }
 
@@ -79,10 +80,21 @@ function PasswordModule(props: PasswordModuleType & Props) {
             />
           }
         />
+        <CopyToClipboard value={value} />
+      </View>
+      <View style={globalStyles.moduleView}>
+        <View style={{ flexGrow: 1, padding: 6 }}>
+          <ProgressBar
+            style={{}}
+            progress={entropyPercentage}
+            color={progressbarColor}
+          />
+        </View>
         <IconButton
+          style={{ margin: 0, marginLeft: 8, marginRight: 8 }}
           iconColor={theme.colors.primary}
           icon="lock-check-outline"
-          size={20}
+          size={16}
           onPress={() => {
             setVisible(true);
           }}
@@ -93,11 +105,6 @@ function PasswordModule(props: PasswordModuleType & Props) {
           changePassword={setValue}
         />
       </View>
-      <ProgressBar
-        style={{ margin: 10 }}
-        progress={entropyPercentage}
-        color={progressbarColor}
-      />
     </ModuleContainer>
   );
 }
