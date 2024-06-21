@@ -220,10 +220,7 @@ function EditScreen({ route, navigation }: Props) {
         edit={edit}
       />
 
-      <Button
-        text={"Save"}
-        onPress={saveValue}
-      ></Button>
+      <Button text={"Save"} onPress={saveValue} />
       <AddModuleModal
         addModule={addModule}
         visible={addModuleModalVisible}

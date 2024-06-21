@@ -26,6 +26,10 @@ import getColors from "../ui/linearGradient";
 import { FlatList } from "react-native-gesture-handler";
 import WebSpecific from "../components/platformSpecific/WebSpecific";
 import HomeFilterMenu from "../components/menus/HomeFilterMenu";
+import DataType from "../types/DataType";
+import ValuesType from "../types/ValuesType";
+import ModulesType, { ModuleType } from "../types/ModulesType";
+import ModulesEnum from "../enums/ModulesEnum";
 
 const styles = StyleSheet.create({
   box: {
@@ -59,6 +63,41 @@ function HomeScreen({ navigation }: { navigation: any }) {
       height: withTiming(animatedHeight.value, config),
     };
   });
+
+  const sort = (sort: "asc" | "desc") => {
+    let newData = { ...data.data } as DataType;
+    if (newData) {
+      newData.values = newData.values.sort(function (a, b) {
+        const firstTitle = a.modules.find(
+          (x: ModuleType) => x.module === ModulesEnum.TITLE
+        );
+        const secondTitle = b.modules.find(
+          (x: ModuleType) => x.module === ModulesEnum.TITLE
+        );
+        if (firstTitle && secondTitle) {
+          if (sort == "asc") {
+            if (firstTitle.value < secondTitle.value) {
+              return -1;
+            }
+            if (firstTitle.value > secondTitle.value) {
+              return 1;
+            }
+          }
+          if (sort == "desc") {
+            if (firstTitle.value > secondTitle.value) {
+              return -1;
+            }
+            if (firstTitle.value < secondTitle.value) {
+              return 1;
+            }
+          }
+        }
+
+        return 0;
+      });
+      data.setData(newData);
+    }
+  };
 
   useEffect(() => {
     data.setData(DATA);
@@ -116,7 +155,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
                 onPress={() => console.log("Pressed")}
                 iconColor="white"
               />
-              <HomeFilterMenu values={data.data?.values} />
+              <HomeFilterMenu values={data.data?.values} sort={sort} />
             </WebSpecific>
           </View>
         </View>
@@ -146,7 +185,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
               onPress={() => console.log("Pressed")}
               iconColor="white"
             />
-            <HomeFilterMenu values={data.data?.values} />
+            <HomeFilterMenu values={data.data?.values} sort={sort} />
           </WebSpecific>
         </View>
       </LinearGradient>

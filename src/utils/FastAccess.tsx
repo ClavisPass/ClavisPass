@@ -3,6 +3,8 @@ import * as Notifications from "expo-notifications";
 import { useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import * as Device from "expo-device";
+import ModulesType from "../types/ModulesType";
+import { useQuickSelect } from "../contexts/QuickSelectProvider";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -56,9 +58,9 @@ export default function FastAccess() {
   return <></>;
 }
 
-export async function openFastAccess() {
+export async function openFastAccess(setModules: () => void) {
   if (Platform.OS === "web") {
-    console.log("openFastAccess");
+    setModules();
   } else {
     await Notifications.scheduleNotificationAsync({
       content: {

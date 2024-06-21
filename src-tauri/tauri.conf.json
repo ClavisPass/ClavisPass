@@ -20,7 +20,10 @@
         "show": true,
         "minimize": true,
         "unminimize": true,
-        "startDragging": true
+        "startDragging": true,
+        "setAlwaysOnTop": true,
+        "setSize": true,
+        "center": true
       }
     },
     "bundle": {
@@ -65,13 +68,14 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 800,
         "resizable": true,
         "title": "ClavisPass",
         "width": 500,
+        "height": 800,
         "maxWidth": 500,
         "decorations": false,
-        "transparent": true
+        "transparent": true,
+        "center": true
       }
     ]
   }

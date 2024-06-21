@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Divider, IconButton, Menu } from "react-native-paper";
 import { ValuesListType } from "../../types/ValuesType";
+import { useAuth } from "../../contexts/AuthProvider";
 
 type Props = {
   values?: ValuesListType;
+  sort: (sort: "asc" | "desc") => void;
 };
 function HomeFilterMenu(props: Props) {
+  const auth = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   return (
     <Menu
@@ -47,7 +50,9 @@ function HomeFilterMenu(props: Props) {
           backgroundColor: "white",
         }}
         leadingIcon="sort-ascending"
-        onPress={() => {}}
+        onPress={() => {
+          props.sort("asc");
+        }}
         title="sort ascending"
       />
       <Menu.Item
@@ -55,7 +60,9 @@ function HomeFilterMenu(props: Props) {
           backgroundColor: "white",
         }}
         leadingIcon="sort-descending"
-        onPress={() => {}}
+        onPress={() => {
+          props.sort("desc");
+        }}
         title="sort descending"
       />
       <Divider />
@@ -66,7 +73,7 @@ function HomeFilterMenu(props: Props) {
           backgroundColor: "white",
         }}
         leadingIcon="logout"
-        onPress={() => {}}
+        onPress={auth.logout}
         title="Logout"
       />
     </Menu>

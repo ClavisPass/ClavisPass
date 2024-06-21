@@ -7,6 +7,8 @@ import ModulesEnum from "../enums/ModulesEnum";
 
 import { Image } from "expo-image";
 import FastAccess, { openFastAccess } from "../utils/FastAccess";
+import { Item } from "react-native-paper/lib/typescript/components/Drawer/Drawer";
+import { useQuickSelect } from "../contexts/QuickSelectProvider";
 
 const styles = StyleSheet.create({
   container: {
@@ -31,6 +33,8 @@ type Props = {
 };
 
 function ListItem(props: Props) {
+  const { setModules } = useQuickSelect();
+
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [icon, setIcon] = useState("lock");
@@ -85,7 +89,7 @@ function ListItem(props: Props) {
         onPress={props.onPress}
         rippleColor="rgba(0, 0, 0, .32)"
         onLongPress={() => {
-          openFastAccess();
+          openFastAccess(() => setModules(props.item.modules));
         }}
       >
         <>
