@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { View, StyleSheet } from "react-native";
 import ModulesType from "../types/ModulesType";
 import { TitlebarHeight } from "./CustomTitlebar";

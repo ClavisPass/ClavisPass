@@ -7,7 +7,6 @@ import ModulesEnum from "../enums/ModulesEnum";
 
 import { Image } from "expo-image";
 import FastAccess, { openFastAccess } from "../utils/FastAccess";
-import { Item } from "react-native-paper/lib/typescript/components/Drawer/Drawer";
 import { useQuickSelect } from "../contexts/QuickSelectProvider";
 
 const styles = StyleSheet.create({

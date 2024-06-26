@@ -1,8 +1,6 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { StyleSheet } from "react-native";
 import { Text, TouchableRipple } from "react-native-paper";
-import ValuesType from "../types/ValuesType";
-import theme from "../ui/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../ui/linearGradient";
 

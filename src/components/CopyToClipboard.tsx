@@ -31,14 +31,12 @@ function CopyToClipboard(props: Props) {
     onToggleSnackBar();
   };
   return (
-    <>
-      <IconButton
-        icon={icon}
-        iconColor={theme.colors.primary}
-        size={20}
-        onPress={copyToClipboard}
-      />
-    </>
+    <IconButton
+      icon={icon}
+      iconColor={theme.colors.primary}
+      size={20}
+      onPress={copyToClipboard}
+    />
   );
 }
 

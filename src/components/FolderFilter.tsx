@@ -1,7 +1,6 @@
 import React, { useRef } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 import { Chip, IconButton } from "react-native-paper";
-import { appWindow } from "@tauri-apps/api/window";
 import WebSpecific from "./platformSpecific/WebSpecific";
 
 const styles = StyleSheet.create({

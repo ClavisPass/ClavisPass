@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { Divider, Icon, IconButton, Text } from "react-native-paper";
+import { Icon, IconButton, Text } from "react-native-paper";
 import WebSpecific from "./platformSpecific/WebSpecific";
 import theme from "../ui/theme";
 

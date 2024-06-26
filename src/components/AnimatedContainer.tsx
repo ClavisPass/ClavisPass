@@ -1,5 +1,5 @@
-import React, { EffectCallback, ReactNode, useEffect, useRef, useState } from "react";
-import { StyleProp, StyleSheet, Text, ViewStyle } from "react-native";
+import React, { EffectCallback, ReactNode, useEffect } from "react";
+import { StyleProp, StyleSheet, ViewStyle } from "react-native";
 
 import Animated, {
   Easing,
@@ -8,20 +8,6 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import globalStyles from "../ui/globalStyles";
-
-import { useFocusEffect } from "@react-navigation/native";
-
-const styles = StyleSheet.create({
-  container: {
-    marginLeft: 8,
-    marginRight: 8,
-    marginBottom: 8,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    overflow: "hidden",
-    padding: 16,
-  },
-});
 
 type Props = {
   children: ReactNode;

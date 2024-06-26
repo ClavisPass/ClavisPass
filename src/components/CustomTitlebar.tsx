@@ -1,11 +1,9 @@
 import React, { useEffect } from "react";
 import { Platform, View } from "react-native";
-import { Divider, IconButton } from "react-native-paper";
+import { IconButton } from "react-native-paper";
 import theme from "../ui/theme";
 import WebSpecific from "./platformSpecific/WebSpecific";
 import { appWindow } from "@tauri-apps/api/window";
-import { LinearGradient } from "expo-linear-gradient";
-import getColors from "../ui/linearGradient";
 
 type Props = {};
 
@@ -62,14 +60,6 @@ function CustomTitlebar(props: Props) {
           }}
         >
           <View>
-            {/*
-            <IconButton
-              icon={"layers-outline"}
-              iconColor={"white"}
-              size={20}
-              onPress={minimizeWindow}
-            />
-            */}
           </View>
           <View
             style={{
@@ -94,16 +84,6 @@ function CustomTitlebar(props: Props) {
             />
           </View>
         </View>
-        {/*<LinearGradient
-          colors={getColors().reverse()}
-          dither={true}
-          style={{
-            width: "96%",
-            height: 2,
-            borderRadius: 10,
-          }}
-          end={{ x: 0.1, y: 0.2 }}
-        />*/}
       </View>
     </WebSpecific>
   );

@@ -1,27 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text } from "react-native";
-
-import { BlurView } from "expo-blur";
+import React, { useEffect, useState } from "react";
+import { StyleSheet } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { Button } from "react-native-paper";
 import { appWindow } from "@tauri-apps/api/window";
-
-const styles = StyleSheet.create({
-  container: {
-    marginLeft: 8,
-    marginRight: 8,
-    marginBottom: 8,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    overflow: "hidden",
-    padding: 16,
-  },
-});
 
 type Props = {};
 
@@ -80,17 +65,6 @@ function Blur(props: Props) {
             style,
           ]}
         >
-          {/*<BlurView
-            intensity={40}
-            style={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              left: 0,
-              bottom: 0,
-            }}
-          >
-          </BlurView>*/}
         </Animated.View>
       ) : null}
     </>

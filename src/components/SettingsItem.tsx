@@ -1,13 +1,6 @@
 import React, { ReactNode } from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
-import {
-  Divider,
-  Icon,
-  IconButton,
-  Text,
-  TouchableRipple,
-} from "react-native-paper";
-import ValuesType from "../types/ValuesType";
+import { View, StyleSheet } from "react-native";
+import { Icon } from "react-native-paper";
 import theme from "../ui/theme";
 
 const styles = StyleSheet.create({

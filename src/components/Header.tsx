@@ -1,11 +1,9 @@
 import React, { ReactNode } from "react";
-import { View, StyleSheet, Platform } from "react-native";
+import { View, Platform } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import theme from "../ui/theme";
-import { LinearGradient } from "expo-linear-gradient";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
-import { TitlebarHeight } from "./CustomTitlebar";
 
 type Props = {
   children?: ReactNode;
