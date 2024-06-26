@@ -27,7 +27,7 @@ function CopyToClipboard(props: Props) {
     setIcon("check");
     setTimeout(() => {
       setIcon("content-copy");
-    }, 700);
+    }, 1000);
     onToggleSnackBar();
   };
   return (

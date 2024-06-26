@@ -2,14 +2,45 @@ import { useState } from "react";
 import { Divider, IconButton, Menu } from "react-native-paper";
 import { ValuesListType } from "../../types/ValuesType";
 import { useAuth } from "../../contexts/AuthProvider";
+import DataType from "../../types/DataType";
+import { ModuleType } from "../../types/ModulesType";
+import ModulesEnum from "../../enums/ModulesEnum";
 
 type Props = {
-  values?: ValuesListType;
-  sort: (sort: "asc" | "desc") => void;
+  data: DataType;
+  setData: (data: DataType) => void;
 };
 function HomeFilterMenu(props: Props) {
   const auth = useAuth();
   const [showMenu, setShowMenu] = useState(false);
+
+  const sort = (sort: "asc" | "desc") => {
+    let newData = { ...props.data } as DataType;
+    if (newData) {
+      newData.values = newData.values.sort(function (a, b) {
+        if (sort == "asc") {
+          if (a.title < b.title) {
+            return -1;
+          }
+          if (a.title > b.title) {
+            return 1;
+          }
+        }
+        if (sort == "desc") {
+          if (a.title > b.title) {
+            return -1;
+          }
+          if (a.title < b.title) {
+            return 1;
+          }
+        }
+
+        return 0;
+      });
+      props.setData(newData);
+    }
+  };
+
   return (
     <Menu
       contentStyle={{
@@ -42,7 +73,7 @@ function HomeFilterMenu(props: Props) {
           borderTopRightRadius: 4,
           backgroundColor: "white",
         }}
-        title={props.values?.length + " Entries"}
+        title={props.data?.values.length + " Entries"}
       />
       <Divider />
       <Menu.Item
@@ -51,7 +82,8 @@ function HomeFilterMenu(props: Props) {
         }}
         leadingIcon="sort-ascending"
         onPress={() => {
-          props.sort("asc");
+          sort("asc");
+          setShowMenu(false);
         }}
         title="sort ascending"
       />
@@ -61,7 +93,8 @@ function HomeFilterMenu(props: Props) {
         }}
         leadingIcon="sort-descending"
         onPress={() => {
-          props.sort("desc");
+          sort("desc");
+          setShowMenu(false);
         }}
         title="sort descending"
       />

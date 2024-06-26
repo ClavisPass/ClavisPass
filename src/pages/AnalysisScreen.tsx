@@ -1,10 +1,11 @@
 import Constants from "expo-constants";
 import React from "react";
-import { SafeAreaView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SegmentedButtons } from "react-native-paper";
-import globalStyles from "../ui/globalStyles";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import { StatusBar } from "expo-status-bar";
+import AnimatedContainer from "../components/AnimatedContainer";
+import { useFocusEffect } from "@react-navigation/native";
 
 const styles = StyleSheet.create({
   container: {
@@ -16,18 +17,19 @@ const styles = StyleSheet.create({
   },
 });
 
-function AnalysisScreen() {
+function AnalysisScreen({ navigation }: { navigation: any }) {
   const [value, setValue] = React.useState("");
   return (
-    <View
-      style={[globalStyles.container, { marginTop: Constants.statusBarHeight }]}
+    <AnimatedContainer
+      style={{ marginTop: Constants.statusBarHeight }}
+      useFocusEffect={useFocusEffect}
     >
       <StatusBar
-          animated={true}
-          style="dark"
-          backgroundColor="transparent"
-          translucent={true}
-        />
+        animated={true}
+        style="dark"
+        backgroundColor="transparent"
+        translucent={true}
+      />
       <TitlebarHeight />
       <SegmentedButtons
         value={value}
@@ -44,7 +46,7 @@ function AnalysisScreen() {
           { value: "risk", label: "Risk" },
         ]}
       />
-    </View>
+    </AnimatedContainer>
   );
 }
 

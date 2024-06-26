@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
-import { Surface, Text } from "react-native-paper";
+import { Surface, Switch, Text } from "react-native-paper";
 import globalStyles from "../ui/globalStyles";
 import SettingsItem from "../components/SettingsItem";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
+import { appWindow } from "@tauri-apps/api/window";
+import AnimatedContainer from "../components/AnimatedContainer";
+import { useFocusEffect } from "@react-navigation/native";
 
 const styles = StyleSheet.create({
   surface: {
@@ -22,10 +25,15 @@ const styles = StyleSheet.create({
   },
 });
 
-function SettingsScreen() {
+function SettingsScreen({ navigation }: { navigation: any }) {
+  const [isSwitchOn, setIsSwitchOn] = React.useState(true);
+  useEffect(() => {
+    //appWindow.setContentProtected(isSwitchOn);
+  }, [isSwitchOn]);
   return (
-    <View
-      style={[globalStyles.container, { marginTop: Constants.statusBarHeight }]}
+    <AnimatedContainer
+      style={{ marginTop: Constants.statusBarHeight }}
+      useFocusEffect={useFocusEffect}
     >
       <StatusBar
         animated={true}
@@ -36,7 +44,13 @@ function SettingsScreen() {
       <TitlebarHeight />
       <ScrollView style={styles.scrollView}>
         <SettingsItem>
-          <Text>Surface</Text>
+          <Text>Contentprotection</Text>
+          <Switch
+            value={isSwitchOn}
+            onValueChange={() => {
+              setIsSwitchOn(!isSwitchOn);
+            }}
+          />
         </SettingsItem>
         <SettingsItem>
           <Text>Surface</Text>
@@ -57,7 +71,7 @@ function SettingsScreen() {
           <Text>Surface</Text>
         </SettingsItem>
       </ScrollView>
-    </View>
+    </AnimatedContainer>
   );
 }
 

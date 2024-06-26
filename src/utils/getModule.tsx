@@ -103,21 +103,6 @@ function getModule(
       />
     );
   }
-  if (module.module === ModulesEnum.TITLE) {
-    let moduleObject = module as TitleModuleType;
-    return (
-      <TitleModule
-        key={moduleObject.id}
-        id={moduleObject.id}
-        module={moduleObject.module}
-        value={moduleObject.value}
-        edit={edit}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-        deleteModule={deleteModule}
-      />
-    );
-  }
   if (module.module === ModulesEnum.URL) {
     let moduleObject = module as URLModuleType;
     return (

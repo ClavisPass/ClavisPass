@@ -67,6 +67,7 @@ export async function openFastAccess(setModules: () => void) {
         title: "You've got mail! 📬",
         body: "Here is the notification body",
         data: { data: "goes here", test: { test1: "more data" } },
+        vibrate: [0, 250, 250, 250]
       },
       trigger: null,
     });
@@ -82,6 +83,7 @@ async function registerForPushNotificationsAsync() {
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: "#FF231F7C",
+      enableVibrate: true,
     });
   }
 

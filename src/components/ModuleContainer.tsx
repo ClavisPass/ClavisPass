@@ -43,9 +43,9 @@ type Props = {
   title: string;
   edit: boolean;
   delete: boolean;
-  onDragStart: () => void;
-  onDragEnd: () => void;
-  deleteModule: (id: string) => void;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
+  deleteModule?: (id: string) => void;
 };
 
 function ModuleContainer(props: Props) {
@@ -78,7 +78,7 @@ function ModuleContainer(props: Props) {
                 icon="close"
                 iconColor={theme.colors.error}
                 size={20}
-                onPress={() => props.deleteModule(props.id)}
+                onPress={() => props.deleteModule?.(props.id)}
               />
             </View>
           </>

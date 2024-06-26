@@ -35,17 +35,9 @@ type Props = {
 function ListItem(props: Props) {
   const { setModules } = useQuickSelect();
 
-  const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [icon, setIcon] = useState("lock");
   useEffect(() => {
-    const titleResult = props.item.modules.filter(
-      (module) => module.module === ModulesEnum.TITLE
-    );
-    if (titleResult.length > 0) {
-      setTitle(titleResult[0].value);
-    }
-
     const urlResult = props.item.modules.filter(
       (module) => module.module === ModulesEnum.URL
     );
@@ -113,7 +105,7 @@ function ListItem(props: Props) {
               <Icon color={"lightgray"} source={icon} size={20} />
             )}
             <Text variant="bodyMedium" style={{ userSelect: "none" }}>
-              {title}
+              {props.item.title}
             </Text>
           </View>
           <Icon

@@ -1,11 +1,11 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import ModulesType, { ModuleType } from "../types/ModulesType";
 
 import ModulesEnum from "../enums/ModulesEnum";
 
 import type { StackScreenProps } from "@react-navigation/stack";
-import { IconButton, Menu, Modal } from "react-native-paper";
+import { IconButton } from "react-native-paper";
 import DragList, { DragListRenderItemInfo } from "react-native-draglist";
 import Header from "../components/Header";
 import globalStyles from "../ui/globalStyles";
@@ -17,11 +17,12 @@ import getModule from "../utils/getModule";
 import getModuleData from "../utils/getModuleData";
 import { ScrollView } from "react-native-gesture-handler";
 import AddModuleModal from "../components/modals/AddModuleModal";
-import { formatDateTime, getDateTime } from "../utils/Timestamp";
+import { getDateTime } from "../utils/Timestamp";
 import { TitlebarHeight } from "../components/CustomTitlebar";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useData } from "../contexts/DataProvider";
 import DataType from "../types/DataType";
+import TitleModule from "../components/modules/TitleModule";
+import AnimatedContainer from "../components/AnimatedContainer";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -41,7 +42,8 @@ type RootStackParamList = {
 type Props = StackScreenProps<RootStackParamList>;
 
 type DraggableListProps = {
-  modules: ModulesType;
+  value: ValuesType;
+  setValue: (value: ValuesType) => void;
   changeModules: (data: ModulesType) => void;
   deleteModule: (id: string) => void;
   edit: boolean;
@@ -69,7 +71,7 @@ function DraggableList(props: DraggableListProps) {
   }
 
   async function onReordered(fromIndex: number, toIndex: number) {
-    const copy = [...props.modules]; // Don't modify react data in-place
+    const copy = [...props.value.modules]; // Don't modify react data in-place
     const removed = copy.splice(fromIndex, 1);
 
     copy.splice(toIndex, 0, removed[0]); // Now insert at the new pos
@@ -79,10 +81,11 @@ function DraggableList(props: DraggableListProps) {
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={{ width: Dimensions.get("window").width, flex: 1 }}>
+        <TitleModule value={props.value} setValue={props.setValue} />
         <DragList
           contentContainerStyle={styles.scrollView}
           style={styles.scrollViewStyle}
-          data={props.modules}
+          data={props.value.modules}
           keyExtractor={keyExtractor}
           onReordered={onReordered}
           renderItem={renderItem}
@@ -91,8 +94,6 @@ function DraggableList(props: DraggableListProps) {
     </View>
   );
 }
-
-//<ScrollView style={{ width: Dimensions.get("window").width }}>
 
 function EditScreen({ route, navigation }: Props) {
   const data = useData();
@@ -164,7 +165,7 @@ function EditScreen({ route, navigation }: Props) {
   }, [edit]);
 
   return (
-    <View style={globalStyles.container}>
+    <AnimatedContainer style={globalStyles.container}>
       <TitlebarHeight />
       <Header
         title={title}
@@ -214,19 +215,19 @@ function EditScreen({ route, navigation }: Props) {
         )}
       </Header>
       <DraggableList
-        modules={value.modules}
+        value={value}
+        setValue={setValue}
         changeModules={changeModules}
         deleteModule={deleteModule}
         edit={edit}
       />
-
       <Button text={"Save"} onPress={saveValue} />
       <AddModuleModal
         addModule={addModule}
         visible={addModuleModalVisible}
         setVisible={setAddModuleModalVisible}
       />
-    </View>
+    </AnimatedContainer>
   );
 }
 

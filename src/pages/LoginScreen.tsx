@@ -1,11 +1,10 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import globalStyles from "../ui/globalStyles";
 import { useAuth } from "../contexts/AuthProvider";
 import Button from "../components/Button";
 import TypeWriterComponent from "../components/TypeWriter";
-import FadeInView from "../components/FadeInView";
-import CustomTitlebar from "../components/CustomTitlebar";
+import AnimatedContainer from "../components/AnimatedContainer";
+import ContentProtection from "../components/ContentProtection";
 
 const styles = StyleSheet.create({
   surface: {
@@ -24,12 +23,18 @@ const styles = StyleSheet.create({
 
 function LoginScreen() {
   const auth = useAuth();
+
   return (
-    <View style={globalStyles.container}>
-      <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
-        <TypeWriterComponent />
-        <Button text={"Login"} onPress={() => auth.login("1234")}></Button>
-      </View>
+    <View style={{ flex: 1, backgroundColor: "white" }}>
+      <AnimatedContainer>
+        <ContentProtection enabled={false} />
+        <View
+          style={{ alignItems: "center", justifyContent: "center", flex: 1 }}
+        >
+          <TypeWriterComponent />
+          <Button text={"Login"} onPress={() => auth.login("1234")}></Button>
+        </View>
+      </AnimatedContainer>
     </View>
   );
 }

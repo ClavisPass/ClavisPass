@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { Searchbar, IconButton } from "react-native-paper";
 
@@ -10,26 +10,19 @@ import { getData } from "../api/getData";
 
 const DATA = getData();
 
-import {
-  useSharedValue,
-  withTiming,
-  useAnimatedStyle,
-  Easing,
-} from "react-native-reanimated";
-import globalStyles from "../ui/globalStyles";
 import { useData } from "../contexts/DataProvider";
 import { LinearGradient } from "expo-linear-gradient";
 import ListItem from "../components/ListItem";
 import { StatusBar } from "expo-status-bar";
 import Constants from "expo-constants";
 import getColors from "../ui/linearGradient";
-import { FlatList } from "react-native-gesture-handler";
 import WebSpecific from "../components/platformSpecific/WebSpecific";
 import HomeFilterMenu from "../components/menus/HomeFilterMenu";
-import DataType from "../types/DataType";
-import ValuesType from "../types/ValuesType";
-import ModulesType, { ModuleType } from "../types/ModulesType";
-import ModulesEnum from "../enums/ModulesEnum";
+import Blur from "../components/Blur";
+import FolderFilter from "../components/FolderFilter";
+import AnimatedContainer from "../components/AnimatedContainer";
+import ContentProtection from "../components/ContentProtection";
+import { useFocusEffect } from "@react-navigation/native";
 
 const styles = StyleSheet.create({
   box: {
@@ -38,77 +31,49 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
     margin: 30,
   },
-  chip: {
-    marginRight: 4,
-    borderRadius: 15,
-  },
 });
 
 function HomeScreen({ navigation }: { navigation: any }) {
-  const flatListRef = useRef<FlatList>(null);
-  const [flatListOffset, setFlatListOffset] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFolder, setSelectedFolder] = useState("");
+  const [selectedFav, setSelectedFav] = useState(false);
 
   const data = useData();
 
-  let animatedHeight = useSharedValue(0);
-
-  const config = {
-    duration: 500,
-    easing: Easing.bezier(0.5, 0.01, 0, 1),
-  };
-
-  const style = useAnimatedStyle(() => {
-    return {
-      height: withTiming(animatedHeight.value, config),
-    };
-  });
-
-  const sort = (sort: "asc" | "desc") => {
-    let newData = { ...data.data } as DataType;
-    if (newData) {
-      newData.values = newData.values.sort(function (a, b) {
-        const firstTitle = a.modules.find(
-          (x: ModuleType) => x.module === ModulesEnum.TITLE
-        );
-        const secondTitle = b.modules.find(
-          (x: ModuleType) => x.module === ModulesEnum.TITLE
-        );
-        if (firstTitle && secondTitle) {
-          if (sort == "asc") {
-            if (firstTitle.value < secondTitle.value) {
-              return -1;
-            }
-            if (firstTitle.value > secondTitle.value) {
-              return 1;
-            }
-          }
-          if (sort == "desc") {
-            if (firstTitle.value > secondTitle.value) {
-              return -1;
-            }
-            if (firstTitle.value < secondTitle.value) {
-              return 1;
-            }
-          }
+  const filteredValues = useMemo(() => {
+    return data.data?.values.filter((item) => {
+      let folderFilter = false;
+      if (selectedFolder != "") {
+        if (item.folder == selectedFolder) {
+          folderFilter = true;
         }
-
-        return 0;
-      });
-      data.setData(newData);
-    }
-  };
+      } else {
+        folderFilter = true;
+      }
+      let favFilter = false;
+      if (selectedFav) {
+        if (item.fav) {
+          favFilter = true;
+        }
+      } else {
+        favFilter = true;
+      }
+      return (
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        folderFilter &&
+        favFilter
+      );
+    });
+  }, [data.data, searchQuery, selectedFolder, selectedFav]);
 
   useEffect(() => {
     data.setData(DATA);
   }, []);
 
   return (
-    <View
-      style={[
-        globalStyles.container,
-        { display: "flex", justifyContent: "center" },
-      ]}
+    <AnimatedContainer
+      style={{ display: "flex", justifyContent: "center" }}
+      useFocusEffect={useFocusEffect}
     >
       <StatusBar
         animated={true}
@@ -116,6 +81,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
         backgroundColor="transparent"
         translucent={true}
       />
+      <ContentProtection enabled={true} />
       <LinearGradient
         colors={getColors()}
         dither={true}
@@ -155,7 +121,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
                 onPress={() => console.log("Pressed")}
                 iconColor="white"
               />
-              <HomeFilterMenu values={data.data?.values} sort={sort} />
+              <HomeFilterMenu data={data.data} setData={data.setData} />
             </WebSpecific>
           </View>
         </View>
@@ -185,13 +151,13 @@ function HomeScreen({ navigation }: { navigation: any }) {
               onPress={() => console.log("Pressed")}
               iconColor="white"
             />
-            <HomeFilterMenu values={data.data?.values} sort={sort} />
+            <HomeFilterMenu data={data.data} setData={data.setData} />
           </WebSpecific>
         </View>
       </LinearGradient>
       <View style={{ flex: 1, width: "100%" }}>
         <FlashList
-          data={data.data?.values}
+          data={filteredValues}
           renderItem={({ item }) => (
             <ListItem
               item={item}
@@ -204,78 +170,18 @@ function HomeScreen({ navigation }: { navigation: any }) {
           )}
           estimatedItemSize={200}
         />
-      </View>
-      <View
-        style={{
-          padding: 4,
-          maxHeight: 50,
-          width: "100%",
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-        }}
-      >
         <WebSpecific>
-          <IconButton
-            icon={"chevron-left"}
-            style={{ margin: 0 }}
-            onPress={() => {
-              const offset = flatListOffset - 200;
-              setFlatListOffset(offset);
-              flatListRef?.current?.scrollToOffset({
-                animated: true,
-                offset: offset,
-              });
-            }}
-            size={12}
-          />
-        </WebSpecific>
-        <View style={{ flexBasis: "auto", flexShrink: 1 }}>
-          <FlatList
-            ref={flatListRef}
-            data={data.data?.folder}
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            style={{ flexGrow: 1 }}
-            ListHeaderComponent={() => {
-              return (
-                <Chip
-                  icon={"star"}
-                  onPress={() => console.log("Pressed")}
-                  style={styles.chip}
-                >
-                  {"Favorite"}
-                </Chip>
-              );
-            }}
-            renderItem={({ item }) => (
-              <Chip
-                icon={"folder"}
-                onPress={() => console.log("Pressed")}
-                style={styles.chip}
-              >
-                {item}
-              </Chip>
-            )}
-          />
-        </View>
-        <WebSpecific>
-          <IconButton
-            icon={"chevron-right"}
-            style={{ margin: 0 }}
-            onPress={() => {
-              const offset = flatListOffset + 200;
-              setFlatListOffset(offset);
-              flatListRef?.current?.scrollToOffset({
-                animated: true,
-                offset: offset,
-              });
-            }}
-            size={12}
-          />
+          <Blur />
         </WebSpecific>
       </View>
-    </View>
+      <FolderFilter
+        folder={data.data?.folder}
+        selectedFav={selectedFav}
+        setSelectedFav={setSelectedFav}
+        selectedFolder={selectedFolder}
+        setSelectedFolder={setSelectedFolder}
+      />
+    </AnimatedContainer>
   );
 }
 

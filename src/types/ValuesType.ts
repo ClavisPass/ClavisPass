@@ -4,6 +4,7 @@ import { ModulesTypeSchema } from "./ModulesType";
 export const ValuesTypeSchema = z.object({
   id: z.string(),
   modules: ModulesTypeSchema,
+  title: z.string(),
   fav: z.boolean(),
   created: z.string().datetime(),
   lastUpdated: z.string().datetime(),
