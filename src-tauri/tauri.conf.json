@@ -24,6 +24,9 @@
         "setAlwaysOnTop": true,
         "setSize": true,
         "center": true
+      },
+      "shell": {
+        "open": true
       }
     },
     "bundle": {

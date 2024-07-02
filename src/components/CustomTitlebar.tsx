@@ -1,21 +1,43 @@
 import React, { useEffect } from "react";
-import { Platform, View } from "react-native";
+import { Platform, View, StyleSheet } from "react-native";
 import { IconButton } from "react-native-paper";
 import theme from "../ui/theme";
 import WebSpecific from "./platformSpecific/WebSpecific";
 import { appWindow } from "@tauri-apps/api/window";
 
-type Props = {};
+const styles = StyleSheet.create({
+  titlebar: {
+    height: 46,
+    width: "100%",
+    zIndex: 0,
+  },
+});
 
-export function TitlebarHeight() {
+type Props = {
+  filled?: boolean;
+};
+
+export function TitlebarHeight(props: Props) {
+  if (props.filled) {
+    return (
+      <WebSpecific>
+        <View
+          style={[
+            styles.titlebar,
+            { backgroundColor: "white", borderRadius: 20, marginBottom: 4 },
+          ]}
+        ></View>
+      </WebSpecific>
+    );
+  }
   return (
     <WebSpecific>
-      <View style={{ height: 46, width: "100%", zIndex: 9999 }}></View>
+      <View style={styles.titlebar}></View>
     </WebSpecific>
   );
 }
 
-function CustomTitlebar(props: Props) {
+function CustomTitlebar() {
   useEffect(() => {
     if (Platform.OS === "web") {
       if (document) {
@@ -59,8 +81,7 @@ function CustomTitlebar(props: Props) {
             justifyContent: "space-between",
           }}
         >
-          <View>
-          </View>
+          <View></View>
           <View
             style={{
               display: "flex",

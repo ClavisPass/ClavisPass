@@ -12,6 +12,7 @@ import Props from "../../types/ModuleProps";
 import theme from "../../ui/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../../ui/linearGradient";
+import WifiQRCodeModal from "../modals/WifiQRCodeModal";
 
 function WifiModule(props: WifiModuleType & Props) {
   const [secureTextEntry, setSecureTextEntry] = React.useState(true);
@@ -95,7 +96,7 @@ function WifiModule(props: WifiModuleType & Props) {
           <CopyToClipboard value={value} />
         </View>
       </View>
-      
+      <WifiQRCodeModal visible={visible} setVisible={setVisible} wifiname={name} wifitype={wifiType} wifipassword={value}/>
     </ModuleContainer>
   );
 }

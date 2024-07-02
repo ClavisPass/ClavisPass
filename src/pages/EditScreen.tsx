@@ -165,7 +165,7 @@ function EditScreen({ route, navigation }: Props) {
   }, [edit]);
 
   return (
-    <AnimatedContainer style={globalStyles.container}>
+    <AnimatedContainer style={globalStyles.container} trigger={edit}>
       <TitlebarHeight />
       <Header
         title={title}
@@ -195,7 +195,8 @@ function EditScreen({ route, navigation }: Props) {
           icon="square-edit-outline"
           iconColor={theme.colors.primary}
           size={20}
-          selected={true}
+          animated={true}
+          selected={edit}
           onPress={() => setEdit(!edit)}
         />
         {edit ? (
@@ -203,7 +204,7 @@ function EditScreen({ route, navigation }: Props) {
             icon="delete"
             iconColor={theme.colors.error}
             size={20}
-            selected={true}
+            selected={false}
             onPress={() => console.log("test")}
           />
         ) : (

@@ -86,36 +86,45 @@ function PasswordGeneratorModal(props: Props) {
               justifyContent: "center",
             }}
           >
-            <View style={{ display: "flex", flexDirection: "row", margin: 4 }}>
+            <View style={{ width: "100%", height: 40 }}>
+              <TextInput
+                outlineStyle={[globalStyles.outlineStyle]}
+                style={[globalStyles.textInputStyle, { textAlign: "center" }]}
+                value={genPassword}
+                mode="outlined"
+                autoCapitalize="none"
+                readOnly={true}
+              />
+            </View>
+            <View
+              style={{
+                //width: "100%",
+                display: "flex",
+                flexDirection: "row",
+                margin: 2,
+                //justifyContent: "space-between",
+              }}
+            >
               <IconButton
                 iconColor={theme.colors.primary}
                 icon="autorenew"
                 size={20}
                 onPress={generate}
               />
-              <TextInput
-                outlineStyle={[globalStyles.outlineStyle]}
-                style={globalStyles.textInputStyle}
-                value={genPassword}
-                mode="outlined"
-                autoCapitalize="none"
-                readOnly={true}
+              <Slider
+                value={valueSlider}
+                onValueChange={setvalueSlider}
+                onSlidingComplete={generate}
+                style={{ width: 200, height: 40 }}
+                minimumValue={1}
+                maximumValue={50}
+                step={1}
+                minimumTrackTintColor="lightgray"
+                maximumTrackTintColor="lightgray"
+                thumbTintColor={theme.colors.primary}
               />
               <CopyToClipboard value={genPassword} />
             </View>
-
-            <Slider
-              value={valueSlider}
-              onValueChange={setvalueSlider}
-              onSlidingComplete={generate}
-              style={{ width: 200, height: 40 }}
-              minimumValue={1}
-              maximumValue={50}
-              step={1}
-              minimumTrackTintColor="lightgray"
-              maximumTrackTintColor="lightgray"
-              thumbTintColor={theme.colors.primary}
-            />
             <View style={styles.container}>
               <Text variant="bodyLarge">
                 {"Password Length: " + valueSlider}

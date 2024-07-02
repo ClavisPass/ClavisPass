@@ -5,6 +5,7 @@ import ModulesEnum from "../../enums/ModulesEnum";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../../ui/linearGradient";
 import QRCode from "react-qr-code";
+import { BlurView } from "expo-blur";
 
 const styles = StyleSheet.create({
   containerStyle: {
@@ -37,44 +38,58 @@ function WifiQRCodeModal(props: Props) {
     setValue(wifiString);
   }, [props.wifitype, props.wifiname, props.wifipassword]);
   return (
-    <Portal>
-      <Modal
-        visible={props.visible}
-        onDismiss={hideModal}
-        contentContainerStyle={{
-          backgroundColor: "transparent",
-          margin: 26,
-          borderRadius: 20,
-          display: "flex",
-          alignSelf: "center",
-          justifyContent: "center",
-          width: 300,
-          height: 300,
-        }}
-      >
-        <LinearGradient
-          colors={getColors()}
-          style={{ padding: 6, width: 300, height: 300, borderRadius: 20 }}
-          end={{ x: 0.1, y: 0.2 }}
-          dither={true}
-        >
-          <View
+    <>
+      <Portal>
+        {props.visible ? (
+          <BlurView
+            intensity={20}
             style={{
-              backgroundColor: "white",
-              padding: 20,
-              borderRadius: 20,
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
             }}
+          ></BlurView>
+        ) : null}
+        <Modal
+          visible={props.visible}
+          onDismiss={hideModal}
+          contentContainerStyle={{
+            backgroundColor: "transparent",
+            margin: 26,
+            borderRadius: 20,
+            display: "flex",
+            alignSelf: "center",
+            justifyContent: "center",
+            width: 300,
+            height: 300,
+          }}
+        >
+          <LinearGradient
+            colors={getColors()}
+            style={{ padding: 6, borderRadius: 20 }}
+            end={{ x: 0.1, y: 0.2 }}
+            dither={true}
           >
-            <QRCode
-              size={256}
-              style={{ height: "auto", width: "auto" }}
-              value={value}
-              viewBox="0 0 256 256"
-            />
-          </View>
-        </LinearGradient>
-      </Modal>
-    </Portal>
+            <View
+              style={{
+                backgroundColor: "white",
+                padding: 20,
+                borderRadius: 20,
+              }}
+            >
+              <QRCode
+                size={256}
+                style={{ height: "auto", width: "auto" }}
+                value={value}
+                viewBox="0 0 256 256"
+              />
+            </View>
+          </LinearGradient>
+        </Modal>
+      </Portal>
+    </>
   );
 }
 

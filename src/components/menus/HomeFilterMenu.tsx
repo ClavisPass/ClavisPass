@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Divider, IconButton, Menu } from "react-native-paper";
-import { ValuesListType } from "../../types/ValuesType";
 import { useAuth } from "../../contexts/AuthProvider";
 import DataType from "../../types/DataType";
-import { ModuleType } from "../../types/ModulesType";
-import ModulesEnum from "../../enums/ModulesEnum";
+import { View } from "react-native";
+import theme from "../../ui/theme";
 
 type Props = {
   data: DataType;
@@ -66,15 +65,25 @@ function HomeFilterMenu(props: Props) {
         />
       }
     >
-      <Menu.Item
-        style={{
-          cursor: "auto",
-          borderTopLeftRadius: 22,
-          borderTopRightRadius: 4,
-          backgroundColor: "white",
-        }}
-        title={props.data?.values.length + " Entries"}
-      />
+      <View style={{ display: "flex", flexDirection: "row" }}>
+        <Menu.Item
+          style={{
+            cursor: "auto",
+            borderTopLeftRadius: 22,
+            borderTopRightRadius: 4,
+            backgroundColor: "white",
+          }}
+          title={props.data?.values.length + " Entries"}
+        />
+        <IconButton
+          icon="refresh"
+          size={20}
+          iconColor={theme.colors.primary}
+          onPress={() => {
+            //setShowMenu(true);
+          }}
+        />
+      </View>
       <Divider />
       <Menu.Item
         style={{

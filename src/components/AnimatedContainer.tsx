@@ -13,6 +13,7 @@ type Props = {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
   useFocusEffect?: (effect: EffectCallback) => void;
+  trigger?: boolean;
 };
 
 function AnimatedContainer(props: Props) {
@@ -39,7 +40,7 @@ function AnimatedContainer(props: Props) {
       return () => {
         opacity.value = 0;
       };
-    }, [])
+    }, [props.trigger])
   );
 
   return (

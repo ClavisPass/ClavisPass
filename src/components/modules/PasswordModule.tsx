@@ -85,7 +85,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
       <View style={globalStyles.moduleView}>
         <View style={{ flexGrow: 1, padding: 6 }}>
           <ProgressBar
-            style={{ width: "auto" }}
+            style={{ width: "100%" }}
             progress={entropyPercentage}
             color={progressbarColor}
           />
