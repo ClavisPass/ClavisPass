@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View } from "react-native";
 
 import { IconButton, TextInput } from "react-native-paper";
@@ -58,7 +58,6 @@ function PasswordModule(props: PasswordModuleType & Props) {
       edit={props.edit}
       delete={props.edit}
       onDragStart={props.onDragStart}
-      onDragEnd={props.onDragEnd}
       deleteModule={props.deleteModule}
     >
       <View style={globalStyles.moduleView}>
@@ -72,15 +71,17 @@ function PasswordModule(props: PasswordModuleType & Props) {
           autoCapitalize="none"
           autoComplete="password"
           textContentType="password"
+          disabled={props.edit}
           right={
             <TextInput.Icon
               icon={eyeIcon}
               color={theme.colors.primary}
               onPress={() => setSecureTextEntry(!secureTextEntry)}
+              disabled={props.edit}
             />
           }
         />
-        <CopyToClipboard value={value} />
+        <CopyToClipboard value={value} disabled={props.edit} />
       </View>
       <View style={globalStyles.moduleView}>
         <View style={{ flexGrow: 1, padding: 6 }}>
@@ -98,6 +99,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
           onPress={() => {
             setVisible(true);
           }}
+          disabled={props.edit}
         />
         <PasswordGeneratorModal
           visible={visible}

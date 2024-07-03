@@ -17,7 +17,6 @@ function KeyModule(props: KeyModuleType & Props) {
       edit={props.edit}
       delete={props.edit}
       onDragStart={props.onDragStart}
-      onDragEnd={props.onDragEnd}
       deleteModule={props.deleteModule}
     >
       <TextInput
@@ -28,6 +27,7 @@ function KeyModule(props: KeyModuleType & Props) {
         onChangeText={(text) => setValue(text)}
         autoComplete="one-time-code"
         keyboardType="visible-password"
+        disabled={props.edit}
       />
     </ModuleContainer>
   );

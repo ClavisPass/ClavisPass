@@ -11,6 +11,7 @@ import ValuesType from "../../types/ValuesType";
 type Props = {
   value: ValuesType;
   setValue: (value: ValuesType) => void;
+  disabled: boolean;
 };
 
 function TitleModule(props: Props) {
@@ -27,6 +28,7 @@ function TitleModule(props: Props) {
         value={props.value.title}
         mode="outlined"
         onChangeText={(text) => changeTitle(text)}
+        disabled={props.disabled}
       />
     </ModuleContainer>
   );

@@ -89,7 +89,6 @@ function URLModule(props: URLModuleType & Props) {
       edit={props.edit}
       delete={props.edit}
       onDragStart={props.onDragStart}
-      onDragEnd={props.onDragEnd}
       deleteModule={props.deleteModule}
     >
       <View style={globalStyles.moduleView}>
@@ -109,6 +108,7 @@ function URLModule(props: URLModuleType & Props) {
           autoComplete="url"
           textContentType="URL"
           keyboardType="url"
+          disabled={props.edit}
         />
         {
           <IconButton
@@ -122,6 +122,7 @@ function URLModule(props: URLModuleType & Props) {
                 Linking.openURL(value);
               }
             }}
+            disabled={props.edit}
           />
         }
       </View>

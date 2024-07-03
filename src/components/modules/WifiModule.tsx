@@ -43,7 +43,6 @@ function WifiModule(props: WifiModuleType & Props) {
       edit={props.edit}
       delete={props.edit}
       onDragStart={props.onDragStart}
-      onDragEnd={props.onDragEnd}
       deleteModule={props.deleteModule}
     >
       <View style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -63,12 +62,14 @@ function WifiModule(props: WifiModuleType & Props) {
             value={name}
             mode="outlined"
             onChangeText={(text) => setName(text)}
+            disabled={props.edit}
           />
           <IconButton
             iconColor={theme.colors.primary}
             icon="qrcode"
             size={20}
             onPress={showModal}
+            disabled={props.edit}
           />
         </View>
         <View style={globalStyles.moduleView}>
@@ -90,13 +91,20 @@ function WifiModule(props: WifiModuleType & Props) {
                   Keyboard.dismiss();
                   setSecureTextEntry(!secureTextEntry);
                 }}
+                disabled={props.edit}
               />
             }
           />
-          <CopyToClipboard value={value} />
+          <CopyToClipboard value={value} disabled={props.edit} />
         </View>
       </View>
-      <WifiQRCodeModal visible={visible} setVisible={setVisible} wifiname={name} wifitype={wifiType} wifipassword={value}/>
+      <WifiQRCodeModal
+        visible={visible}
+        setVisible={setVisible}
+        wifiname={name}
+        wifitype={wifiType}
+        wifipassword={value}
+      />
     </ModuleContainer>
   );
 }

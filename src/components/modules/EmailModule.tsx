@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { IconButton, Text, TextInput } from "react-native-paper";
@@ -19,7 +19,6 @@ function EmailModule(props: EmailModuleType & Props) {
       edit={props.edit}
       delete={props.edit}
       onDragStart={props.onDragStart}
-      onDragEnd={props.onDragEnd}
       deleteModule={props.deleteModule}
     >
       <View style={globalStyles.moduleView}>
@@ -33,8 +32,9 @@ function EmailModule(props: EmailModuleType & Props) {
           autoComplete="email"
           textContentType="emailAddress"
           keyboardType="email-address"
+          disabled={props.edit}
         />
-        <CopyToClipboard value={value} />
+        <CopyToClipboard value={value} disabled={props.edit}/>
       </View>
     </ModuleContainer>
   );

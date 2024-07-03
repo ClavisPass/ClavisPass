@@ -70,6 +70,19 @@ function HomeScreen({ navigation }: { navigation: any }) {
     data.setData(DATA);
   }, []);
 
+  const [statusbarStyle, setStatusbarStyle] = useState<"dark" | "light">(
+    "light"
+  );
+
+  /*useFocusEffect(
+    React.useCallback(() => {
+      setStatusbarStyle("light");
+      return () => {
+        setStatusbarStyle("dark");
+      };
+    }, [])
+  );*/
+
   return (
     <AnimatedContainer
       style={{ display: "flex", justifyContent: "center" }}
@@ -77,7 +90,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
     >
       <StatusBar
         animated={true}
-        style="light"
+        style={statusbarStyle}
         backgroundColor="transparent"
         translucent={true}
       />

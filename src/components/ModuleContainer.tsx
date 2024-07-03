@@ -6,6 +6,11 @@ import theme from "../ui/theme";
 
 const styles = StyleSheet.create({
   container: {
+    display: "flex",
+    flexDirection: "row",
+    flex: 1,
+  },
+  innercontainer: {
     padding: 10,
     marginLeft: 4,
     marginRight: 4,
@@ -15,6 +20,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     flex: 1,
+    alignItems: "center",
   },
   draggable: {
     borderWidth: 1,
@@ -31,9 +37,9 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    borderLeftWidth: 1,
-    borderColor: "lightgrey",
-    marginLeft: 6,
+    //borderLeftWidth: 1,
+    //borderColor: "lightgrey",
+    //marginLeft: 6,
   },
 });
 
@@ -44,25 +50,15 @@ type Props = {
   edit: boolean;
   delete: boolean;
   onDragStart?: () => void;
-  onDragEnd?: () => void;
   deleteModule?: (id: string) => void;
 };
 
 function ModuleContainer(props: Props) {
   return (
-    <>
-      <View style={styles.container}>
+    <View style={styles.container}>
+      <View style={styles.innercontainer}>
         {props.edit ? (
-          <WebSpecific notIn={true}>
-            <TouchableOpacity
-              key={props.title}
-              onPressIn={props.onDragStart}
-              onPressOut={props.onDragEnd}
-              style={styles.draggable}
-            >
-              <Icon source="drag" color={theme.colors.primary} size={20} />
-            </TouchableOpacity>
-          </WebSpecific>
+          <Icon source="drag" color={theme.colors.primary} size={20} />
         ) : null}
 
         <View style={styles.content}>
@@ -71,20 +67,21 @@ function ModuleContainer(props: Props) {
           </Text>
           {props.children}
         </View>
-        {props.delete ? (
-          <>
-            <View style={styles.delete}>
-              <IconButton
-                icon="close"
-                iconColor={theme.colors.error}
-                size={20}
-                onPress={() => props.deleteModule?.(props.id)}
-              />
-            </View>
-          </>
-        ) : null}
       </View>
-    </>
+      {props.delete ? (
+        <>
+          <View style={styles.delete}>
+            <IconButton
+              style={{ margin: 0 }}
+              icon="close"
+              iconColor={theme.colors.error}
+              size={20}
+              onPress={() => props.deleteModule?.(props.id)}
+            />
+          </View>
+        </>
+      ) : null}
+    </View>
   );
 }
 

@@ -17,7 +17,6 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
       edit={props.edit}
       delete={props.edit}
       onDragStart={props.onDragStart}
-      onDragEnd={props.onDragEnd}
       deleteModule={props.deleteModule}
     >
       <TextInput
@@ -28,6 +27,7 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
         onChangeText={(text) => setText(text)}
         onEndEditing={() => console.log("der bro ist fertig")}
         autoCapitalize="none"
+        disabled={props.edit}
       />
     </ModuleContainer>
   );

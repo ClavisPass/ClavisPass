@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Dimensions } from "react-native";
+import { View, StyleSheet, Dimensions, Platform } from "react-native";
 import ModulesType, { ModuleType } from "../types/ModulesType";
 
 import ModulesEnum from "../enums/ModulesEnum";
@@ -23,6 +23,8 @@ import { useData } from "../contexts/DataProvider";
 import DataType from "../types/DataType";
 import TitleModule from "../components/modules/TitleModule";
 import AnimatedContainer from "../components/AnimatedContainer";
+import DraggableModulesListWeb from "../components/DraggableList/DraggableModulesListWeb";
+import DraggableModulesList from "../components/DraggableList/DraggableModulesList";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -41,15 +43,15 @@ type RootStackParamList = {
 
 type Props = StackScreenProps<RootStackParamList>;
 
-type DraggableListProps = {
+/*type DraggableListProps = {
   value: ValuesType;
   setValue: (value: ValuesType) => void;
   changeModules: (data: ModulesType) => void;
   deleteModule: (id: string) => void;
   edit: boolean;
-};
+};*/
 
-function DraggableList(props: DraggableListProps) {
+/*function DraggableList(props: DraggableListProps) {
   function keyExtractor(str: ModuleType) {
     return str.id;
   }
@@ -93,7 +95,7 @@ function DraggableList(props: DraggableListProps) {
       </ScrollView>
     </View>
   );
-}
+}*/
 
 function EditScreen({ route, navigation }: Props) {
   const data = useData();
@@ -110,6 +112,7 @@ function EditScreen({ route, navigation }: Props) {
     let valueToChange: any = newData?.values.find(
       (x: ValuesType) => x.id === route.params.value.id
     );
+    valueToChange.title = value.title;
     valueToChange.fav = value.fav;
     valueToChange.folder = value.folder;
     valueToChange.modules = value.modules;
@@ -215,13 +218,33 @@ function EditScreen({ route, navigation }: Props) {
           />
         )}
       </Header>
-      <DraggableList
+      {/*<DraggableList
         value={value}
         setValue={setValue}
         changeModules={changeModules}
         deleteModule={deleteModule}
         edit={edit}
-      />
+      />*/}
+      <View style={{ width: "100%", height: 84 }}>
+        <TitleModule value={value} setValue={setValue} disabled={edit} />
+      </View>
+      {Platform.OS === "web" ? (
+        <DraggableModulesListWeb
+          value={value}
+          setValue={setValue}
+          changeModules={changeModules}
+          deleteModule={deleteModule}
+          edit={edit}
+        />
+      ) : (
+        <DraggableModulesList
+          value={value}
+          setValue={setValue}
+          changeModules={changeModules}
+          deleteModule={deleteModule}
+          edit={edit}
+        />
+      )}
       <Button text={"Save"} onPress={saveValue} />
       <AddModuleModal
         addModule={addModule}

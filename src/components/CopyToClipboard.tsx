@@ -13,6 +13,7 @@ const styles = StyleSheet.create({
 
 type Props = {
   value: string;
+  disabled?: boolean;
 };
 
 function CopyToClipboard(props: Props) {
@@ -36,6 +37,7 @@ function CopyToClipboard(props: Props) {
       iconColor={theme.colors.primary}
       size={20}
       onPress={copyToClipboard}
+      disabled={props.disabled}
     />
   );
 }

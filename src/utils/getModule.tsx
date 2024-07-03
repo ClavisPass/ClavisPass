@@ -11,8 +11,6 @@ import NoteModuleType from "../types/modules/NoteModuleType";
 import NoteModule from "../components/modules/NoteModule";
 import PasswordModuleType from "../types/modules/PasswordModuleType";
 import PasswordModule from "../components/modules/PasswordModule";
-import TitleModuleType from "../types/modules/TitleModuleType";
-import TitleModule from "../components/modules/TitleModule";
 import URLModuleType from "../types/modules/URLModuleType";
 import URLModule from "../components/modules/URLModule";
 import UsernameModuleType from "../types/modules/UsernameModuleType";
@@ -24,7 +22,6 @@ function getModule(
   module: ModuleType,
   edit: boolean,
   onDragStart: () => void,
-  onDragEnd: () => void,
   deleteModule: (id: string) => void
 ): ReactNode {
   if (module.module === ModulesEnum.CUSTOM_FIELD) {
@@ -38,7 +35,6 @@ function getModule(
         value={moduleObject.value}
         edit={edit}
         onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
         deleteModule={deleteModule}
       />
     );
@@ -53,7 +49,6 @@ function getModule(
         value={moduleObject.value}
         edit={edit}
         onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
         deleteModule={deleteModule}
       />
     );
@@ -68,7 +63,6 @@ function getModule(
         value={moduleObject.value}
         edit={edit}
         onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
         deleteModule={deleteModule}
       />
     );
@@ -83,7 +77,6 @@ function getModule(
         value={moduleObject.value}
         edit={edit}
         onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
         deleteModule={deleteModule}
       />
     );
@@ -98,7 +91,6 @@ function getModule(
         value={moduleObject.value}
         edit={edit}
         onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
         deleteModule={deleteModule}
       />
     );
@@ -113,7 +105,6 @@ function getModule(
         value={moduleObject.value}
         edit={edit}
         onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
         deleteModule={deleteModule}
       />
     );
@@ -128,7 +119,6 @@ function getModule(
         value={moduleObject.value}
         edit={edit}
         onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
         deleteModule={deleteModule}
       />
     );
@@ -145,7 +135,6 @@ function getModule(
         value={moduleObject.value}
         edit={edit}
         onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
         deleteModule={deleteModule}
       />
     );
