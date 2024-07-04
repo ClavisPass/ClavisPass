@@ -16,25 +16,11 @@ type Props = {
 };
 
 function DraggableModulesList(props: Props) {
-  useEffect(() => {
-    console.log(props.edit);
-  }, [props.edit]);
   const renderItem = useCallback(
     ({ item, drag, isActive }: RenderItemParams<ModuleType>) => {
-      return (
-        <Pressable
-          onLongPress={() => {
-            //if (props.edit) {
-            console.log(props.edit);
-            drag();
-            //}
-          }}
-        >
-          {getModule(item, props.edit, () => {}, props.deleteModule)}
-        </Pressable>
-      );
+      return <>{getModule(item, props.edit, drag, props.deleteModule)}</>;
     },
-    [props.edit]
+    [props.edit, props.value]
   );
 
   return (

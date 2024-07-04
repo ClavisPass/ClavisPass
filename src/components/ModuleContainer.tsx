@@ -1,5 +1,11 @@
 import React, { ReactNode } from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+  Platform,
+} from "react-native";
 import { Icon, IconButton, Text } from "react-native-paper";
 import WebSpecific from "./platformSpecific/WebSpecific";
 import theme from "../ui/theme";
@@ -58,7 +64,15 @@ function ModuleContainer(props: Props) {
     <View style={styles.container}>
       <View style={styles.innercontainer}>
         {props.edit ? (
-          <Icon source="drag" color={theme.colors.primary} size={20} />
+          <>
+            {Platform.OS === "web" ? (
+              <Icon source="drag" color={theme.colors.primary} size={20} />
+            ) : (
+              <Pressable onPressIn={props.onDragStart}>
+                <Icon source="drag" color={theme.colors.primary} size={20} />
+              </Pressable>
+            )}
+          </>
         ) : null}
 
         <View style={styles.content}>
