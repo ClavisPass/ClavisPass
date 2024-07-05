@@ -19,7 +19,7 @@ const globalStyles = StyleSheet.create({
     width: "100%",
     flexGrow: 1,
   },
-  textInputStyle: { height: 40, lineHeight: 16, flex: 1, },
+  textInputStyle: { height: 40, lineHeight: 16, flex: 1 },
   textInputNoteStyle: { lineHeight: 16, padding: 4 },
   moduleView: {
     display: "flex",
@@ -33,6 +33,13 @@ const globalStyles = StyleSheet.create({
     margin: 16,
     right: 0,
     bottom: 26,
+  },
+  folderContainer: {
+    backgroundColor: "white",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });
 

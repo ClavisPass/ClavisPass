@@ -1,0 +1,122 @@
+import React from "react";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { View } from "react-native";
+import globalStyles from "../../ui/globalStyles";
+import { Divider, Icon, IconButton, Text } from "react-native-paper";
+import theme from "../../ui/theme";
+
+type Props = {
+  folder: string[];
+  setFolder: (folder: string[]) => void;
+  draggableDisabled: boolean;
+};
+
+// a little function to help us with reordering the result
+const reorder = (list: any, startIndex: any, endIndex: any) => {
+  const result = [...list];
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
+
+const grid = 8;
+
+const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
+  userSelect: "none",
+  //background: isDragging ? "lightgreen" : "grey",
+  ...draggableStyle,
+});
+
+const getListStyle = (isDraggingOver: boolean) => ({
+  //background: isDraggingOver ? "lightblue" : "lightgrey",
+  flex: 1,
+  width: "100%",
+});
+
+function DraggableFolderListWeb(props: Props) {
+  const onDragEnd = (result: any) => {
+    if (!result.destination) {
+      return;
+    }
+    const itemsChange = reorder(
+      props.folder,
+      result.source.index,
+      result.destination.index
+    );
+    props.setFolder(itemsChange);
+  };
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Droppable droppableId="droppable">
+        {(provided, snapshot) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            style={getListStyle(snapshot.isDraggingOver)}
+          >
+            {props.folder.map((item: string, index: number) => (
+              <Draggable
+                isDragDisabled={props.draggableDisabled}
+                key={item + "-" + index}
+                draggableId={item + "-" + index}
+                index={index}
+              >
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    style={getItemStyle(
+                      snapshot.isDragging,
+                      provided.draggableProps.style
+                    )}
+                  >
+                    <Divider />
+                    <View style={globalStyles.folderContainer}>
+                      <View
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Icon source="drag" size={20} />
+                        <Icon
+                          source="folder"
+                          size={20}
+                          color={theme.colors.primary}
+                        />
+                        <Text
+                          style={{
+                            userSelect: "none",
+                            fontWeight: "bold",
+                            fontSize: 15,
+                            color: theme.colors.primary,
+                          }}
+                          variant="bodyMedium"
+                        >
+                          {item}
+                        </Text>
+                      </View>
+                      <IconButton
+                        //style={{ margin: 0 }}
+                        icon="close"
+                        iconColor={theme.colors.error}
+                        size={20}
+                        onPress={() => {}}
+                      />
+                    </View>
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
+}
+
+export default DraggableFolderListWeb;

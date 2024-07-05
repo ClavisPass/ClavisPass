@@ -3,14 +3,18 @@ import { Divider, IconButton, Menu } from "react-native-paper";
 import theme from "../../ui/theme";
 import { formatDateTime } from "../../utils/Timestamp";
 import { View } from "react-native";
+import FolderModal from "../modals/FolderModal";
 
 type Props = {
   created: string;
   lastUpdated: string;
   folder: string;
+  folderList: string[];
+  setFolderList: (folder: string[]) => void;
 };
 function EditMetaInfMenu(props: Props) {
   const [showMenu, setShowMenu] = useState(false);
+  const [folderModalVisible, setFolderModalVisible] = useState(false);
   return (
     <Menu
       testID="1234"
@@ -54,8 +58,14 @@ function EditMetaInfMenu(props: Props) {
           size={20}
           iconColor={theme.colors.primary}
           onPress={() => {
-            //setShowMenu(true);
+            setFolderModalVisible(true);
           }}
+        />
+        <FolderModal
+          visible={folderModalVisible}
+          setVisible={setFolderModalVisible}
+          folder={props.folderList}
+          setFolder={props.setFolderList}
         />
       </View>
       <Divider />

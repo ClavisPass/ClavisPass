@@ -6,16 +6,13 @@ import ModulesEnum from "../enums/ModulesEnum";
 
 import type { StackScreenProps } from "@react-navigation/stack";
 import { IconButton } from "react-native-paper";
-import DragList, { DragListRenderItemInfo } from "react-native-draglist";
 import Header from "../components/Header";
 import globalStyles from "../ui/globalStyles";
 import theme from "../ui/theme";
 import Button from "../components/Button";
 import EditMetaInfMenu from "../components/menus/EditMetaInfMenu";
 import ValuesType from "../types/ValuesType";
-import getModule from "../utils/getModule";
 import getModuleData from "../utils/getModuleData";
-import { ScrollView } from "react-native-gesture-handler";
 import AddModuleModal from "../components/modals/AddModuleModal";
 import { getDateTime } from "../utils/Timestamp";
 import { TitlebarHeight } from "../components/CustomTitlebar";
@@ -23,8 +20,9 @@ import { useData } from "../contexts/DataProvider";
 import DataType from "../types/DataType";
 import TitleModule from "../components/modules/TitleModule";
 import AnimatedContainer from "../components/AnimatedContainer";
-import DraggableModulesListWeb from "../components/DraggableList/DraggableModulesListWeb";
-import DraggableModulesList from "../components/DraggableList/DraggableModulesList";
+import DraggableModulesListWeb from "../components/draggableModulesList/DraggableModulesListWeb";
+import DraggableModulesList from "../components/draggableModulesList/DraggableModulesList";
+import FolderModal from "../components/modals/FolderModal";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -42,60 +40,6 @@ type RootStackParamList = {
 };
 
 type Props = StackScreenProps<RootStackParamList>;
-
-/*type DraggableListProps = {
-  value: ValuesType;
-  setValue: (value: ValuesType) => void;
-  changeModules: (data: ModulesType) => void;
-  deleteModule: (id: string) => void;
-  edit: boolean;
-};*/
-
-/*function DraggableList(props: DraggableListProps) {
-  function keyExtractor(str: ModuleType) {
-    return str.id;
-  }
-
-  function renderItem(info: DragListRenderItemInfo<ModuleType>) {
-    const { item, onDragStart, onDragEnd, isActive } = info;
-
-    return (
-      <>
-        {getModule(
-          item,
-          props.edit,
-          onDragStart,
-          onDragEnd,
-          props.deleteModule
-        )}
-      </>
-    );
-  }
-
-  async function onReordered(fromIndex: number, toIndex: number) {
-    const copy = [...props.value.modules]; // Don't modify react data in-place
-    const removed = copy.splice(fromIndex, 1);
-
-    copy.splice(toIndex, 0, removed[0]); // Now insert at the new pos
-    props.changeModules(copy);
-  }
-
-  return (
-    <View style={{ flex: 1 }}>
-      <ScrollView style={{ width: Dimensions.get("window").width, flex: 1 }}>
-        <TitleModule value={props.value} setValue={props.setValue} />
-        <DragList
-          contentContainerStyle={styles.scrollView}
-          style={styles.scrollViewStyle}
-          data={props.value.modules}
-          keyExtractor={keyExtractor}
-          onReordered={onReordered}
-          renderItem={renderItem}
-        />
-      </ScrollView>
-    </View>
-  );
-}*/
 
 function EditScreen({ route, navigation }: Props) {
   const data = useData();
@@ -140,6 +84,14 @@ function EditScreen({ route, navigation }: Props) {
     const newValue = { ...value };
     newValue.fav = !value.fav;
     setValue(newValue);
+  };
+
+  const changeFolder = (folder: string[]) => {
+    let newData = { ...data.data } as DataType;
+    if (newData) {
+      newData.folder = folder;
+    }
+    data.setData(newData);
   };
 
   const deleteModule = (id: string) => {
@@ -215,16 +167,11 @@ function EditScreen({ route, navigation }: Props) {
             created={route.params.value.created}
             lastUpdated={route.params.value.lastUpdated}
             folder={route.params.value.folder}
+            folderList={data?.data ? data.data.folder : []}
+            setFolderList={changeFolder}
           />
         )}
       </Header>
-      {/*<DraggableList
-        value={value}
-        setValue={setValue}
-        changeModules={changeModules}
-        deleteModule={deleteModule}
-        edit={edit}
-      />*/}
       <View style={{ width: "100%", height: 84 }}>
         <TitleModule value={value} setValue={setValue} disabled={edit} />
       </View>
