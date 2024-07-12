@@ -1,28 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
-import { Platform, StyleSheet, View } from "react-native";
-import { IconButton, Modal, Portal, TextInput } from "react-native-paper";
+import { FlatList, View } from "react-native";
+import {
+  IconButton,
+  Portal,
+  TextInput,
+  TouchableRipple,
+  Text,
+} from "react-native-paper";
 import getColors from "../../ui/linearGradient";
 import { LinearGradient } from "expo-linear-gradient";
 import globalStyles from "../../ui/globalStyles";
-import DraggableFolderListWeb from "../draggableFolderList/DraggableFolderListWeb";
-import DraggableFolderList from "../draggableFolderList/DraggableFolderList";
-
-const styles = StyleSheet.create({
-  container: {
-    display: "flex",
-    flexDirection: "row",
-    width: "100%",
-    justifyContent: "space-between",
-    alignItems: "center",
-    margin: 4,
-  },
-});
+import Modal from "react-native-modal";
 
 type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
   folder: string[];
   setFolder: (folder: string[]) => void;
+  navigation: any;
 };
 
 function FolderModal(props: Props) {
@@ -47,12 +42,15 @@ function FolderModal(props: Props) {
       setDraggableDisabled(true);
     }
   }, [filteredValues]);
+
   return (
     <Portal>
       <Modal
-        visible={props.visible}
-        onDismiss={hideModal}
-        contentContainerStyle={{
+        coverScreen={false}
+        isVisible={props.visible}
+        onBackdropPress={hideModal}
+        style={{
+          zIndex: 2,
           backgroundColor: "transparent",
           borderRadius: 20,
           display: "flex",
@@ -60,53 +58,73 @@ function FolderModal(props: Props) {
           justifyContent: "center",
         }}
       >
-        <LinearGradient
-          colors={getColors()}
-          style={{ padding: 3, width: 300, borderRadius: 20 }}
-          end={{ x: 0.1, y: 0.2 }}
-          dither={true}
-        >
-          <View
-            style={{
-              backgroundColor: "white",
-              padding: 16,
-              borderRadius: 20,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "column",
-            }}
+        <View>
+          <LinearGradient
+            colors={getColors()}
+            style={{ padding: 3, width: 300, borderRadius: 20 }}
+            end={{ x: 0.1, y: 0.2 }}
+            dither={true}
           >
-            <View style={globalStyles.moduleView}>
-              <TextInput
-                outlineStyle={globalStyles.outlineStyle}
-                style={globalStyles.textInputStyle}
-                value={searchQuery}
-                mode="outlined"
-                onChangeText={(text) => setSearchQuery(text)}
-                autoCapitalize="none"
-              />
-              <IconButton
-                icon={"plus"}
-                onPress={() => {}}
-                disabled={addButtonDisabled}
+            <View
+              style={{
+                backgroundColor: "white",
+                padding: 16,
+                borderRadius: 20,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "column",
+              }}
+            >
+              <View style={globalStyles.moduleView}>
+                <TextInput
+                  outlineStyle={globalStyles.outlineStyle}
+                  style={globalStyles.textInputStyle}
+                  value={searchQuery}
+                  mode="outlined"
+                  onChangeText={(text) => setSearchQuery(text)}
+                  autoCapitalize="none"
+                />
+                <IconButton
+                  icon={"square-edit-outline"}
+                  onPress={() => {
+                    props.navigation.navigate("EditFolder", {
+                      folder: props.folder,
+                      setFolder: props.setFolder,
+                    });
+                  }}
+                  //disabled={addButtonDisabled}
+                />
+              </View>
+              <FlatList
+                data={filteredValues}
+                renderItem={({ item }) => (
+                  <View style={globalStyles.folderContainer}>
+                    <TouchableRipple
+                      //style={styles.ripple}
+                      onPress={() => {
+                        console.log("test");
+                      }}
+                      rippleColor="rgba(0, 0, 0, .32)"
+                    >
+                      <Text
+                        style={{
+                          userSelect: "none",
+                          fontWeight: "bold",
+                          fontSize: 15,
+                          //color: theme.colors.primary,
+                        }}
+                        variant="bodyMedium"
+                      >
+                        {item}
+                      </Text>
+                    </TouchableRipple>
+                  </View>
+                )}
               />
             </View>
-            {Platform.OS === "web" ? (
-              <DraggableFolderListWeb
-                folder={filteredValues}
-                setFolder={props.setFolder}
-                draggableDisabled={draggableDisabled}
-              />
-            ) : (
-              <DraggableFolderList
-                folder={filteredValues}
-                setFolder={props.setFolder}
-                draggableDisabled={draggableDisabled}
-              />
-            )}
-          </View>
-        </LinearGradient>
+          </LinearGradient>
+        </View>
       </Modal>
     </Portal>
   );

@@ -27,6 +27,7 @@ import { Platform, View } from "react-native";
 import CustomTitlebar from "./src/components/CustomTitlebar";
 import { QuickSelectProvider } from "./src/contexts/QuickSelectProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import EditFolderListScreen from "./src/pages/EditFolderListScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -183,6 +184,17 @@ function HomeStack() {
       <Stack.Screen
         name="Edit"
         component={EditScreen}
+        options={{
+          headerShown: false,
+          transitionSpec: {
+            open: transitionSpecConfig,
+            close: transitionSpecConfig,
+          },
+        }}
+      />
+      <Stack.Screen
+        name="EditFolder"
+        component={EditFolderListScreen}
         options={{
           headerShown: false,
           transitionSpec: {

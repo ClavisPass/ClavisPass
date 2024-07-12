@@ -1,15 +1,30 @@
-import React from "react";
-import { StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
 
-import { Text, TextInput } from "react-native-paper";
+import { TextInput } from "react-native-paper";
 
 import CustomFieldModuleType from "../../types/modules/CustomFieldModuleType";
 import ModuleContainer from "../ModuleContainer";
 import globalStyles from "../../ui/globalStyles";
 import Props from "../../types/ModuleProps";
+import EditCustomFieldModal from "../modals/EditCustomFieldModal";
+import CopyToClipboard from "../CopyToClipboard";
+import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 
 function CustomFieldModule(props: CustomFieldModuleType & Props) {
-  const [text, setText] = React.useState(props.value);
+  const [visible, setVisible] = useState(false);
+
+  const [value, setValue] = useState(props.value);
+  const [title, setTitle] = useState(props.title);
+  useEffect(() => {
+    const newModule: CustomFieldModuleType = {
+      id: props.id,
+      module: props.module,
+      title: title,
+      value: value,
+    };
+    props.changeModule(newModule);
+  }, [value, title]);
   return (
     <ModuleContainer
       id={props.id}
@@ -18,17 +33,30 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
       delete={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
+      modal={
+        <EditCustomFieldModal
+          visible={visible}
+          setVisible={setVisible}
+          title={title}
+          setTitle={setTitle}
+        />
+      }
+      icon={ModuleIconsEnum.CUSTOM_FIELD}
+      titlePress={() => {
+        setVisible(true);
+      }}
     >
-      <TextInput
-        outlineStyle={globalStyles.outlineStyle}
-        style={globalStyles.textInputStyle}
-        value={text}
-        mode="outlined"
-        onChangeText={(text) => setText(text)}
-        onEndEditing={() => console.log("der bro ist fertig")}
-        autoCapitalize="none"
-        disabled={props.edit}
-      />
+      <View style={globalStyles.moduleView}>
+        <TextInput
+          outlineStyle={globalStyles.outlineStyle}
+          style={globalStyles.textInputStyle}
+          value={value}
+          mode="outlined"
+          onChangeText={(text) => setValue(text)}
+          autoCapitalize="none"
+        />
+        <CopyToClipboard value={value} />
+      </View>
     </ModuleContainer>
   );
 }

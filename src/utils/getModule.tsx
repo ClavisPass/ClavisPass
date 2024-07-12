@@ -22,7 +22,8 @@ function getModule(
   module: ModuleType,
   edit: boolean,
   onDragStart: () => void,
-  deleteModule: (id: string) => void
+  deleteModule: (id: string) => void,
+  changeModule: (module: ModuleType) => void
 ): ReactNode {
   if (module.module === ModulesEnum.CUSTOM_FIELD) {
     let moduleObject = module as CustomFieldModuleType;
@@ -36,6 +37,7 @@ function getModule(
         edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
+        changeModule={changeModule}
       />
     );
   }
@@ -50,6 +52,7 @@ function getModule(
         edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
+        changeModule={changeModule}
       />
     );
   }
@@ -64,6 +67,7 @@ function getModule(
         edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
+        changeModule={changeModule}
       />
     );
   }
@@ -78,6 +82,7 @@ function getModule(
         edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
+        changeModule={changeModule}
       />
     );
   }
@@ -92,6 +97,7 @@ function getModule(
         edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
+        changeModule={changeModule}
       />
     );
   }
@@ -106,6 +112,7 @@ function getModule(
         edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
+        changeModule={changeModule}
       />
     );
   }
@@ -120,6 +127,7 @@ function getModule(
         edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
+        changeModule={changeModule}
       />
     );
   }
@@ -136,6 +144,7 @@ function getModule(
         edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
+        changeModule={changeModule}
       />
     );
   }

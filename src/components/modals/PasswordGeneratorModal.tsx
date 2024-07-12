@@ -102,7 +102,7 @@ function PasswordGeneratorModal(props: Props) {
                 display: "flex",
                 flexDirection: "row",
                 margin: 2,
-                //justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
               <IconButton

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Divider, IconButton, Menu } from "react-native-paper";
 import theme from "../../ui/theme";
 import { formatDateTime } from "../../utils/Timestamp";
@@ -11,6 +11,8 @@ type Props = {
   folder: string;
   folderList: string[];
   setFolderList: (folder: string[]) => void;
+  favButton: ReactNode;
+  navigation: any;
 };
 function EditMetaInfMenu(props: Props) {
   const [showMenu, setShowMenu] = useState(false);
@@ -23,7 +25,7 @@ function EditMetaInfMenu(props: Props) {
         borderRadius: 22,
         borderTopRightRadius: 4,
       }}
-      style={{ backgroundColor: "transparent", borderRadius: 22 }}
+      style={{ backgroundColor: "transparent", borderRadius: 22, zIndex: 2 }}
       elevation={2}
       visible={showMenu}
       onDismiss={() => {
@@ -59,6 +61,7 @@ function EditMetaInfMenu(props: Props) {
           iconColor={theme.colors.primary}
           onPress={() => {
             setFolderModalVisible(true);
+            //setShowMenu(false);
           }}
         />
         <FolderModal
@@ -66,7 +69,9 @@ function EditMetaInfMenu(props: Props) {
           setVisible={setFolderModalVisible}
           folder={props.folderList}
           setFolder={props.setFolderList}
+          navigation={props.navigation}
         />
+        {props.favButton}
       </View>
       <Divider />
       <Menu.Item
@@ -78,12 +83,23 @@ function EditMetaInfMenu(props: Props) {
       />
       <Menu.Item
         style={{
+          backgroundColor: "white",
           cursor: "auto",
+        }}
+        title={"last updated: " + formatDateTime(props.lastUpdated)}
+      />
+      <Divider />
+      <Menu.Item
+        style={{
           borderBottomLeftRadius: 20,
           borderBottomRightRadius: 20,
           backgroundColor: "white",
         }}
-        title={"last updated: " + formatDateTime(props.lastUpdated)}
+        title={"Delete"}
+        leadingIcon={"delete"}
+        onPress={() => {
+          console.log("test");
+        }}
       />
     </Menu>
   );

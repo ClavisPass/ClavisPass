@@ -15,6 +15,7 @@ import * as WebBrowser from "expo-web-browser";
 
 import validator from "validator";
 import theme from "../../ui/theme";
+import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 
 function URLModule(props: URLModuleType & Props) {
   const [value, setValue] = useState(props.value);
@@ -82,6 +83,15 @@ function URLModule(props: URLModuleType & Props) {
     setIsValid(validator.isURL(value));
   }, [value]);
 
+  useEffect(() => {
+    const newModule: URLModuleType = {
+      id: props.id,
+      module: props.module,
+      value: value,
+    };
+    props.changeModule(newModule);
+  }, [value]);
+
   return (
     <ModuleContainer
       id={props.id}
@@ -90,6 +100,7 @@ function URLModule(props: URLModuleType & Props) {
       delete={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
+      icon={ModuleIconsEnum.URL}
     >
       <View style={globalStyles.moduleView}>
         <TextInput
@@ -108,7 +119,6 @@ function URLModule(props: URLModuleType & Props) {
           autoComplete="url"
           textContentType="URL"
           keyboardType="url"
-          disabled={props.edit}
         />
         {
           <IconButton
@@ -122,7 +132,6 @@ function URLModule(props: URLModuleType & Props) {
                 Linking.openURL(value);
               }
             }}
-            disabled={props.edit}
           />
         }
       </View>

@@ -1,15 +1,23 @@
-import React from "react";
-import { StyleSheet } from "react-native";
-
-import { Text, TextInput } from "react-native-paper";
-
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
+import { TextInput } from "react-native-paper";
 import KeyModuleType from "../../types/modules/KeyModuleType";
 import ModuleContainer from "../ModuleContainer";
 import globalStyles from "../../ui/globalStyles";
 import Props from "../../types/ModuleProps";
+import CopyToClipboard from "../CopyToClipboard";
+import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 
 function KeyModule(props: KeyModuleType & Props) {
-  const [value, setValue] = React.useState(props.value);
+  const [value, setValue] = useState(props.value);
+  useEffect(() => {
+    const newModule: KeyModuleType = {
+      id: props.id,
+      module: props.module,
+      value: value,
+    };
+    props.changeModule(newModule);
+  }, [value]);
   return (
     <ModuleContainer
       id={props.id}
@@ -18,17 +26,20 @@ function KeyModule(props: KeyModuleType & Props) {
       delete={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
+      icon={ModuleIconsEnum.KEY}
     >
-      <TextInput
-        outlineStyle={globalStyles.outlineStyle}
-        style={globalStyles.textInputStyle}
-        value={value}
-        mode="outlined"
-        onChangeText={(text) => setValue(text)}
-        autoComplete="one-time-code"
-        keyboardType="visible-password"
-        disabled={props.edit}
-      />
+      <View style={globalStyles.moduleView}>
+        <TextInput
+          outlineStyle={globalStyles.outlineStyle}
+          style={globalStyles.textInputStyle}
+          value={value}
+          mode="outlined"
+          onChangeText={(text) => setValue(text)}
+          autoComplete="one-time-code"
+          keyboardType="visible-password"
+        />
+        <CopyToClipboard value={value} />
+      </View>
     </ModuleContainer>
   );
 }

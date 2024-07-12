@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -9,6 +9,12 @@ import {
 import { Icon, IconButton, Text } from "react-native-paper";
 import WebSpecific from "./platformSpecific/WebSpecific";
 import theme from "../ui/theme";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 const styles = StyleSheet.create({
   container: {
@@ -38,14 +44,13 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    //display: "flex",
+    //flexDirection: "row",
   },
   delete: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    //borderLeftWidth: 1,
-    //borderColor: "lightgrey",
-    //marginLeft: 6,
   },
 });
 
@@ -57,45 +62,103 @@ type Props = {
   delete: boolean;
   onDragStart?: () => void;
   deleteModule?: (id: string) => void;
+  modal?: ReactNode;
+  icon?: string;
+  titlePress?: () => void;
 };
 
 function ModuleContainer(props: Props) {
-  return (
-    <View style={styles.container}>
-      <View style={styles.innercontainer}>
-        {props.edit ? (
-          <>
-            {Platform.OS === "web" ? (
-              <Icon source="drag" color={theme.colors.primary} size={20} />
-            ) : (
-              <Pressable onPressIn={props.onDragStart}>
-                <Icon source="drag" color={theme.colors.primary} size={20} />
-              </Pressable>
-            )}
-          </>
-        ) : null}
+  const translateX = useSharedValue(-16);
+  const paddingLeft = useSharedValue(4);
+  const paddingRight = useSharedValue(4);
+  const translateXDelete = useSharedValue(44);
+  useEffect(() => {
+    if (props.edit) {
+      translateX.value = withTiming(0, { duration: 250 });
+      paddingLeft.value = withTiming(24, { duration: 250 });
+      paddingRight.value = withTiming(50, { duration: 250 });
+      translateXDelete.value = withTiming(0, { duration: 250 });
+    } else {
+      translateX.value = withTiming(-16, { duration: 250 });
+      paddingLeft.value = withTiming(4, { duration: 250 });
+      paddingRight.value = withTiming(4, { duration: 250 });
+      translateXDelete.value = withTiming(44, { duration: 250 });
+    }
+  }, [props.edit]);
 
-        <View style={styles.content}>
-          <Text variant="bodyMedium" style={{ userSelect: "none" }}>
-            {props.title}
-          </Text>
-          {props.children}
+  const animatedIconStyle = useAnimatedStyle(() => {
+    return {
+      position: "absolute",
+      left: 0,
+      transform: [{ translateX: translateX.value }],
+    };
+  });
+
+  const animatedIconStyleDelete = useAnimatedStyle(() => {
+    return {
+      position: "absolute",
+      right: 0,
+      transform: [{ translateX: translateXDelete.value }],
+    };
+  });
+
+  const animatedContainerStyle = useAnimatedStyle(() => {
+    return {
+      overflow: "hidden",
+      paddingLeft: paddingLeft.value,
+      paddingRight: paddingRight.value,
+    };
+  });
+  return (
+    <Animated.View
+      style={[styles.container, styles.innercontainer, animatedContainerStyle]}
+    >
+      <Animated.View style={animatedIconStyle}>
+        {Platform.OS === "web" ? (
+          <Icon source="drag" color={theme.colors.primary} size={20} />
+        ) : (
+          <Pressable onPressIn={props.onDragStart}>
+            <Icon source="drag" color={theme.colors.primary} size={20} />
+          </Pressable>
+        )}
+      </Animated.View>
+      <View
+        style={[styles.content]}
+      >
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 4,
+            height: 20,
+          }}
+        >
+          {props.icon ? <Icon source={props.icon} size={16} /> : null}
+          <Pressable
+            onPress={props.titlePress}
+            style={{ cursor: props.titlePress ? "pointer" : "auto" }}
+          >
+            <Text variant="bodyMedium" style={{ userSelect: "none" }}>
+              {props.title}
+            </Text>
+          </Pressable>
+          {props.modal}
         </View>
+        {props.children}
       </View>
-      {props.delete ? (
-        <>
-          <View style={styles.delete}>
-            <IconButton
-              style={{ margin: 0 }}
-              icon="close"
-              iconColor={theme.colors.error}
-              size={20}
-              onPress={() => props.deleteModule?.(props.id)}
-            />
-          </View>
-        </>
-      ) : null}
-    </View>
+      <Animated.View style={[styles.delete, animatedIconStyleDelete]}>
+        <IconButton
+          animated={true}
+          selected={props.edit}
+          mode="contained-tonal"
+          icon="close"
+          iconColor={theme.colors.error}
+          size={20}
+          onPress={() => props.deleteModule?.(props.id)}
+        />
+      </Animated.View>
+    </Animated.View>
   );
 }
 

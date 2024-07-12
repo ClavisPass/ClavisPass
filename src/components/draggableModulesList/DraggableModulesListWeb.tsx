@@ -9,6 +9,7 @@ type Props = {
   setValue: (value: ValuesType) => void;
   changeModules: (data: ModulesType) => void;
   deleteModule: (id: string) => void;
+  changeModule: (module: ModuleType) => void;
   edit: boolean;
 };
 
@@ -33,6 +34,7 @@ const getListStyle = (isDraggingOver: boolean) => ({
   //background: isDraggingOver ? "lightblue" : "lightgrey",
   flex: 1,
   width: "100%",
+  overflow: "auto",
 });
 
 function DraggableModulesListWeb(props: Props) {
@@ -73,7 +75,13 @@ function DraggableModulesListWeb(props: Props) {
                       provided.draggableProps.style
                     )}
                   >
-                    {getModule(item, props.edit, () => {}, props.deleteModule)}
+                    {getModule(
+                      item,
+                      props.edit,
+                      () => {},
+                      props.deleteModule,
+                      props.changeModule
+                    )}
                   </div>
                 )}
               </Draggable>

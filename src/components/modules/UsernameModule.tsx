@@ -1,16 +1,25 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
 
-import { Snackbar, Text, TextInput } from "react-native-paper";
+import { TextInput } from "react-native-paper";
 
 import UsernameModuleType from "../../types/modules/UsernameModuleType";
 import ModuleContainer from "../ModuleContainer";
 import CopyToClipboard from "../CopyToClipboard";
 import globalStyles from "../../ui/globalStyles";
 import Props from "../../types/ModuleProps";
+import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 
 function UsernameModule(props: UsernameModuleType & Props) {
-  const [value, setValue] = React.useState(props.value);
+  const [value, setValue] = useState(props.value);
+  useEffect(() => {
+    const newModule: UsernameModuleType = {
+      id: props.id,
+      module: props.module,
+      value: value,
+    };
+    props.changeModule(newModule);
+  }, [value]);
   return (
     <ModuleContainer
       id={props.id}
@@ -19,6 +28,7 @@ function UsernameModule(props: UsernameModuleType & Props) {
       delete={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
+      icon={ModuleIconsEnum.USERNAME}
     >
       <View style={globalStyles.moduleView}>
         <TextInput
@@ -30,9 +40,8 @@ function UsernameModule(props: UsernameModuleType & Props) {
           autoCapitalize="none"
           autoComplete="username"
           textContentType="username"
-          disabled={props.edit}
         />
-        <CopyToClipboard value={value} disabled={props.edit} />
+        <CopyToClipboard value={value} />
       </View>
     </ModuleContainer>
   );

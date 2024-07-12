@@ -1,15 +1,21 @@
-import React from "react";
-import { StyleSheet } from "react-native";
-
-import { Text, TextInput } from "react-native-paper";
-
+import React, { useEffect, useState } from "react";
+import { TextInput } from "react-native-paper";
 import NoteModuleType from "../../types/modules/NoteModuleType";
 import ModuleContainer from "../ModuleContainer";
 import globalStyles from "../../ui/globalStyles";
 import Props from "../../types/ModuleProps";
+import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 
 function NoteModule(props: NoteModuleType & Props) {
-  const [value, setValue] = React.useState(props.value);
+  const [value, setValue] = useState(props.value);
+  useEffect(() => {
+    const newModule: NoteModuleType = {
+      id: props.id,
+      module: props.module,
+      value: value,
+    };
+    props.changeModule(newModule);
+  }, [value]);
   return (
     <ModuleContainer
       id={props.id}
@@ -18,6 +24,7 @@ function NoteModule(props: NoteModuleType & Props) {
       delete={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
+      icon={ModuleIconsEnum.NOTE}
     >
       <TextInput
         outlineStyle={globalStyles.outlineStyle}
@@ -28,7 +35,6 @@ function NoteModule(props: NoteModuleType & Props) {
         autoCapitalize="none"
         multiline={true}
         numberOfLines={4}
-        disabled={props.edit}
       />
     </ModuleContainer>
   );

@@ -1,9 +1,7 @@
 import React from "react";
-import { StyleSheet } from "react-native";
 
-import { Text, TextInput } from "react-native-paper";
+import { TextInput } from "react-native-paper";
 
-import TitleModuleType from "../../types/modules/TitleModuleType";
 import ModuleContainer from "../ModuleContainer";
 import globalStyles from "../../ui/globalStyles";
 import ValuesType from "../../types/ValuesType";
@@ -21,16 +19,17 @@ function TitleModule(props: Props) {
     props.setValue(newValue);
   };
   return (
-    <ModuleContainer id={""} title={"Title"} edit={false} delete={false}>
-      <TextInput
-        outlineStyle={globalStyles.outlineStyle}
-        style={globalStyles.textInputStyle}
-        value={props.value.title}
-        mode="outlined"
-        onChangeText={(text) => changeTitle(text)}
-        disabled={props.disabled}
-      />
-    </ModuleContainer>
+    <TextInput
+      placeholder={"Title"}
+      outlineStyle={[
+        globalStyles.outlineStyle,
+        { borderWidth: 0, padding: 0, margin: 0, flex: 1, width: "100%" },
+      ]}
+      style={[{ margin: 0, padding: 0 }]}
+      value={props.value.title}
+      mode="outlined"
+      onChangeText={(text) => changeTitle(text)}
+    />
   );
 }
 

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { StyleSheet } from "react-native";
-import { Menu, Modal } from "react-native-paper";
+import { Menu } from "react-native-paper";
 import ModulesEnum from "../../enums/ModulesEnum";
+import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
+import Modal from "react-native-modal";
 
 const styles = StyleSheet.create({
   containerStyle: {
@@ -20,61 +22,61 @@ function AddModuleModal(props: Props) {
   const hideModal = () => props.setVisible(false);
   return (
     <Modal
-      visible={props.visible}
-      onDismiss={hideModal}
-      contentContainerStyle={styles.containerStyle}
+      isVisible={props.visible}
+      onBackdropPress={hideModal}
+      style={styles.containerStyle}
     >
       <Menu.Item
-        leadingIcon="account"
+        leadingIcon={ModuleIconsEnum.USERNAME}
         onPress={() => {
           props.addModule(ModulesEnum.USERNAME);
         }}
         title="Username"
       />
       <Menu.Item
-        leadingIcon="email"
+        leadingIcon={ModuleIconsEnum.E_MAIL}
         onPress={() => {
           props.addModule(ModulesEnum.E_MAIL);
         }}
         title="E-Mail"
       />
       <Menu.Item
-        leadingIcon="form-textbox-password"
+        leadingIcon={ModuleIconsEnum.PASSWORD}
         onPress={() => {
           props.addModule(ModulesEnum.PASSWORD);
         }}
         title="Password"
       />
       <Menu.Item
-        leadingIcon="web"
+        leadingIcon={ModuleIconsEnum.URL}
         onPress={() => {
           props.addModule(ModulesEnum.URL);
         }}
         title="URL"
       />
       <Menu.Item
-        leadingIcon="wifi"
+        leadingIcon={ModuleIconsEnum.WIFI}
         onPress={() => {
           props.addModule(ModulesEnum.WIFI);
         }}
         title="Wifi"
       />
       <Menu.Item
-        leadingIcon="key-variant"
+        leadingIcon={ModuleIconsEnum.KEY}
         onPress={() => {
           props.addModule(ModulesEnum.KEY);
         }}
         title="Key"
       />
       <Menu.Item
-        leadingIcon="pencil-box"
+        leadingIcon={ModuleIconsEnum.CUSTOM_FIELD}
         onPress={() => {
           props.addModule(ModulesEnum.CUSTOM_FIELD);
         }}
         title="Custom Field"
       />
       <Menu.Item
-        leadingIcon="note"
+        leadingIcon={ModuleIconsEnum.NOTE}
         onPress={() => {
           props.addModule(ModulesEnum.NOTE);
         }}

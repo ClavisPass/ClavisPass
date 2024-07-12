@@ -7,8 +7,9 @@ import { StatusBar } from "expo-status-bar";
 
 type Props = {
   children?: ReactNode;
-  title: string;
+  title?: string;
   onPress: () => void;
+  leftNode?: ReactNode;
 };
 
 function Header(props: Props) {
@@ -44,8 +45,11 @@ function Header(props: Props) {
           style={{
             display: "flex",
             flexDirection: "row",
-            gap: 4,
+            //gap: 4,
             alignItems: "center",
+            flex: 1,
+
+            width: "100%",
           }}
         >
           <IconButton
@@ -54,17 +58,20 @@ function Header(props: Props) {
             size={20}
             onPress={props.onPress}
           />
-          <Text
-            style={{
-              color: theme.colors.primary,
-              userSelect: "none",
-              fontWeight: "bold",
-              fontSize: 15,
-            }}
-            variant="bodyMedium"
-          >
-            {props.title}
-          </Text>
+          {props.title ? (
+            <Text
+              style={{
+                color: theme.colors.primary,
+                userSelect: "none",
+                fontWeight: "bold",
+                fontSize: 15,
+              }}
+              variant="bodyMedium"
+            >
+              {props.title}
+            </Text>
+          ) : null}
+          {props.leftNode}
         </View>
         <View
           style={{

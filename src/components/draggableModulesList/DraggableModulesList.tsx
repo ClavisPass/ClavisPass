@@ -12,13 +12,24 @@ type Props = {
   setValue: (value: ValuesType) => void;
   changeModules: (data: ModulesType) => void;
   deleteModule: (id: string) => void;
+  changeModule: (module: ModuleType) => void;
   edit: boolean;
 };
 
 function DraggableModulesList(props: Props) {
   const renderItem = useCallback(
     ({ item, drag, isActive }: RenderItemParams<ModuleType>) => {
-      return <>{getModule(item, props.edit, drag, props.deleteModule)}</>;
+      return (
+        <>
+          {getModule(
+            item,
+            props.edit,
+            drag,
+            props.deleteModule,
+            props.changeModule
+          )}
+        </>
+      );
     },
     [props.edit, props.value]
   );

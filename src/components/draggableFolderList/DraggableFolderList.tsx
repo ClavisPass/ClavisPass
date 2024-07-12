@@ -1,17 +1,15 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { Pressable, View } from "react-native";
 import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
 import globalStyles from "../../ui/globalStyles";
-import { Divider, Icon, IconButton, Text } from "react-native-paper";
+import { Icon, IconButton, Text } from "react-native-paper";
 import theme from "../../ui/theme";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 type Props = {
   folder: string[];
   setFolder: (folder: string[]) => void;
-  draggableDisabled: boolean;
 };
 
 function DraggableFolderList(props: Props) {
@@ -26,11 +24,7 @@ function DraggableFolderList(props: Props) {
               alignItems: "center",
             }}
           >
-            <Pressable
-              onPressIn={() => {
-                if (props.draggableDisabled == false) drag;
-              }}
-            >
+            <Pressable onPressIn={drag}>
               <Icon source="drag" size={20} />
             </Pressable>
             <Icon source="folder" color={theme.colors.primary} size={20} />
@@ -62,7 +56,7 @@ function DraggableFolderList(props: Props) {
   return (
     <View style={{ flex: 1, width: "100%" }}>
       <DraggableFlatList
-        ItemSeparatorComponent={Divider}
+        //ItemSeparatorComponent={Divider}
         data={[...props.folder]}
         renderItem={renderItem}
         keyExtractor={(item, index) => `drag-item-${item}-${index}`}

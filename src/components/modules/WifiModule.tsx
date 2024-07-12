@@ -1,8 +1,7 @@
 import { Picker } from "@react-native-picker/picker";
-import React from "react";
-import { StyleSheet, View, Keyboard } from "react-native";
-import { IconButton, Modal, Portal, Text, TextInput } from "react-native-paper";
-import QRCode from "react-qr-code";
+import React, { useEffect, useState } from "react";
+import { View, Keyboard } from "react-native";
+import { IconButton, TextInput } from "react-native-paper";
 
 import WifiModuleType from "../../types/modules/WifiModuleType";
 import CopyToClipboard from "../CopyToClipboard";
@@ -10,32 +9,43 @@ import ModuleContainer from "../ModuleContainer";
 import globalStyles from "../../ui/globalStyles";
 import Props from "../../types/ModuleProps";
 import theme from "../../ui/theme";
-import { LinearGradient } from "expo-linear-gradient";
-import getColors from "../../ui/linearGradient";
 import WifiQRCodeModal from "../modals/WifiQRCodeModal";
+import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 
 function WifiModule(props: WifiModuleType & Props) {
-  const [secureTextEntry, setSecureTextEntry] = React.useState(true);
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
 
-  const [visible, setVisible] = React.useState(false);
+  const [visible, setVisible] = useState(false);
 
   const showModal = () => setVisible(true);
-  const hideModal = () => setVisible(false);
 
-  const [name, setName] = React.useState(props.wifiName);
-  const [value, setValue] = React.useState(props.value);
+  const [name, setName] = useState(props.wifiName);
+  const [value, setValue] = useState(props.value);
 
-  const [wifiType, setWifiType] = React.useState("WEP");
+  const [wifiType, setWifiType] = useState<"WEP" | "WPA" | "blank">(
+    props.wifiType
+  );
 
-  const [eyeIcon, setEyeIcon] = React.useState("eye");
+  const [eyeIcon, setEyeIcon] = useState("eye");
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (secureTextEntry) {
       setEyeIcon("eye");
     } else {
       setEyeIcon("eye-off");
     }
   }, [secureTextEntry]);
+
+  useEffect(() => {
+    const newModule: WifiModuleType = {
+      id: props.id,
+      module: props.module,
+      wifiType: wifiType,
+      wifiName: name,
+      value: value,
+    };
+    props.changeModule(newModule);
+  }, [wifiType, name, value]);
   return (
     <ModuleContainer
       id={props.id}
@@ -44,6 +54,7 @@ function WifiModule(props: WifiModuleType & Props) {
       delete={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
+      icon={ModuleIconsEnum.WIFI}
     >
       <View style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <Picker
@@ -57,23 +68,23 @@ function WifiModule(props: WifiModuleType & Props) {
 
         <View style={globalStyles.moduleView}>
           <TextInput
+            placeholder="Wifi Name"
             outlineStyle={globalStyles.outlineStyle}
             style={globalStyles.textInputStyle}
             value={name}
             mode="outlined"
             onChangeText={(text) => setName(text)}
-            disabled={props.edit}
           />
           <IconButton
             iconColor={theme.colors.primary}
             icon="qrcode"
             size={20}
             onPress={showModal}
-            disabled={props.edit}
           />
         </View>
         <View style={globalStyles.moduleView}>
           <TextInput
+            placeholder="Password"
             outlineStyle={globalStyles.outlineStyle}
             style={globalStyles.textInputStyle}
             value={value}
@@ -91,11 +102,10 @@ function WifiModule(props: WifiModuleType & Props) {
                   Keyboard.dismiss();
                   setSecureTextEntry(!secureTextEntry);
                 }}
-                disabled={props.edit}
               />
             }
           />
-          <CopyToClipboard value={value} disabled={props.edit} />
+          <CopyToClipboard value={value} />
         </View>
       </View>
       <WifiQRCodeModal

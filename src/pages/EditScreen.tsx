@@ -62,6 +62,7 @@ function EditScreen({ route, navigation }: Props) {
     valueToChange.modules = value.modules;
     valueToChange.lastUpdated = getDateTime();
     data.setData(newData);
+    navigation.goBack();
   };
 
   const addModule = (module: ModulesEnum) => {
@@ -101,6 +102,13 @@ function EditScreen({ route, navigation }: Props) {
     changeModules(newModules);
   };
 
+  const changeModule = (module: ModuleType) => {
+    const index = value.modules.findIndex((val) => val.id === module.id);
+    const newModules = [...value.modules];
+    newModules[index] = module;
+    changeModules(newModules);
+  };
+
   useEffect(() => {
     if (value.fav) {
       setFavIcon("star");
@@ -111,42 +119,36 @@ function EditScreen({ route, navigation }: Props) {
 
   const [title, setTitle] = useState("Edit");
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (edit) {
       setTitle("Changing Modules..");
     } else {
       setTitle("Edit");
     }
-  }, [edit]);
+  }, [edit]);*/
 
   return (
     <AnimatedContainer style={globalStyles.container} trigger={edit}>
       <TitlebarHeight />
       <Header
-        title={title}
+        //title={title}
         onPress={() => {
           navigation.goBack();
         }}
+        leftNode={
+          <TitleModule value={value} setValue={setValue} disabled={edit} />
+        }
       >
-        {edit ? (
-          <IconButton
-            icon="plus"
-            iconColor={theme.colors.primary}
-            size={20}
-            onPress={() => {
-              setAddModuleModalVisible(true);
-            }}
-          />
-        ) : (
-          <IconButton
-            icon={favIcon}
-            iconColor={theme.colors.primary}
-            size={20}
-            onPress={() => changeFav()}
-          />
-        )}
-
         <IconButton
+          icon="plus"
+          iconColor={theme.colors.primary}
+          size={20}
+          onPress={() => {
+            setAddModuleModalVisible(true);
+          }}
+        />
+        <IconButton
+          mode={edit ? "contained-tonal" : undefined}
           icon="square-edit-outline"
           iconColor={theme.colors.primary}
           size={20}
@@ -154,33 +156,31 @@ function EditScreen({ route, navigation }: Props) {
           selected={edit}
           onPress={() => setEdit(!edit)}
         />
-        {edit ? (
-          <IconButton
-            icon="delete"
-            iconColor={theme.colors.error}
-            size={20}
-            selected={false}
-            onPress={() => console.log("test")}
-          />
-        ) : (
-          <EditMetaInfMenu
-            created={route.params.value.created}
-            lastUpdated={route.params.value.lastUpdated}
-            folder={route.params.value.folder}
-            folderList={data?.data ? data.data.folder : []}
-            setFolderList={changeFolder}
-          />
-        )}
+        <EditMetaInfMenu
+          created={route.params.value.created}
+          lastUpdated={route.params.value.lastUpdated}
+          folder={route.params.value.folder}
+          folderList={data?.data ? data.data.folder : []}
+          setFolderList={changeFolder}
+          favButton={
+            <IconButton
+              //mode="contained-tonal"
+              icon={favIcon}
+              iconColor={theme.colors.primary}
+              size={20}
+              onPress={() => changeFav()}
+            />
+          }
+          navigation={navigation}
+        />
       </Header>
-      <View style={{ width: "100%", height: 84 }}>
-        <TitleModule value={value} setValue={setValue} disabled={edit} />
-      </View>
       {Platform.OS === "web" ? (
         <DraggableModulesListWeb
           value={value}
           setValue={setValue}
           changeModules={changeModules}
           deleteModule={deleteModule}
+          changeModule={changeModule}
           edit={edit}
         />
       ) : (
@@ -189,6 +189,7 @@ function EditScreen({ route, navigation }: Props) {
           setValue={setValue}
           changeModules={changeModules}
           deleteModule={deleteModule}
+          changeModule={changeModule}
           edit={edit}
         />
       )}

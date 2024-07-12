@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 
 import { IconButton, TextInput } from "react-native-paper";
@@ -9,23 +9,24 @@ import globalStyles from "../../ui/globalStyles";
 import Props from "../../types/ModuleProps";
 import theme from "../../ui/theme";
 
-import { ProgressBar } from "react-native-paper";
 import passwordEntropy from "../../utils/Entropy";
 import PasswordGeneratorModal from "../modals/PasswordGeneratorModal";
 import CopyToClipboard from "../CopyToClipboard";
+import * as Progress from "react-native-progress";
+import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 
 function PasswordModule(props: PasswordModuleType & Props) {
-  const [value, setValue] = React.useState(props.value);
-  const [secureTextEntry, setSecureTextEntry] = React.useState(true);
+  const [value, setValue] = useState(props.value);
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
 
-  const [eyeIcon, setEyeIcon] = React.useState("eye");
+  const [eyeIcon, setEyeIcon] = useState("eye");
 
-  const [entropyPercentage, setEntropyPercentage] = React.useState(0);
-  const [progressbarColor, setProgressbarColor] = React.useState("#238823");
+  const [entropyPercentage, setEntropyPercentage] = useState(0);
+  const [progressbarColor, setProgressbarColor] = useState("#238823");
 
-  const [visible, setVisible] = React.useState(false);
+  const [visible, setVisible] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (secureTextEntry) {
       setEyeIcon("eye");
     } else {
@@ -33,7 +34,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
     }
   }, [secureTextEntry]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const percentage = passwordEntropy(value) / 200;
     console.log("Entropy: " + percentage);
     setProgressbarColor("#238823");
@@ -51,6 +52,15 @@ function PasswordModule(props: PasswordModuleType & Props) {
     }
   }, [value]);
 
+  useEffect(() => {
+    const newModule: PasswordModuleType = {
+      id: props.id,
+      module: props.module,
+      value: value,
+    };
+    props.changeModule(newModule);
+  }, [value]);
+
   return (
     <ModuleContainer
       id={props.id}
@@ -59,6 +69,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
       delete={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
+      icon={ModuleIconsEnum.PASSWORD}
     >
       <View style={globalStyles.moduleView}>
         <TextInput
@@ -71,24 +82,25 @@ function PasswordModule(props: PasswordModuleType & Props) {
           autoCapitalize="none"
           autoComplete="password"
           textContentType="password"
-          disabled={props.edit}
           right={
             <TextInput.Icon
               icon={eyeIcon}
               color={theme.colors.primary}
               onPress={() => setSecureTextEntry(!secureTextEntry)}
-              disabled={props.edit}
             />
           }
         />
-        <CopyToClipboard value={value} disabled={props.edit} />
+        <CopyToClipboard value={value}/>
       </View>
       <View style={globalStyles.moduleView}>
         <View style={{ flexGrow: 1, padding: 6 }}>
-          <ProgressBar
-            style={{ width: "100%" }}
+          <Progress.Bar
             progress={entropyPercentage}
             color={progressbarColor}
+            width={null}
+            borderWidth={0}
+            unfilledColor={"lightgray"}
+            height={4}
           />
         </View>
         <IconButton
@@ -99,7 +111,6 @@ function PasswordModule(props: PasswordModuleType & Props) {
           onPress={() => {
             setVisible(true);
           }}
-          disabled={props.edit}
         />
         <PasswordGeneratorModal
           visible={visible}

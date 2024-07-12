@@ -8,7 +8,6 @@ import theme from "../../ui/theme";
 type Props = {
   folder: string[];
   setFolder: (folder: string[]) => void;
-  draggableDisabled: boolean;
 };
 
 // a little function to help us with reordering the result
@@ -57,7 +56,6 @@ function DraggableFolderListWeb(props: Props) {
           >
             {props.folder.map((item: string, index: number) => (
               <Draggable
-                isDragDisabled={props.draggableDisabled}
                 key={item + "-" + index}
                 draggableId={item + "-" + index}
                 index={index}
