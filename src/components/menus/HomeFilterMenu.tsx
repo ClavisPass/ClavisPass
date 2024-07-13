@@ -1,17 +1,20 @@
 import { useState } from "react";
-import { Divider, IconButton, Menu } from "react-native-paper";
+import { Divider, IconButton } from "react-native-paper";
 import { useAuth } from "../../contexts/AuthProvider";
 import DataType from "../../types/DataType";
 import { View } from "react-native";
 import theme from "../../ui/theme";
+import Menu, { MenuItem } from "./Menu";
 
 type Props = {
+  visible: boolean;
+  setVisible: (visible: boolean) => void;
   data: DataType;
   setData: (data: DataType) => void;
+  positionY: number;
 };
 function HomeFilterMenu(props: Props) {
   const auth = useAuth();
-  const [showMenu, setShowMenu] = useState(false);
 
   const sort = (sort: "asc" | "desc") => {
     let newData = { ...props.data } as DataType;
@@ -42,82 +45,48 @@ function HomeFilterMenu(props: Props) {
 
   return (
     <Menu
-      contentStyle={{
-        backgroundColor: "white",
-        borderRadius: 22,
-        borderTopRightRadius: 4,
-      }}
-      style={{ backgroundColor: "transparent", borderRadius: 22 }}
-      elevation={2}
-      visible={showMenu}
+      visible={props.visible}
       onDismiss={() => {
-        setShowMenu(false);
+        props.setVisible(false);
       }}
-      anchorPosition={"bottom"}
-      anchor={
-        <IconButton
-          icon="sort-variant"
-          size={25}
-          onPress={() => {
-            setShowMenu(true);
-          }}
-          iconColor="white"
-        />
-      }
+      positionY={props.positionY}
     >
-      <View style={{ display: "flex", flexDirection: "row" }}>
-        <Menu.Item
-          style={{
-            cursor: "auto",
-            borderTopLeftRadius: 22,
-            borderTopRightRadius: 4,
-            backgroundColor: "white",
-          }}
-          title={props.data?.values.length + " Entries"}
-        />
-        <IconButton
-          icon="refresh"
-          size={20}
-          iconColor={theme.colors.primary}
+      <>
+        <View style={{ display: "flex", flexDirection: "row" }}>
+          <MenuItem>{props.data?.values.length + " Entries"}</MenuItem>
+          <IconButton
+            icon="refresh"
+            size={20}
+            iconColor={theme.colors.primary}
+            onPress={() => {
+              //setShowMenu(true);
+            }}
+          />
+        </View>
+        <Divider />
+        <MenuItem
+          leadingIcon="sort-ascending"
           onPress={() => {
-            //setShowMenu(true);
+            sort("asc");
+            props.setVisible(false);
           }}
-        />
-      </View>
-      <Divider />
-      <Menu.Item
-        style={{
-          backgroundColor: "white",
-        }}
-        leadingIcon="sort-ascending"
-        onPress={() => {
-          sort("asc");
-          setShowMenu(false);
-        }}
-        title="sort ascending"
-      />
-      <Menu.Item
-        style={{
-          backgroundColor: "white",
-        }}
-        leadingIcon="sort-descending"
-        onPress={() => {
-          sort("desc");
-          setShowMenu(false);
-        }}
-        title="sort descending"
-      />
-      <Divider />
-      <Menu.Item
-        style={{
-          borderBottomLeftRadius: 20,
-          borderBottomRightRadius: 20,
-          backgroundColor: "white",
-        }}
-        leadingIcon="logout"
-        onPress={auth.logout}
-        title="Logout"
-      />
+        >
+          {"sort ascending"}
+        </MenuItem>
+        <MenuItem
+          leadingIcon="sort-descending"
+          onPress={() => {
+            sort("desc");
+            props.setVisible(false);
+          }}
+        >
+          {"sort descending"}
+        </MenuItem>
+        <Divider />
+        <MenuItem leadingIcon="logout" onPress={auth.logout}>
+          {"Logout"}
+        </MenuItem>
+      </>
     </Menu>
   );
 }

@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Dimensions, Platform } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { StyleSheet, Platform, View } from "react-native";
 import ModulesType, { ModuleType } from "../types/ModulesType";
 
 import ModulesEnum from "../enums/ModulesEnum";
 
 import type { StackScreenProps } from "@react-navigation/stack";
-import { IconButton } from "react-native-paper";
+import { IconButton, Text } from "react-native-paper";
 import Header from "../components/Header";
 import globalStyles from "../ui/globalStyles";
 import theme from "../ui/theme";
@@ -15,14 +15,15 @@ import ValuesType from "../types/ValuesType";
 import getModuleData from "../utils/getModuleData";
 import AddModuleModal from "../components/modals/AddModuleModal";
 import { getDateTime } from "../utils/Timestamp";
-import { TitlebarHeight } from "../components/CustomTitlebar";
+import { TITLEBAR_HEIGHT, TitlebarHeight } from "../components/CustomTitlebar";
 import { useData } from "../contexts/DataProvider";
 import DataType from "../types/DataType";
 import TitleModule from "../components/modules/TitleModule";
 import AnimatedContainer from "../components/AnimatedContainer";
 import DraggableModulesListWeb from "../components/draggableModulesList/DraggableModulesListWeb";
 import DraggableModulesList from "../components/draggableModulesList/DraggableModulesList";
-import FolderModal from "../components/modals/FolderModal";
+import Menu, { MenuItem } from "../components/menus/Menu";
+import Constants from "expo-constants";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -48,6 +49,7 @@ function EditScreen({ route, navigation }: Props) {
   const [value, setValue] = useState<ValuesType>({ ...route.params.value });
 
   const [addModuleModalVisible, setAddModuleModalVisible] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const [favIcon, setFavIcon] = useState("star-outline");
 
@@ -117,21 +119,10 @@ function EditScreen({ route, navigation }: Props) {
     }
   }, [value]);
 
-  const [title, setTitle] = useState("Edit");
-
-  /*useEffect(() => {
-    if (edit) {
-      setTitle("Changing Modules..");
-    } else {
-      setTitle("Edit");
-    }
-  }, [edit]);*/
-
   return (
     <AnimatedContainer style={globalStyles.container} trigger={edit}>
       <TitlebarHeight />
       <Header
-        //title={title}
         onPress={() => {
           navigation.goBack();
         }}
@@ -156,22 +147,13 @@ function EditScreen({ route, navigation }: Props) {
           selected={edit}
           onPress={() => setEdit(!edit)}
         />
-        <EditMetaInfMenu
-          created={route.params.value.created}
-          lastUpdated={route.params.value.lastUpdated}
-          folder={route.params.value.folder}
-          folderList={data?.data ? data.data.folder : []}
-          setFolderList={changeFolder}
-          favButton={
-            <IconButton
-              //mode="contained-tonal"
-              icon={favIcon}
-              iconColor={theme.colors.primary}
-              size={20}
-              onPress={() => changeFav()}
-            />
-          }
-          navigation={navigation}
+        <IconButton
+          icon="dots-vertical"
+          size={20}
+          iconColor={theme.colors.primary}
+          onPress={(event) => {
+            setShowMenu(true);
+          }}
         />
       </Header>
       {Platform.OS === "web" ? (
@@ -198,6 +180,26 @@ function EditScreen({ route, navigation }: Props) {
         addModule={addModule}
         visible={addModuleModalVisible}
         setVisible={setAddModuleModalVisible}
+      />
+      <EditMetaInfMenu
+        visible={showMenu}
+        setVisible={setShowMenu}
+        created={route.params.value.created}
+        lastUpdated={route.params.value.lastUpdated}
+        folder={route.params.value.folder}
+        folderList={data?.data ? data.data.folder : []}
+        setFolderList={changeFolder}
+        favButton={
+          <IconButton
+            icon={favIcon}
+            iconColor={theme.colors.primary}
+            size={20}
+            onPress={() => changeFav()}
+          />
+        }
+        navigation={navigation}
+        //anchor={buttonRef}
+        positionY={Constants.statusBarHeight + TITLEBAR_HEIGHT + 60}
       />
     </AnimatedContainer>
   );

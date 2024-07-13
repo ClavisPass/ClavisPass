@@ -1,0 +1,139 @@
+import { MutableRefObject, ReactNode, useEffect, useState } from "react";
+import { Pressable, View } from "react-native";
+import { TouchableRipple, Text, Icon } from "react-native-paper";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+
+type MenuItemProps = {
+  children: ReactNode;
+  onPress?: () => void;
+  leadingIcon?: string;
+};
+export function MenuItem(props: MenuItemProps) {
+  return (
+    <TouchableRipple onPress={props.onPress} style={{cursor: props.onPress? "pointer": "auto"}} rippleColor="rgba(0, 0, 0, .32)">
+      <View
+        style={{
+          flex: 1,
+          display: "flex",
+          padding: 14,
+          minWidth: 140,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 4,
+        }}
+      >
+        {props.leadingIcon && <Icon size={20} source={props.leadingIcon} />}
+        <Text variant="bodyLarge" style={{ userSelect: "none" }}>
+          {props.children}
+        </Text>
+      </View>
+    </TouchableRipple>
+  );
+}
+
+type Props = {
+  children: ReactNode;
+  visible: boolean;
+  onDismiss: () => void;
+  positionY: number;
+};
+function Menu(props: Props) {
+  const translationX = useSharedValue(-30);
+  const translationY = useSharedValue(-30);
+  const scale = useSharedValue(0);
+  const positionY = props.positionY;
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: scale.value }],
+    };
+  });
+
+  const startAnimation = () => {
+    translationX.value = withTiming(0, {
+      duration: 250,
+      easing: Easing.out(Easing.exp),
+    });
+    translationY.value = withTiming(0, {
+      duration: 250,
+      easing: Easing.out(Easing.exp),
+    });
+    scale.value = withTiming(1, {
+      duration: 250,
+      easing: Easing.out(Easing.exp),
+    });
+  };
+
+  useEffect(() => {
+    if (props.visible) {
+      startAnimation();
+    } else {
+      translationX.value = 0;
+      translationY.value = 0;
+      scale.value = 0;
+    }
+  }, [props.visible]);
+  return (
+    <>
+      {props.visible && (
+        <View
+          style={{
+            backgroundColor: "transparent",
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+          }}
+        >
+          <Pressable
+            style={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+            }}
+            onPress={props.onDismiss}
+          >
+            <Pressable>
+              <Animated.View
+                style={[
+                  {
+                    overflow: "hidden",
+                    position: "absolute",
+                    backgroundColor: "white",
+                    top: positionY,
+                    right: 4,
+                    borderTopLeftRadius: 22,
+                    borderTopRightRadius: 4,
+                    borderBottomLeftRadius: 20,
+                    borderBottomRightRadius: 20,
+                    display: "flex",
+                    flexDirection: "column",
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.4,
+                    shadowRadius: 6,
+                    elevation: 5,
+                    zIndex: 1,
+                  },
+                  animatedStyle,
+                ]}
+              >
+                {props.children}
+              </Animated.View>
+            </Pressable>
+          </Pressable>
+        </View>
+      )}
+    </>
+  );
+}
+
+export default Menu;

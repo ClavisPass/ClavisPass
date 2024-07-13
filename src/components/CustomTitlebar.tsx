@@ -5,9 +5,11 @@ import theme from "../ui/theme";
 import WebSpecific from "./platformSpecific/WebSpecific";
 import { appWindow } from "@tauri-apps/api/window";
 
+export const TITLEBAR_HEIGHT = Platform.OS === "web" ? 46 : 0;
+
 const styles = StyleSheet.create({
   titlebar: {
-    height: 46,
+    height: TITLEBAR_HEIGHT,
     width: "100%",
     zIndex: 0,
   },

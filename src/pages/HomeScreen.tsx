@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Platform } from "react-native";
 import { Searchbar, IconButton } from "react-native-paper";
 
 import { Chip, Text } from "react-native-paper";
@@ -23,20 +23,14 @@ import FolderFilter from "../components/FolderFilter";
 import AnimatedContainer from "../components/AnimatedContainer";
 import ContentProtection from "../components/ContentProtection";
 import { useFocusEffect } from "@react-navigation/native";
-
-const styles = StyleSheet.create({
-  box: {
-    width: "100%",
-    height: 80,
-    backgroundColor: "black",
-    margin: 30,
-  },
-});
+import { TITLEBAR_HEIGHT } from "../components/CustomTitlebar";
 
 function HomeScreen({ navigation }: { navigation: any }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFolder, setSelectedFolder] = useState("");
   const [selectedFav, setSelectedFav] = useState(false);
+
+  const [showMenu, setShowMenu] = useState(false);
 
   const data = useData();
 
@@ -73,15 +67,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
   const [statusbarStyle, setStatusbarStyle] = useState<"dark" | "light">(
     "light"
   );
-
-  /*useFocusEffect(
-    React.useCallback(() => {
-      setStatusbarStyle("light");
-      return () => {
-        setStatusbarStyle("dark");
-      };
-    }, [])
-  );*/
 
   return (
     <AnimatedContainer
@@ -134,7 +119,15 @@ function HomeScreen({ navigation }: { navigation: any }) {
                 onPress={() => console.log("Pressed")}
                 iconColor="white"
               />
-              <HomeFilterMenu data={data.data} setData={data.setData} />
+
+              <IconButton
+                icon="sort-variant"
+                size={25}
+                onPress={() => {
+                  setShowMenu(true);
+                }}
+                iconColor="white"
+              />
             </WebSpecific>
           </View>
         </View>
@@ -164,7 +157,14 @@ function HomeScreen({ navigation }: { navigation: any }) {
               onPress={() => console.log("Pressed")}
               iconColor="white"
             />
-            <HomeFilterMenu data={data.data} setData={data.setData} />
+            <IconButton
+              icon="sort-variant"
+              size={25}
+              onPress={() => {
+                setShowMenu(true);
+              }}
+              iconColor="white"
+            />
           </WebSpecific>
         </View>
       </LinearGradient>
@@ -193,6 +193,17 @@ function HomeScreen({ navigation }: { navigation: any }) {
         setSelectedFav={setSelectedFav}
         selectedFolder={selectedFolder}
         setSelectedFolder={setSelectedFolder}
+      />
+      <HomeFilterMenu
+        visible={showMenu}
+        setVisible={setShowMenu}
+        data={data.data}
+        setData={data.setData}
+        positionY={
+          Constants.statusBarHeight +
+          TITLEBAR_HEIGHT +
+          (Platform.OS === "web" ? 48 : 66)
+        }
       />
     </AnimatedContainer>
   );
