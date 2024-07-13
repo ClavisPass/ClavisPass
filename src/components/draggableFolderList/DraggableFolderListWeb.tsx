@@ -2,12 +2,20 @@ import React from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { View } from "react-native";
 import globalStyles from "../../ui/globalStyles";
-import { Divider, Icon, IconButton, Text } from "react-native-paper";
+import {
+  Divider,
+  Icon,
+  IconButton,
+  Text,
+  TouchableRipple,
+} from "react-native-paper";
 import theme from "../../ui/theme";
 
 type Props = {
   folder: string[];
   setFolder: (folder: string[]) => void;
+  setSelectedFolder: (folder: string) => void;
+  deleteFolder: (folder: string) => void;
 };
 
 // a little function to help us with reordering the result
@@ -23,6 +31,8 @@ const grid = 8;
 
 const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
   userSelect: "none",
+  top: "auto",
+  left: "auto",
   //background: isDragging ? "lightgreen" : "grey",
   ...draggableStyle,
 });
@@ -31,6 +41,7 @@ const getListStyle = (isDraggingOver: boolean) => ({
   //background: isDraggingOver ? "lightblue" : "lightgrey",
   flex: 1,
   width: "100%",
+  overflow: "auto",
 });
 
 function DraggableFolderListWeb(props: Props) {
@@ -70,39 +81,49 @@ function DraggableFolderListWeb(props: Props) {
                       provided.draggableProps.style
                     )}
                   >
-                    <Divider />
                     <View style={globalStyles.folderContainer}>
-                      <View
+                      <Icon source="drag" size={20} />
+
+                      <TouchableRipple
                         style={{
+                          padding: 12,
+                          flexGrow: 1,
+                          flex: 1,
                           display: "flex",
                           flexDirection: "row",
                           alignItems: "center",
+                          gap: 4,
                         }}
+                        onPress={() => {
+                          props.setSelectedFolder(item);
+                        }}
+                        rippleColor="rgba(0, 0, 0, .32)"
                       >
-                        <Icon source="drag" size={20} />
-                        <Icon
-                          source="folder"
-                          size={20}
-                          color={theme.colors.primary}
-                        />
-                        <Text
-                          style={{
-                            userSelect: "none",
-                            fontWeight: "bold",
-                            fontSize: 15,
-                            color: theme.colors.primary,
-                          }}
-                          variant="bodyMedium"
-                        >
-                          {item}
-                        </Text>
-                      </View>
+                        <>
+                          <Icon
+                            source="folder"
+                            size={20}
+                            color={theme.colors.primary}
+                          />
+                          <Text
+                            style={{
+                              userSelect: "none",
+                              fontWeight: "bold",
+                              fontSize: 15,
+                            }}
+                            variant="bodyMedium"
+                          >
+                            {item}
+                          </Text>
+                        </>
+                      </TouchableRipple>
                       <IconButton
-                        //style={{ margin: 0 }}
                         icon="close"
-                        iconColor={theme.colors.error}
-                        size={20}
-                        onPress={() => {}}
+                        size={16}
+                        style={{ margin: 0 }}
+                        onPress={() => {
+                          props.deleteFolder(item);
+                        }}
                       />
                     </View>
                   </div>

@@ -4,12 +4,21 @@ import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
 import globalStyles from "../../ui/globalStyles";
-import { Icon, IconButton, Text } from "react-native-paper";
+import {
+  Divider,
+  Icon,
+  IconButton,
+  Portal,
+  Text,
+  TouchableRipple,
+} from "react-native-paper";
 import theme from "../../ui/theme";
 
 type Props = {
   folder: string[];
   setFolder: (folder: string[]) => void;
+  setSelectedFolder: (folder: string) => void;
+  deleteFolder: (folder: string) => void;
 };
 
 function DraggableFolderList(props: Props) {
@@ -17,35 +26,45 @@ function DraggableFolderList(props: Props) {
     ({ item, drag, isActive }: RenderItemParams<string>) => {
       return (
         <View style={globalStyles.folderContainer}>
-          <View
+          <Pressable onPressIn={drag}>
+            <Icon source="drag" size={20} />
+          </Pressable>
+          <TouchableRipple
             style={{
+              padding: 12,
+              flexGrow: 1,
+              flex: 1,
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
+              gap: 4,
             }}
+            onPress={() => {
+              props.setSelectedFolder(item);
+            }}
+            rippleColor="rgba(0, 0, 0, .32)"
           >
-            <Pressable onPressIn={drag}>
-              <Icon source="drag" size={20} />
-            </Pressable>
-            <Icon source="folder" color={theme.colors.primary} size={20} />
-            <Text
-              style={{
-                userSelect: "none",
-                fontWeight: "bold",
-                fontSize: 15,
-                color: theme.colors.primary,
-              }}
-              variant="bodyMedium"
-            >
-              {item}
-            </Text>
-          </View>
+            <>
+              <Icon source="folder" color={theme.colors.primary} size={20} />
+              <Text
+                style={{
+                  userSelect: "none",
+                  fontWeight: "bold",
+                  fontSize: 15,
+                }}
+                variant="bodyMedium"
+              >
+                {item}
+              </Text>
+            </>
+          </TouchableRipple>
           <IconButton
-            //style={{ margin: 0 }}
             icon="close"
-            iconColor={theme.colors.error}
-            size={20}
-            onPress={() => {}}
+            size={16}
+            style={{ margin: 0 }}
+            onPress={() => {
+              props.deleteFolder(item);
+            }}
           />
         </View>
       );
@@ -56,8 +75,7 @@ function DraggableFolderList(props: Props) {
   return (
     <View style={{ flex: 1, width: "100%" }}>
       <DraggableFlatList
-        //ItemSeparatorComponent={Divider}
-        data={[...props.folder]}
+        data={props.folder}
         renderItem={renderItem}
         keyExtractor={(item, index) => `drag-item-${item}-${index}`}
         onDragEnd={({ data }) => props.setFolder(data)}

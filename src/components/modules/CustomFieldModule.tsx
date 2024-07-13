@@ -33,14 +33,6 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
       delete={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      modal={
-        <EditCustomFieldModal
-          visible={visible}
-          setVisible={setVisible}
-          title={title}
-          setTitle={setTitle}
-        />
-      }
       icon={ModuleIconsEnum.CUSTOM_FIELD}
       titlePress={() => {
         setVisible(true);
@@ -57,6 +49,12 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
         />
         <CopyToClipboard value={value} />
       </View>
+      <EditCustomFieldModal
+        visible={visible}
+        setVisible={setVisible}
+        title={title}
+        setTitle={setTitle}
+      />
     </ModuleContainer>
   );
 }

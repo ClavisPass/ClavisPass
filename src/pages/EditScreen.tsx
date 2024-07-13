@@ -24,6 +24,7 @@ import DraggableModulesListWeb from "../components/draggableModulesList/Draggabl
 import DraggableModulesList from "../components/draggableModulesList/DraggableModulesList";
 import Menu, { MenuItem } from "../components/menus/Menu";
 import Constants from "expo-constants";
+import FolderModal from "../components/modals/FolderModal";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -49,6 +50,7 @@ function EditScreen({ route, navigation }: Props) {
   const [value, setValue] = useState<ValuesType>({ ...route.params.value });
 
   const [addModuleModalVisible, setAddModuleModalVisible] = useState(false);
+  const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
   const [favIcon, setFavIcon] = useState("star-outline");
@@ -81,6 +83,13 @@ function EditScreen({ route, navigation }: Props) {
     newValue.modules = modules;
     setValue(newValue);
     setAddModuleModalVisible(false);
+  };
+
+  const changeSelectedFolder = (folder: string) => {
+    const newValue = { ...value };
+    newValue.folder = folder;
+    setValue(newValue);
+    setFolderModalVisible(false);
   };
 
   const changeFav = () => {
@@ -186,7 +195,7 @@ function EditScreen({ route, navigation }: Props) {
         setVisible={setShowMenu}
         created={route.params.value.created}
         lastUpdated={route.params.value.lastUpdated}
-        folder={route.params.value.folder}
+        folder={value.folder}
         folderList={data?.data ? data.data.folder : []}
         setFolderList={changeFolder}
         favButton={
@@ -197,9 +206,15 @@ function EditScreen({ route, navigation }: Props) {
             onPress={() => changeFav()}
           />
         }
-        navigation={navigation}
-        //anchor={buttonRef}
+        setFolderModalVisible={setFolderModalVisible}
         positionY={Constants.statusBarHeight + TITLEBAR_HEIGHT + 60}
+      />
+      <FolderModal
+        visible={folderModalVisible}
+        setVisible={setFolderModalVisible}
+        folder={data?.data ? data.data.folder : []}
+        setFolder={changeFolder}
+        setSelectedFolder={changeSelectedFolder}
       />
     </AnimatedContainer>
   );

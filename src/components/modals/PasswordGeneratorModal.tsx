@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import {
   IconButton,
-  Modal,
   Portal,
   Switch,
   Text,
@@ -17,6 +16,7 @@ import Button from "../Button";
 import generatePassword from "../../utils/generatePassword";
 import globalStyles from "../../ui/globalStyles";
 import CopyToClipboard from "../CopyToClipboard";
+import Modal from "./Modal";
 
 const styles = StyleSheet.create({
   container: {
@@ -59,17 +59,7 @@ function PasswordGeneratorModal(props: Props) {
   const hideModal = () => props.setVisible(false);
   return (
     <Portal>
-      <Modal
-        visible={props.visible}
-        onDismiss={hideModal}
-        contentContainerStyle={{
-          backgroundColor: "transparent",
-          borderRadius: 20,
-          display: "flex",
-          alignSelf: "center",
-          justifyContent: "center",
-        }}
-      >
+      <Modal visible={props.visible} onDismiss={hideModal}>
         <LinearGradient
           colors={getColors()}
           style={{ padding: 3, width: 300, borderRadius: 20 }}
@@ -126,7 +116,7 @@ function PasswordGeneratorModal(props: Props) {
               <CopyToClipboard value={genPassword} />
             </View>
             <View style={styles.container}>
-              <Text variant="bodyLarge">
+              <Text style={{ userSelect: "none" }} variant="bodyLarge">
                 {"Password Length: " + valueSlider}
               </Text>
             </View>
@@ -140,14 +130,14 @@ function PasswordGeneratorModal(props: Props) {
               />
             </View>
             <View style={styles.container}>
-              <Text variant="bodyLarge">{"include Numbers"}</Text>
+              <Text style={{ userSelect: "none" }} variant="bodyLarge">{"include Numbers"}</Text>
               <Switch
                 value={numberInclude}
                 onValueChange={() => setNumberInclude(!numberInclude)}
               />
             </View>
             <View style={styles.container}>
-              <Text variant="bodyLarge">{"include Symbols"}</Text>
+              <Text style={{ userSelect: "none" }} variant="bodyLarge">{"include Symbols"}</Text>
               <Switch
                 value={symbolInclude}
                 onValueChange={() => setSymbolInclude(!symbolInclude)}

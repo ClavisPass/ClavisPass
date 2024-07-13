@@ -52,7 +52,14 @@ function HomeFilterMenu(props: Props) {
       positionY={props.positionY}
     >
       <>
-        <View style={{ display: "flex", flexDirection: "row" }}>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <MenuItem>{props.data?.values.length + " Entries"}</MenuItem>
           <IconButton
             icon="refresh"

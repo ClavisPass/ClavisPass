@@ -9,17 +9,16 @@ import Menu, { MenuItem } from "./Menu";
 type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
+  setFolderModalVisible: (visible: boolean) => void;
   created: string;
   lastUpdated: string;
   folder: string;
   folderList: string[];
   setFolderList: (folder: string[]) => void;
   favButton: ReactNode;
-  navigation: any;
   positionY: number;
 };
 function EditMetaInfMenu(props: Props) {
-  const [folderModalVisible, setFolderModalVisible] = useState(false);
   return (
     <Menu
       visible={props.visible}
@@ -28,25 +27,22 @@ function EditMetaInfMenu(props: Props) {
       }}
       positionY={props.positionY}
     >
-      <View style={{ display: "flex", flexDirection: "row" }}>
-        <MenuItem leadingIcon={"folder"}>
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <MenuItem
+          leadingIcon={"folder"}
+          onPress={() => {
+            props.setFolderModalVisible(true);
+          }}
+        >
           {props.folder === "" ? "None" : props.folder}
         </MenuItem>
-        <IconButton
-          icon="pencil"
-          size={20}
-          iconColor={theme.colors.primary}
-          onPress={() => {
-            setFolderModalVisible(true);
-          }}
-        />
-        <FolderModal
-          visible={folderModalVisible}
-          setVisible={setFolderModalVisible}
-          folder={props.folderList}
-          setFolder={props.setFolderList}
-          navigation={props.navigation}
-        />
         {props.favButton}
       </View>
       <Divider />
@@ -55,7 +51,14 @@ function EditMetaInfMenu(props: Props) {
         {"last updated: " + formatDateTime(props.lastUpdated)}
       </MenuItem>
       <Divider />
-      <MenuItem leadingIcon={"delete"}>Delete</MenuItem>
+      <MenuItem
+        leadingIcon={"delete"}
+        onPress={() => {
+          console.log("test");
+        }}
+      >
+        Delete
+      </MenuItem>
     </Menu>
   );
 }

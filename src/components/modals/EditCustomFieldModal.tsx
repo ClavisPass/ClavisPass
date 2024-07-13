@@ -3,7 +3,8 @@ import { Portal, TextInput, Text } from "react-native-paper";
 import getColors from "../../ui/linearGradient";
 import { LinearGradient } from "expo-linear-gradient";
 import globalStyles from "../../ui/globalStyles";
-import Modal from "react-native-modal";
+import Modal from "./Modal";
+import { useEffect, useRef } from "react";
 
 type Props = {
   visible: boolean;
@@ -13,51 +14,43 @@ type Props = {
 };
 
 function EditCustomFieldModal(props: Props) {
+  const inputRef = useRef<any>();
+
+  useEffect(() => {
+    if (props.visible) {
+      inputRef.current.focus();
+    }
+  }, [props.visible]);
   return (
-    <Portal>
-      <Modal
-        isVisible={props.visible}
-        onBackdropPress={() => {
-          props.setVisible(false);
-        }}
+    <Modal
+      visible={props.visible}
+      onDismiss={() => {
+        props.setVisible(false);
+      }}
+    >
+      <View
         style={{
-          backgroundColor: "transparent",
+          backgroundColor: "white",
+          padding: 10,
           borderRadius: 20,
           display: "flex",
-          alignSelf: "center",
-          justifyContent: "center",
+          height: 60,
         }}
       >
-        <View>
-          <LinearGradient
-            colors={getColors()}
-            style={{ padding: 3, width: 300, borderRadius: 20 }}
-            end={{ x: 0.1, y: 0.2 }}
-            dither={true}
-          >
-            <View
-              style={{
-                backgroundColor: "white",
-                padding: 16,
-                borderRadius: 20,
-                display: "flex",
-                height: 100,
-              }}
-            >
-              <Text variant="labelLarge">Change Title:</Text>
-              <TextInput
-                outlineStyle={globalStyles.outlineStyle}
-                style={globalStyles.textInputStyle}
-                value={props.title}
-                mode="outlined"
-                onChangeText={(text) => props.setTitle(text)}
-                autoCapitalize="none"
-              />
-            </View>
-          </LinearGradient>
-        </View>
-      </Modal>
-    </Portal>
+        <TextInput
+          ref={inputRef}
+          outlineStyle={globalStyles.outlineStyle}
+          style={globalStyles.textInputStyle}
+          value={props.title}
+          mode="outlined"
+          onChangeText={(text) => props.setTitle(text)}
+          autoCapitalize="none"
+          onBlur={() => {
+            props.setVisible(false);
+          }}
+        />
+      </View>
+    </Modal>
   );
 }
 

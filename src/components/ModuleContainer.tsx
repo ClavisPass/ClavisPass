@@ -74,15 +74,15 @@ function ModuleContainer(props: Props) {
   const translateXDelete = useSharedValue(44);
   useEffect(() => {
     if (props.edit) {
-      translateX.value = withTiming(0, { duration: 250 });
-      paddingLeft.value = withTiming(24, { duration: 250 });
-      paddingRight.value = withTiming(50, { duration: 250 });
-      translateXDelete.value = withTiming(0, { duration: 250 });
+      translateX.value = withTiming(0, { duration: 150 });
+      paddingLeft.value = withTiming(24, { duration: 150 });
+      paddingRight.value = withTiming(50, { duration: 150 });
+      translateXDelete.value = withTiming(0, { duration: 150 });
     } else {
-      translateX.value = withTiming(-16, { duration: 250 });
-      paddingLeft.value = withTiming(4, { duration: 250 });
-      paddingRight.value = withTiming(4, { duration: 250 });
-      translateXDelete.value = withTiming(44, { duration: 250 });
+      translateX.value = withTiming(-16, { duration: 150 });
+      paddingLeft.value = withTiming(4, { duration: 150 });
+      paddingRight.value = withTiming(4, { duration: 150 });
+      translateXDelete.value = withTiming(44, { duration: 150 });
     }
   }, [props.edit]);
 

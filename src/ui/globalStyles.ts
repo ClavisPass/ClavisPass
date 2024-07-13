@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import theme from "./theme";
 
 const globalStyles = StyleSheet.create({
   container: {
@@ -35,10 +36,14 @@ const globalStyles = StyleSheet.create({
   },
   folderContainer: {
     backgroundColor: "white",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#d3d3d3",
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginBottom: 4,
   },
 });
 

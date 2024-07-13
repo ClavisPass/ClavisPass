@@ -7,6 +7,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import theme from "../../ui/theme";
 
 type MenuItemProps = {
   children: ReactNode;
@@ -15,7 +16,11 @@ type MenuItemProps = {
 };
 export function MenuItem(props: MenuItemProps) {
   return (
-    <TouchableRipple onPress={props.onPress} style={{cursor: props.onPress? "pointer": "auto"}} rippleColor="rgba(0, 0, 0, .32)">
+    <TouchableRipple
+      onPress={props.onPress}
+      style={{ cursor: props.onPress ? "pointer" : "auto", flex: 1 }}
+      rippleColor="rgba(0, 0, 0, .32)"
+    >
       <View
         style={{
           flex: 1,
@@ -27,7 +32,13 @@ export function MenuItem(props: MenuItemProps) {
           gap: 4,
         }}
       >
-        {props.leadingIcon && <Icon size={20} source={props.leadingIcon} />}
+        {props.leadingIcon && (
+          <Icon
+            size={20}
+            color={theme.colors.primary}
+            source={props.leadingIcon}
+          />
+        )}
         <Text variant="bodyLarge" style={{ userSelect: "none" }}>
           {props.children}
         </Text>

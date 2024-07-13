@@ -1,30 +1,34 @@
 import { useEffect, useMemo, useState } from "react";
-import { FlatList, View } from "react-native";
+import { FlatList, Platform, View } from "react-native";
 import {
   IconButton,
   Portal,
   TextInput,
   TouchableRipple,
   Text,
+  Divider,
 } from "react-native-paper";
 import getColors from "../../ui/linearGradient";
 import { LinearGradient } from "expo-linear-gradient";
 import globalStyles from "../../ui/globalStyles";
-import Modal from "react-native-modal";
+import Modal from "./Modal";
+import DraggableFolderListWeb from "../draggableFolderList/DraggableFolderListWeb";
+import DraggableFolderList from "../draggableFolderList/DraggableFolderList";
 
 type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
   folder: string[];
   setFolder: (folder: string[]) => void;
-  navigation: any;
+  setSelectedFolder: (folder: string) => void;
 };
 
 function FolderModal(props: Props) {
   const [searchQuery, setSearchQuery] = useState("");
   const filteredValues = useMemo(() => {
     return props.folder.filter((item) => {
-      return item.toLowerCase().includes(searchQuery.toLowerCase());
+      return item === searchQuery;
+      //return item.toLowerCase().includes(searchQuery.toLowerCase());
     });
   }, [props.folder, searchQuery]);
   const [addButtonDisabled, setAddButtonDisabled] = useState(true);
@@ -41,92 +45,85 @@ function FolderModal(props: Props) {
     } else {
       setDraggableDisabled(true);
     }
-  }, [filteredValues]);
+    if (searchQuery === "") {
+      setAddButtonDisabled(true);
+    }
+  }, [filteredValues, searchQuery]);
+
+  useEffect(() => {
+    if (addButtonDisabled) {
+      setDraggableDisabled(false);
+    } else {
+      setDraggableDisabled(true);
+    }
+  }, [addButtonDisabled]);
+
+  const deleteFolder= (folder: string) => {
+    const newFolder: string[] = [
+      ...props.folder.filter((item: string) => item !== folder),
+    ];
+    props.setFolder(newFolder);
+  };
 
   return (
-    <Portal>
-      <Modal
-        coverScreen={false}
-        isVisible={props.visible}
-        onBackdropPress={hideModal}
-        style={{
-          zIndex: 2,
-          backgroundColor: "transparent",
-          borderRadius: 20,
-          display: "flex",
-          alignSelf: "center",
-          justifyContent: "center",
-        }}
+    <Modal visible={props.visible} onDismiss={hideModal}>
+      <LinearGradient
+        colors={getColors()}
+        style={{ padding: 3, width: 300, borderRadius: 20 }}
+        end={{ x: 0.1, y: 0.2 }}
+        dither={true}
       >
-        <View>
-          <LinearGradient
-            colors={getColors()}
-            style={{ padding: 3, width: 300, borderRadius: 20 }}
-            end={{ x: 0.1, y: 0.2 }}
-            dither={true}
-          >
-            <View
-              style={{
-                backgroundColor: "white",
-                padding: 16,
-                borderRadius: 20,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "column",
+        <View
+          style={{
+            backgroundColor: "white",
+            padding: 16,
+            borderRadius: 20,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            height: 360,
+          }}
+        >
+          <View style={globalStyles.moduleView}>
+            <TextInput
+              placeholder="Add Folder..."
+              outlineStyle={globalStyles.outlineStyle}
+              style={globalStyles.textInputStyle}
+              value={searchQuery}
+              mode="outlined"
+              onChangeText={(text) => setSearchQuery(text)}
+              autoCapitalize="none"
+            />
+            <IconButton
+              selected
+              mode={addButtonDisabled ? undefined : "contained-tonal"}
+              disabled={addButtonDisabled}
+              icon={"plus"}
+              onPress={() => {
+                props.setFolder([...props.folder, searchQuery]);
               }}
-            >
-              <View style={globalStyles.moduleView}>
-                <TextInput
-                  outlineStyle={globalStyles.outlineStyle}
-                  style={globalStyles.textInputStyle}
-                  value={searchQuery}
-                  mode="outlined"
-                  onChangeText={(text) => setSearchQuery(text)}
-                  autoCapitalize="none"
-                />
-                <IconButton
-                  icon={"square-edit-outline"}
-                  onPress={() => {
-                    props.navigation.navigate("EditFolder", {
-                      folder: props.folder,
-                      setFolder: props.setFolder,
-                    });
-                  }}
-                  //disabled={addButtonDisabled}
-                />
-              </View>
-              <FlatList
-                data={filteredValues}
-                renderItem={({ item }) => (
-                  <View style={globalStyles.folderContainer}>
-                    <TouchableRipple
-                      //style={styles.ripple}
-                      onPress={() => {
-                        console.log("test");
-                      }}
-                      rippleColor="rgba(0, 0, 0, .32)"
-                    >
-                      <Text
-                        style={{
-                          userSelect: "none",
-                          fontWeight: "bold",
-                          fontSize: 15,
-                          //color: theme.colors.primary,
-                        }}
-                        variant="bodyMedium"
-                      >
-                        {item}
-                      </Text>
-                    </TouchableRipple>
-                  </View>
-                )}
-              />
-            </View>
-          </LinearGradient>
+            />
+          </View>
+          
+          {Platform.OS === "web" ? (
+            <DraggableFolderListWeb
+              folder={props.folder}
+              setFolder={props.setFolder}
+              setSelectedFolder={props.setSelectedFolder}
+              deleteFolder={deleteFolder}
+            />
+          ) : (
+            <DraggableFolderList
+              folder={props.folder}
+              setFolder={props.setFolder}
+              setSelectedFolder={props.setSelectedFolder}
+              deleteFolder={deleteFolder}
+            />
+          )}
         </View>
-      </Modal>
-    </Portal>
+      </LinearGradient>
+    </Modal>
   );
 }
 
