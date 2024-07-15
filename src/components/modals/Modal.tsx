@@ -1,7 +1,5 @@
-import { BlurView } from "expo-blur";
-import { MutableRefObject, ReactNode, useEffect, useState } from "react";
-import { Platform, Pressable, View } from "react-native";
-import { TouchableRipple, Text, Icon } from "react-native-paper";
+import { ReactNode, useEffect, useState } from "react";
+import { Platform, Pressable } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,

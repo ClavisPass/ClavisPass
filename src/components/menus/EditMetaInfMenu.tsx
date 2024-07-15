@@ -1,9 +1,7 @@
-import { MutableRefObject, ReactNode, useState } from "react";
-import { Divider, IconButton } from "react-native-paper";
-import theme from "../../ui/theme";
+import { ReactNode } from "react";
+import { Divider} from "react-native-paper";
 import { formatDateTime } from "../../utils/Timestamp";
 import { View } from "react-native";
-import FolderModal from "../modals/FolderModal";
 import Menu, { MenuItem } from "./Menu";
 
 type Props = {
@@ -36,7 +34,7 @@ function EditMetaInfMenu(props: Props) {
         }}
       >
         <MenuItem
-          leadingIcon={"folder"}
+          leadingIcon={"folder-outline"}
           onPress={() => {
             props.setFolderModalVisible(true);
           }}
@@ -52,7 +50,7 @@ function EditMetaInfMenu(props: Props) {
       </MenuItem>
       <Divider />
       <MenuItem
-        leadingIcon={"delete"}
+        leadingIcon={"delete-outline"}
         onPress={() => {
           console.log("test");
         }}

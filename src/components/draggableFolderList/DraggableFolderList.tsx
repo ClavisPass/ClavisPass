@@ -4,20 +4,13 @@ import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
 import globalStyles from "../../ui/globalStyles";
-import {
-  Divider,
-  Icon,
-  IconButton,
-  Portal,
-  Text,
-  TouchableRipple,
-} from "react-native-paper";
+import { Icon, IconButton, Text, TouchableRipple } from "react-native-paper";
 import theme from "../../ui/theme";
 
 type Props = {
   folder: string[];
   setFolder: (folder: string[]) => void;
-  setSelectedFolder: (folder: string) => void;
+  setSelectedFolder?: (folder: string) => void;
   deleteFolder: (folder: string) => void;
 };
 
@@ -31,7 +24,7 @@ function DraggableFolderList(props: Props) {
           </Pressable>
           <TouchableRipple
             style={{
-              padding: 12,
+              padding: 6,
               flexGrow: 1,
               flex: 1,
               display: "flex",
@@ -39,9 +32,13 @@ function DraggableFolderList(props: Props) {
               alignItems: "center",
               gap: 4,
             }}
-            onPress={() => {
-              props.setSelectedFolder(item);
-            }}
+            onPress={
+              props.setSelectedFolder
+                ? () => {
+                    props.setSelectedFolder?.(item);
+                  }
+                : undefined
+            }
             rippleColor="rgba(0, 0, 0, .32)"
           >
             <>
@@ -60,7 +57,7 @@ function DraggableFolderList(props: Props) {
           </TouchableRipple>
           <IconButton
             icon="close"
-            size={16}
+            size={14}
             style={{ margin: 0 }}
             onPress={() => {
               props.deleteFolder(item);

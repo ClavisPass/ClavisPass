@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
 type RootStackParamList = {
   params: {
     value: ValuesType;
+    changeFolder: (folder: string[]) => void;
   };
 };
 
@@ -96,14 +97,6 @@ function EditScreen({ route, navigation }: Props) {
     const newValue = { ...value };
     newValue.fav = !value.fav;
     setValue(newValue);
-  };
-
-  const changeFolder = (folder: string[]) => {
-    let newData = { ...data.data } as DataType;
-    if (newData) {
-      newData.folder = folder;
-    }
-    data.setData(newData);
   };
 
   const deleteModule = (id: string) => {
@@ -197,7 +190,7 @@ function EditScreen({ route, navigation }: Props) {
         lastUpdated={route.params.value.lastUpdated}
         folder={value.folder}
         folderList={data?.data ? data.data.folder : []}
-        setFolderList={changeFolder}
+        setFolderList={route.params.changeFolder}
         favButton={
           <IconButton
             icon={favIcon}
@@ -213,7 +206,7 @@ function EditScreen({ route, navigation }: Props) {
         visible={folderModalVisible}
         setVisible={setFolderModalVisible}
         folder={data?.data ? data.data.folder : []}
-        setFolder={changeFolder}
+        setFolder={route.params.changeFolder}
         setSelectedFolder={changeSelectedFolder}
       />
     </AnimatedContainer>

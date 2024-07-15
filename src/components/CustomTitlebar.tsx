@@ -58,7 +58,7 @@ function CustomTitlebar() {
 
   const closeWindow = () => {
     if (Platform.OS === "web") {
-      appWindow.close();
+      appWindow.hide();
     }
   };
   return (

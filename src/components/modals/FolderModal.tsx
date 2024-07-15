@@ -1,15 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { FlatList, Platform, View } from "react-native";
-import {
-  IconButton,
-  Portal,
-  TextInput,
-  TouchableRipple,
-  Text,
-  Divider,
-} from "react-native-paper";
-import getColors from "../../ui/linearGradient";
-import { LinearGradient } from "expo-linear-gradient";
+import { Platform, View } from "react-native";
+import { IconButton, TextInput } from "react-native-paper";
 import globalStyles from "../../ui/globalStyles";
 import Modal from "./Modal";
 import DraggableFolderListWeb from "../draggableFolderList/DraggableFolderListWeb";
@@ -20,7 +11,7 @@ type Props = {
   setVisible: (visible: boolean) => void;
   folder: string[];
   setFolder: (folder: string[]) => void;
-  setSelectedFolder: (folder: string) => void;
+  setSelectedFolder?: (folder: string) => void;
 };
 
 function FolderModal(props: Props) {
@@ -28,7 +19,6 @@ function FolderModal(props: Props) {
   const filteredValues = useMemo(() => {
     return props.folder.filter((item) => {
       return item === searchQuery;
-      //return item.toLowerCase().includes(searchQuery.toLowerCase());
     });
   }, [props.folder, searchQuery]);
   const [addButtonDisabled, setAddButtonDisabled] = useState(true);
@@ -45,7 +35,7 @@ function FolderModal(props: Props) {
     } else {
       setDraggableDisabled(true);
     }
-    if (searchQuery === "") {
+    if (searchQuery === "" || searchQuery === "Favorite") {
       setAddButtonDisabled(true);
     }
   }, [filteredValues, searchQuery]);
@@ -58,7 +48,7 @@ function FolderModal(props: Props) {
     }
   }, [addButtonDisabled]);
 
-  const deleteFolder= (folder: string) => {
+  const deleteFolder = (folder: string) => {
     const newFolder: string[] = [
       ...props.folder.filter((item: string) => item !== folder),
     ];
@@ -67,62 +57,56 @@ function FolderModal(props: Props) {
 
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
-      <LinearGradient
-        colors={getColors()}
-        style={{ padding: 3, width: 300, borderRadius: 20 }}
-        end={{ x: 0.1, y: 0.2 }}
-        dither={true}
+      <View
+        style={{
+          backgroundColor: "white",
+          padding: 16,
+          borderRadius: 20,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          height: 350,
+          cursor: "auto",
+        }}
       >
-        <View
-          style={{
-            backgroundColor: "white",
-            padding: 16,
-            borderRadius: 20,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "column",
-            height: 360,
-          }}
-        >
-          <View style={globalStyles.moduleView}>
-            <TextInput
-              placeholder="Add Folder..."
-              outlineStyle={globalStyles.outlineStyle}
-              style={globalStyles.textInputStyle}
-              value={searchQuery}
-              mode="outlined"
-              onChangeText={(text) => setSearchQuery(text)}
-              autoCapitalize="none"
-            />
-            <IconButton
-              selected
-              mode={addButtonDisabled ? undefined : "contained-tonal"}
-              disabled={addButtonDisabled}
-              icon={"plus"}
-              onPress={() => {
-                props.setFolder([...props.folder, searchQuery]);
-              }}
-            />
-          </View>
-          
-          {Platform.OS === "web" ? (
-            <DraggableFolderListWeb
-              folder={props.folder}
-              setFolder={props.setFolder}
-              setSelectedFolder={props.setSelectedFolder}
-              deleteFolder={deleteFolder}
-            />
-          ) : (
-            <DraggableFolderList
-              folder={props.folder}
-              setFolder={props.setFolder}
-              setSelectedFolder={props.setSelectedFolder}
-              deleteFolder={deleteFolder}
-            />
-          )}
+        <View style={globalStyles.moduleView}>
+          <TextInput
+            placeholder="Add Folder..."
+            outlineStyle={globalStyles.outlineStyle}
+            style={globalStyles.textInputStyle}
+            value={searchQuery}
+            mode="outlined"
+            onChangeText={(text) => setSearchQuery(text)}
+            autoCapitalize="none"
+          />
+          <IconButton
+            selected
+            mode={addButtonDisabled ? undefined : "contained-tonal"}
+            disabled={addButtonDisabled}
+            icon={"plus"}
+            onPress={() => {
+              props.setFolder([...props.folder, searchQuery]);
+            }}
+          />
         </View>
-      </LinearGradient>
+
+        {Platform.OS === "web" ? (
+          <DraggableFolderListWeb
+            folder={props.folder}
+            setFolder={props.setFolder}
+            setSelectedFolder={props.setSelectedFolder}
+            deleteFolder={deleteFolder}
+          />
+        ) : (
+          <DraggableFolderList
+            folder={props.folder}
+            setFolder={props.setFolder}
+            setSelectedFolder={props.setSelectedFolder}
+            deleteFolder={deleteFolder}
+          />
+        )}
+      </View>
     </Modal>
   );
 }

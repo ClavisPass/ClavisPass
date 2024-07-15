@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
-import { Surface, Switch, Text } from "react-native-paper";
-import globalStyles from "../ui/globalStyles";
+import { StyleSheet, ScrollView } from "react-native";
+import { Switch, Text } from "react-native-paper";
 import SettingsItem from "../components/SettingsItem";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
-import { appWindow } from "@tauri-apps/api/window";
 import AnimatedContainer from "../components/AnimatedContainer";
 import { useFocusEffect } from "@react-navigation/native";
+import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
+import WebSpecific from "../components/platformSpecific/WebSpecific";
 
 const styles = StyleSheet.create({
   surface: {
@@ -26,10 +26,27 @@ const styles = StyleSheet.create({
 });
 
 function SettingsScreen({ navigation }: { navigation: any }) {
-  const [isSwitchOn, setIsSwitchOn] = React.useState(true);
+  const [startup, setStartup] = React.useState(false);
+
+  const changeAutoStart = async (startup: boolean) => {
+    if (startup) {
+      await enable();
+      setStartup(true);
+    } else {
+      await disable();
+      setStartup(false);
+    }
+  };
+
+  const getAutoStart = async () => {
+    const value = await isEnabled();
+    setStartup(value);
+  };
+
   useEffect(() => {
-    //appWindow.setContentProtected(isSwitchOn);
-  }, [isSwitchOn]);
+    getAutoStart();
+  }, []);
+
   return (
     <AnimatedContainer
       style={{ marginTop: Constants.statusBarHeight }}
@@ -43,15 +60,18 @@ function SettingsScreen({ navigation }: { navigation: any }) {
       />
       <TitlebarHeight />
       <ScrollView style={styles.scrollView}>
-        <SettingsItem>
-          <Text>Contentprotection</Text>
-          <Switch
-            value={isSwitchOn}
-            onValueChange={() => {
-              setIsSwitchOn(!isSwitchOn);
-            }}
-          />
-        </SettingsItem>
+        <WebSpecific>
+          <SettingsItem>
+            <Text>Autostart</Text>
+            <Switch
+              value={startup}
+              onValueChange={(checked) => {
+                console.log(checked)
+                changeAutoStart(checked);
+              }}
+            />
+          </SettingsItem>
+        </WebSpecific>
         <SettingsItem>
           <Text>Surface</Text>
         </SettingsItem>

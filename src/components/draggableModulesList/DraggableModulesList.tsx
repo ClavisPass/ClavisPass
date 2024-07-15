@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect } from "react";
-import { View, Pressable } from "react-native";
+import React, { useCallback } from "react";
+import { View } from "react-native";
 import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";

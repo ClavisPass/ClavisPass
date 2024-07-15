@@ -1,7 +1,5 @@
 import { View } from "react-native";
-import { Portal, TextInput, Text } from "react-native-paper";
-import getColors from "../../ui/linearGradient";
-import { LinearGradient } from "expo-linear-gradient";
+import { TextInput } from "react-native-paper";
 import globalStyles from "../../ui/globalStyles";
 import Modal from "./Modal";
 import { useEffect, useRef } from "react";
@@ -30,11 +28,9 @@ function EditCustomFieldModal(props: Props) {
     >
       <View
         style={{
-          backgroundColor: "white",
+          backgroundColor: "transparent",
           padding: 10,
-          borderRadius: 20,
           display: "flex",
-          height: 60,
         }}
       >
         <TextInput

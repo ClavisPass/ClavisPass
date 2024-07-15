@@ -1,27 +1,39 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-import DataType from '../types/DataType';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useEffect,
+} from "react";
+import DataType from "../types/DataType";
 
 interface DataContextType {
-    data: DataType;
-    setData: (data: DataType) => void;
+  data: DataType;
+  setData: (data: DataType) => void;
+  backup: DataType;
 }
 
 export const DataContext = createContext<DataContextType | null>(null);
 
 type Props = {
-    children: ReactNode
-}
+  children: ReactNode;
+};
 
 export const DataProvider = ({ children }: Props) => {
-    const [data, setData] = useState<DataType>(null);
+  const [data, setData] = useState<DataType>(null);
+  const [backup, setBackup] = useState<DataType>(null);
 
-    return (
-        <DataContext.Provider value={{ data, setData }}>
-            {children}
-        </DataContext.Provider>
-    );
+  useEffect(() => {
+    if (backup === null && data !== null) setBackup({ ...data });
+  }, [data]);
+
+  return (
+    <DataContext.Provider value={{ data, setData, backup }}>
+      {children}
+    </DataContext.Provider>
+  );
 };
 
 export const useData = () => {
-    return useContext(DataContext) as DataContextType;
+  return useContext(DataContext) as DataContextType;
 };

@@ -11,6 +11,10 @@
     "version": "0.1.0"
   },
   "tauri": {
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    },
     "allowlist": {
       "all": false,
       "window": {
@@ -23,10 +27,15 @@
         "startDragging": true,
         "setAlwaysOnTop": true,
         "setSize": true,
-        "center": true
+        "setPosition": true,
+        "center": true,
+        "setFocus": true
       },
       "shell": {
         "open": true
+      },
+      "globalShortcut": {
+        "all": true
       }
     },
     "bundle": {
@@ -73,9 +82,8 @@
         "fullscreen": false,
         "resizable": true,
         "title": "ClavisPass",
-        "width": 500,
-        "height": 800,
-        "maxWidth": 500,
+        "width": 450,
+        "height": 750,
         "decorations": false,
         "transparent": true,
         "center": true,

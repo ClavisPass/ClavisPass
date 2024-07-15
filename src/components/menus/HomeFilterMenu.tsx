@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Divider, IconButton } from "react-native-paper";
 import { useAuth } from "../../contexts/AuthProvider";
 import DataType from "../../types/DataType";
@@ -12,6 +11,7 @@ type Props = {
   data: DataType;
   setData: (data: DataType) => void;
   positionY: number;
+  openEditFolder: () => void;
 };
 function HomeFilterMenu(props: Props) {
   const auth = useAuth();
@@ -71,6 +71,16 @@ function HomeFilterMenu(props: Props) {
           />
         </View>
         <Divider />
+
+        <MenuItem
+          leadingIcon="folder-outline"
+          onPress={() => {
+            props.openEditFolder();
+            props.setVisible(false);
+          }}
+        >
+          {"Edit Folder"}
+        </MenuItem>
         <MenuItem
           leadingIcon="sort-ascending"
           onPress={() => {

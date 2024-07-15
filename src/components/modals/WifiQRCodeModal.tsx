@@ -1,18 +1,10 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import { Menu, Modal, Portal } from "react-native-paper";
-import ModulesEnum from "../../enums/ModulesEnum";
+import { View } from "react-native";
+import { Modal, Portal } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../../ui/linearGradient";
 import QRCode from "react-qr-code";
 import { BlurView } from "expo-blur";
-
-const styles = StyleSheet.create({
-  containerStyle: {
-    backgroundColor: "white",
-    padding: 20,
-  },
-});
 
 type Props = {
   visible: boolean;

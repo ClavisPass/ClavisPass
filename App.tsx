@@ -27,6 +27,7 @@ import { Platform, View } from "react-native";
 import CustomTitlebar from "./src/components/CustomTitlebar";
 import { QuickSelectProvider } from "./src/contexts/QuickSelectProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import GlobalShortcuts from "./src/components/GlobalShortcuts";
 
 const Tab = createBottomTabNavigator();
 
@@ -46,6 +47,8 @@ export default function App() {
               }}
             >
               <CustomTitlebar />
+
+              <GlobalShortcuts />
               <QuickSelectProvider>
                 <ProtectedRoute loginScreen={<LoginScreen />}>
                   <NavigationContainer>

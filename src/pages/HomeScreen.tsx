@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, StyleSheet, Platform } from "react-native";
-import { Searchbar, IconButton } from "react-native-paper";
+import { Searchbar, IconButton, TouchableRipple } from "react-native-paper";
 
 import { Chip, Text } from "react-native-paper";
 
@@ -24,6 +24,10 @@ import AnimatedContainer from "../components/AnimatedContainer";
 import ContentProtection from "../components/ContentProtection";
 import { useFocusEffect } from "@react-navigation/native";
 import { TITLEBAR_HEIGHT } from "../components/CustomTitlebar";
+import theme from "../ui/theme";
+import { useHotkeys } from "react-hotkeys-hook";
+import FolderModal from "../components/modals/FolderModal";
+import DataType from "../types/DataType";
 
 function HomeScreen({ navigation }: { navigation: any }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,6 +35,9 @@ function HomeScreen({ navigation }: { navigation: any }) {
   const [selectedFav, setSelectedFav] = useState(false);
 
   const [showMenu, setShowMenu] = useState(false);
+  const [showSave, setShowSave] = useState(false);
+
+  const [folderModalVisible, setFolderModalVisible] = useState(false);
 
   const data = useData();
 
@@ -64,9 +71,30 @@ function HomeScreen({ navigation }: { navigation: any }) {
     data.setData(DATA);
   }, []);
 
+  /*useEffect(() => {
+    if (data.data !== data.backup) {
+      setShowSave(true);
+    }
+  }, [data.data]);*/
+
   const [statusbarStyle, setStatusbarStyle] = useState<"dark" | "light">(
     "light"
   );
+
+  const searchRef = useRef<any>();
+
+  useHotkeys("ctrl+f", () => {
+    searchRef.current.focus();
+    console.log("gggg");
+  });
+
+  const changeFolder = (folder: string[]) => {
+    let newData = { ...data.data } as DataType;
+    if (newData) {
+      newData.folder = folder;
+    }
+    data.setData(newData);
+  };
 
   return (
     <AnimatedContainer
@@ -93,6 +121,11 @@ function HomeScreen({ navigation }: { navigation: any }) {
           paddingTop: Constants.statusBarHeight,
           borderBottomLeftRadius: 20,
           borderBottomRightRadius: 20,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.4,
+          shadowRadius: 6,
+          elevation: 5,
         }}
         end={{ x: 0.1, y: 0.2 }}
       >
@@ -139,6 +172,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
           }}
         >
           <Searchbar
+            ref={searchRef}
             inputStyle={{ height: 40, minHeight: 40, color: "white" }}
             style={{
               height: 40,
@@ -169,6 +203,38 @@ function HomeScreen({ navigation }: { navigation: any }) {
         </View>
       </LinearGradient>
       <View style={{ flex: 1, width: "100%" }}>
+        {showSave && (
+          <View
+            style={{
+              height: 40,
+              width: "100%",
+              backgroundColor: theme.colors.primary,
+              borderRadius: 8,
+              marginBottom: 4,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <TouchableRipple
+              onPress={() => {
+                console.log("test");
+              }}
+              rippleColor="rgba(0, 0, 0, .32)"
+              style={{
+                height: 40,
+                width: 80,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text variant="bodyLarge" style={{ color: "white" }}>
+                Save
+              </Text>
+            </TouchableRipple>
+          </View>
+        )}
         <FlashList
           data={filteredValues}
           renderItem={({ item }) => (
@@ -177,6 +243,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
               onPress={() => {
                 navigation.navigate("Edit", {
                   value: item,
+                  changeFolder: changeFolder,
                 });
               }}
             />
@@ -204,6 +271,14 @@ function HomeScreen({ navigation }: { navigation: any }) {
           TITLEBAR_HEIGHT +
           (Platform.OS === "web" ? 48 : 66)
         }
+        openEditFolder={() => setFolderModalVisible(true)}
+      />
+
+      <FolderModal
+        visible={folderModalVisible}
+        setVisible={setFolderModalVisible}
+        folder={data?.data ? data.data.folder : []}
+        setFolder={changeFolder}
       />
     </AnimatedContainer>
   );

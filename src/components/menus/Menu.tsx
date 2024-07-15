@@ -1,4 +1,4 @@
-import { MutableRefObject, ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect } from "react";
 import { Pressable, View } from "react-native";
 import { TouchableRipple, Text, Icon } from "react-native-paper";
 import Animated, {
@@ -29,7 +29,7 @@ export function MenuItem(props: MenuItemProps) {
           minWidth: 140,
           flexDirection: "row",
           alignItems: "center",
-          gap: 4,
+          gap: 6,
         }}
       >
         {props.leadingIcon && (
@@ -54,8 +54,8 @@ type Props = {
   positionY: number;
 };
 function Menu(props: Props) {
-  const translationX = useSharedValue(-30);
-  const translationY = useSharedValue(-30);
+  const translationX = useSharedValue(-80);
+  const translationY = useSharedValue(-80);
   const scale = useSharedValue(0);
   const positionY = props.positionY;
 
@@ -84,8 +84,8 @@ function Menu(props: Props) {
     if (props.visible) {
       startAnimation();
     } else {
-      translationX.value = 0;
-      translationY.value = 0;
+      translationX.value = -80;
+      translationY.value = -80;
       scale.value = 0;
     }
   }, [props.visible]);
