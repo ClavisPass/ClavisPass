@@ -4,6 +4,7 @@
 
 use tauri::{CustomMenuItem, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem};
 use tauri::Manager;
+use tauri_plugin_autostart::MacosLauncher;
 
 fn main() {
 
@@ -64,6 +65,7 @@ fn main() {
             }
             _ => {}
         }) //additional code for tauri
+        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--flag1", "--flag2"]) /* arbitrary number of args to pass to your app */))
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

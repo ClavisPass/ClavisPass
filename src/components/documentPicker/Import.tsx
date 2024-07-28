@@ -1,11 +1,13 @@
-import React, { ReactNode, useState } from "react";
-import { View, Button, FlatList, TextInput, SafeAreaView } from "react-native";
+import React, { useState } from "react";
+import { View } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import Papa from "papaparse";
 import * as FileSystem from "expo-file-system";
+import { Button } from "react-native-paper";
 
 type Props = {
-  //children: ReactNode;
+  title: string;
+  icon: string;
 };
 
 function Import(props: Props) {
@@ -26,7 +28,7 @@ function Import(props: Props) {
           if (parsedData.errors.length > 0) {
             console.error("Error parsing CSV:", parsedData.errors);
           } else {
-            console.log(parsedData.data)
+            console.log(parsedData.data);
             setCsvData(parsedData.data);
           }
         } else {
@@ -50,11 +52,9 @@ function Import(props: Props) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-         <Button title="Pick a file" onPress={pickDocument} />
-      </View>
-    </View>
+    <Button icon={props.icon} mode="contained-tonal" onPress={pickDocument}>
+      {props.title} Passwords
+    </Button>
   );
 }
 

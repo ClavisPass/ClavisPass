@@ -15,7 +15,7 @@ import styles from "../ui/globalStyles";
 interface ThemeContextType {
   darkmode: boolean;
   setDarkmode: (darkmode: boolean) => void;
-  theme: ThemeProp;
+  theme: any;
   globalStyles: any;
 }
 

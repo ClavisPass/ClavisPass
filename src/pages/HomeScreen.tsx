@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { View, StyleSheet, Platform } from "react-native";
+import { View, Platform } from "react-native";
 import { Searchbar, IconButton, TouchableRipple } from "react-native-paper";
 
-import { Chip, Text } from "react-native-paper";
+import { Text } from "react-native-paper";
 
 import { FlashList } from "@shopify/flash-list";
 
@@ -28,6 +28,7 @@ import theme from "../ui/theme";
 import FolderModal from "../components/modals/FolderModal";
 import DataType from "../types/DataType";
 import SearchShortcut from "../components/shortcuts/SearchShortcut";
+import AddValueModal from "../components/modals/AddValueModal";
 
 function HomeScreen({ navigation }: { navigation: any }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,6 +39,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
   const [showSave, setShowSave] = useState(false);
 
   const [folderModalVisible, setFolderModalVisible] = useState(false);
+  const [valueModalVisible, setValueModalVisible] = useState(false);
 
   const data = useData();
 
@@ -147,7 +149,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
               <IconButton
                 icon="plus"
                 size={25}
-                onPress={() => console.log("Pressed")}
+                onPress={() => setValueModalVisible(true)}
                 iconColor="white"
               />
 
@@ -188,7 +190,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
             <IconButton
               icon="plus"
               size={25}
-              onPress={() => console.log("Pressed")}
+              onPress={() => setValueModalVisible(true)}
               iconColor="white"
             />
             <IconButton
@@ -279,6 +281,12 @@ function HomeScreen({ navigation }: { navigation: any }) {
         setVisible={setFolderModalVisible}
         folder={data?.data ? data.data.folder : []}
         setFolder={changeFolder}
+      />
+      <AddValueModal
+        visible={valueModalVisible}
+        setVisible={setValueModalVisible}
+        navigation={navigation}
+        changeFolder={changeFolder}
       />
     </AnimatedContainer>
   );

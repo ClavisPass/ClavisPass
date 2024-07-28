@@ -11,6 +11,9 @@ import WebSpecific from "../components/platformSpecific/WebSpecific";
 import { useTheme } from "../contexts/ThemeProvider";
 //import Import from "../components/documentPicker/Import";
 
+import { enable, isEnabled, disable } from "tauri-plugin-autostart-api";
+import Import from "../components/documentPicker/Import";
+
 const styles = StyleSheet.create({
   surface: {
     padding: 8,
@@ -38,7 +41,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
 
   const { darkmode, setDarkmode } = useTheme();
 
-  /*const changeAutoStart = async (startup: boolean) => {
+  const changeAutoStart = async (startup: boolean) => {
     if (startup) {
       await enable();
       setStartup(true);
@@ -55,7 +58,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
 
   useEffect(() => {
     getAutoStart();
-  }, []);*/
+  }, []);
 
   return (
     <AnimatedContainer
@@ -85,7 +88,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
                 value={startup}
                 onValueChange={(checked) => {
                   console.log(checked);
-                  //changeAutoStart(checked);
+                  changeAutoStart(checked);
                 }}
               />
             </View>
@@ -93,28 +96,9 @@ function SettingsScreen({ navigation }: { navigation: any }) {
         </WebSpecific>
         <SettingsItem title={"Import Passwords"}>
           <View style={styles.container}>
-            <Button
-              icon="firefox"
-              mode="contained-tonal"
-              onPress={() => console.log("Pressed")}
-            >
-              Firefox Passwords
-            </Button>
-            <Button
-              icon="google-chrome"
-              mode="contained-tonal"
-              onPress={() => console.log("Pressed")}
-            >
-              Chrome Passwords
-            </Button>
-            <Button
-              icon="circle-outline"
-              mode="contained-tonal"
-              onPress={() => console.log("Pressed")}
-            >
-              pCloud Passwords
-            </Button>
-            
+            <Import title={"Firefox"} icon={"firefox"} />
+            <Import title={"Chrome"} icon={"google-chrome"}/>
+            <Import title={"pCloud"} icon={"circle-outline"}/>
           </View>
           <Text variant="titleMedium">{"Export"}</Text>
           <Divider />

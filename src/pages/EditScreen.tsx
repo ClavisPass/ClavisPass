@@ -61,11 +61,15 @@ function EditScreen({ route, navigation }: Props) {
     let valueToChange: any = newData?.values.find(
       (x: ValuesType) => x.id === route.params.value.id
     );
-    valueToChange.title = value.title;
-    valueToChange.fav = value.fav;
-    valueToChange.folder = value.folder;
-    valueToChange.modules = value.modules;
-    valueToChange.lastUpdated = getDateTime();
+    if (valueToChange) {
+      valueToChange.title = value.title;
+      valueToChange.fav = value.fav;
+      valueToChange.folder = value.folder;
+      valueToChange.modules = value.modules;
+      valueToChange.lastUpdated = getDateTime();
+    } else {
+      if (newData) newData.values = [...newData.values, value];
+    }
     data.setData(newData);
     navigation.goBack();
   };

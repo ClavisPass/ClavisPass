@@ -49,7 +49,7 @@ function AnimatedContainer(props: Props) {
     <View
       style={{
         flex: 1,
-        backgroundColor: theme.colors?.background,
+        backgroundColor: theme.colors?.elevation.level2,
       }}
     >
       <Animated.View style={[globalStyles.container, props.style, style]}>
