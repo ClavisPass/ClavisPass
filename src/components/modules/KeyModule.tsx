@@ -3,12 +3,13 @@ import { View } from "react-native";
 import { TextInput } from "react-native-paper";
 import KeyModuleType from "../../types/modules/KeyModuleType";
 import ModuleContainer from "../ModuleContainer";
-import globalStyles from "../../ui/globalStyles";
 import Props from "../../types/ModuleProps";
 import CopyToClipboard from "../CopyToClipboard";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 function KeyModule(props: KeyModuleType & Props) {
+  const { globalStyles } = useTheme();
   const [value, setValue] = useState(props.value);
   useEffect(() => {
     const newModule: KeyModuleType = {

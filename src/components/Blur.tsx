@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -7,10 +6,12 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { appWindow } from "@tauri-apps/api/window";
+import { useTheme } from "../contexts/ThemeProvider";
 
 type Props = {};
 
 function Blur(props: Props) {
+  const { theme } = useTheme();
   const [show, setShow] = useState(false);
 
   const [showComponents, setShowComponents] = useState(false);
@@ -59,13 +60,12 @@ function Blur(props: Props) {
               left: 0,
               bottom: 0,
               zIndex: 6,
-              backgroundColor: "white",
-              borderRadius: 10,
+              backgroundColor: theme.colors?.background,
+              //borderRadius: 10,
             },
             style,
           ]}
-        >
-        </Animated.View>
+        ></Animated.View>
       ) : null}
     </>
   );

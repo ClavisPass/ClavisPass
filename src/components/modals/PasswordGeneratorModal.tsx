@@ -14,9 +14,9 @@ import theme from "../../ui/theme";
 import Button from "../Button";
 
 import generatePassword from "../../utils/generatePassword";
-import globalStyles from "../../ui/globalStyles";
 import CopyToClipboard from "../CopyToClipboard";
 import Modal from "./Modal";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 const styles = StyleSheet.create({
   container: {
@@ -36,6 +36,7 @@ type Props = {
 };
 
 function PasswordGeneratorModal(props: Props) {
+  const { globalStyles } = useTheme();
   const [valueSlider, setvalueSlider] = useState(20);
 
   const [upperInclude, setupperInclude] = useState(true);

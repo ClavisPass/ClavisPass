@@ -6,13 +6,14 @@ import { IconButton, TextInput } from "react-native-paper";
 import WifiModuleType from "../../types/modules/WifiModuleType";
 import CopyToClipboard from "../CopyToClipboard";
 import ModuleContainer from "../ModuleContainer";
-import globalStyles from "../../ui/globalStyles";
 import Props from "../../types/ModuleProps";
 import theme from "../../ui/theme";
 import WifiQRCodeModal from "../modals/WifiQRCodeModal";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 function WifiModule(props: WifiModuleType & Props) {
+  const { globalStyles } = useTheme();
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
   const [visible, setVisible] = useState(false);

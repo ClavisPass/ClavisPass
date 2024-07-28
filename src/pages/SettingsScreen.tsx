@@ -1,14 +1,15 @@
 import React, { useEffect } from "react";
-import { StyleSheet, ScrollView } from "react-native";
-import { Switch, Text } from "react-native-paper";
+import { StyleSheet, ScrollView, View } from "react-native";
+import { Button, Divider, Switch, Text } from "react-native-paper";
 import SettingsItem from "../components/SettingsItem";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
 import AnimatedContainer from "../components/AnimatedContainer";
 import { useFocusEffect } from "@react-navigation/native";
-import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import WebSpecific from "../components/platformSpecific/WebSpecific";
+import { useTheme } from "../contexts/ThemeProvider";
+//import Import from "../components/documentPicker/Import";
 
 const styles = StyleSheet.create({
   surface: {
@@ -23,12 +24,21 @@ const styles = StyleSheet.create({
   scrollView: {
     width: "100%",
   },
+  container: {
+    width: 200,
+    display: "flex",
+    flexDirection: "column",
+    gap: 4,
+    margin: 6,
+  },
 });
 
 function SettingsScreen({ navigation }: { navigation: any }) {
   const [startup, setStartup] = React.useState(false);
 
-  const changeAutoStart = async (startup: boolean) => {
+  const { darkmode, setDarkmode } = useTheme();
+
+  /*const changeAutoStart = async (startup: boolean) => {
     if (startup) {
       await enable();
       setStartup(true);
@@ -45,7 +55,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
 
   useEffect(() => {
     getAutoStart();
-  }, []);
+  }, []);*/
 
   return (
     <AnimatedContainer
@@ -61,33 +71,91 @@ function SettingsScreen({ navigation }: { navigation: any }) {
       <TitlebarHeight />
       <ScrollView style={styles.scrollView}>
         <WebSpecific>
-          <SettingsItem>
-            <Text>Autostart</Text>
-            <Switch
-              value={startup}
-              onValueChange={(checked) => {
-                console.log(checked)
-                changeAutoStart(checked);
+          <SettingsItem title={"System"}>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 10,
+                alignItems: "center",
               }}
-            />
+            >
+              <Text>Autostart</Text>
+              <Switch
+                value={startup}
+                onValueChange={(checked) => {
+                  console.log(checked);
+                  //changeAutoStart(checked);
+                }}
+              />
+            </View>
           </SettingsItem>
         </WebSpecific>
-        <SettingsItem>
+        <SettingsItem title={"Import Passwords"}>
+          <View style={styles.container}>
+            <Button
+              icon="firefox"
+              mode="contained-tonal"
+              onPress={() => console.log("Pressed")}
+            >
+              Firefox Passwords
+            </Button>
+            <Button
+              icon="google-chrome"
+              mode="contained-tonal"
+              onPress={() => console.log("Pressed")}
+            >
+              Chrome Passwords
+            </Button>
+            <Button
+              icon="circle-outline"
+              mode="contained-tonal"
+              onPress={() => console.log("Pressed")}
+            >
+              pCloud Passwords
+            </Button>
+            
+          </View>
+          <Text variant="titleMedium">{"Export"}</Text>
+          <Divider />
+          <View style={styles.container}>
+            <Button
+              icon="export"
+              mode="contained-tonal"
+              onPress={() => console.log("Pressed")}
+            >
+              Export Passwords
+            </Button>
+          </View>
+        </SettingsItem>
+        <SettingsItem title={"Design"}>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 10,
+              alignItems: "center",
+            }}
+          >
+            <Text>darkmode</Text>
+            <Switch
+              value={darkmode}
+              onValueChange={(checked) => {
+                setDarkmode(checked);
+              }}
+            />
+          </View>
+        </SettingsItem>
+        <SettingsItem title={"test"}>
           <Text>Surface</Text>
         </SettingsItem>
-        <SettingsItem>
+        <SettingsItem title={"test"}>
           <Text>Surface</Text>
         </SettingsItem>
-        <SettingsItem>
+        <SettingsItem title={"test"}>
           <Text>Surface</Text>
         </SettingsItem>
-        <SettingsItem>
-          <Text>Surface</Text>
-        </SettingsItem>
-        <SettingsItem>
-          <Text>Surface</Text>
-        </SettingsItem>
-        <SettingsItem>
+        <SettingsItem title={"test"}>
           <Text>Surface</Text>
         </SettingsItem>
       </ScrollView>

@@ -6,6 +6,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 type Props = {
   children: ReactNode;
@@ -13,6 +14,7 @@ type Props = {
   onDismiss: () => void;
 };
 function Modal(props: Props) {
+  const { theme } = useTheme();
   const scale = useSharedValue(0);
   const opacity = useSharedValue(0);
 
@@ -91,7 +93,7 @@ function Modal(props: Props) {
                 style={[
                   {
                     overflow: "hidden",
-                    backgroundColor: "white",
+                    backgroundColor: theme.colors?.background,
                     borderTopLeftRadius: 20,
                     borderTopRightRadius: 20,
                     borderBottomLeftRadius: 20,

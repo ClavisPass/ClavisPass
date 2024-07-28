@@ -1,14 +1,14 @@
 import { StyleSheet } from "react-native";
-import theme from "./theme";
+import { useTheme } from "../contexts/ThemeProvider";
 
-const globalStyles = StyleSheet.create({
+//const { theme } = useTheme();
+
+const globalStyles = (background: string) => ({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: background, //theme.colors?.background,
     alignItems: "center",
     display: "flex",
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
   },
   outlineStyle: {
     borderRadius: 10,

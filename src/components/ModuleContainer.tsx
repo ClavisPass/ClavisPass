@@ -1,20 +1,12 @@
 import React, { ReactNode, useEffect } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Pressable,
-  Platform,
-} from "react-native";
+import { View, StyleSheet, Pressable, Platform } from "react-native";
 import { Icon, IconButton, Text } from "react-native-paper";
-import WebSpecific from "./platformSpecific/WebSpecific";
-import theme from "../ui/theme";
 import Animated, {
-  Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { useTheme } from "../contexts/ThemeProvider";
 
 const styles = StyleSheet.create({
   container: {
@@ -27,7 +19,6 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     marginRight: 4,
     marginBottom: 4,
-    backgroundColor: "#fff",
     borderRadius: 12,
     display: "flex",
     flexDirection: "row",
@@ -68,6 +59,7 @@ type Props = {
 };
 
 function ModuleContainer(props: Props) {
+  const { theme } = useTheme();
   const translateX = useSharedValue(-16);
   const paddingLeft = useSharedValue(4);
   const paddingRight = useSharedValue(4);
@@ -111,20 +103,23 @@ function ModuleContainer(props: Props) {
   });
   return (
     <Animated.View
-      style={[styles.container, styles.innercontainer, animatedContainerStyle]}
+      style={[
+        styles.container,
+        styles.innercontainer,
+        { backgroundColor: theme.colors?.background },
+        animatedContainerStyle,
+      ]}
     >
       <Animated.View style={animatedIconStyle}>
         {Platform.OS === "web" ? (
-          <Icon source="drag" color={theme.colors.primary} size={20} />
+          <Icon source="drag" color={theme.colors?.primary} size={20} />
         ) : (
           <Pressable onPressIn={props.onDragStart}>
-            <Icon source="drag" color={theme.colors.primary} size={20} />
+            <Icon source="drag" color={theme.colors?.primary} size={20} />
           </Pressable>
         )}
       </Animated.View>
-      <View
-        style={[styles.content]}
-      >
+      <View style={[styles.content]}>
         <View
           style={{
             display: "flex",
@@ -153,7 +148,7 @@ function ModuleContainer(props: Props) {
           selected={props.edit}
           mode="contained-tonal"
           icon="close"
-          iconColor={theme.colors.error}
+          iconColor={theme.colors?.error}
           size={20}
           onPress={() => props.deleteModule?.(props.id)}
         />

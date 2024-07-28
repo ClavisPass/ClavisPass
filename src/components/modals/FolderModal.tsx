@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Platform, View } from "react-native";
 import { IconButton, TextInput } from "react-native-paper";
-import globalStyles from "../../ui/globalStyles";
 import Modal from "./Modal";
 import DraggableFolderListWeb from "../draggableFolderList/DraggableFolderListWeb";
 import DraggableFolderList from "../draggableFolderList/DraggableFolderList";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 type Props = {
   visible: boolean;
@@ -15,6 +15,7 @@ type Props = {
 };
 
 function FolderModal(props: Props) {
+  const { globalStyles } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const filteredValues = useMemo(() => {
     return props.folder.filter((item) => {
@@ -59,7 +60,7 @@ function FolderModal(props: Props) {
     <Modal visible={props.visible} onDismiss={hideModal}>
       <View
         style={{
-          backgroundColor: "white",
+          //backgroundColor: "white",
           padding: 16,
           borderRadius: 20,
           display: "flex",
@@ -87,6 +88,7 @@ function FolderModal(props: Props) {
             icon={"plus"}
             onPress={() => {
               props.setFolder([...props.folder, searchQuery]);
+              setSearchQuery("");
             }}
           />
         </View>

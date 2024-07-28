@@ -8,6 +8,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import theme from "../../ui/theme";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 type MenuItemProps = {
   children: ReactNode;
@@ -54,6 +55,7 @@ type Props = {
   positionY: number;
 };
 function Menu(props: Props) {
+  const { theme } = useTheme();
   const translationX = useSharedValue(-80);
   const translationY = useSharedValue(-80);
   const scale = useSharedValue(0);
@@ -118,7 +120,7 @@ function Menu(props: Props) {
                   {
                     overflow: "hidden",
                     position: "absolute",
-                    backgroundColor: "white",
+                    backgroundColor: theme.colors?.background,
                     top: positionY,
                     right: 4,
                     borderTopLeftRadius: 22,

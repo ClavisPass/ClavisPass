@@ -1,5 +1,5 @@
 import React, { EffectCallback, ReactNode, useEffect } from "react";
-import { StyleProp, StyleSheet, ViewStyle } from "react-native";
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 
 import Animated, {
   Easing,
@@ -7,7 +7,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import globalStyles from "../ui/globalStyles";
+import { useTheme } from "../contexts/ThemeProvider";
 
 type Props = {
   children: ReactNode;
@@ -18,6 +18,8 @@ type Props = {
 
 function AnimatedContainer(props: Props) {
   const opacity = useSharedValue(0);
+
+  const { globalStyles, theme } = useTheme();
 
   const config = {
     duration: 400,
@@ -44,9 +46,16 @@ function AnimatedContainer(props: Props) {
   );
 
   return (
-    <Animated.View style={[globalStyles.container, props.style, style]}>
-      {props.children}
-    </Animated.View>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: theme.colors?.background,
+      }}
+    >
+      <Animated.View style={[globalStyles.container, props.style, style]}>
+        {props.children}
+      </Animated.View>
+    </View>
   );
 }
 

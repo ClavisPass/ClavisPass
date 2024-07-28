@@ -1,10 +1,8 @@
 import React from "react";
 
 import { TextInput } from "react-native-paper";
-
-import ModuleContainer from "../ModuleContainer";
-import globalStyles from "../../ui/globalStyles";
 import ValuesType from "../../types/ValuesType";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 type Props = {
   value: ValuesType;
@@ -13,6 +11,7 @@ type Props = {
 };
 
 function TitleModule(props: Props) {
+  const { globalStyles } = useTheme();
   const changeTitle = (text: string) => {
     const newValue = { ...props.value };
     newValue.title = text;

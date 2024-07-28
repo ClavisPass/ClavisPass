@@ -3,9 +3,9 @@ import { Pressable, View } from "react-native";
 import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
-import globalStyles from "../../ui/globalStyles";
 import { Icon, IconButton, Text, TouchableRipple } from "react-native-paper";
 import theme from "../../ui/theme";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 type Props = {
   folder: string[];
@@ -15,6 +15,7 @@ type Props = {
 };
 
 function DraggableFolderList(props: Props) {
+  const { globalStyles } = useTheme();
   const renderItem = useCallback(
     ({ item, drag, isActive }: RenderItemParams<string>) => {
       return (

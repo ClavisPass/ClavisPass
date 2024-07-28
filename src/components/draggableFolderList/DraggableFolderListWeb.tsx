@@ -1,9 +1,9 @@
 import React from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { View } from "react-native";
-import globalStyles from "../../ui/globalStyles";
 import { Icon, IconButton, Text, TouchableRipple } from "react-native-paper";
 import theme from "../../ui/theme";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 type Props = {
   folder: string[];
@@ -39,6 +39,7 @@ const getListStyle = (isDraggingOver: boolean) => ({
 });
 
 function DraggableFolderListWeb(props: Props) {
+  const { globalStyles } = useTheme();
   const onDragEnd = (result: any) => {
     if (!result.destination) {
       return;

@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { TextInput } from "react-native-paper";
 import NoteModuleType from "../../types/modules/NoteModuleType";
 import ModuleContainer from "../ModuleContainer";
-import globalStyles from "../../ui/globalStyles";
 import Props from "../../types/ModuleProps";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 function NoteModule(props: NoteModuleType & Props) {
+  const { globalStyles } = useTheme();
   const [value, setValue] = useState(props.value);
   useEffect(() => {
     const newModule: NoteModuleType = {

@@ -25,9 +25,9 @@ import ContentProtection from "../components/ContentProtection";
 import { useFocusEffect } from "@react-navigation/native";
 import { TITLEBAR_HEIGHT } from "../components/CustomTitlebar";
 import theme from "../ui/theme";
-import { useHotkeys } from "react-hotkeys-hook";
 import FolderModal from "../components/modals/FolderModal";
 import DataType from "../types/DataType";
+import SearchShortcut from "../components/shortcuts/SearchShortcut";
 
 function HomeScreen({ navigation }: { navigation: any }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -83,11 +83,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
 
   const searchRef = useRef<any>();
 
-  useHotkeys("ctrl+f", () => {
-    searchRef.current.focus();
-    console.log("gggg");
-  });
-
   const changeFolder = (folder: string[]) => {
     let newData = { ...data.data } as DataType;
     if (newData) {
@@ -108,6 +103,9 @@ function HomeScreen({ navigation }: { navigation: any }) {
         translucent={true}
       />
       <ContentProtection enabled={true} />
+      <WebSpecific>
+        <SearchShortcut searchRef={searchRef} />
+      </WebSpecific>
       <LinearGradient
         colors={getColors()}
         dither={true}
@@ -183,6 +181,8 @@ function HomeScreen({ navigation }: { navigation: any }) {
             onChangeText={setSearchQuery}
             value={searchQuery}
             loading={false}
+            iconColor={"#ffffff80"}
+            placeholderTextColor={"#ffffff80"}
           />
           <WebSpecific>
             <IconButton

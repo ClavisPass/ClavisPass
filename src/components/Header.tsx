@@ -4,6 +4,7 @@ import { IconButton, Text } from "react-native-paper";
 import theme from "../ui/theme";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
+import { useTheme } from "../contexts/ThemeProvider";
 
 type Props = {
   children?: ReactNode;
@@ -13,13 +14,14 @@ type Props = {
 };
 
 function Header(props: Props) {
+  const { theme } = useTheme();
   return (
     <View
       style={{
         width: "100%",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "white",
+        backgroundColor: theme.colors?.background,
         marginBottom: 4,
         borderRadius: Platform.OS === "web" ? 12 : 0,
         borderBottomLeftRadius: 12,
@@ -45,7 +47,6 @@ function Header(props: Props) {
           style={{
             display: "flex",
             flexDirection: "row",
-            //gap: 4,
             alignItems: "center",
             flex: 1,
 
@@ -54,14 +55,14 @@ function Header(props: Props) {
         >
           <IconButton
             icon={"chevron-down"}
-            iconColor={theme.colors.primary}
+            iconColor={theme.colors?.primary}
             size={20}
             onPress={props.onPress}
           />
           {props.title ? (
             <Text
               style={{
-                color: theme.colors.primary,
+                color: theme.colors?.primary,
                 userSelect: "none",
                 fontWeight: "bold",
                 fontSize: 15,

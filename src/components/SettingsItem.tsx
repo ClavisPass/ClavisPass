@@ -1,36 +1,28 @@
 import React, { ReactNode } from "react";
 import { View, StyleSheet } from "react-native";
-import { Icon } from "react-native-paper";
-import theme from "../ui/theme";
+import { Divider, Icon, Text } from "react-native-paper";
+import { useTheme } from "../contexts/ThemeProvider";
 
 const styles = StyleSheet.create({
   container: {
     marginLeft: 8,
     marginRight: 8,
     marginBottom: 8,
-    backgroundColor: "#fff",
     borderRadius: 12,
     overflow: "hidden",
     padding: 16,
   },
 });
 
-type Props = { children: ReactNode };
+type Props = { children: ReactNode; title: string };
 
 function SettingsItem(props: Props) {
+  const { theme } = useTheme();
   return (
-    <View style={styles.container}>
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          gap: 10,
-          alignItems: "center",
-        }}
-      >
-        {props.children}
-      </View>
-      <Icon color={theme.colors.primary} source={"chevron-right"} size={20} />
+    <View style={[styles.container, {backgroundColor: theme.colors?.background}]}>
+      <Text variant="titleMedium">{props.title}</Text>
+      <Divider />
+      {props.children}
     </View>
   );
 }

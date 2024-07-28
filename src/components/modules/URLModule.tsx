@@ -4,7 +4,6 @@ import { IconButton, TextInput } from "react-native-paper";
 
 import URLModuleType from "../../types/modules/URLModuleType";
 import ModuleContainer from "../ModuleContainer";
-import globalStyles from "../../ui/globalStyles";
 import Props from "../../types/ModuleProps";
 import { Platform, View } from "react-native";
 
@@ -16,8 +15,10 @@ import * as WebBrowser from "expo-web-browser";
 import validator from "validator";
 import theme from "../../ui/theme";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 function URLModule(props: URLModuleType & Props) {
+  const { globalStyles } = useTheme();
   const [value, setValue] = useState(props.value);
   const [isValid, setIsValid] = useState(false);
 

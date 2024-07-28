@@ -16,7 +16,6 @@ function GlobalShortcuts(props: Props) {
   };
   useEffect(() => {
     if (Platform.OS === "web") {
-      registerShortcuts;
       document.addEventListener("keydown", function (event) {
         if (event.ctrlKey && event.key === "f") {
           event.preventDefault();
@@ -40,6 +39,7 @@ function GlobalShortcuts(props: Props) {
           event.preventDefault();
         }
       });
+      registerShortcuts();
     }
   });
 

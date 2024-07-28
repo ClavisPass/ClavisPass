@@ -1,7 +1,5 @@
 import React from "react";
 
-import { PaperProvider } from "react-native-paper";
-
 import { CommonActions } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { BottomNavigation } from "react-native-paper";
@@ -15,7 +13,6 @@ import "react-native-gesture-handler";
 import HomeScreen from "./src/pages/HomeScreen";
 import SettingsScreen from "./src/pages/SettingsScreen";
 
-import theme from "./src/ui/theme";
 import EditScreen from "./src/pages/EditScreen";
 import AnalysisScreen from "./src/pages/AnalysisScreen";
 import { AuthProvider } from "./src/contexts/AuthProvider";
@@ -27,7 +24,8 @@ import { Platform, View } from "react-native";
 import CustomTitlebar from "./src/components/CustomTitlebar";
 import { QuickSelectProvider } from "./src/contexts/QuickSelectProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import GlobalShortcuts from "./src/components/GlobalShortcuts";
+import GlobalShortcuts from "./src/components/shortcuts/GlobalShortcuts";
+import { ThemeProvider } from "./src/contexts/ThemeProvider";
 
 const Tab = createBottomTabNavigator();
 
@@ -35,7 +33,7 @@ const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <PaperProvider theme={theme}>
+    <ThemeProvider>
       <AuthProvider>
         <DataProvider>
           <GestureHandlerRootView style={{ flex: 1 }}>
@@ -159,7 +157,7 @@ export default function App() {
           </GestureHandlerRootView>
         </DataProvider>
       </AuthProvider>
-    </PaperProvider>
+    </ThemeProvider>
   );
 }
 

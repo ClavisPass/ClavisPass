@@ -7,8 +7,6 @@ import ModulesEnum from "../enums/ModulesEnum";
 import type { StackScreenProps } from "@react-navigation/stack";
 import { IconButton, Text } from "react-native-paper";
 import Header from "../components/Header";
-import globalStyles from "../ui/globalStyles";
-import theme from "../ui/theme";
 import Button from "../components/Button";
 import EditMetaInfMenu from "../components/menus/EditMetaInfMenu";
 import ValuesType from "../types/ValuesType";
@@ -25,6 +23,7 @@ import DraggableModulesList from "../components/draggableModulesList/DraggableMo
 import Menu, { MenuItem } from "../components/menus/Menu";
 import Constants from "expo-constants";
 import FolderModal from "../components/modals/FolderModal";
+import { useTheme } from "../contexts/ThemeProvider";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -46,6 +45,7 @@ type Props = StackScreenProps<RootStackParamList>;
 
 function EditScreen({ route, navigation }: Props) {
   const data = useData();
+  const { globalStyles, theme } = useTheme();
 
   const [edit, setEdit] = useState(false);
   const [value, setValue] = useState<ValuesType>({ ...route.params.value });
@@ -134,7 +134,7 @@ function EditScreen({ route, navigation }: Props) {
       >
         <IconButton
           icon="plus"
-          iconColor={theme.colors.primary}
+          iconColor={theme.colors?.primary}
           size={20}
           onPress={() => {
             setAddModuleModalVisible(true);
@@ -143,7 +143,7 @@ function EditScreen({ route, navigation }: Props) {
         <IconButton
           mode={edit ? "contained-tonal" : undefined}
           icon="square-edit-outline"
-          iconColor={theme.colors.primary}
+          iconColor={theme.colors?.primary}
           size={20}
           animated={true}
           selected={edit}
@@ -152,7 +152,7 @@ function EditScreen({ route, navigation }: Props) {
         <IconButton
           icon="dots-vertical"
           size={20}
-          iconColor={theme.colors.primary}
+          iconColor={theme.colors?.primary}
           onPress={(event) => {
             setShowMenu(true);
           }}
@@ -194,7 +194,7 @@ function EditScreen({ route, navigation }: Props) {
         favButton={
           <IconButton
             icon={favIcon}
-            iconColor={theme.colors.primary}
+            iconColor={theme.colors?.primary}
             size={20}
             onPress={() => changeFav()}
           />

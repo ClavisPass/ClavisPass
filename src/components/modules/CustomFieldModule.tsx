@@ -5,13 +5,14 @@ import { TextInput } from "react-native-paper";
 
 import CustomFieldModuleType from "../../types/modules/CustomFieldModuleType";
 import ModuleContainer from "../ModuleContainer";
-import globalStyles from "../../ui/globalStyles";
 import Props from "../../types/ModuleProps";
 import EditCustomFieldModal from "../modals/EditCustomFieldModal";
 import CopyToClipboard from "../CopyToClipboard";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 function CustomFieldModule(props: CustomFieldModuleType & Props) {
+  const { globalStyles } = useTheme();
   const [visible, setVisible] = useState(false);
 
   const [value, setValue] = useState(props.value);

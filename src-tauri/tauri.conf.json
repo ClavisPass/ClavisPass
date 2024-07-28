@@ -87,7 +87,8 @@
         "decorations": false,
         "transparent": true,
         "center": true,
-        "contentProtected": false
+        "contentProtected": false,
+        "maximizable": false
       }
     ]
   }

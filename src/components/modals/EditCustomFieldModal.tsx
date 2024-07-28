@@ -1,8 +1,8 @@
 import { View } from "react-native";
 import { TextInput } from "react-native-paper";
-import globalStyles from "../../ui/globalStyles";
 import Modal from "./Modal";
 import { useEffect, useRef } from "react";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 type Props = {
   visible: boolean;
@@ -12,6 +12,7 @@ type Props = {
 };
 
 function EditCustomFieldModal(props: Props) {
+  const { globalStyles } = useTheme();
   const inputRef = useRef<any>();
 
   useEffect(() => {

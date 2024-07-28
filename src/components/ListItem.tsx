@@ -2,19 +2,18 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { Icon, Text, TouchableRipple } from "react-native-paper";
 import ValuesType from "../types/ValuesType";
-import theme from "../ui/theme";
 import ModulesEnum from "../enums/ModulesEnum";
 
 import { Image } from "expo-image";
 import FastAccess, { openFastAccess } from "../utils/FastAccess";
 import { useQuickSelect } from "../contexts/QuickSelectProvider";
+import { useTheme } from "../contexts/ThemeProvider";
 
 const styles = StyleSheet.create({
   container: {
     marginLeft: 4,
     marginRight: 4,
     marginBottom: 4,
-    backgroundColor: "#fff",
     borderRadius: 12,
     overflow: "hidden",
   },
@@ -32,6 +31,7 @@ type Props = {
 };
 
 function ListItem(props: Props) {
+  const { theme } = useTheme();
   const { setModules } = useQuickSelect();
 
   const [url, setUrl] = useState("");
@@ -74,7 +74,7 @@ function ListItem(props: Props) {
     }
   };
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: theme.colors?.background}]}>
       <TouchableRipple
         style={styles.ripple}
         onPress={props.onPress}
@@ -108,7 +108,7 @@ function ListItem(props: Props) {
             </Text>
           </View>
           <Icon
-            color={theme.colors.primary}
+            color={theme.colors?.primary}
             source={"chevron-right"}
             size={20}
           />
