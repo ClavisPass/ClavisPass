@@ -10,7 +10,6 @@ import {
 import getColors from "../../ui/linearGradient";
 import { LinearGradient } from "expo-linear-gradient";
 import Slider from "@react-native-community/slider";
-import theme from "../../ui/theme";
 import Button from "../Button";
 
 import generatePassword from "../../utils/generatePassword";
@@ -36,7 +35,7 @@ type Props = {
 };
 
 function PasswordGeneratorModal(props: Props) {
-  const { globalStyles } = useTheme();
+  const { globalStyles, theme } = useTheme();
   const [valueSlider, setvalueSlider] = useState(20);
 
   const [upperInclude, setupperInclude] = useState(true);
@@ -69,7 +68,7 @@ function PasswordGeneratorModal(props: Props) {
         >
           <View
             style={{
-              backgroundColor: "white",
+              backgroundColor: theme.colors?.background,
               padding: 16,
               borderRadius: 20,
               display: "flex",

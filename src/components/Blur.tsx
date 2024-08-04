@@ -60,8 +60,7 @@ function Blur(props: Props) {
               left: 0,
               bottom: 0,
               zIndex: 6,
-              backgroundColor: theme.colors?.background,
-              //borderRadius: 10,
+              backgroundColor: theme.colors?.elevation.level2,
             },
             style,
           ]}

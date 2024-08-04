@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { StyleSheet, ScrollView, View } from "react-native";
 import { Button, Divider, Switch, Text } from "react-native-paper";
-import SettingsItem from "../components/SettingsItem";
+import SettingsItem, { SubItem } from "../components/SettingsItem";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
@@ -13,6 +13,7 @@ import { useTheme } from "../contexts/ThemeProvider";
 
 import { enable, isEnabled, disable } from "tauri-plugin-autostart-api";
 import Import from "../components/documentPicker/Import";
+import DarkModeSwitch from "../components/DarkModeSwitch";
 
 const styles = StyleSheet.create({
   surface: {
@@ -38,8 +39,6 @@ const styles = StyleSheet.create({
 
 function SettingsScreen({ navigation }: { navigation: any }) {
   const [startup, setStartup] = React.useState(false);
-
-  const { darkmode, setDarkmode } = useTheme();
 
   const changeAutoStart = async (startup: boolean) => {
     if (startup) {
@@ -83,11 +82,10 @@ function SettingsScreen({ navigation }: { navigation: any }) {
                 alignItems: "center",
               }}
             >
-              <Text>Autostart</Text>
+              <Text variant="bodyLarge">Autostart</Text>
               <Switch
                 value={startup}
                 onValueChange={(checked) => {
-                  console.log(checked);
                   changeAutoStart(checked);
                 }}
               />
@@ -97,38 +95,23 @@ function SettingsScreen({ navigation }: { navigation: any }) {
         <SettingsItem title={"Import Passwords"}>
           <View style={styles.container}>
             <Import title={"Firefox"} icon={"firefox"} />
-            <Import title={"Chrome"} icon={"google-chrome"}/>
-            <Import title={"pCloud"} icon={"circle-outline"}/>
+            <Import title={"Chrome"} icon={"google-chrome"} />
+            <Import title={"pCloud"} icon={"circle-outline"} />
           </View>
-          <Text variant="titleMedium">{"Export"}</Text>
-          <Divider />
-          <View style={styles.container}>
-            <Button
-              icon="export"
-              mode="contained-tonal"
-              onPress={() => console.log("Pressed")}
-            >
-              Export Passwords
-            </Button>
-          </View>
+          <SubItem title={"Export"}>
+            <View style={styles.container}>
+              <Button
+                icon="export"
+                mode="contained-tonal"
+                onPress={() => console.log("Pressed")}
+              >
+                Export Passwords
+              </Button>
+            </View>
+          </SubItem>
         </SettingsItem>
         <SettingsItem title={"Design"}>
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              gap: 10,
-              alignItems: "center",
-            }}
-          >
-            <Text>darkmode</Text>
-            <Switch
-              value={darkmode}
-              onValueChange={(checked) => {
-                setDarkmode(checked);
-              }}
-            />
-          </View>
+          <DarkModeSwitch />
         </SettingsItem>
         <SettingsItem title={"test"}>
           <Text>Surface</Text>

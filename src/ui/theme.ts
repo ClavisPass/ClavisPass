@@ -1,4 +1,4 @@
-import { MD3LightTheme as DefaultTheme } from "react-native-paper";
+import { MD3LightTheme as DefaultTheme, shadow } from "react-native-paper";
 
 const theme = {
   ...DefaultTheme,
@@ -11,15 +11,16 @@ const theme = {
     primaryContainer: "rgba(120, 126, 245, 1)",
     secondary: "#69C4FF",
     secondaryContainer: "rgba(120, 126, 245, 0.09)",
+    //shadowColor: "#000",
     elevation: {
-      "level0": "transparent",
-      "level1": "#FAFAFA",
-      "level2": "#F5F5F5",
-      "level3": "#EEEEEE",
-      "level4": "#E0E0E0",
-      "level5": "#BDBDBD"
+      level0: "transparent",
+      level1: "#FAFAFA",
+      level2: "#F5F5F5",
+      level3: "#FFF",
+      level4: "#E0E0E0",
+      level5: "#BDBDBD"
     },
-    //tertiary: "#800080",
+    tertiary: "rgba(151, 151, 151, 1)",
     //tertiaryContainer: "#FFA500",
     surface: "#FFC0CB",
     surfaceVariant: "#F5F5F5",

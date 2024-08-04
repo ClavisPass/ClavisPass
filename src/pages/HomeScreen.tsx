@@ -30,6 +30,33 @@ import DataType from "../types/DataType";
 import SearchShortcut from "../components/shortcuts/SearchShortcut";
 import AddValueModal from "../components/modals/AddValueModal";
 
+type Props = {
+  setShowMenu: (boolean: boolean) => void;
+  setValueModalVisible: (boolean: boolean) => void;
+};
+
+function Tools(props: Props) {
+  return (
+    <>
+      <IconButton
+        icon="plus"
+        size={25}
+        onPress={() => props.setValueModalVisible(true)}
+        iconColor="white"
+      />
+
+      <IconButton
+        icon="sort-variant"
+        size={25}
+        onPress={() => {
+          props.setShowMenu(true);
+        }}
+        iconColor="white"
+      />
+    </>
+  );
+}
+
 function HomeScreen({ navigation }: { navigation: any }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFolder, setSelectedFolder] = useState("");
@@ -146,20 +173,9 @@ function HomeScreen({ navigation }: { navigation: any }) {
           </Text>
           <View style={{ display: "flex", flexDirection: "row" }}>
             <WebSpecific notIn={true}>
-              <IconButton
-                icon="plus"
-                size={25}
-                onPress={() => setValueModalVisible(true)}
-                iconColor="white"
-              />
-
-              <IconButton
-                icon="sort-variant"
-                size={25}
-                onPress={() => {
-                  setShowMenu(true);
-                }}
-                iconColor="white"
+              <Tools
+                setShowMenu={setShowMenu}
+                setValueModalVisible={setValueModalVisible}
               />
             </WebSpecific>
           </View>
@@ -187,19 +203,9 @@ function HomeScreen({ navigation }: { navigation: any }) {
             placeholderTextColor={"#ffffff80"}
           />
           <WebSpecific>
-            <IconButton
-              icon="plus"
-              size={25}
-              onPress={() => setValueModalVisible(true)}
-              iconColor="white"
-            />
-            <IconButton
-              icon="sort-variant"
-              size={25}
-              onPress={() => {
-                setShowMenu(true);
-              }}
-              iconColor="white"
+            <Tools
+              setShowMenu={setShowMenu}
+              setValueModalVisible={setValueModalVisible}
             />
           </WebSpecific>
         </View>

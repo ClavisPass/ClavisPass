@@ -35,10 +35,10 @@ const globalStyles = (background: string) => ({
     bottom: 26,
   },
   folderContainer: {
-    backgroundColor: "white",
+    backgroundColor: background,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#d3d3d3",
+    borderColor: background,
     display: "flex",
     flexDirection: "row",
     alignItems: "center",

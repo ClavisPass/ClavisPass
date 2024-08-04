@@ -5,7 +5,12 @@ import ModulesType, { ModuleType } from "../types/ModulesType";
 import ModulesEnum from "../enums/ModulesEnum";
 
 import type { StackScreenProps } from "@react-navigation/stack";
-import { IconButton, Text } from "react-native-paper";
+import {
+  Dialog,
+  IconButton,
+  Text,
+  Button as PaperBtn,
+} from "react-native-paper";
 import Header from "../components/Header";
 import Button from "../components/Button";
 import EditMetaInfMenu from "../components/menus/EditMetaInfMenu";
@@ -20,7 +25,6 @@ import TitleModule from "../components/modules/TitleModule";
 import AnimatedContainer from "../components/AnimatedContainer";
 import DraggableModulesListWeb from "../components/draggableModulesList/DraggableModulesListWeb";
 import DraggableModulesList from "../components/draggableModulesList/DraggableModulesList";
-import Menu, { MenuItem } from "../components/menus/Menu";
 import Constants from "expo-constants";
 import FolderModal from "../components/modals/FolderModal";
 import { useTheme } from "../contexts/ThemeProvider";
@@ -71,6 +75,10 @@ function EditScreen({ route, navigation }: Props) {
       if (newData) newData.values = [...newData.values, value];
     }
     data.setData(newData);
+    goBack();
+  };
+
+  const goBack = () => {
     navigation.goBack();
   };
 
@@ -192,7 +200,7 @@ function EditScreen({ route, navigation }: Props) {
         setVisible={setShowMenu}
         created={route.params.value.created}
         lastUpdated={route.params.value.lastUpdated}
-        folder={value.folder}
+        value={value}
         folderList={data?.data ? data.data.folder : []}
         setFolderList={route.params.changeFolder}
         favButton={
@@ -205,6 +213,7 @@ function EditScreen({ route, navigation }: Props) {
         }
         setFolderModalVisible={setFolderModalVisible}
         positionY={Constants.statusBarHeight + TITLEBAR_HEIGHT + 60}
+        goBack={goBack}
       />
       <FolderModal
         visible={folderModalVisible}

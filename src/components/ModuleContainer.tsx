@@ -129,12 +129,21 @@ function ModuleContainer(props: Props) {
             height: 20,
           }}
         >
-          {props.icon ? <Icon source={props.icon} size={16} /> : null}
+          {props.icon ? (
+            <Icon
+              source={props.icon}
+              size={16}
+              color={theme.colors?.tertiary}
+            />
+          ) : null}
           <Pressable
             onPress={props.titlePress}
             style={{ cursor: props.titlePress ? "pointer" : "auto" }}
           >
-            <Text variant="bodyMedium" style={{ userSelect: "none" }}>
+            <Text
+              variant="bodyMedium"
+              style={{ userSelect: "none", color: theme.colors?.tertiary }}
+            >
               {props.title}
             </Text>
           </Pressable>

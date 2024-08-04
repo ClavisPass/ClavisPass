@@ -1,13 +1,20 @@
-import { useHotkeys } from "react-hotkeys-hook";
+import { useEffect } from "react";
+import { Platform } from "react-native";
 
 type Props = {
   searchRef: any;
 };
 
 function SearchShortcut(props: Props) {
-  useHotkeys("ctrl+f", () => {
-    props.searchRef.current.focus();
-    console.log("gggg");
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      document.addEventListener("keydown", function (event) {
+        if (event.ctrlKey && event.key === "f") {
+          event.preventDefault();
+          props.searchRef.current.focus();
+        }
+      });
+    }
   });
   return <></>;
 }

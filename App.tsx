@@ -45,7 +45,6 @@ export default function App() {
               }}
             >
               <CustomTitlebar />
-
               <GlobalShortcuts />
               <QuickSelectProvider>
                 <ProtectedRoute loginScreen={<LoginScreen />}>

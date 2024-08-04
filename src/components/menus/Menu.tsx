@@ -19,7 +19,10 @@ export function MenuItem(props: MenuItemProps) {
   return (
     <TouchableRipple
       onPress={props.onPress}
-      style={{ cursor: props.onPress ? "pointer" : "auto", flex: 1 }}
+      style={{
+        cursor: props.onPress ? "pointer" : "auto",
+        flex: 1,
+      }}
       rippleColor="rgba(0, 0, 0, .32)"
     >
       <View
@@ -28,6 +31,8 @@ export function MenuItem(props: MenuItemProps) {
           display: "flex",
           padding: 14,
           minWidth: 140,
+          minHeight: 50,
+          height:50,
           flexDirection: "row",
           alignItems: "center",
           gap: 6,
@@ -120,7 +125,7 @@ function Menu(props: Props) {
                   {
                     overflow: "hidden",
                     position: "absolute",
-                    backgroundColor: theme.colors?.background,
+                    backgroundColor: theme.colors?.elevation.level3,
                     top: positionY,
                     right: 4,
                     borderTopLeftRadius: 22,

@@ -4,6 +4,7 @@ import { View } from "react-native";
 import ValueIconsEnum from "../../enums/ValueIconsEnum";
 import TemplateEnum from "../../enums/TemplateEnum";
 import getTemplate from "../../utils/getTemplate";
+import { TextInput } from "react-native-paper";
 
 type Props = {
   visible: boolean;
@@ -23,7 +24,7 @@ function AddValueModal(props: Props) {
   };
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
-      <View style={{ width: 280 }}>
+      <View style={{ width: 280, height: 220 }}>
         <MenuItem
           leadingIcon={ValueIconsEnum.PASSWORD}
           onPress={() => {

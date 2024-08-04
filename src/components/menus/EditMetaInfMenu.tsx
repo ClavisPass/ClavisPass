@@ -1,8 +1,11 @@
 import { ReactNode } from "react";
-import { Divider} from "react-native-paper";
+import { Divider } from "react-native-paper";
 import { formatDateTime } from "../../utils/Timestamp";
 import { View } from "react-native";
 import Menu, { MenuItem } from "./Menu";
+import { useData } from "../../contexts/DataProvider";
+import ValuesType, { ValuesListType } from "../../types/ValuesType";
+import DataType from "../../types/DataType";
 
 type Props = {
   visible: boolean;
@@ -10,13 +13,29 @@ type Props = {
   setFolderModalVisible: (visible: boolean) => void;
   created: string;
   lastUpdated: string;
-  folder: string;
+  value: ValuesType;
   folderList: string[];
   setFolderList: (folder: string[]) => void;
   favButton: ReactNode;
   positionY: number;
+  goBack: () => void;
 };
 function EditMetaInfMenu(props: Props) {
+  const data = useData();
+
+  const deleteValue = (id: string) => {
+    let newData = { ...data.data } as DataType;
+    let valueToChange: any = newData?.values?.filter(
+      (item: ValuesType) => item.id !== id
+    );
+    if (newData) {
+      newData.values = valueToChange;
+      data.setData(newData);
+    }
+    props.setVisible(false);
+    props.goBack();
+  };
+
   return (
     <Menu
       visible={props.visible}
@@ -39,7 +58,7 @@ function EditMetaInfMenu(props: Props) {
             props.setFolderModalVisible(true);
           }}
         >
-          {props.folder === "" ? "None" : props.folder}
+          {props.value.folder === "" ? "None" : props.value.folder}
         </MenuItem>
         {props.favButton}
       </View>
@@ -52,7 +71,7 @@ function EditMetaInfMenu(props: Props) {
       <MenuItem
         leadingIcon={"delete-outline"}
         onPress={() => {
-          console.log("test");
+          deleteValue(props.value.id);
         }}
       >
         Delete

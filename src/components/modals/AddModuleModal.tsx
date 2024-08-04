@@ -1,4 +1,3 @@
-import { Menu } from "react-native-paper";
 import ModulesEnum from "../../enums/ModulesEnum";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import Modal from "./Modal";
@@ -15,7 +14,7 @@ function AddModuleModal(props: Props) {
   const hideModal = () => props.setVisible(false);
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
-      <View style={{ width: 280 }}>
+      <View style={{ width: 280, minHeight: 440 }}>
         <MenuItem
           leadingIcon={ModuleIconsEnum.USERNAME}
           onPress={() => {

@@ -8,8 +8,6 @@ import React, {
 import { PaperProvider } from "react-native-paper";
 import lightTheme from "../ui/theme";
 import darkTheme from "../ui/theme-darkmode";
-import { ThemeProp } from "react-native-paper/lib/typescript/types";
-import { StyleSheet } from "react-native";
 import styles from "../ui/globalStyles";
 
 interface ThemeContextType {

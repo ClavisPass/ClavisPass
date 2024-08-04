@@ -46,6 +46,10 @@ function CustomTitlebar() {
         document
           .getElementById("titlebar")
           ?.setAttribute("data-tauri-drag-region", "");
+
+        const sheet = new CSSStyleSheet();
+        sheet.replaceSync("::-webkit-scrollbar {width: 8px} ::-webkit-scrollbar-track {background: transparent;} ::-webkit-scrollbar-thumb {background: #5e5e5e50; border-radius: 10px;}");
+        document.adoptedStyleSheets = [sheet];
       }
     }
   }, []);
