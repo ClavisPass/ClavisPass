@@ -1,5 +1,5 @@
-import React, { createRef, useRef, useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import React, { useRef, useState } from "react";
+import { Dimensions, FlatList, StyleSheet, View } from "react-native";
 import { Chip, IconButton } from "react-native-paper";
 import WebSpecific from "./platformSpecific/WebSpecific";
 
@@ -20,7 +20,24 @@ type Props = {
 
 function FolderFilter(props: Props) {
   const flatListRef: any = useRef<FlatList>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentOffset, setCurrentOffset] = useState(0);
+
+  const handleScroll = (event: any) => {
+    const offsetY = event.nativeEvent.contentOffset.x;
+    setCurrentOffset(offsetY);
+  };
+
+  const change = (direction: "+" | "-") => {
+    const { width } = Dimensions.get("window");
+    let nextOffset = 0;
+    if (direction === "+") nextOffset = currentOffset + width - 100;
+    if (direction === "-") nextOffset = currentOffset - width - 100;
+    flatListRef?.current?.scrollToOffset({
+      animated: true,
+      offset: nextOffset,
+    });
+  };
+
   return (
     <View
       style={{
@@ -30,22 +47,13 @@ function FolderFilter(props: Props) {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        //flex: 1,
       }}
     >
       <WebSpecific>
         <IconButton
           icon={"chevron-left"}
           style={{ margin: 0 }}
-          onPress={() => {
-            let newIndex = currentIndex - 3;
-            if (newIndex < 0) newIndex = 0;
-            flatListRef?.current?.scrollToIndex({
-              animated: true,
-              index: newIndex,
-            });
-            setCurrentIndex(newIndex);
-          }}
+          onPress={() => change("-")}
           size={12}
         />
       </WebSpecific>
@@ -56,6 +64,7 @@ function FolderFilter(props: Props) {
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           style={{ flexGrow: 1 }}
+          onScroll={handleScroll}
           renderItem={({ item, index }) => (
             <>
               {index === 0 && item === "Favorite" ? (
@@ -101,18 +110,7 @@ function FolderFilter(props: Props) {
         <IconButton
           icon={"chevron-right"}
           style={{ margin: 0 }}
-          onPress={() => {
-            const indexEnd: number = flatListRef?.current?.props?.data?.length
-              ? flatListRef?.current?.props?.data?.length - 1
-              : 0;
-            let newIndex = currentIndex + 3;
-            if (newIndex > indexEnd) newIndex = indexEnd;
-            flatListRef?.current?.scrollToIndex({
-              animated: true,
-              index: newIndex,
-            });
-            setCurrentIndex(newIndex);
-          }}
+          onPress={() => change("+")}
           size={12}
         />
       </WebSpecific>
