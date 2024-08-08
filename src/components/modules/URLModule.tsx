@@ -10,7 +10,6 @@ import { Platform, View } from "react-native";
 import { open } from "@tauri-apps/api/shell";
 
 import * as Linking from "expo-linking";
-import * as WebBrowser from "expo-web-browser";
 
 import validator from "validator";
 import theme from "../../ui/theme";
@@ -21,11 +20,6 @@ function URLModule(props: URLModuleType & Props) {
   const { globalStyles } = useTheme();
   const [value, setValue] = useState(props.value);
   const [isValid, setIsValid] = useState(false);
-
-  const _handlePressButtonAsync = async (url: string) => {
-    let result = await WebBrowser.openBrowserAsync(url);
-    //setResult(result);
-  };
 
   const fillUrl = () => {
     let url = value;

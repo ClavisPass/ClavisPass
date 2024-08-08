@@ -28,6 +28,7 @@ import DraggableModulesList from "../components/draggableModulesList/DraggableMo
 import Constants from "expo-constants";
 import FolderModal from "../components/modals/FolderModal";
 import { useTheme } from "../contexts/ThemeProvider";
+import Autocomplete from "../components/Autocomplete";
 
 const styles = StyleSheet.create({
   scrollView: {
