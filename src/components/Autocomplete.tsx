@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Platform, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -64,43 +64,45 @@ function Autocomplete(props: Props) {
   return (
     <>
       {props.visible && props.data.length > 0 && (
-        <Animated.View
-          style={[
-            {
-              backgroundColor: theme.colors?.elevation.level3,
-              borderRadius: 10,
-              display: "flex",
-              flexDirection: "column",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.4,
-              shadowRadius: 6,
-              elevation: 5,
-              maxHeight: 200,
-              paddingTop: 6,
-              paddingBottom: 6,
-            },
-            animatedStyle,
-            animatedOpacity,
-            !useScale && { transform: undefined },
-          ]}
-        >
-          <ScrollView>
-            {props.data.map((item, index) => (
-              <TouchableRipple
-                key={index}
-                style={{}}
-                onPress={() => {
-                  props.setValue(item);
-                  props.setVisible(false);
-                }}
-                rippleColor="rgba(0, 0, 0, .32)"
-              >
-                <Text style={{ margin: 4 }}>{item}</Text>
-              </TouchableRipple>
-            ))}
-          </ScrollView>
-        </Animated.View>
+        <KeyboardAvoidingView>
+          <Animated.View
+            style={[
+              {
+                backgroundColor: theme.colors?.elevation.level3,
+                borderRadius: 10,
+                display: "flex",
+                flexDirection: "column",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.4,
+                shadowRadius: 6,
+                elevation: 5,
+                maxHeight: 200,
+                paddingTop: 6,
+                paddingBottom: 6,
+              },
+              animatedStyle,
+              animatedOpacity,
+              !useScale && { transform: undefined },
+            ]}
+          >
+            <ScrollView>
+              {props.data.map((item, index) => (
+                <TouchableRipple
+                  key={index}
+                  style={{}}
+                  onPress={() => {
+                    props.setValue(item);
+                    props.setVisible(false);
+                  }}
+                  rippleColor="rgba(0, 0, 0, .32)"
+                >
+                  <Text style={{ margin: 4 }}>{item}</Text>
+                </TouchableRipple>
+              ))}
+            </ScrollView>
+          </Animated.View>
+        </KeyboardAvoidingView>
       )}
     </>
   );

@@ -54,8 +54,12 @@ function EmailModule(props: EmailModuleType & Props) {
 
   const filteredAutocompleteData = useMemo(() => {
     return autocompleteData.filter((item) => {
-      if (value === "") return [];
-      return item.toLowerCase().includes(value.toLowerCase());
+      const valueLowercase = value.toLowerCase();
+      const itemLowercase = item.toLowerCase();
+      return (
+        itemLowercase.includes(valueLowercase) &&
+        item !== value
+      );
     });
   }, [value]);
 
@@ -86,11 +90,11 @@ function EmailModule(props: EmailModuleType & Props) {
           onFocus={() => {
             setAutocompleteVisible(true);
           }}
-          onBlur={() =>
+          /*onBlur={() =>
             setTimeout(function () {
               setAutocompleteVisible(false);
             }, 150)
-          }
+          }*/
           outlineStyle={[
             globalStyles.outlineStyle,
             !isValid ? { borderColor: theme.colors.error } : null,
