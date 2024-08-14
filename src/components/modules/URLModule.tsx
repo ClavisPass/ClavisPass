@@ -23,6 +23,9 @@ function URLModule(props: URLModuleType & Props) {
 
   const fillUrl = () => {
     let url = value;
+    if (value === "") {
+      return;
+    }
     if (
       validator.isURL(value) &&
       url.charAt(0) == "h" &&

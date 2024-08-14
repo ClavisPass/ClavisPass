@@ -65,7 +65,7 @@ fn main() {
             }
             _ => {}
         }) //additional code for tauri
-        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--flag1", "--flag2"]) /* arbitrary number of args to pass to your app */))
+        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--flag1", "--flag2"])))
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

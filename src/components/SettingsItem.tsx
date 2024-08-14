@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { View, StyleSheet } from "react-native";
-import { Divider, Text } from "react-native-paper";
+import { Divider, Icon, Text } from "react-native-paper";
 import { useTheme } from "../contexts/ThemeProvider";
 
 const styles = StyleSheet.create({
@@ -14,15 +14,20 @@ const styles = StyleSheet.create({
   },
 });
 
-type Props = { children: ReactNode; title: string };
+type Props = { children: ReactNode; title: string; icon?: string };
 
 export function SubItem(props: Props) {
   const { theme } = useTheme();
   return (
     <>
-      <Text style={{ color: theme.colors?.tertiary }} variant="titleMedium">
-        {props.title}
-      </Text>
+      <View style={{ display: "flex", flexDirection: "row", gap: 4, alignItems: "center" }}>
+        {props.icon && (
+          <Icon color={theme.colors?.tertiary} source={props.icon} size={16} />
+        )}
+        <Text style={{ color: theme.colors?.tertiary }} variant="titleMedium">
+          {props.title}
+        </Text>
+      </View>
       <Divider style={{ marginBottom: 6 }} />
       {props.children}
     </>
@@ -35,7 +40,7 @@ function SettingsItem(props: Props) {
     <View
       style={[styles.container, { backgroundColor: theme.colors?.background }]}
     >
-      <SubItem title={props.title}>{props.children}</SubItem>
+      <SubItem icon={props.icon} title={props.title}>{props.children}</SubItem>
     </View>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { StyleSheet, ScrollView, View } from "react-native";
-import { Button, Divider, Switch, Text } from "react-native-paper";
+import { Button, Switch, Text } from "react-native-paper";
 import SettingsItem, { SubItem } from "../components/SettingsItem";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import Constants from "expo-constants";
@@ -8,12 +8,12 @@ import { StatusBar } from "expo-status-bar";
 import AnimatedContainer from "../components/AnimatedContainer";
 import { useFocusEffect } from "@react-navigation/native";
 import WebSpecific from "../components/platformSpecific/WebSpecific";
-import { useTheme } from "../contexts/ThemeProvider";
-//import Import from "../components/documentPicker/Import";
 
 import { enable, isEnabled, disable } from "tauri-plugin-autostart-api";
-import Import from "../components/documentPicker/Import";
+import Import, { DocumentTypeEnum } from "../components/documentPicker/Import";
 import DarkModeSwitch from "../components/DarkModeSwitch";
+
+import GoogleDrive from "../components/GoogleDrive";
 
 const styles = StyleSheet.create({
   surface: {
@@ -72,52 +72,48 @@ function SettingsScreen({ navigation }: { navigation: any }) {
       />
       <TitlebarHeight />
       <ScrollView style={styles.scrollView}>
+        <SettingsItem icon="google-drive" title={"Google Drive"}>
+          <View style={styles.container}>
+            <GoogleDrive />
+          </View>
+        </SettingsItem>
         <WebSpecific>
-          <SettingsItem title={"System"}>
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                gap: 10,
-                alignItems: "center",
-              }}
-            >
-              <Text variant="bodyLarge">Autostart</Text>
-              <Switch
-                value={startup}
-                onValueChange={(checked) => {
-                  changeAutoStart(checked);
+          <SettingsItem icon={"cogs"} title={"System"}>
+            <View style={styles.container}>
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 10,
+                  alignItems: "center",
                 }}
-              />
+              >
+                <Text variant="bodyLarge">Autostart</Text>
+                <Switch
+                  value={startup}
+                  onValueChange={(checked) => {
+                    changeAutoStart(checked);
+                  }}
+                />
+              </View>
             </View>
           </SettingsItem>
         </WebSpecific>
-        <SettingsItem title={"Import Passwords"}>
+        <SettingsItem icon={"theme-light-dark"} title={"Design"}>
           <View style={styles.container}>
-            <Import title={"Firefox"} icon={"firefox"} />
-            <Import title={"Chrome"} icon={"google-chrome"} />
-            <Import title={"pCloud"} icon={"circle-outline"} />
+            <DarkModeSwitch />
           </View>
-          <SubItem title={"Export"}>
-            <View style={styles.container}>
-              <Button
-                icon="export"
-                mode="contained-tonal"
-                onPress={() => console.log("Pressed")}
-              >
-                Export Passwords
-              </Button>
-            </View>
-          </SubItem>
         </SettingsItem>
-        <SettingsItem title={"Design"}>
-          <DarkModeSwitch />
-        </SettingsItem>
-        <SettingsItem title={"test"}>
-          <Text>Surface</Text>
-        </SettingsItem>
-        <SettingsItem title={"test"}>
-          <Text>Surface</Text>
+        <SettingsItem icon={"import"} title={"Import Passwords"}>
+          <View style={styles.container}>
+            <Import
+              type={DocumentTypeEnum.FIREFOX}
+              title={"Firefox"}
+              icon={"firefox"}
+            />
+            <Import type={DocumentTypeEnum.CHROME} title={"Chrome"} icon={"google-chrome"} />
+            <Import type={DocumentTypeEnum.PCLOUD} title={"pCloud"} icon={"circle-outline"} />
+          </View>
         </SettingsItem>
         <SettingsItem title={"test"}>
           <Text>Surface</Text>
