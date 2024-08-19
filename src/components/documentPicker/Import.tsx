@@ -1,16 +1,15 @@
-import React, { useState } from "react";
-import { View } from "react-native";
+import React, { useEffect, useState } from "react";
 import * as DocumentPicker from "expo-document-picker";
-import Papa from "papaparse";
-import * as FileSystem from "expo-file-system";
-import { Button } from "react-native-paper";
-import ValuesType, { ValuesListType } from "../../types/ValuesType";
-import createUniqueID from "../../utils/createUniqueID";
-import getModuleData from "../../utils/getModuleData";
-import ModulesEnum from "../../enums/ModulesEnum";
-import { getDateTime } from "../../utils/Timestamp";
+import { Button, Text, TextInput } from "react-native-paper";
+import { ValuesListType } from "../../types/ValuesType";
 import { useData } from "../../contexts/DataProvider";
 import DataType from "../../types/DataType";
+import importChrome from "./chrome";
+import importFirefox from "./firefox";
+import importpCloud from "./pcloud";
+import Modal from "../modals/Modal";
+import { useTheme } from "../../contexts/ThemeProvider";
+import { View } from "react-native";
 
 export enum DocumentTypeEnum {
   FIREFOX,
@@ -26,91 +25,21 @@ type Props = {
 
 function Import(props: Props) {
   const data = useData();
+  const { globalStyles, theme } = useTheme();
 
-  const importFirefox = (fileData: string) => {
-    const parsedData: any = Papa.parse(fileData);
-    if (parsedData.errors.length > 0) {
-      console.error("Error parsing CSV:", parsedData.errors);
-    } else {
-      const data = parsedData.data;
-      const dateTime = getDateTime();
-      let allValues: ValuesListType = [];
-      for (var i = 2; i < data.length; i++) {
-        const current = data[i];
-        let value: ValuesType = {
-          id: createUniqueID(),
-          title: current[1],
-          modules: [],
-          folder: "",
-          fav: false,
-          created: dateTime,
-          lastUpdated: dateTime,
-        };
-        let url = getModuleData(ModulesEnum.URL);
-        let username = getModuleData(ModulesEnum.USERNAME);
-        let password = getModuleData(ModulesEnum.PASSWORD);
-        if (url && username && password) {
-          if (current[0]) {
-            url.value = current[0];
-          }
-          if (current[1]) {
-            username.value = current[1];
-          }
-          if (current[2]) {
-            password.value = current[2];
-          }
-          value.modules = [username, password, url];
-        }
-        allValues = [...allValues, value];
-      }
-      saveValues(allValues);
-    }
-  };
+  const [modalVisible, setModalVisible] = useState(false);
+  const [value, setValue] = useState("");
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
 
-  const importChrome = (fileData: string) => {
-    const parsedData: any = Papa.parse(fileData);
-    if (parsedData.errors.length > 0) {
-      console.error("Error parsing CSV:", parsedData.errors);
+  const [eyeIcon, setEyeIcon] = useState("eye");
+
+  useEffect(() => {
+    if (secureTextEntry) {
+      setEyeIcon("eye");
     } else {
-      const data = parsedData.data;
-      const dateTime = getDateTime();
-      let allValues: ValuesListType = [];
-      for (var i = 1; i < data.length; i++) {
-        const current = data[i];
-        let value: ValuesType = {
-          id: createUniqueID(),
-          title: current[0],
-          modules: [],
-          folder: "",
-          fav: false,
-          created: dateTime,
-          lastUpdated: dateTime,
-        };
-        let url = getModuleData(ModulesEnum.URL);
-        let username = getModuleData(ModulesEnum.USERNAME);
-        let password = getModuleData(ModulesEnum.PASSWORD);
-        let note = getModuleData(ModulesEnum.NOTE);
-        if (url && username && password && note) {
-          if (current[1]) {
-            url.value = current[1];
-          }
-          if (current[2]) {
-            username.value = current[2];
-          }
-          if (current[3]) {
-            password.value = current[3];
-          }
-          value.modules = [username, password, url];
-          if (current[4] && current[4] !== "") {
-            note.value = current[4];
-            value.modules = [...value.modules, note];
-          }
-        }
-        allValues = [...allValues, value];
-      }
-      saveValues(allValues);
+      setEyeIcon("eye-off");
     }
-  };
+  }, [secureTextEntry]);
 
   const saveValues = (values: ValuesListType) => {
     let newData = { ...data.data } as DataType;
@@ -127,20 +56,29 @@ function Import(props: Props) {
           ? {
               type: "text/csv",
             }
-          : { type: "text/json" }
+          : { type: "application/json" }
       );
       if (result.canceled === false) {
+        console.log(result);
         const fileData = await readFile(result.assets[0].uri);
         if (fileData) {
           if (props.type === DocumentTypeEnum.CHROME) {
-            importChrome(fileData);
+            const data = importChrome(fileData);
+            if (data) {
+              saveValues(data);
+            }
             return;
           }
           if (props.type === DocumentTypeEnum.FIREFOX) {
-            importFirefox(fileData);
+            const data = importFirefox(fileData);
+            if (data) {
+              saveValues(data);
+            }
             return;
           }
           if (props.type === DocumentTypeEnum.PCLOUD) {
+            const data = importpCloud(fileData, value);
+            saveValues(data);
             return;
           }
         } else {
@@ -164,9 +102,61 @@ function Import(props: Props) {
   };
 
   return (
-    <Button icon={props.icon} mode="contained-tonal" onPress={pickDocument}>
-      {props.title} Passwords
-    </Button>
+    <>
+      {" "}
+      <Button
+        icon={props.icon}
+        mode="contained-tonal"
+        onPress={
+          props.type === DocumentTypeEnum.PCLOUD
+            ? () => {
+                setValue("");
+                setModalVisible(true);
+              }
+            : pickDocument
+        }
+      >
+        {props.title} Passwords
+      </Button>
+      {props.type === DocumentTypeEnum.PCLOUD && (
+        <Modal
+          visible={modalVisible}
+          onDismiss={() => {
+            setModalVisible(false);
+          }}
+        >
+          <View style={{ margin: 6 }}>
+            <Text>Enter Master Password of pCloud</Text>
+            <TextInput
+              outlineStyle={globalStyles.outlineStyle}
+              style={globalStyles.textInputStyle}
+              value={value}
+              mode="outlined"
+              onChangeText={(text) => setValue(text)}
+              secureTextEntry={secureTextEntry}
+              autoCapitalize="none"
+              autoComplete="password"
+              textContentType="password"
+              right={
+                <TextInput.Icon
+                  icon={eyeIcon}
+                  color={theme.colors.primary}
+                  onPress={() => setSecureTextEntry(!secureTextEntry)}
+                />
+              }
+            />
+            <Button
+              onPress={() => {
+                pickDocument();
+                setModalVisible(false);
+              }}
+            >
+              Ok
+            </Button>
+          </View>
+        </Modal>
+      )}
+    </>
   );
 }
 
