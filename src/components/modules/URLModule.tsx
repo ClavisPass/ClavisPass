@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { IconButton, TextInput } from "react-native-paper";
+import { Icon, IconButton, TextInput } from "react-native-paper";
 
 import URLModuleType from "../../types/modules/URLModuleType";
 import ModuleContainer from "../ModuleContainer";
@@ -16,10 +16,24 @@ import theme from "../../ui/theme";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 
+import { Image } from "expo-image";
+import { isColor } from "react-native-reanimated";
+
 function URLModule(props: URLModuleType & Props) {
   const { globalStyles } = useTheme();
   const [value, setValue] = useState(props.value);
   const [isValid, setIsValid] = useState(false);
+
+  const getFavIcon = (value: string) => {
+    if (value !== "" && isValid) {
+      const string =
+        "https://www.google.com/s2/favicons?domain=" + value + "&sz=64";
+      return string;
+    }
+    return "";
+  };
+
+  const [url, setUrl] = useState(getFavIcon(props.value));
 
   const fillUrl = () => {
     let url = value;
@@ -79,7 +93,8 @@ function URLModule(props: URLModuleType & Props) {
 
   useEffect(() => {
     setIsValid(validator.isURL(value));
-  }, [value]);
+    setUrl(getFavIcon(value));
+  }, [value, isValid]);
 
   useEffect(() => {
     const newModule: URLModuleType = {
@@ -101,6 +116,18 @@ function URLModule(props: URLModuleType & Props) {
       icon={ModuleIconsEnum.URL}
     >
       <View style={globalStyles.moduleView}>
+        <View style={{ width: 30, alignItems: "center" }}>
+          {url !== "" && isValid ? (
+            <Image
+              style={{ width: 22, height: 22, margin: 0 }}
+              source={url}
+              contentFit="cover"
+              transition={250}
+            />
+          ) : (
+            <Icon color={"lightgray"} source={"web-remove"} size={20} />
+          )}
+        </View>
         <TextInput
           outlineStyle={[
             globalStyles.outlineStyle,

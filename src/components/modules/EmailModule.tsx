@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { View } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Platform, View } from "react-native";
 
 import { TextInput } from "react-native-paper";
 
@@ -18,6 +18,8 @@ import { ModuleType } from "../../types/ModulesType";
 import theme from "../../ui/theme";
 
 function EmailModule(props: EmailModuleType & Props) {
+  const inputRef = useRef<any>();
+
   const data = useData();
   const [isValid, setIsValid] = useState(false);
 
@@ -25,6 +27,7 @@ function EmailModule(props: EmailModuleType & Props) {
   const [value, setValue] = useState(props.value);
 
   const [autocompleteVisible, setAutocompleteVisible] = useState(false);
+  const [isSuggestionClicked, setIsSuggestionClicked] = React.useState(false);
 
   function validateEmail(email: string) {
     if (email === "") return true;
@@ -53,14 +56,13 @@ function EmailModule(props: EmailModuleType & Props) {
   const autocompleteData = findEmails();
 
   const filteredAutocompleteData = useMemo(() => {
-    return autocompleteData.filter((item) => {
+    const data = autocompleteData.filter((item) => {
       const valueLowercase = value.toLowerCase();
       const itemLowercase = item.toLowerCase();
-      return (
-        itemLowercase.includes(valueLowercase) &&
-        item !== value
-      );
+      return itemLowercase.includes(valueLowercase) && item !== value;
     });
+    if (Platform.OS === "web") return data;
+    return [value, ...data];
   }, [value]);
 
   useEffect(() => {
@@ -75,6 +77,22 @@ function EmailModule(props: EmailModuleType & Props) {
     };
     props.changeModule(newModule);
   }, [value]);
+
+  const handleBlur = () => {
+    if (Platform.OS === "web") {
+      setTimeout(() => {
+        if (!isSuggestionClicked) {
+          setAutocompleteVisible(false);
+        }
+        setIsSuggestionClicked(false);
+      }, 200);
+    } else {
+      setAutocompleteVisible(false);
+      setIsSuggestionClicked(false);
+      inputRef.current.blur();
+    }
+  };
+
   return (
     <ModuleContainer
       id={props.id}
@@ -87,14 +105,12 @@ function EmailModule(props: EmailModuleType & Props) {
     >
       <View style={globalStyles.moduleView}>
         <TextInput
+          ref={inputRef}
           onFocus={() => {
             setAutocompleteVisible(true);
           }}
-          /*onBlur={() =>
-            setTimeout(function () {
-              setAutocompleteVisible(false);
-            }, 150)
-          }*/
+          onBlur={handleBlur}
+          blurOnSubmit={false}
           outlineStyle={[
             globalStyles.outlineStyle,
             !isValid ? { borderColor: theme.colors.error } : null,
@@ -115,6 +131,7 @@ function EmailModule(props: EmailModuleType & Props) {
         data={filteredAutocompleteData}
         visible={autocompleteVisible}
         setVisible={setAutocompleteVisible}
+        setIsSuggestionClicked={setIsSuggestionClicked}
       />
     </ModuleContainer>
   );

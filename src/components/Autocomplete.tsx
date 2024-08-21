@@ -15,6 +15,7 @@ type Props = {
   setVisible: (visible: boolean) => void;
   data: string[];
   setValue: (value: string) => void;
+  setIsSuggestionClicked: (isSuggestionClicked: boolean) => void;
 };
 function Autocomplete(props: Props) {
   const { theme } = useTheme();
@@ -86,12 +87,13 @@ function Autocomplete(props: Props) {
               !useScale && { transform: undefined },
             ]}
           >
-            <ScrollView>
+            <ScrollView keyboardShouldPersistTaps="handled">
               {props.data.map((item, index) => (
                 <TouchableRipple
                   key={index}
                   style={{}}
-                  onPress={() => {
+                  onPressIn={() => props.setIsSuggestionClicked(true)}
+                  onPressOut={() => {
                     props.setValue(item);
                     props.setVisible(false);
                   }}

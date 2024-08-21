@@ -4,16 +4,15 @@ import * as WebBrowser from "expo-web-browser";
 
 import { Text, Button, IconButton } from "react-native-paper";
 
-import { invoke } from "@tauri-apps/api";
 import { Platform, View } from "react-native";
 import WebSpecific from "./platformSpecific/WebSpecific";
 
 import { Image } from "expo-image";
 
-async function googleDriveCall(url: string, token: string) {
+/*async function googleDriveCall(url: string, token: string) {
   try {
     if (Platform.OS === "web") {
-      return await invoke("fetch_from_api", { url: url, token: token });
+      //return await invoke("fetch_from_api", { url: url, token: token });
     } else {
       return await fetch(
         "https://cors-anywhere.herokuapp.com/https://www.googleapis.com/oauth2/v3/about",
@@ -25,7 +24,7 @@ async function googleDriveCall(url: string, token: string) {
   } catch (error) {
     console.error("Error fetching data:", error);
   }
-}
+}*/
 
 const CLIENT_ID =
   "838936511257-vavcs00oa2dgv2ikvv5a2upt7oa4kdsg.apps.googleusercontent.com";
