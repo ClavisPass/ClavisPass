@@ -70,7 +70,7 @@ function Autocomplete(props: Props) {
             style={[
               {
                 backgroundColor: theme.colors?.elevation.level3,
-                borderRadius: 10,
+                borderRadius: 6,
                 display: "flex",
                 flexDirection: "column",
                 shadowColor: "#000",
@@ -79,8 +79,11 @@ function Autocomplete(props: Props) {
                 shadowRadius: 6,
                 elevation: 5,
                 maxHeight: 200,
-                paddingTop: 6,
-                paddingBottom: 6,
+                //paddingTop: 4,
+                //paddingBottom: 4,
+                overflow: "hidden",
+                marginRight: 50,
+                marginLeft: 2,
               },
               animatedStyle,
               animatedOpacity,

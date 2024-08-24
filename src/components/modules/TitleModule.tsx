@@ -19,12 +19,20 @@ function TitleModule(props: Props) {
   };
   return (
     <TextInput
-      placeholder={"Title"}
+      placeholder={"Title..."}
+      placeholderTextColor="lightgrey"
       outlineStyle={[
         globalStyles.outlineStyle,
-        { borderWidth: 0, padding: 0, margin: 0, flex: 1, width: "100%" },
+        {
+          borderWidth: 0,
+          padding: 0,
+          margin: 0,
+          flex: 1,
+          width: "100%",
+        },
       ]}
-      style={[{ margin: 0, padding: 0 }]}
+      underlineStyle={{ margin: 0, padding: 0 }}
+      style={[{ margin: 0, padding: 0, flex: 1, width: "100%" }]}
       value={props.value.title}
       mode="outlined"
       onChangeText={(text) => changeTitle(text)}
