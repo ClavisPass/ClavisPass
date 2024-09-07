@@ -29,6 +29,7 @@ import Constants from "expo-constants";
 import FolderModal from "../components/modals/FolderModal";
 import { useTheme } from "../contexts/ThemeProvider";
 import Autocomplete from "../components/Autocomplete";
+import { RootStackParamList } from "../../App";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -39,21 +40,15 @@ const styles = StyleSheet.create({
   },
 });
 
-type RootStackParamList = {
-  params: {
-    value: ValuesType;
-    changeFolder: (folder: string[]) => void;
-  };
-};
+type EditScreenProps = StackScreenProps<RootStackParamList, 'Edit'>;
 
-type Props = StackScreenProps<RootStackParamList>;
-
-function EditScreen({ route, navigation }: Props) {
+const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
+  const { value: routeValue, changeFolder } = route.params!;
   const data = useData();
   const { globalStyles, theme } = useTheme();
 
   const [edit, setEdit] = useState(false);
-  const [value, setValue] = useState<ValuesType>({ ...route.params.value });
+  const [value, setValue] = useState<ValuesType>({ ...routeValue });
 
   const [addModuleModalVisible, setAddModuleModalVisible] = useState(false);
   const [folderModalVisible, setFolderModalVisible] = useState(false);
@@ -64,7 +59,7 @@ function EditScreen({ route, navigation }: Props) {
   const saveValue = () => {
     let newData = { ...data.data } as DataType;
     let valueToChange: any = newData?.values.find(
-      (x: ValuesType) => x.id === route.params.value.id
+      (x: ValuesType) => x.id === routeValue.id
     );
     if (valueToChange) {
       valueToChange.title = value.title;
@@ -199,11 +194,11 @@ function EditScreen({ route, navigation }: Props) {
       <EditMetaInfMenu
         visible={showMenu}
         setVisible={setShowMenu}
-        created={route.params.value.created}
-        lastUpdated={route.params.value.lastUpdated}
+        created={routeValue.created}
+        lastUpdated={routeValue.lastUpdated}
         value={value}
         folderList={data?.data ? data.data.folder : []}
-        setFolderList={route.params.changeFolder}
+        setFolderList={changeFolder}
         favButton={
           <IconButton
             icon={favIcon}
@@ -220,7 +215,7 @@ function EditScreen({ route, navigation }: Props) {
         visible={folderModalVisible}
         setVisible={setFolderModalVisible}
         folder={data?.data ? data.data.folder : []}
-        setFolder={route.params.changeFolder}
+        setFolder={changeFolder}
         setSelectedFolder={changeSelectedFolder}
       />
     </AnimatedContainer>

@@ -15,7 +15,7 @@
     "upgrade": "npx expo install --fix"
   },
   "dependencies": {
-    "@expo/metro-runtime": "~3.2.1",
+    "@expo/metro-runtime": "~3.2.3",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/slider": "^4.5.2",
     "@react-native-picker/picker": "2.7.5",
@@ -25,7 +25,7 @@
     "@shopify/flash-list": "1.6.4",
     "@tauri-apps/api": "^1.5.6",
     "@types/charset": "^1.0.5",
-    "expo": "~51.0.26",
+    "expo": "~51.0.31",
     "expo-auth-session": "~5.5.2",
     "expo-blur": "~13.0.2",
     "expo-clipboard": "~6.0.3",
@@ -33,10 +33,10 @@
     "expo-device": "~6.0.2",
     "expo-document-picker": "^12.0.2",
     "expo-file-system": "^17.0.1",
-    "expo-image": "~1.12.13",
+    "expo-image": "~1.12.15",
     "expo-linear-gradient": "~13.0.2",
     "expo-linking": "~6.3.1",
-    "expo-notifications": "~0.28.15",
+    "expo-notifications": "~0.28.16",
     "expo-screen-capture": "~6.0.1",
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.6",
@@ -64,7 +64,9 @@
     "react-qr-code": "^2.0.12",
     "tauri-plugin-autostart-api": "github:tauri-apps/tauri-plugin-autostart#v1",
     "validator": "^13.12.0",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "expo-secure-store": "~13.0.2",
+    "expo-camera": "~15.0.15"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

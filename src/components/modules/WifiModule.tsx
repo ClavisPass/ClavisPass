@@ -61,6 +61,7 @@ function WifiModule(props: WifiModuleType & Props) {
         <Picker
           selectedValue={wifiType}
           onValueChange={(itemValue, itemIndex) => setWifiType(itemValue)}
+          style={[globalStyles.outlineStyle, { padding: 10 }]}
         >
           <Picker.Item label="WEP" value="WEP" />
           <Picker.Item label="WPA" value="WPA" />

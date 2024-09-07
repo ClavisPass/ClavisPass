@@ -26,139 +26,159 @@ import { QuickSelectProvider } from "./src/contexts/QuickSelectProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import GlobalShortcuts from "./src/components/shortcuts/GlobalShortcuts";
 import { ThemeProvider } from "./src/contexts/ThemeProvider";
+import { TokenProvider } from "./src/contexts/TokenProvider";
+import ValuesType from "./src/types/ValuesType";
+import ScanScreen from "./src/pages/ScanScreen";
 
 const Tab = createBottomTabNavigator();
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <DataProvider>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <View
-              style={{
-                borderRadius: Platform.OS === "web" ? 10 : 0,
-                overflow: "hidden",
-                flex: 1,
-              }}
-            >
-              <CustomTitlebar />
-              <GlobalShortcuts />
-              <QuickSelectProvider>
-                <ProtectedRoute loginScreen={<LoginScreen />}>
-                  <NavigationContainer>
-                    <Tab.Navigator
-                      initialRouteName="HomeStack"
-                      screenOptions={{
-                        headerShown: false,
-                      }}
-                      tabBar={({ navigation, state, descriptors, insets }) => (
-                        <BottomNavigation.Bar
-                          shifting={true}
-                          navigationState={state}
-                          safeAreaInsets={insets}
-                          onTabPress={({ route, preventDefault }) => {
-                            const event = navigation.emit({
-                              type: "tabPress",
-                              target: route.key,
-                              canPreventDefault: true,
-                            });
-
-                            if (event.defaultPrevented) {
-                              preventDefault();
-                            } else {
-                              navigation.dispatch({
-                                ...CommonActions.navigate(
-                                  route.name,
-                                  route.params
-                                ),
-                                target: state.key,
+        <TokenProvider>
+          <DataProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <View
+                style={{
+                  borderRadius: Platform.OS === "web" ? 10 : 0,
+                  overflow: "hidden",
+                  flex: 1,
+                }}
+              >
+                <GlobalShortcuts />
+                <QuickSelectProvider>
+                  <CustomTitlebar />
+                  <ProtectedRoute loginScreen={<LoginScreen />}>
+                    <NavigationContainer>
+                      <Tab.Navigator
+                        initialRouteName="HomeStack"
+                        screenOptions={{
+                          headerShown: false,
+                        }}
+                        tabBar={({
+                          navigation,
+                          state,
+                          descriptors,
+                          insets,
+                        }) => (
+                          <BottomNavigation.Bar
+                            shifting={true}
+                            navigationState={state}
+                            safeAreaInsets={insets}
+                            onTabPress={({ route, preventDefault }) => {
+                              const event = navigation.emit({
+                                type: "tabPress",
+                                target: route.key,
+                                canPreventDefault: true,
                               });
-                            }
-                          }}
-                          renderIcon={({ route, focused, color }) => {
-                            const { options } = descriptors[route.key];
-                            if (options.tabBarIcon) {
-                              return options.tabBarIcon({
-                                focused,
-                                color,
-                                size: 24,
-                              });
-                            }
 
-                            return null;
-                          }}
-                          getLabelText={({ route }) => {
-                            const { options } = descriptors[route.key];
+                              if (event.defaultPrevented) {
+                                preventDefault();
+                              } else {
+                                navigation.dispatch({
+                                  ...CommonActions.navigate(
+                                    route.name,
+                                    route.params
+                                  ),
+                                  target: state.key,
+                                });
+                              }
+                            }}
+                            renderIcon={({ route, focused, color }) => {
+                              const { options } = descriptors[route.key];
+                              if (options.tabBarIcon) {
+                                return options.tabBarIcon({
+                                  focused,
+                                  color,
+                                  size: 24,
+                                });
+                              }
 
-                            let label: string = "test";
+                              return null;
+                            }}
+                            getLabelText={({ route }) => {
+                              const { options } = descriptors[route.key];
 
-                            if (options.title !== undefined) {
-                              label = options.title;
-                            }
+                              let label: string = "test";
 
-                            return label;
+                              if (options.title !== undefined) {
+                                label = options.title;
+                              }
+
+                              return label;
+                            }}
+                          />
+                        )}
+                      >
+                        <Tab.Screen
+                          name="Analysis"
+                          component={AnalysisScreen}
+                          options={{
+                            tabBarLabel: "Analysis",
+                            title: "Analysis",
+                            tabBarIcon: ({ color, size }) => {
+                              return (
+                                <Icon
+                                  name="shield-search"
+                                  size={size}
+                                  color={color}
+                                />
+                              );
+                            },
                           }}
                         />
-                      )}
-                    >
-                      <Tab.Screen
-                        name="Analysis"
-                        component={AnalysisScreen}
-                        options={{
-                          tabBarLabel: "Analysis",
-                          title: "Analysis",
-                          tabBarIcon: ({ color, size }) => {
-                            return (
-                              <Icon
-                                name="shield-search"
-                                size={size}
-                                color={color}
-                              />
-                            );
-                          },
-                        }}
-                      />
-                      <Tab.Screen
-                        name="HomeStack"
-                        component={HomeStack}
-                        options={{
-                          tabBarLabel: "Home",
-                          title: "Home",
+                        <Tab.Screen
+                          name="HomeStack"
+                          component={HomeStack}
+                          options={{
+                            tabBarLabel: "Home",
+                            title: "Home",
 
-                          tabBarIcon: ({ color, size }) => {
-                            return (
-                              <Icon name="home" size={size} color={color} />
-                            );
-                          },
-                        }}
-                      />
-                      <Tab.Screen
-                        name="Settings"
-                        component={SettingsScreen}
-                        options={{
-                          tabBarLabel: "Settings",
-                          title: "Settings",
-                          tabBarIcon: ({ color, size }) => {
-                            return (
-                              <Icon name="cog" size={size} color={color} />
-                            );
-                          },
-                        }}
-                      />
-                    </Tab.Navigator>
-                  </NavigationContainer>
-                </ProtectedRoute>
-              </QuickSelectProvider>
-            </View>
-          </GestureHandlerRootView>
-        </DataProvider>
+                            tabBarIcon: ({ color, size }) => {
+                              return (
+                                <Icon name="home" size={size} color={color} />
+                              );
+                            },
+                          }}
+                        />
+                        <Tab.Screen
+                          name="SettingsStack"
+                          component={SettingsStack}
+                          options={{
+                            tabBarLabel: "Settings",
+                            title: "Settings",
+                            tabBarIcon: ({ color, size }) => {
+                              return (
+                                <Icon name="cog" size={size} color={color} />
+                              );
+                            },
+                          }}
+                        />
+                      </Tab.Navigator>
+                    </NavigationContainer>
+                  </ProtectedRoute>
+                </QuickSelectProvider>
+              </View>
+            </GestureHandlerRootView>
+          </DataProvider>
+        </TokenProvider>
       </AuthProvider>
     </ThemeProvider>
   );
 }
+
+export type RootStackParamList = {
+  Home: undefined,
+  Edit: {
+    value: ValuesType;
+    changeFolder: (folder: string[]) => void;
+  };
+  Settings: undefined,
+  Scan: undefined,
+};
 
 function HomeStack() {
   return (
@@ -183,6 +203,41 @@ function HomeStack() {
       <Stack.Screen
         name="Edit"
         component={EditScreen}
+        options={{
+          headerShown: false,
+          transitionSpec: {
+            open: transitionSpecConfig,
+            close: transitionSpecConfig,
+          },
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function SettingsStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: true,
+        gestureEnabled: true,
+        gestureDirection: "vertical",
+      }}
+    >
+      <Stack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{
+          headerShown: false,
+          transitionSpec: {
+            open: transitionSpecConfig,
+            close: transitionSpecConfig,
+          },
+        }}
+      />
+      <Stack.Screen
+        name="Scan"
+        component={ScanScreen}
         options={{
           headerShown: false,
           transitionSpec: {

@@ -41,11 +41,10 @@ export const QuickSelectProvider = ({ children }: Props) => {
       setWidth(size.width);
       setHeight(size.height);
       const position = await appWindow.outerPosition();
-      console.log(position);
       setPostionx(position.x);
       setPostionY(position.y);
       appWindow.setAlwaysOnTop(true);
-      appWindow.setSize(new PhysicalSize(200, 400));
+      appWindow.setSize(new PhysicalSize(60, 180));
       appWindow.setPosition(new PhysicalPosition(0, position.y));
     } catch (error) {
       console.error("Failed to get window size:", error);

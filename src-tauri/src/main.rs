@@ -1,13 +1,41 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-
-use tauri::{CustomMenuItem, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem};
 use tauri::Manager;
+use tauri::{CustomMenuItem, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem};
 use tauri_plugin_autostart::MacosLauncher;
 
-fn main() {
+use keyring::Entry;
 
+#[tauri::command]
+fn save_key(key: &str, value: &str) {
+    let entry = Entry::new("ClavisPass", key).expect("Failed to create keyring entry");
+    entry.set_password(value).expect("Failed to save password");
+}
+
+#[tauri::command]
+fn get_key(key: &str) -> Option<String> {
+    let entry = Entry::new("ClavisPass", key).expect("Failed to create keyring entry");
+    entry.get_password().ok()
+}
+
+#[tauri::command]
+fn remove_key(key: &str) {
+    let entry = Entry::new("ClavisPass", key).expect("Failed to create keyring entry");
+    match entry.get_password() {
+        Ok(_) => {
+            // Schlüssel existiert, also versuche ihn zu löschen
+            if let Err(e) = entry.delete_credential() {
+                eprintln!("Fehler beim Entfernen des Schlüssels: {:?}", e);
+            } else {
+                println!("Schlüssel erfolgreich entfernt");
+            }
+        }
+        Err(e) => eprintln!("Schlüssel nicht gefunden: {:?}", e),
+    }
+}
+
+fn main() {
     let show = CustomMenuItem::new("show".to_string(), "Öffnen");
     let quit = CustomMenuItem::new("quit".to_string(), "Schließen");
     let tray_menu = SystemTrayMenu::new()
@@ -65,7 +93,11 @@ fn main() {
             }
             _ => {}
         }) //additional code for tauri
-        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--flag1", "--flag2"])))
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            Some(vec!["--flag1", "--flag2"]),
+        ))
+        .invoke_handler(tauri::generate_handler![save_key, get_key, remove_key])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

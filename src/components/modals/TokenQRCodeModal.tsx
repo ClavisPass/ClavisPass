@@ -1,34 +1,31 @@
-import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../../ui/linearGradient";
 import QRCode from "react-qr-code";
 import Modal from "./Modal";
 import { Portal } from "react-native-paper";
+import { useToken } from "../../contexts/TokenProvider";
+import { useEffect, useState } from "react";
 
 type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  wifitype: string;
-  wifiname: string;
-  wifipassword: string;
 };
 
-function WifiQRCodeModal(props: Props) {
+function TokenQRCodeModal(props: Props) {
+  const { token } = useToken();
   const [value, setValue] = useState("");
   const hideModal = () => props.setVisible(false);
-
   useEffect(() => {
-    const wifiString =
-      "WIFI:S:" +
-      props.wifiname +
-      ";T:" +
-      props.wifitype +
-      ";P:" +
-      props.wifipassword +
-      ";;";
-    setValue(wifiString);
-  }, [props.wifitype, props.wifiname, props.wifipassword]);
+    if (token) {
+      hideModal();
+      setValue(token)
+    }
+    else{
+      hideModal();
+      setValue("")
+    }
+  }, [token]);
   return (
     <Portal>
       <Modal visible={props.visible} onDismiss={hideModal}>
@@ -58,4 +55,4 @@ function WifiQRCodeModal(props: Props) {
   );
 }
 
-export default WifiQRCodeModal;
+export default TokenQRCodeModal;

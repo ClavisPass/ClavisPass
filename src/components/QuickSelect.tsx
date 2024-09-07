@@ -2,7 +2,8 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import ModulesType from "../types/ModulesType";
 import { TitlebarHeight } from "./CustomTitlebar";
-import Button from "./Button";
+import { IconButton } from "react-native-paper";
+import { useTheme } from "../contexts/ThemeProvider";
 
 const styles = StyleSheet.create({
   container: {
@@ -22,11 +23,35 @@ type Props = {
 };
 
 function QuickSelect(props: Props) {
+  const { theme } = useTheme();
   return (
     <View style={styles.container}>
-      <TitlebarHeight />
-      <Button
-        text={"Go Back"}
+      <IconButton
+        icon={"account"}
+        mode={"contained"}
+        containerColor={theme.colors.primary}
+        iconColor={"white"}
+        size={26}
+        onPress={() => {
+          //
+        }}
+      />
+      <IconButton
+        icon={"form-textbox-password"}
+        mode={"contained"}
+        containerColor={theme.colors.primary}
+        iconColor={"white"}
+        size={26}
+        onPress={() => {
+          //props.setModules(null);
+        }}
+      />
+      <IconButton
+        icon={"arrow-left"}
+        mode={"contained-tonal"}
+        selected
+        iconColor={theme.colors.primary}
+        size={26}
         onPress={() => {
           props.setModules(null);
         }}

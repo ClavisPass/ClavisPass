@@ -14,6 +14,7 @@ import Import, { DocumentTypeEnum } from "../components/documentPicker/Import";
 import DarkModeSwitch from "../components/DarkModeSwitch";
 
 import GoogleDrive from "../components/GoogleDrive";
+import TokenQRCodeModal from "../components/modals/TokenQRCodeModal";
 
 const styles = StyleSheet.create({
   surface: {
@@ -39,6 +40,8 @@ const styles = StyleSheet.create({
 
 function SettingsScreen({ navigation }: { navigation: any }) {
   const [startup, setStartup] = React.useState(false);
+
+  const [qrCodeVisible, setQrCodeVisible] = React.useState(false);
 
   const changeAutoStart = async (startup: boolean) => {
     if (startup) {
@@ -75,6 +78,19 @@ function SettingsScreen({ navigation }: { navigation: any }) {
         <SettingsItem icon="google-drive" title={"Google Drive"}>
           <View style={styles.container}>
             <GoogleDrive />
+            <Button icon={"qrcode"} onPress={() => setQrCodeVisible(true)}>
+              Show QR-Code
+            </Button>
+            <TokenQRCodeModal
+              visible={qrCodeVisible}
+              setVisible={setQrCodeVisible}
+            />
+            <Button
+              icon={"qrcode-scan"}
+              onPress={() => navigation.navigate("Scan")}
+            >
+              Scan QR-Code
+            </Button>
           </View>
         </SettingsItem>
         <WebSpecific>
@@ -111,8 +127,16 @@ function SettingsScreen({ navigation }: { navigation: any }) {
               title={"Firefox"}
               icon={"firefox"}
             />
-            <Import type={DocumentTypeEnum.CHROME} title={"Chrome"} icon={"google-chrome"} />
-            <Import type={DocumentTypeEnum.PCLOUD} title={"pCloud"} icon={"circle-outline"} />
+            <Import
+              type={DocumentTypeEnum.CHROME}
+              title={"Chrome"}
+              icon={"google-chrome"}
+            />
+            <Import
+              type={DocumentTypeEnum.PCLOUD}
+              title={"pCloud"}
+              icon={"circle-outline"}
+            />
           </View>
         </SettingsItem>
         <SettingsItem title={"test"}>
