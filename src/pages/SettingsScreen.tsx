@@ -15,6 +15,7 @@ import DarkModeSwitch from "../components/DarkModeSwitch";
 
 import GoogleDrive from "../components/GoogleDrive";
 import TokenQRCodeModal from "../components/modals/TokenQRCodeModal";
+import ShowQRCodeButton from "../components/buttons/ShowQRCodeButton";
 
 const styles = StyleSheet.create({
   surface: {
@@ -40,8 +41,6 @@ const styles = StyleSheet.create({
 
 function SettingsScreen({ navigation }: { navigation: any }) {
   const [startup, setStartup] = React.useState(false);
-
-  const [qrCodeVisible, setQrCodeVisible] = React.useState(false);
 
   const changeAutoStart = async (startup: boolean) => {
     if (startup) {
@@ -78,13 +77,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
         <SettingsItem icon="google-drive" title={"Google Drive"}>
           <View style={styles.container}>
             <GoogleDrive />
-            <Button icon={"qrcode"} onPress={() => setQrCodeVisible(true)}>
-              Show QR-Code
-            </Button>
-            <TokenQRCodeModal
-              visible={qrCodeVisible}
-              setVisible={setQrCodeVisible}
-            />
+            <ShowQRCodeButton />
             <Button
               icon={"qrcode-scan"}
               onPress={() => navigation.navigate("Scan")}

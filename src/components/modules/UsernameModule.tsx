@@ -5,7 +5,7 @@ import { TextInput } from "react-native-paper";
 
 import UsernameModuleType from "../../types/modules/UsernameModuleType";
 import ModuleContainer from "../ModuleContainer";
-import CopyToClipboard from "../CopyToClipboard";
+import CopyToClipboard from "../buttons/CopyToClipboard";
 import Props from "../../types/ModuleProps";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";

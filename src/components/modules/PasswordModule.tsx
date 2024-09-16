@@ -10,7 +10,7 @@ import theme from "../../ui/theme";
 
 import passwordEntropy from "../../utils/Entropy";
 import PasswordGeneratorModal from "../modals/PasswordGeneratorModal";
-import CopyToClipboard from "../CopyToClipboard";
+import CopyToClipboard from "../buttons/CopyToClipboard";
 import * as Progress from "react-native-progress";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";

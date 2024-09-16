@@ -6,7 +6,7 @@ import { TextInput } from "react-native-paper";
 import EmailModuleType from "../../types/modules/EmailModuleType";
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../types/ModuleProps";
-import CopyToClipboard from "../CopyToClipboard";
+import CopyToClipboard from "../buttons/CopyToClipboard";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 import Autocomplete from "../Autocomplete";

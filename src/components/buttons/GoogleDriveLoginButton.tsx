@@ -5,7 +5,7 @@ import { Button } from "react-native-paper";
 
 import { Platform } from "react-native";
 
-import { useToken } from "../contexts/TokenProvider";
+import { useToken } from "../../contexts/TokenProvider";
 import { useEffect } from "react";
 
 const CLIENT_ID_WEB =

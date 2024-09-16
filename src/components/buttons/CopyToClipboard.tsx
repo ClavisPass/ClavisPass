@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 import { IconButton } from "react-native-paper";
 
 import * as Clipboard from "expo-clipboard";
-import theme from "../ui/theme";
+import theme from "../../ui/theme";
 
 const styles = StyleSheet.create({
   container: {

@@ -8,7 +8,7 @@ import { View } from "react-native";
 import { Image } from "expo-image";
 import { useToken } from "../contexts/TokenProvider";
 import fetchUserInfo from "../api/fetchUserInfo";
-import GoogleDriveLoginButton from "./GoogleDriveLoginButton";
+import GoogleDriveLoginButton from "./buttons/GoogleDriveLoginButton";
 
 WebBrowser.maybeCompleteAuthSession();
 

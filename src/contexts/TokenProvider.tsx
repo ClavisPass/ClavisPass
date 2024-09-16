@@ -65,11 +65,11 @@ export const TokenProvider = ({ children }: Props) => {
           console.error("Fehler beim Speichern des Tokens:", error)
         );
     } else {
-      removeData(GOOGLE_DRIVE_KEY)
+      /*removeData(GOOGLE_DRIVE_KEY)
         .then(() => console.log("Token entfernt"))
         .catch((error) =>
           console.error("Fehler beim Entfernen des Tokens:", error)
-        );
+        );*/
     }
   }, [token]);
   return (

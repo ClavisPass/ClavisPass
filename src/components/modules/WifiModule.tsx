@@ -4,7 +4,7 @@ import { View, Keyboard } from "react-native";
 import { IconButton, TextInput } from "react-native-paper";
 
 import WifiModuleType from "../../types/modules/WifiModuleType";
-import CopyToClipboard from "../CopyToClipboard";
+import CopyToClipboard from "../buttons/CopyToClipboard";
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../types/ModuleProps";
 import theme from "../../ui/theme";

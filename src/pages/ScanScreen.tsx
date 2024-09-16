@@ -79,11 +79,13 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ route, navigation }) => {
       ) : (
         <CameraView
           style={styles.camera}
-          facing={facing}
-          barcodeScannerSettings={{
+          //facing={facing}
+          //mirror={false}
+          /*barcodeScannerSettings={{
             barcodeTypes: ["qr"],
-          }}
+          }}*/
           onBarcodeScanned={(scanningResult) => {
+            console.log("passiert was");
             console.log(scanningResult);
           }}
         >

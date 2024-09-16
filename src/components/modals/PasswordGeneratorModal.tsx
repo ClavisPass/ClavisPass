@@ -10,10 +10,10 @@ import {
 import getColors from "../../ui/linearGradient";
 import { LinearGradient } from "expo-linear-gradient";
 import Slider from "@react-native-community/slider";
-import Button from "../Button";
+import Button from "../buttons/Button";
 
 import generatePassword from "../../utils/generatePassword";
-import CopyToClipboard from "../CopyToClipboard";
+import CopyToClipboard from "../buttons/CopyToClipboard";
 import Modal from "./Modal";
 import { useTheme } from "../../contexts/ThemeProvider";
 

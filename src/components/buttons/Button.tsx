@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import { Text, TouchableRipple } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
-import getColors from "../ui/linearGradient";
+import getColors from "../../ui/linearGradient";
 
 const styles = StyleSheet.create({
   container: {

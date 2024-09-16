@@ -12,7 +12,7 @@ import {
   Button as PaperBtn,
 } from "react-native-paper";
 import Header from "../components/Header";
-import Button from "../components/Button";
+import Button from "../components/buttons/Button";
 import EditMetaInfMenu from "../components/menus/EditMetaInfMenu";
 import ValuesType from "../types/ValuesType";
 import getModuleData from "../utils/getModuleData";

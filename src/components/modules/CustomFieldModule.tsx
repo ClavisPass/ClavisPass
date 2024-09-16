@@ -7,7 +7,7 @@ import CustomFieldModuleType from "../../types/modules/CustomFieldModuleType";
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../types/ModuleProps";
 import EditCustomFieldModal from "../modals/EditCustomFieldModal";
-import CopyToClipboard from "../CopyToClipboard";
+import CopyToClipboard from "../buttons/CopyToClipboard";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 

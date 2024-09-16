@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { useAuth } from "../contexts/AuthProvider";
-import Button from "../components/Button";
+import Button from "../components/buttons/Button";
 import TypeWriterComponent from "../components/TypeWriter";
 import AnimatedContainer from "../components/AnimatedContainer";
 import ContentProtection from "../components/ContentProtection";
