@@ -1,10 +1,13 @@
-import Constants from "expo-constants";
 import { useState } from "react";
 import { View } from "react-native";
 import TypeWriter from "react-native-typewriter";
 import theme from "../ui/theme";
 
-function TypeWriterComponent() {
+type Props = {
+  displayName: string;
+}
+
+function TypeWriterComponent(props: Props) {
   const [startUsername, setStartUsername] = useState<-1 | 0 | 1>(0);
   const [startExclamationMark, setStartExclamationMark] = useState<-1 | 0 | 1>(
     0
@@ -37,7 +40,7 @@ function TypeWriterComponent() {
         typing={startUsername}
         onTypingEnd={() => setStartExclamationMark(1)}
       >
-        {Constants.deviceName}
+        {props.displayName}
       </TypeWriter>
       <TypeWriter
         style={{ fontSize: 24, userSelect: "none" }}

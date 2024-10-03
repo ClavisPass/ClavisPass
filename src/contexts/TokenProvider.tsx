@@ -23,10 +23,8 @@ type Props = {
 export const TokenProvider = ({ children }: Props) => {
   const GOOGLE_DRIVE_KEY = "GoogleDrive";
   const [token, setToken] = useState<string | null>(null);
+  const [init, setInit] = useState<boolean>(true);
 
-  const [init, setInit] = useState(true);
-
-  // Funktion zum Entfernen des Tokens und aus dem SecureStore löschen
   const removeToken = async () => {
     setToken(null);
     try {
@@ -46,7 +44,6 @@ export const TokenProvider = ({ children }: Props) => {
     } catch (error) {
       console.error("Fehler beim Abrufen der Daten:", error);
     }
-    setInit(false);
   };
 
   useEffect(() => {
@@ -54,24 +51,24 @@ export const TokenProvider = ({ children }: Props) => {
   }, []);
 
   useEffect(() => {
-    if (init) return;
-    if (token) {
+    if(token)
+    {
       saveData(GOOGLE_DRIVE_KEY, token)
         .then(() => {
           console.log("Token gespeichert");
-          fetchData();
         })
         .catch((error) =>
           console.error("Fehler beim Speichern des Tokens:", error)
         );
-    } else {
-      /*removeData(GOOGLE_DRIVE_KEY)
-        .then(() => console.log("Token entfernt"))
-        .catch((error) =>
-          console.error("Fehler beim Entfernen des Tokens:", error)
-        );*/
     }
+
+    if(token === null && !init)
+    {
+      removeToken();
+    }
+    setInit(false)
   }, [token]);
+  
   return (
     <TokenContext.Provider value={{ token, setToken, removeToken }}>
       {children}

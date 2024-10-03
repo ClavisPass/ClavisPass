@@ -8,6 +8,8 @@ import { useTheme } from "../contexts/ThemeProvider";
 import { Button, Icon, IconButton, Text } from "react-native-paper";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import { RootStackParamList } from "../../App";
+import { useToken } from "../contexts/TokenProvider";
+import fetchUserInfo from "../api/fetchUserInfo";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -49,9 +51,23 @@ type ScanScreenProps = StackScreenProps<RootStackParamList, "Scan">;
 
 const ScanScreen: React.FC<ScanScreenProps> = ({ route, navigation }) => {
   const { globalStyles } = useTheme();
+  const { setToken } = useToken();
 
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
+
+  function isValidTokenFormat(data: string) {
+    const tokenRegex = /^ya29\.[0-9A-Za-z\-_]+$/;
+    if (tokenRegex.test(data)) {
+      try {
+        fetchUserInfo(data, () => {});
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+    return false;
+  }
 
   function toggleCameraFacing() {
     setFacing((current) => (current === "back" ? "front" : "back"));
@@ -79,14 +95,20 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ route, navigation }) => {
       ) : (
         <CameraView
           style={styles.camera}
-          //facing={facing}
+          facing={facing}
           //mirror={false}
-          /*barcodeScannerSettings={{
+          barcodeScannerSettings={{
             barcodeTypes: ["qr"],
-          }}*/
+          }}
           onBarcodeScanned={(scanningResult) => {
-            console.log("passiert was");
-            console.log(scanningResult);
+            try {
+              if (isValidTokenFormat(scanningResult.data)) {
+                setToken(scanningResult.data);
+                navigation.goBack();
+              }
+            } catch (error) {
+              console.log(error);
+            }
           }}
         >
           <View style={styles.buttonContainer}>

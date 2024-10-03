@@ -10,7 +10,11 @@ function ShowQRCodeButton() {
     <>
       {token && (
         <>
-          <Button icon={"qrcode"} onPress={() => setQrCodeVisible(true)}>
+          <Button
+            mode="contained-tonal"
+            icon={"qrcode"}
+            onPress={() => setQrCodeVisible(true)}
+          >
             Show QR-Code
           </Button>
           <TokenQRCodeModal

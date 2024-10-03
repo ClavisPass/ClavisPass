@@ -5,27 +5,34 @@ use tauri::Manager;
 use tauri::{CustomMenuItem, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem};
 use tauri_plugin_autostart::MacosLauncher;
 
-use keyring::Entry;
+use keytar::{set_password, get_password, delete_password};
 
 #[tauri::command]
 fn save_key(key: &str, value: &str) {
-    let entry = Entry::new("ClavisPass", key).expect("Failed to create keyring entry");
-    entry.set_password(value).expect("Failed to save password");
+    let service = "ClavisPass";
+    set_password(service, key, value).unwrap();
 }
 
 #[tauri::command]
 fn get_key(key: &str) -> Option<String> {
-    let entry = Entry::new("ClavisPass", key).expect("Failed to create keyring entry");
-    entry.get_password().ok()
+    let service = "ClavisPass";
+    match get_password(service, key) {
+        Ok(password) => Some(password.password),
+        Err(e) => {
+            // Fehlerausgabe, um zu sehen, warum es fehlschlägt
+            eprintln!("Fehler beim Abrufen des Passworts: {:?}", e);
+            None
+        }
+    }
 }
 
 #[tauri::command]
 fn remove_key(key: &str) {
-    let entry = Entry::new("ClavisPass", key).expect("Failed to create keyring entry");
-    match entry.get_password() {
+    let service = "ClavisPass";
+    match get_password(service, key) {
         Ok(_) => {
             // Schlüssel existiert, also versuche ihn zu löschen
-            if let Err(e) = entry.delete_credential() {
+            if let Err(e) = delete_password(service, key) {
                 eprintln!("Fehler beim Entfernen des Schlüssels: {:?}", e);
             } else {
                 println!("Schlüssel erfolgreich entfernt");

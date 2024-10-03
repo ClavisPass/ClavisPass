@@ -51,8 +51,9 @@ export default function App() {
                 <GlobalShortcuts />
                 <QuickSelectProvider>
                   <CustomTitlebar />
-                  <ProtectedRoute loginScreen={<LoginScreen />}>
-                    <NavigationContainer>
+
+                  <NavigationContainer>
+                    <ProtectedRoute loginScreen={<LoginStack />}>
                       <Tab.Navigator
                         initialRouteName="HomeStack"
                         screenOptions={{
@@ -158,8 +159,8 @@ export default function App() {
                           }}
                         />
                       </Tab.Navigator>
-                    </NavigationContainer>
-                  </ProtectedRoute>
+                    </ProtectedRoute>
+                  </NavigationContainer>
                 </QuickSelectProvider>
               </View>
             </GestureHandlerRootView>
@@ -171,13 +172,14 @@ export default function App() {
 }
 
 export type RootStackParamList = {
-  Home: undefined,
+  Home: undefined;
   Edit: {
     value: ValuesType;
     changeFolder: (folder: string[]) => void;
   };
-  Settings: undefined,
-  Scan: undefined,
+  Settings: undefined;
+  Login: undefined;
+  Scan: undefined;
 };
 
 function HomeStack() {
@@ -227,6 +229,41 @@ function SettingsStack() {
       <Stack.Screen
         name="Settings"
         component={SettingsScreen}
+        options={{
+          headerShown: false,
+          transitionSpec: {
+            open: transitionSpecConfig,
+            close: transitionSpecConfig,
+          },
+        }}
+      />
+      <Stack.Screen
+        name="Scan"
+        component={ScanScreen}
+        options={{
+          headerShown: false,
+          transitionSpec: {
+            open: transitionSpecConfig,
+            close: transitionSpecConfig,
+          },
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function LoginStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: true,
+        gestureEnabled: true,
+        gestureDirection: "vertical",
+      }}
+    >
+      <Stack.Screen
+        name="Login"
+        component={LoginScreen}
         options={{
           headerShown: false,
           transitionSpec: {

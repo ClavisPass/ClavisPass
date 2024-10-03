@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { StyleSheet, ScrollView, View } from "react-native";
-import { Button, Switch, Text } from "react-native-paper";
+import { Button, Divider, Switch, Text } from "react-native-paper";
 import SettingsItem, { SubItem } from "../components/SettingsItem";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import Constants from "expo-constants";
@@ -14,8 +14,6 @@ import Import, { DocumentTypeEnum } from "../components/documentPicker/Import";
 import DarkModeSwitch from "../components/DarkModeSwitch";
 
 import GoogleDrive from "../components/GoogleDrive";
-import TokenQRCodeModal from "../components/modals/TokenQRCodeModal";
-import ShowQRCodeButton from "../components/buttons/ShowQRCodeButton";
 
 const styles = StyleSheet.create({
   surface: {
@@ -76,14 +74,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
       <ScrollView style={styles.scrollView}>
         <SettingsItem icon="google-drive" title={"Google Drive"}>
           <View style={styles.container}>
-            <GoogleDrive />
-            <ShowQRCodeButton />
-            <Button
-              icon={"qrcode-scan"}
-              onPress={() => navigation.navigate("Scan")}
-            >
-              Scan QR-Code
-            </Button>
+          <GoogleDrive navigation={navigation}/>
           </View>
         </SettingsItem>
         <WebSpecific>
