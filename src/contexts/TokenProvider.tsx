@@ -7,11 +7,14 @@ import React, {
 } from "react";
 
 import { getData, saveData, removeData } from "../utils/secureStore";
+import isDropboxToken from "../utils/regex/isDropboxToken";
+import isGoogleDriveToken from "../utils/regex/isGoogleDriveToken";
 
 interface TokenContextType {
   token: string | null;
   setToken: (token: string | null) => void;
   removeToken: () => void;
+  tokenType: "Dropbox" | "GoogleDrive" | null;
 }
 
 export const TokenContext = createContext<TokenContextType | null>(null);
@@ -21,14 +24,18 @@ type Props = {
 };
 
 export const TokenProvider = ({ children }: Props) => {
-  const GOOGLE_DRIVE_KEY = "GoogleDrive";
+  const TOKEN_NAME = "ClavisPass-Token";
   const [token, setToken] = useState<string | null>(null);
+  const [tokenType, setTokenType] = useState<"Dropbox" | "GoogleDrive" | null>(
+    null
+  );
   const [init, setInit] = useState<boolean>(true);
 
   const removeToken = async () => {
     setToken(null);
+    setTokenType(null);
     try {
-      await removeData(GOOGLE_DRIVE_KEY);
+      await removeData(TOKEN_NAME);
       console.log("Token aus SecureStore entfernt");
     } catch (error) {
       console.error("Fehler beim Entfernen des Tokens:", error);
@@ -37,7 +44,7 @@ export const TokenProvider = ({ children }: Props) => {
 
   const fetchData = async () => {
     try {
-      const value = await getData(GOOGLE_DRIVE_KEY);
+      const value = await getData(TOKEN_NAME);
       setToken(value);
       console.log(value);
       console.log("Token geladen");
@@ -51,9 +58,14 @@ export const TokenProvider = ({ children }: Props) => {
   }, []);
 
   useEffect(() => {
-    if(token)
-    {
-      saveData(GOOGLE_DRIVE_KEY, token)
+    if (token) {
+      if (isDropboxToken(token)) {
+        setTokenType("Dropbox");
+      }
+      if (isGoogleDriveToken(token)) {
+        setTokenType("GoogleDrive");
+      }
+      saveData(TOKEN_NAME, token)
         .then(() => {
           console.log("Token gespeichert");
         })
@@ -62,15 +74,14 @@ export const TokenProvider = ({ children }: Props) => {
         );
     }
 
-    if(token === null && !init)
-    {
+    if (token === null && !init) {
       removeToken();
     }
-    setInit(false)
+    setInit(false);
   }, [token]);
-  
+
   return (
-    <TokenContext.Provider value={{ token, setToken, removeToken }}>
+    <TokenContext.Provider value={{ token, setToken, removeToken, tokenType }}>
       {children}
     </TokenContext.Provider>
   );

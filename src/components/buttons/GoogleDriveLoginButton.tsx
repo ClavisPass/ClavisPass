@@ -51,7 +51,7 @@ function GoogleDriveLoginButton() {
   };
 
   return (
-    <Button icon={"login"} mode="contained-tonal" onPress={handleAuth}>
+    <Button icon={"google-drive"} mode="contained-tonal" onPress={handleAuth}>
       Sign in with Google
     </Button>
   );

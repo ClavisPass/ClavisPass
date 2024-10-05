@@ -8,6 +8,7 @@ import ContentProtection from "../components/ContentProtection";
 import { useToken } from "../contexts/TokenProvider";
 import fetchUserInfo from "../api/fetchUserInfo";
 import GoogleDrive from "../components/GoogleDrive";
+import UserInfoType from "../types/UserInfoType";
 
 const styles = StyleSheet.create({
   container: {
@@ -21,13 +22,13 @@ const styles = StyleSheet.create({
 
 function LoginScreen({ navigation }: { navigation: any }) {
   const auth = useAuth();
-  const { token } = useToken();
+  const { token, tokenType } = useToken();
 
-  const [userInfo, setUserInfo] = useState<any>(null);
+  const [userInfo, setUserInfo] = useState<UserInfoType>(null);
 
   useEffect(() => {
     if (token) {
-      fetchUserInfo(token, setUserInfo);
+      fetchUserInfo(token, tokenType, setUserInfo);
     }
   }, [token]);
 
@@ -41,7 +42,7 @@ function LoginScreen({ navigation }: { navigation: any }) {
           {token ? (
             <>
               {userInfo ? (
-                <TypeWriterComponent displayName={userInfo.displayName} />
+                <TypeWriterComponent displayName={userInfo.username} />
               ) : null}
               <Button
                 text={"Login"}

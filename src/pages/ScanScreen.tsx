@@ -10,6 +10,8 @@ import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import { RootStackParamList } from "../../App";
 import { useToken } from "../contexts/TokenProvider";
 import fetchUserInfo from "../api/fetchUserInfo";
+import isDropboxToken from "../utils/regex/isDropboxToken";
+import isGoogleDriveToken from "../utils/regex/isGoogleDriveToken";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -56,11 +58,14 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ route, navigation }) => {
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
 
-  function isValidTokenFormat(data: string) {
-    const tokenRegex = /^ya29\.[0-9A-Za-z\-_]+$/;
-    if (tokenRegex.test(data)) {
+  function isValidTokenFormat(token: string) {
+    let tokenType: "Dropbox" | "GoogleDrive" | null = null;
+    if (isDropboxToken(token)) tokenType = "Dropbox";
+    if (isGoogleDriveToken(token)) tokenType = "GoogleDrive";
+
+    if (tokenType) {
       try {
-        fetchUserInfo(data, () => {});
+        fetchUserInfo(token, tokenType, () => {});
         return true;
       } catch (error) {
         return false;

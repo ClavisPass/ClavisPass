@@ -1,6 +1,8 @@
-const fetchUserInfo = async (
+import UserInfoType from "../types/UserInfoType";
+
+const fetchGoogleDriveUserInfo = async (
   token: string,
-  setUserInfo: (data: any) => void
+  setUserInfo: (data: UserInfoType) => void
 ) => {
   if (token) {
     try {
@@ -15,7 +17,11 @@ const fetchUserInfo = async (
       if (response.ok) {
         const data = await response.json();
         console.log(data.user);
-        setUserInfo(data.user);
+        const userData: UserInfoType = {
+          username: data.user.displayName,
+          avatar: data.user.photoLink,
+        };
+        setUserInfo(userData);
       } else {
         const errorData = await response.json();
         console.error("Error fetching user info:", errorData);
@@ -23,6 +29,54 @@ const fetchUserInfo = async (
     } catch (error) {
       console.error("Network error:", error);
     }
+  }
+};
+
+const fetchDropboxUserInfo = async (
+  token: string,
+  setUserInfo: (data: UserInfoType) => void
+) => {
+  if (token) {
+    try {
+      const response = await fetch(
+        "https://api.dropboxapi.com/2/users/get_current_account",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user information");
+      }
+
+      const data = await response.json();
+      console.log(data);
+      const userData: UserInfoType = {
+        username: data.name.display_name,
+        avatar: data.profile_photo_url,
+      };
+      setUserInfo(userData);
+    } catch (error) {
+      console.error("Network error:", error);
+    }
+  }
+};
+
+const fetchUserInfo = async (
+  token: string,
+  tokenType: "Dropbox" | "GoogleDrive" | null,
+  setUserInfo: (data: UserInfoType) => void
+) => {
+  if (tokenType === "Dropbox") {
+    fetchDropboxUserInfo(token, setUserInfo);
+    return;
+  }
+  if (tokenType === "GoogleDrive") {
+    fetchGoogleDriveUserInfo(token, setUserInfo);
+    return;
   }
 };
 

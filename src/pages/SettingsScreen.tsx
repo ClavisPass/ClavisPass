@@ -72,7 +72,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
       />
       <TitlebarHeight />
       <ScrollView style={styles.scrollView}>
-        <SettingsItem icon="google-drive" title={"Google Drive"}>
+        <SettingsItem icon="cloud" title={"Cloud"}>
           <View style={styles.container}>
           <GoogleDrive navigation={navigation}/>
           </View>
