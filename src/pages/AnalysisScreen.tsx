@@ -4,7 +4,7 @@ import { Dimensions, View, StyleSheet } from "react-native";
 import { Chip, Text } from "react-native-paper";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import { StatusBar } from "expo-status-bar";
-import AnimatedContainer from "../components/AnimatedContainer";
+import AnimatedContainer from "../components/containers/AnimatedContainer";
 import { useFocusEffect } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
 import { LinearGradient } from "expo-linear-gradient";

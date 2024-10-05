@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { Icon, Text, TouchableRipple } from "react-native-paper";
-import ValuesType from "../types/ValuesType";
-import ModulesEnum from "../enums/ModulesEnum";
+import ValuesType from "../../types/ValuesType";
+import ModulesEnum from "../../enums/ModulesEnum";
 
 import { Image } from "expo-image";
-import FastAccess, { openFastAccess } from "../utils/FastAccess";
-import { useQuickSelect } from "../contexts/QuickSelectProvider";
-import { useTheme } from "../contexts/ThemeProvider";
+import FastAccess, { openFastAccess } from "../../utils/FastAccess";
+import { useQuickSelect } from "../../contexts/QuickSelectProvider";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 const styles = StyleSheet.create({
   container: {

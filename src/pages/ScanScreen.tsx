@@ -3,7 +3,7 @@ import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import type { StackScreenProps } from "@react-navigation/stack";
 import Header from "../components/Header";
 import { TitlebarHeight } from "../components/CustomTitlebar";
-import AnimatedContainer from "../components/AnimatedContainer";
+import AnimatedContainer from "../components/containers/AnimatedContainer";
 import { useTheme } from "../contexts/ThemeProvider";
 import { Button, Icon, IconButton, Text } from "react-native-paper";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";

@@ -16,7 +16,7 @@ function GoogleDrive(props: Props) {
     <>
       <GoogleDriveUser />
       <Divider />
-      <ShowQRCodeButton />
+      
       <Button
         icon={"qrcode-scan"}
         mode="contained-tonal"
@@ -24,6 +24,7 @@ function GoogleDrive(props: Props) {
       >
         Scan QR-Code
       </Button>
+      <ShowQRCodeButton />
     </>
   );
 }

@@ -12,7 +12,7 @@ const DATA = getData();
 
 import { useData } from "../contexts/DataProvider";
 import { LinearGradient } from "expo-linear-gradient";
-import ListItem from "../components/ListItem";
+import ListItem from "../components/items/ListItem";
 import { StatusBar } from "expo-status-bar";
 import Constants from "expo-constants";
 import getColors from "../ui/linearGradient";
@@ -20,7 +20,7 @@ import WebSpecific from "../components/platformSpecific/WebSpecific";
 import HomeFilterMenu from "../components/menus/HomeFilterMenu";
 import Blur from "../components/Blur";
 import FolderFilter from "../components/FolderFilter";
-import AnimatedContainer from "../components/AnimatedContainer";
+import AnimatedContainer from "../components/containers/AnimatedContainer";
 import ContentProtection from "../components/ContentProtection";
 import { useFocusEffect } from "@react-navigation/native";
 import { TITLEBAR_HEIGHT } from "../components/CustomTitlebar";

@@ -4,7 +4,7 @@ import { View } from "react-native";
 import { TextInput } from "react-native-paper";
 
 import UsernameModuleType from "../../types/modules/UsernameModuleType";
-import ModuleContainer from "../ModuleContainer";
+import ModuleContainer from "../containers/ModuleContainer";
 import CopyToClipboard from "../buttons/CopyToClipboard";
 import Props from "../../types/ModuleProps";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";

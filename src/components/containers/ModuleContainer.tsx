@@ -6,7 +6,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { useTheme } from "../contexts/ThemeProvider";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 const styles = StyleSheet.create({
   container: {

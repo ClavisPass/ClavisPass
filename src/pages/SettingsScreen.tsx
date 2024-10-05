@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { StyleSheet, ScrollView, View } from "react-native";
 import { Button, Divider, Switch, Text } from "react-native-paper";
-import SettingsItem, { SubItem } from "../components/SettingsItem";
+import SettingsItem, { SubItem } from "../components/items/SettingsItem";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
-import AnimatedContainer from "../components/AnimatedContainer";
+import AnimatedContainer from "../components/containers/AnimatedContainer";
 import { useFocusEffect } from "@react-navigation/native";
 import WebSpecific from "../components/platformSpecific/WebSpecific";
 

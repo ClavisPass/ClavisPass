@@ -7,7 +7,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { useTheme } from "../contexts/ThemeProvider";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 type Props = {
   children: ReactNode;

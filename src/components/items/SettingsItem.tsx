@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import { View, StyleSheet } from "react-native";
 import { Divider, Icon, Text } from "react-native-paper";
-import { useTheme } from "../contexts/ThemeProvider";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 const styles = StyleSheet.create({
   container: {
