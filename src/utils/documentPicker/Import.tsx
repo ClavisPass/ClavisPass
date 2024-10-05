@@ -7,7 +7,7 @@ import DataType from "../../types/DataType";
 import importChrome from "./chrome";
 import importFirefox from "./firefox";
 import importpCloud from "./pcloud";
-import Modal from "../modals/Modal";
+import Modal from "../../components/modals/Modal";
 import { useTheme } from "../../contexts/ThemeProvider";
 import { View } from "react-native";
 

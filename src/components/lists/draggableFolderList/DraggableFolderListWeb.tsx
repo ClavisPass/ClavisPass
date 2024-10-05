@@ -2,8 +2,8 @@ import React from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { View } from "react-native";
 import { Icon, IconButton, Text, TouchableRipple } from "react-native-paper";
-import theme from "../../ui/theme";
-import { useTheme } from "../../contexts/ThemeProvider";
+import theme from "../../../ui/theme";
+import { useTheme } from "../../../contexts/ThemeProvider";
 
 type Props = {
   folder: string[];

@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Platform, View } from "react-native";
 import { IconButton, TextInput } from "react-native-paper";
 import Modal from "./Modal";
-import DraggableFolderListWeb from "../draggableFolderList/DraggableFolderListWeb";
-import DraggableFolderList from "../draggableFolderList/DraggableFolderList";
+import DraggableFolderListWeb from "../lists/draggableFolderList/DraggableFolderListWeb";
+import DraggableFolderList from "../lists/draggableFolderList/DraggableFolderList";
 import { useTheme } from "../../contexts/ThemeProvider";
 
 type Props = {

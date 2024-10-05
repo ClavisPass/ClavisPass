@@ -10,7 +10,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import WebSpecific from "../components/platformSpecific/WebSpecific";
 
 import { enable, isEnabled, disable } from "tauri-plugin-autostart-api";
-import Import, { DocumentTypeEnum } from "../components/documentPicker/Import";
+import Import, { DocumentTypeEnum } from "../utils/documentPicker/Import";
 import DarkModeSwitch from "../components/DarkModeSwitch";
 
 import GoogleDrive from "../components/GoogleDrive";

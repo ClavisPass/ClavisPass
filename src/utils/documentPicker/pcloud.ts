@@ -1,9 +1,9 @@
 import ModulesEnum from "../../enums/ModulesEnum";
 import ValuesType, { ValuesListType } from "../../types/ValuesType";
-import createUniqueID from "../../utils/createUniqueID";
-import { decrypt } from "../../utils/CryptoJS";
-import getModuleData from "../../utils/getModuleData";
-import { getDateTime } from "../../utils/Timestamp";
+import createUniqueID from "../createUniqueID";
+import { decrypt } from "../CryptoJS";
+import getModuleData from "../getModuleData";
+import { getDateTime } from "../Timestamp";
 
 export default (fileData: string, secret: string) => {
     const data: any = JSON.parse(fileData);

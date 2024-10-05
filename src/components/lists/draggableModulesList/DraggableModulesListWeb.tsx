@@ -1,8 +1,8 @@
 import React from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import ValuesType from "../../types/ValuesType";
-import ModulesType, { ModuleType } from "../../types/ModulesType";
-import getModule from "../../utils/getModule";
+import ValuesType from "../../../types/ValuesType";
+import ModulesType, { ModuleType } from "../../../types/ModulesType";
+import getModule from "../../../utils/getModule";
 
 type Props = {
   value: ValuesType;

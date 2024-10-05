@@ -3,9 +3,9 @@ import { View } from "react-native";
 import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
-import ValuesType from "../../types/ValuesType";
-import ModulesType, { ModuleType } from "../../types/ModulesType";
-import getModule from "../../utils/getModule";
+import ValuesType from "../../../types/ValuesType";
+import ModulesType, { ModuleType } from "../../../types/ModulesType";
+import getModule from "../../../utils/getModule";
 
 type Props = {
   value: ValuesType;

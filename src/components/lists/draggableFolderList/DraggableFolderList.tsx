@@ -4,8 +4,8 @@ import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
 import { Icon, IconButton, Text, TouchableRipple } from "react-native-paper";
-import theme from "../../ui/theme";
-import { useTheme } from "../../contexts/ThemeProvider";
+import theme from "../../../ui/theme";
+import { useTheme } from "../../../contexts/ThemeProvider";
 
 type Props = {
   folder: string[];
