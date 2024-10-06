@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from "react";
 import * as WebBrowser from "expo-web-browser";
 
-import { Text, IconButton, Chip } from "react-native-paper";
+import { Text, Chip, ActivityIndicator } from "react-native-paper";
 
 import { View } from "react-native";
 
 import { Image } from "expo-image";
 import { useToken } from "../contexts/TokenProvider";
 import fetchUserInfo from "../api/fetchUserInfo";
-import GoogleDriveLoginButton from "./buttons/GoogleDriveLoginButton";
 import DropboxLoginButton from "./buttons/DropboxLoginButton";
 import UserInfoType from "../types/UserInfoType";
+import EditTokenModal from "./modals/EditTokenModal";
 
 WebBrowser.maybeCompleteAuthSession();
 
-function UserInformation() {
+type Props = {
+  changeEditTokenVisibility?: (value: boolean) => void;
+};
+
+function UserInformation(props: Props) {
   const { token, removeToken, tokenType } = useToken();
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
 
@@ -28,29 +32,38 @@ function UserInformation() {
     <>
       {token ? (
         <>
-          {userInfo ? (
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 4,
-                width: "100%",
-              }}
-            >
-              {userInfo.avatar &&
-                <Image
-                  style={{ width: 30, height: 30, margin: 0, borderRadius: 50 }}
-                  source={userInfo?.avatar}
-                  contentFit="cover"
-                  transition={250}
-                />
-              }
-              <Text>{`Hello ${userInfo?.username}`}</Text>
-            </View>
-          ) : (
-            <Text>{`Unavailable`}</Text>
-          )}
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 4,
+              width: "100%",
+              height: 30,
+            }}
+          >
+            {userInfo ? (
+              <>
+                {userInfo.avatar && (
+                  <Image
+                    style={{
+                      width: 30,
+                      height: 30,
+                      margin: 0,
+                      borderRadius: 50,
+                    }}
+                    source={userInfo?.avatar}
+                    contentFit="cover"
+                    transition={250}
+                  />
+                )}
+                <Text variant="bodyLarge">{`Hello ${userInfo?.username}!`}</Text>
+              </>
+            ) : (
+              <ActivityIndicator animating={true} />
+            )}
+          </View>
+
           <View
             style={{
               display: "flex",
@@ -60,26 +73,33 @@ function UserInformation() {
               width: "100%",
             }}
           >
-            {tokenType === "Dropbox" && <Chip icon="check">Dropbox</Chip>}
+            {tokenType === "Dropbox" && (
+              <Chip
+                onPress={() => {
+                  props.changeEditTokenVisibility?.(true);
+                }}
+                icon="check"
+              >
+                Dropbox
+              </Chip>
+            )}
             {tokenType === "GoogleDrive" && (
               <Chip icon="check">Google Drive</Chip>
             )}
-            <IconButton
-              icon={"logout"}
-              iconColor={"grey"}
-              size={20}
-              selected
-              mode="contained-tonal"
+            <Chip
               onPress={() => {
                 removeToken();
                 setUserInfo(null);
               }}
-            />
+              icon="logout"
+            >
+              Logout
+            </Chip>
           </View>
         </>
       ) : (
         <>
-          <GoogleDriveLoginButton />
+          {/*<GoogleDriveLoginButton />*/}
           <DropboxLoginButton />
         </>
       )}

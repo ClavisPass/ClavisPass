@@ -28,7 +28,6 @@ import DraggableModulesList from "../components/lists/draggableModulesList/Dragg
 import Constants from "expo-constants";
 import FolderModal from "../components/modals/FolderModal";
 import { useTheme } from "../contexts/ThemeProvider";
-import Autocomplete from "../components/Autocomplete";
 import { RootStackParamList } from "../../App";
 
 const styles = StyleSheet.create({

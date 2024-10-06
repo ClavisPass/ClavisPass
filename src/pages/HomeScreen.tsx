@@ -29,6 +29,9 @@ import FolderModal from "../components/modals/FolderModal";
 import DataType from "../types/DataType";
 import SearchShortcut from "../components/shortcuts/SearchShortcut";
 import AddValueModal from "../components/modals/AddValueModal";
+import uploadData from "../api/uploadData";
+import { useToken } from "../contexts/TokenProvider";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 type Props = {
   setShowMenu: (boolean: boolean) => void;
@@ -69,6 +72,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
   const [valueModalVisible, setValueModalVisible] = useState(false);
 
   const data = useData();
+  const { token, tokenType } = useToken();
 
   const filteredValues = useMemo(() => {
     return data.data?.values.filter((item) => {
@@ -99,12 +103,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
   useEffect(() => {
     data.setData(DATA);
   }, []);
-
-  /*useEffect(() => {
-    if (data.data !== data.backup) {
-      setShowSave(true);
-    }
-  }, [data.data]);*/
 
   const [statusbarStyle, setStatusbarStyle] = useState<"dark" | "light">(
     "light"
@@ -210,7 +208,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
           </WebSpecific>
         </View>
       </LinearGradient>
-      <View style={{ flex: 1, width: "100%" }}>
+      <View style={{ flex: 1, width: "100%", padding: 4 }}>
         {showSave && (
           <View
             style={{
@@ -218,15 +216,16 @@ function HomeScreen({ navigation }: { navigation: any }) {
               width: "100%",
               backgroundColor: theme.colors.primary,
               borderRadius: 8,
-              marginBottom: 4,
+              marginBottom: 8,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              flexDirection: "row",
             }}
           >
             <TouchableRipple
               onPress={() => {
-                console.log("test");
+                uploadData(token, tokenType, data.data, "clavispass.lock");
               }}
               rippleColor="rgba(0, 0, 0, .32)"
               style={{
@@ -235,12 +234,36 @@ function HomeScreen({ navigation }: { navigation: any }) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                backgroundColor: "#00000017",
               }}
             >
-              <Text variant="bodyLarge" style={{ color: "white" }}>
+              <Text
+                variant="bodyLarge"
+                style={{ color: "white", userSelect: "none" }}
+              >
                 Save
               </Text>
             </TouchableRipple>
+            <TouchableWithoutFeedback
+              onPress={() => {
+                uploadData(token, tokenType, data.data, "clavispass.lock");
+              }}
+              style={{
+                height: 40,
+                width: 80,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+            >
+              <Text
+                variant="bodyLarge"
+                style={{ textDecorationLine: "underline", userSelect: "none" }}
+              >
+                Reset
+              </Text>
+            </TouchableWithoutFeedback>
           </View>
         )}
         <FlashList

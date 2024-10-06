@@ -7,7 +7,7 @@ import AnimatedContainer from "../components/containers/AnimatedContainer";
 import ContentProtection from "../components/ContentProtection";
 import { useToken } from "../contexts/TokenProvider";
 import fetchUserInfo from "../api/fetchUserInfo";
-import GoogleDrive from "../components/GoogleDrive";
+import Auth from "../components/Auth";
 import UserInfoType from "../types/UserInfoType";
 
 const styles = StyleSheet.create({
@@ -51,7 +51,7 @@ function LoginScreen({ navigation }: { navigation: any }) {
             </>
           ) : (
             <View style={styles.container}>
-              <GoogleDrive navigation={navigation} />
+              <Auth navigation={navigation} />
             </View>
           )}
         </View>

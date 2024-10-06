@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, ScrollView, View } from "react-native";
-import { Button, Divider, Switch, Text } from "react-native-paper";
-import SettingsItem, { SubItem } from "../components/items/SettingsItem";
+import { Button, Switch, Text, TextInput } from "react-native-paper";
+import SettingsItem from "../components/items/SettingsItem";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
@@ -13,7 +13,9 @@ import { enable, isEnabled, disable } from "tauri-plugin-autostart-api";
 import Import, { DocumentTypeEnum } from "../utils/documentPicker/Import";
 import DarkModeSwitch from "../components/DarkModeSwitch";
 
-import GoogleDrive from "../components/GoogleDrive";
+import Auth from "../components/Auth";
+import EditTokenModal from "../components/modals/EditTokenModal";
+import { useTheme } from "../contexts/ThemeProvider";
 
 const styles = StyleSheet.create({
   surface: {
@@ -38,7 +40,12 @@ const styles = StyleSheet.create({
 });
 
 function SettingsScreen({ navigation }: { navigation: any }) {
+  const { globalStyles } = useTheme();
   const [startup, setStartup] = React.useState(false);
+
+  const [value, setValue] = useState("clavispass");
+
+  const [editTokenVisibility, setEditTokenVisibility] = useState(false);
 
   const changeAutoStart = async (startup: boolean) => {
     if (startup) {
@@ -60,77 +67,94 @@ function SettingsScreen({ navigation }: { navigation: any }) {
   }, []);
 
   return (
-    <AnimatedContainer
-      style={{ marginTop: Constants.statusBarHeight }}
-      useFocusEffect={useFocusEffect}
-    >
-      <StatusBar
-        animated={true}
-        style="dark"
-        backgroundColor="transparent"
-        translucent={true}
-      />
-      <TitlebarHeight />
-      <ScrollView style={styles.scrollView}>
-        <SettingsItem icon="cloud" title={"Cloud"}>
-          <View style={styles.container}>
-          <GoogleDrive navigation={navigation}/>
-          </View>
-        </SettingsItem>
-        <WebSpecific>
-          <SettingsItem icon={"cogs"} title={"System"}>
+    <>
+      <AnimatedContainer
+        style={{ marginTop: Constants.statusBarHeight }}
+        useFocusEffect={useFocusEffect}
+      >
+        <StatusBar
+          animated={true}
+          style="dark"
+          backgroundColor="transparent"
+          translucent={true}
+        />
+        <TitlebarHeight />
+        <ScrollView style={styles.scrollView}>
+          <SettingsItem icon="cloud-outline" title={"Cloud"}>
             <View style={styles.container}>
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  gap: 10,
-                  alignItems: "center",
-                }}
-              >
-                <Text variant="bodyLarge">Autostart</Text>
-                <Switch
-                  value={startup}
-                  onValueChange={(checked) => {
-                    changeAutoStart(checked);
-                  }}
-                />
-              </View>
+              <Auth
+                navigation={navigation}
+                changeEditTokenVisibility={setEditTokenVisibility}
+              />
             </View>
           </SettingsItem>
-        </WebSpecific>
-        <SettingsItem icon={"theme-light-dark"} title={"Design"}>
-          <View style={styles.container}>
-            <DarkModeSwitch />
-          </View>
-        </SettingsItem>
-        <SettingsItem icon={"import"} title={"Import Passwords"}>
-          <View style={styles.container}>
-            <Import
-              type={DocumentTypeEnum.FIREFOX}
-              title={"Firefox"}
-              icon={"firefox"}
-            />
-            <Import
-              type={DocumentTypeEnum.CHROME}
-              title={"Chrome"}
-              icon={"google-chrome"}
-            />
-            <Import
-              type={DocumentTypeEnum.PCLOUD}
-              title={"pCloud"}
-              icon={"circle-outline"}
-            />
-          </View>
-        </SettingsItem>
-        <SettingsItem title={"test"}>
-          <Text>Surface</Text>
-        </SettingsItem>
-        <SettingsItem title={"test"}>
-          <Text>Surface</Text>
-        </SettingsItem>
-      </ScrollView>
-    </AnimatedContainer>
+          <WebSpecific>
+            <SettingsItem icon={"cogs"} title={"System"}>
+              <View style={styles.container}>
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  <Text variant="bodyLarge">Autostart</Text>
+                  <Switch
+                    value={startup}
+                    onValueChange={(checked) => {
+                      changeAutoStart(checked);
+                    }}
+                  />
+                </View>
+              </View>
+            </SettingsItem>
+          </WebSpecific>
+          <SettingsItem icon={"theme-light-dark"} title={"Design"}>
+            <View style={styles.container}>
+              <DarkModeSwitch />
+            </View>
+          </SettingsItem>
+          <SettingsItem icon={"file-lock-outline"} title={"Credentials"}>
+            <View style={styles.container}>
+              <TextInput
+                placeholder="Filename"
+                outlineStyle={globalStyles.outlineStyle}
+                style={globalStyles.textInputStyle}
+                value={value}
+                mode="outlined"
+                onChangeText={(text) => setValue(text)}
+                autoCapitalize="none"
+              />
+              <Button mode="contained-tonal">Change Password</Button>
+            </View>
+          </SettingsItem>
+          <SettingsItem icon={"import"} title={"Import Passwords"}>
+            <View style={styles.container}>
+              <Import
+                type={DocumentTypeEnum.FIREFOX}
+                title={"Firefox"}
+                icon={"firefox"}
+              />
+              <Import
+                type={DocumentTypeEnum.CHROME}
+                title={"Chrome"}
+                icon={"google-chrome"}
+              />
+              <Import
+                type={DocumentTypeEnum.PCLOUD}
+                title={"pCloud"}
+                icon={"circle-outline"}
+              />
+            </View>
+          </SettingsItem>
+        </ScrollView>
+        <EditTokenModal
+          visible={editTokenVisibility}
+          setVisible={setEditTokenVisibility}
+        />
+      </AnimatedContainer>
+    </>
   );
 }
 

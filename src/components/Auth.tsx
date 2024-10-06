@@ -1,22 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 
-import { Chip, Divider } from "react-native-paper";
+import { Divider } from "react-native-paper";
 
 import { Button } from "react-native-paper";
 
 import ShowQRCodeButton from "./buttons/ShowQRCodeButton";
 import UserInformation from "./UserInformation";
-import { useToken } from "../contexts/TokenProvider";
+import EditTokenModal from "./modals/EditTokenModal";
 
 type Props = {
-  navigation: any
-}
+  navigation: any;
+  changeEditTokenVisibility?: (value: boolean) => void;
+};
 
-function GoogleDrive(props: Props) {
-  const {tokenType} = useToken()
+function Auth(props: Props) {
   return (
     <>
-      <UserInformation />
+      <UserInformation changeEditTokenVisibility={props.changeEditTokenVisibility} />
       <Divider />
       <Button
         icon={"qrcode-scan"}
@@ -30,4 +30,4 @@ function GoogleDrive(props: Props) {
   );
 }
 
-export default GoogleDrive;
+export default Auth;
