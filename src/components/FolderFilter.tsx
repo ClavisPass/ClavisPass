@@ -57,7 +57,7 @@ function FolderFilter(props: Props) {
           size={12}
         />
       </WebSpecific>
-      <View style={{ flexBasis: "auto", flexShrink: 1 }}>
+      <View style={{ flexBasis: "auto", flexGrow: 1 }}>
         <FlatList
           ref={flatListRef}
           data={["Favorite", ...(props.folder ? props.folder : [])]}

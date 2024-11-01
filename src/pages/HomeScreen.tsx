@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { View, Platform } from "react-native";
+import { View, Platform, RefreshControl } from "react-native";
 import { Searchbar, IconButton, TouchableRipple } from "react-native-paper";
 
 import { Text } from "react-native-paper";
 
 import { FlashList } from "@shopify/flash-list";
 
-import { getData } from "../api/getData";
+//import { getData } from "../api/getData";
 
-const DATA = getData();
+//const DATA = getData();
 
 import { useData } from "../contexts/DataProvider";
 import { LinearGradient } from "expo-linear-gradient";
@@ -31,7 +31,7 @@ import SearchShortcut from "../components/shortcuts/SearchShortcut";
 import AddValueModal from "../components/modals/AddValueModal";
 import uploadData from "../api/uploadData";
 import { useToken } from "../contexts/TokenProvider";
-import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import fetchData from "../api/fetchData";
 
 type Props = {
   setShowMenu: (boolean: boolean) => void;
@@ -65,8 +65,10 @@ function HomeScreen({ navigation }: { navigation: any }) {
   const [selectedFolder, setSelectedFolder] = useState("");
   const [selectedFav, setSelectedFav] = useState(false);
 
+  const [refreshing, setRefreshing] = useState(true);
+
   const [showMenu, setShowMenu] = useState(false);
-  const [showSave, setShowSave] = useState(false);
+  const [showSave, setShowSave] = useState(true);
 
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [valueModalVisible, setValueModalVisible] = useState(false);
@@ -100,9 +102,18 @@ function HomeScreen({ navigation }: { navigation: any }) {
     });
   }, [data.data, searchQuery, selectedFolder, selectedFav]);
 
-  useEffect(() => {
-    data.setData(DATA);
-  }, []);
+  /*useEffect(() => {
+    setRefreshing(true);
+  }, []);*/
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchData(token, tokenType, "clavispass.lock").then((response) => {
+      setRefreshing(false);
+      data.setData(response);
+      
+    });
+  }, [refreshing]);
 
   const [statusbarStyle, setStatusbarStyle] = useState<"dark" | "light">(
     "light"
@@ -223,31 +234,33 @@ function HomeScreen({ navigation }: { navigation: any }) {
               flexDirection: "row",
             }}
           >
+            <View style={{ backgroundColor: "#00000017" }}>
+              <TouchableRipple
+                onPress={() => {
+                  uploadData(token, tokenType, data.data, "clavispass.lock");
+                }}
+                rippleColor="rgba(0, 0, 0, .32)"
+                style={{
+                  height: 40,
+                  width: 80,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  variant="bodyLarge"
+                  style={{ color: "white", userSelect: "none" }}
+                >
+                  Save
+                </Text>
+              </TouchableRipple>
+            </View>
             <TouchableRipple
               onPress={() => {
-                uploadData(token, tokenType, data.data, "clavispass.lock");
+                setRefreshing(true);
               }}
               rippleColor="rgba(0, 0, 0, .32)"
-              style={{
-                height: 40,
-                width: 80,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#00000017",
-              }}
-            >
-              <Text
-                variant="bodyLarge"
-                style={{ color: "white", userSelect: "none" }}
-              >
-                Save
-              </Text>
-            </TouchableRipple>
-            <TouchableWithoutFeedback
-              onPress={() => {
-                uploadData(token, tokenType, data.data, "clavispass.lock");
-              }}
               style={{
                 height: 40,
                 width: 80,
@@ -263,10 +276,18 @@ function HomeScreen({ navigation }: { navigation: any }) {
               >
                 Reset
               </Text>
-            </TouchableWithoutFeedback>
+            </TouchableRipple>
           </View>
         )}
         <FlashList
+          refreshControl={
+            <RefreshControl
+              //colors={[color.blue]}
+              progressBackgroundColor="#2e2e2e"
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+            />
+          }
           data={filteredValues}
           renderItem={({ item }) => (
             <ListItem

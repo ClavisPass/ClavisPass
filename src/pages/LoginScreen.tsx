@@ -9,6 +9,7 @@ import { useToken } from "../contexts/TokenProvider";
 import fetchUserInfo from "../api/fetchUserInfo";
 import Auth from "../components/Auth";
 import UserInfoType from "../types/UserInfoType";
+import EditTokenModal from "../components/modals/EditTokenModal";
 
 const styles = StyleSheet.create({
   container: {
@@ -25,10 +26,16 @@ function LoginScreen({ navigation }: { navigation: any }) {
   const { token, tokenType } = useToken();
 
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
+  const [loading, setLoading] = useState(true);
+
+  const [editTokenVisibility, setEditTokenVisibility] = useState(false);
 
   useEffect(() => {
     if (token) {
-      fetchUserInfo(token, tokenType, setUserInfo);
+      setLoading(true);
+      fetchUserInfo(token, tokenType, setUserInfo, () => {
+        setLoading(false);
+      });
     }
   }, [token]);
 
@@ -39,20 +46,24 @@ function LoginScreen({ navigation }: { navigation: any }) {
         <View
           style={{ alignItems: "center", justifyContent: "center", flex: 1 }}
         >
-          {token ? (
+          {token && userInfo ? (
             <>
-              {userInfo ? (
-                <TypeWriterComponent displayName={userInfo.username} />
-              ) : null}
+              <TypeWriterComponent displayName={userInfo.username} />
               <Button
                 text={"Login"}
                 onPress={() => auth.login("1234")}
               ></Button>
             </>
           ) : (
-            <View style={styles.container}>
-              <Auth navigation={navigation} />
-            </View>
+            <>
+              <View style={styles.container}>
+                <Auth navigation={navigation} changeEditTokenVisibility={setEditTokenVisibility}/>
+              </View>
+              <EditTokenModal
+                visible={editTokenVisibility}
+                setVisible={setEditTokenVisibility}
+              />
+            </>
           )}
         </View>
       </AnimatedContainer>

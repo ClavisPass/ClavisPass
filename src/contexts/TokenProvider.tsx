@@ -67,6 +67,7 @@ export const TokenProvider = ({ children }: Props) => {
       }
       saveData(TOKEN_NAME, token)
         .then(() => {
+          console.log(token);
           console.log("Token gespeichert");
         })
         .catch((error) =>

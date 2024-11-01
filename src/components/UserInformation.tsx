@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import * as WebBrowser from "expo-web-browser";
 
-import { Text, Chip, ActivityIndicator } from "react-native-paper";
+import { Text, Chip, ActivityIndicator, IconButton } from "react-native-paper";
 
 import { View } from "react-native";
 
@@ -12,6 +12,8 @@ import DropboxLoginButton from "./buttons/DropboxLoginButton";
 import UserInfoType from "../types/UserInfoType";
 import EditTokenModal from "./modals/EditTokenModal";
 
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+
 WebBrowser.maybeCompleteAuthSession();
 
 type Props = {
@@ -21,10 +23,18 @@ type Props = {
 function UserInformation(props: Props) {
   const { token, removeToken, tokenType } = useToken();
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetch = (token: string)=>{
+    fetchUserInfo(token, tokenType, setUserInfo, () => {
+      setLoading(false);
+    });
+  }
 
   useEffect(() => {
     if (token) {
-      fetchUserInfo(token, tokenType, setUserInfo);
+      setLoading(true);
+      fetch(token);
     }
   }, [token]);
 
@@ -60,7 +70,18 @@ function UserInformation(props: Props) {
                 <Text variant="bodyLarge">{`Hello ${userInfo?.username}!`}</Text>
               </>
             ) : (
-              <ActivityIndicator animating={true} />
+              <>
+                {loading ? (
+                  <View style={{flex:1}}>
+                  <ActivityIndicator animating={true} />
+                  </View>
+                ) : (
+                  <>
+                    <Icon name="wifi-remove" size={20} />
+                    <IconButton icon={"replay"} size={20} onPress={() => {fetch(token)}} />
+                  </>
+                )}
+              </>
             )}
           </View>
 
@@ -78,7 +99,7 @@ function UserInformation(props: Props) {
                 onPress={() => {
                   props.changeEditTokenVisibility?.(true);
                 }}
-                icon="check"
+                icon="dropbox"
               >
                 Dropbox
               </Chip>

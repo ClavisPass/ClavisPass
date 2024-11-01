@@ -2,7 +2,8 @@ import UserInfoType from "../types/UserInfoType";
 
 const fetchGoogleDriveUserInfo = async (
   token: string,
-  setUserInfo: (data: UserInfoType) => void
+  setUserInfo: (data: UserInfoType) => void,
+  callback?: ()=> void
 ) => {
   if (token) {
     try {
@@ -25,16 +26,19 @@ const fetchGoogleDriveUserInfo = async (
       } else {
         const errorData = await response.json();
         console.error("Error fetching user info:", errorData);
+        callback?.();
       }
     } catch (error) {
       console.error("Network error:", error);
+      callback?.();
     }
   }
 };
 
 const fetchDropboxUserInfo = async (
   token: string,
-  setUserInfo: (data: UserInfoType) => void
+  setUserInfo: (data: UserInfoType) => void,
+  callback?: ()=> void
 ) => {
   if (token) {
     try {
@@ -49,6 +53,7 @@ const fetchDropboxUserInfo = async (
       );
 
       if (!response.ok) {
+        callback?.();
         throw new Error("Failed to fetch user information");
       }
 
@@ -61,6 +66,7 @@ const fetchDropboxUserInfo = async (
       setUserInfo(userData);
     } catch (error) {
       console.error("Network error:", error);
+      callback?.();
     }
   }
 };
@@ -68,14 +74,15 @@ const fetchDropboxUserInfo = async (
 const fetchUserInfo = async (
   token: string,
   tokenType: "Dropbox" | "GoogleDrive" | null,
-  setUserInfo: (data: UserInfoType) => void
+  setUserInfo: (data: UserInfoType) => void,
+  callback?: () => void
 ) => {
   if (tokenType === "Dropbox") {
-    fetchDropboxUserInfo(token, setUserInfo);
+    fetchDropboxUserInfo(token, setUserInfo, callback);
     return;
   }
   if (tokenType === "GoogleDrive") {
-    fetchGoogleDriveUserInfo(token, setUserInfo);
+    fetchGoogleDriveUserInfo(token, setUserInfo, callback);
     return;
   }
 };
