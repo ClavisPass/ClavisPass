@@ -17,7 +17,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 type Props = {
   changeEditTokenVisibility?: (value: boolean) => void;
-  setUserInfo?: (userInfo: any) => void;
+  setUserInfo?: (userInfo: UserInfoType) => void;
 };
 
 function UserInformation(props: Props) {
@@ -51,6 +51,7 @@ function UserInformation(props: Props) {
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
+              justifyContent: "center",
               gap: 4,
               width: "100%",
               height: 30,

@@ -18,24 +18,14 @@ const fetchFileFromDropbox = async (
     );
 
     if (!response.ok) {
-      throw new Error(`Failed to download file: ${response.statusText}`);
+      //throw new Error(`Failed to download file: ${response.statusText}`);
+      return null
     }
 
     // Lies den Blob als Text
     const fileContent = await response.text();
 
     return fileContent;
-
-    /*try {
-      const jsonData = JSON.parse(fileContent);
-
-      // Validiere die Struktur des JSON mit Zod
-      const parsedData = DataTypeSchema.parse(jsonData);
-      return parsedData; // Gültiges JSON zurückgeben
-    } catch (jsonError) {
-      console.error("Error parsing or validating JSON:", jsonError);
-      return null;
-    }*/
   } catch (error) {
     console.error("Error downloading file:", error);
     return null;

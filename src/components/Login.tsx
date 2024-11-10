@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthProvider";
 import UserInfoType from "../types/UserInfoType";
 import Button from "./buttons/Button";
@@ -6,12 +6,13 @@ import TypeWriterComponent from "./TypeWriter";
 import fetchData from "../api/fetchData";
 import { useToken } from "../contexts/TokenProvider";
 import { ActivityIndicator } from "react-native-paper";
-import { View } from "react-native";
+import { View, Text } from "react-native";
 import { useData } from "../contexts/DataProvider";
 import getEmptyData from "../utils/getEmptyData";
 import PasswordTextbox from "./PasswordTextbox";
 import CryptoType, { CryptoTypeSchema } from "../types/CryptoType";
 import { decrypt } from "../utils/CryptoLayer";
+import { DataTypeSchema } from "../types/DataType";
 
 type Props = {
   userInfo: UserInfoType;
@@ -20,7 +21,7 @@ type Props = {
 function Login(props: Props) {
   const auth = useAuth();
   const { token, tokenType } = useToken();
-  const { data, setData } = useData();
+  const { setData } = useData();
 
   const [parsedCryptoData, setParsedCryptoData] = useState<CryptoType | null>(
     null
@@ -36,14 +37,11 @@ function Login(props: Props) {
     if (token) {
       setLoading(true);
       fetchData(token, tokenType, "clavispass.lock").then((response) => {
-        //data.setData(response);
         if (response == null) {
           setShowNewData(true);
         } else {
           console.log(response);
-          const parsedCryptoData = CryptoTypeSchema.parse(
-            JSON.parse(response)
-          );
+          const parsedCryptoData = CryptoTypeSchema.parse(JSON.parse(response));
           setParsedCryptoData(parsedCryptoData);
           setLoading(false);
         }
@@ -51,6 +49,7 @@ function Login(props: Props) {
     } else {
       setLoading(false);
     }
+    setLoading(false);
   }, []);
 
   const login = async () => {
@@ -58,8 +57,12 @@ function Login(props: Props) {
       if (parsedCryptoData === null) {
         return;
       }
-      decrypt(parsedCryptoData, value);
-      //auth.login(value);
+      const decryptedData = decrypt(parsedCryptoData, value);
+      const jsonData = JSON.parse(decryptedData);
+
+      const parsedData = DataTypeSchema.parse(jsonData);
+      setData(parsedData)
+      auth.login(value);
     } catch (error) {
       console.error("Error getting Data:", error);
     }
@@ -76,7 +79,10 @@ function Login(props: Props) {
   return (
     <>
       {loading ? (
-        <ActivityIndicator animating={true} />
+        <>
+          <ActivityIndicator animating={true} />
+          <Text>TTT</Text>
+        </>
       ) : (
         <>
           <TypeWriterComponent

@@ -31,7 +31,7 @@ function LoginScreen({ navigation }: { navigation: any }) {
 
   const [editTokenVisibility, setEditTokenVisibility] = useState(false);
 
-  useEffect(() => {
+  const fetchAsync = async () => {
     if (token) {
       setLoading(true);
       fetchUserInfo(token, tokenType, setUserInfo, () => {
@@ -41,6 +41,10 @@ function LoginScreen({ navigation }: { navigation: any }) {
       setLoading(false);
     }
     setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchAsync();
   }, []);
 
   return (
@@ -50,14 +54,10 @@ function LoginScreen({ navigation }: { navigation: any }) {
         <View
           style={{ alignItems: "center", justifyContent: "center", flex: 1 }}
         >
-          {loading ? (
-            <ActivityIndicator animating={true} />
-          ) : (
+          {!loading ? (
             <>
-              {token && userInfo ? (
-                <>
-                  <Login userInfo={userInfo} />
-                </>
+              {userInfo ? (
+                <Login userInfo={userInfo} />
               ) : (
                 <>
                   <View style={styles.container}>
@@ -74,6 +74,8 @@ function LoginScreen({ navigation }: { navigation: any }) {
                 </>
               )}
             </>
+          ) : (
+            <ActivityIndicator animating={true} />
           )}
         </View>
       </AnimatedContainer>

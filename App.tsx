@@ -29,6 +29,7 @@ import { ThemeProvider } from "./src/contexts/ThemeProvider";
 import { TokenProvider } from "./src/contexts/TokenProvider";
 import ValuesType from "./src/types/ValuesType";
 import ScanScreen from "./src/pages/ScanScreen";
+import theme from "./src/ui/theme";
 
 const Tab = createBottomTabNavigator();
 
@@ -44,6 +45,8 @@ export default function App() {
               <View
                 style={{
                   borderRadius: Platform.OS === "web" ? 10 : 0,
+                  borderColor: Platform.OS === "web" ? theme.colors.primary: undefined,
+                  borderWidth: Platform.OS === "web" ? 1 : 0,
                   overflow: "hidden",
                   flex: 1,
                 }}
