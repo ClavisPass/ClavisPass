@@ -21,6 +21,7 @@ function TypeWriterComponent(props: Props) {
         overflow: "visible",
         alignItems: "center",
         justifyContent: "center",
+        marginBottom: 8
       }}
     >
       <TypeWriter

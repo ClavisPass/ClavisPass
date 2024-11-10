@@ -10,7 +10,7 @@ type Props = {
 const ProtectedRoute = ({ children, loginScreen }: Props) => {
   const auth = useAuth();
 
-  if (auth.master == "") {
+  if (auth.master == null) {
     return loginScreen;
   }
   return children;

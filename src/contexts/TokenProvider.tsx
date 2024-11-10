@@ -45,8 +45,8 @@ export const TokenProvider = ({ children }: Props) => {
   const fetchData = async () => {
     try {
       const value = await getData(TOKEN_NAME);
-      setToken(value);
-      console.log(value);
+      setToken(value? value : null);
+      console.log(value? value : null);
       console.log("Token geladen");
     } catch (error) {
       console.error("Fehler beim Abrufen der Daten:", error);
@@ -75,9 +75,9 @@ export const TokenProvider = ({ children }: Props) => {
         );
     }
 
-    if (token === null && !init) {
+    /*if (token === null && !init) {
       removeToken();
-    }
+    }*/
     setInit(false);
   }, [token]);
 

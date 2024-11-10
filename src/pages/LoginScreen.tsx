@@ -10,6 +10,8 @@ import fetchUserInfo from "../api/fetchUserInfo";
 import Auth from "../components/Auth";
 import UserInfoType from "../types/UserInfoType";
 import EditTokenModal from "../components/modals/EditTokenModal";
+import { ActivityIndicator } from "react-native-paper";
+import Login from "../components/Login";
 
 const styles = StyleSheet.create({
   container: {
@@ -22,7 +24,6 @@ const styles = StyleSheet.create({
 });
 
 function LoginScreen({ navigation }: { navigation: any }) {
-  const auth = useAuth();
   const { token, tokenType } = useToken();
 
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
@@ -36,8 +37,11 @@ function LoginScreen({ navigation }: { navigation: any }) {
       fetchUserInfo(token, tokenType, setUserInfo, () => {
         setLoading(false);
       });
+    } else {
+      setLoading(false);
     }
-  }, [token]);
+    setLoading(false);
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
@@ -46,23 +50,29 @@ function LoginScreen({ navigation }: { navigation: any }) {
         <View
           style={{ alignItems: "center", justifyContent: "center", flex: 1 }}
         >
-          {token && userInfo ? (
-            <>
-              <TypeWriterComponent displayName={userInfo.username} />
-              <Button
-                text={"Login"}
-                onPress={() => auth.login("1234")}
-              ></Button>
-            </>
+          {loading ? (
+            <ActivityIndicator animating={true} />
           ) : (
             <>
-              <View style={styles.container}>
-                <Auth navigation={navigation} changeEditTokenVisibility={setEditTokenVisibility}/>
-              </View>
-              <EditTokenModal
-                visible={editTokenVisibility}
-                setVisible={setEditTokenVisibility}
-              />
+              {token && userInfo ? (
+                <>
+                  <Login userInfo={userInfo} />
+                </>
+              ) : (
+                <>
+                  <View style={styles.container}>
+                    <Auth
+                      setUserInfo={setUserInfo}
+                      navigation={navigation}
+                      changeEditTokenVisibility={setEditTokenVisibility}
+                    />
+                  </View>
+                  <EditTokenModal
+                    visible={editTokenVisibility}
+                    setVisible={setEditTokenVisibility}
+                  />
+                </>
+              )}
             </>
           )}
         </View>

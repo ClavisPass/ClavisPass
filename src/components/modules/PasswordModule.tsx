@@ -6,7 +6,6 @@ import { IconButton, TextInput } from "react-native-paper";
 import PasswordModuleType from "../../types/modules/PasswordModuleType";
 import ModuleContainer from "../containers/ModuleContainer";
 import Props from "../../types/ModuleProps";
-import theme from "../../ui/theme";
 
 import passwordEntropy from "../../utils/Entropy";
 import PasswordGeneratorModal from "../modals/PasswordGeneratorModal";
@@ -16,7 +15,7 @@ import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 
 function PasswordModule(props: PasswordModuleType & Props) {
-  const { globalStyles } = useTheme();
+  const { globalStyles, theme } = useTheme();
   const [value, setValue] = useState(props.value);
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 

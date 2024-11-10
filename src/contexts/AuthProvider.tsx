@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 interface AuthContextType {
-    master: string;
+    master: string | null;
     login: (user: string) => void;
     logout: () => void;
 }
@@ -13,14 +13,14 @@ type Props = {
 }
 
 export const AuthProvider = ({ children } : Props) => {
-    const [master, setMaster] = useState('');
+    const [master, setMaster] = useState<string | null>(null);
 
     const login = (master: string) => {
         setMaster(master);
     };
 
     const logout = () => {
-        setMaster('');
+        setMaster(null);
     };
     return (
         <AuthContext.Provider

@@ -4,7 +4,6 @@ export function getData() {
   const data: DataType = {
     version: "",
     lastUpdated: "2024-06-12T20:48:33.139Z",
-    master: "1zge12zge12uzge21uzge21uzeg21zueg1uz2gr21iuriu",
     folder: ["idk", "Wifi", "stuff", "test", "yo"],
     values: [
       {

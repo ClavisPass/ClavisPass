@@ -23,6 +23,7 @@ const fetchGoogleDriveUserInfo = async (
           avatar: data.user.photoLink,
         };
         setUserInfo(userData);
+        callback?.();
       } else {
         const errorData = await response.json();
         console.error("Error fetching user info:", errorData);
@@ -64,10 +65,15 @@ const fetchDropboxUserInfo = async (
         avatar: data.profile_photo_url,
       };
       setUserInfo(userData);
+      callback?.();
     } catch (error) {
       console.error("Network error:", error);
       callback?.();
     }
+  }
+  else{
+    console.log("Token ist 2: "+token)
+    callback?.();
   }
 };
 
@@ -78,11 +84,14 @@ const fetchUserInfo = async (
   callback?: () => void
 ) => {
   if (tokenType === "Dropbox") {
+    console.log("Token ist: "+token)
     fetchDropboxUserInfo(token, setUserInfo, callback);
+    callback?.();
     return;
   }
   if (tokenType === "GoogleDrive") {
     fetchGoogleDriveUserInfo(token, setUserInfo, callback);
+    callback?.();
     return;
   }
 };

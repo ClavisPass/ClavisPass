@@ -10,7 +10,6 @@ import { useToken } from "../contexts/TokenProvider";
 import fetchUserInfo from "../api/fetchUserInfo";
 import DropboxLoginButton from "./buttons/DropboxLoginButton";
 import UserInfoType from "../types/UserInfoType";
-import EditTokenModal from "./modals/EditTokenModal";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -18,25 +17,30 @@ WebBrowser.maybeCompleteAuthSession();
 
 type Props = {
   changeEditTokenVisibility?: (value: boolean) => void;
+  setUserInfo?: (userInfo: any) => void;
 };
 
 function UserInformation(props: Props) {
   const { token, removeToken, tokenType } = useToken();
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const fetch = (token: string)=>{
+  const fetch = (token: string) => {
     fetchUserInfo(token, tokenType, setUserInfo, () => {
       setLoading(false);
     });
-  }
+  };
 
   useEffect(() => {
     if (token) {
       setLoading(true);
       fetch(token);
     }
-  }, [token]);
+  }, [token, loading]);
+
+  useEffect(() => {
+    props.setUserInfo?.(userInfo)
+  }, [userInfo]);
 
   return (
     <>
@@ -72,13 +76,19 @@ function UserInformation(props: Props) {
             ) : (
               <>
                 {loading ? (
-                  <View style={{flex:1}}>
-                  <ActivityIndicator animating={true} />
+                  <View style={{ flex: 1 }}>
+                    <ActivityIndicator animating={true} />
                   </View>
                 ) : (
                   <>
                     <Icon name="wifi-remove" size={20} />
-                    <IconButton icon={"replay"} size={20} onPress={() => {fetch(token)}} />
+                    <IconButton
+                      icon={"replay"}
+                      size={20}
+                      onPress={() => {
+                        fetch(token);
+                      }}
+                    />
                   </>
                 )}
               </>

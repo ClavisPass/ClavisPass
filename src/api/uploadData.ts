@@ -1,8 +1,8 @@
-import DataType from "../types/DataType";
+import CryptoType from "../types/CryptoType";
 
 const uploadFileToDropbox = async (
   token: string,
-  fileContent: DataType,
+  fileContent: CryptoType,
   fileName: string
 ) => {
   const response = await fetch(
@@ -34,7 +34,7 @@ const uploadFileToDropbox = async (
 const uploadData = async (
   token: string | null,
   tokenType: string | null,
-  fileContent: DataType,
+  fileContent: CryptoType,
   fileName: string
 ) => {
   if (token && tokenType) uploadFileToDropbox(token, fileContent, fileName);

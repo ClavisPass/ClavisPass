@@ -32,6 +32,8 @@ import AddValueModal from "../components/modals/AddValueModal";
 import uploadData from "../api/uploadData";
 import { useToken } from "../contexts/TokenProvider";
 import fetchData from "../api/fetchData";
+import { encrypt } from "../utils/CryptoLayer";
+import { useAuth } from "../contexts/AuthProvider";
 
 type Props = {
   setShowMenu: (boolean: boolean) => void;
@@ -61,6 +63,8 @@ function Tools(props: Props) {
 }
 
 function HomeScreen({ navigation }: { navigation: any }) {
+  const auth = useAuth();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFolder, setSelectedFolder] = useState("");
   const [selectedFav, setSelectedFav] = useState(false);
@@ -110,7 +114,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
     setRefreshing(true);
     fetchData(token, tokenType, "clavispass.lock").then((response) => {
       setRefreshing(false);
-      data.setData(response);
+      //data.setData(response);
       
     });
   }, [refreshing]);
@@ -237,7 +241,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
             <View style={{ backgroundColor: "#00000017" }}>
               <TouchableRipple
                 onPress={() => {
-                  uploadData(token, tokenType, data.data, "clavispass.lock");
+                  uploadData(token, tokenType, encrypt(data.data, auth.master?auth.master:""), "clavispass.lock");
                 }}
                 rippleColor="rgba(0, 0, 0, .32)"
                 style={{

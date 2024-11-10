@@ -1,10 +1,9 @@
-import DataType, { DataTypeSchema } from "../types/DataType";
-
 const fetchFileFromDropbox = async (
   token: string,
   fileName: string
-): Promise<DataType | null> => {
+): Promise<string | null> => {
   try {
+    console.log("DAS HIER WIRD BENUTZT: "+token);
     const response = await fetch(
       "https://content.dropboxapi.com/2/files/download",
       {
@@ -25,7 +24,9 @@ const fetchFileFromDropbox = async (
     // Lies den Blob als Text
     const fileContent = await response.text();
 
-    try {
+    return fileContent;
+
+    /*try {
       const jsonData = JSON.parse(fileContent);
 
       // Validiere die Struktur des JSON mit Zod
@@ -34,7 +35,7 @@ const fetchFileFromDropbox = async (
     } catch (jsonError) {
       console.error("Error parsing or validating JSON:", jsonError);
       return null;
-    }
+    }*/
   } catch (error) {
     console.error("Error downloading file:", error);
     return null;
@@ -45,7 +46,7 @@ const fetchData = async (
   token: string | null,
   tokenType: string | null,
   fileName: string
-): Promise<DataType | null> => {
+): Promise<string | null> => {
   if (token && tokenType) {
     try {
       const data = await fetchFileFromDropbox(token, fileName);

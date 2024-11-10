@@ -11,12 +11,13 @@ import EditTokenModal from "./modals/EditTokenModal";
 type Props = {
   navigation: any;
   changeEditTokenVisibility?: (value: boolean) => void;
+  setUserInfo?: (userInfo: any) => void;
 };
 
 function Auth(props: Props) {
   return (
     <>
-      <UserInformation changeEditTokenVisibility={props.changeEditTokenVisibility} />
+      <UserInformation setUserInfo={props.setUserInfo} changeEditTokenVisibility={props.changeEditTokenVisibility} />
       <Divider />
       <Button
         icon={"qrcode-scan"}
