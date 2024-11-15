@@ -17,7 +17,6 @@ import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 
 import { Image } from "expo-image";
-import { isColor } from "react-native-reanimated";
 
 function URLModule(props: URLModuleType & Props) {
   const { globalStyles } = useTheme();

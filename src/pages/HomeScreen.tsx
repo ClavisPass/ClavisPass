@@ -316,6 +316,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
         setSelectedFav={setSelectedFav}
         selectedFolder={selectedFolder}
         setSelectedFolder={setSelectedFolder}
+        setFolderModalVisible={setFolderModalVisible}
       />
       <HomeFilterMenu
         visible={showMenu}

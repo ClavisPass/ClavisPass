@@ -61,7 +61,7 @@ function Login(props: Props) {
       const jsonData = JSON.parse(decryptedData);
 
       const parsedData = DataTypeSchema.parse(jsonData);
-      setData(parsedData)
+      setData(parsedData);
       auth.login(value);
     } catch (error) {
       console.error("Error getting Data:", error);
@@ -76,6 +76,7 @@ function Login(props: Props) {
       console.log("Wrong Password");
     }
   };
+
   return (
     <>
       {loading ? (
@@ -102,6 +103,7 @@ function Login(props: Props) {
             {showNewData ? (
               <>
                 <PasswordTextbox
+                  autofocus
                   setValue={setValue}
                   value={value}
                   placeholder="New Master Password"
@@ -119,6 +121,7 @@ function Login(props: Props) {
             ) : (
               <>
                 <PasswordTextbox
+                  autofocus
                   setValue={setValue}
                   value={value}
                   placeholder="Enter Master Password"

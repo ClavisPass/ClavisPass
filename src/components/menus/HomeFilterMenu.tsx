@@ -79,7 +79,7 @@ function HomeFilterMenu(props: Props) {
             props.setVisible(false);
           }}
         >
-          {"Edit Folder"}
+          {"Add/Edit Folder"}
         </MenuItem>
         <MenuItem
           leadingIcon="sort-ascending"

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Dimensions, FlatList, StyleSheet, View } from "react-native";
 import { Chip, IconButton } from "react-native-paper";
 import WebSpecific from "./platformSpecific/WebSpecific";
@@ -16,6 +16,7 @@ type Props = {
   setSelectedFav: (selectedFav: boolean) => void;
   selectedFolder: string;
   setSelectedFolder: (selectedFolder: string) => void;
+  setFolderModalVisible: (folderModalVisible: boolean) => void;
 };
 
 function FolderFilter(props: Props) {
@@ -44,6 +45,7 @@ function FolderFilter(props: Props) {
         padding: 4,
         maxHeight: 50,
         width: "100%",
+        //flex: 1,
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
@@ -57,13 +59,13 @@ function FolderFilter(props: Props) {
           size={12}
         />
       </WebSpecific>
-      <View style={{ flexBasis: "auto", flexGrow: 1 }}>
+      <View style={{ flexBasis: "auto", flexShrink: 1, overflow: "hidden" }}>
         <FlatList
           ref={flatListRef}
           data={["Favorite", ...(props.folder ? props.folder : [])]}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          style={{ flexGrow: 1 }}
+          style={{flexShrink: 1 }}
           onScroll={handleScroll}
           renderItem={({ item, index }) => (
             <>
@@ -106,6 +108,12 @@ function FolderFilter(props: Props) {
           )}
         />
       </View>
+      <IconButton
+        icon={"plus"}
+        style={{ margin: 0 }}
+        onPress={() => props.setFolderModalVisible(true)}
+        size={12}
+      />
       <WebSpecific>
         <IconButton
           icon={"chevron-right"}
