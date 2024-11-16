@@ -31,21 +31,34 @@ function LoginScreen({ navigation }: { navigation: any }) {
 
   const [editTokenVisibility, setEditTokenVisibility] = useState(false);
 
-  const fetchAsync = async () => {
-    if (token) {
-      setLoading(true);
-      fetchUserInfo(token, tokenType, setUserInfo, () => {
-        setLoading(false);
-      });
-    } else {
+  const fetchAsync = async (
+    token: string,
+    tokenType: "Dropbox" | "GoogleDrive"
+  ) => {
+    console.log("Token: " + token);
+    fetchUserInfo(token, tokenType, setUserInfo, () => {
+      console.log("callback");
       setLoading(false);
-    }
-    setLoading(false);
+    });
+    //setLoading(false);
   };
 
   useEffect(() => {
-    fetchAsync();
-  }, []);
+    setLoading(true);
+    if (token && tokenType) {
+      fetchAsync(token, tokenType);
+    }
+  }, [token, tokenType]);
+
+  useEffect(() => {
+    if (userInfo !== null) {
+      setLoading(false);
+    }
+    if(token === null)
+    {
+      setLoading(false);
+    }
+  }, [userInfo]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
@@ -54,7 +67,9 @@ function LoginScreen({ navigation }: { navigation: any }) {
         <View
           style={{ alignItems: "center", justifyContent: "center", flex: 1 }}
         >
-          {!loading ? (
+          {loading ? (
+            <ActivityIndicator animating={true} />
+          ) : (
             <>
               {userInfo ? (
                 <Login userInfo={userInfo} />
@@ -74,8 +89,6 @@ function LoginScreen({ navigation }: { navigation: any }) {
                 </>
               )}
             </>
-          ) : (
-            <ActivityIndicator animating={true} />
           )}
         </View>
       </AnimatedContainer>

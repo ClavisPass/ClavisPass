@@ -29,6 +29,7 @@ import Constants from "expo-constants";
 import FolderModal from "../components/modals/FolderModal";
 import { useTheme } from "../contexts/ThemeProvider";
 import { RootStackParamList } from "../../App";
+import DiscardChangesModal from "../components/modals/DiscardChangesModal";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -39,7 +40,7 @@ const styles = StyleSheet.create({
   },
 });
 
-type EditScreenProps = StackScreenProps<RootStackParamList, 'Edit'>;
+type EditScreenProps = StackScreenProps<RootStackParamList, "Edit">;
 
 const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const { value: routeValue, changeFolder } = route.params!;
@@ -51,6 +52,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   const [addModuleModalVisible, setAddModuleModalVisible] = useState(false);
   const [folderModalVisible, setFolderModalVisible] = useState(false);
+  const [discardChangesVisible, setDiscardChangesVisible] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
   const [favIcon, setFavIcon] = useState("star-outline");
@@ -133,7 +135,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       <TitlebarHeight />
       <Header
         onPress={() => {
-          navigation.goBack();
+          //navigation.goBack();
+          setDiscardChangesVisible(true);
         }}
         leftNode={
           <TitleModule value={value} setValue={setValue} disabled={edit} />
@@ -217,8 +220,13 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         setFolder={changeFolder}
         setSelectedFolder={changeSelectedFolder}
       />
+      <DiscardChangesModal
+        visible={discardChangesVisible}
+        setVisible={setDiscardChangesVisible}
+        onDiscard={goBack}
+      />
     </AnimatedContainer>
   );
-}
+};
 
 export default EditScreen;

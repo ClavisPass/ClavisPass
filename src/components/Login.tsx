@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../contexts/AuthProvider";
 import UserInfoType from "../types/UserInfoType";
 import Button from "./buttons/Button";
@@ -13,6 +13,7 @@ import PasswordTextbox from "./PasswordTextbox";
 import CryptoType, { CryptoTypeSchema } from "../types/CryptoType";
 import { decrypt } from "../utils/CryptoLayer";
 import { DataTypeSchema } from "../types/DataType";
+import { useTheme } from "../contexts/ThemeProvider";
 
 type Props = {
   userInfo: UserInfoType;
@@ -21,6 +22,7 @@ type Props = {
 function Login(props: Props) {
   const auth = useAuth();
   const { token, tokenType } = useToken();
+  const { theme } = useTheme();
   const { setData } = useData();
 
   const [parsedCryptoData, setParsedCryptoData] = useState<CryptoType | null>(
@@ -29,6 +31,12 @@ function Login(props: Props) {
 
   const [loading, setLoading] = useState(false);
   const [showNewData, setShowNewData] = useState(false);
+
+  const [capsLock, setCapsLock] = useState(false);
+
+  const [error, setError] = useState(false);
+
+  const textInputRef = useRef<any>(null);
 
   const [value, setValue] = useState("");
   const [value2, setValue2] = useState("");
@@ -65,6 +73,12 @@ function Login(props: Props) {
       auth.login(value);
     } catch (error) {
       console.error("Error getting Data:", error);
+      textInputRef.current.focus();
+      setValue("");
+      setError(true);
+      setTimeout(() => {
+        setError(false);
+      }, 1000);
     }
   };
 
@@ -121,13 +135,22 @@ function Login(props: Props) {
             ) : (
               <>
                 <PasswordTextbox
+                  setCapsLock={setCapsLock}
+                  textInputRef={textInputRef}
+                  errorColor={error}
                   autofocus
                   setValue={setValue}
                   value={value}
                   placeholder="Enter Master Password"
+                  onSubmitEditing={login}
                 />
                 <Button text={"Login"} onPress={login}></Button>
               </>
+            )}
+            {capsLock && (
+              <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
+                Caps Lock is activated
+              </Text>
             )}
           </View>
         </>
