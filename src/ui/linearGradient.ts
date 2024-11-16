@@ -4,7 +4,7 @@ import theme from "./theme";
 const primary = theme.colors.primary
 const secondary = theme.colors.secondary
 
-function getColors() {
+function getColors(): [string, string] {
   if (Platform.OS === "web") {
     return [primary, secondary];
   } else {
