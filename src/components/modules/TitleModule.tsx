@@ -8,10 +8,12 @@ type Props = {
   value: ValuesType;
   setValue: (value: ValuesType) => void;
   disabled: boolean;
+  discardChanges: () => void;
 };
 
 function TitleModule(props: Props) {
-  const { globalStyles, theme } = useTheme();
+  const didMount = useRef(false);
+  const { theme } = useTheme();
 
   const textInputRef = useRef<any>(null);
 
@@ -19,6 +21,7 @@ function TitleModule(props: Props) {
     const newValue = { ...props.value };
     newValue.title = text;
     props.setValue(newValue);
+    props.discardChanges();
   };
 
   useEffect(() => {

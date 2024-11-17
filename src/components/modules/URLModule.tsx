@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { Icon, IconButton, TextInput } from "react-native-paper";
 
@@ -19,6 +19,7 @@ import { useTheme } from "../../contexts/ThemeProvider";
 import { Image } from "expo-image";
 
 function URLModule(props: URLModuleType & Props) {
+  const didMount = useRef(false);
   const { globalStyles } = useTheme();
   const [value, setValue] = useState(props.value);
   const [isValid, setIsValid] = useState(false);
@@ -96,12 +97,16 @@ function URLModule(props: URLModuleType & Props) {
   }, [value, isValid]);
 
   useEffect(() => {
-    const newModule: URLModuleType = {
-      id: props.id,
-      module: props.module,
-      value: value,
-    };
-    props.changeModule(newModule);
+    if (didMount.current) {
+      const newModule: URLModuleType = {
+        id: props.id,
+        module: props.module,
+        value: value,
+      };
+      props.changeModule(newModule);
+    } else {
+      didMount.current = true;
+    }
   }, [value]);
 
   return (

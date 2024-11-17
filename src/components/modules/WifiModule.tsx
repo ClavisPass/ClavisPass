@@ -1,5 +1,5 @@
 import { Picker } from "@react-native-picker/picker";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, Keyboard } from "react-native";
 import { IconButton, TextInput } from "react-native-paper";
 
@@ -13,6 +13,7 @@ import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 
 function WifiModule(props: WifiModuleType & Props) {
+  const didMount = useRef(false);
   const { globalStyles } = useTheme();
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
@@ -38,14 +39,18 @@ function WifiModule(props: WifiModuleType & Props) {
   }, [secureTextEntry]);
 
   useEffect(() => {
-    const newModule: WifiModuleType = {
-      id: props.id,
-      module: props.module,
-      wifiType: wifiType,
-      wifiName: name,
-      value: value,
-    };
-    props.changeModule(newModule);
+    if (didMount.current) {
+      const newModule: WifiModuleType = {
+        id: props.id,
+        module: props.module,
+        wifiType: wifiType,
+        wifiName: name,
+        value: value,
+      };
+      props.changeModule(newModule);
+    } else {
+      didMount.current = true;
+    }
   }, [wifiType, name, value]);
   return (
     <ModuleContainer

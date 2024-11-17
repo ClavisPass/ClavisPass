@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 
 import { TextInput } from "react-native-paper";
@@ -12,19 +12,24 @@ import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 
 function CustomFieldModule(props: CustomFieldModuleType & Props) {
+  const didMount = useRef(false);
   const { globalStyles } = useTheme();
   const [visible, setVisible] = useState(false);
 
   const [value, setValue] = useState(props.value);
   const [title, setTitle] = useState(props.title);
   useEffect(() => {
-    const newModule: CustomFieldModuleType = {
-      id: props.id,
-      module: props.module,
-      title: title,
-      value: value,
-    };
-    props.changeModule(newModule);
+    if (didMount.current) {
+      const newModule: CustomFieldModuleType = {
+        id: props.id,
+        module: props.module,
+        title: title,
+        value: value,
+      };
+      props.changeModule(newModule);
+    } else {
+      didMount.current = true;
+    }
   }, [value, title]);
   return (
     <ModuleContainer

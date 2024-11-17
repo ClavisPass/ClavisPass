@@ -63,6 +63,7 @@ function Tools(props: Props) {
 }
 
 function HomeScreen({ navigation }: { navigation: any }) {
+  const didMount = useRef(false);
   const auth = useAuth();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -72,7 +73,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
   const [refreshing, setRefreshing] = useState(true);
 
   const [showMenu, setShowMenu] = useState(false);
-  const [showSave, setShowSave] = useState(true);
+  const [showSave, setShowSave] = useState(false);
 
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [valueModalVisible, setValueModalVisible] = useState(false);
@@ -106,6 +107,14 @@ function HomeScreen({ navigation }: { navigation: any }) {
     });
   }, [data.data, searchQuery, selectedFolder, selectedFav]);
 
+  useEffect(() => {
+    if (didMount.current) {
+      setShowSave(true);
+    } else {
+      didMount.current = true;
+    }
+  }, [data.data]);
+
   /*useEffect(() => {
     setRefreshing(true);
   }, []);*/
@@ -115,7 +124,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
     fetchData(token, tokenType, "clavispass.lock").then((response) => {
       setRefreshing(false);
       //data.setData(response);
-      
     });
   }, [refreshing]);
 
@@ -241,7 +249,12 @@ function HomeScreen({ navigation }: { navigation: any }) {
             <View style={{ backgroundColor: "#00000017" }}>
               <TouchableRipple
                 onPress={() => {
-                  uploadData(token, tokenType, encrypt(data.data, auth.master?auth.master:""), "clavispass.lock");
+                  uploadData(
+                    token,
+                    tokenType,
+                    encrypt(data.data, auth.master ? auth.master : ""),
+                    "clavispass.lock"
+                  );
                 }}
                 rippleColor="rgba(0, 0, 0, .32)"
                 style={{

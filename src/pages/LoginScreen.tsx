@@ -31,6 +31,8 @@ function LoginScreen({ navigation }: { navigation: any }) {
 
   const [editTokenVisibility, setEditTokenVisibility] = useState(false);
 
+  const [init, setInit] = useState(true);
+
   const fetchAsync = async (
     token: string,
     tokenType: "Dropbox" | "GoogleDrive"
@@ -48,16 +50,21 @@ function LoginScreen({ navigation }: { navigation: any }) {
     if (token && tokenType) {
       fetchAsync(token, tokenType);
     }
-  }, [token, tokenType]);
+    if(init)
+    {
+      setLoading(true);
+      setInit(false);
+    }
+    //setLoading(false);
+  }, [token, tokenType, init]);
 
   useEffect(() => {
     if (userInfo !== null) {
       setLoading(false);
     }
-    if(token === null)
-    {
-      setLoading(false);
-    }
+    /*if (token === null && init) {
+      setInit(false);
+    }*/
   }, [userInfo]);
 
   return (

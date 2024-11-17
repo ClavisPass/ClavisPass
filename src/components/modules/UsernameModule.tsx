@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 
 import { TextInput } from "react-native-paper";
@@ -11,15 +11,20 @@ import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 
 function UsernameModule(props: UsernameModuleType & Props) {
+  const didMount = useRef(false);
   const { globalStyles } = useTheme();
   const [value, setValue] = useState(props.value);
   useEffect(() => {
-    const newModule: UsernameModuleType = {
-      id: props.id,
-      module: props.module,
-      value: value,
-    };
-    props.changeModule(newModule);
+    if (didMount.current) {
+      const newModule: UsernameModuleType = {
+        id: props.id,
+        module: props.module,
+        value: value,
+      };
+      props.changeModule(newModule);
+    } else {
+      didMount.current = true;
+    }
   }, [value]);
   return (
     <ModuleContainer

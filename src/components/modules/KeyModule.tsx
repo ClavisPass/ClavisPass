@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { TextInput, Text } from "react-native-paper";
 import KeyModuleType from "../../types/modules/KeyModuleType";
@@ -9,17 +9,22 @@ import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 
 function KeyModule(props: KeyModuleType & Props) {
+  const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
   const [value, setValue] = useState(props.value);
   const [keyType, setKeyType] = useState(identifyKeyType(value));
   useEffect(() => {
-    const newModule: KeyModuleType = {
-      id: props.id,
-      module: props.module,
-      value: value,
-    };
-    props.changeModule(newModule);
-    setKeyType(identifyKeyType(value));
+    if (didMount.current) {
+      const newModule: KeyModuleType = {
+        id: props.id,
+        module: props.module,
+        value: value,
+      };
+      props.changeModule(newModule);
+      setKeyType(identifyKeyType(value));
+    } else {
+      didMount.current = true;
+    }
   }, [value]);
 
   function identifyKeyType(key: string) {

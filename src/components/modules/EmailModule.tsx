@@ -18,6 +18,7 @@ import { ModuleType } from "../../types/ModulesType";
 import theme from "../../ui/theme";
 
 function EmailModule(props: EmailModuleType & Props) {
+  const didMount = useRef(false);
   const inputRef = useRef<any>();
 
   const data = useData();
@@ -70,12 +71,16 @@ function EmailModule(props: EmailModuleType & Props) {
   }, [value]);
 
   useEffect(() => {
-    const newModule: EmailModuleType = {
-      id: props.id,
-      module: props.module,
-      value: value,
-    };
-    props.changeModule(newModule);
+    if (didMount.current) {
+      const newModule: EmailModuleType = {
+        id: props.id,
+        module: props.module,
+        value: value,
+      };
+      props.changeModule(newModule);
+    } else {
+      didMount.current = true;
+    }
   }, [value]);
 
   const handleBlur = () => {

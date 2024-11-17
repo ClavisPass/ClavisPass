@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 
 import { IconButton, TextInput } from "react-native-paper";
@@ -15,6 +15,7 @@ import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 
 function PasswordModule(props: PasswordModuleType & Props) {
+  const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
   const [value, setValue] = useState(props.value);
   const [secureTextEntry, setSecureTextEntry] = useState(true);
@@ -53,12 +54,16 @@ function PasswordModule(props: PasswordModuleType & Props) {
   }, [value]);
 
   useEffect(() => {
-    const newModule: PasswordModuleType = {
-      id: props.id,
-      module: props.module,
-      value: value,
-    };
-    props.changeModule(newModule);
+    if (didMount.current) {
+      const newModule: PasswordModuleType = {
+        id: props.id,
+        module: props.module,
+        value: value,
+      };
+      props.changeModule(newModule);
+    } else {
+      didMount.current = true;
+    }
   }, [value]);
 
   return (
@@ -90,7 +95,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
             />
           }
         />
-        <CopyToClipboard value={value}/>
+        <CopyToClipboard value={value} />
       </View>
       <View style={globalStyles.moduleView}>
         <View style={{ flexGrow: 1, padding: 6 }}>

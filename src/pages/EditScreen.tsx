@@ -5,14 +5,8 @@ import ModulesType, { ModuleType } from "../types/ModulesType";
 import ModulesEnum from "../enums/ModulesEnum";
 
 import type { StackScreenProps } from "@react-navigation/stack";
-import {
-  Dialog,
-  IconButton,
-  Text,
-  Button as PaperBtn,
-} from "react-native-paper";
+import { IconButton, Button } from "react-native-paper";
 import Header from "../components/Header";
-import Button from "../components/buttons/Button";
 import EditMetaInfMenu from "../components/menus/EditMetaInfMenu";
 import ValuesType from "../types/ValuesType";
 import getModuleData from "../utils/getModuleData";
@@ -53,6 +47,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const [addModuleModalVisible, setAddModuleModalVisible] = useState(false);
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [discardChangesVisible, setDiscardChangesVisible] = useState(false);
+  const [discardChanges, setDiscardChanges] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
   const [favIcon, setFavIcon] = useState("star-outline");
@@ -86,6 +81,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       newElement as ModuleType,
     ];
     changeModules(newModules);
+    setDiscardChanges(true);
   };
 
   const changeModules = (modules: ModulesType) => {
@@ -100,12 +96,14 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     newValue.folder = folder;
     setValue(newValue);
     setFolderModalVisible(false);
+    setDiscardChanges(true);
   };
 
   const changeFav = () => {
     const newValue = { ...value };
     newValue.fav = !value.fav;
     setValue(newValue);
+    setDiscardChanges(true);
   };
 
   const deleteModule = (id: string) => {
@@ -113,6 +111,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       ...value.modules.filter((item: ModuleType) => item.id !== id),
     ];
     changeModules(newModules);
+    setDiscardChanges(true);
   };
 
   const changeModule = (module: ModuleType) => {
@@ -120,6 +119,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     const newModules = [...value.modules];
     newModules[index] = module;
     changeModules(newModules);
+    setDiscardChanges(true);
   };
 
   useEffect(() => {
@@ -135,11 +135,21 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       <TitlebarHeight />
       <Header
         onPress={() => {
-          //navigation.goBack();
-          setDiscardChangesVisible(true);
+          if (discardChanges) {
+            setDiscardChangesVisible(true);
+          } else {
+            goBack();
+          }
         }}
         leftNode={
-          <TitleModule value={value} setValue={setValue} disabled={edit} />
+          <TitleModule
+            value={value}
+            setValue={setValue}
+            disabled={edit}
+            discardChanges={() => {
+              setDiscardChanges(true);
+            }}
+          />
         }
       >
         <IconButton
@@ -187,7 +197,14 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           edit={edit}
         />
       )}
-      <Button text={"Save"} onPress={saveValue} />
+      <Button
+        mode="contained"
+        style={{ width: 200 }}
+        disabled={!discardChanges}
+        onPress={saveValue}
+      >
+        Save
+      </Button>
       <AddModuleModal
         addModule={addModule}
         visible={addModuleModalVisible}
