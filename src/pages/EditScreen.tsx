@@ -24,6 +24,7 @@ import FolderModal from "../components/modals/FolderModal";
 import { useTheme } from "../contexts/ThemeProvider";
 import { RootStackParamList } from "../../App";
 import DiscardChangesModal from "../components/modals/DiscardChangesModal";
+import DeleteModal from "../components/modals/DeleteModal";
 
 const styles = StyleSheet.create({
   scrollView: {

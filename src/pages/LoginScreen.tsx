@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
 });
 
 function LoginScreen({ navigation }: { navigation: any }) {
+  const didMount = useRef(false);
   const { token, tokenType } = useToken();
 
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
@@ -31,41 +32,37 @@ function LoginScreen({ navigation }: { navigation: any }) {
 
   const [editTokenVisibility, setEditTokenVisibility] = useState(false);
 
-  const [init, setInit] = useState(true);
-
   const fetchAsync = async (
     token: string,
     tokenType: "Dropbox" | "GoogleDrive"
   ) => {
-    console.log("Token: " + token);
+    console.log("fetchAsync")
     fetchUserInfo(token, tokenType, setUserInfo, () => {
-      console.log("callback");
+      console.log("CALLBACK")
       setLoading(false);
     });
-    //setLoading(false);
   };
 
-  useEffect(() => {
-    setLoading(true);
+  const asyncFetch = async (
+    token: string | null,
+    tokenType: "Dropbox" | "GoogleDrive" | null
+  ) => {
+    console.log("asyncFetch")
     if (token && tokenType) {
       fetchAsync(token, tokenType);
     }
-    if(init)
-    {
-      setLoading(true);
-      setInit(false);
-    }
-    //setLoading(false);
-  }, [token, tokenType, init]);
-
-  useEffect(() => {
-    if (userInfo !== null) {
+    else{
       setLoading(false);
     }
-    /*if (token === null && init) {
-      setInit(false);
-    }*/
-  }, [userInfo]);
+  };
+
+  useEffect(() => {
+    if (didMount.current) {
+      asyncFetch(token, tokenType);
+    } else {
+      didMount.current = true;
+    }
+  }, [token, tokenType]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>

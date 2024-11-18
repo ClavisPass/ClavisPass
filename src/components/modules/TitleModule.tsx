@@ -12,7 +12,6 @@ type Props = {
 };
 
 function TitleModule(props: Props) {
-  const didMount = useRef(false);
   const { theme } = useTheme();
 
   const textInputRef = useRef<any>(null);

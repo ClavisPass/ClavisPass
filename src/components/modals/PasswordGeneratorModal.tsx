@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import {
+  Button,
   IconButton,
   Portal,
   Switch,
@@ -10,7 +11,6 @@ import {
 import getColors from "../../ui/linearGradient";
 import { LinearGradient } from "expo-linear-gradient";
 import Slider from "@react-native-community/slider";
-import Button from "../buttons/Button";
 
 import generatePassword from "../../utils/generatePassword";
 import CopyToClipboard from "../buttons/CopyToClipboard";
@@ -130,26 +130,33 @@ function PasswordGeneratorModal(props: Props) {
               />
             </View>
             <View style={styles.container}>
-              <Text style={{ userSelect: "none" }} variant="bodyLarge">{"include Numbers"}</Text>
+              <Text style={{ userSelect: "none" }} variant="bodyLarge">
+                {"include Numbers"}
+              </Text>
               <Switch
                 value={numberInclude}
                 onValueChange={() => setNumberInclude(!numberInclude)}
               />
             </View>
             <View style={styles.container}>
-              <Text style={{ userSelect: "none" }} variant="bodyLarge">{"include Symbols"}</Text>
+              <Text style={{ userSelect: "none" }} variant="bodyLarge">
+                {"include Symbols"}
+              </Text>
               <Switch
                 value={symbolInclude}
                 onValueChange={() => setSymbolInclude(!symbolInclude)}
               />
             </View>
             <Button
+              style={{ width: 200 }}
+              mode="contained-tonal"
               onPress={() => {
                 props.changePassword(genPassword);
                 hideModal();
               }}
-              text="Use"
-            />
+            >
+              Use
+            </Button>
           </View>
         </LinearGradient>
       </Modal>

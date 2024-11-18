@@ -5,17 +5,17 @@ import { Button, Text } from "react-native-paper";
 type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  onDiscard: () => void;
+  onDelete: () => void;
 };
 
-function DiscardChangesModal(props: Props) {
+function DeleteModal(props: Props) {
   const hideModal = () => props.setVisible(false);
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
       <View
         style={{
           width: 280,
-          minHeight: 190,
+          minHeight: 170,
           display: "flex",
           flexDirection: "column",
           padding: 14,
@@ -24,11 +24,10 @@ function DiscardChangesModal(props: Props) {
       >
         <View style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <Text variant="headlineSmall" style={{ userSelect: "none" }}>
-            Discard Changes?
+            Delete?
           </Text>
           <Text variant="bodyMedium" style={{ userSelect: "none" }}>
-            You have unsaved changes. Are you shure to discard them and leave
-            the screen?
+            Do you want to delete this entry?
           </Text>
         </View>
         <View
@@ -47,8 +46,12 @@ function DiscardChangesModal(props: Props) {
           >
             Cancel
           </Button>
-          <Button mode="contained" onPress={props.onDiscard}>
-            Discard
+          <Button
+            buttonColor="#D2222D"
+            mode="contained"
+            onPress={props.onDelete}
+          >
+            Delete
           </Button>
         </View>
       </View>
@@ -56,4 +59,4 @@ function DiscardChangesModal(props: Props) {
   );
 }
 
-export default DiscardChangesModal;
+export default DeleteModal;

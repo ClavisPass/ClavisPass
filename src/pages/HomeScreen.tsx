@@ -231,15 +231,21 @@ function HomeScreen({ navigation }: { navigation: any }) {
           </WebSpecific>
         </View>
       </LinearGradient>
-      <View style={{ flex: 1, width: "100%", padding: 4 }}>
-        {showSave && (
+      {showSave && (
+        <View
+          style={{
+            height: 48,
+            width: "100%",
+            padding: 4,
+            paddingLeft: 8,
+            paddingRight: 8,
+          }}
+        >
           <View
             style={{
-              height: 40,
-              width: "100%",
               backgroundColor: theme.colors.primary,
               borderRadius: 8,
-              marginBottom: 8,
+              flex: 1,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -295,7 +301,9 @@ function HomeScreen({ navigation }: { navigation: any }) {
               </Text>
             </TouchableRipple>
           </View>
-        )}
+        </View>
+      )}
+      <View style={{ flex: 1, width: "100%", padding: 4 }}>
         <FlashList
           refreshControl={
             <RefreshControl

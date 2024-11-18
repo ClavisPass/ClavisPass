@@ -190,7 +190,7 @@ function HomeStack() {
     <Stack.Navigator
       screenOptions={{
         headerShown: true,
-        gestureEnabled: true,
+        //gestureEnabled: true,
         gestureDirection: "vertical",
       }}
     >

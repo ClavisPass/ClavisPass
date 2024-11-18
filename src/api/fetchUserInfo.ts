@@ -84,7 +84,6 @@ const fetchUserInfo = async (
   callback?: () => void
 ) => {
   if (tokenType === "Dropbox") {
-    console.log("Token ist: "+token)
     fetchDropboxUserInfo(token, setUserInfo, callback);
     callback?.();
     return;
