@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
 type EditScreenProps = StackScreenProps<RootStackParamList, "Edit">;
 
 const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
-  const { value: routeValue, changeFolder } = route.params!;
+  const { value: routeValue } = route.params!;
   const data = useData();
   const { globalStyles, theme } = useTheme();
 
@@ -218,7 +218,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         lastUpdated={routeValue.lastUpdated}
         value={value}
         folderList={data?.data ? data.data.folder : []}
-        setFolderList={changeFolder}
         favButton={
           <IconButton
             icon={favIcon}
@@ -235,7 +234,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         visible={folderModalVisible}
         setVisible={setFolderModalVisible}
         folder={data?.data ? data.data.folder : []}
-        setFolder={changeFolder}
         setSelectedFolder={changeSelectedFolder}
       />
       <DiscardChangesModal

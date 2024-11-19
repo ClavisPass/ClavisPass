@@ -95,7 +95,7 @@ function ListItem(props: Props) {
           >
             {url !== "" ? (
               <Image
-                style={{ width: 22, height: 22, margin: 0 }}
+                style={{ width: 22, height: 22, margin: 0, borderRadius: 8 }}
                 source={url}
                 contentFit="cover"
                 transition={250}

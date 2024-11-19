@@ -12,6 +12,7 @@ type Props = {
   setData: (data: DataType) => void;
   positionY: number;
   openEditFolder: () => void;
+  refreshData: () => void;
 };
 function HomeFilterMenu(props: Props) {
   const auth = useAuth();
@@ -66,7 +67,8 @@ function HomeFilterMenu(props: Props) {
             size={20}
             iconColor={theme.colors.primary}
             onPress={() => {
-              //setShowMenu(true);
+              props.refreshData();
+              props.setVisible(false);
             }}
           />
         </View>

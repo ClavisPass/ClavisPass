@@ -92,18 +92,19 @@ function Autocomplete(props: Props) {
           >
             <ScrollView keyboardShouldPersistTaps="handled">
               {props.data.map((item, index) => (
-                <TouchableRipple
-                  key={index}
-                  style={{}}
-                  onPressIn={() => props.setIsSuggestionClicked(true)}
-                  onPressOut={() => {
-                    props.setValue(item);
-                    props.setVisible(false);
-                  }}
-                  rippleColor="rgba(0, 0, 0, .32)"
-                >
-                  <Text style={{ margin: 4 }}>{item}</Text>
-                </TouchableRipple>
+                <View key={index}>
+                  <TouchableRipple
+                    style={{}}
+                    onPressIn={() => props.setIsSuggestionClicked(true)}
+                    onPressOut={() => {
+                      props.setValue(item);
+                      props.setVisible(false);
+                    }}
+                    rippleColor="rgba(0, 0, 0, .32)"
+                  >
+                    <Text style={{ margin: 4 }}>{item}</Text>
+                  </TouchableRipple>
+                </View>
               ))}
             </ScrollView>
           </Animated.View>

@@ -5,16 +5,18 @@ import Modal from "./Modal";
 import DraggableFolderListWeb from "../lists/draggableFolderList/DraggableFolderListWeb";
 import DraggableFolderList from "../lists/draggableFolderList/DraggableFolderList";
 import { useTheme } from "../../contexts/ThemeProvider";
+import changeFolder from "../../utils/changeFolder";
+import { useData } from "../../contexts/DataProvider";
 
 type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
   folder: string[];
-  setFolder: (folder: string[]) => void;
   setSelectedFolder?: (folder: string) => void;
 };
 
 function FolderModal(props: Props) {
+  const data = useData();
   const { globalStyles } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const filteredValues = useMemo(() => {
@@ -53,7 +55,7 @@ function FolderModal(props: Props) {
     const newFolder: string[] = [
       ...props.folder.filter((item: string) => item !== folder),
     ];
-    props.setFolder(newFolder);
+    changeFolder(newFolder, data);
   };
 
   return (
@@ -87,7 +89,7 @@ function FolderModal(props: Props) {
             disabled={addButtonDisabled}
             icon={"plus"}
             onPress={() => {
-              props.setFolder([...props.folder, searchQuery]);
+              changeFolder([...props.folder, searchQuery], data);
               setSearchQuery("");
             }}
           />
@@ -96,14 +98,12 @@ function FolderModal(props: Props) {
         {Platform.OS === "web" ? (
           <DraggableFolderListWeb
             folder={props.folder}
-            setFolder={props.setFolder}
             setSelectedFolder={props.setSelectedFolder}
             deleteFolder={deleteFolder}
           />
         ) : (
           <DraggableFolderList
             folder={props.folder}
-            setFolder={props.setFolder}
             setSelectedFolder={props.setSelectedFolder}
             deleteFolder={deleteFolder}
           />

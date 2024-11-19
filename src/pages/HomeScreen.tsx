@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, Platform, RefreshControl } from "react-native";
-import { Searchbar, IconButton, TouchableRipple } from "react-native-paper";
+import {
+  Searchbar,
+  IconButton,
+  TouchableRipple,
+  ActivityIndicator,
+} from "react-native-paper";
 
 import { Text } from "react-native-paper";
 
@@ -26,14 +31,16 @@ import { useFocusEffect } from "@react-navigation/native";
 import { TITLEBAR_HEIGHT } from "../components/CustomTitlebar";
 import theme from "../ui/theme";
 import FolderModal from "../components/modals/FolderModal";
-import DataType from "../types/DataType";
+import DataType, { DataTypeSchema } from "../types/DataType";
 import SearchShortcut from "../components/shortcuts/SearchShortcut";
 import AddValueModal from "../components/modals/AddValueModal";
 import uploadData from "../api/uploadData";
 import { useToken } from "../contexts/TokenProvider";
 import fetchData from "../api/fetchData";
-import { encrypt } from "../utils/CryptoLayer";
+import { decrypt, encrypt } from "../utils/CryptoLayer";
 import { useAuth } from "../contexts/AuthProvider";
+import changeFolder from "../utils/changeFolder";
+import { CryptoTypeSchema } from "../types/CryptoType";
 
 type Props = {
   setShowMenu: (boolean: boolean) => void;
@@ -70,7 +77,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
   const [selectedFolder, setSelectedFolder] = useState("");
   const [selectedFav, setSelectedFav] = useState(false);
 
-  const [refreshing, setRefreshing] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const [showMenu, setShowMenu] = useState(false);
   const [showSave, setShowSave] = useState(false);
@@ -115,31 +122,33 @@ function HomeScreen({ navigation }: { navigation: any }) {
     }
   }, [data.data]);
 
-  /*useEffect(() => {
-    setRefreshing(true);
-  }, []);*/
+  const refreshData = () => {
+    const master = auth.master;
+    if (token && tokenType && master) {
+      setRefreshing(true);
+      fetchData(token, tokenType, "clavispass.lock").then((response) => {
+        if (response == null) {
+          setRefreshing(false);
+        } else {
+          const parsedCryptoData = CryptoTypeSchema.parse(JSON.parse(response));
+          const decryptedData = decrypt(parsedCryptoData, master);
+          const jsonData = JSON.parse(decryptedData);
 
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    fetchData(token, tokenType, "clavispass.lock").then((response) => {
+          const parsedData = DataTypeSchema.parse(jsonData);
+          data.setData(parsedData);
+          setRefreshing(false);
+        }
+      });
+    } else {
       setRefreshing(false);
-      //data.setData(response);
-    });
-  }, [refreshing]);
+    }
+  };
 
   const [statusbarStyle, setStatusbarStyle] = useState<"dark" | "light">(
     "light"
   );
 
   const searchRef = useRef<any>();
-
-  const changeFolder = (folder: string[]) => {
-    let newData = { ...data.data } as DataType;
-    if (newData) {
-      newData.folder = folder;
-    }
-    data.setData(newData);
-  };
 
   return (
     <AnimatedContainer
@@ -261,6 +270,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
                     encrypt(data.data, auth.master ? auth.master : ""),
                     "clavispass.lock"
                   );
+                  setShowSave(false);
                 }}
                 rippleColor="rgba(0, 0, 0, .32)"
                 style={{
@@ -280,9 +290,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
               </TouchableRipple>
             </View>
             <TouchableRipple
-              onPress={() => {
-                setRefreshing(true);
-              }}
+              onPress={refreshData}
               rippleColor="rgba(0, 0, 0, .32)"
               style={{
                 height: 40,
@@ -304,29 +312,24 @@ function HomeScreen({ navigation }: { navigation: any }) {
         </View>
       )}
       <View style={{ flex: 1, width: "100%", padding: 4 }}>
-        <FlashList
-          refreshControl={
-            <RefreshControl
-              //colors={[color.blue]}
-              progressBackgroundColor="#2e2e2e"
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-            />
-          }
-          data={filteredValues}
-          renderItem={({ item }) => (
-            <ListItem
-              item={item}
-              onPress={() => {
-                navigation.navigate("Edit", {
-                  value: item,
-                  changeFolder: changeFolder,
-                });
-              }}
-            />
-          )}
-          estimatedItemSize={200}
-        />
+        {refreshing ? (
+          <ActivityIndicator size="large" />
+        ) : (
+          <FlashList
+            data={filteredValues}
+            renderItem={({ item }) => (
+              <ListItem
+                item={item}
+                onPress={() => {
+                  navigation.navigate("Edit", {
+                    value: item,
+                  });
+                }}
+              />
+            )}
+            estimatedItemSize={200}
+          />
+        )}
         <WebSpecific>
           <Blur />
         </WebSpecific>
@@ -350,19 +353,18 @@ function HomeScreen({ navigation }: { navigation: any }) {
           (Platform.OS === "web" ? 48 : 66)
         }
         openEditFolder={() => setFolderModalVisible(true)}
+        refreshData={refreshData}
       />
 
       <FolderModal
         visible={folderModalVisible}
         setVisible={setFolderModalVisible}
         folder={data?.data ? data.data.folder : []}
-        setFolder={changeFolder}
       />
       <AddValueModal
         visible={valueModalVisible}
         setVisible={setValueModalVisible}
         navigation={navigation}
-        changeFolder={changeFolder}
       />
     </AnimatedContainer>
   );

@@ -10,7 +10,6 @@ type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
   navigation: any;
-  changeFolder: (folder: string[]) => void;
 };
 
 function AddValueModal(props: Props) {
@@ -18,7 +17,6 @@ function AddValueModal(props: Props) {
   const navigateToAddValue = (template: TemplateEnum) => {
     props.navigation.navigate("Edit", {
       value: getTemplate(template),
-      changeFolder: props.changeFolder,
     });
     props.setVisible(false);
   };

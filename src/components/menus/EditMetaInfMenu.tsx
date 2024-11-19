@@ -16,7 +16,6 @@ type Props = {
   lastUpdated: string;
   value: ValuesType;
   folderList: string[];
-  setFolderList: (folder: string[]) => void;
   favButton: ReactNode;
   positionY: number;
   goBack: () => void;

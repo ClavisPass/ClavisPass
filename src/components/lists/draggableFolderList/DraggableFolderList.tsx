@@ -6,15 +6,17 @@ import DraggableFlatList, {
 import { Icon, IconButton, Text, TouchableRipple } from "react-native-paper";
 import theme from "../../../ui/theme";
 import { useTheme } from "../../../contexts/ThemeProvider";
+import { useData } from "../../../contexts/DataProvider";
+import changeFolder from "../../../utils/changeFolder";
 
 type Props = {
   folder: string[];
-  setFolder: (folder: string[]) => void;
   setSelectedFolder?: (folder: string) => void;
   deleteFolder: (folder: string) => void;
 };
 
 function DraggableFolderList(props: Props) {
+  const dataData = useData();
   const { globalStyles } = useTheme();
   const renderItem = useCallback(
     ({ item, drag, isActive }: RenderItemParams<string>) => {
@@ -76,7 +78,7 @@ function DraggableFolderList(props: Props) {
         data={props.folder}
         renderItem={renderItem}
         keyExtractor={(item, index) => `drag-item-${item}-${index}`}
-        onDragEnd={({ data }) => props.setFolder(data)}
+        onDragEnd={({ data }) => changeFolder(data, dataData)}
       />
     </View>
   );

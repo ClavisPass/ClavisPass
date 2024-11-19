@@ -178,7 +178,6 @@ export type RootStackParamList = {
   Home: undefined;
   Edit: {
     value: ValuesType;
-    changeFolder: (folder: string[]) => void;
   };
   Settings: undefined;
   Login: undefined;

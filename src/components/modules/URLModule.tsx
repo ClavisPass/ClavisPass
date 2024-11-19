@@ -123,7 +123,7 @@ function URLModule(props: URLModuleType & Props) {
         <View style={{ width: 30, alignItems: "center" }}>
           {url !== "" && isValid ? (
             <Image
-              style={{ width: 22, height: 22, margin: 0 }}
+              style={{ width: 22, height: 22, margin: 0, borderRadius: 8 }}
               source={url}
               contentFit="cover"
               transition={250}
