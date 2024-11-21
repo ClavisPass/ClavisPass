@@ -80,7 +80,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
   const [refreshing, setRefreshing] = useState(false);
 
   const [showMenu, setShowMenu] = useState(false);
-  const [showSave, setShowSave] = useState(false);
 
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [valueModalVisible, setValueModalVisible] = useState(false);
@@ -114,14 +113,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
     });
   }, [data.data, searchQuery, selectedFolder, selectedFav]);
 
-  useEffect(() => {
-    if (didMount.current) {
-      setShowSave(true);
-    } else {
-      didMount.current = true;
-    }
-  }, [data.data]);
-
   const refreshData = () => {
     const master = auth.master;
     if (token && tokenType && master) {
@@ -137,6 +128,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
           const parsedData = DataTypeSchema.parse(jsonData);
           data.setData(parsedData);
           setRefreshing(false);
+          data.setShowSave(false);
         }
       });
     } else {
@@ -240,7 +232,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
           </WebSpecific>
         </View>
       </LinearGradient>
-      {showSave && (
+      {data.showSave && (
         <View
           style={{
             height: 48,
@@ -261,75 +253,85 @@ function HomeScreen({ navigation }: { navigation: any }) {
               flexDirection: "row",
             }}
           >
-            <View style={{ backgroundColor: "#00000017" }}>
-              <TouchableRipple
-                onPress={() => {
-                  uploadData(
-                    token,
-                    tokenType,
-                    encrypt(data.data, auth.master ? auth.master : ""),
-                    "clavispass.lock"
-                  );
-                  setShowSave(false);
-                }}
-                rippleColor="rgba(0, 0, 0, .32)"
-                style={{
-                  height: 40,
-                  width: 80,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text
-                  variant="bodyLarge"
-                  style={{ color: "white", userSelect: "none" }}
+            {refreshing ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <>
+                <View style={{ backgroundColor: "#00000017" }}>
+                  <TouchableRipple
+                    onPress={() => {
+                      setRefreshing(true);
+                      uploadData(
+                        token,
+                        tokenType,
+                        encrypt(data.data, auth.master ? auth.master : ""),
+                        "clavispass.lock",
+                        () => {
+                          data.setShowSave(false);
+                          setRefreshing(false);
+                        }
+                      );
+                    }}
+                    rippleColor="rgba(0, 0, 0, .32)"
+                    style={{
+                      height: 40,
+                      width: 100,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text
+                      variant="bodyLarge"
+                      style={{ color: "white", userSelect: "none" }}
+                    >
+                      Save
+                    </Text>
+                  </TouchableRipple>
+                </View>
+                <TouchableRipple
+                  onPress={refreshData}
+                  rippleColor="rgba(0, 0, 0, .32)"
+                  style={{
+                    height: 40,
+                    width: 100,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                  }}
                 >
-                  Save
-                </Text>
-              </TouchableRipple>
-            </View>
-            <TouchableRipple
-              onPress={refreshData}
-              rippleColor="rgba(0, 0, 0, .32)"
-              style={{
-                height: 40,
-                width: 80,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-              }}
-            >
-              <Text
-                variant="bodyLarge"
-                style={{ textDecorationLine: "underline", userSelect: "none" }}
-              >
-                Reset
-              </Text>
-            </TouchableRipple>
+                  <Text
+                    variant="bodyLarge"
+                    style={{
+                      textDecorationLine: "underline",
+                      color: "white",
+                      userSelect: "none",
+                    }}
+                  >
+                    Reset
+                  </Text>
+                </TouchableRipple>
+              </>
+            )}
           </View>
         </View>
       )}
       <View style={{ flex: 1, width: "100%", padding: 4 }}>
-        {refreshing ? (
-          <ActivityIndicator size="large" />
-        ) : (
-          <FlashList
-            data={filteredValues}
-            renderItem={({ item }) => (
-              <ListItem
-                item={item}
-                onPress={() => {
-                  navigation.navigate("Edit", {
-                    value: item,
-                  });
-                }}
-              />
-            )}
-            estimatedItemSize={200}
-          />
-        )}
+        <FlashList
+          data={filteredValues}
+          renderItem={({ item }) => (
+            <ListItem
+              item={item}
+              onPress={() => {
+                navigation.navigate("Edit", {
+                  value: item,
+                });
+              }}
+            />
+          )}
+          estimatedItemSize={200}
+        />
         <WebSpecific>
           <Blur />
         </WebSpecific>

@@ -11,6 +11,8 @@ interface DataContextType {
   data: DataType;
   setData: (data: DataType) => void;
   backup: DataType;
+  showSave: boolean;
+  setShowSave: (showSave: boolean) => void;
 }
 
 export const DataContext = createContext<DataContextType | null>(null);
@@ -23,12 +25,14 @@ export const DataProvider = ({ children }: Props) => {
   const [data, setData] = useState<DataType>(null);
   const [backup, setBackup] = useState<DataType>(null);
 
+  const [showSave, setShowSave] = useState(false);
+
   useEffect(() => {
     if (backup === null && data !== null) setBackup({ ...data });
   }, [data]);
 
   return (
-    <DataContext.Provider value={{ data, setData, backup }}>
+    <DataContext.Provider value={{ data, setData, backup, showSave, setShowSave }}>
       {children}
     </DataContext.Provider>
   );

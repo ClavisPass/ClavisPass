@@ -3,7 +3,8 @@ import CryptoType from "../types/CryptoType";
 const uploadFileToDropbox = async (
   token: string,
   fileContent: CryptoType,
-  fileName: string
+  fileName: string,
+  callback?: () => void
 ) => {
   const response = await fetch(
     "https://content.dropboxapi.com/2/files/upload",
@@ -29,15 +30,18 @@ const uploadFileToDropbox = async (
 
   const data = await response.json();
   console.log("Datei hochgeladen:", data);
+  callback?.();
 };
 
 const uploadData = async (
   token: string | null,
   tokenType: string | null,
   fileContent: CryptoType,
-  fileName: string
+  fileName: string,
+  callback?: () => void
 ) => {
-  if (token && tokenType) uploadFileToDropbox(token, fileContent, fileName);
+  if (token && tokenType)
+    uploadFileToDropbox(token, fileContent, fileName, callback);
 };
 
 export default uploadData;

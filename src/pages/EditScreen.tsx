@@ -68,6 +68,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       if (newData) newData.values = [...newData.values, value];
     }
     data.setData(newData);
+    data.setShowSave(true);
     goBack();
   };
 
