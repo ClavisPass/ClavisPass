@@ -54,6 +54,7 @@ function WifiModule(props: WifiModuleType & Props) {
   }, [wifiType, name, value]);
   return (
     <ModuleContainer
+      key={props.key}
       id={props.id}
       title="Wifi"
       edit={props.edit}

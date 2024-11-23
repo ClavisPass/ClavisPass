@@ -24,6 +24,7 @@ function NoteModule(props: NoteModuleType & Props) {
   }, [value]);
   return (
     <ModuleContainer
+      key={props.key}
       id={props.id}
       title={"Note"}
       edit={props.edit}

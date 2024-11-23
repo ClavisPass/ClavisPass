@@ -100,6 +100,7 @@ function EmailModule(props: EmailModuleType & Props) {
 
   return (
     <ModuleContainer
+      key={props.key}
       id={props.id}
       title={"E-Mail"}
       edit={props.edit}

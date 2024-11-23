@@ -111,6 +111,7 @@ function URLModule(props: URLModuleType & Props) {
 
   return (
     <ModuleContainer
+      key={props.key}
       id={props.id}
       title={"URL"}
       edit={props.edit}

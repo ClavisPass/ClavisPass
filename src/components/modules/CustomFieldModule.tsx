@@ -33,6 +33,7 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
   }, [value, title]);
   return (
     <ModuleContainer
+      key={props.key}
       id={props.id}
       title={props.title}
       edit={props.edit}

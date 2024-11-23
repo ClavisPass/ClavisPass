@@ -28,6 +28,7 @@ function UsernameModule(props: UsernameModuleType & Props) {
   }, [value]);
   return (
     <ModuleContainer
+      key={props.key}
       id={props.id}
       title={"Username"}
       edit={props.edit}

@@ -15,7 +15,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ricirico.ClavisPass"
+      "package": "com.ricirico.ClavisPass",
+      "newArchEnabled": true
     },
     "web": {
       "favicon": "./assets/favicon.png"

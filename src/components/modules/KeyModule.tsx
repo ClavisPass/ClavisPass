@@ -55,6 +55,7 @@ function KeyModule(props: KeyModuleType & Props) {
 
   return (
     <ModuleContainer
+      key={props.key}
       id={props.id}
       title={"Key"}
       edit={props.edit}
