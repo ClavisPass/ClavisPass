@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
-import { Platform, Pressable, Text } from "react-native";
+import { Platform, Pressable, Text, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -15,14 +15,14 @@ type Props = {
 };
 function Modal(props: Props) {
   const { theme } = useTheme();
-  const scale = useSharedValue(1);
+  const scale = useSharedValue(0);
   const opacity = useSharedValue(0);
 
   const [useScale, setUseScale] = useState(true);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ scale: scale.value }],
+      transform: Platform.OS === "web" ? [{ scale: scale.value }] : undefined,
     };
   });
 
@@ -61,7 +61,7 @@ function Modal(props: Props) {
   return (
     <>
       {props.visible && (
-        <Animated.View
+        <View
           style={[
             {
               position: "absolute",
@@ -70,7 +70,7 @@ function Modal(props: Props) {
               left: 0,
               right: 0,
             },
-            animatedOpacity,
+            //animatedOpacity,
           ]}
         >
           <Pressable
@@ -113,7 +113,7 @@ function Modal(props: Props) {
               </Animated.View>
             </Pressable>
           </Pressable>
-        </Animated.View>
+        </View>
       )}
     </>
   );

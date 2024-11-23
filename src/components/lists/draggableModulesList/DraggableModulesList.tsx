@@ -8,7 +8,6 @@ import ModulesType, { ModuleType } from "../../../types/ModulesType";
 import getModule from "../../../utils/getModule";
 
 type Props = {
-  key: string;
   value: ValuesType;
   setValue: (value: ValuesType) => void;
   changeModules: (data: ModulesType) => void;

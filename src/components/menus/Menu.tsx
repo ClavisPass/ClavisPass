@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react";
-import { Pressable, View } from "react-native";
+import { Platform, Pressable, View } from "react-native";
 import { TouchableRipple, Text, Icon } from "react-native-paper";
 import Animated, {
   Easing,
@@ -32,7 +32,7 @@ export function MenuItem(props: MenuItemProps) {
           padding: 14,
           minWidth: 140,
           minHeight: 50,
-          height:50,
+          height: 50,
           flexDirection: "row",
           alignItems: "center",
           gap: 6,
@@ -68,7 +68,7 @@ function Menu(props: Props) {
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ scale: scale.value }],
+      transform: Platform.OS === "web" ? [{ scale: scale.value }] : undefined,
     };
   });
 

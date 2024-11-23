@@ -46,7 +46,6 @@ const styles = StyleSheet.create({
 });
 
 type Props = {
-  key: string;
   id: string;
   children: ReactNode;
   title: string;
@@ -104,7 +103,7 @@ function ModuleContainer(props: Props) {
   });
   return (
     <Animated.View
-      key={props.key}
+      key={props.id}
       style={[
         styles.container,
         styles.innercontainer,

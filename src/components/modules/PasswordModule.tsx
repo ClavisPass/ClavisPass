@@ -68,7 +68,6 @@ function PasswordModule(props: PasswordModuleType & Props) {
 
   return (
     <ModuleContainer
-      key={props.key}
       id={props.id}
       title={"Password"}
       edit={props.edit}
