@@ -51,7 +51,7 @@ function PasswordTextbox(props: Props) {
   };
 
   return (
-    <View style={{ height: 40, width: "100%" }}>
+    <View style={{ height: 40, width: 240 }}>
       <TextInput
         ref={getTextInputRef()}
         placeholder={props.placeholder}

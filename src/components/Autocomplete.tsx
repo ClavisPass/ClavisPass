@@ -79,8 +79,6 @@ function Autocomplete(props: Props) {
                 shadowRadius: 6,
                 elevation: 5,
                 maxHeight: 200,
-                //paddingTop: 4,
-                //paddingBottom: 4,
                 overflow: "hidden",
                 marginRight: 50,
                 marginLeft: 2,

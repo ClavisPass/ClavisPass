@@ -96,7 +96,6 @@ function Login(props: Props) {
       {loading ? (
         <>
           <ActivityIndicator animating={true} />
-          <Text>TTT</Text>
         </>
       ) : (
         <>
@@ -112,6 +111,7 @@ function Login(props: Props) {
               alignItems: "center",
               justifyContent: "center",
               gap: 4,
+              width: "100%"
             }}
           >
             {showNewData ? (

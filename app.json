@@ -1,5 +1,6 @@
 {
   "expo": {
+    "newArchEnabled": true,
     "name": "ClavisPass",
     "slug": "ClavisPass",
     "version": "1.0.0",
@@ -15,8 +16,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ricirico.ClavisPass",
-      "newArchEnabled": true
+      "package": "com.ricirico.ClavisPass"
     },
     "web": {
       "favicon": "./assets/favicon.png"

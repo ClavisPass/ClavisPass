@@ -21,7 +21,6 @@ const styles = StyleSheet.create({
 });
 
 function LoginScreen({ navigation }: { navigation: any }) {
-  const didMount = useRef(false);
   const { token, tokenType } = useToken();
 
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
@@ -33,9 +32,10 @@ function LoginScreen({ navigation }: { navigation: any }) {
     token: string,
     tokenType: "Dropbox" | "GoogleDrive"
   ) => {
-    console.log("fetchAsync")
+    console.log("fetchAsync");
+    setLoading(true);
     fetchUserInfo(token, tokenType, setUserInfo, () => {
-      console.log("CALLBACK")
+      console.log("CALLBACK");
       setLoading(false);
     });
   };
@@ -44,56 +44,46 @@ function LoginScreen({ navigation }: { navigation: any }) {
     token: string | null,
     tokenType: "Dropbox" | "GoogleDrive" | null
   ) => {
-    console.log("asyncFetch")
+    console.log("asyncFetch");
     if (token && tokenType) {
+      setLoading(true);
       fetchAsync(token, tokenType);
-    }
-    else{
+    } else {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (didMount.current) {
       asyncFetch(token, tokenType);
-    } else {
-      didMount.current = true;
-    }
   }, [token, tokenType]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
-      <AnimatedContainer>
-        <ContentProtection enabled={false} />
-        <View
-          style={{ alignItems: "center", justifyContent: "center", flex: 1 }}
-        >
-          {loading ? (
-            <ActivityIndicator animating={true} />
-          ) : (
-            <>
-              {userInfo ? (
-                <Login userInfo={userInfo} />
-              ) : (
-                <>
-                  <View style={styles.container}>
-                    <Auth
-                      setUserInfo={setUserInfo}
-                      navigation={navigation}
-                      changeEditTokenVisibility={setEditTokenVisibility}
-                    />
-                  </View>
-                  <EditTokenModal
-                    visible={editTokenVisibility}
-                    setVisible={setEditTokenVisibility}
-                  />
-                </>
-              )}
-            </>
-          )}
-        </View>
-      </AnimatedContainer>
-    </View>
+    <AnimatedContainer>
+      <ContentProtection enabled={false} />
+      <View
+        style={{ alignItems: "center", justifyContent: "center", flex: 1 }}
+      >
+        {loading ? (
+          <ActivityIndicator animating={true} />
+        ) : userInfo ? (
+          <Login userInfo={userInfo} />
+        ) : (
+          <View style={styles.container}>
+            <Auth
+              setUserInfo={setUserInfo}
+              navigation={navigation}
+              changeEditTokenVisibility={setEditTokenVisibility}
+            />
+            <EditTokenModal
+              visible={editTokenVisibility}
+              setVisible={setEditTokenVisibility}
+            />
+          </View>
+        )}
+      </View>
+    </AnimatedContainer>
+  </View>
   );
 }
 

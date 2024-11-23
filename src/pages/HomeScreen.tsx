@@ -115,6 +115,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
   const refreshData = () => {
     const master = auth.master;
     if (token && tokenType && master) {
+      data.setShowSave(true);
       setRefreshing(true);
       fetchData(token, tokenType, "clavispass.lock").then((response) => {
         if (response == null) {
