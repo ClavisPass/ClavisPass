@@ -39,7 +39,6 @@ import { useToken } from "../contexts/TokenProvider";
 import fetchData from "../api/fetchData";
 import { decrypt, encrypt } from "../utils/CryptoLayer";
 import { useAuth } from "../contexts/AuthProvider";
-import changeFolder from "../utils/changeFolder";
 import { CryptoTypeSchema } from "../types/CryptoType";
 
 type Props = {
@@ -318,23 +317,22 @@ function HomeScreen({ navigation }: { navigation: any }) {
         </View>
       )}
       <View style={{ flex: 1, width: "100%", padding: 4 }}>
-        <FlashList
-          data={filteredValues}
-          renderItem={({ item }) => (
-            <ListItem
-              item={item}
-              onPress={() => {
-                navigation.navigate("Edit", {
-                  value: item,
-                });
-              }}
-            />
-          )}
-          estimatedItemSize={200}
-        />
-        <WebSpecific>
-          <Blur />
-        </WebSpecific>
+        <Blur>
+          <FlashList
+            data={filteredValues}
+            renderItem={({ item }) => (
+              <ListItem
+                item={item}
+                onPress={() => {
+                  navigation.navigate("Edit", {
+                    value: item,
+                  });
+                }}
+              />
+            )}
+            estimatedItemSize={200}
+          />
+        </Blur>
       </View>
       <FolderFilter
         folder={data.data?.folder}

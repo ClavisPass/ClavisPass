@@ -1,73 +1,68 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect } from "react";
 import Animated, {
-  Easing,
-  useAnimatedStyle,
   useSharedValue,
+  useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
 import { appWindow } from "@tauri-apps/api/window";
-import { useTheme } from "../contexts/ThemeProvider";
+import { Platform, StyleSheet } from "react-native";
 
-type Props = {};
+type Props = {
+  children: ReactNode;
+};
 
 function Blur(props: Props) {
-  const { theme } = useTheme();
-  const [show, setShow] = useState(false);
+  const blurValue = useSharedValue(0);
 
-  const [showComponents, setShowComponents] = useState(false);
-  const opacity = useSharedValue(0);
+  useEffect(() => {
+    const handleMouseEnter = () => {
+      blurValue.value = withTiming(0, { duration: 200 });
+    };
 
-  const config = {
-    duration: 500,
-    easing: Easing.bezier(0.5, 0.01, 0, 1),
-  };
+    const handleMouseLeave = () => {
+      blurValue.value = withTiming(6, { duration: 200 });
+    };
 
-  const style = useAnimatedStyle(() => {
+    const focusListener = appWindow.listen("tauri://focus", () => {
+      blurValue.value = withTiming(0, { duration: 200 });
+      document.removeEventListener("mouseenter", handleMouseEnter);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+    });
+
+    const blurListener = appWindow.listen("tauri://blur", () => {
+      blurValue.value = withTiming(6, { duration: 200 });
+      document.addEventListener("mouseenter", handleMouseEnter);
+      document.addEventListener("mouseleave", handleMouseLeave);
+    });
+
+    return () => {
+      focusListener.then((unsub) => unsub());
+      blurListener.then((unsub) => unsub());
+    };
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: withTiming(opacity.value, config, () => {
-        if (opacity.value === 0) {
-          setShowComponents(false);
-        }
-      }),
+      filter: `blur(${blurValue.value}px)`,
+      opacity: 1 - blurValue.value / 16,
     };
   });
 
-  appWindow.listen("tauri://focus", ({ event, payload }) => {
-    setShow(false);
-  });
-  appWindow.listen("tauri://blur", ({ event, payload }) => {
-    setShow(true);
-    setShowComponents(true);
-  });
-
-  useEffect(() => {
-    if (show) {
-      opacity.value = 1;
-    } else {
-      opacity.value = 0;
-    }
-  }, [show]);
+  if (Platform.OS === "web" && !appWindow) {
+    return <>{props.children}</>;
+  }
 
   return (
-    <>
-      {showComponents ? (
-        <Animated.View
-          style={[
-            {
-              position: "absolute",
-              top: 0,
-              right: 0,
-              left: 0,
-              bottom: 0,
-              zIndex: 6,
-              backgroundColor: theme.colors?.elevation.level2,
-            },
-            style,
-          ]}
-        ></Animated.View>
-      ) : null}
-    </>
+    <Animated.View style={[styles.container, animatedStyle]}>
+      {props.children}
+    </Animated.View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
 
 export default Blur;
