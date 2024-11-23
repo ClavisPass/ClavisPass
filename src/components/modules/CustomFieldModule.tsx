@@ -4,12 +4,12 @@ import { View } from "react-native";
 import { TextInput } from "react-native-paper";
 
 import CustomFieldModuleType from "../../types/modules/CustomFieldModuleType";
-import ModuleContainer from "../container/ModuleContainer";
 import Props from "../../types/ModuleProps";
 import EditCustomFieldModal from "../modals/EditCustomFieldModal";
 import CopyToClipboard from "../buttons/CopyToClipboard";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
+import ModuleContainer from "../container/ModuleContainer";
 
 function CustomFieldModule(props: CustomFieldModuleType & Props) {
   const didMount = useRef(false);

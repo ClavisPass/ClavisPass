@@ -1,8 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { useAuth } from "../contexts/AuthProvider";
-import Button from "../components/buttons/Button";
-import TypeWriterComponent from "../components/TypeWriter";
 import AnimatedContainer from "../components/container/AnimatedContainer";
 import ContentProtection from "../components/ContentProtection";
 import { useToken } from "../contexts/TokenProvider";
