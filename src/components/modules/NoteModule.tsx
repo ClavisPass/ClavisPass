@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { TextInput } from "react-native-paper";
 import NoteModuleType from "../../types/modules/NoteModuleType";
-import ModuleContainer from "../containers/ModuleContainer";
+import ModuleContainer from "../container/ModuleContainer";
 import Props from "../../types/ModuleProps";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";

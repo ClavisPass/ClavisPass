@@ -25,7 +25,7 @@ import WebSpecific from "../components/platformSpecific/WebSpecific";
 import HomeFilterMenu from "../components/menus/HomeFilterMenu";
 import Blur from "../components/Blur";
 import FolderFilter from "../components/FolderFilter";
-import AnimatedContainer from "../components/containers/AnimatedContainer";
+import AnimatedContainer from "../components/container/AnimatedContainer";
 import ContentProtection from "../components/ContentProtection";
 import { useFocusEffect } from "@react-navigation/native";
 import { TITLEBAR_HEIGHT } from "../components/CustomTitlebar";

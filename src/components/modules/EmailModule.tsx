@@ -4,7 +4,7 @@ import { Platform, View } from "react-native";
 import { TextInput } from "react-native-paper";
 
 import EmailModuleType from "../../types/modules/EmailModuleType";
-import ModuleContainer from "../containers/ModuleContainer";
+import ModuleContainer from "../container/ModuleContainer";
 import Props from "../../types/ModuleProps";
 import CopyToClipboard from "../buttons/CopyToClipboard";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";

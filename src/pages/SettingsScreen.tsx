@@ -5,7 +5,7 @@ import SettingsItem from "../components/items/SettingsItem";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
-import AnimatedContainer from "../components/containers/AnimatedContainer";
+import AnimatedContainer from "../components/container/AnimatedContainer";
 import { useFocusEffect } from "@react-navigation/native";
 import WebSpecific from "../components/platformSpecific/WebSpecific";
 

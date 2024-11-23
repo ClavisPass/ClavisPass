@@ -5,7 +5,7 @@ import { IconButton, TextInput } from "react-native-paper";
 
 import WifiModuleType from "../../types/modules/WifiModuleType";
 import CopyToClipboard from "../buttons/CopyToClipboard";
-import ModuleContainer from "../containers/ModuleContainer";
+import ModuleContainer from "../container/ModuleContainer";
 import Props from "../../types/ModuleProps";
 import theme from "../../ui/theme";
 import WifiQRCodeModal from "../modals/WifiQRCodeModal";

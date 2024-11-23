@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Icon, IconButton, TextInput } from "react-native-paper";
 
 import URLModuleType from "../../types/modules/URLModuleType";
-import ModuleContainer from "../containers/ModuleContainer";
+import ModuleContainer from "../container/ModuleContainer";
 import Props from "../../types/ModuleProps";
 import { Platform, View } from "react-native";
 

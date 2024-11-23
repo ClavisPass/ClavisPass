@@ -4,7 +4,7 @@ import { View } from "react-native";
 import { IconButton, TextInput } from "react-native-paper";
 
 import PasswordModuleType from "../../types/modules/PasswordModuleType";
-import ModuleContainer from "../containers/ModuleContainer";
+import ModuleContainer from "../container/ModuleContainer";
 import Props from "../../types/ModuleProps";
 
 import passwordEntropy from "../../utils/Entropy";

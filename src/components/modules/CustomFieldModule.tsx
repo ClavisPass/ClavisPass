@@ -4,7 +4,7 @@ import { View } from "react-native";
 import { TextInput } from "react-native-paper";
 
 import CustomFieldModuleType from "../../types/modules/CustomFieldModuleType";
-import ModuleContainer from "../containers/ModuleContainer";
+import ModuleContainer from "../container/ModuleContainer";
 import Props from "../../types/ModuleProps";
 import EditCustomFieldModal from "../modals/EditCustomFieldModal";
 import CopyToClipboard from "../buttons/CopyToClipboard";

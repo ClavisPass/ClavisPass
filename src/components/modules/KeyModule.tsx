@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { TextInput, Text } from "react-native-paper";
 import KeyModuleType from "../../types/modules/KeyModuleType";
-import ModuleContainer from "../containers/ModuleContainer";
+import ModuleContainer from "../container/ModuleContainer";
 import Props from "../../types/ModuleProps";
 import CopyToClipboard from "../buttons/CopyToClipboard";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";

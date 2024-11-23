@@ -16,7 +16,7 @@ import { TITLEBAR_HEIGHT, TitlebarHeight } from "../components/CustomTitlebar";
 import { useData } from "../contexts/DataProvider";
 import DataType from "../types/DataType";
 import TitleModule from "../components/modules/TitleModule";
-import AnimatedContainer from "../components/containers/AnimatedContainer";
+import AnimatedContainer from "../components/container/AnimatedContainer";
 import DraggableModulesListWeb from "../components/lists/draggableModulesList/DraggableModulesListWeb";
 import DraggableModulesList from "../components/lists/draggableModulesList/DraggableModulesList";
 import Constants from "expo-constants";
