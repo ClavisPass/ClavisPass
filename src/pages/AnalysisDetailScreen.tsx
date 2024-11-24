@@ -1,0 +1,275 @@
+import React, { useEffect, useState } from "react";
+import type { StackScreenProps } from "@react-navigation/stack";
+import Header from "../components/Header";
+import { TitlebarHeight } from "../components/CustomTitlebar";
+import AnimatedContainer from "../components/container/AnimatedContainer";
+import { useTheme } from "../contexts/ThemeProvider";
+import { RootStackParamList } from "../../App";
+import { Icon, Text, TextInput } from "react-native-paper";
+import ModulesEnum from "../enums/ModulesEnum";
+import ModuleIconsEnum from "../enums/ModuleIconsEnum";
+import { View } from "react-native";
+import AnalysisEntry from "../components/AnalysisEntry";
+import AnalysisEntryGradient from "../components/AnalysisEntryGradient";
+
+type AnalysisDetailScreenProps = StackScreenProps<
+  RootStackParamList,
+  "AnalysisDetail"
+>;
+
+type CharacterAnalysis = {
+  letters: number;
+  lettersPercent: number;
+  digits: number;
+  digitsPercent: number;
+  specialCharacters: number;
+  specialCharactersPercent: number;
+} | null;
+
+type PasswordAnalysis = {
+  pattern: string;
+  repeatedSequences: string[];
+  sequentialPatterns: string[];
+} | null;
+
+const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
+  route,
+  navigation,
+}) => {
+  const { value: routeValue } = route.params!;
+  const { globalStyles, theme } = useTheme();
+
+  const [characterAnalysis, setCharacterAnalysis] =
+    useState<CharacterAnalysis>(null);
+
+  const [passwordAnalysis, setPasswordAnalysis] =
+    useState<PasswordAnalysis>(null);
+
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
+
+  const [eyeIcon, setEyeIcon] = useState("eye");
+
+  const [edit, setEdit] = useState(false);
+
+  const goBack = () => {
+    navigation.goBack();
+  };
+
+  function analyzeCharacterComposition(input: string): CharacterAnalysis {
+    // Initialisieren der Zähler
+    let letters = 0;
+    let digits = 0;
+    let specialCharacters = 0;
+
+    // Durch den String iterieren
+    for (const char of input) {
+      if (/[a-zA-Z]/.test(char)) {
+        letters++;
+      } else if (/[0-9]/.test(char)) {
+        digits++;
+      } else {
+        specialCharacters++;
+      }
+    }
+
+    // Gesamtlänge für die Berechnung der Anteile
+    const total = input.length || 1; // Vermeidung einer Division durch 0
+
+    return {
+      letters: letters,
+      lettersPercent: (letters / total) * 100,
+      digits: digits,
+      digitsPercent: (digits / total) * 100,
+      specialCharacters: specialCharacters,
+      specialCharactersPercent: (specialCharacters / total) * 100,
+    };
+  }
+
+  function analyzePassword(password: string): PasswordAnalysis {
+    // Initialisiere Variablen
+    let pattern = "";
+    const repeatedSequences: string[] = [];
+    const sequentialPatterns: string[] = [];
+
+    // Regex für die Klassifikation
+    const regexMap: { [key: string]: RegExp } = {
+      a: /[a-z]/,
+      A: /[A-Z]/,
+      1: /[0-9]/,
+      "!": /[^a-zA-Z0-9]/,
+    };
+
+    // Erzeuge das Pattern
+    for (const char of password) {
+      for (const [key, regex] of Object.entries(regexMap)) {
+        if (regex.test(char)) {
+          pattern += key;
+          break;
+        }
+      }
+    }
+
+    // Finde wiederholte Sequenzen (z. B. "aaa", "111")
+    const repeatedMatch = pattern.match(/(.)\1{2,}/g); // Mindestens 3 gleiche Zeichen
+    if (repeatedMatch) {
+      repeatedSequences.push(...repeatedMatch);
+    }
+
+    // Finde sequentielle Muster (z. B. "123", "abc")
+    for (let i = 0; i < password.length - 2; i++) {
+      const currentChar = password[i];
+      const nextChar = password[i + 1];
+      const nextNextChar = password[i + 2];
+
+      // Prüfe auf numerische oder alphabetische Sequenzen
+      if (
+        (/\d/.test(currentChar) &&
+          +nextChar === +currentChar + 1 &&
+          +nextNextChar === +currentChar + 2) || // Numerische Sequenz
+        (/[a-zA-Z]/.test(currentChar) &&
+          nextChar.charCodeAt(0) === currentChar.charCodeAt(0) + 1 &&
+          nextNextChar.charCodeAt(0) === currentChar.charCodeAt(0) + 2) // Alphabetische Sequenz
+      ) {
+        sequentialPatterns.push(password.slice(i, i + 3));
+      }
+    }
+
+    return {
+      pattern,
+      repeatedSequences,
+      sequentialPatterns,
+    };
+  }
+
+  const getTypeIcon = () => {
+    if (routeValue.type === ModulesEnum.PASSWORD) {
+      return ModuleIconsEnum.PASSWORD;
+    }
+    if (routeValue.type === ModulesEnum.WIFI) {
+      return ModuleIconsEnum.WIFI;
+    }
+    return "";
+  };
+
+  useEffect(() => {
+    setCharacterAnalysis(analyzeCharacterComposition(routeValue.password));
+    setPasswordAnalysis(analyzePassword(routeValue.password));
+  }, [routeValue]);
+
+  useEffect(() => {
+    if (secureTextEntry) {
+      setEyeIcon("eye");
+    } else {
+      setEyeIcon("eye-off");
+    }
+  }, [secureTextEntry]);
+
+  return (
+    <AnimatedContainer style={globalStyles.container} trigger={edit}>
+      <TitlebarHeight />
+      <Header onPress={goBack} leftNode={<Text>{routeValue.title}</Text>}>
+        <View style={{ marginRight: 30 }}>
+          <Icon
+            source={getTypeIcon()}
+            color={theme.colors?.primary}
+            size={20}
+          />
+        </View>
+      </Header>
+      <View style={{ height: 40, width: "100%", margin: 10, marginBottom: 0, marginTop: 0 }}>
+        <TextInput
+          outlineStyle={globalStyles.outlineStyle}
+          style={[globalStyles.textInputStyle, { userSelect: "none" }]}
+          value={routeValue.password}
+          mode="outlined"
+          secureTextEntry={secureTextEntry}
+          readOnly={true}
+          right={
+            <TextInput.Icon
+              icon={eyeIcon}
+              color={theme.colors.primary}
+              onPress={() => setSecureTextEntry(!secureTextEntry)}
+            />
+          }
+        />
+      </View>
+      <View
+        style={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          height: 100,
+          gap: 10,
+          padding: 10,
+        }}
+      >
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-evenly",
+            height: 100,
+            gap: 10,
+          }}
+        >
+          <AnalysisEntryGradient
+            name={"Entropy"}
+            number={10}
+            percentage={routeValue.entropy / 200 * 100}
+          />
+          <AnalysisEntry
+            name={"Letters"}
+            number={characterAnalysis?.letters ? characterAnalysis?.letters : 0}
+            percentage={
+              characterAnalysis?.lettersPercent
+                ? characterAnalysis?.lettersPercent
+                : 0
+            }
+          />
+        </View>
+        <View
+          style={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-evenly",
+            height: 100,
+            gap: 10,
+          }}
+        >
+          <AnalysisEntry
+            name={"Digits"}
+            number={characterAnalysis?.digits ? characterAnalysis?.digits : 0}
+            percentage={
+              characterAnalysis?.digitsPercent
+                ? characterAnalysis?.digitsPercent
+                : 0
+            }
+          />
+          <AnalysisEntry
+            name={"Characters"}
+            number={
+              characterAnalysis?.specialCharacters
+                ? characterAnalysis?.specialCharacters
+                : 0
+            }
+            percentage={
+              characterAnalysis?.specialCharactersPercent
+                ? characterAnalysis?.specialCharactersPercent
+                : 0
+            }
+          />
+        </View>
+        <Text>{"Pattern: " + passwordAnalysis?.pattern}</Text>
+        <Text>
+          {"repeatedSequences: " + passwordAnalysis?.repeatedSequences}
+        </Text>
+        <Text>
+          {"sequentialPatterns: " + passwordAnalysis?.sequentialPatterns}
+        </Text>
+      </View>
+    </AnimatedContainer>
+  );
+};
+
+export default AnalysisDetailScreen;

@@ -14,7 +14,7 @@ import HomeScreen from "./src/pages/HomeScreen";
 import SettingsScreen from "./src/pages/SettingsScreen";
 
 import EditScreen from "./src/pages/EditScreen";
-import AnalysisScreen from "./src/pages/AnalysisScreen";
+import AnalysisScreen, { CachedPasswordsType } from "./src/pages/AnalysisScreen";
 import { AuthProvider } from "./src/contexts/AuthProvider";
 import { DataProvider } from "./src/contexts/DataProvider";
 import ProtectedRoute from "./src/utils/ProtectedRoute";
@@ -30,6 +30,7 @@ import { TokenProvider } from "./src/contexts/TokenProvider";
 import ValuesType from "./src/types/ValuesType";
 import ScanScreen from "./src/pages/ScanScreen";
 import theme from "./src/ui/theme";
+import AnalysisDetailScreen from "./src/pages/AnalysisDetailScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -119,7 +120,7 @@ export default function App() {
                       >
                         <Tab.Screen
                           name="Analysis"
-                          component={AnalysisScreen}
+                          component={AnalysisStack}
                           options={{
                             tabBarLabel: "Analysis",
                             title: "Analysis",
@@ -179,6 +180,10 @@ export type RootStackParamList = {
   Edit: {
     value: ValuesType;
   };
+  Analysis: undefined;
+  AnalysisDetail: {
+    value: CachedPasswordsType;
+  };
   Settings: undefined;
   Login: undefined;
   Scan: undefined;
@@ -207,6 +212,41 @@ function HomeStack() {
       <Stack.Screen
         name="Edit"
         component={EditScreen}
+        options={{
+          headerShown: false,
+          transitionSpec: {
+            open: transitionSpecConfig,
+            close: transitionSpecConfig,
+          },
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function AnalysisStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: true,
+        //gestureEnabled: true,
+        gestureDirection: "vertical",
+      }}
+    >
+      <Stack.Screen
+        name="Analysis"
+        component={AnalysisScreen}
+        options={{
+          headerShown: false,
+          transitionSpec: {
+            open: transitionSpecConfig,
+            close: transitionSpecConfig,
+          },
+        }}
+      />
+      <Stack.Screen
+        name="AnalysisDetail"
+        component={AnalysisDetailScreen}
         options={{
           headerShown: false,
           transitionSpec: {
