@@ -26,6 +26,7 @@ function Header(props: Props) {
         borderRadius: Platform.OS === "web" ? 12 : 0,
         borderBottomLeftRadius: 12,
         borderBottomRightRadius: 12,
+        boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
       }}
     >
       <View

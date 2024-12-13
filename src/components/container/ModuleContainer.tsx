@@ -107,7 +107,10 @@ function ModuleContainer(props: Props) {
       style={[
         styles.container,
         styles.innercontainer,
-        { backgroundColor: theme.colors?.background },
+        {
+          backgroundColor: theme.colors?.background,
+          boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+        },
         animatedContainerStyle,
       ]}
     >

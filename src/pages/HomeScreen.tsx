@@ -29,7 +29,6 @@ import AnimatedContainer from "../components/container/AnimatedContainer";
 import ContentProtection from "../components/ContentProtection";
 import { useFocusEffect } from "@react-navigation/native";
 import { TITLEBAR_HEIGHT } from "../components/CustomTitlebar";
-import theme from "../ui/theme";
 import FolderModal from "../components/modals/FolderModal";
 import DataType, { DataTypeSchema } from "../types/DataType";
 import SearchShortcut from "../components/shortcuts/SearchShortcut";
@@ -40,6 +39,7 @@ import fetchData from "../api/fetchData";
 import { decrypt, encrypt } from "../utils/CryptoLayer";
 import { useAuth } from "../contexts/AuthProvider";
 import { CryptoTypeSchema } from "../types/CryptoType";
+import { useTheme } from "../contexts/ThemeProvider";
 
 type Props = {
   setShowMenu: (boolean: boolean) => void;
@@ -69,7 +69,7 @@ function Tools(props: Props) {
 }
 
 function HomeScreen({ navigation }: { navigation: any }) {
-  const didMount = useRef(false);
+  const { theme } = useTheme();
   const auth = useAuth();
 
   const [searchQuery, setSearchQuery] = useState("");

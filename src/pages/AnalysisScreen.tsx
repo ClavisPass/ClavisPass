@@ -108,7 +108,7 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
   }, [data?.data?.values]);
 
   return (
-    <AnimatedContainer useFocusEffect={useFocusEffect}>
+    <AnimatedContainer style={{ marginTop: Constants.statusBarHeight }} useFocusEffect={useFocusEffect}>
       <StatusBar
         animated={true}
         style="dark"
@@ -138,8 +138,8 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
           <View>
             <TextInput
               placeholder="Search"
-              outlineStyle={globalStyles.outlineStyle}
-              style={globalStyles.textInputStyle}
+              outlineStyle={[globalStyles.outlineStyle, {borderColor: theme.colors.primary, borderWidth: 2}]}
+              style={[globalStyles.textInputStyle, {borderColor: theme.colors.primary, borderBottomWidth: 1}]}
               value={value}
               mode="flat"
               onChangeText={(text) => setValue(text)}
@@ -155,8 +155,7 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
                   marginBottom: 0,
                   backgroundColor: theme.colors.background,
                   gap: 4,
-                  marginTop: 6,
-                  marginRight: 12,
+                  marginTop: 4,
                   overflow: "hidden",
                 }}
               >

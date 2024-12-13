@@ -11,6 +11,7 @@ import ModuleIconsEnum from "../enums/ModuleIconsEnum";
 import { View } from "react-native";
 import AnalysisEntry from "../components/AnalysisEntry";
 import AnalysisEntryGradient from "../components/AnalysisEntryGradient";
+import Pattern from "../components/Pattern";
 
 type AnalysisDetailScreenProps = StackScreenProps<
   RootStackParamList,
@@ -176,46 +177,62 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
           />
         </View>
       </Header>
-      <View style={{ height: 40, width: "100%", margin: 10, marginBottom: 0, marginTop: 0 }}>
-        <TextInput
-          outlineStyle={globalStyles.outlineStyle}
-          style={[globalStyles.textInputStyle, { userSelect: "none" }]}
-          value={routeValue.password}
-          mode="outlined"
-          secureTextEntry={secureTextEntry}
-          readOnly={true}
-          right={
-            <TextInput.Icon
-              icon={eyeIcon}
-              color={theme.colors.primary}
-              onPress={() => setSecureTextEntry(!secureTextEntry)}
-            />
-          }
-        />
-      </View>
       <View
         style={{
           width: "100%",
           display: "flex",
           flexDirection: "column",
           height: 100,
-          gap: 10,
-          padding: 10,
+          gap: 6,
+          padding: 6,
         }}
       >
+        <Text variant="bodySmall" style={{ marginLeft: 6, userSelect: "none" }}>
+          Your Password
+        </Text>
+        <View
+          style={{
+            height: 40,
+            margin: 0,
+            marginBottom: 0,
+            marginTop: 0,
+          }}
+        >
+          <TextInput
+            outlineStyle={[
+              globalStyles.outlineStyle,
+              { borderColor: theme.colors.primary, borderWidth: 2 },
+            ]}
+            style={[globalStyles.textInputStyle, { userSelect: "none" }]}
+            value={routeValue.password}
+            mode="outlined"
+            secureTextEntry={secureTextEntry}
+            readOnly={true}
+            right={
+              <TextInput.Icon
+                icon={eyeIcon}
+                color={theme.colors.primary}
+                onPress={() => setSecureTextEntry(!secureTextEntry)}
+              />
+            }
+          />
+        </View>
+        <Text variant="bodySmall" style={{ marginLeft: 6, userSelect: "none" }}>
+          Statistics
+        </Text>
         <View
           style={{
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-evenly",
-            height: 100,
-            gap: 10,
+            height: 80,
+            gap: 6,
           }}
         >
           <AnalysisEntryGradient
             name={"Entropy"}
             number={10}
-            percentage={routeValue.entropy / 200 * 100}
+            percentage={(routeValue.entropy / 200) * 100}
           />
           <AnalysisEntry
             name={"Letters"}
@@ -233,8 +250,8 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-evenly",
-            height: 100,
-            gap: 10,
+            height: 80,
+            gap: 6,
           }}
         >
           <AnalysisEntry
@@ -260,13 +277,38 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             }
           />
         </View>
-        <Text>{"Pattern: " + passwordAnalysis?.pattern}</Text>
-        <Text>
-          {"repeatedSequences: " + passwordAnalysis?.repeatedSequences}
+        <Text variant="bodySmall" style={{ marginLeft: 6, userSelect: "none" }}>
+          Patterns
         </Text>
-        <Text>
-          {"sequentialPatterns: " + passwordAnalysis?.sequentialPatterns}
-        </Text>
+        <Pattern pattern={passwordAnalysis?.pattern} />
+        {passwordAnalysis?.repeatedSequences &&
+        passwordAnalysis?.repeatedSequences.length !== 0 ? (
+          <>
+            <Text
+              variant="bodySmall"
+              style={{ marginLeft: 6, userSelect: "none" }}
+            >
+              Repeated Sequences
+            </Text>
+            {passwordAnalysis?.repeatedSequences.map((sequence, _index) => {
+              return <Pattern pattern={sequence} />;
+            })}
+          </>
+        ) : null}
+        {passwordAnalysis?.sequentialPatterns &&
+        passwordAnalysis?.sequentialPatterns.length !== 0 ? (
+          <>
+            <Text
+              variant="bodySmall"
+              style={{ marginLeft: 6, userSelect: "none" }}
+            >
+              Sequencial Patterns
+            </Text>
+            {passwordAnalysis?.sequentialPatterns.map((pattern, _index) => {
+              return <Pattern pattern={pattern} />;
+            })}
+          </>
+        ) : null}
       </View>
     </AnimatedContainer>
   );
