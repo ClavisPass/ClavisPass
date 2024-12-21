@@ -9,6 +9,7 @@ type MenuItemProps = {
   children: ReactNode;
   onPress?: () => void;
   leadingIcon?: string;
+  selected?: boolean;
 };
 export function MenuItem(props: MenuItemProps) {
   return (
@@ -31,6 +32,7 @@ export function MenuItem(props: MenuItemProps) {
           flexDirection: "row",
           alignItems: "center",
           gap: 6,
+          backgroundColor: props.selected? "rgba(0, 0, 0, 0.137)" : "transparent",
         }}
       >
         {props.leadingIcon && (

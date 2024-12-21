@@ -124,12 +124,12 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
           width: "100%",
         }}
       >
-        <Text variant="bodySmall" style={{ marginLeft: 6, userSelect: "none" }}>
+        <Text variant="titleSmall" style={{ marginLeft: 6, userSelect: "none" }}>
           Statistics
         </Text>
         <Test />
         <Text
-          variant="bodySmall"
+          variant="titleSmall"
           style={{ marginTop: 10, marginLeft: 6, userSelect: "none" }}
         >
           Your Entries

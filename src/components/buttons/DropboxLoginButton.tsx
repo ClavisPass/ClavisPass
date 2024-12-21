@@ -24,7 +24,6 @@ function DropboxLoginButton() {
       scopes: SCOPES,
       responseType: "token",
       usePKCE: false,
-      //prompt: AuthSession.Prompt.SelectAccount,
     },
     {
       authorizationEndpoint: "https://www.dropbox.com/oauth2/authorize",

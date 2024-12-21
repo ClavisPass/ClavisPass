@@ -1,7 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Dimensions, FlatList, StyleSheet, View } from "react-native";
-import { Chip, IconButton } from "react-native-paper";
+import React, { useRef, useState } from "react";
+import {
+  Dimensions,
+  FlatList,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import { Chip, Divider, IconButton } from "react-native-paper";
 import WebSpecific from "./platformSpecific/WebSpecific";
+import { MenuItem } from "./menus/Menu";
 
 const styles = StyleSheet.create({
   chip: {
@@ -20,6 +27,8 @@ type Props = {
 };
 
 function FolderFilter(props: Props) {
+  const { width, height } = useWindowDimensions();
+
   const flatListRef: any = useRef<FlatList>(null);
   const [currentOffset, setCurrentOffset] = useState(0);
 
@@ -40,89 +49,144 @@ function FolderFilter(props: Props) {
   };
 
   return (
-    <View
-      style={{
-        padding: 4,
-        maxHeight: 50,
-        width: "100%",
-        //flex: 1,
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-      }}
-    >
-      <WebSpecific>
-        <IconButton
-          icon={"chevron-left"}
-          style={{ margin: 0 }}
-          onPress={() => change("-")}
-          size={12}
-        />
-      </WebSpecific>
-      <View style={{ flexBasis: "auto", flexShrink: 1, overflow: "hidden" }}>
-        <FlatList
-          ref={flatListRef}
-          data={["Favorite", ...(props.folder ? props.folder : [])]}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          style={{flexShrink: 1 }}
-          onScroll={handleScroll}
-          renderItem={({ item, index }) => (
-            <>
-              {index === 0 && item === "Favorite" ? (
-                <Chip
-                  icon={"star"}
-                  selected={props.selectedFav}
-                  showSelectedOverlay={true}
-                  onPress={() => {
-                    props.setSelectedFav(!props.selectedFav);
-                    if (props.selectedFav) {
-                      props.setSelectedFav(false);
-                    } else {
-                      props.setSelectedFav(true);
-                    }
-                  }}
-                  style={styles.chip}
-                >
-                  {"Favorite"}
-                </Chip>
-              ) : (
-                <Chip
-                  key={index}
-                  icon={"folder"}
-                  selected={props.selectedFolder == item ? true : false}
-                  showSelectedOverlay={true}
-                  onPress={() => {
-                    if (props.selectedFolder != item) {
-                      props.setSelectedFolder("" + item);
-                    } else {
-                      props.setSelectedFolder("");
-                    }
-                  }}
-                  style={styles.chip}
-                >
-                  {item}
-                </Chip>
+    <>
+      {width > 600 ? (
+        <View style={{ maxWidth: 200, height: "100%", display: "flex", flexDirection: "row", paddingRight: 4, borderRadius: 15, overflow: "hidden" }}>
+          <FlatList
+            ref={flatListRef}
+            data={["Favorite", ...(props.folder ? props.folder : [])]}
+            //horizontal={true}
+            //showsHorizontalScrollIndicator={false}
+            style={{ flexShrink: 1 }}
+            onScroll={handleScroll}
+            renderItem={({ item, index }) => (
+              <>
+                {index === 0 && item === "Favorite" ? (
+                  <MenuItem
+                    leadingIcon={"star"}
+                    selected={props.selectedFav}
+                    //showSelectedOverlay={true}
+                    onPress={() => {
+                      props.setSelectedFav(!props.selectedFav);
+                      if (props.selectedFav) {
+                        props.setSelectedFav(false);
+                      } else {
+                        props.setSelectedFav(true);
+                      }
+                    }}
+                  >
+                    {"Favorite"}
+                  </MenuItem>
+                ) : (
+                  <MenuItem
+                    key={index}
+                    leadingIcon={"folder"}
+                    selected={props.selectedFolder == item ? true : false}
+                    //showSelectedOverlay={true}
+                    onPress={() => {
+                      if (props.selectedFolder != item) {
+                        props.setSelectedFolder("" + item);
+                      } else {
+                        props.setSelectedFolder("");
+                      }
+                    }}
+                  >
+                    {item}
+                  </MenuItem>
+                )}
+              </>
+            )}
+          />
+          <Divider style={{ width: 1, height: '100%' }}/>
+        </View>
+      ) : (
+        <View
+          style={{
+            padding: 4,
+            maxHeight: 50,
+            width: "100%",
+            //flex: 1,
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <WebSpecific>
+            <IconButton
+              icon={"chevron-left"}
+              style={{ margin: 0 }}
+              onPress={() => change("-")}
+              size={12}
+            />
+          </WebSpecific>
+          <View
+            style={{ flexBasis: "auto", flexShrink: 1, overflow: "hidden" }}
+          >
+            <FlatList
+              ref={flatListRef}
+              data={["Favorite", ...(props.folder ? props.folder : [])]}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              style={{ flexShrink: 1 }}
+              onScroll={handleScroll}
+              renderItem={({ item, index }) => (
+                <>
+                  {index === 0 && item === "Favorite" ? (
+                    <Chip
+                      icon={"star"}
+                      selected={props.selectedFav}
+                      showSelectedOverlay={true}
+                      onPress={() => {
+                        props.setSelectedFav(!props.selectedFav);
+                        if (props.selectedFav) {
+                          props.setSelectedFav(false);
+                        } else {
+                          props.setSelectedFav(true);
+                        }
+                      }}
+                      style={styles.chip}
+                    >
+                      {"Favorite"}
+                    </Chip>
+                  ) : (
+                    <Chip
+                      key={index}
+                      icon={"folder"}
+                      selected={props.selectedFolder == item ? true : false}
+                      showSelectedOverlay={true}
+                      onPress={() => {
+                        if (props.selectedFolder != item) {
+                          props.setSelectedFolder("" + item);
+                        } else {
+                          props.setSelectedFolder("");
+                        }
+                      }}
+                      style={styles.chip}
+                    >
+                      {item}
+                    </Chip>
+                  )}
+                </>
               )}
-            </>
-          )}
-        />
-      </View>
-      <IconButton
-        icon={"plus"}
-        style={{ margin: 0 }}
-        onPress={() => props.setFolderModalVisible(true)}
-        size={12}
-      />
-      <WebSpecific>
-        <IconButton
-          icon={"chevron-right"}
-          style={{ margin: 0 }}
-          onPress={() => change("+")}
-          size={12}
-        />
-      </WebSpecific>
-    </View>
+            />
+          </View>
+          <IconButton
+            icon={"plus"}
+            style={{ margin: 0 }}
+            onPress={() => props.setFolderModalVisible(true)}
+            size={12}
+          />
+          <WebSpecific>
+            <IconButton
+              icon={"chevron-right"}
+              style={{ margin: 0 }}
+              onPress={() => change("+")}
+              size={12}
+            />
+          </WebSpecific>
+        </View>
+      )}
+    </>
   );
 }
 

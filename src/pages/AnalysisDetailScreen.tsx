@@ -187,7 +187,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
           padding: 6,
         }}
       >
-        <Text variant="bodySmall" style={{ marginLeft: 6, userSelect: "none" }}>
+        <Text variant="titleSmall" style={{ marginLeft: 6, userSelect: "none" }}>
           Your Password
         </Text>
         <View
@@ -217,7 +217,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             }
           />
         </View>
-        <Text variant="bodySmall" style={{ marginLeft: 6, userSelect: "none" }}>
+        <Text variant="titleSmall" style={{ marginLeft: 6, userSelect: "none" }}>
           Statistics
         </Text>
         <View
@@ -277,7 +277,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             }
           />
         </View>
-        <Text variant="bodySmall" style={{ marginLeft: 6, userSelect: "none" }}>
+        <Text variant="titleSmall" style={{ marginLeft: 6, userSelect: "none" }}>
           Patterns
         </Text>
         <Pattern pattern={passwordAnalysis?.pattern} />
@@ -285,7 +285,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
         passwordAnalysis?.repeatedSequences.length !== 0 ? (
           <>
             <Text
-              variant="bodySmall"
+              variant="titleSmall"
               style={{ marginLeft: 6, userSelect: "none" }}
             >
               Repeated Sequences
@@ -299,7 +299,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
         passwordAnalysis?.sequentialPatterns.length !== 0 ? (
           <>
             <Text
-              variant="bodySmall"
+              variant="titleSmall"
               style={{ marginLeft: 6, userSelect: "none" }}
             >
               Sequencial Patterns

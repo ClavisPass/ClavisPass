@@ -1,5 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { View, Platform, RefreshControl } from "react-native";
+import {
+  View,
+  Platform,
+  RefreshControl,
+  useWindowDimensions,
+} from "react-native";
 import {
   Searchbar,
   IconButton,
@@ -70,6 +75,7 @@ function Tools(props: Props) {
 
 function HomeScreen({ navigation }: { navigation: any }) {
   const { theme } = useTheme();
+  const { width, height } = useWindowDimensions();
   const auth = useAuth();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -317,7 +323,14 @@ function HomeScreen({ navigation }: { navigation: any }) {
           </View>
         </View>
       )}
-      <View style={{ flex: 1, width: "100%", padding: 4 }}>
+      <View
+        style={{
+          flex: 1,
+          width: "100%",
+          padding: 4,
+          flexDirection: width > 600 ? "row-reverse" : "column",
+        }}
+      >
         <Blur>
           <FlashList
             data={filteredValues}
@@ -334,15 +347,16 @@ function HomeScreen({ navigation }: { navigation: any }) {
             estimatedItemSize={200}
           />
         </Blur>
+        <FolderFilter
+          folder={data.data?.folder}
+          selectedFav={selectedFav}
+          setSelectedFav={setSelectedFav}
+          selectedFolder={selectedFolder}
+          setSelectedFolder={setSelectedFolder}
+          setFolderModalVisible={setFolderModalVisible}
+        />
       </View>
-      <FolderFilter
-        folder={data.data?.folder}
-        selectedFav={selectedFav}
-        setSelectedFav={setSelectedFav}
-        selectedFolder={selectedFolder}
-        setSelectedFolder={setSelectedFolder}
-        setFolderModalVisible={setFolderModalVisible}
-      />
+
       <HomeFilterMenu
         visible={showMenu}
         setVisible={setShowMenu}
