@@ -9,10 +9,13 @@ import React, {
 import { getData, saveData, removeData } from "../utils/secureStore";
 import isDropboxToken from "../utils/regex/isDropboxToken";
 import isGoogleDriveToken from "../utils/regex/isGoogleDriveToken";
+import generateNewToken from "../api/generateNewToken";
 
 interface TokenContextType {
   token: string | null;
   setToken: (token: string | null) => void;
+  refreshToken: string | null;
+  setRefreshToken: (token: string | null) => void;
   removeToken: () => void;
   tokenType: "Dropbox" | "GoogleDrive" | null;
 }
@@ -26,6 +29,7 @@ type Props = {
 export const TokenProvider = ({ children }: Props) => {
   const TOKEN_NAME = "ClavisPass-Token";
   const [token, setToken] = useState<string | null>(null);
+  const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [tokenType, setTokenType] = useState<"Dropbox" | "GoogleDrive" | null>(
     null
   );
@@ -33,6 +37,7 @@ export const TokenProvider = ({ children }: Props) => {
 
   const removeToken = async () => {
     setToken(null);
+    setRefreshToken(null);
     setTokenType(null);
     try {
       await removeData(TOKEN_NAME);
@@ -45,8 +50,7 @@ export const TokenProvider = ({ children }: Props) => {
   const fetchData = async () => {
     try {
       const value = await getData(TOKEN_NAME);
-      setToken(value? value : null);
-      console.log(value? value : null);
+      setRefreshToken(value ? value : null);
       console.log("Token geladen");
     } catch (error) {
       console.error("Fehler beim Abrufen der Daten:", error);
@@ -58,16 +62,16 @@ export const TokenProvider = ({ children }: Props) => {
   }, []);
 
   useEffect(() => {
-    if (token) {
-      if (isDropboxToken(token)) {
+    if (refreshToken) {
+      if (isDropboxToken(refreshToken)) {
         setTokenType("Dropbox");
       }
-      if (isGoogleDriveToken(token)) {
+      if (isGoogleDriveToken(refreshToken)) {
         setTokenType("GoogleDrive");
       }
-      saveData(TOKEN_NAME, token)
+      saveData(TOKEN_NAME, refreshToken)
         .then(() => {
-          console.log(token);
+          console.log(refreshToken);
           console.log("Token gespeichert");
         })
         .catch((error) =>
@@ -78,11 +82,32 @@ export const TokenProvider = ({ children }: Props) => {
     /*if (token === null && !init) {
       removeToken();
     }*/
+    if (token == null && refreshToken != null) {
+      renewToken(refreshToken);
+    }
     setInit(false);
-  }, [token]);
+  }, [refreshToken]);
+
+  const renewToken = async (refreshToken: string) => {
+    try {
+      const newToken = await generateNewToken(refreshToken);
+      console.log("Neuer Token erhalten:", newToken);
+    } catch (error) {
+      console.error("Token konnte nicht erneuert werden:", error);
+    }
+  };
 
   return (
-    <TokenContext.Provider value={{ token, setToken, removeToken, tokenType }}>
+    <TokenContext.Provider
+      value={{
+        token,
+        setToken,
+        refreshToken,
+        setRefreshToken,
+        removeToken,
+        tokenType,
+      }}
+    >
       {children}
     </TokenContext.Provider>
   );

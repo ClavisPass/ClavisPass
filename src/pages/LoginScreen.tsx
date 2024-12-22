@@ -54,36 +54,37 @@ function LoginScreen({ navigation }: { navigation: any }) {
   };
 
   useEffect(() => {
-      asyncFetch(token, tokenType);
+    if (token) asyncFetch(token, tokenType);
+    else setLoading(false);
   }, [token, tokenType]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
-    <AnimatedContainer>
-      <ContentProtection enabled={false} />
-      <View
-        style={{ alignItems: "center", justifyContent: "center", flex: 1 }}
-      >
-        {loading ? (
-          <ActivityIndicator animating={true} />
-        ) : userInfo ? (
-          <Login userInfo={userInfo} />
-        ) : (
-          <View style={styles.container}>
-            <Auth
-              setUserInfo={setUserInfo}
-              navigation={navigation}
-              changeEditTokenVisibility={setEditTokenVisibility}
-            />
-            <EditTokenModal
-              visible={editTokenVisibility}
-              setVisible={setEditTokenVisibility}
-            />
-          </View>
-        )}
-      </View>
-    </AnimatedContainer>
-  </View>
+      <AnimatedContainer>
+        <ContentProtection enabled={false} />
+        <View
+          style={{ alignItems: "center", justifyContent: "center", flex: 1 }}
+        >
+          {loading ? (
+            <ActivityIndicator animating={true} />
+          ) : userInfo ? (
+            <Login userInfo={userInfo} />
+          ) : (
+            <View style={styles.container}>
+              <Auth
+                setUserInfo={setUserInfo}
+                navigation={navigation}
+                changeEditTokenVisibility={setEditTokenVisibility}
+              />
+              <EditTokenModal
+                visible={editTokenVisibility}
+                setVisible={setEditTokenVisibility}
+              />
+            </View>
+          )}
+        </View>
+      </AnimatedContainer>
+    </View>
   );
 }
 
