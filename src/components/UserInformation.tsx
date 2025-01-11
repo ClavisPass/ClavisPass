@@ -26,6 +26,8 @@ function UserInformation(props: Props) {
   const [loading, setLoading] = useState(false);
 
   const fetch = (token: string) => {
+    console.log("TRY");
+    setLoading(true);
     fetchUserInfo(token, tokenType, setUserInfo, () => {
       setLoading(false);
     });
@@ -36,6 +38,7 @@ function UserInformation(props: Props) {
       setLoading(true);
       fetch(token);
     }
+    setLoading(false)
   }, [token, loading]);
 
   useEffect(() => {

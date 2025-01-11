@@ -18,31 +18,44 @@ function Pattern(props: Props) {
   return (
     <View
       style={{
+        backgroundColor: theme.colors.background,
+        height: 50,
+        borderRadius: 16,
+        padding: 12,
         display: "flex",
-        flexDirection: "row",
-        gap: 8,
-        width: "100%",
         justifyContent: "center",
+        boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
       }}
     >
-      {arrayPattern.map((char) => {
-        return (
-          <View
-            style={{
-              padding: 6,
-              borderRadius: 10,
-              backgroundColor: theme.colors.primary,
-              display: "flex",
-              width: 30,
-              height: 30,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text variant="bodyLarge" style={{ color: "white" }}>{char}</Text>
-          </View>
-        );
-      })}
+      <View
+        style={{
+          flexDirection: "row",
+          gap: 6,
+          width: "100%",
+          justifyContent: "center",
+        }}
+      >
+        {arrayPattern.map((char) => {
+          return (
+            <View
+              style={{
+                padding: 6,
+                borderRadius: 10,
+                backgroundColor: theme.colors.primary,
+                display: "flex",
+                width: 30,
+                height: 30,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text variant="bodyLarge" style={{ color: "white" }}>
+                {char}
+              </Text>
+            </View>
+          );
+        })}
+      </View>
     </View>
   );
 }

@@ -18,6 +18,11 @@ interface TokenContextType {
   setRefreshToken: (token: string | null) => void;
   removeToken: () => void;
   tokenType: "Dropbox" | "GoogleDrive" | null;
+  setTokenType: (tokenType: "Dropbox" | "GoogleDrive" | null) => void;
+  loadRefreshToken: () => Promise<string | null>;
+  saveRefreshToken: (refreshToken: string) => void;
+  renewAccessToken: (refreshToken: string) => Promise<string | null>;
+  checkTokenType: (token: string) => "Dropbox" | "GoogleDrive" | null;
 }
 
 export const TokenContext = createContext<TokenContextType | null>(null);
@@ -31,14 +36,13 @@ export const TokenProvider = ({ children }: Props) => {
   const [token, setToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [tokenType, setTokenType] = useState<"Dropbox" | "GoogleDrive" | null>(
-    null
+    "Dropbox"
   );
-  const [init, setInit] = useState<boolean>(true);
 
   const removeToken = async () => {
     setToken(null);
     setRefreshToken(null);
-    setTokenType(null);
+    //setTokenType(null);
     try {
       await removeData(TOKEN_NAME);
       console.log("Token aus SecureStore entfernt");
@@ -47,28 +51,26 @@ export const TokenProvider = ({ children }: Props) => {
     }
   };
 
-  const fetchData = async () => {
+  const loadRefreshToken = async () => {
     try {
       const value = await getData(TOKEN_NAME);
       setRefreshToken(value ? value : null);
       console.log("Token geladen");
+      return value;
     } catch (error) {
       console.error("Fehler beim Abrufen der Daten:", error);
+      return null;
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  useEffect(() => {
+  const saveRefreshToken = async (refreshToken: string) => {
     if (refreshToken) {
-      if (isDropboxToken(refreshToken)) {
+      /*if (isDropboxToken(refreshToken)) {
         setTokenType("Dropbox");
       }
       if (isGoogleDriveToken(refreshToken)) {
         setTokenType("GoogleDrive");
-      }
+      }*/
       saveData(TOKEN_NAME, refreshToken)
         .then(() => {
           console.log(refreshToken);
@@ -78,22 +80,41 @@ export const TokenProvider = ({ children }: Props) => {
           console.error("Fehler beim Speichern des Tokens:", error)
         );
     }
+  };
 
-    /*if (token === null && !init) {
-      removeToken();
-    }*/
-    if (token == null && refreshToken != null) {
-      renewToken(refreshToken);
+  const checkTokenType = (token: string) => {
+    if (isDropboxToken(token)) {
+      return "Dropbox";
     }
-    setInit(false);
-  }, [refreshToken]);
+    if (isGoogleDriveToken(token)) {
+      return "GoogleDrive";
+    }
+    return null;
+  };
 
-  const renewToken = async (refreshToken: string) => {
+  /*useEffect(() => {
+    if (refreshToken) {
+      if (isDropboxToken(refreshToken)) {
+        setTokenType("Dropbox");
+        return;
+      }
+      if (isGoogleDriveToken(refreshToken)) {
+        setTokenType("GoogleDrive");
+        return;
+      }
+    }
+    setTokenType(null);
+  }, [refreshToken]);*/
+
+  const renewAccessToken = async (refreshToken: string) => {
     try {
       const newToken = await generateNewToken(refreshToken);
-      console.log("Neuer Token erhalten:", newToken);
+      console.log("Neuer Token erhalten: ", newToken);
+      setToken(newToken.accessToken);
+      return newToken.accessToken;
     } catch (error) {
       console.error("Token konnte nicht erneuert werden:", error);
+      return null;
     }
   };
 
@@ -106,6 +127,11 @@ export const TokenProvider = ({ children }: Props) => {
         setRefreshToken,
         removeToken,
         tokenType,
+        setTokenType,
+        loadRefreshToken,
+        saveRefreshToken,
+        renewAccessToken,
+        checkTokenType,
       }}
     >
       {children}

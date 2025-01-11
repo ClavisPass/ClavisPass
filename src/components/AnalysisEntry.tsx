@@ -2,7 +2,6 @@ import { View } from "react-native";
 import { useTheme } from "../contexts/ThemeProvider";
 import CircularProgressBar from "./CircularProgressBar";
 import { Text } from "react-native-paper";
-import { number } from "zod";
 
 type Props = {
   name: string;
@@ -39,8 +38,15 @@ function AnalysisEntry(props: Props) {
             justifyContent: "center",
           }}
         >
-          <Text variant="titleLarge" style={{ color: theme.colors.primary, fontWeight: "bold" }}>{props.number}</Text>
-          <Text variant="titleSmall" style={{ color: theme.colors.primary }}>{props.name}</Text>
+          <Text
+            variant="titleLarge"
+            style={{ color: theme.colors.primary, fontWeight: "bold" }}
+          >
+            {props.number}
+          </Text>
+          <Text variant="titleSmall" style={{ color: theme.colors.primary }}>
+            {props.name}
+          </Text>
         </View>
       </View>
     </View>

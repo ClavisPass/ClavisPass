@@ -22,7 +22,6 @@ const fetchFileFromDropbox = async (
       return null
     }
 
-    // Lies den Blob als Text
     const fileContent = await response.text();
 
     return fileContent;

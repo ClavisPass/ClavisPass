@@ -42,23 +42,24 @@ function Login(props: Props) {
   const [value2, setValue2] = useState("");
 
   useEffect(() => {
-    if (token) {
+    console.log("hier 1")
+    console.log(token)
+    console.log(tokenType)
+    if (token && tokenType) {
       setLoading(true);
       fetchData(token, tokenType, "clavispass.lock").then((response) => {
-        if (response == null) {
+        console.log("hier 2 "+response)
+        if (response === null) {
           setShowNewData(true);
         } else {
           console.log(response);
           const parsedCryptoData = CryptoTypeSchema.parse(JSON.parse(response));
           setParsedCryptoData(parsedCryptoData);
-          setLoading(false);
         }
       });
-    } else {
-      setLoading(false);
     }
     setLoading(false);
-  }, []);
+  }, [token, tokenType]);
 
   const login = async () => {
     try {
@@ -111,7 +112,7 @@ function Login(props: Props) {
               alignItems: "center",
               justifyContent: "center",
               gap: 4,
-              width: "100%"
+              width: "100%",
             }}
           >
             {showNewData ? (

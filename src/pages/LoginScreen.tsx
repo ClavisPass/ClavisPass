@@ -9,6 +9,8 @@ import UserInfoType from "../types/UserInfoType";
 import EditTokenModal from "../components/modals/EditTokenModal";
 import { ActivityIndicator } from "react-native-paper";
 import Login from "../components/Login";
+import generateNewToken from "../api/generateNewToken";
+import { set } from "zod";
 
 const styles = StyleSheet.create({
   container: {
@@ -21,42 +23,57 @@ const styles = StyleSheet.create({
 });
 
 function LoginScreen({ navigation }: { navigation: any }) {
-  const { token, tokenType } = useToken();
+  const {
+    setToken,
+    setRefreshToken,
+    loadRefreshToken,
+    tokenType,
+    checkTokenType,
+    setTokenType,
+  } = useToken();
 
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
   const [loading, setLoading] = useState(true);
 
   const [editTokenVisibility, setEditTokenVisibility] = useState(false);
 
-  const fetchAsync = async (
-    token: string,
-    tokenType: "Dropbox" | "GoogleDrive"
-  ) => {
-    console.log("fetchAsync");
-    setLoading(true);
-    fetchUserInfo(token, tokenType, setUserInfo, () => {
-      console.log("CALLBACK");
-      setLoading(false);
-    });
-  };
+  const login = async () => {
+    try {
+      const refreshToken = await loadRefreshToken();
+      if (refreshToken === null || refreshToken === "") {
+        setLoading(false);
+        return;
+      }
 
-  const asyncFetch = async (
-    token: string | null,
-    tokenType: "Dropbox" | "GoogleDrive" | null
-  ) => {
-    console.log("asyncFetch");
-    if (token && tokenType) {
-      setLoading(true);
-      fetchAsync(token, tokenType);
-    } else {
+      console.log("TEEEST REFRESHTOKEN: " + refreshToken);
+
+      const accessToken = await generateNewToken(refreshToken).then((data) => {
+        return data.accessToken;
+      });
+
+      console.log("TEEEEST ACCESSTOKEN: " + accessToken);
+      if (accessToken === null) {
+        setLoading(false);
+        return;
+      }
+
+      //const tokenType = await checkTokenType(refreshToken);
+      //console.log("TOKENTYPE: " + tokenType);
+      setToken(accessToken);
+      //setTokenType(tokenType);
+      setRefreshToken(refreshToken);
+      fetchUserInfo(accessToken, tokenType, setUserInfo, () => {
+        setLoading(false);
+      });
+    } catch (error) {
+      console.log(error);
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (token) asyncFetch(token, tokenType);
-    else setLoading(false);
-  }, [token, tokenType]);
+    login();
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>

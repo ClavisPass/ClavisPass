@@ -13,11 +13,11 @@ const SCOPES = ["account_info.read files.content.read files.content.write"];
 WebBrowser.maybeCompleteAuthSession();
 
 function DropboxLoginButton() {
-  const { setToken, setRefreshToken } = useToken();
+  const { setToken, setRefreshToken, saveRefreshToken, checkTokenType } = useToken();
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
-      clientId: DROPBOX_CLIENT_ID,
+      clientId: "kzgl7hhvg4juwnq",
       redirectUri: REDIRECT_URI,
       scopes: SCOPES,
       responseType: "code",
@@ -58,13 +58,10 @@ function DropboxLoginButton() {
 
           const data = await tokenResponse.json();
 
-          console.log(data);
-
           if (data.access_token && data.refresh_token) {
-            console.log("Access Token:", data.access_token);
             setToken(data.access_token);
-            console.log("Refresh Token:", data.refresh_token);
             setRefreshToken(data.refresh_token);
+            saveRefreshToken(data.refresh_token);
           } else {
             console.error("Token response error:", data);
           }
@@ -78,8 +75,6 @@ function DropboxLoginButton() {
   }, [response]);
 
   const handleAuth = async () => {
-    console.log(DROPBOX_CLIENT_ID)
-    console.log("redirectURI: " + REDIRECT_URI);
     promptAsync();
   };
 
