@@ -290,8 +290,8 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             >
               Repeated Sequences
             </Text>
-            {passwordAnalysis?.repeatedSequences.map((sequence, _index) => {
-              return <Pattern pattern={sequence} />;
+            {passwordAnalysis?.repeatedSequences.map((sequence, index) => {
+              return <Pattern pattern={sequence} key={index}/>;
             })}
           </>
         ) : null}
@@ -304,8 +304,8 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             >
               Sequencial Patterns
             </Text>
-            {passwordAnalysis?.sequentialPatterns.map((pattern, _index) => {
-              return <Pattern pattern={pattern} />;
+            {passwordAnalysis?.sequentialPatterns.map((pattern, index) => {
+              return <Pattern pattern={pattern} key={index}/>;
             })}
           </>
         ) : null}

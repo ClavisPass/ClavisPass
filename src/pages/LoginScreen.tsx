@@ -83,7 +83,7 @@ function LoginScreen({ navigation }: { navigation: any }) {
           style={{ alignItems: "center", justifyContent: "center", flex: 1 }}
         >
           {loading ? (
-            <ActivityIndicator animating={true} />
+            <ActivityIndicator size={"large"} animating={true} />
           ) : userInfo ? (
             <Login userInfo={userInfo} />
           ) : (

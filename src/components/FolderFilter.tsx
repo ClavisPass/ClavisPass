@@ -51,7 +51,17 @@ function FolderFilter(props: Props) {
   return (
     <>
       {width > 600 ? (
-        <View style={{ maxWidth: 200, height: "100%", display: "flex", flexDirection: "row", paddingRight: 4, borderRadius: 15, overflow: "hidden" }}>
+        <View
+          style={{
+            maxWidth: 200,
+            height: "100%",
+            display: "flex",
+            flexDirection: "row",
+            paddingRight: 4,
+            borderRadius: 15,
+            overflow: "hidden",
+          }}
+        >
           <FlatList
             ref={flatListRef}
             data={["Favorite", ...(props.folder ? props.folder : [])]}
@@ -78,26 +88,29 @@ function FolderFilter(props: Props) {
                     {"Favorite"}
                   </MenuItem>
                 ) : (
-                  <MenuItem
-                    key={index}
-                    leadingIcon={"folder"}
-                    selected={props.selectedFolder == item ? true : false}
-                    //showSelectedOverlay={true}
-                    onPress={() => {
-                      if (props.selectedFolder != item) {
-                        props.setSelectedFolder("" + item);
-                      } else {
-                        props.setSelectedFolder("");
-                      }
-                    }}
-                  >
-                    {item}
-                  </MenuItem>
+                  <>
+                    <Divider style={{marginRight: 4}}/>
+                    <MenuItem
+                      key={index}
+                      leadingIcon={"folder"}
+                      selected={props.selectedFolder == item ? true : false}
+                      //showSelectedOverlay={true}
+                      onPress={() => {
+                        if (props.selectedFolder != item) {
+                          props.setSelectedFolder("" + item);
+                        } else {
+                          props.setSelectedFolder("");
+                        }
+                      }}
+                    >
+                      {item}
+                    </MenuItem>
+                  </>
                 )}
               </>
             )}
           />
-          <Divider style={{ width: 1, height: '100%' }}/>
+          <Divider style={{ width: 1, height: "100%" }} />
         </View>
       ) : (
         <View

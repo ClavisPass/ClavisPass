@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   ripple: {
-    padding: 16,
+    padding: 14,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Platform, View, StyleSheet } from "react-native";
-import { IconButton } from "react-native-paper";
+import { Icon, IconButton, TouchableRipple } from "react-native-paper";
 import theme from "../ui/theme";
 import WebSpecific from "./platformSpecific/WebSpecific";
 import { appWindow } from "@tauri-apps/api/window";
@@ -48,7 +48,9 @@ function CustomTitlebar() {
           ?.setAttribute("data-tauri-drag-region", "");
 
         const sheet = new CSSStyleSheet();
-        sheet.replaceSync("::-webkit-scrollbar {width: 8px} ::-webkit-scrollbar-track {background: transparent;} ::-webkit-scrollbar-thumb {background: #5e5e5e50; border-radius: 10px;} input::-ms-reveal {display: none;}");
+        sheet.replaceSync(
+          "::-webkit-scrollbar {width: 8px} ::-webkit-scrollbar-track {background: transparent;} ::-webkit-scrollbar-thumb {background: #5e5e5e50; border-radius: 10px;} input::-ms-reveal {display: none;}"
+        );
         document.adoptedStyleSheets = [sheet];
       }
     }
@@ -97,18 +99,46 @@ function CustomTitlebar() {
               paddingLeft: 16,
             }}
           >
-            <IconButton
-              icon={"window-minimize"}
-              iconColor={theme.colors.primary}
-              size={20}
+            <TouchableRipple
               onPress={minimizeWindow}
-            />
-            <IconButton
-              icon={"window-close"}
-              iconColor={theme.colors.primary}
-              size={20}
+              style={{
+                cursor: "pointer",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 50,
+                height: 38,
+                borderRadius: 4,
+              }}
+              rippleColor="rgba(0, 0, 0, 0.158)"
+            >
+              <Icon
+                source={"window-minimize"}
+                size={20}
+                color={theme.colors.primary}
+              />
+            </TouchableRipple>
+            <TouchableRipple
               onPress={closeWindow}
-            />
+              style={{
+                cursor: "pointer",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 50,
+                height: 38,
+                borderRadius: 4,
+              }}
+              rippleColor="rgba(0, 0, 0, 0.158)"
+            >
+              <Icon
+                source={"window-close"}
+                size={20}
+                color={theme.colors.primary}
+              />
+            </TouchableRipple>
           </View>
         </View>
       </View>

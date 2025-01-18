@@ -46,6 +46,12 @@ import { useAuth } from "../contexts/AuthProvider";
 import { CryptoTypeSchema } from "../types/CryptoType";
 import { useTheme } from "../contexts/ThemeProvider";
 
+import { 
+  useFonts, 
+  LexendExa_400Regular, 
+  LexendExa_700Bold 
+} from '@expo-google-fonts/lexend-exa';
+
 type Props = {
   setShowMenu: (boolean: boolean) => void;
   setValueModalVisible: (boolean: boolean) => void;
@@ -77,6 +83,11 @@ function HomeScreen({ navigation }: { navigation: any }) {
   const { theme } = useTheme();
   const { width, height } = useWindowDimensions();
   const auth = useAuth();
+
+  const [fontsLoaded] = useFonts({
+    LexendExa_400Regular,
+    LexendExa_700Bold,
+  });
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFolder, setSelectedFolder] = useState("");
@@ -190,15 +201,14 @@ function HomeScreen({ navigation }: { navigation: any }) {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            marginTop: 16,
+            marginTop: 12,
+            marginBottom: 8,
+            marginLeft: 4,
+            width: "100%",
           }}
         >
-          <Text
-            variant="titleMedium"
-            style={{ color: "white", userSelect: "none" }}
-          >
-            ClavisPass
-          </Text>
+          
+          <Text style={{ fontFamily: 'LexendExa_400Regular', fontSize: 16, color: "white", userSelect: "none" }}>ClavisPass</Text>
           <View style={{ display: "flex", flexDirection: "row" }}>
             <WebSpecific notIn={true}>
               <Tools

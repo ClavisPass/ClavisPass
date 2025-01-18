@@ -135,7 +135,7 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
           Your Entries
         </Text>
         <View style={{ width: "100%", flex: 1, padding: 6 }}>
-          <View>
+          <View style={{height: 40}}>
             <TextInput
               placeholder="Search"
               outlineStyle={[globalStyles.outlineStyle, {borderColor: theme.colors.primary, borderWidth: 2}]}

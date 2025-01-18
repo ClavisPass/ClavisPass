@@ -68,7 +68,7 @@ function Header(props: Props) {
                 fontWeight: "bold",
                 fontSize: 15,
               }}
-              variant="bodyMedium"
+              variant="titleSmall"
             >
               {props.title}
             </Text>
