@@ -40,11 +40,11 @@ function AnalysisEntry(props: Props) {
         >
           <Text
             variant="titleLarge"
-            style={{ color: theme.colors.primary, fontWeight: "bold" }}
+            style={{ color: theme.colors.primary, fontWeight: "bold", userSelect: "none" }}
           >
             {props.number}
           </Text>
-          <Text variant="titleSmall" style={{ color: theme.colors.primary }}>
+          <Text variant="titleSmall" style={{ color: theme.colors.primary, userSelect: "none" }}>
             {props.name}
           </Text>
         </View>

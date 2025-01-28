@@ -110,9 +110,9 @@ function UserInformation(props: Props) {
           >
             {tokenType === "Dropbox" && (
               <Chip
-                onPress={() => {
-                  props.changeEditTokenVisibility?.(true);
-                }}
+                //onPress={() => {
+                //  props.changeEditTokenVisibility?.(true);
+                //}}
                 icon="dropbox"
               >
                 Dropbox

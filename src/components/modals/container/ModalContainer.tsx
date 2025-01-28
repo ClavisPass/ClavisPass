@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { Platform, Pressable, Text, View } from "react-native";
 import { Animated, Easing } from "react-native";
 import { useTheme } from "../../../contexts/ThemeProvider";
+import React from "react";
 
 type Props = {
   children: ReactNode;

@@ -5,7 +5,7 @@ import Button from "./buttons/Button";
 import TypeWriterComponent from "./TypeWriter";
 import fetchData from "../api/fetchData";
 import { useToken } from "../contexts/TokenProvider";
-import { ActivityIndicator } from "react-native-paper";
+import { ActivityIndicator, Button as ButtonA, Divider } from "react-native-paper";
 import { View, Text } from "react-native";
 import { useData } from "../contexts/DataProvider";
 import getEmptyData from "../utils/getEmptyData";
@@ -14,6 +14,7 @@ import CryptoType, { CryptoTypeSchema } from "../types/CryptoType";
 import { decrypt } from "../utils/CryptoLayer";
 import { DataTypeSchema } from "../types/DataType";
 import { useTheme } from "../contexts/ThemeProvider";
+import { authenticateUser } from "../utils/authenticateUser";
 
 type Props = {
   userInfo: UserInfoType;
@@ -42,13 +43,14 @@ function Login(props: Props) {
   const [value2, setValue2] = useState("");
 
   useEffect(() => {
-    console.log("hier 1")
-    console.log(token)
-    console.log(tokenType)
+    console.log("hier 1");
+    authenticateUser();
+    console.log(token);
+    console.log(tokenType);
     if (token && tokenType) {
       setLoading(true);
       fetchData(token, tokenType, "clavispass.lock").then((response) => {
-        console.log("hier 2 "+response)
+        console.log("hier 2 " + response);
         if (response === null) {
           setShowNewData(true);
         } else {
@@ -100,11 +102,13 @@ function Login(props: Props) {
         </>
       ) : (
         <>
-          <TypeWriterComponent
-            displayName={
-              props.userInfo?.username ? props.userInfo.username : ""
-            }
-          />
+          <View style={{height: 40}}>
+            <TypeWriterComponent
+              displayName={
+                props.userInfo?.username ? props.userInfo.username : ""
+              }
+            />
+          </View>
           <View
             style={{
               display: "flex",

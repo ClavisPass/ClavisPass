@@ -43,6 +43,7 @@ function KeyModule(props: KeyModuleType & Props) {
       "Bcrypt-Hash": /^\$2[aby]\$.{56}$/, // Bcrypt-Hash
       "MD5-Hash": /^[a-f0-9]{32}$/i, // MD5-Hash
       "SHA-256-Hash": /^[A-Fa-f0-9]{64}$/, // SHA-256-Hash
+      "Discount Code": /^[A-Z0-9]{4,6}$|^[A-Z0-9]{9}$/, // Rabattcode
     };
 
     for (const [type, pattern] of Object.entries(patterns)) {
@@ -50,7 +51,7 @@ function KeyModule(props: KeyModuleType & Props) {
         return type;
       }
     }
-    return "Unknown Key Type"; // Wenn der Schlüssel keinem bekannten Typ entspricht
+    return "false"; // Wenn der Schlüssel keinem bekannten Typ entspricht
   }
 
   return (
@@ -75,9 +76,11 @@ function KeyModule(props: KeyModuleType & Props) {
         />
         <CopyToClipboard value={value} />
       </View>
-      <Text style={{ marginLeft: 6, color: theme.colors.primary }}>
-        {keyType}
-      </Text>
+      {keyType !== "false" && (
+        <Text style={{ marginLeft: 6, color: theme.colors.primary }}>
+          {keyType}
+        </Text>
+      )}
     </ModuleContainer>
   );
 }

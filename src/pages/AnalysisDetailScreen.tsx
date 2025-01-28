@@ -8,7 +8,7 @@ import { RootStackParamList } from "../../App";
 import { Icon, Text, TextInput } from "react-native-paper";
 import ModulesEnum from "../enums/ModulesEnum";
 import ModuleIconsEnum from "../enums/ModuleIconsEnum";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import AnalysisEntry from "../components/AnalysisEntry";
 import AnalysisEntryGradient from "../components/AnalysisEntryGradient";
 import Pattern from "../components/Pattern";
@@ -177,16 +177,19 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
           />
         </View>
       </Header>
-      <View
+      <ScrollView
         style={{
           width: "100%",
           display: "flex",
-          flexDirection: "column",
-          height: 100,
           gap: 6,
           padding: 6,
         }}
       >
+        <View style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 6,
+        }}>
         <Text variant="titleSmall" style={{ marginLeft: 6, userSelect: "none" }}>
           Your Password
         </Text>
@@ -231,7 +234,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
         >
           <AnalysisEntryGradient
             name={"Entropy"}
-            number={10}
+            number={routeValue.entropy}
             percentage={(routeValue.entropy / 200) * 100}
           />
           <AnalysisEntry
@@ -309,7 +312,8 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             })}
           </>
         ) : null}
-      </View>
+        </View>
+      </ScrollView>
     </AnimatedContainer>
   );
 };

@@ -29,38 +29,49 @@ type Props = {
 
 export const QuickSelectProvider = ({ children }: Props) => {
   const [modules, setModules] = useState<ModulesType | null>(null);
-  const [width, setWidth] = useState(440);
-  const [height, setHeight] = useState(750);
+  const [width, setWidth] = useState<number>(0);
+  const [height, setHeight] = useState<number>(0);
+  const [positionX, setPositionX] = useState<number>(0);
+  const [positionY, setPositionY] = useState<number>(0);
 
-  const [positionX, setPostionx] = useState(0);
-  const [positionY, setPostionY] = useState(0);
-
-  const getWindowSize = async () => {
+  const getInitialWindowState = async () => {
     try {
+      // Fenstergröße abrufen
       const size = await appWindow.outerSize();
       setWidth(size.width);
       setHeight(size.height);
+
+      // Fensterposition abrufen
       const position = await appWindow.outerPosition();
-      setPostionx(position.x);
-      setPostionY(position.y);
-      appWindow.setAlwaysOnTop(true);
-      appWindow.setSize(new PhysicalSize(60, 180));
-      appWindow.setPosition(new PhysicalPosition(0, position.y));
+      setPositionX(position.x);
+      setPositionY(position.y);
     } catch (error) {
-      console.error("Failed to get window size:", error);
+      console.error("Failed to get initial window state:", error);
     }
   };
+
+  useEffect(() => {
+    // Initiale Fenstergröße und Position laden
+    getInitialWindowState();
+  }, []);
+
   useEffect(() => {
     if (modules != null) {
-      getWindowSize();
+      // Wenn Module aktiv sind, spezielles Fensterverhalten setzen
+      appWindow.setAlwaysOnTop(true);
+      appWindow.setSize(new PhysicalSize(60, 180));
+      appWindow.setPosition(new PhysicalPosition(0, positionY));
     } else {
+      // Wenn Module nicht aktiv sind, ursprüngliche Fenstergröße und Position wiederherstellen
       appWindow.setAlwaysOnTop(false);
-      appWindow.setSize(new PhysicalSize(width, height));
-      if (positionY !== 0) {
+      if (width > 0 && height > 0) {
+        appWindow.setSize(new PhysicalSize(width, height));
+      }
+      if (positionX !== 0 || positionY !== 0) {
         appWindow.setPosition(new PhysicalPosition(positionX, positionY));
       }
     }
-  }, [modules]);
+  }, [modules, width, height, positionX, positionY]);
 
   return (
     <QuickSelectContext.Provider value={{ modules, setModules }}>

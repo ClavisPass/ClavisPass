@@ -3,8 +3,8 @@ import * as Notifications from "expo-notifications";
 import { useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import * as Device from "expo-device";
-import ModulesType from "../types/ModulesType";
-import { useQuickSelect } from "../contexts/QuickSelectProvider";
+import { BackHandler } from 'react-native';
+import React from "react";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -64,13 +64,54 @@ export async function openFastAccess(setModules: () => void) {
   } else {
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: "You've got mail! 📬",
-        body: "Here is the notification body",
-        data: { data: "goes here", test: { test1: "more data" } },
-        vibrate: [0, 250, 250, 250]
+        title: "Neue Nachricht 📬",
+        //body: "Hier ist der Text der Benachrichtigung",
+        data: { data: "beispieldaten", test: { test1: "mehr daten" } },
+        vibrate: [0, 250, 250, 250],
+        categoryIdentifier: "fast_access",
+        priority: "max", // Oder "high" für leicht reduzierte Wichtigkeit
       },
       trigger: null,
     });
+
+    Notifications.setNotificationCategoryAsync('fast_access', [
+      {
+        identifier: 'open_app',
+        buttonTitle: 'App öffnen',
+        options: { opensAppToForeground: true },
+      },
+      {
+        identifier: 'dismiss',
+        buttonTitle: 'Schließen',
+        options: {},
+      },
+      {
+        identifier: 'custom_action',
+        buttonTitle: 'Benutzerdefinierte Aktion',
+        options: {},
+      },
+    ]);
+
+    Notifications.addNotificationResponseReceivedListener((response) => {
+      const { actionIdentifier } = response;
+      if (actionIdentifier === 'open_app') {
+        console.log("App öffnen wurde ausgewählt");
+        setModules(); // Ihre benutzerdefinierte Funktion aufrufen
+      } else if (actionIdentifier === 'dismiss') {
+        console.log("Benachrichtigung wurde geschlossen");
+      } else if (actionIdentifier === 'custom_action') {
+        console.log("Benutzerdefinierte Aktion wurde ausgewählt");
+        // Implementieren Sie hier Ihre benutzerdefinierte Logik
+      }
+    });
+
+    function minimizeApp() {
+      if (Platform.OS === 'android') {
+        BackHandler.exitApp(); // Beendet oder minimiert die App
+      } else {
+        console.log('App minimieren ist auf iOS nicht möglich.');
+      }
+    }
   }
 }
 

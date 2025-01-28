@@ -99,13 +99,29 @@ function SettingsScreen({ navigation }: { navigation: any }) {
                     alignItems: "center",
                   }}
                 >
-                  <Text variant="bodyLarge">Autostart</Text>
                   <Switch
                     value={startup}
                     onValueChange={(checked) => {
                       changeAutoStart(checked);
                     }}
                   />
+                  <Text variant="bodyLarge">Autostart</Text>
+                </View>
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  <Switch
+                    value={startup}
+                    onValueChange={(checked) => {
+                      changeAutoStart(checked);
+                    }}
+                  />
+                  <Text variant="bodyLarge">Minimize to Tray</Text>
                 </View>
               </View>
             </SettingsItem>

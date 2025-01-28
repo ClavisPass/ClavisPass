@@ -7,6 +7,7 @@ import { useData } from "../../contexts/DataProvider";
 import ValuesType from "../../types/ValuesType";
 import DataType from "../../types/DataType";
 import DeleteModal from "../modals/DeleteModal";
+import React from "react";
 
 type Props = {
   visible: boolean;
@@ -66,9 +67,9 @@ function EditMetaInfMenu(props: Props) {
           {props.favButton}
         </View>
         <Divider />
-        <MenuItem>{"created: " + formatDateTime(props.created)}</MenuItem>
-        <MenuItem>
-          {"last updated: " + formatDateTime(props.lastUpdated)}
+        <MenuItem label="Created">{formatDateTime(props.created)}</MenuItem>
+        <MenuItem label="Last Updated">
+          {formatDateTime(props.lastUpdated)}
         </MenuItem>
         <Divider />
         <MenuItem

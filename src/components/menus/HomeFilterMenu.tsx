@@ -1,3 +1,4 @@
+import React from "react";
 import { Divider, IconButton } from "react-native-paper";
 import { useAuth } from "../../contexts/AuthProvider";
 import DataType from "../../types/DataType";
@@ -74,6 +75,7 @@ function HomeFilterMenu(props: Props) {
         </View>
         <Divider />
 
+        {/* 
         <MenuItem
           leadingIcon="folder-outline"
           onPress={() => {
@@ -83,6 +85,7 @@ function HomeFilterMenu(props: Props) {
         >
           {"Add/Edit Folder"}
         </MenuItem>
+        */}
         <MenuItem
           leadingIcon="sort-ascending"
           onPress={() => {

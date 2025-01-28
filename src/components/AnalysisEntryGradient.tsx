@@ -45,11 +45,11 @@ function AnalysisEntryGradient(props: Props) {
         >
           <Text
             variant="titleLarge"
-            style={{ color: "white", fontWeight: "bold" }}
+            style={{ color: "white", fontWeight: "bold", userSelect: "none" }}
           >
             {props.number}
           </Text>
-          <Text variant="titleSmall" style={{ color: "white" }}>
+          <Text variant="titleSmall" style={{ color: "white", userSelect: "none" }}>
             {props.name}
           </Text>
         </View>

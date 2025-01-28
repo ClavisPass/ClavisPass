@@ -9,6 +9,7 @@ import {
 import { Chip, Divider, IconButton } from "react-native-paper";
 import WebSpecific from "./platformSpecific/WebSpecific";
 import { MenuItem } from "./menus/Menu";
+import AnimatedOpacityContainer from "./container/AnimatedOpacityContainer/AnimatedOpacityContainer";
 
 const styles = StyleSheet.create({
   chip: {
@@ -32,6 +33,8 @@ function FolderFilter(props: Props) {
   const flatListRef: any = useRef<FlatList>(null);
   const [currentOffset, setCurrentOffset] = useState(0);
 
+  const [showAddButton, setShowAddButton] = useState(false);
+
   const handleScroll = (event: any) => {
     const offsetY = event.nativeEvent.contentOffset.x;
     setCurrentOffset(offsetY);
@@ -53,20 +56,19 @@ function FolderFilter(props: Props) {
       {width > 600 ? (
         <View
           style={{
-            maxWidth: 200,
-            height: "100%",
-            display: "flex",
+            maxWidth: 240,
+            width: 160,
             flexDirection: "row",
             paddingRight: 4,
             borderRadius: 15,
             overflow: "hidden",
           }}
+          onPointerEnter={() => setShowAddButton(true)}
+          onPointerLeave={() => setShowAddButton(false)}
         >
           <FlatList
             ref={flatListRef}
             data={["Favorite", ...(props.folder ? props.folder : [])]}
-            //horizontal={true}
-            //showsHorizontalScrollIndicator={false}
             style={{ flexShrink: 1 }}
             onScroll={handleScroll}
             renderItem={({ item, index }) => (
@@ -75,7 +77,6 @@ function FolderFilter(props: Props) {
                   <MenuItem
                     leadingIcon={"star"}
                     selected={props.selectedFav}
-                    //showSelectedOverlay={true}
                     onPress={() => {
                       props.setSelectedFav(!props.selectedFav);
                       if (props.selectedFav) {
@@ -89,12 +90,11 @@ function FolderFilter(props: Props) {
                   </MenuItem>
                 ) : (
                   <>
-                    <Divider style={{marginRight: 4}}/>
+                    <Divider style={{ marginRight: 4 }} />
                     <MenuItem
                       key={index}
                       leadingIcon={"folder"}
                       selected={props.selectedFolder == item ? true : false}
-                      //showSelectedOverlay={true}
                       onPress={() => {
                         if (props.selectedFolder != item) {
                           props.setSelectedFolder("" + item);
@@ -109,6 +109,27 @@ function FolderFilter(props: Props) {
                 )}
               </>
             )}
+            ListFooterComponent={
+              <View
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <AnimatedOpacityContainer visible={showAddButton}>
+                  <IconButton
+                    icon={"plus"}
+                    style={{ margin: 0 }}
+                    onPress={() => props.setFolderModalVisible(true)}
+                    size={20}
+                    selected={true}
+                    mode="contained-tonal"
+                  />
+                </AnimatedOpacityContainer>
+              </View>
+            }
           />
           <Divider style={{ width: 1, height: "100%" }} />
         </View>

@@ -10,6 +10,7 @@ type MenuItemProps = {
   onPress?: () => void;
   leadingIcon?: string;
   selected?: boolean;
+  label?: string;
 };
 export function MenuItem(props: MenuItemProps) {
   return (
@@ -32,7 +33,9 @@ export function MenuItem(props: MenuItemProps) {
           flexDirection: "row",
           alignItems: "center",
           gap: 6,
-          backgroundColor: props.selected? "rgba(0, 0, 0, 0.137)" : "transparent",
+          backgroundColor: props.selected
+            ? "rgba(0, 0, 0, 0.137)"
+            : "transparent",
         }}
       >
         {props.leadingIcon && (
@@ -42,9 +45,35 @@ export function MenuItem(props: MenuItemProps) {
             source={props.leadingIcon}
           />
         )}
-        <Text variant="bodyLarge" style={{ userSelect: "none" }}>
-          {props.children}
-        </Text>
+        {props.label ? (
+          <View style={{ display: "flex", flexDirection: "column" }}>
+            <Text
+              variant="labelLarge"
+              style={{ userSelect: "none", color: theme.colors.primary }}
+              ellipsizeMode="tail"
+              numberOfLines={1}
+            >
+              {props.label}
+            </Text>
+            <Text
+              variant="bodyLarge"
+              style={{ userSelect: "none" }}
+              ellipsizeMode="tail"
+              numberOfLines={1}
+            >
+              {props.children}
+            </Text>
+          </View>
+        ) : (
+          <Text
+            variant="bodyLarge"
+            style={{ userSelect: "none" }}
+            ellipsizeMode="tail"
+            numberOfLines={1}
+          >
+            {props.children}
+          </Text>
+        )}
       </View>
     </TouchableRipple>
   );

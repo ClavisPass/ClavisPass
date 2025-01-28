@@ -2,16 +2,25 @@ import React, { useEffect } from "react";
 import { register } from "@tauri-apps/api/globalShortcut";
 import { Platform } from "react-native";
 import { appWindow } from "@tauri-apps/api/window";
+import { useAuth } from "../../contexts/AuthProvider";
 
 type Props = {};
 
 function GlobalShortcuts(props: Props) {
+  const auth = useAuth();
   const registerShortcuts = async () => {
-    await register("alt+W", () => {
+    await register("alt+W", async () => {
       console.log("Shortcut triggered");
-      appWindow.show();
-      appWindow.unminimize();
-      appWindow.setFocus();
+      const stateIsVisible = await appWindow.isVisible();
+      const stateIsFocused = await appWindow.isFocused();
+      if (stateIsVisible && stateIsFocused) {
+        auth.logout();
+        appWindow.hide();
+      } else {
+        appWindow.show();
+        appWindow.unminimize();
+        appWindow.setFocus();
+      }
     });
   };
   useEffect(() => {

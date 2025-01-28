@@ -7,6 +7,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useTheme } from "../../../contexts/ThemeProvider";
+import React from "react";
 
 type Props = {
   children: ReactNode;

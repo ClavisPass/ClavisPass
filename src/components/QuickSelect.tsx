@@ -1,7 +1,6 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import ModulesType from "../types/ModulesType";
-import { TitlebarHeight } from "./CustomTitlebar";
 import { IconButton } from "react-native-paper";
 import { useTheme } from "../contexts/ThemeProvider";
 

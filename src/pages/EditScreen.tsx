@@ -202,8 +202,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       <Button
         mode="contained"
         style={{ width: 200 }}
-        contentStyle={{ backgroundColor: discardChanges? theme.colors.primary : undefined }}
-        disabled={!discardChanges}
+        contentStyle={{ backgroundColor: discardChanges && value.title !== ""? theme.colors.primary : undefined }}
+        disabled={!discardChanges || value.title === ""}
         onPress={saveValue}
       >
         Save

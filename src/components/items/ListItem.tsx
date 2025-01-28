@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
-import { Icon, Text, TouchableRipple } from "react-native-paper";
+import { View, StyleSheet, Platform } from "react-native";
+import { Icon, IconButton, Text, TouchableRipple } from "react-native-paper";
 import ValuesType from "../../types/ValuesType";
 import ModulesEnum from "../../enums/ModulesEnum";
 
@@ -36,6 +36,9 @@ function ListItem(props: Props) {
 
   const [url, setUrl] = useState("");
   const [icon, setIcon] = useState("lock");
+
+  const [hovered, setHovered] = useState(false);
+
   useEffect(() => {
     const urlResult = props.item.modules.filter(
       (module) => module.module === ModulesEnum.URL
@@ -74,7 +77,11 @@ function ListItem(props: Props) {
     }
   };
   return (
-    <View style={[styles.container, {backgroundColor: theme.colors?.background}]}>
+    <View
+      style={[styles.container, { backgroundColor: theme.colors?.background }]}
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => Platform.OS === "web" && setHovered(false)}
+    >
       <TouchableRipple
         style={styles.ripple}
         onPress={props.onPress}
@@ -107,11 +114,35 @@ function ListItem(props: Props) {
               {props.item.title}
             </Text>
           </View>
-          <Icon
-            color={theme.colors?.primary}
-            source={"chevron-right"}
-            size={20}
-          />
+          <View style={{display: "flex", flexDirection: "row", gap: 10, alignItems: "center"}}>
+            {hovered && (
+              <>
+                <IconButton
+                  icon={"account"}
+                  mode={"contained-tonal"}
+                  size={ 14}
+                  style={{ margin: 0, padding: 0, height: 20, width: 20 }}
+                  onPress={() => {
+                    //
+                  }}
+                />
+                <IconButton
+                  icon={"form-textbox-password"}
+                  mode={"contained-tonal"}
+                  size={14}
+                  style={{ margin: 0, padding: 0, height: 20, width: 20 }}
+                  onPress={() => {
+                    //
+                  }}
+                />
+              </>
+            )}
+            <Icon
+              color={theme.colors?.primary}
+              source={"chevron-right"}
+              size={20}
+            />
+          </View>
         </>
       </TouchableRipple>
     </View>

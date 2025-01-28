@@ -208,7 +208,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
           }}
         >
           
-          <Text style={{ fontFamily: 'LexendExa_400Regular', fontSize: 16, color: "white", userSelect: "none" }}>ClavisPass</Text>
+          <Text style={{ fontFamily: 'LexendExa_400Regular', fontSize: 16, color: "white", userSelect: "none", width: 110 }}>ClavisPass</Text>
           <View style={{ display: "flex", flexDirection: "row" }}>
             <WebSpecific notIn={true}>
               <Tools

@@ -4,6 +4,7 @@ import { Icon, IconButton, TouchableRipple } from "react-native-paper";
 import theme from "../ui/theme";
 import WebSpecific from "./platformSpecific/WebSpecific";
 import { appWindow } from "@tauri-apps/api/window";
+import { useAuth } from "../contexts/AuthProvider";
 
 export const TITLEBAR_HEIGHT = Platform.OS === "web" ? 46 : 0;
 
@@ -40,6 +41,7 @@ export function TitlebarHeight(props: Props) {
 }
 
 function CustomTitlebar() {
+  const auth = useAuth();
   useEffect(() => {
     if (Platform.OS === "web") {
       if (document) {
@@ -64,6 +66,7 @@ function CustomTitlebar() {
 
   const closeWindow = () => {
     if (Platform.OS === "web") {
+      auth.logout();
       appWindow.hide();
     }
   };

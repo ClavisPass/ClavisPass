@@ -1,13 +1,11 @@
 import Constants from "expo-constants";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 import { Text, TextInput, TouchableRipple } from "react-native-paper";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import { StatusBar } from "expo-status-bar";
 import AnimatedContainer from "../components/container/AnimatedContainer";
 import { useFocusEffect } from "@react-navigation/native";
-import { LinearGradient } from "expo-linear-gradient";
-import getColors from "../ui/linearGradient";
 import { FlashList } from "@shopify/flash-list";
 import { useData } from "../contexts/DataProvider";
 import { ValuesListType } from "../types/ValuesType";
@@ -16,33 +14,8 @@ import { ModuleType } from "../types/ModulesType";
 import WifiModuleType from "../types/modules/WifiModuleType";
 import { useTheme } from "../contexts/ThemeProvider";
 import passwordEntropy from "../utils/Entropy";
-import { PieChart } from "react-native-chart-kit";
-import CircularProgressBar from "../components/CircularProgressBar";
-import AnalysisEntryContainer from "../components/AnalysisEntry";
-
-function Test() {
-  return (
-    <View style={{ width: "100%", height: 100 }}>
-      <LinearGradient
-        colors={getColors()}
-        dither={true}
-        style={{
-          margin: 4,
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: 10,
-          paddingTop: Constants.statusBarHeight,
-          borderRadius: 16,
-        }}
-        end={{ x: 0.1, y: 0.2 }}
-      >
-        <CircularProgressBar fill={40} maxValue={100} color={"white"} />
-      </LinearGradient>
-    </View>
-  );
-}
+import AnalysisEntry from "../components/AnalysisEntry";
+import AnalysisEntryGradient from "../components/AnalysisEntryGradient";
 
 export type CachedPasswordsType = {
   title: string;
@@ -55,27 +28,56 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
   const data = useData();
   const { theme, globalStyles } = useTheme();
 
-  const [value, setValue] = useState("");
-
   const [cachedPasswordList, setCachedPasswordList] = React.useState<
     CachedPasswordsType[] | null
   >(null);
+
+  const [averageEntropy, setAverageEntropy] = useState(0);
+  const [averageEntropyPercentage, setAverageEntropyPercentage] = useState(0);
+  const [strong, setStrong] = useState(0);
+  const [medium, setMedium] = useState(0);
+  const [weak, setWeak] = useState(0);
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredValues = useMemo(() => {
+    return cachedPasswordList?.filter((item) => {
+      return item.title.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+  }, [cachedPasswordList, searchQuery]);
 
   const findPasswords = (values: any) => {
     let cachedPasswords: CachedPasswordsType[] = [];
     if (values) {
       let cachedData = [...values] as ValuesListType;
+
+      let weakCount = 0;
+      let mediumCount = 0;
+      let strongCount = 0;
+
       cachedData.forEach((item) => {
         const getallPasswords = item.modules.filter(
           (module) => module.module === ModulesEnum.PASSWORD
         );
         getallPasswords.forEach((module: ModuleType) => {
+          const entropy = passwordEntropy(module.value);
+          const percentage = entropy / 200;
+          if (percentage < 0.4) {
+            weakCount++;
+            console.log("Counts updated:", weakCount);
+          } else if (percentage < 0.55) {
+            mediumCount++;
+            console.log("Counts updated:", mediumCount);
+          } else {
+            strongCount++;
+            console.log("Counts updated:", strongCount);
+          }
           cachedPasswords = [
             ...(cachedPasswords ? cachedPasswords : []),
             {
               title: item.title,
               password: module.value,
-              entropy: passwordEntropy(module.value),
+              entropy: entropy,
               type: ModulesEnum.PASSWORD,
             },
           ];
@@ -84,31 +86,64 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
         const getallWifiPasswords = item.modules.filter(
           (module) => module.module === ModulesEnum.WIFI
         );
+
         getallWifiPasswords.forEach((module: ModuleType) => {
           const transform = module as WifiModuleType;
+          const entropy = passwordEntropy(transform.value);
+          const percentage = entropy / 200;
+          if (percentage < 0.4) {
+            weakCount++;
+            console.log("Counts updated:", weakCount);
+          } else if (percentage < 0.55) {
+            mediumCount++;
+            console.log("Counts updated:", mediumCount);
+          } else {
+            strongCount++;
+            console.log("Counts updated:", strongCount);
+          }
           cachedPasswords = [
             ...(cachedPasswords ? cachedPasswords : []),
             {
               title: transform.wifiName,
               password: transform.value,
-              entropy: passwordEntropy(transform.value),
+              entropy: entropy,
               type: ModulesEnum.WIFI,
             },
           ];
         });
       });
+      setWeak(weakCount);
+      setMedium(mediumCount);
+      setStrong(strongCount);
     }
 
     return cachedPasswords;
   };
 
+  const calculateAverageEntropy = (passwords: CachedPasswordsType[]) => {
+    if (passwords.length === 0) return 0;
+    const totalEntropy = passwords
+      .map((item) => item.entropy)
+      .reduce((sum, current) => sum + current, 0);
+
+    const entropy = totalEntropy / passwords.length;
+    setAverageEntropy(Math.floor(entropy));
+    setAverageEntropyPercentage((entropy / 200) * 100);
+  };
+
   useEffect(() => {
-    if (data?.data?.values)
-      setCachedPasswordList(findPasswords(data?.data?.values));
+    if (data?.data?.values) {
+      const passwords = findPasswords(data?.data?.values);
+      setCachedPasswordList(passwords);
+      calculateAverageEntropy(passwords);
+    }
   }, [data?.data?.values]);
 
   return (
-    <AnimatedContainer style={{ marginTop: Constants.statusBarHeight }} useFocusEffect={useFocusEffect}>
+    <AnimatedContainer
+      style={{ marginTop: Constants.statusBarHeight }}
+      useFocusEffect={useFocusEffect}
+    >
       <StatusBar
         animated={true}
         style="dark"
@@ -124,10 +159,50 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
           width: "100%",
         }}
       >
-        <Text variant="titleSmall" style={{ marginLeft: 6, userSelect: "none" }}>
+        <Text
+          variant="titleSmall"
+          style={{ marginLeft: 6, userSelect: "none" }}
+        >
           Statistics
         </Text>
-        <Test />
+        <View
+          style={{
+            margin: 6,
+            display: "flex",
+            flexDirection: "column",
+            gap: 6,
+          }}
+        >
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              height: 80,
+              gap: 6,
+            }}
+          >
+            <AnalysisEntryGradient
+              name={"avg. Entropy"}
+              number={averageEntropy}
+              percentage={averageEntropyPercentage}
+            />
+            <AnalysisEntry name={"Strong"} number={strong} percentage={cachedPasswordList ? strong / cachedPasswordList.length * 100: 0} />
+          </View>
+          <View
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              height: 80,
+              gap: 6,
+            }}
+          >
+            <AnalysisEntry name={"Medium"} number={medium} percentage={cachedPasswordList ? medium / cachedPasswordList.length * 100: 0} />
+            <AnalysisEntry name={"Weak"} number={weak} percentage={cachedPasswordList ? weak / cachedPasswordList.length * 100: 0} />
+          </View>
+        </View>
         <Text
           variant="titleSmall"
           style={{ marginTop: 10, marginLeft: 6, userSelect: "none" }}
@@ -135,19 +210,25 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
           Your Entries
         </Text>
         <View style={{ width: "100%", flex: 1, padding: 6 }}>
-          <View style={{height: 40}}>
+          <View style={{ height: 40 }}>
             <TextInput
               placeholder="Search"
-              outlineStyle={[globalStyles.outlineStyle, {borderColor: theme.colors.primary, borderWidth: 2}]}
-              style={[globalStyles.textInputStyle, {borderColor: theme.colors.primary, borderBottomWidth: 1}]}
-              value={value}
+              outlineStyle={[
+                globalStyles.outlineStyle,
+                { borderColor: theme.colors.primary, borderWidth: 2 },
+              ]}
+              style={[
+                globalStyles.textInputStyle,
+                { borderColor: theme.colors.primary, borderBottomWidth: 1 },
+              ]}
+              value={searchQuery}
               mode="flat"
-              onChangeText={(text) => setValue(text)}
+              onChangeText={setSearchQuery}
               autoCapitalize="none"
             />
           </View>
           <FlashList
-            data={cachedPasswordList}
+            data={filteredValues}
             renderItem={({ item, index }) => (
               <View
                 style={{
