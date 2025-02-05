@@ -16,6 +16,8 @@ import DarkModeSwitch from "../components/DarkModeSwitch";
 import Auth from "../components/Auth";
 import EditTokenModal from "../components/modals/EditTokenModal";
 import { useTheme } from "../contexts/ThemeProvider";
+import { authenticateUser, isUsingAuthentication, removeAuthentication, saveAuthentication } from "../utils/authenticateUser";
+import { useAuth } from "../contexts/AuthProvider";
 
 const styles = StyleSheet.create({
   surface: {
@@ -31,19 +33,35 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   container: {
-    width: 200,
+    width: 250,
     display: "flex",
     flexDirection: "column",
-    gap: 4,
+    gap: 8,
     margin: 6,
   },
 });
 
 function SettingsScreen({ navigation }: { navigation: any }) {
   const { globalStyles } = useTheme();
+  const { master} = useAuth();
   const [startup, setStartup] = React.useState(false);
 
-  const [value, setValue] = useState("clavispass");
+  const [useAuthentication, setUseAuthentication] = React.useState(false);
+
+  const changeAuthentication = async (authentication: boolean) => {
+    if (authentication) {
+      authenticateUser().then((isAuthenticated) => {
+        if(isAuthenticated && master !== null)
+        {
+          saveAuthentication(master);
+          setUseAuthentication(true)
+        }
+      });
+    } else {
+      removeAuthentication();
+      setUseAuthentication(false)
+    }
+  };
 
   const [editTokenVisibility, setEditTokenVisibility] = useState(false);
 
@@ -64,6 +82,9 @@ function SettingsScreen({ navigation }: { navigation: any }) {
 
   useEffect(() => {
     getAutoStart();
+    isUsingAuthentication().then((isAuthenticated) => {
+      setUseAuthentication(isAuthenticated)
+    });
   }, []);
 
   return (
@@ -131,18 +152,25 @@ function SettingsScreen({ navigation }: { navigation: any }) {
               <DarkModeSwitch />
             </View>
           </SettingsItem>
-          <SettingsItem icon={"file-lock-outline"} title={"Credentials"}>
+          <SettingsItem icon={"fingerprint"} title={"Authentication"}>
             <View style={styles.container}>
-              <TextInput
-                placeholder="Filename"
-                outlineStyle={globalStyles.outlineStyle}
-                style={globalStyles.textInputStyle}
-                value={value}
-                mode="outlined"
-                onChangeText={(text) => setValue(text)}
-                autoCapitalize="none"
-              />
-              <Button mode="contained-tonal">Change Password</Button>
+              <Button mode="contained-tonal">Change Master Password</Button>
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 10,
+                  alignItems: "center",
+                }}
+              >
+                <Switch
+                  value={useAuthentication}
+                  onValueChange={(checked) => {
+                    changeAuthentication(checked);
+                  }}
+                />
+                <Text variant="bodyLarge">Use System Authentication</Text>
+              </View>
             </View>
           </SettingsItem>
           <SettingsItem icon={"import"} title={"Import Passwords"}>

@@ -35,9 +35,10 @@ function Pattern(props: Props) {
           justifyContent: "center",
         }}
       >
-        {arrayPattern.map((char) => {
+        {arrayPattern.map((char, index) => {
           return (
             <View
+              key={index}
               style={{
                 padding: 6,
                 borderRadius: 10,

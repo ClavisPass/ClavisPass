@@ -75,6 +75,7 @@ function FolderFilter(props: Props) {
               <>
                 {index === 0 && item === "Favorite" ? (
                   <MenuItem
+                    key={index}
                     leadingIcon={"star"}
                     selected={props.selectedFav}
                     onPress={() => {
@@ -111,6 +112,7 @@ function FolderFilter(props: Props) {
             )}
             ListFooterComponent={
               <View
+              key={"lastitem-0"}
                 style={{
                   width: "100%",
                   display: "flex",
@@ -167,6 +169,7 @@ function FolderFilter(props: Props) {
                 <>
                   {index === 0 && item === "Favorite" ? (
                     <Chip
+                      key={index}
                       icon={"star"}
                       selected={props.selectedFav}
                       showSelectedOverlay={true}

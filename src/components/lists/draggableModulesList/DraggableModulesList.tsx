@@ -14,6 +14,7 @@ type Props = {
   deleteModule: (id: string) => void;
   changeModule: (module: ModuleType) => void;
   edit: boolean;
+  setDiscardoChanges: () => void;
 };
 
 function DraggableModulesList(props: Props) {
@@ -38,11 +39,15 @@ function DraggableModulesList(props: Props) {
     <View style={{ flex: 1, width: "100%" }}>
       {
         <DraggableFlatList
-          data={[...props.value.modules]}
+          data={props.value.modules}
           renderItem={renderItem}
           keyExtractor={(item, index) => `draggable-item-${item.id}`}
           onDragEnd={({ data }) => {
-            props.changeModules([...data]);
+            props.setValue({
+              ...props.value,
+              modules: data,
+            });
+            props.setDiscardoChanges();
           }}
         />
       }

@@ -6,8 +6,11 @@ import ModulesEnum from "../../enums/ModulesEnum";
 
 import { Image } from "expo-image";
 import FastAccess, { openFastAccess } from "../../utils/FastAccess";
-import { useQuickSelect } from "../../contexts/QuickSelectProvider";
 import { useTheme } from "../../contexts/ThemeProvider";
+import isTauri from "../../utils/isTauri";
+
+import { useQuickSelect as useQuickSelectTauri } from "../../contexts/QuickSelectProvider";
+import { useQuickSelect as useQuickSelectNotTauri } from "../../contexts/QuickSelectProviderNotTauri";
 
 const styles = StyleSheet.create({
   container: {
@@ -16,22 +19,31 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     borderRadius: 12,
     overflow: "hidden",
+    height: 44,
   },
   ripple: {
-    padding: 14,
+    padding: 0,
+    paddingLeft: 8,
+    paddingRight: 8,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+    flex: 1,
   },
 });
 
 type Props = {
   item: ValuesType;
   onPress: () => void;
+  key?: React.Key;
 };
 
 function ListItem(props: Props) {
   const { theme } = useTheme();
+
+  const useQuickSelect =
+    Platform.OS === "web" ? useQuickSelectTauri : useQuickSelectNotTauri;
   const { setModules } = useQuickSelect();
 
   const [url, setUrl] = useState("");
@@ -78,16 +90,20 @@ function ListItem(props: Props) {
   };
   return (
     <View
+      key={props.key}
       style={[styles.container, { backgroundColor: theme.colors?.background }]}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => Platform.OS === "web" && setHovered(false)}
     >
       <TouchableRipple
+        key={props.key}
         style={styles.ripple}
         onPress={props.onPress}
         rippleColor="rgba(0, 0, 0, .32)"
         onLongPress={() => {
-          openFastAccess(() => setModules(props.item.modules));
+          openFastAccess(() => {
+            setModules(props.item.modules);
+          }, props.item.title);
         }}
       >
         <>
@@ -102,35 +118,54 @@ function ListItem(props: Props) {
           >
             {url !== "" ? (
               <Image
-                style={{ width: 22, height: 22, margin: 0, borderRadius: 8 }}
+                style={{ width: 30, height: 30, margin: 0, borderRadius: 8 }}
                 source={url}
                 contentFit="cover"
                 transition={250}
               />
             ) : (
-              <Icon color={"lightgray"} source={icon} size={20} />
+              <View
+                style={{
+                  width: 30,
+                  height: 30,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Icon color={"lightgray"} source={icon} size={26} />
+              </View>
             )}
             <Text variant="bodyMedium" style={{ userSelect: "none" }}>
               {props.item.title}
             </Text>
           </View>
-          <View style={{display: "flex", flexDirection: "row", gap: 10, alignItems: "center"}}>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 10,
+              alignItems: "center",
+            }}
+          >
             {hovered && (
               <>
                 <IconButton
                   icon={"account"}
                   mode={"contained-tonal"}
-                  size={ 14}
-                  style={{ margin: 0, padding: 0, height: 20, width: 20 }}
+                  size={20}
+                  iconColor={theme.colors?.primary}
+                  style={{ margin: 0, padding: 0, height: 30, width: 30 }}
                   onPress={() => {
                     //
                   }}
                 />
                 <IconButton
                   icon={"form-textbox-password"}
-                  mode={"contained-tonal"}
-                  size={14}
-                  style={{ margin: 0, padding: 0, height: 20, width: 20 }}
+                  mode={"contained"}
+                  size={20}
+                  iconColor={theme.colors?.primary}
+                  style={{ margin: 0, padding: 0, height: 30, width: 30 }}
                   onPress={() => {
                     //
                   }}

@@ -1,25 +1,28 @@
 import { Platform } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
+import { getData, removeData, saveData } from "./secureStore";
+
+const MASTER_KEY = "ClavisPass-Master";
 
 export const authenticateUser = async () => {
   if (Platform.OS === "web") {
     // WebAuthn für Web
     if (!window.PublicKeyCredential) return false;
     try {
-        const publicKeyOptions = {
-            challenge: Uint8Array.from("randomString", c => c.charCodeAt(0)), // Beispiel-Challenge
-            timeout: 60000, // Timeout in Millisekunden
-            rpId: window.location.hostname, // Die Root-Domain deiner App
-            allowCredentials: [], // Zulassen aller Methoden
-            userVerification: "preferred" as UserVerificationRequirement, // Nutzerverifizierung ist bevorzugt, aber nicht erforderlich
-          };
-    
-          const credentials = await navigator.credentials.get({
-            publicKey: publicKeyOptions,
-          });
-    
-          console.log("Authentication successful:", credentials);
-          return !!credentials;
+      const publicKeyOptions = {
+        challenge: Uint8Array.from("randomString", (c) => c.charCodeAt(0)), // Beispiel-Challenge
+        timeout: 60000, // Timeout in Millisekunden
+        rpId: window.location.hostname, // Die Root-Domain deiner App
+        allowCredentials: [], // Zulassen aller Methoden
+        userVerification: "preferred" as UserVerificationRequirement, // Nutzerverifizierung ist bevorzugt, aber nicht erforderlich
+      };
+
+      const credentials = await navigator.credentials.get({
+        publicKey: publicKeyOptions,
+      });
+
+      console.log("Authentication successful:", credentials);
+      return !!credentials;
     } catch {
       return false;
     }
@@ -35,4 +38,45 @@ export const authenticateUser = async () => {
     return result.success;
   }
   return false;
+};
+
+export const isUsingAuthentication = async (): Promise<boolean> => {
+  try {
+    const value = await loadAuthentication();
+    if(value !== null && value !== undefined && value !== "") return true;
+    return false;
+  } catch (error) {
+    console.error("Fehler beim Überprüfen der Authentifizierung:", error);
+    return false;
+  }
+};
+
+export const removeAuthentication = async () => {
+  try {
+    await removeData(MASTER_KEY);
+    console.log("Token aus SecureStore entfernt");
+  } catch (error) {
+    console.error("Fehler beim Entfernen des Master Passwort:", error);
+  }
+};
+
+export const loadAuthentication = async () => {
+  try {
+    const value = await getData(MASTER_KEY);
+    return value;
+  } catch (error) {
+    console.error("Fehler beim Abrufen der Daten:", error);
+    return null;
+  }
+};
+
+export const saveAuthentication = async (master: string) => {
+  saveData(MASTER_KEY, master)
+    .then(() => {
+      console.log(master);
+      console.log("Master Passwort gespeichert");
+    })
+    .catch((error) =>
+      console.error("Fehler beim Speichern des Master Passworts:", error)
+    );
 };

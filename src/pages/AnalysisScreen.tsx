@@ -187,7 +187,15 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
               number={averageEntropy}
               percentage={averageEntropyPercentage}
             />
-            <AnalysisEntry name={"Strong"} number={strong} percentage={cachedPasswordList ? strong / cachedPasswordList.length * 100: 0} />
+            <AnalysisEntry
+              name={"Strong"}
+              number={strong}
+              percentage={
+                cachedPasswordList
+                  ? (strong / cachedPasswordList.length) * 100
+                  : 0
+              }
+            />
           </View>
           <View
             style={{
@@ -199,8 +207,24 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
               gap: 6,
             }}
           >
-            <AnalysisEntry name={"Medium"} number={medium} percentage={cachedPasswordList ? medium / cachedPasswordList.length * 100: 0} />
-            <AnalysisEntry name={"Weak"} number={weak} percentage={cachedPasswordList ? weak / cachedPasswordList.length * 100: 0} />
+            <AnalysisEntry
+              name={"Medium"}
+              number={medium}
+              percentage={
+                cachedPasswordList
+                  ? (medium / cachedPasswordList.length) * 100
+                  : 0
+              }
+            />
+            <AnalysisEntry
+              name={"Weak"}
+              number={weak}
+              percentage={
+                cachedPasswordList
+                  ? (weak / cachedPasswordList.length) * 100
+                  : 0
+              }
+            />
           </View>
         </View>
         <Text
@@ -209,17 +233,27 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
         >
           Your Entries
         </Text>
-        <View style={{ width: "100%", flex: 1, padding: 6 }}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: theme.colors.background,
+            borderRadius: 16,
+            padding: 12,
+            boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+            margin: 6,
+          }}
+        >
           <View style={{ height: 40 }}>
             <TextInput
               placeholder="Search"
+              placeholderTextColor={"lightgray"}
               outlineStyle={[
                 globalStyles.outlineStyle,
-                { borderColor: theme.colors.primary, borderWidth: 2 },
+                { borderColor: theme.colors.primary, borderWidth: 2, backgroundColor: "transparent" },
               ]}
               style={[
                 globalStyles.textInputStyle,
-                { borderColor: theme.colors.primary, borderBottomWidth: 1 },
+                { borderColor: theme.colors.primary, borderBottomWidth: 1, backgroundColor: "transparent" },
               ]}
               value={searchQuery}
               mode="flat"
@@ -234,7 +268,6 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
                 style={{
                   borderRadius: 8,
                   marginBottom: 0,
-                  backgroundColor: theme.colors.background,
                   gap: 4,
                   marginTop: 4,
                   overflow: "hidden",

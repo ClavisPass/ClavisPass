@@ -11,6 +11,7 @@ type Props = {
   deleteModule: (id: string) => void;
   changeModule: (module: ModuleType) => void;
   edit: boolean;
+  setDiscardoChanges: () => void;
 };
 
 // a little function to help us with reordering the result
@@ -48,6 +49,7 @@ function DraggableModulesListWeb(props: Props) {
       result.destination.index
     );
     props.changeModules(itemsChange);
+    props.setDiscardoChanges();
   };
   return (
     <DragDropContext onDragEnd={onDragEnd}>

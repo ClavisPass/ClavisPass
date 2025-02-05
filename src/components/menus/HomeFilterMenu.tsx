@@ -5,6 +5,7 @@ import DataType from "../../types/DataType";
 import { View } from "react-native";
 import theme from "../../ui/theme";
 import Menu, { MenuItem } from "./Menu";
+import { useData } from "../../contexts/DataProvider";
 
 type Props = {
   visible: boolean;
@@ -17,6 +18,7 @@ type Props = {
 };
 function HomeFilterMenu(props: Props) {
   const auth = useAuth();
+  const data = useData();
 
   const sort = (sort: "asc" | "desc") => {
     let newData = { ...props.data } as DataType;
@@ -74,7 +76,6 @@ function HomeFilterMenu(props: Props) {
           />
         </View>
         <Divider />
-
         {/* 
         <MenuItem
           leadingIcon="folder-outline"
@@ -90,6 +91,7 @@ function HomeFilterMenu(props: Props) {
           leadingIcon="sort-ascending"
           onPress={() => {
             sort("asc");
+            data.setShowSave(true);
             props.setVisible(false);
           }}
         >
@@ -99,6 +101,7 @@ function HomeFilterMenu(props: Props) {
           leadingIcon="sort-descending"
           onPress={() => {
             sort("desc");
+            data.setShowSave(true);
             props.setVisible(false);
           }}
         >

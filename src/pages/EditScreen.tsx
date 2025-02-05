@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, Platform, View } from "react-native";
+import { StyleSheet, Platform, View, AppState } from "react-native";
 import ModulesType, { ModuleType } from "../types/ModulesType";
 
 import ModulesEnum from "../enums/ModulesEnum";
@@ -24,7 +24,10 @@ import FolderModal from "../components/modals/FolderModal";
 import { useTheme } from "../contexts/ThemeProvider";
 import { RootStackParamList } from "../../App";
 import DiscardChangesModal from "../components/modals/DiscardChangesModal";
-import DeleteModal from "../components/modals/DeleteModal";
+import { openFastAccess, removeAllNotifications } from "../utils/FastAccess";
+
+import { useQuickSelect as useQuickSelectTauri } from "../contexts/QuickSelectProvider";
+import { useQuickSelect as useQuickSelectNotTauri } from "../contexts/QuickSelectProviderNotTauri";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -41,6 +44,10 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const { value: routeValue } = route.params!;
   const data = useData();
   const { globalStyles, theme } = useTheme();
+
+  const useQuickSelect =
+      Platform.OS === "web" ? useQuickSelectTauri : useQuickSelectNotTauri;
+    const { setModules } = useQuickSelect();
 
   const [edit, setEdit] = useState(false);
   const [value, setValue] = useState<ValuesType>({ ...routeValue });
@@ -132,6 +139,27 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     }
   }, [value]);
 
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: string) => {
+      if (nextAppState === "active") {
+        removeAllNotifications();
+      } else if (nextAppState === "background") {
+        openFastAccess(() => {
+          setModules(value.modules);
+        }, value.title);
+      }
+    };
+
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   return (
     <AnimatedContainer style={globalStyles.container} trigger={edit}>
       <TitlebarHeight />
@@ -188,6 +216,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           deleteModule={deleteModule}
           changeModule={changeModule}
           edit={edit}
+          setDiscardoChanges={() => setDiscardChanges(true)}
         />
       ) : (
         <DraggableModulesList
@@ -197,12 +226,18 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           deleteModule={deleteModule}
           changeModule={changeModule}
           edit={edit}
+          setDiscardoChanges={() => setDiscardChanges(true)}
         />
       )}
       <Button
         mode="contained"
         style={{ width: 200 }}
-        contentStyle={{ backgroundColor: discardChanges && value.title !== ""? theme.colors.primary : undefined }}
+        contentStyle={{
+          backgroundColor:
+            discardChanges && value.title !== ""
+              ? theme.colors.primary
+              : undefined,
+        }}
         disabled={!discardChanges || value.title === ""}
         onPress={saveValue}
       >

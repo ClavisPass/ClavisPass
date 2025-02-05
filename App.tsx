@@ -22,7 +22,6 @@ import LoginScreen from "./src/pages/LoginScreen";
 import transitionSpecConfig from "./src/configs/TransitionSpecConfig";
 import { Platform, View } from "react-native";
 import CustomTitlebar from "./src/components/CustomTitlebar";
-import { QuickSelectProvider } from "./src/contexts/QuickSelectProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import GlobalShortcuts from "./src/components/shortcuts/GlobalShortcuts";
 import { ThemeProvider } from "./src/contexts/ThemeProvider";
@@ -31,10 +30,15 @@ import ValuesType from "./src/types/ValuesType";
 import ScanScreen from "./src/pages/ScanScreen";
 import theme from "./src/ui/theme";
 import AnalysisDetailScreen from "./src/pages/AnalysisDetailScreen";
+import isTauri from "./src/utils/isTauri";
 
 const Tab = createBottomTabNavigator();
 
 const Stack = createStackNavigator<RootStackParamList>();
+
+const QuickSelectProvider = isTauri()
+  ? require("./src/contexts/QuickSelectProvider").QuickSelectProvider
+  : require("./src/contexts/QuickSelectProviderNotTauri").QuickSelectProvider;
 
 export default function App() {
   return (

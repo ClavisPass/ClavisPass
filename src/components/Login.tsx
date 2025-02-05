@@ -14,7 +14,7 @@ import CryptoType, { CryptoTypeSchema } from "../types/CryptoType";
 import { decrypt } from "../utils/CryptoLayer";
 import { DataTypeSchema } from "../types/DataType";
 import { useTheme } from "../contexts/ThemeProvider";
-import { authenticateUser } from "../utils/authenticateUser";
+import { authenticateUser, isUsingAuthentication, loadAuthentication } from "../utils/authenticateUser";
 
 type Props = {
   userInfo: UserInfoType;
@@ -43,18 +43,28 @@ function Login(props: Props) {
   const [value2, setValue2] = useState("");
 
   useEffect(() => {
-    console.log("hier 1");
-    authenticateUser();
+    isUsingAuthentication().then((isAuthenticated) => {
+      if(isAuthenticated)
+      {
+        authenticateUser().then((auth) => {
+          if(auth)
+          {
+            loadAuthentication().then((data) => {
+              setValue(data);
+              //login(data);
+            });
+          }
+        });
+      }
+    });
     console.log(token);
     console.log(tokenType);
     if (token && tokenType) {
       setLoading(true);
       fetchData(token, tokenType, "clavispass.lock").then((response) => {
-        console.log("hier 2 " + response);
         if (response === null) {
           setShowNewData(true);
         } else {
-          console.log(response);
           const parsedCryptoData = CryptoTypeSchema.parse(JSON.parse(response));
           setParsedCryptoData(parsedCryptoData);
         }
@@ -64,6 +74,8 @@ function Login(props: Props) {
   }, [token, tokenType]);
 
   const login = async () => {
+    //pw?: string
+    //const password = pw? pw : value;
     try {
       if (parsedCryptoData === null) {
         return;

@@ -58,13 +58,13 @@ export default function FastAccess() {
   return <></>;
 }
 
-export async function openFastAccess(setModules: () => void) {
+export async function openFastAccess(setModules: () => void, title: string) {
   if (Platform.OS === "web") {
     setModules();
   } else {
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: "Neue Nachricht 📬",
+        title: title,
         //body: "Hier ist der Text der Benachrichtigung",
         data: { data: "beispieldaten", test: { test1: "mehr daten" } },
         vibrate: [0, 250, 250, 250],
@@ -159,4 +159,9 @@ async function registerForPushNotificationsAsync() {
   }
 
   return token;
+}
+
+export async function removeAllNotifications() {
+  await Notifications.dismissAllNotificationsAsync();
+  console.log("Alle Benachrichtigungen wurden entfernt.");
 }

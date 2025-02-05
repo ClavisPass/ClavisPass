@@ -13,6 +13,7 @@ import {
   PhysicalSize,
   appWindow,
 } from "@tauri-apps/api/window";
+import isTauri from "../utils/isTauri";
 
 interface QuickSelectContextType {
   modules: ModulesType | null;
@@ -51,11 +52,14 @@ export const QuickSelectProvider = ({ children }: Props) => {
   };
 
   useEffect(() => {
-    // Initiale Fenstergröße und Position laden
-    getInitialWindowState();
+    if (isTauri()) {
+      getInitialWindowState();
+    }
   }, []);
 
   useEffect(() => {
+    if (!isTauri()) return;
+    
     if (modules != null) {
       // Wenn Module aktiv sind, spezielles Fensterverhalten setzen
       appWindow.setAlwaysOnTop(true);
