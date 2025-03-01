@@ -24,7 +24,7 @@ export function SubItem(props: Props) {
         {props.icon && (
           <Icon color={theme.colors?.tertiary} source={props.icon} size={16} />
         )}
-        <Text style={{ color: theme.colors?.tertiary }} variant="titleMedium">
+        <Text style={{ color: theme.colors?.tertiary, userSelect: "none" }} variant="titleMedium">
           {props.title}
         </Text>
       </View>

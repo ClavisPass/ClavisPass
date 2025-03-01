@@ -1,7 +1,7 @@
 import { View } from "react-native";
 import { TextInput, Text, Button } from "react-native-paper";
 import Modal from "./Modal";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useTheme } from "../../contexts/ThemeProvider";
 import { useToken } from "../../contexts/TokenProvider";
 import isDropboxToken from "../../utils/regex/isDropboxToken";

@@ -5,8 +5,8 @@ import Button from "./buttons/Button";
 import TypeWriterComponent from "./TypeWriter";
 import fetchData from "../api/fetchData";
 import { useToken } from "../contexts/TokenProvider";
-import { ActivityIndicator, Button as ButtonA, Divider } from "react-native-paper";
-import { View, Text } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
+import { View } from "react-native";
 import { useData } from "../contexts/DataProvider";
 import getEmptyData from "../utils/getEmptyData";
 import PasswordTextbox from "./PasswordTextbox";
@@ -14,7 +14,13 @@ import CryptoType, { CryptoTypeSchema } from "../types/CryptoType";
 import { decrypt } from "../utils/CryptoLayer";
 import { DataTypeSchema } from "../types/DataType";
 import { useTheme } from "../contexts/ThemeProvider";
-import { authenticateUser, isUsingAuthentication, loadAuthentication } from "../utils/authenticateUser";
+import { Text } from "react-native-paper";
+
+import {
+  authenticateUser,
+  isUsingAuthentication,
+  loadAuthentication,
+} from "../utils/authenticateUser";
 
 type Props = {
   userInfo: UserInfoType;
@@ -44,11 +50,9 @@ function Login(props: Props) {
 
   useEffect(() => {
     isUsingAuthentication().then((isAuthenticated) => {
-      if(isAuthenticated)
-      {
+      if (isAuthenticated) {
         authenticateUser().then((auth) => {
-          if(auth)
-          {
+          if (auth) {
             loadAuthentication().then((data) => {
               setValue(data);
               //login(data);
@@ -74,8 +78,6 @@ function Login(props: Props) {
   }, [token, tokenType]);
 
   const login = async () => {
-    //pw?: string
-    //const password = pw? pw : value;
     try {
       if (parsedCryptoData === null) {
         return;
@@ -114,7 +116,7 @@ function Login(props: Props) {
         </>
       ) : (
         <>
-          <View style={{height: 40}}>
+          <View style={{ height: 40 }}>
             <TypeWriterComponent
               displayName={
                 props.userInfo?.username ? props.userInfo.username : ""
@@ -135,11 +137,13 @@ function Login(props: Props) {
               <>
                 <PasswordTextbox
                   autofocus
+                  setCapsLock={setCapsLock}
                   setValue={setValue}
                   value={value}
                   placeholder="New Master Password"
                 />
                 <PasswordTextbox
+                  setCapsLock={setCapsLock}
                   setValue={setValue2}
                   value={value2}
                   placeholder="Reenter Master Password"

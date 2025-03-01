@@ -50,7 +50,7 @@ function Pattern(props: Props) {
                 justifyContent: "center",
               }}
             >
-              <Text variant="bodyLarge" style={{ color: "white" }}>
+              <Text variant="bodyLarge" style={{ color: "white", userSelect: "none" }}>
                 {char}
               </Text>
             </View>

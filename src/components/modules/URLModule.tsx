@@ -120,10 +120,10 @@ function URLModule(props: URLModuleType & Props) {
       icon={ModuleIconsEnum.URL}
     >
       <View style={globalStyles.moduleView}>
-        <View style={{ width: 30, alignItems: "center" }}>
+        <View style={{ width: 30, alignItems: "center", marginRight: 4 }}>
           {url !== "" && isValid ? (
             <Image
-              style={{ width: 22, height: 22, margin: 0, borderRadius: 8 }}
+              style={{ width: 30, height: 30, margin: 0, borderRadius: 8 }}
               source={url}
               contentFit="cover"
               transition={250}

@@ -27,6 +27,7 @@ function DraggableFolderList(props: Props) {
           </Pressable>
           <TouchableRipple
             style={{
+              borderRadius: 12,
               padding: 6,
               flexGrow: 1,
               flex: 1,

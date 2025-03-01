@@ -16,8 +16,14 @@ import DarkModeSwitch from "../components/DarkModeSwitch";
 import Auth from "../components/Auth";
 import EditTokenModal from "../components/modals/EditTokenModal";
 import { useTheme } from "../contexts/ThemeProvider";
-import { authenticateUser, isUsingAuthentication, removeAuthentication, saveAuthentication } from "../utils/authenticateUser";
+import {
+  authenticateUser,
+  isUsingAuthentication,
+  removeAuthentication,
+  saveAuthentication,
+} from "../utils/authenticateUser";
 import { useAuth } from "../contexts/AuthProvider";
+import ChangeMasterPasswordModal from "../components/modals/ChangeMasterPasswordModal";
 
 const styles = StyleSheet.create({
   surface: {
@@ -43,7 +49,7 @@ const styles = StyleSheet.create({
 
 function SettingsScreen({ navigation }: { navigation: any }) {
   const { globalStyles } = useTheme();
-  const { master} = useAuth();
+  const { master } = useAuth();
   const [startup, setStartup] = React.useState(false);
 
   const [useAuthentication, setUseAuthentication] = React.useState(false);
@@ -51,17 +57,19 @@ function SettingsScreen({ navigation }: { navigation: any }) {
   const changeAuthentication = async (authentication: boolean) => {
     if (authentication) {
       authenticateUser().then((isAuthenticated) => {
-        if(isAuthenticated && master !== null)
-        {
+        if (isAuthenticated && master !== null) {
           saveAuthentication(master);
-          setUseAuthentication(true)
+          setUseAuthentication(true);
         }
       });
     } else {
       removeAuthentication();
-      setUseAuthentication(false)
+      setUseAuthentication(false);
     }
   };
+
+  const [showChangeMasterPasswordModal, setShowChangeMasterPasswordModal] =
+    useState(false);
 
   const [editTokenVisibility, setEditTokenVisibility] = useState(false);
 
@@ -83,7 +91,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
   useEffect(() => {
     getAutoStart();
     isUsingAuthentication().then((isAuthenticated) => {
-      setUseAuthentication(isAuthenticated)
+      setUseAuthentication(isAuthenticated);
     });
   }, []);
 
@@ -154,7 +162,14 @@ function SettingsScreen({ navigation }: { navigation: any }) {
           </SettingsItem>
           <SettingsItem icon={"fingerprint"} title={"Authentication"}>
             <View style={styles.container}>
-              <Button mode="contained-tonal">Change Master Password</Button>
+              <Button
+                mode="contained-tonal"
+                onPress={() => {
+                  setShowChangeMasterPasswordModal(true);
+                }}
+              >
+                Change Master Password
+              </Button>
               <View
                 style={{
                   display: "flex",
@@ -196,6 +211,10 @@ function SettingsScreen({ navigation }: { navigation: any }) {
         <EditTokenModal
           visible={editTokenVisibility}
           setVisible={setEditTokenVisibility}
+        />
+        <ChangeMasterPasswordModal
+          visible={showChangeMasterPasswordModal}
+          setVisible={setShowChangeMasterPasswordModal}
         />
       </AnimatedContainer>
     </>

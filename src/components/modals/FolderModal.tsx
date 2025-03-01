@@ -62,7 +62,6 @@ function FolderModal(props: Props) {
     <Modal visible={props.visible} onDismiss={hideModal}>
       <View
         style={{
-          //backgroundColor: "white",
           padding: 16,
           borderRadius: 20,
           display: "flex",
