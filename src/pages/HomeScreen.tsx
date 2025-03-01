@@ -4,6 +4,7 @@ import {
   Platform,
   RefreshControl,
   useWindowDimensions,
+  Animated,
 } from "react-native";
 import {
   Searchbar,
@@ -46,11 +47,11 @@ import { useAuth } from "../contexts/AuthProvider";
 import { CryptoTypeSchema } from "../types/CryptoType";
 import { useTheme } from "../contexts/ThemeProvider";
 
-import { 
-  useFonts, 
-  LexendExa_400Regular, 
-  LexendExa_700Bold 
-} from '@expo-google-fonts/lexend-exa';
+import {
+  useFonts,
+  LexendExa_400Regular,
+  LexendExa_700Bold,
+} from "@expo-google-fonts/lexend-exa";
 
 type Props = {
   setShowMenu: (boolean: boolean) => void;
@@ -102,6 +103,41 @@ function HomeScreen({ navigation }: { navigation: any }) {
 
   const data = useData();
   const { token, tokenType } = useToken();
+
+  const slideAnim = useRef(new Animated.Value(0)).current; // Startet bei 0 Höhe
+  const fadeAnim = useRef(new Animated.Value(0)).current; // Startet bei voller Transparenz
+
+  useEffect(() => {
+    if (data.showSave) {
+      // Einblenden & Höhe animieren
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 48, // Höhe der Komponente
+          duration: 250,
+          useNativeDriver: false,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 250,
+          useNativeDriver: false,
+        }),
+      ]).start();
+    } else {
+      // Ausblenden & Höhe reduzieren
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: false,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: false,
+        }),
+      ]).start();
+    }
+  }, [data.showSave]);
 
   const filteredValues = useMemo(() => {
     return data.data?.values.filter((item) => {
@@ -207,8 +243,17 @@ function HomeScreen({ navigation }: { navigation: any }) {
             width: "100%",
           }}
         >
-          
-          <Text style={{ fontFamily: 'LexendExa_400Regular', fontSize: 16, color: "white", userSelect: "none", width: 110 }}>ClavisPass</Text>
+          <Text
+            style={{
+              fontFamily: "LexendExa_400Regular",
+              fontSize: 16,
+              color: "white",
+              userSelect: "none",
+              width: 110,
+            }}
+          >
+            ClavisPass
+          </Text>
           <View style={{ display: "flex", flexDirection: "row" }}>
             <WebSpecific notIn={true}>
               <Tools
@@ -248,46 +293,75 @@ function HomeScreen({ navigation }: { navigation: any }) {
           </WebSpecific>
         </View>
       </LinearGradient>
-      {data.showSave && (
-        <View
-          style={{
-            height: 48,
-            width: "100%",
-            padding: 4,
-            paddingLeft: 8,
-            paddingRight: 8,
-          }}
-        >
+      <Animated.View
+        style={{
+          height: slideAnim,
+          opacity: fadeAnim,
+          width: "100%",
+          padding: 0,
+          margin: 0,
+          overflow: "hidden",
+        }}
+      >
+        {data.showSave && (
           <View
             style={{
-              backgroundColor: theme.colors.primary,
-              borderRadius: 8,
-              flex: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "row",
+              height: 48,
+              width: "100%",
+              padding: 4,
+              paddingLeft: 8,
+              paddingRight: 8,
             }}
           >
-            {refreshing ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <>
-                <View style={{ backgroundColor: "#00000017" }}>
+            <View
+              style={{
+                backgroundColor: theme.colors.primary,
+                borderRadius: 8,
+                flex: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "row",
+              }}
+            >
+              {refreshing ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <>
+                  <View style={{ backgroundColor: "#00000017" }}>
+                    <TouchableRipple
+                      onPress={() => {
+                        setRefreshing(true);
+                        uploadData(
+                          token,
+                          tokenType,
+                          encrypt(data.data, auth.master ? auth.master : ""),
+                          "clavispass.lock",
+                          () => {
+                            data.setShowSave(false);
+                            setRefreshing(false);
+                          }
+                        );
+                      }}
+                      rippleColor="rgba(0, 0, 0, .32)"
+                      style={{
+                        height: 40,
+                        width: 100,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text
+                        variant="bodyLarge"
+                        style={{ color: "white", userSelect: "none" }}
+                      >
+                        Save
+                      </Text>
+                    </TouchableRipple>
+                  </View>
                   <TouchableRipple
-                    onPress={() => {
-                      setRefreshing(true);
-                      uploadData(
-                        token,
-                        tokenType,
-                        encrypt(data.data, auth.master ? auth.master : ""),
-                        "clavispass.lock",
-                        () => {
-                          data.setShowSave(false);
-                          setRefreshing(false);
-                        }
-                      );
-                    }}
+                    onPress={refreshData}
                     rippleColor="rgba(0, 0, 0, .32)"
                     style={{
                       height: 40,
@@ -295,44 +369,26 @@ function HomeScreen({ navigation }: { navigation: any }) {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      cursor: "pointer",
                     }}
                   >
                     <Text
                       variant="bodyLarge"
-                      style={{ color: "white", userSelect: "none" }}
+                      style={{
+                        textDecorationLine: "underline",
+                        color: "white",
+                        userSelect: "none",
+                      }}
                     >
-                      Save
+                      Reset
                     </Text>
                   </TouchableRipple>
-                </View>
-                <TouchableRipple
-                  onPress={refreshData}
-                  rippleColor="rgba(0, 0, 0, .32)"
-                  style={{
-                    height: 40,
-                    width: 100,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                  }}
-                >
-                  <Text
-                    variant="bodyLarge"
-                    style={{
-                      textDecorationLine: "underline",
-                      color: "white",
-                      userSelect: "none",
-                    }}
-                  >
-                    Reset
-                  </Text>
-                </TouchableRipple>
-              </>
-            )}
+                </>
+              )}
+            </View>
           </View>
-        </View>
-      )}
+        )}
+      </Animated.View>
       <View
         style={{
           flex: 1,
