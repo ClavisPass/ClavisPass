@@ -3,8 +3,13 @@ import * as Notifications from "expo-notifications";
 import { useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import * as Device from "expo-device";
-import { BackHandler } from 'react-native';
 import React from "react";
+import FastAccessType from "../types/FastAccessType";
+import * as Clipboard from "expo-clipboard";
+
+const copyToClipboard = async (value: string) => {
+  await Clipboard.setStringAsync(value);
+};
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -58,60 +63,57 @@ export default function FastAccess() {
   return <></>;
 }
 
-export async function openFastAccess(setModules: () => void, title: string) {
+export async function openFastAccess(
+  setFastAccess: (fastAccess: FastAccessType) => void,
+  fastAccess: FastAccessType
+) {
+  if (fastAccess === null) return;
   if (Platform.OS === "web") {
-    setModules();
+    setFastAccess(fastAccess);
   } else {
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: title,
-        //body: "Hier ist der Text der Benachrichtigung",
-        data: { data: "beispieldaten", test: { test1: "mehr daten" } },
+        title: fastAccess.title,
+        body: fastAccess.username,
         vibrate: [0, 250, 250, 250],
         categoryIdentifier: "fast_access",
-        priority: "max", // Oder "high" für leicht reduzierte Wichtigkeit
+        priority: "max",
+        sticky: true,
+        interruptionLevel: "critical",
+        sound: "default",
       },
       trigger: null,
     });
 
-    Notifications.setNotificationCategoryAsync('fast_access', [
+    Notifications.setNotificationCategoryAsync("fast_access", [
       {
-        identifier: 'open_app',
-        buttonTitle: 'App öffnen',
-        options: { opensAppToForeground: true },
+        identifier: "copy_username",
+        buttonTitle: "Username",
+        options: { opensAppToForeground: false },
       },
       {
-        identifier: 'dismiss',
-        buttonTitle: 'Schließen',
-        options: {},
+        identifier: "clear",
+        buttonTitle: "clear",
+        options: { opensAppToForeground: true, isDestructive: true },
       },
       {
-        identifier: 'custom_action',
-        buttonTitle: 'Benutzerdefinierte Aktion',
-        options: {},
+        identifier: "copy_password",
+        buttonTitle: "Password",
+        options: { opensAppToForeground: false },
       },
     ]);
 
     Notifications.addNotificationResponseReceivedListener((response) => {
       const { actionIdentifier } = response;
-      if (actionIdentifier === 'open_app') {
-        console.log("App öffnen wurde ausgewählt");
-        setModules(); // Ihre benutzerdefinierte Funktion aufrufen
-      } else if (actionIdentifier === 'dismiss') {
-        console.log("Benachrichtigung wurde geschlossen");
-      } else if (actionIdentifier === 'custom_action') {
-        console.log("Benutzerdefinierte Aktion wurde ausgewählt");
-        // Implementieren Sie hier Ihre benutzerdefinierte Logik
+      if (actionIdentifier === "copy_username") {
+        copyToClipboard(fastAccess.username);
+      } else if (actionIdentifier === "clear") {
+        copyToClipboard("");
+        removeAllNotifications();
+      } else if (actionIdentifier === "copy_password") {
+        copyToClipboard(fastAccess.password);
       }
     });
-
-    function minimizeApp() {
-      if (Platform.OS === 'android') {
-        BackHandler.exitApp(); // Beendet oder minimiert die App
-      } else {
-        console.log('App minimieren ist auf iOS nicht möglich.');
-      }
-    }
   }
 }
 
@@ -137,7 +139,6 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status;
     }
     if (finalStatus !== "granted") {
-      alert("Failed to get push token for push notification!");
       return;
     }
     try {
@@ -163,5 +164,4 @@ async function registerForPushNotificationsAsync() {
 
 export async function removeAllNotifications() {
   await Notifications.dismissAllNotificationsAsync();
-  console.log("Alle Benachrichtigungen wurden entfernt.");
 }

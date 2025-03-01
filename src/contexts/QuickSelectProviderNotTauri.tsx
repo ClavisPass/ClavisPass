@@ -1,9 +1,10 @@
 import React, { createContext, ReactNode, useContext, useState } from "react";
 import ModulesType from "../types/ModulesType";
+import FastAccessType from "../types/FastAccessType";
 
 interface QuickSelectContextType {
-  modules: ModulesType | null;
-  setModules: (modules: ModulesType | null) => void;
+  fastAccess: FastAccessType;
+  setFastAccess: (fastAccess: FastAccessType) => void;
 }
 
 export const QuickSelectContext = createContext<QuickSelectContextType | null>(
@@ -16,9 +17,9 @@ type Props = {
 
 // Falls nicht in Tauri, wird einfach das children gerendert
 export const QuickSelectProvider = ({ children }: Props) => {
-  const [modules, setModules] = useState<ModulesType | null>(null);
+  const [fastAccess, setFastAccess] = useState<FastAccessType>(null);
   return (
-    <QuickSelectContext.Provider value={{ modules, setModules }}>
+    <QuickSelectContext.Provider value={{ fastAccess, setFastAccess }}>
       {children}
     </QuickSelectContext.Provider>
   );

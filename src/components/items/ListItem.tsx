@@ -4,13 +4,15 @@ import { Icon, IconButton, Text, TouchableRipple } from "react-native-paper";
 import ValuesType from "../../types/ValuesType";
 import ModulesEnum from "../../enums/ModulesEnum";
 
+import * as Clipboard from "expo-clipboard";
+
 import { Image } from "expo-image";
 import FastAccess, { openFastAccess } from "../../utils/FastAccess";
 import { useTheme } from "../../contexts/ThemeProvider";
-import isTauri from "../../utils/isTauri";
 
 import { useQuickSelect as useQuickSelectTauri } from "../../contexts/QuickSelectProvider";
 import { useQuickSelect as useQuickSelectNotTauri } from "../../contexts/QuickSelectProviderNotTauri";
+import extractFastAccessObject from "../../utils/extractFastAccessObject";
 
 const styles = StyleSheet.create({
   container: {
@@ -44,7 +46,7 @@ function ListItem(props: Props) {
 
   const useQuickSelect =
     Platform.OS === "web" ? useQuickSelectTauri : useQuickSelectNotTauri;
-  const { setModules } = useQuickSelect();
+  const { setFastAccess } = useQuickSelect();
 
   const [url, setUrl] = useState("");
   const [icon, setIcon] = useState("lock");
@@ -69,6 +71,10 @@ function ListItem(props: Props) {
       determineIcon();
     }
   }, [props.item]);
+
+  const copyToClipboard = async (value: string) => {
+    await Clipboard.setStringAsync(value);
+  };
 
   const determineIcon = () => {
     setUrl("");
@@ -101,9 +107,10 @@ function ListItem(props: Props) {
         onPress={props.onPress}
         rippleColor="rgba(0, 0, 0, .32)"
         onLongPress={() => {
-          openFastAccess(() => {
-            setModules(props.item.modules);
-          }, props.item.title);
+          openFastAccess(
+            setFastAccess,
+            extractFastAccessObject(props.item.modules, props.item.title)
+          );
         }}
       >
         <>
@@ -148,30 +155,37 @@ function ListItem(props: Props) {
               alignItems: "center",
             }}
           >
-            {hovered && (
-              <>
-                <IconButton
-                  icon={"account"}
-                  mode={"contained-tonal"}
-                  size={20}
-                  iconColor={theme.colors?.primary}
-                  style={{ margin: 0, padding: 0, height: 30, width: 30 }}
-                  onPress={() => {
-                    //
-                  }}
-                />
-                <IconButton
-                  icon={"form-textbox-password"}
-                  mode={"contained"}
-                  size={20}
-                  iconColor={theme.colors?.primary}
-                  style={{ margin: 0, padding: 0, height: 30, width: 30 }}
-                  onPress={() => {
-                    //
-                  }}
-                />
-              </>
-            )}
+            {hovered &&
+              (() => {
+                const fastAccessObject = extractFastAccessObject(
+                  props.item.modules,
+                  props.item.title
+                );
+                return (
+                  <>
+                    <IconButton
+                      icon={"account"}
+                      mode={"contained-tonal"}
+                      size={20}
+                      iconColor={theme.colors?.primary}
+                      style={{ margin: 0, padding: 0, height: 30, width: 30 }}
+                      onPress={() => {
+                        copyToClipboard(fastAccessObject.username);
+                      }}
+                    />
+                    <IconButton
+                      icon={"form-textbox-password"}
+                      mode={"contained"}
+                      size={20}
+                      iconColor={theme.colors?.primary}
+                      style={{ margin: 0, padding: 0, height: 30, width: 30 }}
+                      onPress={() => {
+                        copyToClipboard(fastAccessObject.password);
+                      }}
+                    />
+                  </>
+                );
+              })()}
             <Icon
               color={theme.colors?.primary}
               source={"chevron-right"}

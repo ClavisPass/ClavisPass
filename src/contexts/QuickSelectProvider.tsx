@@ -14,10 +14,11 @@ import {
   appWindow,
 } from "@tauri-apps/api/window";
 import isTauri from "../utils/isTauri";
+import FastAccessType from "../types/FastAccessType";
 
 interface QuickSelectContextType {
-  modules: ModulesType | null;
-  setModules: (modules: ModulesType | null) => void;
+  fastAccess: FastAccessType;
+  setFastAccess: (fastAccess: FastAccessType) => void;
 }
 
 export const QuickSelectContext = createContext<QuickSelectContextType | null>(
@@ -29,7 +30,7 @@ type Props = {
 };
 
 export const QuickSelectProvider = ({ children }: Props) => {
-  const [modules, setModules] = useState<ModulesType | null>(null);
+  const [fastAccess, setFastAccess] = useState<FastAccessType>(null);
   const [width, setWidth] = useState<number>(0);
   const [height, setHeight] = useState<number>(0);
   const [positionX, setPositionX] = useState<number>(0);
@@ -60,7 +61,7 @@ export const QuickSelectProvider = ({ children }: Props) => {
   useEffect(() => {
     if (!isTauri()) return;
     
-    if (modules != null) {
+    if (fastAccess != null) {
       // Wenn Module aktiv sind, spezielles Fensterverhalten setzen
       appWindow.setAlwaysOnTop(true);
       appWindow.setSize(new PhysicalSize(60, 180));
@@ -75,12 +76,12 @@ export const QuickSelectProvider = ({ children }: Props) => {
         appWindow.setPosition(new PhysicalPosition(positionX, positionY));
       }
     }
-  }, [modules, width, height, positionX, positionY]);
+  }, [fastAccess, width, height, positionX, positionY]);
 
   return (
-    <QuickSelectContext.Provider value={{ modules, setModules }}>
-      {modules != null ? (
-        <QuickSelect modules={modules} setModules={setModules} />
+    <QuickSelectContext.Provider value={{ fastAccess, setFastAccess }}>
+      {fastAccess != null ? (
+        <QuickSelect fastAccess={fastAccess} setFastAccess={setFastAccess} />
       ) : (
         children
       )}

@@ -28,6 +28,7 @@ import { openFastAccess, removeAllNotifications } from "../utils/FastAccess";
 
 import { useQuickSelect as useQuickSelectTauri } from "../contexts/QuickSelectProvider";
 import { useQuickSelect as useQuickSelectNotTauri } from "../contexts/QuickSelectProviderNotTauri";
+import extractFastAccessObject from "../utils/extractFastAccessObject";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -46,8 +47,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const { globalStyles, theme } = useTheme();
 
   const useQuickSelect =
-      Platform.OS === "web" ? useQuickSelectTauri : useQuickSelectNotTauri;
-    const { setModules } = useQuickSelect();
+    Platform.OS === "web" ? useQuickSelectTauri : useQuickSelectNotTauri;
+  const { setFastAccess } = useQuickSelect();
 
   const [edit, setEdit] = useState(false);
   const [value, setValue] = useState<ValuesType>({ ...routeValue });
@@ -144,9 +145,12 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       if (nextAppState === "active") {
         removeAllNotifications();
       } else if (nextAppState === "background") {
-        openFastAccess(() => {
-          setModules(value.modules);
-        }, value.title);
+        openFastAccess(
+          () => {
+            setFastAccess;
+          },
+          extractFastAccessObject(value.modules, value.title)
+        );
       }
     };
 
