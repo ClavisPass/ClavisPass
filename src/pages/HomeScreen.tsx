@@ -399,6 +399,8 @@ function HomeScreen({ navigation }: { navigation: any }) {
       >
         <Blur>
           <FlashList
+            refreshing={false}
+            onRefresh={refreshData}
             data={filteredValues}
             renderItem={({ item }) => (
               <ListItem

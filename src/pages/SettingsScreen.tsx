@@ -27,6 +27,7 @@ import SettingsDivider from "../components/SettingsDivider";
 import SettingsContainer from "../components/container/SettingsContainer";
 import SettingsItem from "../components/items/SettingsItem";
 import SettingsSwitch from "../components/SettingsSwitch";
+import Footer from "../components/Footer";
 
 const styles = StyleSheet.create({
   surface: {
@@ -179,6 +180,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
             />
             <SettingsDivider />
           </SettingsContainer>
+          <Footer />
         </ScrollView>
         <EditTokenModal
           visible={editTokenVisibility}

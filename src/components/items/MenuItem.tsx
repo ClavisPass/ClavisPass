@@ -4,15 +4,16 @@ import { TouchableRipple, Text, Icon } from "react-native-paper";
 import { useTheme } from "../../contexts/ThemeProvider";
 
 type Props = {
-    children: ReactNode;
-    onPress?: () => void;
-    leadingIcon?: string;
-    selected?: boolean;
-    label?: string;
-  };
-  export function MenuItem(props: Props) {
-    const { theme } = useTheme();
-    return (
+  children: ReactNode;
+  onPress?: () => void;
+  leadingIcon?: string;
+  selected?: boolean;
+  label?: string;
+};
+export function MenuItem(props: Props) {
+  const { theme } = useTheme();
+  return (
+    <View style={{ height: 44 }}>
       <TouchableRipple
         onPress={props.onPress}
         style={{
@@ -75,5 +76,6 @@ type Props = {
           )}
         </View>
       </TouchableRipple>
-    );
-  }
+    </View>
+  );
+}

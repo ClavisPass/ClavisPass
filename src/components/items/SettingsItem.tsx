@@ -11,16 +11,14 @@ type Props = {
 };
 function SettingsItem(props: Props) {
   return (
-    <View style={{ height: 44 }}>
-      <MenuItem
-        onPress={props.onPress}
-        leadingIcon={props.leadingIcon}
-        selected={props.selected}
-        label={props.label}
-      >
-        {props.children}
-      </MenuItem>
-    </View>
+    <MenuItem
+      onPress={props.onPress}
+      leadingIcon={props.leadingIcon}
+      selected={props.selected}
+      label={props.label}
+    >
+      {props.children}
+    </MenuItem>
   );
 }
 

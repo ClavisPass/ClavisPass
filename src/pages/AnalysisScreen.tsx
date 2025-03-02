@@ -1,7 +1,7 @@
 import Constants from "expo-constants";
 import React, { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
-import { Text, TextInput, TouchableRipple } from "react-native-paper";
+import { Divider, Text, TextInput, TouchableRipple } from "react-native-paper";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import { StatusBar } from "expo-status-bar";
 import AnimatedContainer from "../components/container/AnimatedContainer";
@@ -263,6 +263,7 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
           </View>
           <FlashList
             data={filteredValues}
+            ItemSeparatorComponent={() => <Divider style={{marginTop: 0, marginBottom: 0}} />}
             renderItem={({ item, index }) => (
               <View
                 style={{
