@@ -2,12 +2,13 @@ import { ReactNode, useState } from "react";
 import { Divider } from "react-native-paper";
 import { formatDateTime } from "../../utils/Timestamp";
 import { View } from "react-native";
-import Menu, { MenuItem } from "./Menu";
+import Menu from "./Menu";
 import { useData } from "../../contexts/DataProvider";
 import ValuesType from "../../types/ValuesType";
 import DataType from "../../types/DataType";
 import DeleteModal from "../modals/DeleteModal";
 import React from "react";
+import { MenuItem } from "../items/MenuItem";
 
 type Props = {
   visible: boolean;

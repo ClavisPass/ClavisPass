@@ -1,7 +1,5 @@
 import { ReactNode } from "react";
-import { Platform, Pressable, View } from "react-native";
-import { Animated } from "react-native";
-import { useTheme } from "../../contexts/ThemeProvider";
+import { Platform } from "react-native";
 import ModalContainerWeb from "./container/ModalContainerWeb";
 import ModalContainer from "./container/ModalContainer";
 

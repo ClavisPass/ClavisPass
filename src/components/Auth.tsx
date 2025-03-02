@@ -8,6 +8,8 @@ import ShowQRCodeButton from "./buttons/ShowQRCodeButton";
 import UserInformation from "./UserInformation";
 import EditTokenModal from "./modals/EditTokenModal";
 import UserInfoType from "../types/UserInfoType";
+import SettingsItem from "./items/SettingsItem";
+import SettingsDivider from "./SettingsDivider";
 
 type Props = {
   navigation: any;
@@ -18,16 +20,20 @@ type Props = {
 function Auth(props: Props) {
   return (
     <>
-      <UserInformation setUserInfo={props.setUserInfo} changeEditTokenVisibility={props.changeEditTokenVisibility} />
+      <UserInformation
+        setUserInfo={props.setUserInfo}
+        changeEditTokenVisibility={props.changeEditTokenVisibility}
+      />
       <Divider />
-      <Button
-        icon={"qrcode-scan"}
-        mode="contained-tonal"
+      <SettingsItem
+        leadingIcon={"qrcode-scan"}
         onPress={() => props.navigation.navigate("Scan")}
       >
         Scan QR-Code
-      </Button>
+      </SettingsItem>
+      <SettingsDivider />
       <ShowQRCodeButton />
+      <SettingsDivider />
     </>
   );
 }

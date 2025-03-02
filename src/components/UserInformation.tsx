@@ -12,6 +12,7 @@ import DropboxLoginButton from "./buttons/DropboxLoginButton";
 import UserInfoType from "../types/UserInfoType";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import TypeWriterComponent from "./TypeWriter";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -38,11 +39,11 @@ function UserInformation(props: Props) {
       setLoading(true);
       fetch(token);
     }
-    setLoading(false)
+    setLoading(false);
   }, [token, loading]);
 
   useEffect(() => {
-    props.setUserInfo?.(userInfo)
+    props.setUserInfo?.(userInfo);
   }, [userInfo]);
 
   return (
@@ -54,10 +55,10 @@ function UserInformation(props: Props) {
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
-              justifyContent: "center",
+              //justifyContent: "center",
               gap: 4,
               width: "100%",
-              height: 30,
+              height: 36,
             }}
           >
             {userInfo ? (
@@ -75,7 +76,7 @@ function UserInformation(props: Props) {
                     transition={250}
                   />
                 )}
-                <Text variant="bodyLarge">{`Hello ${userInfo?.username}!`}</Text>
+                <TypeWriterComponent displayName={userInfo?.username} />
               </>
             ) : (
               <>
@@ -108,16 +109,7 @@ function UserInformation(props: Props) {
               width: "100%",
             }}
           >
-            {tokenType === "Dropbox" && (
-              <Chip
-                //onPress={() => {
-                //  props.changeEditTokenVisibility?.(true);
-                //}}
-                icon="dropbox"
-              >
-                Dropbox
-              </Chip>
-            )}
+            {tokenType === "Dropbox" && <Chip icon="dropbox">Dropbox</Chip>}
             {tokenType === "GoogleDrive" && (
               <Chip icon="check">Google Drive</Chip>
             )}

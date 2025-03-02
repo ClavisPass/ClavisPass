@@ -4,8 +4,9 @@ import { useAuth } from "../../contexts/AuthProvider";
 import DataType from "../../types/DataType";
 import { View } from "react-native";
 import theme from "../../ui/theme";
-import Menu, { MenuItem } from "./Menu";
+import Menu from "./Menu";
 import { useData } from "../../contexts/DataProvider";
+import { MenuItem } from "../items/MenuItem";
 
 type Props = {
   visible: boolean;

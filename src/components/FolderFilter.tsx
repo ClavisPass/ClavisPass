@@ -8,8 +8,8 @@ import {
 } from "react-native";
 import { Chip, Divider, IconButton } from "react-native-paper";
 import WebSpecific from "./platformSpecific/WebSpecific";
-import { MenuItem } from "./menus/Menu";
 import AnimatedOpacityContainer from "./container/AnimatedOpacityContainer/AnimatedOpacityContainer";
+import { MenuItem } from "./items/MenuItem";
 
 const styles = StyleSheet.create({
   chip: {

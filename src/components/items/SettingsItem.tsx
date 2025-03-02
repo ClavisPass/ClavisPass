@@ -1,46 +1,25 @@
-import React, { ReactNode } from "react";
-import { View, StyleSheet } from "react-native";
-import { Divider, Icon, Text } from "react-native-paper";
-import { useTheme } from "../../contexts/ThemeProvider";
+import { ReactNode } from "react";
+import { View } from "react-native";
+import { MenuItem } from "./MenuItem";
 
-const styles = StyleSheet.create({
-  container: {
-    marginLeft: 8,
-    marginRight: 8,
-    marginBottom: 8,
-    borderRadius: 12,
-    overflow: "hidden",
-    padding: 16,
-  },
-});
-
-type Props = { children: ReactNode; title: string; icon?: string };
-
-export function SubItem(props: Props) {
-  const { theme } = useTheme();
-  return (
-    <>
-      <View style={{ display: "flex", flexDirection: "row", gap: 4, alignItems: "center" }}>
-        {props.icon && (
-          <Icon color={theme.colors?.tertiary} source={props.icon} size={16} />
-        )}
-        <Text style={{ color: theme.colors?.tertiary, userSelect: "none" }} variant="titleMedium">
-          {props.title}
-        </Text>
-      </View>
-      <Divider style={{ marginBottom: 6 }} />
-      {props.children}
-    </>
-  );
-}
-
+type Props = {
+  children: ReactNode;
+  onPress?: () => void;
+  leadingIcon?: string;
+  selected?: boolean;
+  label?: string;
+};
 function SettingsItem(props: Props) {
-  const { theme } = useTheme();
   return (
-    <View
-      style={[styles.container, { backgroundColor: theme.colors?.background }]}
-    >
-      <SubItem icon={props.icon} title={props.title}>{props.children}</SubItem>
+    <View style={{ height: 44 }}>
+      <MenuItem
+        onPress={props.onPress}
+        leadingIcon={props.leadingIcon}
+        selected={props.selected}
+        label={props.label}
+      >
+        {props.children}
+      </MenuItem>
     </View>
   );
 }

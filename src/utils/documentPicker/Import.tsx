@@ -10,6 +10,7 @@ import importpCloud from "./pcloud";
 import Modal from "../../components/modals/Modal";
 import { useTheme } from "../../contexts/ThemeProvider";
 import { View } from "react-native";
+import SettingsItem from "../../components/items/SettingsItem";
 
 export enum DocumentTypeEnum {
   FIREFOX,
@@ -103,9 +104,8 @@ function Import(props: Props) {
 
   return (
     <>
-      <Button
-        icon={props.icon}
-        mode="contained-tonal"
+      <SettingsItem
+        leadingIcon={props.icon}
         onPress={
           props.type === DocumentTypeEnum.PCLOUD
             ? () => {
@@ -116,7 +116,7 @@ function Import(props: Props) {
         }
       >
         {props.title} Passwords
-      </Button>
+      </SettingsItem>
       {props.type === DocumentTypeEnum.PCLOUD && (
         <Modal
           visible={modalVisible}

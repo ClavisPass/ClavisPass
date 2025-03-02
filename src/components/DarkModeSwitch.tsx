@@ -73,7 +73,7 @@ function DarkModeSwitch() {
     if (checked == "dark") setDarkmode(true);
   }, [checked]);
   return (
-    <View style={{ display: "flex", flexDirection: "row", gap: 6 }}>
+    <View style={{ display: "flex", flexDirection: "row", gap: 6, marginTop: 10 }}>
       <DarkModeSwitchPreview
         value="light"
         checked={checked}

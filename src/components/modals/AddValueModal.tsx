@@ -1,10 +1,10 @@
 import Modal from "./Modal";
-import { MenuItem } from "../menus/Menu";
 import { View } from "react-native";
 import ValueIconsEnum from "../../enums/ValueIconsEnum";
 import TemplateEnum from "../../enums/TemplateEnum";
 import getTemplate from "../../utils/getTemplate";
 import { TextInput } from "react-native-paper";
+import { MenuItem } from "../items/MenuItem";
 
 type Props = {
   visible: boolean;

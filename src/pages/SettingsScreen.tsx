@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, ScrollView, View } from "react-native";
-import { Button, Switch, Text, TextInput } from "react-native-paper";
-import SettingsItem from "../components/items/SettingsItem";
+import { Switch, Text } from "react-native-paper";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
@@ -24,6 +23,10 @@ import {
 } from "../utils/authenticateUser";
 import { useAuth } from "../contexts/AuthProvider";
 import ChangeMasterPasswordModal from "../components/modals/ChangeMasterPasswordModal";
+import SettingsDivider from "../components/SettingsDivider";
+import SettingsContainer from "../components/container/SettingsContainer";
+import SettingsItem from "../components/items/SettingsItem";
+import SettingsSwitch from "../components/SettingsSwitch";
 
 const styles = StyleSheet.create({
   surface: {
@@ -109,104 +112,73 @@ function SettingsScreen({ navigation }: { navigation: any }) {
         />
         <TitlebarHeight />
         <ScrollView style={styles.scrollView}>
-          <SettingsItem icon="cloud-outline" title={"Cloud"}>
-            <View style={styles.container}>
-              <Auth
-                navigation={navigation}
-                changeEditTokenVisibility={setEditTokenVisibility}
-              />
-            </View>
-          </SettingsItem>
+          <SettingsContainer icon="cloud-outline" title={"Cloud"}>
+            <Auth
+              navigation={navigation}
+              changeEditTokenVisibility={setEditTokenVisibility}
+            />
+          </SettingsContainer>
           <WebSpecific>
-            <SettingsItem icon={"cogs"} title={"System"}>
-              <View style={styles.container}>
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    gap: 10,
-                    alignItems: "center",
-                  }}
-                >
-                  <Switch
-                    value={startup}
-                    onValueChange={(checked) => {
-                      changeAutoStart(checked);
-                    }}
-                  />
-                  <Text variant="bodyLarge">Autostart</Text>
-                </View>
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    gap: 10,
-                    alignItems: "center",
-                  }}
-                >
-                  <Switch
-                    value={startup}
-                    onValueChange={(checked) => {
-                      changeAutoStart(checked);
-                    }}
-                  />
-                  <Text variant="bodyLarge">Minimize to Tray</Text>
-                </View>
-              </View>
-            </SettingsItem>
+            <SettingsContainer icon={"cogs"} title={"System"}>
+              <SettingsSwitch
+                label={"Autostart"}
+                value={startup}
+                onValueChange={(checked) => {
+                  changeAutoStart(checked);
+                }}
+              />
+              <SettingsDivider />
+              <SettingsSwitch
+                label={"Minimize to Tray"}
+                value={startup}
+                onValueChange={(checked) => {
+                  changeAutoStart(checked);
+                }}
+              />
+              <SettingsDivider />
+            </SettingsContainer>
           </WebSpecific>
-          <SettingsItem icon={"theme-light-dark"} title={"Design"}>
-            <View style={styles.container}>
-              <DarkModeSwitch />
-            </View>
-          </SettingsItem>
-          <SettingsItem icon={"fingerprint"} title={"Authentication"}>
-            <View style={styles.container}>
-              <Button
-                mode="contained-tonal"
-                onPress={() => {
-                  setShowChangeMasterPasswordModal(true);
-                }}
-              >
-                Change Master Password
-              </Button>
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  gap: 10,
-                  alignItems: "center",
-                }}
-              >
-                <Switch
-                  value={useAuthentication}
-                  onValueChange={(checked) => {
-                    changeAuthentication(checked);
-                  }}
-                />
-                <Text variant="bodyLarge">Use System Authentication</Text>
-              </View>
-            </View>
-          </SettingsItem>
-          <SettingsItem icon={"import"} title={"Import Passwords"}>
-            <View style={styles.container}>
-              <Import
-                type={DocumentTypeEnum.FIREFOX}
-                title={"Firefox"}
-                icon={"firefox"}
-              />
-              <Import
-                type={DocumentTypeEnum.CHROME}
-                title={"Chrome"}
-                icon={"google-chrome"}
-              />
-              <Import
-                type={DocumentTypeEnum.PCLOUD}
-                title={"pCloud"}
-                icon={"circle-outline"}
-              />
-            </View>
-          </SettingsItem>
+          <SettingsContainer icon={"theme-light-dark"} title={"Design"}>
+            <DarkModeSwitch />
+          </SettingsContainer>
+          <SettingsContainer icon={"fingerprint"} title={"Authentication"}>
+            <SettingsItem
+              onPress={() => {
+                setShowChangeMasterPasswordModal(true);
+              }}
+            >
+              Change Master Password
+            </SettingsItem>
+            <SettingsDivider />
+            <SettingsSwitch
+              label={"Use System Authentication"}
+              value={useAuthentication}
+              onValueChange={(checked) => {
+                changeAuthentication(checked);
+              }}
+            />
+            <SettingsDivider />
+          </SettingsContainer>
+          <SettingsContainer icon={"import"} title={"Import Passwords"}>
+            <Import
+              type={DocumentTypeEnum.FIREFOX}
+              title={"Firefox"}
+              icon={"firefox"}
+            />
+            <SettingsDivider />
+            <Import
+              type={DocumentTypeEnum.CHROME}
+              title={"Chrome"}
+              icon={"google-chrome"}
+            />
+            <SettingsDivider />
+            <Import
+              type={DocumentTypeEnum.PCLOUD}
+              title={"pCloud"}
+              icon={"circle-outline"}
+            />
+            <SettingsDivider />
+          </SettingsContainer>
         </ScrollView>
         <EditTokenModal
           visible={editTokenVisibility}

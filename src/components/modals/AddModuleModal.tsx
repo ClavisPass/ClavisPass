@@ -1,8 +1,8 @@
 import ModulesEnum from "../../enums/ModulesEnum";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import Modal from "./Modal";
-import { MenuItem } from "../menus/Menu";
 import { View } from "react-native";
+import { MenuItem } from "../items/MenuItem";
 
 type Props = {
   addModule: (module: ModulesEnum) => void;
