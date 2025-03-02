@@ -5,6 +5,7 @@ import TemplateEnum from "../../enums/TemplateEnum";
 import getTemplate from "../../utils/getTemplate";
 import { TextInput } from "react-native-paper";
 import { MenuItem } from "../items/MenuItem";
+import Divider from "../Divider";
 
 type Props = {
   visible: boolean;
@@ -22,7 +23,7 @@ function AddValueModal(props: Props) {
   };
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
-      <View style={{ width: 280, height: 220 }}>
+      <View style={{ width: 280, height: 177 }}>
         <MenuItem
           leadingIcon={ValueIconsEnum.PASSWORD}
           onPress={() => {
@@ -31,6 +32,7 @@ function AddValueModal(props: Props) {
         >
           {"Password"}
         </MenuItem>
+        <Divider />
         <MenuItem
           leadingIcon={ValueIconsEnum.WIFI}
           onPress={() => {
@@ -39,6 +41,7 @@ function AddValueModal(props: Props) {
         >
           {"Wifi"}
         </MenuItem>
+        <Divider />
         <MenuItem
           leadingIcon={ValueIconsEnum.KEY}
           onPress={() => {
@@ -47,6 +50,7 @@ function AddValueModal(props: Props) {
         >
           {"Key"}
         </MenuItem>
+        <Divider />
         <MenuItem
           leadingIcon={ValueIconsEnum.BLANK}
           onPress={() => {

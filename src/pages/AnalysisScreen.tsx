@@ -1,7 +1,7 @@
 import Constants from "expo-constants";
 import React, { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
-import { Divider, Text, TextInput, TouchableRipple } from "react-native-paper";
+import { Text, TextInput, TouchableRipple } from "react-native-paper";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import { StatusBar } from "expo-status-bar";
 import AnimatedContainer from "../components/container/AnimatedContainer";
@@ -16,6 +16,7 @@ import { useTheme } from "../contexts/ThemeProvider";
 import passwordEntropy from "../utils/Entropy";
 import AnalysisEntry from "../components/AnalysisEntry";
 import AnalysisEntryGradient from "../components/AnalysisEntryGradient";
+import Divider from "../components/Divider";
 
 export type CachedPasswordsType = {
   title: string;
@@ -263,7 +264,7 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
           </View>
           <FlashList
             data={filteredValues}
-            ItemSeparatorComponent={() => <Divider style={{marginTop: 0, marginBottom: 0}} />}
+            ItemSeparatorComponent={() => <Divider />}
             renderItem={({ item, index }) => (
               <View
                 style={{

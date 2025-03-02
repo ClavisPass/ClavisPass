@@ -3,6 +3,7 @@ import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import Modal from "./Modal";
 import { View } from "react-native";
 import { MenuItem } from "../items/MenuItem";
+import Divider from "../Divider";
 
 type Props = {
   addModule: (module: ModulesEnum) => void;
@@ -14,7 +15,7 @@ function AddModuleModal(props: Props) {
   const hideModal = () => props.setVisible(false);
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
-      <View style={{ width: 280, minHeight: 440 }}>
+      <View style={{ width: 280, minHeight: 354 }}>
         <MenuItem
           leadingIcon={ModuleIconsEnum.USERNAME}
           onPress={() => {
@@ -23,6 +24,7 @@ function AddModuleModal(props: Props) {
         >
           {"Username"}
         </MenuItem>
+        <Divider />
         <MenuItem
           leadingIcon={ModuleIconsEnum.E_MAIL}
           onPress={() => {
@@ -31,6 +33,7 @@ function AddModuleModal(props: Props) {
         >
           {"E-Mail"}
         </MenuItem>
+        <Divider />
         <MenuItem
           leadingIcon={ModuleIconsEnum.PASSWORD}
           onPress={() => {
@@ -39,6 +42,7 @@ function AddModuleModal(props: Props) {
         >
           {"Password"}
         </MenuItem>
+        <Divider />
         <MenuItem
           leadingIcon={ModuleIconsEnum.URL}
           onPress={() => {
@@ -47,6 +51,7 @@ function AddModuleModal(props: Props) {
         >
           {"URL"}
         </MenuItem>
+        <Divider />
         <MenuItem
           leadingIcon={ModuleIconsEnum.WIFI}
           onPress={() => {
@@ -55,6 +60,7 @@ function AddModuleModal(props: Props) {
         >
           {"Wifi"}
         </MenuItem>
+        <Divider />
         <MenuItem
           leadingIcon={ModuleIconsEnum.KEY}
           onPress={() => {
@@ -63,6 +69,7 @@ function AddModuleModal(props: Props) {
         >
           {"Key"}
         </MenuItem>
+        <Divider />
         <MenuItem
           leadingIcon={ModuleIconsEnum.CUSTOM_FIELD}
           onPress={() => {
@@ -71,6 +78,7 @@ function AddModuleModal(props: Props) {
         >
           {"Custom Field"}
         </MenuItem>
+        <Divider />
         <MenuItem
           leadingIcon={ModuleIconsEnum.NOTE}
           onPress={() => {
