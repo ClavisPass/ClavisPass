@@ -160,15 +160,10 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
           width: "100%",
         }}
       >
-        <Text
-          variant="titleSmall"
-          style={{ marginLeft: 6, userSelect: "none" }}
-        >
-          Statistics
-        </Text>
         <View
           style={{
             margin: 6,
+            marginTop: 0,
             display: "flex",
             flexDirection: "column",
             gap: 6,
@@ -228,12 +223,6 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
             />
           </View>
         </View>
-        <Text
-          variant="titleSmall"
-          style={{ marginTop: 10, marginLeft: 6, userSelect: "none" }}
-        >
-          Your Entries
-        </Text>
         <View
           style={{
             flex: 1,
@@ -242,6 +231,7 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
             padding: 12,
             boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
             margin: 6,
+            marginTop: 0,
           }}
         >
           <View style={{ height: 40 }}>
@@ -250,11 +240,19 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
               placeholderTextColor={"lightgray"}
               outlineStyle={[
                 globalStyles.outlineStyle,
-                { borderColor: theme.colors.primary, borderWidth: 2, backgroundColor: "transparent" },
+                {
+                  borderColor: theme.colors.primary,
+                  borderWidth: 2,
+                  backgroundColor: "transparent",
+                },
               ]}
               style={[
                 globalStyles.textInputStyle,
-                { borderColor: theme.colors.primary, borderBottomWidth: 1, backgroundColor: "transparent" },
+                {
+                  borderColor: theme.colors.primary,
+                  borderBottomWidth: 1,
+                  backgroundColor: "transparent",
+                },
               ]}
               value={searchQuery}
               mode="flat"

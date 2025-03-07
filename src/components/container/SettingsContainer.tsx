@@ -55,6 +55,7 @@ function SettingsContainer(props: Props) {
           backgroundColor: theme.colors?.background,
           borderRadius: 12,
           overflow: "hidden",
+          boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
         },
       ]}
     >
