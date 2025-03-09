@@ -16,9 +16,9 @@ const styles = StyleSheet.create({
   },
   innercontainer: {
     padding: 10,
-    marginLeft: 4,
-    marginRight: 4,
-    marginBottom: 4,
+    marginLeft: 8,
+    marginRight: 8,
+    marginBottom: 8,
     borderRadius: 12,
     display: "flex",
     flexDirection: "row",

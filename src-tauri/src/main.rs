@@ -85,8 +85,8 @@ fn load_window_size(app_handle: &tauri::AppHandle) -> Option<WindowSize> {
 }
 
 fn main() {
-    let show = CustomMenuItem::new("show".to_string(), "Öffnen");
-    let quit = CustomMenuItem::new("quit".to_string(), "Schließen");
+    let show = CustomMenuItem::new("show".to_string(), "Open");
+    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
     let tray_menu = SystemTrayMenu::new()
         .add_item(show)
         .add_native_item(SystemTrayMenuItem::Separator)

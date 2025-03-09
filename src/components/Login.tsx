@@ -36,7 +36,7 @@ function Login(props: Props) {
     null
   );
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showNewData, setShowNewData] = useState(false);
 
   const [capsLock, setCapsLock] = useState(false);
@@ -50,34 +50,33 @@ function Login(props: Props) {
 
   useEffect(() => {
     isUsingAuthentication().then((isAuthenticated) => {
-      if (isAuthenticated) {
-        authenticateUser().then((auth) => {
-          if (auth) {
-            loadAuthentication().then((data) => {
-              setValue(data);
-              //login(data);
-            });
+      if (token && tokenType) {
+        setLoading(true);
+        fetchData(token, tokenType, "clavispass.lock").then((response) => {
+          if (response === null) {
+            setShowNewData(true);
+          } else {
+            const parsedCryptoData = CryptoTypeSchema.parse(
+              JSON.parse(response)
+            );
+            setParsedCryptoData(parsedCryptoData);
+            setLoading(false);
+            if (isAuthenticated) {
+              authenticateUser().then((auth) => {
+                if (auth) {
+                  loadAuthentication().then((data) => {
+                    login(data, parsedCryptoData);
+                  });
+                }
+              });
+            }
           }
         });
       }
     });
-    console.log(token);
-    console.log(tokenType);
-    if (token && tokenType) {
-      setLoading(true);
-      fetchData(token, tokenType, "clavispass.lock").then((response) => {
-        if (response === null) {
-          setShowNewData(true);
-        } else {
-          const parsedCryptoData = CryptoTypeSchema.parse(JSON.parse(response));
-          setParsedCryptoData(parsedCryptoData);
-        }
-      });
-    }
-    setLoading(false);
   }, [token, tokenType]);
 
-  const login = async () => {
+  const login = async (value: string, parsedCryptoData: CryptoType | null) => {
     try {
       if (parsedCryptoData === null) {
         return;
@@ -112,7 +111,7 @@ function Login(props: Props) {
     <>
       {loading ? (
         <>
-          <ActivityIndicator animating={true} />
+          <ActivityIndicator size={"large"} animating={true} />
         </>
       ) : (
         <>
@@ -163,9 +162,12 @@ function Login(props: Props) {
                   setValue={setValue}
                   value={value}
                   placeholder="Enter Master Password"
-                  onSubmitEditing={login}
+                  onSubmitEditing={() => login(value, parsedCryptoData)}
                 />
-                <Button text={"Login"} onPress={login}></Button>
+                <Button
+                  text={"Login"}
+                  onPress={() => login(value, parsedCryptoData)}
+                ></Button>
               </>
             )}
             {capsLock && (

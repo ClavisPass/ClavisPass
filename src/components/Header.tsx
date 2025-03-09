@@ -22,7 +22,7 @@ function Header(props: Props) {
         display: "flex",
         flexDirection: "column",
         backgroundColor: theme.colors?.background,
-        marginBottom: 4,
+        marginBottom: 8,
         borderRadius: Platform.OS === "web" ? 12 : 0,
         borderBottomLeftRadius: 12,
         borderBottomRightRadius: 12,

@@ -162,11 +162,11 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
       >
         <View
           style={{
-            margin: 6,
+            margin: 8,
             marginTop: 0,
             display: "flex",
             flexDirection: "column",
-            gap: 6,
+            gap: 8,
           }}
         >
           <View
@@ -175,7 +175,7 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
               flexDirection: "row",
               justifyContent: "space-evenly",
               height: 80,
-              gap: 6,
+              gap: 8,
             }}
           >
             <AnalysisEntryGradient
@@ -200,7 +200,7 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
               flexDirection: "row",
               justifyContent: "space-evenly",
               height: 80,
-              gap: 6,
+              gap: 8,
             }}
           >
             <AnalysisEntry
@@ -230,7 +230,7 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
             borderRadius: 16,
             padding: 12,
             boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
-            margin: 6,
+            margin: 8,
             marginTop: 0,
           }}
         >
