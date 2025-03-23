@@ -79,7 +79,7 @@ function DraggableFolderList(props: Props) {
         data={props.folder}
         renderItem={renderItem}
         keyExtractor={(item, index) => `drag-item-${item}-${index}`}
-        onDragEnd={({ data }) => changeFolder(data, dataData)}
+        onDragEnd={({ data }) => {changeFolder(data, dataData); dataData.setShowSave(true);}}
       />
     </View>
   );

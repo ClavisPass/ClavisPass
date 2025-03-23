@@ -46,6 +46,7 @@ function Import(props: Props) {
     let newData = { ...data.data } as DataType;
     if (newData) newData.values = [...newData.values, ...values];
     data.setData(newData);
+    data.setShowSave(true);
   };
 
   const pickDocument = async () => {

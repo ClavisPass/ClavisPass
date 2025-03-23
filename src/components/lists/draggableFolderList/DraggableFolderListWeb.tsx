@@ -52,6 +52,7 @@ function DraggableFolderListWeb(props: Props) {
       result.destination.index
     );
     changeFolder(itemsChange, data);
+    data.setShowSave(true);
   };
   return (
     <DragDropContext onDragEnd={onDragEnd}>

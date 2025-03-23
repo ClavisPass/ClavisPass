@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Platform,
-  RefreshControl,
   useWindowDimensions,
   Animated,
 } from "react-native";
@@ -16,10 +15,6 @@ import {
 import { Text } from "react-native-paper";
 
 import { FlashList } from "@shopify/flash-list";
-
-//import { getData } from "../api/getData";
-
-//const DATA = getData();
 
 import { useData } from "../contexts/DataProvider";
 import { LinearGradient } from "expo-linear-gradient";
@@ -36,7 +31,7 @@ import ContentProtection from "../components/ContentProtection";
 import { useFocusEffect } from "@react-navigation/native";
 import { TITLEBAR_HEIGHT } from "../components/CustomTitlebar";
 import FolderModal from "../components/modals/FolderModal";
-import DataType, { DataTypeSchema } from "../types/DataType";
+import { DataTypeSchema } from "../types/DataType";
 import SearchShortcut from "../components/shortcuts/SearchShortcut";
 import AddValueModal from "../components/modals/AddValueModal";
 import uploadData from "../api/uploadData";

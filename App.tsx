@@ -14,7 +14,9 @@ import HomeScreen from "./src/pages/HomeScreen";
 import SettingsScreen from "./src/pages/SettingsScreen";
 
 import EditScreen from "./src/pages/EditScreen";
-import AnalysisScreen, { CachedPasswordsType } from "./src/pages/AnalysisScreen";
+import AnalysisScreen, {
+  CachedPasswordsType,
+} from "./src/pages/AnalysisScreen";
 import { AuthProvider } from "./src/contexts/AuthProvider";
 import { DataProvider } from "./src/contexts/DataProvider";
 import ProtectedRoute from "./src/utils/ProtectedRoute";
@@ -31,6 +33,7 @@ import ScanScreen from "./src/pages/ScanScreen";
 import theme from "./src/ui/theme";
 import AnalysisDetailScreen from "./src/pages/AnalysisDetailScreen";
 import isTauri from "./src/utils/isTauri";
+import { OnlineProvider } from "./src/contexts/OnlineProvider";
 
 const Tab = createBottomTabNavigator();
 
@@ -43,138 +46,140 @@ const QuickSelectProvider = isTauri()
 export default function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <TokenProvider>
-          <DataProvider>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <View
-                style={{
-                  borderRadius: Platform.OS === "web" ? 10 : 0,
-                  borderColor: Platform.OS === "web" ? theme.colors.primary: undefined,
-                  borderWidth: Platform.OS === "web" ? 1 : 0,
-                  overflow: "hidden",
-                  flex: 1,
-                }}
-              >
-                <GlobalShortcuts />
-                <QuickSelectProvider>
-                  <CustomTitlebar />
-
-                  <NavigationContainer>
-                    <ProtectedRoute loginScreen={<LoginStack />}>
-                      <Tab.Navigator
-                        initialRouteName="HomeStack"
-                        screenOptions={{
-                          headerShown: false,
-                        }}
-                        tabBar={({
-                          navigation,
-                          state,
-                          descriptors,
-                          insets,
-                        }) => (
-                          <BottomNavigation.Bar
-                            shifting={true}
-                            navigationState={state}
-                            safeAreaInsets={insets}
-                            onTabPress={({ route, preventDefault }) => {
-                              const event = navigation.emit({
-                                type: "tabPress",
-                                target: route.key,
-                                canPreventDefault: true,
-                              });
-
-                              if (event.defaultPrevented) {
-                                preventDefault();
-                              } else {
-                                navigation.dispatch({
-                                  ...CommonActions.navigate(
-                                    route.name,
-                                    route.params
-                                  ),
-                                  target: state.key,
+      <OnlineProvider>
+        <AuthProvider>
+          <TokenProvider>
+            <DataProvider>
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <View
+                  style={{
+                    borderRadius: Platform.OS === "web" ? 10 : 0,
+                    borderColor:
+                      Platform.OS === "web" ? theme.colors.primary : undefined,
+                    borderWidth: Platform.OS === "web" ? 1 : 0,
+                    overflow: "hidden",
+                    flex: 1,
+                  }}
+                >
+                  <GlobalShortcuts />
+                  <QuickSelectProvider>
+                    <CustomTitlebar />
+                    <NavigationContainer>
+                      <ProtectedRoute loginScreen={<LoginStack />}>
+                        <Tab.Navigator
+                          initialRouteName="HomeStack"
+                          screenOptions={{
+                            headerShown: false,
+                          }}
+                          tabBar={({
+                            navigation,
+                            state,
+                            descriptors,
+                            insets,
+                          }) => (
+                            <BottomNavigation.Bar
+                              shifting={true}
+                              navigationState={state}
+                              safeAreaInsets={insets}
+                              onTabPress={({ route, preventDefault }) => {
+                                const event = navigation.emit({
+                                  type: "tabPress",
+                                  target: route.key,
+                                  canPreventDefault: true,
                                 });
-                              }
-                            }}
-                            renderIcon={({ route, focused, color }) => {
-                              const { options } = descriptors[route.key];
-                              if (options.tabBarIcon) {
-                                return options.tabBarIcon({
-                                  focused,
-                                  color,
-                                  size: 24,
-                                });
-                              }
 
-                              return null;
-                            }}
-                            getLabelText={({ route }) => {
-                              const { options } = descriptors[route.key];
+                                if (event.defaultPrevented) {
+                                  preventDefault();
+                                } else {
+                                  navigation.dispatch({
+                                    ...CommonActions.navigate(
+                                      route.name,
+                                      route.params
+                                    ),
+                                    target: state.key,
+                                  });
+                                }
+                              }}
+                              renderIcon={({ route, focused, color }) => {
+                                const { options } = descriptors[route.key];
+                                if (options.tabBarIcon) {
+                                  return options.tabBarIcon({
+                                    focused,
+                                    color,
+                                    size: 24,
+                                  });
+                                }
 
-                              let label: string = "test";
+                                return null;
+                              }}
+                              getLabelText={({ route }) => {
+                                const { options } = descriptors[route.key];
 
-                              if (options.title !== undefined) {
-                                label = options.title;
-                              }
+                                let label: string = "test";
 
-                              return label;
+                                if (options.title !== undefined) {
+                                  label = options.title;
+                                }
+
+                                return label;
+                              }}
+                            />
+                          )}
+                        >
+                          <Tab.Screen
+                            name="Analysis"
+                            component={AnalysisStack}
+                            options={{
+                              tabBarLabel: "Analysis",
+                              title: "Analysis",
+                              tabBarIcon: ({ color, size }) => {
+                                return (
+                                  <Icon
+                                    name="shield-search"
+                                    size={size}
+                                    color={color}
+                                  />
+                                );
+                              },
                             }}
                           />
-                        )}
-                      >
-                        <Tab.Screen
-                          name="Analysis"
-                          component={AnalysisStack}
-                          options={{
-                            tabBarLabel: "Analysis",
-                            title: "Analysis",
-                            tabBarIcon: ({ color, size }) => {
-                              return (
-                                <Icon
-                                  name="shield-search"
-                                  size={size}
-                                  color={color}
-                                />
-                              );
-                            },
-                          }}
-                        />
-                        <Tab.Screen
-                          name="HomeStack"
-                          component={HomeStack}
-                          options={{
-                            tabBarLabel: "Home",
-                            title: "Home",
+                          <Tab.Screen
+                            name="HomeStack"
+                            component={HomeStack}
+                            options={{
+                              tabBarLabel: "Home",
+                              title: "Home",
 
-                            tabBarIcon: ({ color, size }) => {
-                              return (
-                                <Icon name="home" size={size} color={color} />
-                              );
-                            },
-                          }}
-                        />
-                        <Tab.Screen
-                          name="SettingsStack"
-                          component={SettingsStack}
-                          options={{
-                            tabBarLabel: "Settings",
-                            title: "Settings",
-                            tabBarIcon: ({ color, size }) => {
-                              return (
-                                <Icon name="cog" size={size} color={color} />
-                              );
-                            },
-                          }}
-                        />
-                      </Tab.Navigator>
-                    </ProtectedRoute>
-                  </NavigationContainer>
-                </QuickSelectProvider>
-              </View>
-            </GestureHandlerRootView>
-          </DataProvider>
-        </TokenProvider>
-      </AuthProvider>
+                              tabBarIcon: ({ color, size }) => {
+                                return (
+                                  <Icon name="home" size={size} color={color} />
+                                );
+                              },
+                            }}
+                          />
+                          <Tab.Screen
+                            name="SettingsStack"
+                            component={SettingsStack}
+                            options={{
+                              tabBarLabel: "Settings",
+                              title: "Settings",
+                              tabBarIcon: ({ color, size }) => {
+                                return (
+                                  <Icon name="cog" size={size} color={color} />
+                                );
+                              },
+                            }}
+                          />
+                        </Tab.Navigator>
+                      </ProtectedRoute>
+                    </NavigationContainer>
+                  </QuickSelectProvider>
+                </View>
+              </GestureHandlerRootView>
+            </DataProvider>
+          </TokenProvider>
+        </AuthProvider>
+      </OnlineProvider>
     </ThemeProvider>
   );
 }

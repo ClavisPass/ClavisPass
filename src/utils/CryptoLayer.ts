@@ -1,6 +1,7 @@
 import CryptoJS from "crypto-js";
 import DataType from "../types/DataType";
 import CryptoType from "../types/CryptoType";
+import { getDateTime } from "./Timestamp";
 
 // Passwort-basierte Schlüsselableitung
 const deriveKey = (password: string, salt: CryptoJS.lib.WordArray) => {
@@ -20,6 +21,7 @@ export const encrypt = (data: DataType, password: string) => {
   });
 
   return {
+    lastUpdated: getDateTime(),
     ciphertext: encrypted.toString(),
     salt: salt.toString(),
     iv: iv.toString(),

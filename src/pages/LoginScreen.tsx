@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import AnimatedContainer from "../components/container/AnimatedContainer";
 import ContentProtection from "../components/ContentProtection";
@@ -10,7 +10,8 @@ import EditTokenModal from "../components/modals/EditTokenModal";
 import { ActivityIndicator } from "react-native-paper";
 import Login from "../components/Login";
 import generateNewToken from "../api/generateNewToken";
-import { set } from "zod";
+import { Text } from "react-native-paper";
+import { useOnline } from "../contexts/OnlineProvider";
 
 const styles = StyleSheet.create({
   container: {
@@ -28,9 +29,8 @@ function LoginScreen({ navigation }: { navigation: any }) {
     setRefreshToken,
     loadRefreshToken,
     tokenType,
-    checkTokenType,
-    setTokenType,
   } = useToken();
+  const { isOnline } = useOnline();
 
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
   const [loading, setLoading] = useState(true);
@@ -74,6 +74,14 @@ function LoginScreen({ navigation }: { navigation: any }) {
   useEffect(() => {
     login();
   }, []);
+
+  useEffect(() => {
+    console.log(isOnline);
+  }, [isOnline]);
+
+  if(!isOnline){
+    return <Text>OFFLINE</Text>
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>

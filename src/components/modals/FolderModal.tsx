@@ -56,6 +56,7 @@ function FolderModal(props: Props) {
       ...props.folder.filter((item: string) => item !== folder),
     ];
     changeFolder(newFolder, data);
+    data.setShowSave(true);
   };
 
   return (
@@ -90,6 +91,7 @@ function FolderModal(props: Props) {
             onPress={() => {
               changeFolder([...props.folder, searchQuery], data);
               setSearchQuery("");
+              data.setShowSave(true);
             }}
           />
         </View>

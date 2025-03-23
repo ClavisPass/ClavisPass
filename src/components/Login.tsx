@@ -55,6 +55,7 @@ function Login(props: Props) {
         fetchData(token, tokenType, "clavispass.lock").then((response) => {
           if (response === null) {
             setShowNewData(true);
+            setLoading(false);
           } else {
             const parsedCryptoData = CryptoTypeSchema.parse(
               JSON.parse(response)

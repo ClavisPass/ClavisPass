@@ -3,7 +3,6 @@ import DataType from "../types/DataType";
 export function getData() {
   const data: DataType = {
     version: "",
-    lastUpdated: "2024-06-12T20:48:33.139Z",
     folder: ["idk", "Wifi", "stuff", "test", "yo"],
     values: [
       {
