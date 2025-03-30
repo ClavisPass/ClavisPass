@@ -3,7 +3,7 @@ import { useTheme } from "../contexts/ThemeProvider";
 import { useEffect, useRef, useState } from "react";
 import { Platform, View } from "react-native";
 type Props = {
-  placeholder: string;
+  placeholder?: string;
   value: string;
   setValue: (value: string) => void;
   autofocus?: boolean;

@@ -78,7 +78,12 @@
       "csp": null
     },
     "updater": {
-      "active": false
+      "active": true,
+      "endpoints": [
+        "https://github.com/RiciRic/ClavisPass/releases/latest/download/updater.json"
+      ],
+      "dialog": true,
+      "pubkey": "DEIN-PUBLIC-KEY"
     },
     "windows": [
       {

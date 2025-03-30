@@ -28,6 +28,7 @@ import SettingsContainer from "../components/container/SettingsContainer";
 import SettingsItem from "../components/items/SettingsItem";
 import SettingsSwitch from "../components/SettingsSwitch";
 import Footer from "../components/Footer";
+import UpdateManager from "../components/UpdateManager";
 
 const styles = StyleSheet.create({
   surface: {
@@ -113,6 +114,9 @@ function SettingsScreen({ navigation }: { navigation: any }) {
         />
         <TitlebarHeight />
         <ScrollView style={styles.scrollView}>
+          <SettingsContainer icon="cloud-outline" title={"Cloud"}>
+            <UpdateManager />
+          </SettingsContainer>
           <SettingsContainer icon="cloud-outline" title={"Cloud"}>
             <Auth
               navigation={navigation}

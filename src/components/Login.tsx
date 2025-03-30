@@ -30,7 +30,7 @@ function Login(props: Props) {
   const auth = useAuth();
   const { token, tokenType } = useToken();
   const { theme } = useTheme();
-  const { setData } = useData();
+  const { setData, setLastUpdated } = useData();
 
   const [parsedCryptoData, setParsedCryptoData] = useState<CryptoType | null>(
     null
@@ -44,6 +44,8 @@ function Login(props: Props) {
   const [error, setError] = useState(false);
 
   const textInputRef = useRef<any>(null);
+  const textInput2Ref = useRef<any>(null);
+  const textInput3Ref = useRef<any>(null);
 
   const [value, setValue] = useState("");
   const [value2, setValue2] = useState("");
@@ -82,11 +84,13 @@ function Login(props: Props) {
       if (parsedCryptoData === null) {
         return;
       }
+      const lastUpdated = parsedCryptoData.lastUpdated;
       const decryptedData = decrypt(parsedCryptoData, value);
       const jsonData = JSON.parse(decryptedData);
 
       const parsedData = DataTypeSchema.parse(jsonData);
       setData(parsedData);
+      setLastUpdated(lastUpdated);
       auth.login(value);
     } catch (error) {
       console.error("Error getting Data:", error);
@@ -111,9 +115,7 @@ function Login(props: Props) {
   return (
     <>
       {loading ? (
-        <>
-          <ActivityIndicator size={"large"} animating={true} />
-        </>
+        <ActivityIndicator size={"large"} animating={true} />
       ) : (
         <>
           <View style={{ height: 40 }}>
@@ -137,16 +139,21 @@ function Login(props: Props) {
               <>
                 <PasswordTextbox
                   autofocus
+                  textInputRef={textInput2Ref}
                   setCapsLock={setCapsLock}
                   setValue={setValue}
                   value={value}
-                  placeholder="New Master Password"
+                  placeholder="New Password"
+                  onSubmitEditing={() => {
+                    textInput3Ref.current.focus();
+                  }}
                 />
                 <PasswordTextbox
+                  textInputRef={textInput3Ref}
                   setCapsLock={setCapsLock}
                   setValue={setValue2}
                   value={value2}
-                  placeholder="Reenter Master Password"
+                  placeholder="Confirm Password"
                 />
                 <Button
                   text={"Set Password"}
@@ -162,7 +169,7 @@ function Login(props: Props) {
                   autofocus
                   setValue={setValue}
                   value={value}
-                  placeholder="Enter Master Password"
+                  placeholder="Enter Password"
                   onSubmitEditing={() => login(value, parsedCryptoData)}
                 />
                 <Button

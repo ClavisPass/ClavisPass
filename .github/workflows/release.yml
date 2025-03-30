@@ -1,0 +1,82 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-tauri:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Setup Rust & Tauri
+        uses: tauri-apps/tauri-action@v0.4
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Tauri App
+        run: npm run tauri build
+
+      - name: Upload binaries
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            src-tauri/target/release/bundle/**/*
+          body: "Neue Version mit Verbesserungen und Fixes"
+
+  update-expo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Publish Expo Update
+        run: npx eas update --branch production
+
+  update-json:
+    needs: [build-tauri]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update updater.json
+        run: |
+          echo '{
+            "version": "${{ github.ref_name }}",
+            "notes": "Neue Version mit Bugfixes",
+            "pub_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "platforms": {
+              "windows-x86_64": {
+                "url": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/app-windows.exe"
+              },
+              "linux-x86_64": {
+                "url": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/app-linux.AppImage"
+              },
+              "darwin-x86_64": {
+                "url": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/app-macos.dmg"
+              }
+            }
+          }' > updater.json
+
+      - name: Commit updater.json
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'github-actions@github.com'
+          git add updater.json
+          git commit -m "Update updater.json"
+          git push

@@ -13,6 +13,8 @@ interface DataContextType {
   backup: DataType;
   showSave: boolean;
   setShowSave: (showSave: boolean) => void;
+  lastUpdated: string;
+  setLastUpdated: (lastUpdated: string) => void;
 }
 
 export const DataContext = createContext<DataContextType | null>(null);
@@ -27,12 +29,14 @@ export const DataProvider = ({ children }: Props) => {
 
   const [showSave, setShowSave] = useState(false);
 
+  const [lastUpdated, setLastUpdated] = useState("");
+
   useEffect(() => {
     if (backup === null && data !== null) setBackup({ ...data });
   }, [data]);
 
   return (
-    <DataContext.Provider value={{ data, setData, backup, showSave, setShowSave }}>
+    <DataContext.Provider value={{ data, setData, backup, showSave, setShowSave, lastUpdated, setLastUpdated }}>
       {children}
     </DataContext.Provider>
   );

@@ -1,17 +1,29 @@
+import * as Crypto from "expo-crypto";
 import CryptoJS from "crypto-js";
 import DataType from "../types/DataType";
 import CryptoType from "../types/CryptoType";
 import { getDateTime } from "./Timestamp";
 
-// Passwort-basierte Schlüsselableitung
-const deriveKey = (password: string, salt: CryptoJS.lib.WordArray) => {
-  return CryptoJS.PBKDF2(password, salt, { keySize: 256 / 32, iterations: 1000 });
+const getRandomBytes = async (size: number) => {
+  const randomBytes = await Crypto.getRandomBytesAsync(size);
+  return CryptoJS.lib.WordArray.create(randomBytes);
 };
 
-// Verschlüsseln
-export const encrypt = (data: DataType, password: string) => {
-  const salt = CryptoJS.lib.WordArray.random(128 / 8);
-  const iv = CryptoJS.lib.WordArray.random(96 / 8);
+// Passwort-basierte Schlüsselableitung
+const deriveKey = (password: string, salt: CryptoJS.lib.WordArray) => {
+  return CryptoJS.PBKDF2(password, salt, {
+    keySize: 256 / 32,
+    iterations: 1000,
+  });
+};
+
+export const encrypt = async (
+  data: DataType,
+  password: string,
+  lastUpdated?: string
+) => {
+  const salt = await getRandomBytes(16);
+  const iv = await getRandomBytes(12);
   const key = deriveKey(password, salt);
 
   const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key, {
@@ -21,14 +33,13 @@ export const encrypt = (data: DataType, password: string) => {
   });
 
   return {
-    lastUpdated: getDateTime(),
+    lastUpdated: lastUpdated ? lastUpdated : getDateTime(),
     ciphertext: encrypted.toString(),
     salt: salt.toString(),
     iv: iv.toString(),
   } as CryptoType;
 };
 
-// Entschlüsseln
 export const decrypt = (crypto: CryptoType, password: string) => {
   const key = deriveKey(password, CryptoJS.enc.Hex.parse(crypto.salt));
   const decrypted = CryptoJS.AES.decrypt(crypto.ciphertext, key, {

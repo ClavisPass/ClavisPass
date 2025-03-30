@@ -17,6 +17,7 @@ type Props = {
 
 function FolderModal(props: Props) {
   const data = useData();
+  const { theme } = useTheme();
   const { globalStyles } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const filteredValues = useMemo(() => {
@@ -71,15 +72,37 @@ function FolderModal(props: Props) {
           flexDirection: "column",
           height: 350,
           cursor: "auto",
+          gap: 6,
         }}
       >
-        <View style={globalStyles.moduleView}>
+        <View
+          style={[
+            globalStyles.moduleView,
+            {
+              borderColor: theme.colors.primary,
+              borderBottomWidth: 2,
+              backgroundColor: "transparent",
+            },
+          ]}
+        >
           <TextInput
             placeholder="Add Folder..."
-            outlineStyle={globalStyles.outlineStyle}
-            style={globalStyles.textInputStyle}
+            outlineStyle={[
+              globalStyles.outlineStyle,
+              {
+                borderBottomWidth: 0,
+              },
+            ]}
+            style={[
+              globalStyles.textInputStyle,
+              {
+                borderColor: theme.colors.primary,
+                borderBottomWidth: 0,
+                backgroundColor: "transparent",
+              },
+            ]}
             value={searchQuery}
-            mode="outlined"
+            mode="flat"
             onChangeText={(text) => setSearchQuery(text)}
             autoCapitalize="none"
           />

@@ -47,6 +47,7 @@ import {
   LexendExa_400Regular,
   LexendExa_700Bold,
 } from "@expo-google-fonts/lexend-exa";
+import { getDateTime } from "../utils/Timestamp";
 
 type Props = {
   setShowMenu: (boolean: boolean) => void;
@@ -99,15 +100,14 @@ function HomeScreen({ navigation }: { navigation: any }) {
   const data = useData();
   const { token, tokenType } = useToken();
 
-  const slideAnim = useRef(new Animated.Value(0)).current; // Startet bei 0 Höhe
-  const fadeAnim = useRef(new Animated.Value(0)).current; // Startet bei voller Transparenz
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (data.showSave) {
-      // Einblenden & Höhe animieren
       Animated.parallel([
         Animated.timing(slideAnim, {
-          toValue: 48, // Höhe der Komponente
+          toValue: 48,
           duration: 250,
           useNativeDriver: false,
         }),
@@ -118,7 +118,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
         }),
       ]).start();
     } else {
-      // Ausblenden & Höhe reduzieren
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 0,
@@ -175,6 +174,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
 
           const parsedData = DataTypeSchema.parse(jsonData);
           data.setData(parsedData);
+          data.setLastUpdated(parsedCryptoData.lastUpdated);
           setRefreshing(false);
           data.setShowSave(false);
         }
@@ -325,12 +325,13 @@ function HomeScreen({ navigation }: { navigation: any }) {
                 <>
                   <View style={{ backgroundColor: "#00000017" }}>
                     <TouchableRipple
-                      onPress={() => {
+                      onPress={async () => {
                         setRefreshing(true);
+                        const lastUpdated = getDateTime();
                         uploadData(
                           token,
                           tokenType,
-                          encrypt(data.data, auth.master ? auth.master : ""),
+                          await encrypt(data.data, auth.master ? auth.master : "", lastUpdated),
                           "clavispass.lock",
                           () => {
                             data.setShowSave(false);

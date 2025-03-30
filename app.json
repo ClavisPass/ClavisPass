@@ -1,5 +1,9 @@
 {
   "expo": {
+    "updates": {
+      "enabled": true,
+      "url": "https://u.expo.dev/d0965944-a59f-4f32-be3b-2518cf2f1b40"
+    },
     "newArchEnabled": true,
     "name": "ClavisPass",
     "slug": "ClavisPass",
@@ -18,7 +22,10 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ricirico.ClavisPass"
+      "package": "com.ricirico.ClavisPass",
+      "permissions": [
+        "android.permission.CAMERA"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -34,6 +41,11 @@
         }
       ],
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d0965944-a59f-4f32-be3b-2518cf2f1b40"
+      }
+    }
   }
 }
