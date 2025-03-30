@@ -83,7 +83,7 @@
         "https://github.com/RiciRic/ClavisPass/releases/latest/download/updater.json"
       ],
       "dialog": true,
-      "pubkey": "DEIN-PUBLIC-KEY"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDk0Rjg1RUJBRjhCQzIzMkMKUldRc0k3ejR1bDc0bEhWNnExMGhDb0JsYkFvMjgvVlp4bjFuS3gyZnFUVVZUajh0TFFRNWlLbVoK"
     },
     "windows": [
       {
