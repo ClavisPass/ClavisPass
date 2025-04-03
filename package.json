@@ -13,7 +13,10 @@
     "icon": "tauri icon",
     "lint": "eslint .",
     "upgrade": "npx expo install --fix",
-    "generate": "tauri signer generate"
+    "generate": "tauri signer generate",
+    "sync-version": "node sync-version.js",
+    "release": "npm run sync-version && ./release.sh $(node -p 'require(\"./version.json\").version')",
+    "release:windows": "npm run sync-version && .\\release.bat $(node -p 'require(\"./version.json\").version')"
   },
   "dependencies": {
     "@expo-google-fonts/lexend-exa": "^0.2.3",
