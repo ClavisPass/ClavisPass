@@ -9,6 +9,7 @@
     "web": "expo start --web",
     "ts:check": "tsc",
     "tauri": "tauri dev",
+    "tauri:build": "tauri build",
     "info": "tauri info",
     "icon": "tauri icon",
     "lint": "eslint .",

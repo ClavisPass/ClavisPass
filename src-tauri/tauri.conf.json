@@ -4,7 +4,7 @@
     "beforeBuildCommand": "npx expo export --platform web",
     "beforeDevCommand": "npm run web",
     "devPath": "http://localhost:8081",
-    "distDir": "../build"
+    "distDir": "../dist"
   },
   "package": {
     "productName": "ClavisPass",
@@ -56,7 +56,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.clavis.pass",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -83,7 +83,7 @@
         "https://github.com/RiciRic/ClavisPass/releases/latest/download/updater.json"
       ],
       "dialog": true,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDk0Rjg1RUJBRjhCQzIzMkMKUldRc0k3ejR1bDc0bEhWNnExMGhDb0JsYkFvMjgvVlp4bjFuS3gyZnFUVVZUajh0TFFRNWlLbVoK"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE1QUI3NTQxRDFEODYzNzcKUldSM1k5alJRWFdyRllkWVNST2IzZVBrTm5ubkV5YXI4S0xXL0pydG9lRVdBMmZaL3FaZ044d3IK"
     },
     "windows": [
       {

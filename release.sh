@@ -16,8 +16,7 @@ echo "🚀 Starting release process for version $VERSION..."
 npm run sync-version
 
 echo "📦 Building the Tauri application..."
-cd src-tauri && cargo tauri build
-cd ..
+npm run tauri:build
 
 echo "📦 Building the Expo application..."
 npx expo export --output-dir dist
