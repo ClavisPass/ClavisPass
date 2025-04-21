@@ -44,6 +44,7 @@ mv src-tauri/target/release/bundle/* release/
 mv dist release/expo
 
 # Create a GitHub release
-gh release create "$VERSION" release/* --title "Release $VERSION" --notes "Automated release for version $VERSION"
+FILES=$(find release -type f)
+gh release create "$VERSION" $FILES --title "Release $VERSION" --notes "Automated release for version $VERSION"
 
 echo "✅ Release $VERSION successfully created and published!"
