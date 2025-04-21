@@ -15,11 +15,11 @@ echo "🚀 Starting release process for version $VERSION..."
 # Synchronize version across configuration files
 npm run sync-version
 
-echo "📦 Building the Tauri application..."
-npm run tauri:build
-
 echo "📦 Building the Expo application..."
 npx expo export --output-dir dist
+
+echo "📦 Building the Tauri application..."
+npm run tauri:build
 
 # Create a new Git tag for the release
 git add .
