@@ -43,9 +43,21 @@ for (const file of filesToUpdate) {
 }
 
 // 3. Git commit, tag & push
-execSync("git add .");
-execSync(`git commit -m "🔖 Release version ${version}"`);
-execSync(`git tag ${tag}`);
-execSync(`git push origin ${tag}`);
+const tagExists = execSync(`git tag`).toString().split("\n").includes(`v${version}`);
+if (tagExists) {
+  console.error(`❌ Tag v${version} already exists!`);
+  process.exit(1);
+}
+
+const status = execSync("git status --porcelain").toString().trim();
+if (status) {
+  execSync("git add .");
+  execSync(`git commit -m "🔖 Release version ${version}"`);
+  execSync(`git tag ${tag}`);
+  execSync(`git push origin ${tag}`);
+  console.log("✅ Git commit created.");
+} else {
+  console.log("ℹ️  Nothing to commit – working directory is clean.");
+}
 
 console.log(`🎉 Release ${tag} committed and pushed!`);
