@@ -33,6 +33,7 @@ git tag -a "$VERSION" -m "Release $VERSION"
 git push origin "$VERSION"
 
 echo "🗂 Preparing release artifacts..."
+rm -rf release
 mkdir -p release
 mv src-tauri/target/release/bundle/* release/
 mv dist release/expo
