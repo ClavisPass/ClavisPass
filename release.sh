@@ -3,12 +3,17 @@
 set -e  # Exit immediately if a command exits with a non-zero status
 
 # Ensure a version argument is provided
-if [ -z "$1" ]; then
-  echo "❌ Error: No version provided. Usage: ./release.sh <version>"
+if [ ! -f "version.json" ]; then
+  echo "❌ Error: version.json not found."
   exit 1
 fi
 
-VERSION=$1
+VERSION=$(grep '"version"' version.json | sed -E 's/[^0-9.]*([0-9.]+).*/\1/')
+
+if [ -z "$VERSION" ] || [ "$VERSION" == "null" ]; then
+  echo "❌ Error: Version not found in version.json."
+  exit 1
+fi
 
 echo "🚀 Starting release process for version $VERSION..."
 
