@@ -27,6 +27,11 @@ echo "📦 Building the Tauri application..."
 npm run tauri:build
 
 # Create a new Git tag for the release
+if git rev-parse "$VERSION" >/dev/null 2>&1; then
+  echo "❌ Git tag '$VERSION' already exists. Please bump the version in version.json."
+  exit 1
+fi
+
 git add .
 git commit -m "🔖 Release version $VERSION"
 git tag -a "$VERSION" -m "Release $VERSION"
