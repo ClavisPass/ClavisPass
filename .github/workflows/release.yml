@@ -24,7 +24,7 @@ jobs:
         uses: tauri-apps/tauri-action@v0.4
 
       - name: Build Tauri App
-        run: npm run tauri:build
+        run: npm run tauri
 
       - name: Upload binaries
         uses: softprops/action-gh-release@v1
