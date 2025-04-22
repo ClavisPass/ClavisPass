@@ -17,11 +17,11 @@ jobs:
         with:
           node-version: 18
 
-      - name: Setup Rust & Tauri
-        uses: tauri-apps/tauri-action@v0.4
-
       - name: Install dependencies
         run: npm install
+
+      - name: Setup Rust & Tauri
+        uses: tauri-apps/tauri-action@v0.4
 
       - name: Build Tauri App
         run: npm run tauri:build
