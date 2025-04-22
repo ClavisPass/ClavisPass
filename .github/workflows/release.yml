@@ -26,7 +26,7 @@ jobs:
           runBuild: false
 
       - name: Build Tauri App
-        run: npm run tauri
+        run: npm run tauri:build
 
       - name: Upload binaries
         uses: softprops/action-gh-release@v1
