@@ -22,6 +22,8 @@ jobs:
 
       - name: Setup Rust & Tauri
         uses: tauri-apps/tauri-action@v0.4
+        with:
+          runBuild: false
 
       - name: Build Tauri App
         run: npm run tauri
