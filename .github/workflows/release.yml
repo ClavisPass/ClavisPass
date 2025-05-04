@@ -40,9 +40,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            src-tauri/target/release/bundle/deb/*.deb
-            src-tauri/target/release/bundle/rpm/*.rpm
-            src-tauri/target/release/bundle/appimage/*.AppImage
+            src-tauri/target/release/bundle/**/clavis-pass*
           body: "Fixes and improvements in this release."
 
   update-expo:
@@ -63,6 +61,8 @@ jobs:
         run: npm install --global eas-cli
 
       - name: Publish Expo Update
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: npx eas update --branch production
 
   update-json:
@@ -71,7 +71,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
+
       - name: Update updater.json
         run: |
           echo '{
