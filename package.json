@@ -1,6 +1,6 @@
 {
   "name": "clavispass",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -17,8 +17,6 @@
     "upgrade": "npx expo install --fix",
     "generate": "tauri signer generate",
     "sync-version": "node sync-version.js",
-    "release:dev": "./release.sh",
-    "release:windows": ".\\release.bat",
     "release": "node release.js"
   },
   "dependencies": {
