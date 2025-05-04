@@ -40,8 +40,10 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            src-tauri/target/release/bundle/**/*
-          body: "Neue Version mit Verbesserungen und Fixes"
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/rpm/*.rpm
+            src-tauri/target/release/bundle/appimage/*.AppImage
+          body: "Fixes and improvements in this release."
 
   update-expo:
     runs-on: ubuntu-latest
