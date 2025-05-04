@@ -63,7 +63,7 @@ jobs:
       - name: Publish Expo Update
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: npx eas update --branch production
+        run: npx eas update --branch production --message "Release for ${{ github.ref_name }}"
 
   update-json:
     needs: [build-tauri]
