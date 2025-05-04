@@ -97,4 +97,4 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           git add updater.json
           git commit -m "Update updater.json"
-          git push
+          git push origin HEAD:master
