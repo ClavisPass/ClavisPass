@@ -102,6 +102,9 @@ jobs:
         run: |
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'github-actions@github.com'
+          git fetch origin master
+          git checkout master
+          git pull --rebase origin master
           git add updater.json
           git commit -m "Update updater.json"
-          git push origin HEAD:master
+          git push origin master
