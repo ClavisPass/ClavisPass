@@ -70,11 +70,10 @@ jobs:
             }
           }" > updater.json
 
-      - name: Install Tauri CLI
-        run: cargo install tauri-cli
-
-      - name: Sign updater.json
+      - name: Install and run Tauri signer
         run: |
+          cargo install tauri-cli
+          export PATH="$HOME/.cargo/bin:$PATH"
           tauri signer sign \
             --input updater.json \
             --output updater.json.sig \
