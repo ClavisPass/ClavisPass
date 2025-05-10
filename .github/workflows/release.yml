@@ -75,6 +75,9 @@ jobs:
         with:
           args: --target x86_64-pc-windows-msvc
 
+      - name: List output files
+        run: dir src-tauri\target\release\bundle\ /s
+
       - name: Upload Windows binaries
         uses: softprops/action-gh-release@v1
         with:
