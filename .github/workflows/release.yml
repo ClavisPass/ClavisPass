@@ -116,21 +116,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Set version without 'v'
+        run: echo "VERSION_NO_V=${{ github.ref_name }}" | sed 's/^v//' >> $GITHUB_ENV
+
       - name: Update updater.json
         run: |
           echo "{
-            \"version\": \"${{ github.ref_name }}\",
+            \"version\": \"${{ env.VERSION_NO_V }}\",
             \"notes\": \"New Version with Bugfixes\",
             \"pub_date\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
             \"platforms\": {
               \"windows-x86_64\": {
-                \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/ClavisPass_1.0.0_x64-setup.exe\"
+                \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/ClavisPass_${{ env.VERSION_NO_V }}_x64-setup.exe\"
               },
               \"linux-x86_64\": {
-                \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/clavis-pass_1.0.0_amd64.AppImage\"
+                \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/clavis-pass_${{ env.VERSION_NO_V }}_amd64.AppImage\"
               },
               \"darwin-aarch64\": {
-                \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/ClavisPass_1.0.0_aarch64.dmg\"
+                \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/ClavisPass_${{ env.VERSION_NO_V }}_aarch64.dmg\"
               }
             }
           }" > updater.json
