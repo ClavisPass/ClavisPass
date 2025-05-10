@@ -7,6 +7,7 @@ on:
 
 jobs:
   build-linux:
+    needs: [build-windows, build-macos]
     runs-on: ubuntu-22.04
     env:
       TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
@@ -46,6 +47,45 @@ jobs:
             src-tauri/target/release/bundle/rpm/*.rpm
             src-tauri/target/release/bundle/appimage/*
           body: "Linux Release for version ${{ github.ref_name }}"
+
+      - name: Set version without 'v'
+        run: echo "VERSION_NO_V=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+
+      - name: Update updater.json
+        run: |
+          echo "{
+            \"version\": \"${{ env.VERSION_NO_V }}\",
+            \"notes\": \"New Version with Bugfixes\",
+            \"pub_date\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+            \"platforms\": {
+              \"windows-x86_64\": {
+                \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/ClavisPass_${{ env.VERSION_NO_V }}_x64-setup.exe\"
+              },
+              \"linux-x86_64\": {
+                \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/clavis-pass_${{ env.VERSION_NO_V }}_amd64.AppImage\"
+              },
+              \"darwin-aarch64\": {
+                \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/ClavisPass_${{ env.VERSION_NO_V }}_aarch64.dmg\"
+              }
+            }
+          }" > updater.json
+
+      - name: Sign updater.json
+        run: |
+          tauri signer sign \
+            --input updater.json \
+            --output updater.json.sig \
+            --private-key "${TAURI_PRIVATE_KEY}" \
+            --password "${TAURI_KEY_PASSWORD}"
+
+      - name: Upload updater.json and signature to release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: |
+            updater.json
+            updater.json.sig
 
   build-windows:
     runs-on: windows-latest
@@ -108,71 +148,3 @@ jobs:
             src-tauri/target/release/bundle/dmg/*.dmg
             src-tauri/target/release/bundle/macos/*.zip
           body: "macOS Release for version ${{ github.ref_name }}"
-
-  update-json:
-    needs: [build-linux, build-windows, build-macos]
-    runs-on: ubuntu-22.04
-    env:
-      TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-      TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install Linux dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libgtk-3-dev \
-            libwebkit2gtk-4.0-dev \
-            libssl-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev
-
-      - name: Set version without 'v'
-        run: echo "VERSION_NO_V=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
-
-      - name: Update updater.json
-        run: |
-          echo "{
-            \"version\": \"${{ env.VERSION_NO_V }}\",
-            \"notes\": \"New Version with Bugfixes\",
-            \"pub_date\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
-            \"platforms\": {
-              \"windows-x86_64\": {
-                \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/ClavisPass_${{ env.VERSION_NO_V }}_x64-setup.exe\"
-              },
-              \"linux-x86_64\": {
-                \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/clavis-pass_${{ env.VERSION_NO_V }}_amd64.AppImage\"
-              },
-              \"darwin-aarch64\": {
-                \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/ClavisPass_${{ env.VERSION_NO_V }}_aarch64.dmg\"
-              }
-            }
-          }" > updater.json
-
-      - name: Install Rust (required for tauri-cli)
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-
-      - name: Install Tauri CLI
-        run: cargo install tauri-cli --version ^2
-
-      - name: Sign updater.json
-        run: |
-          tauri signer sign \
-            --input updater.json \
-            --output updater.json.sig \
-            --private-key "${TAURI_PRIVATE_KEY}" \
-            --password "${TAURI_KEY_PASSWORD}"
-
-      - name: Upload updater.json and signature to release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          files: |
-            updater.json
-            updater.json.sig
