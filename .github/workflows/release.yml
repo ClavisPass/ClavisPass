@@ -39,6 +39,8 @@ jobs:
       - name: Upload Linux binaries
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           files: |
             src-tauri/target/release/bundle/deb/*.deb
             src-tauri/target/release/bundle/rpm/*.rpm
@@ -70,6 +72,8 @@ jobs:
       - name: Upload Windows binaries
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           files: |
             src-tauri/target/release/bundle/msi/*.msi
             src-tauri/target/release/bundle/nsis/*.exe
@@ -98,6 +102,8 @@ jobs:
       - name: Upload macOS binaries
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           files: |
             src-tauri/target/release/bundle/dmg/*.dmg
             src-tauri/target/release/bundle/macos/*.zip
@@ -114,27 +120,24 @@ jobs:
         run: |
           echo '{
             "version": "${{ github.ref_name }}",
-            "notes": "Neue Version mit Bugfixes",
+            "notes": "New Version with Bugfixes",
             "pub_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "platforms": {
               "windows-x86_64": {
-                "url": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/app-windows.exe"
+                "url": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/ClavisPass_${{ github.ref_name }}_x64_en-US.exe"
               },
               "linux-x86_64": {
-                "url": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/app-linux.AppImage"
+                "url": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/clavis-pass_${{ github.ref_name }}_amd64.AppImage"
               },
               "darwin-x86_64": {
-                "url": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/app-macos.dmg"
+                "url": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/ClavisPass_${{ github.ref_name }}_x64.dmg"
               }
             }
           }' > updater.json
 
-      - name: Commit and push updater.json
-        run: |
-          git config --global user.name 'GitHub Actions'
-          git config --global user.email 'github-actions@github.com'
-          git checkout master
-          git pull origin master
-          git add updater.json
-          git commit -m "Update updater.json for version ${{ github.ref_name }}"
-          git push origin master
+      - name: Upload updater.json to release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: updater.json
