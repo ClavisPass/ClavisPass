@@ -1,7 +1,7 @@
 const fs = require("fs");
 const { execSync } = require("child_process");
 
-// 1. Hole Version aus version.json
+// 1. Read version from version.json
 const versionPath = "version.json";
 const versionData = JSON.parse(fs.readFileSync(versionPath, "utf-8"));
 const version = versionData.version;
@@ -9,7 +9,7 @@ const tag = `v${version}`;
 
 console.log(`🚀 Preparing release for version ${tag}...`);
 
-// 2. Dateien synchronisieren
+// 2. Synchronize version in multiple files
 const filesToUpdate = [
   {
     path: "package.json",
@@ -20,7 +20,7 @@ const filesToUpdate = [
     keyPath: ["package", "version"],
   },
   {
-    path: "app.json", // Expo config (optional)
+    path: "app.json",
     keyPath: ["expo", "version"],
   },
 ];
@@ -42,7 +42,7 @@ for (const file of filesToUpdate) {
   console.log(`✅ Updated ${file.path}`);
 }
 
-// 3. Git commit, tag & push
+// 3. Commit, tag and push changes via Git
 const tagExists = execSync(`git tag`).toString().split("\n").includes(`v${version}`);
 if (tagExists) {
   console.error(`❌ Tag v${version} already exists!`);
