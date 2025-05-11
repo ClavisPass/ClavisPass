@@ -151,7 +151,7 @@ function URLModule(props: URLModuleType & Props) {
         />
         {
           <IconButton
-            icon="play"
+            icon="open-in-new"
             iconColor={theme.colors.primary}
             size={20}
             onPress={async () => {

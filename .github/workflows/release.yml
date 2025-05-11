@@ -74,11 +74,10 @@ jobs:
         run: |
           cargo install tauri-cli
           export PATH="$HOME/.cargo/bin:$PATH"
-          cargo tauri signer sign \
-            --output updater.json.sig \
+          cargo tauri signer sign updater.json -- \
             --private-key "${TAURI_PRIVATE_KEY}" \
             --password "${TAURI_KEY_PASSWORD}" \
-            updater.json
+            --output updater.json.sig
 
       - name: Upload updater.json and signature to release
         uses: softprops/action-gh-release@v1
