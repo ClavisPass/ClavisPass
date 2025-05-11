@@ -12,6 +12,7 @@ const UpdateManager = () => {
 
   useEffect(() => {
     if (Platform.OS === 'web') {
+      console.log('update tauri');
       checkTauriUpdate();
     } else {
       checkExpoUpdate();
@@ -41,7 +42,9 @@ const UpdateManager = () => {
 
   const checkTauriUpdate = async () => {
     try {
+      console.log("checkTauriUpdate");
       const { shouldUpdate } = await checkUpdate();
+      console.log("shouldUpdate", shouldUpdate);
       if (shouldUpdate) {
         setUpdateAvailable(true);
         setUpdateMessage('Ein Update ist verfügbar. Installiere...');
@@ -49,6 +52,7 @@ const UpdateManager = () => {
       }
     } catch (error) {
       setUpdateMessage('Fehler beim Überprüfen auf Updates');
+      console.log("error", error);
     }
   };
 
