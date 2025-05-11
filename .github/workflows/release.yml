@@ -76,7 +76,7 @@ jobs:
           export PATH="$HOME/.cargo/bin:$PATH"
           export TAURI_SIGNING_PRIVATE_KEY="${TAURI_PRIVATE_KEY}"
           export TAURI_SIGNING_PRIVATE_KEY_PASSWORD="${TAURI_KEY_PASSWORD}"
-          cargo tauri signer sign updater.json --output updater.json.sig
+          cargo tauri signer sign updater.json -- --output updater.json.sig
 
       - name: Upload updater.json and signature to release
         uses: softprops/action-gh-release@v1
