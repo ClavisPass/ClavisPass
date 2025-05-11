@@ -3,7 +3,7 @@ name: Deploy Homepage and Keep updater.json on gh-pages
 on:
   push:
     branches:
-      - master
+      - master  # Oder 'master', je nachdem, welchen Branch du verwendest
 
 jobs:
   deploy:
@@ -21,13 +21,12 @@ jobs:
           cd gh-pages
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
-          
+
       - name: Copy homepage files and updater.json to gh-pages
         run: |
-          # Wir kopieren den Inhalt aus dem 'homepage' Ordner in den gh-pages Branch
-          cp -r ../homepage/* ./  # Kopiere alle Dateien aus dem 'homepage' Ordner in den gh-pages Branch
-          # Sicherstellen, dass die updater.json im gh-pages Branch bleibt
-          cp ../updater.json ./  # Kopiere die updater.json nicht zu überschreiben
+          # Stelle sicher, dass der 'homepage' Ordner im Root des Repositories existiert
+          cp -r ../homepage/* ./  # Kopiere alle Dateien aus dem 'homepage' Ordner im Root in den gh-pages Branch
+          cp ../updater.json ./  # Stelle sicher, dass die updater.json Datei ebenfalls mitkopiert wird
 
       - name: Commit and push changes
         run: |
