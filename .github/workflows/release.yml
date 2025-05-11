@@ -91,7 +91,11 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
-          git clone --depth=1 --branch=gh-pages https://github.com/${{ github.repository }} gh-pages
+          
+          # Authentifizierung mit GitHub Token
+          git clone --depth=1 --branch=gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} gh-pages
+          
+          # Kopiere die Dateien und pushe sie
           cp updater.json updater.json.sig gh-pages/
           cd gh-pages
           git add updater.json updater.json.sig
