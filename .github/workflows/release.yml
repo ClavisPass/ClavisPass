@@ -74,7 +74,7 @@ jobs:
         run: |
           cargo install tauri-cli
           export PATH="$HOME/.cargo/bin:$PATH"
-          tauri signer sign \
+          cargo tauri signer sign \
             --input updater.json \
             --output updater.json.sig \
             --private-key "${TAURI_PRIVATE_KEY}" \
