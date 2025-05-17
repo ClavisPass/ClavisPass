@@ -197,6 +197,10 @@
                   </div>
                 </div>
                 <div class="home-right1">
+                  <span class="home-sign-in Link" onclick="scrollToDownloads()">Download</span>
+                  <span class="home-sign-in">|</span>
+                  <span class="home-sign-in Link" onclick="scrollToFAQ()">FAQ</span>
+                  <span class="home-sign-in">|</span>
                   <a class="home-sign-in Link" href="https://github.com/RiciRic/ClavisPass" target="_blank">GitHub</a>
                 </div>
               </nav>
@@ -368,6 +372,7 @@
             >
           </div>
         </section>
+        <!--
         <section class="home-banners">
           <div class="home-banner-manage">
             <div class="home-container16">
@@ -426,12 +431,13 @@
               </div>
             </div>
           </div>
+-->
           <div class="home-banner">
             <div class="home-container17">
               <div class="home-left3">
-                <span class="home-text139">Improve Scheduling</span>
+                <span class="home-text139">Downloads</span>
                 <h2 class="home-text140 title">
-                  Powerful scheduler that saves you time
+                  Latest Version of ClavisPass
                 </h2>
                 <span class="home-text141"
                   >Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
@@ -439,7 +445,7 @@
                   vv</span
                 >
                 <div class="home-get-started4 template-button">
-                  <span class="home-text142">Get started </span>
+                  <span class="home-text142">Download</span>
                 </div>
               </div>
               <div class="home-image-container3">
@@ -452,7 +458,6 @@
             </div>
           </div>
         </section>
-
         <section class="home-faq">
           <div class="home-heading5">
             <span class="home-text203 title">Frequently asked questions</span
@@ -550,7 +555,16 @@
 
                 const scrollToDownloads = () => {
                   const element =
-                    document.getElementsByClassName("home-statistics");
+                    document.getElementsByClassName("home-banner");
+                  element[0].scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                    inline: "nearest",
+                  });
+                };
+                const scrollToFAQ = () => {
+                  const element =
+                    document.getElementsByClassName("home-faq");
                   element[0].scrollIntoView({
                     behavior: "smooth",
                     block: "start",
