@@ -62,12 +62,12 @@ You can even inspect the source code or build it yourself!
 
 ```mermaid
 flowchart TD
-    A[🔑 Master Password] --> B[🔐 Key Derivation (e.g. PBKDF2 / Argon2)]
-    B --> C[🧪 Generate Encryption Key]
-    C --> D[📦 Vault Data (JSON)]
-    D --> E[🔒 AES-256 Encrypt]
-    E --> F[🗄️ Encrypted Vault File (.clavisvault)]
-    F --> G[☁️ Sync via Dropbox / Cloud]
+    A[Master Password] --> B[Key Derivation: PBKDF2 or Argon2]
+    B --> C[Generate Encryption Key]
+    C --> D[Vault Data (JSON)]
+    D --> E[AES-256 Encryption]
+    E --> F[Encrypted Vault File (.clavisvault)]
+    F --> G[Sync via Dropbox or Cloud]
 
     style A fill:#f9f,stroke:#333,stroke-width:1px
     style G fill:#bbf,stroke:#333,stroke-width:1px
