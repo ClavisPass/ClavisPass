@@ -1,13 +1,5 @@
 # ClavisPass
 
-[Expo Dev](https://docs.expo.dev/versions/latest/)
-
-[react native paper](https://callstack.github.io/react-native-paper/docs/components/ActivityIndicator)
-
-[material design icons](https://pictogrammers.com/library/mdi/)
-
-# ClavisPass
-
 **Take control of your passwords – securely and seamlessly.**  
 ClavisPass is a modern, privacy-focused password manager that works *with your own cloud*. Use Dropbox (or any other file-based sync) to securely manage your encrypted vault across all your devices.
 
@@ -78,21 +70,30 @@ flowchart TD
 
 ---
 
+## Tech Stack
+
+### Frontend
+- [React Native](https://reactnative.dev/) via [Expo](https://docs.expo.dev/versions/latest/)
+- [react native paper](https://callstack.github.io/react-native-paper/docs/)
+- [material design icons](https://pictogrammers.com/library/mdi/)
+
+### Backend / Plattform
+- [Tauri](https://tauri.app/) – safe Desktop-Framework with Rust
+- [Rust](https://www.rust-lang.org/) – for native Performance & Encryption
+- [Dropbox API](https://www.dropbox.com/developers) – as Cloud-Synchronisation
+
+### Security
+- AES-256 encryption
+- Local key management – no external servers involved
+
+### CI / CD & Deployment
+- GitHub Actions – automated builds, code signing, and release uploads
+- Expo OTA Updates – over-the-air updates for mobile platforms
+- GitHub Pages – hosts the homepage and automatically serves the `updater.json`
+
 ## ❓ FAQ
 
 > See the [FAQ section on the homepage](https://your-project-url.com) or the bottom of this README for common questions and answers.
-
----
-
-## 🧑‍💻 Contributing
-
-Pull requests and feedback are welcome!
-
-1. Fork the repo
-2. Create your feature branch (`git checkout -b feature/your-feature`)
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
 
 ---
 
