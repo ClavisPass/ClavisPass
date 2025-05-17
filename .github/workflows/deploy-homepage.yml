@@ -1,35 +1,32 @@
-name: Deploy Homepage and Keep updater.json on gh-pages
+name: Deploy Homepage to gh-pages
 
 on:
   push:
     branches:
-      - master  # Oder 'master', je nachdem, welchen Branch du verwendest
+      - master
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout full repository (master branch)
         uses: actions/checkout@v3
-
-      - name: Install Git
-        run: sudo apt-get install git
+        with:
+          fetch-depth: 0  # wichtig für andere Branches wie gh-pages
 
       - name: Clone gh-pages branch
         run: |
-          git clone --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} gh-pages
-          cd gh-pages
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
+          git clone --depth=1 --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} gh-pages
 
-      - name: Copy homepage files and updater.json to gh-pages
+      - name: Copy homepage files into gh-pages
         run: |
-          # Stelle sicher, dass der 'homepage' Ordner im Root des Repositories existiert
-          cp -r ../homepage/* ./  # Kopiere alle Dateien aus dem 'homepage' Ordner im Root in den gh-pages Branch
-          cp ../updater.json ./  # Stelle sicher, dass die updater.json Datei ebenfalls mitkopiert wird
+          cp -r homepage/* gh-pages/
 
       - name: Commit and push changes
         run: |
+          cd gh-pages
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
           git add .
-          git commit -m "Deploy new homepage content and update updater.json" || echo "No changes to commit"
+          git commit -m "Update homepage content" || echo "No changes to commit"
           git push origin gh-pages
