@@ -12,7 +12,7 @@ jobs:
       - name: Checkout full repository (master branch)
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # wichtig für andere Branches wie gh-pages
+          fetch-depth: 0
 
       - name: Clone gh-pages branch
         run: |
