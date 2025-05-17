@@ -92,7 +92,7 @@
 }
  
 .Link:hover {
-  color: #5228F5;
+  color: #787FF6;
 }
  
 .card {
@@ -178,7 +178,7 @@
 }
  
 .sub-title {
-  color: rgb(82, 40, 245);
+  color: #787FF6;
   font-style: normal;
   font-weight: 600;
   margin-bottom: var(--dl-layout-space-oneandhalfunits);

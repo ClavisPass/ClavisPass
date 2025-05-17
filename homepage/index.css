@@ -977,14 +977,14 @@
  
 .home-hero {
   width: 100%;
-  height: 1000px;
+  height: 1600px;
   display: flex;
   align-items: center;
   padding-top: var(--dl-layout-space-oneandhalfunits);
   padding-left: var(--dl-layout-space-sevenunits);
   padding-right: var(--dl-layout-space-sevenunits);
   flex-direction: column;
-  background-color: #5228F5;
+  background: linear-gradient(0.25turn,#787FF6, #69C4FF);
 }
  
 .home-header1 {
@@ -1114,7 +1114,7 @@
 }
  
 .home-get-started1:hover {
-  background-color: #5228F5;
+  background-color: #787FF6;
 }
  
 .home-text106 {
@@ -1196,21 +1196,21 @@
   display: flex;
   position: absolute;
   align-items: center;
-  border-color: #633df6;
+  border-color: #fcfcfc1f;
   border-width: 30px;
   border-radius: 100px;
   flex-direction: column;
-  background-color: #633df6;
+  background-color: #f3f3f313;
 }
  
 .home-outline {
   display: flex;
   align-items: center;
-  border-color: #7350f7;
+  border-color: #fdfdfd5d;
   border-width: 20px;
   border-radius: 70px;
   flex-direction: column;
-  background-color: #7350f7;
+  background-color: #ffffffa2;
 }
  
 .home-image1 {
@@ -1224,11 +1224,11 @@
   display: flex;
   z-index: 1;
   align-items: center;
-  padding-top: 400px;
+  padding-top: var(--dl-layout-space-sevenunits);
   padding-left: var(--dl-layout-space-sevenunits);
   padding-right: var(--dl-layout-space-sevenunits);
   flex-direction: column;
-  background-color: EFF0F2;
+  background-color: #EFF0F2;
 }
  
 .home-title {
@@ -1399,7 +1399,7 @@
 }
  
 .home-quote2 {
-  color: rgb(151, 126, 249);
+  color: #787FF6;
   width: 100%;
   max-width: 800px;
   margin-left: var(--dl-layout-space-unit);
@@ -1419,7 +1419,7 @@
   padding-right: var(--dl-layout-space-sevenunits);
   flex-direction: row;
   justify-content: center;
-  background-color: #5228F5;
+  background-color: #69C4FF;
 }
  
 .home-container15 {
@@ -1576,7 +1576,7 @@
 }
  
 .home-text135 {
-  color: #5228F5;
+  color: #787FF6;
   cursor: pointer;
   font-style: normal;
   transition: 0.3s;
@@ -1608,7 +1608,7 @@
 }
  
 .home-text138 {
-  color: #5228F5;
+  color: #787FF6;
   cursor: pointer;
   font-style: normal;
   transition: 0.3s;
@@ -1649,7 +1649,7 @@
 }
  
 .home-text139 {
-  color: rgb(82, 40, 245);
+  color: #787FF6;
   font-style: normal;
   font-weight: 600;
   margin-bottom: 24px;
@@ -1810,7 +1810,7 @@
   border-radius: 50px;
   margin-bottom: var(--dl-layout-space-threeunits);
   flex-direction: row;
-  background-color: #5228F5;
+  background-color: #787FF6;
 }
  
 .home-headng1 {
@@ -1967,7 +1967,7 @@
   flex-direction: column;
   padding-bottom: var(--dl-layout-space-sixunits);
   justify-content: center;
-  background-color: #5228F5;
+  background-color: #787FF6;
 }
  
 .home-centered-container4 {
@@ -2107,7 +2107,7 @@
 }
  
 .home-icon16 {
-  fill: #5228F5;
+  fill: #787FF6;
   width: 8px;
   height: 8px;
 }
@@ -2127,7 +2127,7 @@
 }
  
 .home-icon18 {
-  fill: #5228F5;
+  fill: #787FF6;
   width: 8px;
   height: 8px;
 }
@@ -2206,7 +2206,7 @@
 }
  
 .home-icon20 {
-  fill: #5228F5;
+  fill: #787FF6;
   width: 8px;
   height: 8px;
 }
@@ -2226,7 +2226,7 @@
 }
  
 .home-icon22 {
-  fill: #5228F5;
+  fill: #787FF6;
   width: 8px;
   height: 8px;
 }
@@ -2246,7 +2246,7 @@
 }
  
 .home-icon24 {
-  fill: #5228F5;
+  fill: #787FF6;
   width: 8px;
   height: 8px;
 }
@@ -2266,7 +2266,7 @@
 }
  
 .home-icon26 {
-  fill: #5228F5;
+  fill: #787FF6;
   width: 8px;
   height: 8px;
 }
@@ -2347,7 +2347,7 @@
 }
  
 .home-icon28 {
-  fill: #5228F5;
+  fill: #787FF6;
   width: 8px;
   height: 8px;
 }
@@ -2368,7 +2368,7 @@
 }
  
 .home-icon30 {
-  fill: #5228F5;
+  fill: #787FF6;
   width: 8px;
   height: 8px;
 }
@@ -2389,7 +2389,7 @@
 }
  
 .home-icon32 {
-  fill: #5228F5;
+  fill: #787FF6;
   width: 8px;
   height: 8px;
 }
@@ -2410,7 +2410,7 @@
 }
  
 .home-icon34 {
-  fill: #5228F5;
+  fill: #787FF6;
   width: 8px;
   height: 8px;
 }
@@ -2444,7 +2444,7 @@
 }
  
 .home-text190 {
-  color: rgb(82, 40, 245);
+  color: #787FF6;
   font-style: normal;
   font-weight: 600;
   margin-bottom: 24px;
@@ -2494,7 +2494,7 @@
   border-radius: 50px;
   flex-direction: row;
   justify-content: space-between;
-  background-color: #5228F5;
+  background-color: #787FF6;
 }
  
 .home-heading4 {
@@ -2760,7 +2760,7 @@
   flex-direction: row;
   padding-bottom: 16px;
   justify-content: flex-start;
-  background-color: #5228F5;
+  background-color: #787FF6;
 }
  
 .home-subscribe:hover {
@@ -3657,4 +3657,42 @@
     padding-right: var(--dl-layout-space-halfunit);
     padding-bottom: var(--dl-layout-space-halfunit);
   }
+}
+
+.lexend-exa-clavispass {
+    font-family: "Lexend Exa", sans-serif !important;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    background: linear-gradient(0.25turn,#787FF6, #69C4FF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: larger;
+  }
+
+  .typewriter {
+  overflow: hidden; /* Ensures the content is not revealed until the animation */
+  border-right: .15em solid #787FF6; /* The typwriter cursor */
+  white-space: nowrap; /* Keeps the content on a single line */
+  margin: 0 auto; /* Gives that scrolling effect as the typing happens */
+  letter-spacing: .15em; /* Adjust as needed */
+  animation: 
+    typing 2.5s steps(40, end),
+    blink-caret .75s step-end infinite;
+}
+
+/* The typing effect */
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+/* The typewriter cursor effect */
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: #787FF6; }
+}
+
+.icon-size {
+  font-size: 100px;
 }

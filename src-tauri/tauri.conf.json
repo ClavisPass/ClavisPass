@@ -102,7 +102,7 @@
         "decorations": false,
         "transparent": true,
         "center": true,
-        "contentProtected": true,
+        "contentProtected": false,
         "maximizable": false
       }
     ]
