@@ -5,23 +5,23 @@ ClavisPass is a modern, privacy-focused password manager that works *with your o
 
 ---
 
-## 🚀 Features
+## Features
 
-- 🔑 **Local Encryption Only**  
+- **Local Encryption Only**  
   Your data is encrypted on your device — it never leaves your hands unprotected.
 
-- ☁️ **Sync with Your Cloud**  
+- **Sync with Your Cloud**  
   Use Dropbox (or any cloud provider) to sync your vault privately without a centralized server.
 
-- 🧩 **Cross-Platform**  
+- **Cross-Platform**  
   Available for **Linux, Windows, macOS, iOS**, and **Android** – one experience across all devices.
 
-- 🧠 **Simple & Focused Design**  
+- **Simple & Focused Design**  
   No bloat, just what you need to manage your credentials — clean, fast, and minimal.
 
 ---
 
-## 📱 Platforms
+## Platforms
 
 | Platform | Status |
 |---------|--------|
@@ -33,7 +33,7 @@ ClavisPass is a modern, privacy-focused password manager that works *with your o
 
 ---
 
-## 🛠 Installation
+## Installation
 
 ### Desktop
 
@@ -45,7 +45,7 @@ Download the latest release for your platform from the [Releases Page](https://g
 
 ---
 
-## 🔒 Security
+## Security
 
 ClavisPass encrypts your data using modern cryptographic standards (AES-256).  
 Only you hold the key – no servers, no tracking, no compromise.
@@ -64,7 +64,7 @@ flowchart TD
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 > *(Insert screenshots or a GIF of your app here to make the project visually appealing)*
 
@@ -91,18 +91,18 @@ flowchart TD
 - Expo OTA Updates – over-the-air updates for mobile platforms
 - GitHub Pages – hosts the homepage and automatically serves the `updater.json`
 
-## ❓ FAQ
+## FAQ
 
-> See the [FAQ section on the homepage](https://your-project-url.com) or the bottom of this README for common questions and answers.
+> See the [FAQ section on the homepage](https://riciric.github.io/ClavisPass/) or the bottom of this README for common questions and answers.
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🌐 Homepage
+## Homepage
 
-[https://your-project-url.com](https://your-project-url.com)
+[https://riciric.github.io/ClavisPass/](https://riciric.github.io/ClavisPass/)
