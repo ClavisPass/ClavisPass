@@ -47,61 +47,6 @@ jobs:
             src-tauri/target/release/bundle/appimage/*
           body: "Linux Release for version ${{ github.ref_name }}"
 
-      - name: Set version without 'v'
-        run: echo "VERSION_NO_V=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
-
-      - name: Update updater.json
-        run: |
-          echo "{
-            \"version\": \"${{ env.VERSION_NO_V }}\",
-            \"notes\": \"New Version with Bugfixes\",
-            \"pub_date\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
-            \"platforms\": {
-              \"windows-x86_64\": {
-                \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/ClavisPass_${{ env.VERSION_NO_V }}_x64-setup.exe\"
-              },
-              \"linux-x86_64\": {
-                \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/clavis-pass_${{ env.VERSION_NO_V }}_amd64.AppImage\"
-              },
-              \"darwin-aarch64\": {
-                \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/ClavisPass_${{ env.VERSION_NO_V }}_aarch64.dmg\"
-              }
-            }
-          }" > updater.json
-
-      - name: Install and run Tauri signer
-        run: |
-          cargo install tauri-cli
-          export PATH="$HOME/.cargo/bin:$PATH"
-          cargo tauri signer sign \
-            --private-key "${TAURI_PRIVATE_KEY}" \
-            --password "${TAURI_KEY_PASSWORD}" \
-            updater.json > updater.json.sig
-
-      - name: Upload updater.json and signature to release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          files: |
-            updater.json
-            updater.json.sig
-
-      - name: Push updater.json to gh-pages
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
-          
-          # Authentifizierung mit GitHub Token
-          git clone --depth=1 --branch=gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} gh-pages
-          
-          # Kopiere die Dateien und pushe sie
-          cp updater.json updater.json.sig gh-pages/
-          cd gh-pages
-          git add updater.json updater.json.sig
-          git commit -m "Update updater.json for ${{ github.ref_name }}" || echo "No changes to commit"
-          git push
-
   build-windows:
     runs-on: windows-latest
     env:
@@ -163,3 +108,82 @@ jobs:
             src-tauri/target/release/bundle/dmg/*.dmg
             src-tauri/target/release/bundle/macos/*.zip
           body: "macOS Release for version ${{ github.ref_name }}"
+
+  build-updater:
+    runs-on: ubuntu-22.04
+    needs: [build-linux, build-windows, build-macos]
+    env:
+      TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+      TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Setup Rust & Tauri
+        run: cargo install tauri-cli
+
+      - name: Set version without 'v'
+        run: echo "VERSION_NO_V=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+
+      - name: Sign installers and generate updater.json
+        run: |
+          VERSION="${{ env.VERSION_NO_V }}"
+          RELEASE_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}"
+
+          export PATH="$HOME/.cargo/bin:$PATH"
+
+          SIGN_WINDOWS=$(cargo tauri signer sign \
+            --private-key "${TAURI_PRIVATE_KEY}" \
+            --password "${TAURI_KEY_PASSWORD}" \
+            "artifacts/windows/ClavisPass_${VERSION}_x64-setup.exe")
+
+          SIGN_LINUX=$(cargo tauri signer sign \
+            --private-key "${TAURI_PRIVATE_KEY}" \
+            --password "${TAURI_KEY_PASSWORD}" \
+            "artifacts/linux/clavis-pass_${VERSION}_amd64.AppImage")
+
+          SIGN_MACOS=$(cargo tauri signer sign \
+            --private-key "${TAURI_PRIVATE_KEY}" \
+            --password "${TAURI_KEY_PASSWORD}" \
+            "artifacts/macos/ClavisPass_${VERSION}_aarch64.dmg")
+
+          echo "{
+            \"version\": \"${VERSION}\",
+            \"notes\": \"New Version with Bugfixes\",
+            \"pub_date\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+            \"platforms\": {
+              \"windows-x86_64\": {
+                \"signature\": \"${SIGN_WINDOWS}\",
+                \"url\": \"${RELEASE_URL}/ClavisPass_${VERSION}_x64-setup.exe\"
+              },
+              \"linux-x86_64\": {
+                \"signature\": \"${SIGN_LINUX}\",
+                \"url\": \"${RELEASE_URL}/clavis-pass_${VERSION}_amd64.AppImage\"
+              },
+              \"darwin-aarch64\": {
+                \"signature\": \"${SIGN_MACOS}\",
+                \"url\": \"${RELEASE_URL}/ClavisPass_${VERSION}_aarch64.dmg\"
+              }
+            }
+          }" > updater.json
+
+      - name: Sign updater.json
+        run: |
+          cargo tauri signer sign \
+            --private-key "${TAURI_PRIVATE_KEY}" \
+            --password "${TAURI_KEY_PASSWORD}" \
+            updater.json > updater.json.sig
+
+      - name: Upload updater.json and signature to release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: |
+            updater.json
+            updater.json.sig
