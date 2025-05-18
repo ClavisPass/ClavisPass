@@ -437,23 +437,14 @@
               <div class="home-left3">
                 <span class="home-text139">Downloads</span>
                 <h2 class="home-text140 title">
-                  Latest Version of ClavisPass
+                  Download ClavisPass for Your Platform
                 </h2>
                 <span class="home-text141"
-                  >Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  vv</span
+                  >Easily access the latest version of ClavisPass for macOS, Windows, or Linux. Choose your platform and start managing your passwords securely.</span
                 >
-                <div class="home-get-started4 template-button">
-                  <span class="home-text142">Download</span>
-                </div>
               </div>
               <div class="home-image-container3">
-                <img
-                  alt="pastedImage"
-                  src="public/83d913a38a75e38d7cef4fea757ed7ed-1200w.png"
-                  class="home-cards-image3"
-                />
+                <div id="releases">Loading releases...</div>
               </div>
             </div>
           </div>
@@ -552,6 +543,54 @@
             <div class="home-container22">
               <script>
                 // Accordion - Code Embed
+
+                const repo = 'riciric/clavispass';
+                const releasesUrl = `https://api.github.com/repos/${repo}/releases`;
+
+                fetch(releasesUrl)
+                .then(res => res.json())
+                .then(data => {
+                  const releasesContainer = document.getElementById('releases');
+                  releasesContainer.innerHTML = '';
+
+                  data.forEach(release => {
+                    const releaseElement = document.createElement('div');
+                    releaseElement.classList.add('release-entry');
+
+                    const assets = release.assets || [];
+
+                    // Finde passende Dateien
+                    const findAsset = (keyword) =>
+                      assets.find(asset => asset.name.toLowerCase().includes(keyword));
+
+                    const macAsset = findAsset('.dmg');
+                    const winAsset = findAsset('.exe') || findAsset('.msi');
+                    const linuxAsset = findAsset('.AppImage') || findAsset('.deb') || findAsset('.rpm');
+
+                    releaseElement.innerHTML = `
+                      <h3>${release.name}</h3>
+                      <div>
+                        <button class="home-sign-in Link" ${winAsset ? `onclick="window.open('${winAsset.browser_download_url}', '_blank')"` : 'disabled'}>
+                          Windows
+                        </button>
+                        <span class="home-sign-in">|</span>
+                        <button class="home-sign-in Link" ${macAsset ? `onclick="window.open('${macAsset.browser_download_url}', '_blank')"` : 'disabled'}>
+                          MacOS
+                        </button>
+                        <span class="home-sign-in">|</span>
+                        <button class="home-sign-in Link" ${linuxAsset ? `onclick="window.open('${linuxAsset.browser_download_url}', '_blank')"` : 'disabled'}>
+                          Linux
+                        </button>
+                      </div>
+                    `;
+
+                    releasesContainer.appendChild(releaseElement);
+                  });
+                })
+                .catch(err => {
+                  console.error('Failed to load releases:', err);
+                  document.getElementById('releases').innerHTML = '<p>Could not load releases.</p>';
+                });
 
                 const scrollToDownloads = () => {
                   const element =
