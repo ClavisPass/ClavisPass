@@ -1,5 +1,15 @@
 import React from "react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+  DraggableProvided,
+  DraggableStateSnapshot,
+  DroppableProvided,
+  DroppableStateSnapshot,
+} from "@hello-pangea/dnd";
+
 import { View } from "react-native";
 import { Icon, IconButton, Text, TouchableRipple } from "react-native-paper";
 import theme from "../../../ui/theme";
@@ -13,27 +23,21 @@ type Props = {
   deleteFolder: (folder: string) => void;
 };
 
-// a little function to help us with reordering the result
-const reorder = (list: any, startIndex: any, endIndex: any) => {
+const reorder = (list: string[], startIndex: number, endIndex: number) => {
   const result = [...list];
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
-
   return result;
 };
-
-const grid = 8;
 
 const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
   userSelect: "none",
   top: "auto",
   left: "auto",
-  //background: isDragging ? "lightgreen" : "grey",
   ...draggableStyle,
 });
 
 const getListStyle = (isDraggingOver: boolean) => ({
-  //background: isDraggingOver ? "lightblue" : "lightgrey",
   flex: 1,
   width: "100%",
   overflow: "auto",
@@ -42,22 +46,24 @@ const getListStyle = (isDraggingOver: boolean) => ({
 function DraggableFolderListWeb(props: Props) {
   const data = useData();
   const { globalStyles } = useTheme();
-  const onDragEnd = (result: any) => {
-    if (!result.destination) {
-      return;
-    }
-    const itemsChange = reorder(
+
+  const onDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const reordered = reorder(
       props.folder,
       result.source.index,
       result.destination.index
     );
-    changeFolder(itemsChange, data);
+
+    changeFolder(reordered, data);
     data.setShowSave(true);
   };
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="droppable">
-        {(provided, snapshot) => (
+        {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
@@ -69,7 +75,7 @@ function DraggableFolderListWeb(props: Props) {
                 draggableId={item + "-" + index}
                 index={index}
               >
-                {(provided, snapshot) => (
+                {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
                   <div
                     ref={provided.innerRef}
                     {...provided.draggableProps}
@@ -95,9 +101,7 @@ function DraggableFolderListWeb(props: Props) {
                         }}
                         onPress={
                           props.setSelectedFolder
-                            ? () => {
-                                props.setSelectedFolder?.(item);
-                              }
+                            ? () => props.setSelectedFolder?.(item)
                             : undefined
                         }
                         rippleColor="rgba(0, 0, 0, .32)"
@@ -120,13 +124,12 @@ function DraggableFolderListWeb(props: Props) {
                           </Text>
                         </>
                       </TouchableRipple>
+
                       <IconButton
                         icon="close"
                         size={14}
                         style={{ margin: 0 }}
-                        onPress={() => {
-                          props.deleteFolder(item);
-                        }}
+                        onPress={() => props.deleteFolder(item)}
                       />
                     </View>
                   </div>

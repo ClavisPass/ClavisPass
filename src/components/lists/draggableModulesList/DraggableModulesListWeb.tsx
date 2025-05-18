@@ -1,5 +1,15 @@
 import React from "react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+  DraggableProvided,
+  DraggableStateSnapshot,
+  DroppableProvided,
+  DroppableStateSnapshot,
+} from "@hello-pangea/dnd";
+
 import ValuesType from "../../../types/ValuesType";
 import ModulesType, { ModuleType } from "../../../types/ModulesType";
 import getModule from "../../../utils/getModule";
@@ -14,47 +24,42 @@ type Props = {
   setDiscardoChanges: () => void;
 };
 
-// a little function to help us with reordering the result
-const reorder = (list: any, startIndex: any, endIndex: any) => {
+const reorder = (list: any, startIndex: number, endIndex: number) => {
   const result = [...list];
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
-
   return result;
 };
 
-const grid = 8;
-
 const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
   userSelect: "none",
-  //background: isDragging ? "lightgreen" : "grey",
   ...draggableStyle,
 });
 
 const getListStyle = (isDraggingOver: boolean) => ({
-  //background: isDraggingOver ? "lightblue" : "lightgrey",
   flex: 1,
   width: "100%",
   overflow: "auto",
 });
 
 function DraggableModulesListWeb(props: Props) {
-  const onDragEnd = (result: any) => {
-    if (!result.destination) {
-      return;
-    }
-    const itemsChange = reorder(
+  const onDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const reordered = reorder(
       props.value.modules,
       result.source.index,
       result.destination.index
     );
-    props.changeModules(itemsChange);
+
+    props.changeModules(reordered);
     props.setDiscardoChanges();
   };
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="droppable">
-        {(provided, snapshot) => (
+        {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
@@ -62,12 +67,12 @@ function DraggableModulesListWeb(props: Props) {
           >
             {props.value.modules.map((item: ModuleType, index: number) => (
               <Draggable
-                isDragDisabled={!props.edit}
                 key={item.id}
                 draggableId={item.id}
                 index={index}
+                isDragDisabled={!props.edit}
               >
-                {(provided, snapshot) => (
+                {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
                   <div
                     ref={provided.innerRef}
                     {...provided.draggableProps}
