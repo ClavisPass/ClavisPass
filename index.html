@@ -440,7 +440,7 @@
                   Download ClavisPass for Your Platform
                 </h2>
                 <span class="home-text141"
-                  >Easily access the latest version of ClavisPass for macOS, Windows, or Linux. Choose your platform and start managing your passwords securely.</span
+                  >Easily access the latest version of ClavisPass for Windows, MacOS, or Linux. Choose your platform and start managing your passwords securely.</span
                 >
               </div>
               <div class="home-image-container3">
@@ -543,6 +543,13 @@
             <div class="home-container22">
               <script>
                 // Accordion - Code Embed
+
+                document.addEventListener('DOMContentLoaded', function () {
+                  const yearElement = document.getElementById('year');
+                  if (yearElement) {
+                    yearElement.textContent = new Date().getFullYear();
+                  }
+                });
 
                 const repo = 'riciric/clavispass';
                 const releasesUrl = `https://api.github.com/repos/${repo}/releases`;
@@ -655,7 +662,7 @@
         </section>
         <footer class="home-footer">
           <div class="home-bottom">
-            <span class="home-text238">Copyright © ClavisPass 2025</span>
+            <span class="home-text238">Copyright © ClavisPass <span id="year"></span></span>
           </div>
         </footer>
       </div>
