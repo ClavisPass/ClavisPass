@@ -188,7 +188,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
     "light"
   );
 
-  const searchRef = useRef<any>();
+  const searchRef = useRef<any>(null);
 
   return (
     <AnimatedContainer

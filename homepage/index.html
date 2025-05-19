@@ -15,10 +15,7 @@
       href="https://fonts.googleapis.com/css2?family=Lexend+Exa:wght@100..900&family=Lexend:wght@100..900&family=Open+Sans:ital@0;1&display=swap"
       rel="stylesheet"
     />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0&icon_names=cloud"
-    />
+    <link rel="stylesheet" href="devices.min.css" />
 
     <style data-tag="reset-style-sheet">
       html {
@@ -250,13 +247,29 @@
           </header>
           <div class="home-dashboard-preview">
             <div class="home-outline">
-              <img
-                alt="pastedImage"
-                src="clavispass-home.png"
-                loading="lazy"
-                class="home-image1"
-                width="1000px"
-              />
+              <div style="display: flex; gap: 40px; justify-content: center; align-items: flex-start;">
+                <div class="device device-google-pixel device-black" style="transform: scale(0.7) translateX(-40px) translateY(110px); z-index: 2;">
+                  <div class="device-frame">
+                    <img class="device-content" src="assets/device-mobile-clavispass.jpg" alt="device-mobile" />
+                  </div>
+                  <div class="device-stripe"></div>
+                  <div class="device-header"></div>
+                  <div class="device-sensors"></div>
+                  <div class="device-btns"></div>
+                  <div class="device-power"></div>
+                </div>
+
+                <div class="device device-pro-display-xdr" style="transform: scale(1.5) translateX(-130px) translateY(100px);">
+                  <div class="device-frame">
+                    <img class="device-content" src="assets/device-clavispass.png" alt="device" />
+                  </div>
+                  <div class="device-stripe"></div>
+                  <div class="device-header"></div>
+                  <div class="device-sensors"></div>
+                  <div class="device-btns"></div>
+                  <div class="device-power"></div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
