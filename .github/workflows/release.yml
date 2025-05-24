@@ -158,17 +158,17 @@ jobs:
           SIGN_WINDOWS=$(cargo tauri signer sign \
             --private-key "${TAURI_PRIVATE_KEY}" \
             --password "${TAURI_KEY_PASSWORD}" \
-            "artifacts/windows/ClavisPass_${VERSION}_x64-setup.exe")
+            "artifacts/windows/ClavisPass_${VERSION}_x64-setup.exe" | awk '/^Public signature:/{getline; print}')
 
           SIGN_LINUX=$(cargo tauri signer sign \
             --private-key "${TAURI_PRIVATE_KEY}" \
             --password "${TAURI_KEY_PASSWORD}" \
-            "artifacts/linux/clavis-pass_${VERSION}_amd64.AppImage")
+            "artifacts/linux/clavis-pass_${VERSION}_amd64.AppImage" | awk '/^Public signature:/{getline; print}')
 
           SIGN_MACOS=$(cargo tauri signer sign \
             --private-key "${TAURI_PRIVATE_KEY}" \
             --password "${TAURI_KEY_PASSWORD}" \
-            "artifacts/macos/ClavisPass_${VERSION}_aarch64.dmg")
+            "artifacts/macos/ClavisPass_${VERSION}_aarch64.dmg" | awk '/^Public signature:/{getline; print}')
 
           echo "{
             \"version\": \"${VERSION}\",
