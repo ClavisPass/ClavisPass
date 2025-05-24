@@ -37,7 +37,7 @@ ClavisPass is a modern, privacy-focused password manager that works *with your o
 
 ### Desktop
 
-Download the latest release for your platform from the [Releases Page](https://github.com/riciric/ClavisPass/releases).
+Download the latest release for your platform from the [Releases Page](https://github.com/ClavisPass/ClavisPass/releases).
 
 ### Mobile
 
@@ -93,7 +93,7 @@ flowchart TD
 
 ## FAQ
 
-> See the [FAQ section on the homepage](https://riciric.github.io/ClavisPass/) or the bottom of this README for common questions and answers.
+> See the [FAQ section on the homepage](https://clavispass.github.io/ClavisPass/) or the bottom of this README for common questions and answers.
 
 ---
 
@@ -105,4 +105,4 @@ This project is licensed under the MIT License – see the [LICENSE](LICENSE) fi
 
 ## Homepage
 
-[https://riciric.github.io/ClavisPass/](https://riciric.github.io/ClavisPass/)
+[https://clavispass.github.io/ClavisPass/](https://clavispass.github.io/ClavisPass/)
