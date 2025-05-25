@@ -10,7 +10,6 @@ function GlobalShortcuts(props: Props) {
   const auth = useAuth();
   const registerShortcuts = async () => {
     await register("alt+W", async () => {
-      console.log("Shortcut triggered");
       const stateIsVisible = await appWindow.isVisible();
       const stateIsFocused = await appWindow.isFocused();
       if (stateIsVisible && stateIsFocused) {

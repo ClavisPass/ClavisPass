@@ -55,7 +55,6 @@ export const TokenProvider = ({ children }: Props) => {
     try {
       const value = await getData(TOKEN_NAME);
       setRefreshToken(value ? value : null);
-      console.log("Token geladen");
       return value;
     } catch (error) {
       console.error("Fehler beim Abrufen der Daten:", error);
@@ -65,16 +64,8 @@ export const TokenProvider = ({ children }: Props) => {
 
   const saveRefreshToken = async (refreshToken: string) => {
     if (refreshToken) {
-      /*if (isDropboxToken(refreshToken)) {
-        setTokenType("Dropbox");
-      }
-      if (isGoogleDriveToken(refreshToken)) {
-        setTokenType("GoogleDrive");
-      }*/
       saveData(TOKEN_NAME, refreshToken)
         .then(() => {
-          console.log(refreshToken);
-          console.log("Token gespeichert");
         })
         .catch((error) =>
           console.error("Fehler beim Speichern des Tokens:", error)
@@ -92,28 +83,13 @@ export const TokenProvider = ({ children }: Props) => {
     return null;
   };
 
-  /*useEffect(() => {
-    if (refreshToken) {
-      if (isDropboxToken(refreshToken)) {
-        setTokenType("Dropbox");
-        return;
-      }
-      if (isGoogleDriveToken(refreshToken)) {
-        setTokenType("GoogleDrive");
-        return;
-      }
-    }
-    setTokenType(null);
-  }, [refreshToken]);*/
-
   const renewAccessToken = async (refreshToken: string) => {
     try {
       const newToken = await generateNewToken(refreshToken);
-      console.log("Neuer Token erhalten: ", newToken);
       setToken(newToken.accessToken);
       return newToken.accessToken;
     } catch (error) {
-      console.error("Token konnte nicht erneuert werden:", error);
+      console.error(error);
       return null;
     }
   };

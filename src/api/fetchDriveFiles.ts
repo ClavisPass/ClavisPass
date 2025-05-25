@@ -3,5 +3,4 @@ const fetchDriveFiles = async (token: string) => {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await response.json();
-  console.log(data);
 };

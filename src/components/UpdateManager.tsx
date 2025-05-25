@@ -56,18 +56,15 @@ const UpdateManager = () => {
 
   const applyTauriUpdate = async () => {
     try {
-      console.log("installUpdate");
       await installUpdate();
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setUpdateMessage('Error while applying update');
     }
   };
 
   const applyUpdate = async () => {
-    console.log("applyUpdate");
     if (Platform.OS === 'web') {
-      console.log("applyTauriUpdate");
       applyTauriUpdate();
     } else {
       applyExpoUpdate();

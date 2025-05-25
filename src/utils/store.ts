@@ -7,8 +7,8 @@ export enum Data {
 export const set = async (key: Data, value: string) => {
   try {
     await AsyncStorage.setItem(key, value);
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.error(error);
   }
 };
 

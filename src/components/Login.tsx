@@ -108,7 +108,7 @@ function Login(props: Props) {
       setData(getEmptyData());
       auth.login(value);
     } else {
-      console.log("Wrong Password");
+      console.error("Wrong Password");
     }
   };
 

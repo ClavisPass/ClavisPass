@@ -112,7 +112,7 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ route, navigation }) => {
                 navigation.goBack();
               }
             } catch (error) {
-              console.log(error);
+              console.error(error);
             }
           }}
         >

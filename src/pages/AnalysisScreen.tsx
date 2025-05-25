@@ -65,13 +65,10 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
           const percentage = entropy / 200;
           if (percentage < 0.4) {
             weakCount++;
-            console.log("Counts updated:", weakCount);
           } else if (percentage < 0.55) {
             mediumCount++;
-            console.log("Counts updated:", mediumCount);
           } else {
             strongCount++;
-            console.log("Counts updated:", strongCount);
           }
           cachedPasswords = [
             ...(cachedPasswords ? cachedPasswords : []),
@@ -94,13 +91,10 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
           const percentage = entropy / 200;
           if (percentage < 0.4) {
             weakCount++;
-            console.log("Counts updated:", weakCount);
           } else if (percentage < 0.55) {
             mediumCount++;
-            console.log("Counts updated:", mediumCount);
           } else {
             strongCount++;
-            console.log("Counts updated:", strongCount);
           }
           cachedPasswords = [
             ...(cachedPasswords ? cachedPasswords : []),
@@ -148,7 +142,6 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
       <StatusBar
         animated={true}
         style="dark"
-        backgroundColor="transparent"
         translucent={true}
       />
       <TitlebarHeight />
@@ -238,14 +231,6 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
             <TextInput
               placeholder="Search"
               placeholderTextColor={"lightgray"}
-              outlineStyle={[
-                globalStyles.outlineStyle,
-                {
-                  borderColor: theme.colors.primary,
-                  borderWidth: 2,
-                  backgroundColor: "transparent",
-                },
-              ]}
               style={[
                 globalStyles.textInputStyle,
                 {
@@ -262,14 +247,14 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
           </View>
           <FlashList
             data={filteredValues}
-            ItemSeparatorComponent={() => <Divider />}
+            ItemSeparatorComponent={() => <Divider/>}
             renderItem={({ item, index }) => (
               <View
                 style={{
                   borderRadius: 8,
                   marginBottom: 0,
                   gap: 4,
-                  marginTop: 4,
+                  marginTop: 0,
                   overflow: "hidden",
                 }}
               >

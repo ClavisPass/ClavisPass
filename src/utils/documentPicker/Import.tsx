@@ -50,7 +50,6 @@ function Import(props: Props) {
   };
 
   const pickDocument = async () => {
-    console.log("Pick document function called");
     try {
       const result: any = await DocumentPicker.getDocumentAsync(
         props.type === DocumentTypeEnum.CHROME ||
@@ -61,7 +60,6 @@ function Import(props: Props) {
           : { type: "application/json" }
       );
       if (result.canceled === false) {
-        console.log(result);
         const fileData = await readFile(result.assets[0].uri);
         if (fileData) {
           if (props.type === DocumentTypeEnum.CHROME) {
@@ -93,7 +91,6 @@ function Import(props: Props) {
   };
 
   const readFile = async (uri: any) => {
-    console.log("Reading file");
     try {
       const response = await fetch(uri);
       const fileData = await response.text();

@@ -7,7 +7,7 @@
     "newArchEnabled": true,
     "name": "ClavisPass",
     "slug": "ClavisPass",
-    "version": "1.0.5",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,7 +22,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ricirico.ClavisPass",
+      "package": "com.ClavisPass.ClavisPass",
       "permissions": [
         "android.permission.CAMERA"
       ]

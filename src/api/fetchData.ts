@@ -3,7 +3,6 @@ const fetchFileFromDropbox = async (
   fileName: string
 ): Promise<string | null> => {
   try {
-    console.log("DAS HIER WIRD BENUTZT: "+token);
     const response = await fetch(
       "https://content.dropboxapi.com/2/files/download",
       {

@@ -8,9 +8,13 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 function Footer() {
   const { theme } = useTheme();
-  const appName = Constants.expoConfig?.name || Constants.manifest?.name;
-  const appVersion =
-    Constants.expoConfig?.version || Constants.manifest?.version;
+  const appName =
+    Constants.expoConfig && "name" in Constants.expoConfig
+      ? (Constants.expoConfig as any).name
+      : Constants.manifest && "name" in Constants.manifest
+        ? (Constants.manifest as any).name
+        : "App";
+  const appVersion = Constants.expoConfig?.version ?? 'unknown';
   const year = new Date().getFullYear();
   return (
     <LinearGradient
@@ -24,7 +28,7 @@ function Footer() {
         padding: 16,
         margin: 8,
         marginTop: 0,
-        
+
         display: "flex",
         justifyContent: "center",
         boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
@@ -38,7 +42,14 @@ function Footer() {
           justifyContent: "space-between",
         }}
       >
-        <View style={{ display: "flex", flexDirection: "row", gap: 4, alignItems: "center" }}>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            gap: 4,
+            alignItems: "center",
+          }}
+        >
           <Icon color={"white"} name="copyright" size={20} />
           <Text
             style={{ color: "white", userSelect: "none" }}

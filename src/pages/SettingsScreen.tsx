@@ -109,7 +109,6 @@ function SettingsScreen({ navigation }: { navigation: any }) {
         <StatusBar
           animated={true}
           style="dark"
-          backgroundColor="transparent"
           translucent={true}
         />
         <TitlebarHeight />

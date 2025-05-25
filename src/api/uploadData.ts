@@ -29,7 +29,6 @@ const uploadFileToDropbox = async (
   }
 
   const data = await response.json();
-  console.log("Datei hochgeladen:", data);
   callback?.();
 };
 

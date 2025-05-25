@@ -45,20 +45,15 @@ function LoginScreen({ navigation }: { navigation: any }) {
         return;
       }
 
-      console.log("TEEEST REFRESHTOKEN: " + refreshToken);
-
       const accessToken = await generateNewToken(refreshToken).then((data) => {
         return data.accessToken;
       });
-
-      console.log("TEEEEST ACCESSTOKEN: " + accessToken);
       if (accessToken === null) {
         setLoading(false);
         return;
       }
 
       //const tokenType = await checkTokenType(refreshToken);
-      //console.log("TOKENTYPE: " + tokenType);
       setToken(accessToken);
       //setTokenType(tokenType);
       setRefreshToken(refreshToken);

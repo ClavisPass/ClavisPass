@@ -27,7 +27,6 @@ function QuickSelect(props: Props) {
   const { theme } = useTheme();
 
   const copyToClipboard = async (value: string) => {
-    console.log("Copying to clipboard: " + value);
     await Clipboard.setStringAsync(value);
   };
 

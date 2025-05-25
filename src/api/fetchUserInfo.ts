@@ -17,7 +17,6 @@ const fetchGoogleDriveUserInfo = async (
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data.user);
         const userData: UserInfoType = {
           username: data.user.displayName,
           avatar: data.user.photoLink,
@@ -59,7 +58,6 @@ const fetchDropboxUserInfo = async (
       }
 
       const data = await response.json();
-      console.log(data);
       const userData: UserInfoType = {
         username: data.name.display_name,
         avatar: data.profile_photo_url,
@@ -72,7 +70,6 @@ const fetchDropboxUserInfo = async (
     }
   }
   else{
-    console.log("Token ist 2: "+token)
     callback?.();
   }
 };

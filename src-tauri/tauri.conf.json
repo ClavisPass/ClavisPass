@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "ClavisPass",
-    "version": "1.0.5"
+    "version": "1.0.4"
   },
   "tauri": {
     "systemTray": {
@@ -56,7 +56,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.clavis.pass",
+      "identifier": "com.ClavisPass.ClavisPass",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

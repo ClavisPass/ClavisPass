@@ -19,7 +19,6 @@ async function generateNewToken(refreshToken: string) {
       const data = await response.json();
   
       if (response.ok) {
-        console.log("New access token:", data.access_token);
         return {
           accessToken: data.access_token,
           expiresIn: data.expires_in,

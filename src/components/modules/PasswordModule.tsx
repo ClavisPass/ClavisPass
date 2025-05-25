@@ -37,7 +37,6 @@ function PasswordModule(props: PasswordModuleType & Props) {
 
   useEffect(() => {
     const percentage = passwordEntropy(value) / 200;
-    console.log("Entropy: " + percentage);
     setProgressbarColor("#238823");
     if (percentage < 0.55) {
       setProgressbarColor("#FFBF00");

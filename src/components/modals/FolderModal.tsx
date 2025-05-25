@@ -87,12 +87,6 @@ function FolderModal(props: Props) {
         >
           <TextInput
             placeholder="Add Folder..."
-            outlineStyle={[
-              globalStyles.outlineStyle,
-              {
-                borderBottomWidth: 0,
-              },
-            ]}
             style={[
               globalStyles.textInputStyle,
               {

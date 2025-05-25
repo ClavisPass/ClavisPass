@@ -1,12 +1,7 @@
-import { StyleSheet } from "react-native";
-import { useTheme } from "../contexts/ThemeProvider";
-
-//const { theme } = useTheme();
-
 const globalStyles = (background: string) => ({
   container: {
     flex: 1,
-    backgroundColor: background, //theme.colors?.background,
+    backgroundColor: background,
     alignItems: "center",
     display: "flex",
   },

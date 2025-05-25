@@ -127,7 +127,7 @@ export default function App() {
                           )}
                         >
                           <Tab.Screen
-                            name="Analysis"
+                            name="AnalysisStack"
                             component={AnalysisStack}
                             options={{
                               tabBarLabel: "Analysis",

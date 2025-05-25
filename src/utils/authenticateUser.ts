@@ -20,8 +20,6 @@ export const authenticateUser = async () => {
       const credentials = await navigator.credentials.get({
         publicKey: publicKeyOptions,
       });
-
-      console.log("Authentication successful:", credentials);
       return !!credentials;
     } catch {
       return false;
@@ -54,7 +52,6 @@ export const isUsingAuthentication = async (): Promise<boolean> => {
 export const removeAuthentication = async () => {
   try {
     await removeData(MASTER_KEY);
-    console.log("Token aus SecureStore entfernt");
   } catch (error) {
     console.error("Fehler beim Entfernen des Master Passwort:", error);
   }
@@ -73,8 +70,6 @@ export const loadAuthentication = async () => {
 export const saveAuthentication = async (master: string) => {
   saveData(MASTER_KEY, master)
     .then(() => {
-      console.log(master);
-      console.log("Master Passwort gespeichert");
     })
     .catch((error) =>
       console.error("Fehler beim Speichern des Master Passworts:", error)

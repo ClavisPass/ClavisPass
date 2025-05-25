@@ -198,7 +198,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
       <StatusBar
         animated={true}
         style={statusbarStyle}
-        backgroundColor="transparent"
         translucent={true}
       />
       <ContentProtection enabled={true} />
