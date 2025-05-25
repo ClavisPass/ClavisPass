@@ -25,34 +25,35 @@ function GlobalShortcuts(props: Props) {
   };
   useEffect(() => {
     if (Platform.OS === "web") {
-      document.addEventListener("keydown", function (event) {
-        if (event.ctrlKey && event.key === "f") {
-          event.preventDefault();
-        }
-        if (event.ctrlKey && event.key === "p") {
-          event.preventDefault();
-        }
-        if (event.ctrlKey && event.key === "u") {
-          event.preventDefault();
-        }
-        if (event.key === "F3") {
-          event.preventDefault();
-        }
-        if (event.ctrlKey && event.key === "p") {
-          event.preventDefault();
-        }
-        if (event.ctrlKey && event.key === "Add") {
-          event.preventDefault();
-        }
-        if (event.ctrlKey && event.key === "Subtract") {
-          event.preventDefault();
-        }
-      });
-      registerShortcuts();
-    }
-  });
+      const isDev = process.env.NODE_ENV === "development";
+      if (isDev) return;
 
-  return <></>;
+      const handleContextMenu = (e: MouseEvent) => {
+        e.preventDefault();
+      };
+
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (
+          (event.ctrlKey && ["f", "p", "u", "+", "-"].includes(event.key.toLowerCase())) ||
+          event.key === "F3"
+        ) {
+          event.preventDefault();
+        }
+      };
+
+      document.addEventListener("contextmenu", handleContextMenu);
+      document.addEventListener("keydown", handleKeyDown);
+
+      registerShortcuts();
+
+      return () => {
+        document.removeEventListener("contextmenu", handleContextMenu);
+        document.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+  }, []);
+
+  return null;
 }
 
 export default GlobalShortcuts;

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Platform, View, Text, Button } from 'react-native';
+import { Platform, View } from 'react-native';
+
+import { Text, Button } from "react-native-paper";
 
 // Expo Updates für Mobile
 import * as Updates from 'expo-updates';
@@ -8,11 +10,10 @@ import { checkUpdate, installUpdate } from '@tauri-apps/api/updater';
 
 const UpdateManager = () => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
-  const [updateMessage, setUpdateMessage] = useState('');
+  const [updateMessage, setUpdateMessage] = useState('Searching for updates...');
 
   useEffect(() => {
     if (Platform.OS === 'web') {
-      console.log('update tauri');
       checkTauriUpdate();
     } else {
       checkExpoUpdate();
@@ -24,10 +25,10 @@ const UpdateManager = () => {
       const update = await Updates.checkForUpdateAsync();
       if (update.isAvailable) {
         setUpdateAvailable(true);
-        setUpdateMessage('Ein Update ist verfügbar. Bitte aktualisieren.');
+        setUpdateMessage('Update Available');
       }
     } catch (error) {
-      setUpdateMessage('Fehler beim Überprüfen auf Updates');
+      setUpdateMessage('Error while checking for updates');
     }
   };
 
@@ -36,31 +37,49 @@ const UpdateManager = () => {
       await Updates.fetchUpdateAsync();
       await Updates.reloadAsync();
     } catch (error) {
-      setUpdateMessage('Fehler beim Anwenden des Updates');
+      setUpdateMessage('Error while applying update');
     }
   };
 
   const checkTauriUpdate = async () => {
     try {
-      console.log("checkTauriUpdate");
       const { shouldUpdate } = await checkUpdate();
-      console.log("shouldUpdate", shouldUpdate);
       if (shouldUpdate) {
         setUpdateAvailable(true);
-        setUpdateMessage('Ein Update ist verfügbar. Installiere...');
-        await installUpdate();
+        setUpdateMessage('Update Available');
       }
     } catch (error) {
-      setUpdateMessage('Fehler beim Überprüfen auf Updates');
+      setUpdateMessage('Error while checking for updates');
       console.log("error", error);
     }
   };
 
+  const applyTauriUpdate = async () => {
+    try {
+      console.log("installUpdate");
+      await installUpdate();
+    } catch (error) {
+      console.log(error);
+      setUpdateMessage('Error while applying update');
+    }
+  };
+
+  const applyUpdate = async () => {
+    console.log("applyUpdate");
+    if (Platform.OS === 'web') {
+      console.log("applyTauriUpdate");
+      applyTauriUpdate();
+    } else {
+      applyExpoUpdate();
+    }
+  };
+
+
   return (
     <View style={{ padding: 20 }}>
       <Text>{updateMessage}</Text>
-      {updateAvailable && Platform.OS !== 'web' && (
-        <Button title="Jetzt aktualisieren" onPress={applyExpoUpdate} />
+      {updateAvailable && (
+        <Button onPress={applyUpdate}>Update</Button>
       )}
     </View>
   );

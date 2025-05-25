@@ -114,7 +114,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
         />
         <TitlebarHeight />
         <ScrollView style={styles.scrollView}>
-          <SettingsContainer icon="cloud-outline" title={"Cloud"}>
+          <SettingsContainer icon="tray-arrow-down" title={"Update"}>
             <UpdateManager />
           </SettingsContainer>
           <SettingsContainer icon="cloud-outline" title={"Cloud"}>

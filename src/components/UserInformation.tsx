@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import * as WebBrowser from "expo-web-browser";
 
-import { Text, Chip, ActivityIndicator, IconButton } from "react-native-paper";
+import { Chip, ActivityIndicator, IconButton } from "react-native-paper";
 
 import { View } from "react-native";
 
