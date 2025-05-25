@@ -150,6 +150,12 @@ jobs:
           zip -r ../web-assets.zip .
           cd ..
 
+      - name: Upload web-assets binaries
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: web-assets.zip
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
