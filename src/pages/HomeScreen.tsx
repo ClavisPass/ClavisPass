@@ -1,10 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-  View,
-  Platform,
-  useWindowDimensions,
-  Animated,
-} from "react-native";
+import { View, Platform, useWindowDimensions, Animated } from "react-native";
 import {
   Searchbar,
   IconButton,
@@ -48,6 +43,7 @@ import {
   LexendExa_700Bold,
 } from "@expo-google-fonts/lexend-exa";
 import { getDateTime } from "../utils/Timestamp";
+import ClavisPass from "../ui/ClavisPass";
 
 type Props = {
   setShowMenu: (boolean: boolean) => void;
@@ -195,11 +191,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
       style={{ display: "flex", justifyContent: "center" }}
       useFocusEffect={useFocusEffect}
     >
-      <StatusBar
-        animated={true}
-        style={statusbarStyle}
-        translucent={true}
-      />
+      <StatusBar animated={true} style={statusbarStyle} translucent={true} />
       <ContentProtection enabled={true} />
       <WebSpecific>
         <SearchShortcut searchRef={searchRef} />
@@ -237,17 +229,25 @@ function HomeScreen({ navigation }: { navigation: any }) {
             width: "100%",
           }}
         >
-          <Text
-            style={{
-              fontFamily: "LexendExa_400Regular",
-              fontSize: 16,
-              color: "white",
-              userSelect: "none",
-              width: 110,
-            }}
-          >
-            ClavisPass
-          </Text>
+          <View style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+          }}>
+            <ClavisPass width={20} height={20} />
+            <Text
+              style={{
+                fontFamily: "LexendExa_400Regular",
+                fontSize: 16,
+                color: "white",
+                userSelect: "none",
+                width: 110,
+              }}
+            >
+              ClavisPass
+            </Text>
+          </View>
           <View style={{ display: "flex", flexDirection: "row" }}>
             <WebSpecific notIn={true}>
               <Tools
@@ -330,7 +330,11 @@ function HomeScreen({ navigation }: { navigation: any }) {
                         uploadData(
                           token,
                           tokenType,
-                          await encrypt(data.data, auth.master ? auth.master : "", lastUpdated),
+                          await encrypt(
+                            data.data,
+                            auth.master ? auth.master : "",
+                            lastUpdated
+                          ),
                           "clavispass.lock",
                           () => {
                             data.setShowSave(false);
