@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react";
 import { View, Platform } from "react-native";
 import { IconButton, Text } from "react-native-paper";
-import theme from "../ui/theme";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
 import { useTheme } from "../contexts/ThemeProvider";

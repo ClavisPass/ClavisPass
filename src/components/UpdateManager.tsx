@@ -73,10 +73,10 @@ const UpdateManager = () => {
 
 
   return (
-    <View style={{ padding: 20 }}>
+    <View style={{ padding: 20, width: "50%" }}>
       <Text>{updateMessage}</Text>
       {updateAvailable && (
-        <Button onPress={applyUpdate}>Update</Button>
+        <Button mode='contained' onPress={applyUpdate}>Update</Button>
       )}
     </View>
   );

@@ -51,7 +51,7 @@ function CustomTitlebar() {
 
         const sheet = new CSSStyleSheet();
         sheet.replaceSync(
-          "::-webkit-scrollbar {width: 8px} ::-webkit-scrollbar-track {background: transparent;} ::-webkit-scrollbar-thumb {background: #5e5e5e50; border-radius: 10px;} input::-ms-reveal {display: none;}"
+          "::-webkit-scrollbar {width: 8px} ::-webkit-scrollbar-track {background: transparent;} ::-webkit-scrollbar-thumb {background: #5e5e5e50; border-radius: 10px;} input::-ms-reveal {display: none;} .css-text-146c3p1 {user-select: none;}"
         );
         document.adoptedStyleSheets = [sheet];
       }
