@@ -6,7 +6,7 @@ import { Text, Button } from "react-native-paper";
 // Expo Updates für Mobile
 import * as Updates from 'expo-updates';
 // Tauri Updater für Desktop
-import { checkUpdate, installUpdate } from '@tauri-apps/api/updater';
+//import { checkUpdate, installUpdate } from '@tauri-apps/plugin-updater'; //TODO: Ensure this is installed in your Tauri project
 
 const UpdateManager = () => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -43,11 +43,11 @@ const UpdateManager = () => {
 
   const checkTauriUpdate = async () => {
     try {
-      const { shouldUpdate } = await checkUpdate();
-      if (shouldUpdate) {
+      //const { shouldUpdate } = await checkUpdate();
+      /*if (shouldUpdate) {
         setUpdateAvailable(true);
         setUpdateMessage('Update Available');
-      }
+      }*/
     } catch (error) {
       setUpdateMessage('Error while checking for updates');
       console.log("error", error);
@@ -56,7 +56,7 @@ const UpdateManager = () => {
 
   const applyTauriUpdate = async () => {
     try {
-      await installUpdate();
+      //await installUpdate();
     } catch (error) {
       console.error(error);
       setUpdateMessage('Error while applying update');

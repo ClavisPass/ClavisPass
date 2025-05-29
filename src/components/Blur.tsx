@@ -4,8 +4,9 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
-import { appWindow } from "@tauri-apps/api/window";
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { Platform, StyleSheet } from "react-native";
+const appWindow = getCurrentWebviewWindow()
 
 type Props = {
   children: ReactNode;

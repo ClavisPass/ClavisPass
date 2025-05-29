@@ -10,7 +10,7 @@ if (Platform.OS === "ios" || Platform.OS === "android") {
 }
 
 if (Platform.OS === "web") {
-  tauri = require("@tauri-apps/api/tauri");
+  tauri = require("@tauri-apps/api/core");
 }
 
 export const saveData = async (key: string, value: string) => {

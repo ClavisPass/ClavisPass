@@ -7,7 +7,7 @@ import ModuleContainer from "../container/ModuleContainer";
 import Props from "../../types/ModuleProps";
 import { Platform, View } from "react-native";
 
-import { open } from "@tauri-apps/api/shell";
+import { open } from "@tauri-apps/plugin-shell";
 
 import * as Linking from "expo-linking";
 

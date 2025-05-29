@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
-import { register } from "@tauri-apps/api/globalShortcut";
+import { register } from "@tauri-apps/plugin-global-shortcut";
 import { Platform } from "react-native";
-import { appWindow } from "@tauri-apps/api/window";
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { useAuth } from "../../contexts/AuthProvider";
+const appWindow = getCurrentWebviewWindow()
 
 type Props = {};
 

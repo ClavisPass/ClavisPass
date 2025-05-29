@@ -8,7 +8,7 @@ import AnimatedContainer from "../components/container/AnimatedContainer";
 import { useFocusEffect } from "@react-navigation/native";
 import WebSpecific from "../components/platformSpecific/WebSpecific";
 
-import { enable, isEnabled, disable } from "tauri-plugin-autostart-api";
+import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
 import Import, { DocumentTypeEnum } from "../utils/documentPicker/Import";
 import DarkModeSwitch from "../components/DarkModeSwitch";
 

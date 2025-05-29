@@ -3,95 +3,57 @@
   "build": {
     "beforeBuildCommand": "npx expo export --platform web",
     "beforeDevCommand": "npm run web",
-    "devPath": "http://localhost:8081",
-    "distDir": "../dist"
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:8081"
   },
-  "package": {
-    "productName": "ClavisPass",
-    "version": "1.0.4"
-  },
-  "tauri": {
-    "systemTray": {
-      "iconPath": "icons/icon.png",
-      "iconAsTemplate": true
+  "bundle": {
+    "active": true,
+    "category": "DeveloperTool",
+    "copyright": "",
+    "targets": ["msi", "nsis", "deb", "appimage", "dmg"],
+    "externalBin": [],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": ""
     },
-    "allowlist": {
-      "all": false,
-      "window": {
-        "all": false,
-        "close": true,
-        "hide": true,
-        "show": true,
-        "minimize": true,
-        "unminimize": true,
-        "startDragging": true,
-        "setAlwaysOnTop": true,
-        "setSize": true,
-        "setPosition": true,
-        "center": true,
-        "setFocus": true
-      },
-      "shell": {
-        "open": true
-      },
-      "globalShortcut": {
-        "all": true
-      },
-      "protocol": {
-        "all": true
-      }
+    "longDescription": "",
+    "macOS": {
+      "entitlements": null,
+      "exceptionDomain": "",
+      "frameworks": [],
+      "providerShortName": null,
+      "signingIdentity": null
     },
-    "bundle": {
-      "active": true,
-      "category": "DeveloperTool",
-      "copyright": "",
+    "resources": [],
+    "shortDescription": "",
+    "linux": {
       "deb": {
         "depends": []
-      },
-      "externalBin": [],
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "identifier": "com.ClavisPass.ClavisPass",
-      "longDescription": "",
-      "macOS": {
-        "entitlements": null,
-        "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": null,
-        "signingIdentity": null
-      },
-      "resources": [],
-      "shortDescription": "",
-      "targets": [
-        "msi",
-        "nsis",
-        "deb",
-        "appimage",
-        "dmg",
-        "updater"
-      ],
-      "windows": {
-        "certificateThumbprint": null,
-        "digestAlgorithm": "sha256",
-        "timestampUrl": ""
       }
     },
-    "security": {
-      "csp": null
-    },
+    "createUpdaterArtifacts": "v1Compatible"
+  },
+  "productName": "ClavisPass",
+  "mainBinaryName": "ClavisPass",
+  "version": "1.0.4",
+  "identifier": "com.ClavisPass.ClavisPass",
+  "plugins": {
     "updater": {
-      "active": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE1QUI3NTQxRDFEODYzNzcKUldSM1k5alJRWFdyRllkWVNST2IzZVBrTm5ubkV5YXI4S0xXL0pydG9lRVdBMmZaL3FaZ044d3IK",
       "endpoints": [
         "https://github.com/ClavisPass/ClavisPass/releases/latest/download/updater.json"
-      ],
-      "dialog": false,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE1QUI3NTQxRDFEODYzNzcKUldSM1k5alJRWFdyRllkWVNST2IzZVBrTm5ubkV5YXI4S0xXL0pydG9lRVdBMmZaL3FaZ044d3IK"
-    },
+      ]
+    }
+  },
+  "app": {
     "windows": [
       {
         "fullscreen": false,
@@ -103,8 +65,12 @@
         "transparent": true,
         "center": true,
         "contentProtected": false,
-        "maximizable": false
+        "maximizable": false,
+        "useHttpsScheme": true
       }
-    ]
+    ],
+    "security": {
+      "csp": null
+    }
   }
 }

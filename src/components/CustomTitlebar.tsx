@@ -3,8 +3,9 @@ import { Platform, View, StyleSheet } from "react-native";
 import { Icon, IconButton, TouchableRipple } from "react-native-paper";
 import theme from "../ui/theme";
 import WebSpecific from "./platformSpecific/WebSpecific";
-import { appWindow } from "@tauri-apps/api/window";
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { useAuth } from "../contexts/AuthProvider";
+const appWindow = getCurrentWebviewWindow()
 
 export const TITLEBAR_HEIGHT = Platform.OS === "web" ? 46 : 0;
 

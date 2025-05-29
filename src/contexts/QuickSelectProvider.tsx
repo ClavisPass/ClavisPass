@@ -5,16 +5,12 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
-import ModulesType from "../types/ModulesType";
 import QuickSelect from "../components/QuickSelect";
 
-import {
-  PhysicalPosition,
-  PhysicalSize,
-  appWindow,
-} from "@tauri-apps/api/window";
+import { getCurrentWindow, PhysicalPosition, PhysicalSize } from "@tauri-apps/api/window";
 import isTauri from "../utils/isTauri";
 import FastAccessType from "../types/FastAccessType";
+const appWindow = getCurrentWindow();
 
 interface QuickSelectContextType {
   fastAccess: FastAccessType;
