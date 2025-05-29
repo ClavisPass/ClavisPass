@@ -17,7 +17,7 @@ const filesToUpdate = [
   },
   {
     path: "src-tauri/tauri.conf.json",
-    keyPath: ["package", "version"],
+    keyPath: ["version"],
   },
   {
     path: "app.json",

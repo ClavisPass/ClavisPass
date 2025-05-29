@@ -49,7 +49,7 @@
   },
   "productName": "ClavisPass",
   "mainBinaryName": "ClavisPass",
-  "version": "1.0.4",
+  "version": "1.0.0",
   "identifier": "com.ClavisPass.ClavisPass",
   "plugins": {
     "updater": {
@@ -81,8 +81,5 @@
     "security": {
       "csp": null
     }
-  },
-  "package": {
-    "version": "1.0.1"
   }
 }
