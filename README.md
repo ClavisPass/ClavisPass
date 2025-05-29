@@ -57,16 +57,11 @@ You can even inspect the source code or build it yourself!
 
 ```mermaid
 graph TD
-  A[Input: Data + Password] --> B[Generate 16-byte Salt (Crypto.getRandomBytesAsync)]
-  B --> C[Generate 12-byte IV (Crypto.getRandomBytesAsync)]
-  C --> D[Derive Key using PBKDF2<br>password + salt, 1000 iterations]
-  D --> E[Encrypt JSON.stringify(data)<br>with AES-CBC + PKCS7 Padding using IV and Key]
-  E --> F[Output: {
-    ciphertext,
-    salt,
-    iv,
-    lastUpdated
-  }]
+  A[Input: Data + Password] --> B[Generate 16-byte Salt]
+  B --> C[Generate 12-byte IV]
+  C --> D[Derive Key using PBKDF2\n(password + salt, 1000 iterations)]
+  D --> E[Encrypt JSON Data using AES-CBC + PKCS7]
+  E --> F[Return:\n- ciphertext\n- salt\n- iv\n- lastUpdated]
 ```
 
 
