@@ -1,5 +1,7 @@
 # ClavisPass
-
+<p align="center">
+  <img src="/assets/icon.svg" alt="Screenshot" width="400" />
+</p>
 **Take control of your passwords – securely and seamlessly.**  
 ClavisPass is a modern, privacy-focused password manager that works *with your own cloud*. Use Dropbox (or any other file-based sync) to securely manage your encrypted vault across all your devices.
 
