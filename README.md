@@ -56,14 +56,33 @@ Only you hold the key – no servers, no tracking, no compromise.
 You can even inspect the source code or build it yourself!
 
 ```mermaid
-flowchart TD
-    A[Master Password] --> B[Key Derivation using PBKDF2 or Argon2]
-    B --> C[Encryption Key]
-    C --> D[Vault Data]
-    D --> E[Encrypted with AES-256]
-    E --> F[Encrypted Vault File]
-    F --> G[Synced via Dropbox or other Cloud]
+graph TD
+  A[Input: Data + Password] --> B[Generate 16-byte Salt (Crypto.getRandomBytesAsync)]
+  B --> C[Generate 12-byte IV (Crypto.getRandomBytesAsync)]
+  C --> D[Derive Key using PBKDF2<br>password + salt, 1000 iterations]
+  D --> E[Encrypt JSON.stringify(data)<br>with AES-CBC + PKCS7 Padding using IV and Key]
+  E --> F[Output: {
+    ciphertext,
+    salt,
+    iv,
+    lastUpdated
+  }]
 ```
+
+
+ClavisPass uses a secure and modern approach to encrypt your sensitive data:
+
+- **Salt Generation**: A random 16-byte salt is generated using `Crypto.getRandomBytesAsync()`. This ensures that the derived key is unique even if the same password is used.
+- **IV Generation**: A random 12-byte initialization vector (IV) is created for use in AES encryption, adding an additional layer of randomness and security.
+- **Key Derivation**: The key is derived from the password and salt using the **PBKDF2** algorithm with 1000 iterations. This helps defend against brute-force attacks.
+- **AES Encryption**: The data is converted to a JSON string and encrypted using **AES-CBC** mode with **PKCS7 padding**.
+- **Output**: The encryption function returns an object containing:
+  - `ciphertext`: the encrypted data
+  - `salt`: the salt used for key derivation (hex encoded)
+  - `iv`: the initialization vector used during encryption (hex encoded)
+  - `lastUpdated`: a UTC timestamp indicating when the encryption took place
+
+This design ensures that your data remains private and can only be decrypted with the correct password.
 
 ---
 
