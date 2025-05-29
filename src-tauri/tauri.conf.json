@@ -81,8 +81,5 @@
     "security": {
       "csp": null
     }
-  },
-  "package": {
-    "version": "1.0.0"
   }
 }
