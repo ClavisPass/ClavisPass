@@ -50,7 +50,10 @@
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE1QUI3NTQxRDFEODYzNzcKUldSM1k5alJRWFdyRllkWVNST2IzZVBrTm5ubkV5YXI4S0xXL0pydG9lRVdBMmZaL3FaZ044d3IK",
       "endpoints": [
         "https://github.com/ClavisPass/ClavisPass/releases/latest/download/updater.json"
-      ]
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
     }
   },
   "app": {
