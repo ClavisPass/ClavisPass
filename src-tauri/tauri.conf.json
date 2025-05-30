@@ -7,6 +7,7 @@
     "devUrl": "http://localhost:8081"
   },
   "bundle": {
+    "createUpdaterArtifacts": true,
     "active": true,
     "category": "DeveloperTool",
     "copyright": "",
@@ -44,8 +45,7 @@
       "deb": {
         "depends": []
       }
-    },
-    "createUpdaterArtifacts": "v1Compatible"
+    }
   },
   "productName": "ClavisPass",
   "mainBinaryName": "ClavisPass",
