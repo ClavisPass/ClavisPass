@@ -1,5 +1,5 @@
 [package]
-name = "ClavisPass"
+name = "clavis-pass"
 version = "1.0.1"
 description = "ClavisPass"
 authors = ["you"]
