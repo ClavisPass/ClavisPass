@@ -43,18 +43,19 @@ for (const file of filesToUpdate) {
 }
 
 // 2b. Update version in Cargo.toml
-const cargoTomlPath = "src-tauri/Cargo.toml";
 if (fs.existsSync(cargoTomlPath)) {
   let cargoToml = fs.readFileSync(cargoTomlPath, "utf-8");
-
-  cargoToml = cargoToml.replace(
-    /^version\s*=\s*".*?"/m,
-    `version = "${version}"`
-  );
-
+  cargoToml = cargoToml.replace(/^version\s*=\s*".*?"/m, `version = "${version}"`);
   fs.writeFileSync(cargoTomlPath, cargoToml);
   console.log(`✅ Updated ${cargoTomlPath}`);
+
+  // Cargo.lock aktualisieren
+  execSync("cargo update --manifest-path src-tauri/Cargo.toml");
+  console.log("✅ Cargo.lock updated");
 }
+
+// Git-Add von Cargo.lock
+execSync("git add src-tauri/Cargo.lock");
 
 // 3. Commit, tag and push changes via Git
 const tagExists = execSync(`git tag`).toString().split("\n").includes(`v${version}`);
