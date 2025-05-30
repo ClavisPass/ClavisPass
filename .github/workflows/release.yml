@@ -38,10 +38,6 @@ jobs:
 
       - name: Setup Rust & Tauri
         uses: tauri-apps/tauri-action@v0.4
-        with:
-          artifactPaths: |
-            src-tauri/target/release/bundle/deb/*.deb
-            src-tauri/target/release/bundle/appimage/*.AppImage
 
       - name: Upload Linux binaries
         uses: softprops/action-gh-release@v1
@@ -165,7 +161,7 @@ jobs:
           SIGN_WINDOWS=$(cargo tauri signer sign \
             --private-key "${TAURI_SIGNING_PRIVATE_KEY}" \
             --password "${TAURI_SIGNING_PRIVATE_KEY_PASSWORD}" \
-            "artifacts/windows/ClavisPass_${VERSION}_x64-setup.exe" | awk '/^Public signature:/{getline; print}')
+            "artifacts/windows/clavis-pass_${VERSION}_x64-setup.exe" | awk '/^Public signature:/{getline; print}')
 
           SIGN_LINUX=$(cargo tauri signer sign \
             --private-key "${TAURI_SIGNING_PRIVATE_KEY}" \
@@ -175,7 +171,7 @@ jobs:
           SIGN_MACOS=$(cargo tauri signer sign \
             --private-key "${TAURI_SIGNING_PRIVATE_KEY}" \
             --password "${TAURI_SIGNING_PRIVATE_KEY_PASSWORD}" \
-            "artifacts/macos/ClavisPass_${VERSION}_aarch64.dmg" | awk '/^Public signature:/{getline; print}')
+            "artifacts/macos/clavis-pass_${VERSION}_aarch64.dmg" | awk '/^Public signature:/{getline; print}')
 
           echo "{
             \"version\": \"${VERSION}\",
@@ -184,7 +180,7 @@ jobs:
             \"platforms\": {
               \"windows-x86_64\": {
                 \"signature\": \"${SIGN_WINDOWS}\",
-                \"url\": \"${RELEASE_URL}/ClavisPass_${VERSION}_x64-setup.exe\"
+                \"url\": \"${RELEASE_URL}/clavis-pass_${VERSION}_x64-setup.exe\"
               },
               \"linux-x86_64\": {
                 \"signature\": \"${SIGN_LINUX}\",
@@ -192,7 +188,7 @@ jobs:
               },
               \"darwin-aarch64\": {
                 \"signature\": \"${SIGN_MACOS}\",
-                \"url\": \"${RELEASE_URL}/ClavisPass_${VERSION}_aarch64.dmg\"
+                \"url\": \"${RELEASE_URL}/clavis-pass_${VERSION}_aarch64.dmg\"
               }
             }
           }" > updater.json
