@@ -59,7 +59,7 @@
         "https://github.com/ClavisPass/ClavisPass/releases/latest/download/updater.json"
       ],
       "windows": {
-        "installMode": "passive"
+        "installMode": "quiet"
       }
     }
   },
