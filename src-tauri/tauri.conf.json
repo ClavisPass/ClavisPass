@@ -16,7 +16,8 @@
       "nsis",
       "deb",
       "appimage",
-      "dmg"
+      "dmg",
+      "app"
     ],
     "externalBin": [],
     "icon": [
