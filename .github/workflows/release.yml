@@ -38,6 +38,10 @@ jobs:
 
       - name: Setup Rust & Tauri
         uses: tauri-apps/tauri-action@v0.4
+        with:
+          artifactPaths: |
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/appimage/*.AppImage
 
       - name: Upload Linux binaries
         uses: softprops/action-gh-release@v1
