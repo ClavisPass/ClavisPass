@@ -8,9 +8,9 @@ on:
 jobs:
   build-linux:
     runs-on: ubuntu-22.04
-    env:
-      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-      TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+    #env:
+      #TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      #TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -58,9 +58,9 @@ jobs:
 
   build-windows:
     runs-on: windows-latest
-    env:
-      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-      TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+    #env:
+      #TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      #TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -96,9 +96,9 @@ jobs:
 
   build-macos:
     runs-on: macos-latest
-    env:
-      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-      TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+    #env:
+      #TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      #TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -130,44 +130,9 @@ jobs:
           path: |
             src-tauri/target/release/bundle/dmg/*.dmg
 
-  build-webview:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build WebView frontend
-        run: npx expo export --platform web --output-dir dist
-
-      - name: Create zip archive
-        run: |
-          cd dist
-          zip -r ../web-assets.zip .
-          cd ..
-
-      - name: Upload web-assets binaries
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          files: web-assets.zip
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: webview
-          path: web-assets.zip
-
   build-updater:
     runs-on: ubuntu-24.04
-    needs: [build-linux, build-windows, build-macos, build-webview]
+    needs: [build-linux, build-windows, build-macos]
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
       TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
@@ -208,11 +173,6 @@ jobs:
             --password "${TAURI_KEY_PASSWORD}" \
             "artifacts/macos/ClavisPass_${VERSION}_aarch64.dmg" | awk '/^Public signature:/{getline; print}')
 
-          SIGN_WEB=$(cargo tauri signer sign \
-            --private-key "${TAURI_SIGNING_PRIVATE_KEY}" \
-            --password "${TAURI_KEY_PASSWORD}" \
-            artifacts/webview/web-assets.zip | awk '/^Public signature:/{getline; print}')
-
           echo "{
             \"version\": \"${VERSION}\",
             \"notes\": \"New Version with Bugfixes\",
@@ -229,10 +189,6 @@ jobs:
               \"darwin-aarch64\": {
                 \"signature\": \"${SIGN_MACOS}\",
                 \"url\": \"${RELEASE_URL}/ClavisPass_${VERSION}_aarch64.dmg\"
-              },
-              \"web\": {
-                \"signature\": \"${SIGN_WEB}\",
-                \"url\": \"${RELEASE_URL}/web-assets.zip\"
               }
             }
           }" > updater.json
