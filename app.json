@@ -8,8 +8,9 @@
     },
     "newArchEnabled": true,
     "name": "ClavisPass",
-    "slug": "ClavisPass",
+    "slug": "clavispass",
     "version": "1.0.11",
+    "owner": "clavispass",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -46,7 +47,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "d0965944-a59f-4f32-be3b-2518cf2f1b40"
+        "projectId": "85aa75f5-f93e-499b-b999-03a921001dab"
       }
     }
   }
