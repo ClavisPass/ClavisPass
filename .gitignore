@@ -35,3 +35,7 @@ yarn-error.*
 *.tsbuildinfo
 
 release
+
+#android
+android.keystore
+android.keystore.base64
