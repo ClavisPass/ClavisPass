@@ -131,50 +131,49 @@ jobs:
             src-tauri/target/release/bundle/dmg/*.dmg
 
   build-android-apk:
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
 
-    - name: Install dependencies
-      run: npm install
+      - name: Install dependencies
+        run: npm install
 
-    - name: Install EAS CLI
-      run: npm install -g eas-cli
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
 
-    - name: Check currently logged in user (should fail if not logged in)
-      run: |
-        echo "Logged in user before login attempt:"
-        eas whoami || echo "No user logged in."
+      - name: Check currently logged in user (should fail if not logged in)
+        run: |
+          echo "Logged in user before login attempt:"
+          eas whoami || echo "No user logged in."
 
-    - name: Login to EAS CLI using EXPO_TOKEN
-      env:
-        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      run: |
-        echo "Logging in with EXPO_TOKEN..."
-        eas login --token $EXPO_TOKEN
+      - name: Login to EAS CLI using EXPO_TOKEN
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          echo "Logging in with EXPO_TOKEN..."
+          eas login --token $EXPO_TOKEN
 
-    - name: Verify logged in user after login
-      env:
-        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      run: eas whoami
+      - name: Verify logged in user after login
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas whoami
 
-    - name: Build APK locally with EAS
-      env:
-        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      run: |
-        eas build --platform android --profile production --non-interactive --local --output=./ClavisPass.apk
+      - name: Build APK
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas build --platform android --profile production --non-interactive --local --output=./ClavisPass.apk
 
-    - name: Upload APK artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: android
-        path: ClavisPass.apk
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: ClavisPass.apk
 
   build-updater:
     runs-on: ubuntu-24.04
