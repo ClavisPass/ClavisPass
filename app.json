@@ -2,7 +2,9 @@
   "expo": {
     "updates": {
       "enabled": true,
-      "url": "https://u.expo.dev/d0965944-a59f-4f32-be3b-2518cf2f1b40"
+      "url": "https://u.expo.dev/d0965944-a59f-4f32-be3b-2518cf2f1b40",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
     },
     "newArchEnabled": true,
     "name": "ClavisPass",
