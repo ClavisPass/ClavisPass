@@ -155,12 +155,12 @@ jobs:
       - name: Build APK
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build --platform android --profile preview --non-interactive --local --output=./ClavisPass.apk
+        run: eas build --platform android --profile production --non-interactive --local --output=./ClavisPass.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: android-apk
+          name: android
           path: ClavisPass.apk
 
   build-updater:
@@ -177,12 +177,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-
-      - name: Download APK
-        uses: actions/download-artifact@v4
-        with:
-          name: android-apk
-          path: artifacts/android
 
       - name: Setup Rust & Tauri
         run: cargo install tauri-cli
