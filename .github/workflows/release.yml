@@ -156,8 +156,8 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
-          echo "Logging in with EXPO_TOKEN..."
-          eas login --token $EXPO_TOKEN
+          echo "Logging in using EXPO_TOKEN environment variable..."
+          eas login || echo "Already logged in or token used"
 
       - name: Verify logged in user after login
         env:
