@@ -1,6 +1,6 @@
 [package]
 name = "clavis-pass"
-version = "1.0.10"
+version = "1.0.11"
 description = "ClavisPass"
 authors = ["you"]
 license = ""
