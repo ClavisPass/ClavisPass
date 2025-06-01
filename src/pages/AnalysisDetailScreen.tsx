@@ -12,6 +12,7 @@ import { ScrollView, View } from "react-native";
 import AnalysisEntry from "../components/AnalysisEntry";
 import AnalysisEntryGradient from "../components/AnalysisEntryGradient";
 import Pattern from "../components/Pattern";
+import { useFocusEffect } from "@react-navigation/native";
 
 type AnalysisDetailScreenProps = StackScreenProps<
   RootStackParamList,
@@ -38,7 +39,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
   navigation,
 }) => {
   const { value: routeValue } = route.params!;
-  const { globalStyles, theme } = useTheme();
+  const { globalStyles, theme, setHeaderWhite } = useTheme();
 
   const [characterAnalysis, setCharacterAnalysis] =
     useState<CharacterAnalysis>(null);
@@ -51,6 +52,12 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
   const [eyeIcon, setEyeIcon] = useState("eye");
 
   const [edit, setEdit] = useState(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setHeaderWhite(false);
+    }, [])
+  );
 
   const goBack = () => {
     navigation.goBack();
@@ -185,133 +192,146 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
           padding: 6,
         }}
       >
-        <View style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 6,
-        }}>
-        <Text variant="titleSmall" style={{ marginLeft: 6, userSelect: "none" }}>
-          Your Password
-        </Text>
-        <View
-          style={{
-            height: 40,
-            margin: 0,
-            marginBottom: 0,
-            marginTop: 0,
-          }}
-        >
-          <TextInput
-            outlineStyle={[
-              globalStyles.outlineStyle,
-              { borderColor: theme.colors.primary, borderWidth: 2 },
-            ]}
-            style={[globalStyles.textInputStyle, { userSelect: "none" }]}
-            value={routeValue.password}
-            mode="outlined"
-            secureTextEntry={secureTextEntry}
-            readOnly={true}
-            right={
-              <TextInput.Icon
-                icon={eyeIcon}
-                color={theme.colors.primary}
-                onPress={() => setSecureTextEntry(!secureTextEntry)}
-              />
-            }
-          />
-        </View>
-        <Text variant="titleSmall" style={{ marginLeft: 6, userSelect: "none" }}>
-          Statistics
-        </Text>
         <View
           style={{
             display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-evenly",
-            height: 80,
+            flexDirection: "column",
             gap: 6,
           }}
         >
-          <AnalysisEntryGradient
-            name={"Entropy"}
-            number={routeValue.entropy}
-            percentage={(routeValue.entropy / 200) * 100}
-          />
-          <AnalysisEntry
-            name={"Letters"}
-            number={characterAnalysis?.letters ? characterAnalysis?.letters : 0}
-            percentage={
-              characterAnalysis?.lettersPercent
-                ? characterAnalysis?.lettersPercent
-                : 0
-            }
-          />
-        </View>
-        <View
-          style={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-evenly",
-            height: 80,
-            gap: 6,
-          }}
-        >
-          <AnalysisEntry
-            name={"Digits"}
-            number={characterAnalysis?.digits ? characterAnalysis?.digits : 0}
-            percentage={
-              characterAnalysis?.digitsPercent
-                ? characterAnalysis?.digitsPercent
-                : 0
-            }
-          />
-          <AnalysisEntry
-            name={"Characters"}
-            number={
-              characterAnalysis?.specialCharacters
-                ? characterAnalysis?.specialCharacters
-                : 0
-            }
-            percentage={
-              characterAnalysis?.specialCharactersPercent
-                ? characterAnalysis?.specialCharactersPercent
-                : 0
-            }
-          />
-        </View>
-        <Text variant="titleSmall" style={{ marginLeft: 6, userSelect: "none" }}>
-          Patterns
-        </Text>
-        <Pattern pattern={passwordAnalysis?.pattern} />
-        {passwordAnalysis?.repeatedSequences &&
-        passwordAnalysis?.repeatedSequences.length !== 0 ? (
-          <>
-            <Text
-              variant="titleSmall"
-              style={{ marginLeft: 6, userSelect: "none" }}
-            >
-              Repeated Sequences
-            </Text>
-            {passwordAnalysis?.repeatedSequences.map((sequence, index) => {
-              return <Pattern pattern={sequence} key={index}/>;
-            })}
-          </>
-        ) : null}
-        {passwordAnalysis?.sequentialPatterns &&
-        passwordAnalysis?.sequentialPatterns.length !== 0 ? (
-          <>
-            <Text
-              variant="titleSmall"
-              style={{ marginLeft: 6, userSelect: "none" }}
-            >
-              Sequencial Patterns
-            </Text>
-            {passwordAnalysis?.sequentialPatterns.map((pattern, index) => {
-              return <Pattern pattern={pattern} key={index}/>;
-            })}
-          </>
-        ) : null}
+          <Text
+            variant="titleSmall"
+            style={{ marginLeft: 6, userSelect: "none" }}
+          >
+            Your Password
+          </Text>
+          <View
+            style={{
+              height: 40,
+              margin: 0,
+              marginBottom: 0,
+              marginTop: 0,
+            }}
+          >
+            <TextInput
+              outlineStyle={[
+                globalStyles.outlineStyle,
+                { borderColor: theme.colors.primary, borderWidth: 2 },
+              ]}
+              style={[globalStyles.textInputStyle, { userSelect: "none" }]}
+              value={routeValue.password}
+              mode="outlined"
+              secureTextEntry={secureTextEntry}
+              readOnly={true}
+              right={
+                <TextInput.Icon
+                  icon={eyeIcon}
+                  color={theme.colors.primary}
+                  onPress={() => setSecureTextEntry(!secureTextEntry)}
+                />
+              }
+            />
+          </View>
+          <Text
+            variant="titleSmall"
+            style={{ marginLeft: 6, userSelect: "none" }}
+          >
+            Statistics
+          </Text>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              height: 80,
+              gap: 6,
+            }}
+          >
+            <AnalysisEntryGradient
+              name={"Entropy"}
+              number={routeValue.entropy}
+              percentage={(routeValue.entropy / 200) * 100}
+            />
+            <AnalysisEntry
+              name={"Letters"}
+              number={
+                characterAnalysis?.letters ? characterAnalysis?.letters : 0
+              }
+              percentage={
+                characterAnalysis?.lettersPercent
+                  ? characterAnalysis?.lettersPercent
+                  : 0
+              }
+            />
+          </View>
+          <View
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              height: 80,
+              gap: 6,
+            }}
+          >
+            <AnalysisEntry
+              name={"Digits"}
+              number={characterAnalysis?.digits ? characterAnalysis?.digits : 0}
+              percentage={
+                characterAnalysis?.digitsPercent
+                  ? characterAnalysis?.digitsPercent
+                  : 0
+              }
+            />
+            <AnalysisEntry
+              name={"Characters"}
+              number={
+                characterAnalysis?.specialCharacters
+                  ? characterAnalysis?.specialCharacters
+                  : 0
+              }
+              percentage={
+                characterAnalysis?.specialCharactersPercent
+                  ? characterAnalysis?.specialCharactersPercent
+                  : 0
+              }
+            />
+          </View>
+          <Text
+            variant="titleSmall"
+            style={{ marginLeft: 6, userSelect: "none" }}
+          >
+            Patterns
+          </Text>
+          <Pattern pattern={passwordAnalysis?.pattern} />
+          {passwordAnalysis?.repeatedSequences &&
+          passwordAnalysis?.repeatedSequences.length !== 0 ? (
+            <>
+              <Text
+                variant="titleSmall"
+                style={{ marginLeft: 6, userSelect: "none" }}
+              >
+                Repeated Sequences
+              </Text>
+              {passwordAnalysis?.repeatedSequences.map((sequence, index) => {
+                return <Pattern pattern={sequence} key={index} />;
+              })}
+            </>
+          ) : null}
+          {passwordAnalysis?.sequentialPatterns &&
+          passwordAnalysis?.sequentialPatterns.length !== 0 ? (
+            <>
+              <Text
+                variant="titleSmall"
+                style={{ marginLeft: 6, userSelect: "none" }}
+              >
+                Sequencial Patterns
+              </Text>
+              {passwordAnalysis?.sequentialPatterns.map((pattern, index) => {
+                return <Pattern pattern={pattern} key={index} />;
+              })}
+            </>
+          ) : null}
         </View>
       </ScrollView>
     </AnimatedContainer>

@@ -1,9 +1,5 @@
 const isTauri = () => {
-  try {
-    return typeof window !== "undefined" && Boolean(require("@tauri-apps/api"));
-  } catch {
-    return false;
-  }
+  return typeof window !== "undefined" && !!(window as any).__TAURI_IPC__;
 };
 
 export default isTauri;

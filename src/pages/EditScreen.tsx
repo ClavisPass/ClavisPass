@@ -24,11 +24,7 @@ import FolderModal from "../components/modals/FolderModal";
 import { useTheme } from "../contexts/ThemeProvider";
 import { RootStackParamList } from "../../App";
 import DiscardChangesModal from "../components/modals/DiscardChangesModal";
-import { openFastAccess, removeAllNotifications } from "../utils/FastAccess";
-
-import { useQuickSelect as useQuickSelectTauri } from "../contexts/QuickSelectProvider";
-import { useQuickSelect as useQuickSelectNotTauri } from "../contexts/QuickSelectProviderNotTauri";
-import extractFastAccessObject from "../utils/extractFastAccessObject";
+import { useFocusEffect } from "@react-navigation/native";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -44,11 +40,7 @@ type EditScreenProps = StackScreenProps<RootStackParamList, "Edit">;
 const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const { value: routeValue } = route.params!;
   const data = useData();
-  const { globalStyles, theme } = useTheme();
-
-  const useQuickSelect =
-    Platform.OS === "web" ? useQuickSelectTauri : useQuickSelectNotTauri;
-  const { setFastAccess } = useQuickSelect();
+  const { globalStyles, theme, setHeaderWhite } = useTheme();
 
   const [edit, setEdit] = useState(false);
   const [value, setValue] = useState<ValuesType>({ ...routeValue });
@@ -60,6 +52,12 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const [showMenu, setShowMenu] = useState(false);
 
   const [favIcon, setFavIcon] = useState("star-outline");
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setHeaderWhite(false);
+    }, [])
+  );
 
   const saveValue = () => {
     let newData = { ...data.data } as DataType;
@@ -139,30 +137,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       setFavIcon("star-outline");
     }
   }, [value]);
-
-  useEffect(() => {
-    const handleAppStateChange = (nextAppState: string) => {
-      if (nextAppState === "active") {
-        removeAllNotifications();
-      } else if (nextAppState === "background") {
-        openFastAccess(
-          () => {
-            setFastAccess;
-          },
-          extractFastAccessObject(value.modules, value.title)
-        );
-      }
-    };
-
-    const subscription = AppState.addEventListener(
-      "change",
-      handleAppStateChange
-    );
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
 
   return (
     <AnimatedContainer style={globalStyles.container} trigger={edit}>

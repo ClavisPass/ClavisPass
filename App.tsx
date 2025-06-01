@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { CommonActions } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -32,16 +32,11 @@ import ValuesType from "./src/types/ValuesType";
 import ScanScreen from "./src/pages/ScanScreen";
 import theme from "./src/ui/theme";
 import AnalysisDetailScreen from "./src/pages/AnalysisDetailScreen";
-import isTauri from "./src/utils/isTauri";
 import { OnlineProvider } from "./src/contexts/OnlineProvider";
 
 const Tab = createBottomTabNavigator();
 
 const Stack = createStackNavigator<RootStackParamList>();
-
-const QuickSelectProvider = isTauri()
-  ? require("./src/contexts/QuickSelectProvider").QuickSelectProvider
-  : require("./src/contexts/QuickSelectProviderNotTauri").QuickSelectProvider;
 
 export default function App() {
   return (
@@ -62,7 +57,6 @@ export default function App() {
                   }}
                 >
                   <GlobalShortcuts />
-                  <QuickSelectProvider>
                     <CustomTitlebar />
                     <NavigationContainer>
                       <ProtectedRoute loginScreen={<LoginStack />}>
@@ -173,7 +167,6 @@ export default function App() {
                         </Tab.Navigator>
                       </ProtectedRoute>
                     </NavigationContainer>
-                  </QuickSelectProvider>
                 </View>
               </GestureHandlerRootView>
             </DataProvider>

@@ -27,7 +27,7 @@ export type CachedPasswordsType = {
 
 function AnalysisScreen({ navigation }: { navigation: any }) {
   const data = useData();
-  const { theme, globalStyles } = useTheme();
+  const { theme, globalStyles, setHeaderWhite } = useTheme();
 
   const [cachedPasswordList, setCachedPasswordList] = React.useState<
     CachedPasswordsType[] | null
@@ -40,6 +40,12 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
   const [weak, setWeak] = useState(0);
 
   const [searchQuery, setSearchQuery] = useState("");
+
+  useFocusEffect(
+      React.useCallback(() => {
+        setHeaderWhite(false);
+      }, [])
+    );
 
   const filteredValues = useMemo(() => {
     return cachedPasswordList?.filter((item) => {

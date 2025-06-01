@@ -10,11 +10,15 @@ import lightTheme from "../ui/theme";
 import darkTheme from "../ui/theme-darkmode";
 import styles from "../ui/globalStyles";
 
+import * as store from "../utils/store";
+
 interface ThemeContextType {
   darkmode: boolean;
   setDarkmode: (darkmode: boolean) => void;
   theme: any;
   globalStyles: any;
+  headerWhite: boolean;
+  setHeaderWhite: (headerWhite: boolean) => void;
 }
 
 export const ThemeContext = createContext<ThemeContextType | null>(null);
@@ -24,22 +28,42 @@ type Props = {
 };
 
 export const ThemeProvider = ({ children }: Props) => {
-  const [darkmode, setDarkmode] = useState(false);
+  const [darkmode, setDarkmodeState] = useState(false);
   const [theme, setTheme] = useState(lightTheme);
+  const [isReady, setIsReady] = useState(false);
+  const [headerWhite, setHeaderWhite] = useState(false);
 
   const globalStyles = styles(theme.colors.elevation.level2);
 
   useEffect(() => {
-    if (darkmode) {
-      setTheme(darkTheme);
-    } else {
-      setTheme(lightTheme);
-    }
-  }, [darkmode]);
+    (async () => {
+      const stored = await store.get("THEME_PREFERENCE");
+      if (stored === "dark") {
+        setDarkmodeState(true);
+        setTheme(darkTheme);
+      } else {
+        setDarkmodeState(false);
+        setTheme(lightTheme);
+      }
+      setIsReady(true);
+    })();
+  }, []);
+
+  useEffect(() => {
+    console.log("Header white state changed:", headerWhite);
+  }, [headerWhite]);
+
+  const setDarkmode = (value: boolean) => {
+    setDarkmodeState(value);
+    store.set("THEME_PREFERENCE", value ? "dark" : "light");
+    setTheme(value ? darkTheme : lightTheme);
+  };
+
+  if (!isReady) return null;
 
   return (
     <ThemeContext.Provider
-      value={{ darkmode, setDarkmode, theme, globalStyles }}
+      value={{ darkmode, setDarkmode, theme, globalStyles, headerWhite, setHeaderWhite }}
     >
       <PaperProvider theme={theme}>{children}</PaperProvider>
     </ThemeContext.Provider>

@@ -1,12 +1,12 @@
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
-import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { getCurrentWebviewWindow, WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { Platform, StyleSheet } from "react-native";
-const appWindow = getCurrentWebviewWindow()
+import isTauri from "../utils/isTauri"; // Deine Hilfsfunktion
 
 type Props = {
   children: ReactNode;
@@ -14,33 +14,52 @@ type Props = {
 
 function Blur(props: Props) {
   const blurValue = useSharedValue(0);
+  const [appWindow, setAppWindow] = useState<WebviewWindow | null>(null);
 
   useEffect(() => {
-    const handleMouseEnter = () => {
-      blurValue.value = withTiming(0, { duration: 200 });
-    };
+  if (!isTauri()) return;
 
-    const handleMouseLeave = () => {
-      blurValue.value = withTiming(6, { duration: 200 });
-    };
+  let focusListenerUnsub: (() => void) | null = null;
+  let blurListenerUnsub: (() => void) | null = null;
 
-    const focusListener = appWindow.listen("tauri://focus", () => {
-      blurValue.value = withTiming(0, { duration: 200 });
-      document.removeEventListener("mouseenter", handleMouseEnter);
-      document.removeEventListener("mouseleave", handleMouseLeave);
-    });
+  async function setup() {
+    try {
+      const window = await getCurrentWebviewWindow();
+      setAppWindow(window);
 
-    const blurListener = appWindow.listen("tauri://blur", () => {
-      blurValue.value = withTiming(6, { duration: 200 });
-      document.addEventListener("mouseenter", handleMouseEnter);
-      document.addEventListener("mouseleave", handleMouseLeave);
-    });
+      focusListenerUnsub = await window.listen("tauri://focus", () => {
+        blurValue.value = withTiming(0, { duration: 200 });
+        document.removeEventListener("mouseenter", handleMouseEnter);
+        document.removeEventListener("mouseleave", handleMouseLeave);
+      });
 
-    return () => {
-      focusListener.then((unsub) => unsub());
-      blurListener.then((unsub) => unsub());
-    };
-  }, []);
+      blurListenerUnsub = await window.listen("tauri://blur", () => {
+        blurValue.value = withTiming(6, { duration: 200 });
+        document.addEventListener("mouseenter", handleMouseEnter);
+        document.addEventListener("mouseleave", handleMouseLeave);
+      });
+    } catch (error) {
+      console.warn("Failed to getCurrentWebviewWindow or listen:", error);
+    }
+  }
+
+  const handleMouseEnter = () => {
+    blurValue.value = withTiming(0, { duration: 200 });
+  };
+
+  const handleMouseLeave = () => {
+    blurValue.value = withTiming(6, { duration: 200 });
+  };
+
+  setup();
+
+  return () => {
+    focusListenerUnsub && focusListenerUnsub();
+    blurListenerUnsub && blurListenerUnsub();
+    document.removeEventListener("mouseenter", handleMouseEnter);
+    document.removeEventListener("mouseleave", handleMouseLeave);
+  };
+}, []);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -49,6 +68,7 @@ function Blur(props: Props) {
     };
   });
 
+  // Wenn kein appWindow (z.B. in Expo Go / Web ohne Tauri), render einfach ohne Animation
   if (Platform.OS === "web" && !appWindow) {
     return <>{props.children}</>;
   }

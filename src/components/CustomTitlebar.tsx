@@ -1,11 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Platform, View, StyleSheet } from "react-native";
-import { Icon, IconButton, TouchableRipple } from "react-native-paper";
+import { Icon, TouchableRipple } from "react-native-paper";
 import theme from "../ui/theme";
 import WebSpecific from "./platformSpecific/WebSpecific";
-import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { getCurrentWebviewWindow, WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { useAuth } from "../contexts/AuthProvider";
-const appWindow = getCurrentWebviewWindow()
+import isTauri from "../utils/isTauri";
+import { useTheme } from "../contexts/ThemeProvider";
 
 export const TITLEBAR_HEIGHT = Platform.OS === "web" ? 46 : 0;
 
@@ -30,25 +31,39 @@ export function TitlebarHeight(props: Props) {
             styles.titlebar,
             { backgroundColor: "white", borderRadius: 20, marginBottom: 4 },
           ]}
-        ></View>
+        />
       </WebSpecific>
     );
   }
   return (
     <WebSpecific>
-      <View style={styles.titlebar}></View>
+      <View style={styles.titlebar} />
     </WebSpecific>
   );
 }
 
 function CustomTitlebar() {
   const auth = useAuth();
+  const {headerWhite} = useTheme();
+
+  // Zustand für appWindow
+  const [appWindow, setAppWindow] = useState<WebviewWindow | null>(null);
+
+  useEffect(() => {
+    if (isTauri()) {
+      try {
+        const window = getCurrentWebviewWindow();
+        setAppWindow(window);
+      } catch (error) {
+        console.warn("Tauri runtime not ready yet:", error);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     if (Platform.OS === "web") {
       if (document) {
-        document
-          .getElementById("titlebar")
-          ?.setAttribute("data-tauri-drag-region", "");
+        document.getElementById("titlebar")?.setAttribute("data-tauri-drag-region", "");
 
         const sheet = new CSSStyleSheet();
         sheet.replaceSync(
@@ -60,17 +75,18 @@ function CustomTitlebar() {
   }, []);
 
   const minimizeWindow = () => {
-    if (Platform.OS === "web") {
+    if (appWindow) {
       appWindow.minimize();
     }
   };
 
   const closeWindow = () => {
-    if (Platform.OS === "web") {
+    if (appWindow) {
       auth.logout();
       appWindow.hide();
     }
   };
+
   return (
     <WebSpecific>
       <View
@@ -120,7 +136,7 @@ function CustomTitlebar() {
               <Icon
                 source={"window-minimize"}
                 size={20}
-                color={theme.colors.primary}
+                color={headerWhite? 'white' : theme.colors.primary}
               />
             </TouchableRipple>
             <TouchableRipple
@@ -140,7 +156,7 @@ function CustomTitlebar() {
               <Icon
                 source={"window-close"}
                 size={20}
-                color={theme.colors.primary}
+                color={headerWhite? 'white' : theme.colors.primary}
               />
             </TouchableRipple>
           </View>

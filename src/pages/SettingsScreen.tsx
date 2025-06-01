@@ -53,11 +53,17 @@ const styles = StyleSheet.create({
 });
 
 function SettingsScreen({ navigation }: { navigation: any }) {
-  const { globalStyles } = useTheme();
+  const { globalStyles, setHeaderWhite } = useTheme();
   const { master } = useAuth();
   const [startup, setStartup] = React.useState(false);
 
   const [useAuthentication, setUseAuthentication] = React.useState(false);
+
+  useFocusEffect(
+      React.useCallback(() => {
+        setHeaderWhite(false);
+      }, [])
+    );
 
   const changeAuthentication = async (authentication: boolean) => {
     if (authentication) {

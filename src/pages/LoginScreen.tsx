@@ -12,6 +12,8 @@ import Login from "../components/Login";
 import generateNewToken from "../api/generateNewToken";
 import { Text } from "react-native-paper";
 import { useOnline } from "../contexts/OnlineProvider";
+import { useTheme } from "../contexts/ThemeProvider";
+import { useFocusEffect } from "@react-navigation/native";
 
 const styles = StyleSheet.create({
   container: {
@@ -24,18 +26,20 @@ const styles = StyleSheet.create({
 });
 
 function LoginScreen({ navigation }: { navigation: any }) {
-  const {
-    setToken,
-    setRefreshToken,
-    loadRefreshToken,
-    tokenType,
-  } = useToken();
+  const { setToken, setRefreshToken, loadRefreshToken, tokenType } = useToken();
   const { isOnline } = useOnline();
+  const { setHeaderWhite } = useTheme();
 
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
   const [loading, setLoading] = useState(true);
 
   const [editTokenVisibility, setEditTokenVisibility] = useState(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setHeaderWhite(false);
+    }, [])
+  );
 
   const login = async () => {
     try {
@@ -74,8 +78,8 @@ function LoginScreen({ navigation }: { navigation: any }) {
     console.log(isOnline);
   }, [isOnline]);
 
-  if(!isOnline){
-    return <Text>OFFLINE</Text>
+  if (!isOnline) {
+    return <Text>OFFLINE</Text>;
   }
 
   return (

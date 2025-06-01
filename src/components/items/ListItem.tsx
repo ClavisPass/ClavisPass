@@ -7,11 +7,8 @@ import ModulesEnum from "../../enums/ModulesEnum";
 import * as Clipboard from "expo-clipboard";
 
 import { Image } from "expo-image";
-import FastAccess, { openFastAccess } from "../../utils/FastAccess";
 import { useTheme } from "../../contexts/ThemeProvider";
 
-import { useQuickSelect as useQuickSelectTauri } from "../../contexts/QuickSelectProvider";
-import { useQuickSelect as useQuickSelectNotTauri } from "../../contexts/QuickSelectProviderNotTauri";
 import extractFastAccessObject from "../../utils/extractFastAccessObject";
 
 const styles = StyleSheet.create({
@@ -43,10 +40,6 @@ type Props = {
 
 function ListItem(props: Props) {
   const { theme } = useTheme();
-
-  const useQuickSelect =
-    Platform.OS === "web" ? useQuickSelectTauri : useQuickSelectNotTauri;
-  const { setFastAccess } = useQuickSelect();
 
   const [url, setUrl] = useState("");
   const [icon, setIcon] = useState("lock");
@@ -98,7 +91,7 @@ function ListItem(props: Props) {
     <View
       key={props.key}
       style={[styles.container, { backgroundColor: theme.colors?.background }]}
-      onPointerEnter={() => setHovered(true)}
+      onPointerEnter={() => Platform.OS === "web" && setHovered(true)}
       onPointerLeave={() => Platform.OS === "web" && setHovered(false)}
     >
       <TouchableRipple
@@ -106,15 +99,8 @@ function ListItem(props: Props) {
         style={styles.ripple}
         onPress={props.onPress}
         rippleColor="rgba(0, 0, 0, .32)"
-        onLongPress={() => {
-          openFastAccess(
-            setFastAccess,
-            extractFastAccessObject(props.item.modules, props.item.title)
-          );
-        }}
       >
         <>
-          <FastAccess />
           <View
             style={{
               display: "flex",

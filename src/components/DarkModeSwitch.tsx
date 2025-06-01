@@ -67,11 +67,10 @@ function DarkModeSwitchPreview(props: Props) {
 
 function DarkModeSwitch() {
   const { darkmode, setDarkmode } = useTheme();
-  const [checked, setChecked] = useState<CheckedType>("light");
+  const [checked, setChecked] = useState<CheckedType>(darkmode ? "dark" : "light");
   useEffect(() => {
-    if (checked == "light") setDarkmode(false);
-    if (checked == "dark") setDarkmode(true);
-  }, [checked]);
+    setDarkmode(checked === "dark");
+  }, [checked, darkmode]);
   return (
     <View style={{ display: "flex", flexDirection: "row", gap: 6, marginTop: 10 }}>
       <DarkModeSwitchPreview

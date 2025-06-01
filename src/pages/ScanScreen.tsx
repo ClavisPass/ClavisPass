@@ -12,6 +12,7 @@ import { useToken } from "../contexts/TokenProvider";
 import fetchUserInfo from "../api/fetchUserInfo";
 import isDropboxToken from "../utils/regex/isDropboxToken";
 import isGoogleDriveToken from "../utils/regex/isGoogleDriveToken";
+import { useFocusEffect } from "@react-navigation/native";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -52,11 +53,17 @@ const styles = StyleSheet.create({
 type ScanScreenProps = StackScreenProps<RootStackParamList, "Scan">;
 
 const ScanScreen: React.FC<ScanScreenProps> = ({ route, navigation }) => {
-  const { globalStyles } = useTheme();
+  const { globalStyles, setHeaderWhite } = useTheme();
   const { setToken } = useToken();
 
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setHeaderWhite(false);
+    }, [])
+  );
 
   function isValidTokenFormat(token: string) {
     let tokenType: "Dropbox" | "GoogleDrive" | null = null;

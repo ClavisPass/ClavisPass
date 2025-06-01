@@ -73,7 +73,7 @@ function Tools(props: Props) {
 }
 
 function HomeScreen({ navigation }: { navigation: any }) {
-  const { theme } = useTheme();
+  const { theme, setHeaderWhite } = useTheme();
   const { width, height } = useWindowDimensions();
   const auth = useAuth();
 
@@ -99,7 +99,14 @@ function HomeScreen({ navigation }: { navigation: any }) {
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
+  useFocusEffect(
+    React.useCallback(() => {
+      setHeaderWhite(true);
+    }, [])
+  );
+
   useEffect(() => {
+    setHeaderWhite(true);
     if (data.showSave) {
       Animated.parallel([
         Animated.timing(slideAnim, {
@@ -229,12 +236,14 @@ function HomeScreen({ navigation }: { navigation: any }) {
             width: "100%",
           }}
         >
-          <View style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 8,
-          }}>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
             <ClavisPass width={20} height={20} />
             <Text
               style={{
