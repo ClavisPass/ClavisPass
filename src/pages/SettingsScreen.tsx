@@ -29,6 +29,7 @@ import SettingsItem from "../components/items/SettingsItem";
 import SettingsSwitch from "../components/SettingsSwitch";
 import Footer from "../components/Footer";
 import UpdateManager from "../components/UpdateManager";
+import * as store from "../utils/store";
 
 const styles = StyleSheet.create({
   surface: {
@@ -58,6 +59,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
   const [startup, setStartup] = React.useState(false);
 
   const [useAuthentication, setUseAuthentication] = React.useState(false);
+  const [closeBehavior, setCloseBehavior] = React.useState(false);
 
   useFocusEffect(
       React.useCallback(() => {
@@ -77,6 +79,15 @@ function SettingsScreen({ navigation }: { navigation: any }) {
       removeAuthentication();
       setUseAuthentication(false);
     }
+  };
+
+  const changeCloseBehavior = async (hide: boolean) => {
+    if (hide) {
+      store.set("CLOSE_BEHAVIOR", "hide");
+    } else {
+      store.set("CLOSE_BEHAVIOR", "exit");
+    }
+    setCloseBehavior(hide);
   };
 
   const [showChangeMasterPasswordModal, setShowChangeMasterPasswordModal] =
@@ -103,6 +114,9 @@ function SettingsScreen({ navigation }: { navigation: any }) {
     getAutoStart();
     isUsingAuthentication().then((isAuthenticated) => {
       setUseAuthentication(isAuthenticated);
+    });
+    store.get("CLOSE_BEHAVIOR").then((stored) => {
+      setCloseBehavior(stored === "hide");
     });
   }, []);
 
@@ -140,9 +154,9 @@ function SettingsScreen({ navigation }: { navigation: any }) {
               <SettingsDivider />
               <SettingsSwitch
                 label={"Minimize to Tray"}
-                value={startup}
+                value={closeBehavior}
                 onValueChange={(checked) => {
-                  changeAutoStart(checked);
+                  changeCloseBehavior(checked);
                 }}
               />
               <SettingsDivider />

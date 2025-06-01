@@ -3,10 +3,11 @@ import { Platform, View, StyleSheet } from "react-native";
 import { Icon, TouchableRipple } from "react-native-paper";
 import theme from "../ui/theme";
 import WebSpecific from "./platformSpecific/WebSpecific";
-import { getCurrentWebviewWindow, WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useAuth } from "../contexts/AuthProvider";
-import isTauri from "../utils/isTauri";
+import { exit } from '@tauri-apps/plugin-process';
 import { useTheme } from "../contexts/ThemeProvider";
+import * as store from "../utils/store";
 
 export const TITLEBAR_HEIGHT = Platform.OS === "web" ? 46 : 0;
 
@@ -44,26 +45,14 @@ export function TitlebarHeight(props: Props) {
 
 function CustomTitlebar() {
   const auth = useAuth();
-  const {headerWhite} = useTheme();
-
-  // Zustand für appWindow
-  const [appWindow, setAppWindow] = useState<WebviewWindow | null>(null);
-
-  useEffect(() => {
-    if (isTauri()) {
-      try {
-        const window = getCurrentWebviewWindow();
-        setAppWindow(window);
-      } catch (error) {
-        console.warn("Tauri runtime not ready yet:", error);
-      }
-    }
-  }, []);
+  const { headerWhite } = useTheme();
 
   useEffect(() => {
     if (Platform.OS === "web") {
       if (document) {
-        document.getElementById("titlebar")?.setAttribute("data-tauri-drag-region", "");
+        document
+          .getElementById("titlebar")
+          ?.setAttribute("data-tauri-drag-region", "");
 
         const sheet = new CSSStyleSheet();
         sheet.replaceSync(
@@ -75,15 +64,22 @@ function CustomTitlebar() {
   }, []);
 
   const minimizeWindow = () => {
+    const appWindow = getCurrentWindow();
     if (appWindow) {
       appWindow.minimize();
     }
   };
 
-  const closeWindow = () => {
+  const closeWindow = async () => {
+    const stored = await store.get("CLOSE_BEHAVIOR");
+    const appWindow = getCurrentWindow();
     if (appWindow) {
-      auth.logout();
-      appWindow.hide();
+      if (stored === "exit") {
+        await exit(0);
+      } else {
+        auth.logout();
+        appWindow.hide();
+      }
     }
   };
 
@@ -136,7 +132,7 @@ function CustomTitlebar() {
               <Icon
                 source={"window-minimize"}
                 size={20}
-                color={headerWhite? 'white' : theme.colors.primary}
+                color={headerWhite ? "white" : theme.colors.primary}
               />
             </TouchableRipple>
             <TouchableRipple
@@ -156,7 +152,7 @@ function CustomTitlebar() {
               <Icon
                 source={"window-close"}
                 size={20}
-                color={headerWhite? 'white' : theme.colors.primary}
+                color={headerWhite ? "white" : theme.colors.primary}
               />
             </TouchableRipple>
           </View>

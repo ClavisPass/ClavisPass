@@ -8,7 +8,7 @@ const storeSchema = {
   },
   CLOSE_BEHAVIOR: {
     values: ["hide", "exit"],
-    default: "hide",
+    default: "exit",
   },
 } as const;
 

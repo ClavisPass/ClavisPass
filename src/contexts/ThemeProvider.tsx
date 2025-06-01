@@ -49,10 +49,6 @@ export const ThemeProvider = ({ children }: Props) => {
     })();
   }, []);
 
-  useEffect(() => {
-    console.log("Header white state changed:", headerWhite);
-  }, [headerWhite]);
-
   const setDarkmode = (value: boolean) => {
     setDarkmodeState(value);
     store.set("THEME_PREFERENCE", value ? "dark" : "light");
