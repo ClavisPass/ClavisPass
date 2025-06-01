@@ -172,23 +172,25 @@ jobs:
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > android.keystore
 
-      - name: Create keystore config file
+      - name: Create EAS credentials file
         run: |
+          mkdir -p ~/.eas
           echo '{
-            "keystorePath": "./android.keystore",
-            "keystorePassword": "'"$ANDROID_KEYSTORE_PASSWORD"'",
-            "keyAlias": "'"$ANDROID_KEY_ALIAS"'",
-            "keyPassword": "'"$ANDROID_KEY_PASSWORD"'"
-          }' > eas-build.json
+            "android": {
+              "keystore": {
+                "keystorePath": "./android.keystore",
+                "keystorePassword": "'"$ANDROID_KEYSTORE_PASSWORD"'",
+                "keyAlias": "'"$ANDROID_KEY_ALIAS"'",
+                "keyPassword": "'"$ANDROID_KEY_PASSWORD"'"
+              }
+            }
+          }' > ~/.eas/credentials.json
 
       - name: Build APK
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
-          eas build --platform android --profile production --non-interactive --local --output=./ClavisPass.apk --local-build-options '{"keystore": "eas-build.json"}'
+          eas build --platform android --profile production --non-interactive --local --output=./ClavisPass.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
