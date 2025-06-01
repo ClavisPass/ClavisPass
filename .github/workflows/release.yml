@@ -149,11 +149,6 @@ jobs:
       - name: Install EAS CLI globally
         run: npm install -g eas-cli@latest
 
-      - name: Login to EAS
-        run: eas login
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
       - name: Verify EAS authentication
         run: eas whoami
         env:
