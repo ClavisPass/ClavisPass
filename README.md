@@ -110,7 +110,7 @@ This design ensures that your data remains private and can only be decrypted wit
 
 ## FAQ
 
-> See the [FAQ section on the homepage](https://clavispass.github.io/ClavisPass/) or the bottom of this README for common questions and answers.
+> See the [FAQ section on the homepage](https://clavispass.github.io/ClavisPass/) for common questions and answers.
 
 ---
 
