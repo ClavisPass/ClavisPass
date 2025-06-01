@@ -9,7 +9,7 @@
     "newArchEnabled": true,
     "name": "ClavisPass",
     "slug": "clavispass",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "owner": "clavispass",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
