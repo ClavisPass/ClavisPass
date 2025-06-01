@@ -150,8 +150,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
+      - name: Install latest EAS CLI
+        run: npm install -g eas-cli@latest
 
       - name: Check currently logged in user (should fail if not logged in)
         run: |
