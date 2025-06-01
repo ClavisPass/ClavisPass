@@ -38,8 +38,8 @@ const globalStyles = (background: string) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    height: 40,
-    marginBottom: 4,
+    height: 50,
+    padding: 8,
   },
 });
 

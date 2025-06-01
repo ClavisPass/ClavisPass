@@ -27,7 +27,7 @@ export type CachedPasswordsType = {
 
 function AnalysisScreen({ navigation }: { navigation: any }) {
   const data = useData();
-  const { theme, globalStyles, setHeaderWhite } = useTheme();
+  const { theme, globalStyles, headerWhite, setHeaderWhite, darkmode } = useTheme();
 
   const [cachedPasswordList, setCachedPasswordList] = React.useState<
     CachedPasswordsType[] | null
@@ -145,11 +145,7 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
       style={{ marginTop: Constants.statusBarHeight }}
       useFocusEffect={useFocusEffect}
     >
-      <StatusBar
-        animated={true}
-        style="dark"
-        translucent={true}
-      />
+      <StatusBar animated={true} style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent={true} />
       <TitlebarHeight />
       <View
         style={{

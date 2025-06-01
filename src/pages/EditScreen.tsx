@@ -25,6 +25,7 @@ import { useTheme } from "../contexts/ThemeProvider";
 import { RootStackParamList } from "../../App";
 import DiscardChangesModal from "../components/modals/DiscardChangesModal";
 import { useFocusEffect } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -40,7 +41,7 @@ type EditScreenProps = StackScreenProps<RootStackParamList, "Edit">;
 const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const { value: routeValue } = route.params!;
   const data = useData();
-  const { globalStyles, theme, setHeaderWhite } = useTheme();
+  const { globalStyles, theme, headerWhite, setHeaderWhite, darkmode } = useTheme();
 
   const [edit, setEdit] = useState(false);
   const [value, setValue] = useState<ValuesType>({ ...routeValue });
@@ -141,6 +142,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   return (
     <AnimatedContainer style={globalStyles.container} trigger={edit}>
       <TitlebarHeight />
+      <StatusBar animated={true} style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent={true} />
       <Header
         onPress={() => {
           if (discardChanges) {

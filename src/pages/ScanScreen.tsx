@@ -13,6 +13,7 @@ import fetchUserInfo from "../api/fetchUserInfo";
 import isDropboxToken from "../utils/regex/isDropboxToken";
 import isGoogleDriveToken from "../utils/regex/isGoogleDriveToken";
 import { useFocusEffect } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
 type ScanScreenProps = StackScreenProps<RootStackParamList, "Scan">;
 
 const ScanScreen: React.FC<ScanScreenProps> = ({ route, navigation }) => {
-  const { globalStyles, setHeaderWhite } = useTheme();
+  const { globalStyles, headerWhite, setHeaderWhite, darkmode } = useTheme();
   const { setToken } = useToken();
 
   const [facing, setFacing] = useState<CameraType>("back");
@@ -88,6 +89,7 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ route, navigation }) => {
   return (
     <AnimatedContainer style={globalStyles.container}>
       <TitlebarHeight />
+      <StatusBar animated={true} style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent={true} />
       <Header
         onPress={() => {
           navigation.goBack();

@@ -26,10 +26,9 @@ function getModule(
   changeModule: (module: ModuleType) => void
 ): ReactNode {
   if (module.module === ModulesEnum.CUSTOM_FIELD) {
-    let moduleObject = module as CustomFieldModuleType;
+    const moduleObject = module as CustomFieldModuleType;
     return (
       <CustomFieldModule
-        key={moduleObject.id}
         id={moduleObject.id}
         module={moduleObject.module}
         title={moduleObject.title}
@@ -42,10 +41,9 @@ function getModule(
     );
   }
   if (module.module === ModulesEnum.E_MAIL) {
-    let moduleObject = module as EmailModuleType;
+    const moduleObject = module as EmailModuleType;
     return (
       <EmailModule
-        key={moduleObject.id}
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
@@ -57,10 +55,9 @@ function getModule(
     );
   }
   if (module.module === ModulesEnum.KEY) {
-    let moduleObject = module as KeyModuleType;
+    const moduleObject = module as KeyModuleType;
     return (
       <KeyModule
-        key={moduleObject.id}
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
@@ -72,10 +69,9 @@ function getModule(
     );
   }
   if (module.module === ModulesEnum.NOTE) {
-    let moduleObject = module as NoteModuleType;
+    const moduleObject = module as NoteModuleType;
     return (
       <NoteModule
-        key={moduleObject.id}
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
@@ -87,10 +83,9 @@ function getModule(
     );
   }
   if (module.module === ModulesEnum.PASSWORD) {
-    let moduleObject = module as PasswordModuleType;
+    const moduleObject = module as PasswordModuleType;
     return (
       <PasswordModule
-        key={moduleObject.id}
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
@@ -102,10 +97,9 @@ function getModule(
     );
   }
   if (module.module === ModulesEnum.URL) {
-    let moduleObject = module as URLModuleType;
+    const moduleObject = module as URLModuleType;
     return (
       <URLModule
-        key={moduleObject.id}
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
@@ -117,10 +111,9 @@ function getModule(
     );
   }
   if (module.module === ModulesEnum.USERNAME) {
-    let moduleObject = module as UsernameModuleType;
+    const moduleObject = module as UsernameModuleType;
     return (
       <UsernameModule
-        key={moduleObject.id}
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
@@ -132,10 +125,9 @@ function getModule(
     );
   }
   if (module.module === ModulesEnum.WIFI) {
-    let moduleObject = module as WifiModuleType;
+    const moduleObject = module as WifiModuleType;
     return (
       <WifiModule
-        key={moduleObject.id}
         id={moduleObject.id}
         module={moduleObject.module}
         wifiName={moduleObject.wifiName}

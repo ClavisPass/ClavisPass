@@ -18,7 +18,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginLeft: 8,
     marginRight: 8,
-    marginBottom: 8,
     borderRadius: 12,
     display: "flex",
     flexDirection: "row",

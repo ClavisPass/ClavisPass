@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
 });
 
 function SettingsScreen({ navigation }: { navigation: any }) {
-  const { globalStyles, setHeaderWhite } = useTheme();
+  const { headerWhite, setHeaderWhite, darkmode } = useTheme();
   const { master } = useAuth();
   const [startup, setStartup] = React.useState(false);
 
@@ -126,11 +126,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
         style={{ marginTop: Constants.statusBarHeight }}
         useFocusEffect={useFocusEffect}
       >
-        <StatusBar
-          animated={true}
-          style="dark"
-          translucent={true}
-        />
+        <StatusBar animated={true} style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent={true} />
         <TitlebarHeight />
         <ScrollView style={styles.scrollView}>
           <SettingsContainer icon="tray-arrow-down" title={"Update"}>

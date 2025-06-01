@@ -20,16 +20,12 @@ type Props = {
 function DraggableModulesList(props: Props) {
   const renderItem = useCallback(
     ({ item, drag, isActive }: RenderItemParams<ModuleType>) => {
-      return (
-        <>
-          {getModule(
-            item,
-            props.edit,
-            drag,
-            props.deleteModule,
-            props.changeModule
-          )}
-        </>
+      return getModule(
+        item,
+        props.edit,
+        drag,
+        props.deleteModule,
+        props.changeModule
       );
     },
     [props.edit, props.value]
@@ -37,20 +33,19 @@ function DraggableModulesList(props: Props) {
 
   return (
     <View style={{ flex: 1, width: "100%" }}>
-      {
-        <DraggableFlatList
-          data={props.value.modules}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => `draggable-item-${item.id}`}
-          onDragEnd={({ data }) => {
-            props.setValue({
-              ...props.value,
-              modules: data,
-            });
-            props.setDiscardoChanges();
-          }}
-        />
-      }
+      <DraggableFlatList
+        ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+        data={props.value.modules}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        onDragEnd={({ data }) => {
+          props.setValue({
+            ...props.value,
+            modules: data,
+          });
+          props.setDiscardoChanges();
+        }}
+      />
     </View>
   );
 }

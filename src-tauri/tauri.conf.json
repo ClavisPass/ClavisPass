@@ -71,6 +71,8 @@
         "title": "ClavisPass",
         "width": 450,
         "height": 750,
+        "minWidth": 350,
+        "minHeight": 350,
         "decorations": false,
         "transparent": true,
         "center": true,

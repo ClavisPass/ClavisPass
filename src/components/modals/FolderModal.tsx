@@ -79,8 +79,6 @@ function FolderModal(props: Props) {
           style={[
             globalStyles.moduleView,
             {
-              borderColor: theme.colors.primary,
-              borderBottomWidth: 2,
               backgroundColor: "transparent",
             },
           ]}
@@ -105,6 +103,7 @@ function FolderModal(props: Props) {
             mode={addButtonDisabled ? undefined : "contained-tonal"}
             disabled={addButtonDisabled}
             icon={"plus"}
+            style={{margin: 4}}
             onPress={() => {
               changeFolder([...props.folder, searchQuery], data);
               setSearchQuery("");

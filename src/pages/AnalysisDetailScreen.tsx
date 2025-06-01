@@ -13,6 +13,7 @@ import AnalysisEntry from "../components/AnalysisEntry";
 import AnalysisEntryGradient from "../components/AnalysisEntryGradient";
 import Pattern from "../components/Pattern";
 import { useFocusEffect } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
 
 type AnalysisDetailScreenProps = StackScreenProps<
   RootStackParamList,
@@ -39,7 +40,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
   navigation,
 }) => {
   const { value: routeValue } = route.params!;
-  const { globalStyles, theme, setHeaderWhite } = useTheme();
+  const { globalStyles, theme, headerWhite, setHeaderWhite, darkmode } = useTheme();
 
   const [characterAnalysis, setCharacterAnalysis] =
     useState<CharacterAnalysis>(null);
@@ -175,6 +176,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
   return (
     <AnimatedContainer style={globalStyles.container} trigger={edit}>
       <TitlebarHeight />
+      <StatusBar animated={true} style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent={true} />
       <Header onPress={goBack} leftNode={<Text>{routeValue.title}</Text>}>
         <View style={{ marginRight: 30 }}>
           <Icon

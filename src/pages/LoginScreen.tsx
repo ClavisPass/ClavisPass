@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import AnimatedContainer from "../components/container/AnimatedContainer";
 import ContentProtection from "../components/ContentProtection";
@@ -14,6 +14,7 @@ import { Text } from "react-native-paper";
 import { useOnline } from "../contexts/OnlineProvider";
 import { useTheme } from "../contexts/ThemeProvider";
 import { useFocusEffect } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
 
 const styles = StyleSheet.create({
   container: {
@@ -28,7 +29,7 @@ const styles = StyleSheet.create({
 function LoginScreen({ navigation }: { navigation: any }) {
   const { setToken, setRefreshToken, loadRefreshToken, tokenType } = useToken();
   const { isOnline } = useOnline();
-  const { setHeaderWhite } = useTheme();
+  const { headerWhite, setHeaderWhite, darkmode } = useTheme();
 
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
   const [loading, setLoading] = useState(true);
@@ -85,6 +86,7 @@ function LoginScreen({ navigation }: { navigation: any }) {
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       <AnimatedContainer>
+        <StatusBar animated={true} style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent={true} />
         <ContentProtection enabled={false} />
         <View
           style={{ alignItems: "center", justifyContent: "center", flex: 1 }}

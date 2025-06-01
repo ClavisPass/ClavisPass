@@ -73,7 +73,7 @@ function Tools(props: Props) {
 }
 
 function HomeScreen({ navigation }: { navigation: any }) {
-  const { theme, setHeaderWhite } = useTheme();
+  const { theme, headerWhite, setHeaderWhite, darkmode } = useTheme();
   const { width, height } = useWindowDimensions();
   const auth = useAuth();
 
@@ -187,10 +187,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
     }
   };
 
-  const [statusbarStyle, setStatusbarStyle] = useState<"dark" | "light">(
-    "light"
-  );
-
   const searchRef = useRef<any>(null);
 
   return (
@@ -198,7 +194,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
       style={{ display: "flex", justifyContent: "center" }}
       useFocusEffect={useFocusEffect}
     >
-      <StatusBar animated={true} style={statusbarStyle} translucent={true} />
+      <StatusBar animated={true} style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent={true} />
       <ContentProtection enabled={true} />
       <WebSpecific>
         <SearchShortcut searchRef={searchRef} />

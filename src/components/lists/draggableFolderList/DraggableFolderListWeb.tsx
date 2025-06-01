@@ -41,6 +41,7 @@ const getListStyle = (isDraggingOver: boolean) => ({
   flex: 1,
   width: "100%",
   overflow: "auto",
+  gap: "8px",
 });
 
 function DraggableFolderListWeb(props: Props) {
@@ -75,65 +76,74 @@ function DraggableFolderListWeb(props: Props) {
                 draggableId={item + "-" + index}
                 index={index}
               >
-                {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    style={getItemStyle(
-                      snapshot.isDragging,
-                      provided.draggableProps.style
-                    )}
-                  >
-                    <View style={globalStyles.folderContainer}>
-                      <Icon source="drag" size={20} />
+                {(
+                  provided: DraggableProvided,
+                  snapshot: DraggableStateSnapshot
+                ) => {
+                  const isLast = index === props.folder.length - 1;
+                  return (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={{
+                        ...getItemStyle(
+                          snapshot.isDragging,
+                          provided.draggableProps.style
+                        ),
+                        marginBottom: 4,
+                      }}
+                    >
+                      <View style={globalStyles.folderContainer}>
+                        <Icon source="drag" size={20} />
 
-                      <TouchableRipple
-                        style={{
-                          borderRadius: 12,
-                          padding: 6,
-                          flexGrow: 1,
-                          flex: 1,
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          gap: 4,
-                        }}
-                        onPress={
-                          props.setSelectedFolder
-                            ? () => props.setSelectedFolder?.(item)
-                            : undefined
-                        }
-                        rippleColor="rgba(0, 0, 0, .32)"
-                      >
-                        <>
-                          <Icon
-                            source="folder"
-                            size={20}
-                            color={theme.colors.primary}
-                          />
-                          <Text
-                            style={{
-                              userSelect: "none",
-                              fontWeight: "bold",
-                              fontSize: 15,
-                            }}
-                            variant="bodyMedium"
-                          >
-                            {item}
-                          </Text>
-                        </>
-                      </TouchableRipple>
+                        <TouchableRipple
+                          style={{
+                            borderRadius: 12,
+                            padding: 6,
+                            flexGrow: 1,
+                            flex: 1,
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            gap: 4,
+                          }}
+                          onPress={
+                            props.setSelectedFolder
+                              ? () => props.setSelectedFolder?.(item)
+                              : undefined
+                          }
+                          rippleColor="rgba(0, 0, 0, .32)"
+                        >
+                          <>
+                            <Icon
+                              source="folder"
+                              size={20}
+                              color={theme.colors.primary}
+                            />
+                            <Text
+                              style={{
+                                userSelect: "none",
+                                fontWeight: "bold",
+                                fontSize: 15,
+                              }}
+                              variant="bodyMedium"
+                            >
+                              {item}
+                            </Text>
+                          </>
+                        </TouchableRipple>
 
-                      <IconButton
-                        icon="close"
-                        size={14}
-                        style={{ margin: 0 }}
-                        onPress={() => props.deleteFolder(item)}
-                      />
-                    </View>
-                  </div>
-                )}
+                        <IconButton
+                          icon="close"
+                          size={14}
+                          style={{ margin: 0 }}
+                          onPress={() => props.deleteFolder(item)}
+                        />
+                      </View>
+                    </div>
+                  );
+                }}
               </Draggable>
             ))}
             {provided.placeholder}

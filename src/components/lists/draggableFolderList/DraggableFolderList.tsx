@@ -76,10 +76,14 @@ function DraggableFolderList(props: Props) {
   return (
     <View style={{ flex: 1, width: "100%" }}>
       <DraggableFlatList
+        ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
         data={props.folder}
         renderItem={renderItem}
         keyExtractor={(item, index) => `drag-item-${item}-${index}`}
-        onDragEnd={({ data }) => {changeFolder(data, dataData); dataData.setShowSave(true);}}
+        onDragEnd={({ data }) => {
+          changeFolder(data, dataData);
+          dataData.setShowSave(true);
+        }}
       />
     </View>
   );

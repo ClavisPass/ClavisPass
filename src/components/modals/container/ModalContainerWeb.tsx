@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect } from "react";
 import { Platform, Pressable, View } from "react-native";
 import Animated, {
   Easing,
@@ -14,110 +14,74 @@ type Props = {
   visible: boolean;
   onDismiss: () => void;
 };
+
 function ModalContainerWeb(props: Props) {
   const { theme } = useTheme();
-  const scale = useSharedValue(0);
   const opacity = useSharedValue(0);
 
-  const [useScale, setUseScale] = useState(true);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: Platform.OS === "web" ? [{ scale: scale.value }] : undefined,
-    };
-  });
-
-  const animatedOpacity = useAnimatedStyle(() => {
-    return {
-      opacity: opacity.value,
-    };
-  });
-
-  const startAnimation = () => {
-    scale.value = withTiming(
-      1,
-      {
-        duration: 250,
-        easing: Easing.out(Easing.exp),
-      },
-      () => {
-        if (Platform.OS === "web") setUseScale(false);
-      }
-    );
-    opacity.value = withTiming(1, {
-      duration: 250,
-      easing: Easing.out(Easing.exp),
-    });
-  };
+  const animatedOpacity = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
 
   useEffect(() => {
     if (props.visible) {
-      startAnimation();
+      opacity.value = withTiming(1, {
+        duration: 250,
+        easing: Easing.out(Easing.exp),
+      });
     } else {
-      scale.value = 0;
-      opacity.value = 0;
-      if (Platform.OS === "web") setUseScale(true);
+      opacity.value = withTiming(0, {
+        duration: 250,
+        easing: Easing.out(Easing.exp),
+      });
     }
   }, [props.visible]);
+
+  if (!props.visible) return null;
+
   return (
-    <>
-      {props.visible && (
-        <View
-          style={[
-            {
-              position: "absolute",
-              top: 0,
-              bottom: 0,
-              left: 0,
-              right: 0,
-              backgroundColor: "rgba(0, 0, 0, 0.1)",
-            },
-            animatedOpacity,
-          ]}
-        >
-          <Pressable
-            style={{
-              position: "absolute",
-              top: 0,
-              bottom: 0,
-              left: 0,
-              right: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            onPress={props.onDismiss}
-          >
-            <Pressable>
-              <Animated.View
-                style={[
-                  {
-                    overflow: "hidden",
-                    backgroundColor: theme.colors?.elevation.level3,
-                    borderTopLeftRadius: 20,
-                    borderTopRightRadius: 20,
-                    borderBottomLeftRadius: 20,
-                    borderBottomRightRadius: 20,
-                    display: "flex",
-                    flexDirection: "column",
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.4,
-                    shadowRadius: 6,
-                    elevation: 5,
-                    zIndex: 1,
-                  },
-                  animatedStyle,
-                  !useScale && { transform: undefined },
-                ]}
-              >
-                {props.children}
-              </Animated.View>
-            </Pressable>
-          </Pressable>
-        </View>
-      )}
-    </>
+    <Animated.View
+      style={[
+        {
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.1)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+        },
+        animatedOpacity,
+      ]}
+    >
+      <Pressable
+        style={{
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+        }}
+        onPress={props.onDismiss}
+      />
+      <View
+        style={{
+          overflow: "hidden",
+          backgroundColor: theme.colors?.elevation.level3,
+          borderRadius: 20,
+          maxWidth: 400,
+          boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+          zIndex: 10000,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {props.children}
+      </View>
+    </Animated.View>
   );
 }
 

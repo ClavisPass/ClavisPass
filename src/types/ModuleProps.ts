@@ -1,7 +1,7 @@
 import { ModuleType } from "./ModulesType";
 
 type Props = {
-  key: string;
+  key?: string;
   edit: boolean;
   onDragStart: () => void;
   deleteModule: (id: string) => void;

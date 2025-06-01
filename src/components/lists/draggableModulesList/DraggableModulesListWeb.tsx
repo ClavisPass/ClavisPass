@@ -77,10 +77,13 @@ function DraggableModulesListWeb(props: Props) {
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    style={getItemStyle(
-                      snapshot.isDragging,
-                      provided.draggableProps.style
-                    )}
+                    style={{
+                        ...getItemStyle(
+                          snapshot.isDragging,
+                          provided.draggableProps.style
+                        ),
+                        marginBottom: 8,
+                      }}
                   >
                     {getModule(
                       item,

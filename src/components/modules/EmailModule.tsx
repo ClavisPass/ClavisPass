@@ -19,7 +19,7 @@ import theme from "../../ui/theme";
 
 function EmailModule(props: EmailModuleType & Props) {
   const didMount = useRef(false);
-  const inputRef = useRef<any>();
+  const inputRef = useRef<any>(null);
 
   const data = useData();
   const [isValid, setIsValid] = useState(false);
