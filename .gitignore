@@ -39,3 +39,5 @@ release
 #android
 android.keystore
 android.keystore.base64
+keystore.txt
+my-release-key.keystore

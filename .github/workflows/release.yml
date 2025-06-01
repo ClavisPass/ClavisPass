@@ -153,21 +153,7 @@ jobs:
       - name: Install latest EAS CLI
         run: npm install -g eas-cli@latest
 
-      - name: Check currently logged in user (should fail if not logged in)
-        run: |
-          echo "Logged in user before login attempt:"
-          eas whoami || echo "No user logged in."
-
-      - name: Login to EAS CLI using EXPO_TOKEN
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: |
-          echo "Logging in using EXPO_TOKEN environment variable..."
-          eas login || echo "Already logged in or token used"
-
-      - name: Verify logged in user after login
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      - name: Verify EAS authentication
         run: eas whoami
 
       - name: Decode Android Keystore
@@ -188,11 +174,11 @@ jobs:
             }
           }' > ~/.eas/credentials.json
 
-      - name: Build APK (force latest eas-cli)
+      - name: Build APK
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
-          npx eas-cli build --platform android --profile production --non-interactive --local --output=./ClavisPass.apk
+          npx eas-cli build --platform android --profile production --non-interactive --local --output=ClavisPass.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
