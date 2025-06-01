@@ -2,7 +2,7 @@
   "expo": {
     "updates": {
       "enabled": true,
-      "url": "https://u.expo.dev/d0965944-a59f-4f32-be3b-2518cf2f1b40",
+      "url": "https://u.expo.dev/85aa75f5-f93e-499b-b999-03a921001dab",
       "checkAutomatically": "ON_LOAD",
       "fallbackToCacheTimeout": 0
     },
@@ -18,7 +18,10 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -27,8 +30,10 @@
       },
       "package": "com.ClavisPass.ClavisPass",
       "permissions": [
+        "android.permission.CAMERA",
         "android.permission.CAMERA"
-      ]
+      ],
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png"

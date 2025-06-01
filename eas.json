@@ -8,7 +8,8 @@
       "distribution": "store",
       "android": {
         "buildType": "apk"
-      }
+      },
+      "channel": "production"
     }
   }
 }
