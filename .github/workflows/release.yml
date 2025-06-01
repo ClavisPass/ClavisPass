@@ -149,8 +149,15 @@ jobs:
       - name: Install EAS CLI globally
         run: npm install -g eas-cli@latest
 
-      - name: Login to Expo CLI
-        run: eas login --token $EXPO_TOKEN
+      - name: Login to EAS
+        run: eas login
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Verify EAS authentication
+        run: eas whoami
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Trigger Android build in Expo Cloud (non-interactive)
         id: eas_build
