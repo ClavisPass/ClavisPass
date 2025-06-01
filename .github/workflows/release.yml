@@ -172,6 +172,15 @@ jobs:
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > android.keystore
 
+      - name: Create keystore config file
+        run: |
+          echo '{
+            "keystorePath": "./android.keystore",
+            "keystorePassword": "'"$ANDROID_KEYSTORE_PASSWORD"'",
+            "keyAlias": "'"$ANDROID_KEY_ALIAS"'",
+            "keyPassword": "'"$ANDROID_KEY_PASSWORD"'"
+          }' > eas-build.json
+
       - name: Build APK
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -179,7 +188,7 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
-          eas build --platform android --profile production --non-interactive --local --output=./ClavisPass.apk
+          eas build --platform android --profile production --non-interactive --local --output=./ClavisPass.apk --local-build-options '{"keystore": "eas-build.json"}'
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4

@@ -7,13 +7,7 @@
       "developmentClient": false,
       "distribution": "store",
       "android": {
-        "buildType": "apk",
-        "keystore": {
-          "keystorePath": "android.keystore",
-          "keystorePassword": "${ANDROID_KEYSTORE_PASSWORD}",
-          "keyAlias": "${ANDROID_KEY_ALIAS}",
-          "keyPassword": "${ANDROID_KEY_PASSWORD}"
-        }
+        "buildType": "apk"
       }
     }
   },
