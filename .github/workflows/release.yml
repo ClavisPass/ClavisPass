@@ -133,11 +133,7 @@ jobs:
   build-android-apk:
     runs-on: ubuntu-latest
     env:
-      EAS_LOCAL_BUILD: true
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -150,35 +146,26 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install latest EAS CLI
+      - name: Install EAS CLI globally
         run: npm install -g eas-cli@latest
 
-      - name: Verify EAS authentication
-        run: eas whoami
+      - name: Login to Expo CLI
+        run: eas login --token $EXPO_TOKEN
 
-      - name: Decode Android Keystore
+      - name: Trigger Android build in Expo Cloud (non-interactive)
+        id: eas_build
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > android.keystore
+          eas build --platform android --profile production --non-interactive --wait --output build-info.json
 
-      - name: Create EAS credentials file
+      - name: Get APK download URL
+        id: get_apk_url
         run: |
-          mkdir -p ~/.eas
-          echo '{
-            "android": {
-              "keystore": {
-                "keystorePath": "./android.keystore",
-                "keystorePassword": "'"$ANDROID_KEYSTORE_PASSWORD"'",
-                "keyAlias": "'"$ANDROID_KEY_ALIAS"'",
-                "keyPassword": "'"$ANDROID_KEY_PASSWORD"'"
-              }
-            }
-          }' > ~/.eas/credentials.json
+          apk_url=$(jq -r '.artifacts.buildUrl' build-info.json)
+          echo "APK_URL=$apk_url" >> $GITHUB_ENV
 
-      - name: Build APK
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      - name: Download APK
         run: |
-          npx eas-cli build --platform android --profile production --non-interactive --local --output=ClavisPass.apk
+          curl -L -o ClavisPass.apk "$APK_URL"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -264,7 +251,7 @@ jobs:
           body: |
             ClavisPass Version ${{ github.ref_name }}
 
-            This release includes the latest builds of ClavisPass for Windows, macOS, and Linux.
+            This release includes the latest builds of ClavisPass for Windows, macOS, Linux and Android.
 
             All platform-specific installers are available in the release assets.
             The updater will automatically download the correct version for your system.
@@ -272,4 +259,4 @@ jobs:
           files: |
             updater.json
             updater.json.sig
-            artifacts/android/ClavisPass.apk
+            ClavisPass.apk
