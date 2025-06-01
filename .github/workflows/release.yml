@@ -188,11 +188,11 @@ jobs:
             }
           }' > ~/.eas/credentials.json
 
-      - name: Build APK
+      - name: Build APK (force latest eas-cli)
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
-          npx eas-cli build --platform android --profile production --non-interactive --local --output=./ClavisPass.apk
+          npx --ignore-existing eas-cli build --platform android --profile production --non-interactive --local --output=./ClavisPass.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
