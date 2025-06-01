@@ -157,7 +157,7 @@ jobs:
       - name: Trigger Android build in Expo Cloud (non-interactive)
         id: eas_build
         run: |
-          eas build --platform android --profile production --non-interactive --wait --output build-info.json
+          eas build --platform android --profile production --non-interactive --wait --json > build-info.json
 
       - name: Get APK download URL
         id: get_apk_url
