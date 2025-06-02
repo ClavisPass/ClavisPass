@@ -16,13 +16,13 @@ function CircularProgressBar(props: Props) {
       <AnimatedCircularProgress
         size={60}
         width={6}
-        fill={props.fill} // Fortschrittswert in Prozent
-        tintColor={props.color} // Farbe des Fortschrittsbalkens
+        fill={props.fill}
+        tintColor={props.color}
         backgroundColor="#d3d3d341"
         rotation={0}
         lineCap="round"
       >
-        {(fill) => (
+        {(fill: number) => (
           <Text variant="bodyMedium" style={[{color: props.color}, {fontWeight: "bold", fontSize: 16, userSelect: "none"}]}>
             {`${Math.round(fill)}%`}
           </Text>

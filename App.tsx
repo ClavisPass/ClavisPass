@@ -196,7 +196,6 @@ function HomeStack() {
     <Stack.Navigator
       screenOptions={{
         headerShown: true,
-        //gestureEnabled: true,
         gestureDirection: "vertical",
       }}
     >
@@ -231,7 +230,6 @@ function AnalysisStack() {
     <Stack.Navigator
       screenOptions={{
         headerShown: true,
-        //gestureEnabled: true,
         gestureDirection: "vertical",
       }}
     >
