@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    paddingLeft: 6,
   },
   delete: {
     display: "flex",
@@ -106,9 +107,12 @@ function ModuleContainer(props: Props) {
         styles.innercontainer,
         {
           backgroundColor: theme.colors?.background,
-          boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+          boxShadow: theme.colors?.shadow,
         },
         animatedContainerStyle,
+        Platform.OS !== "web" && {
+          marginBottom: 8,
+        },
       ]}
     >
       <Animated.View style={animatedIconStyle}>
@@ -143,7 +147,7 @@ function ModuleContainer(props: Props) {
           >
             <Text
               variant="bodyMedium"
-              style={{ userSelect: "none", color: theme.colors?.tertiary }}
+              style={{ userSelect: "none", color: theme.colors?.tertiary, margin: 0 }}
             >
               {props.title}
             </Text>

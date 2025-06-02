@@ -25,7 +25,7 @@ function AnalysisEntryGradient(props: Props) {
         padding: 12,
         display: "flex",
         justifyContent: "center",
-        boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+        boxShadow: theme.colors.shadow,
       }}
     >
       <View style={{ display: "flex", flexDirection: "row", gap: 10 }}>

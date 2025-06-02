@@ -142,7 +142,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   return (
     <AnimatedContainer style={globalStyles.container} trigger={edit}>
       <TitlebarHeight />
-      <StatusBar animated={true} style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent={true} />
+      <StatusBar
+        animated={true}
+        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        translucent={true}
+      />
       <Header
         onPress={() => {
           if (discardChanges) {
@@ -163,14 +167,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         }
       >
         <IconButton
-          icon="plus"
-          iconColor={theme.colors?.primary}
-          size={20}
-          onPress={() => {
-            setAddModuleModalVisible(true);
-          }}
-        />
-        <IconButton
           mode={edit ? "contained-tonal" : undefined}
           icon="square-edit-outline"
           iconColor={theme.colors?.primary}
@@ -188,27 +184,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           }}
         />
       </Header>
-      {Platform.OS === "web" ? (
-        <DraggableModulesListWeb
-          value={value}
-          setValue={setValue}
-          changeModules={changeModules}
-          deleteModule={deleteModule}
-          changeModule={changeModule}
-          edit={edit}
-          setDiscardoChanges={() => setDiscardChanges(true)}
-        />
-      ) : (
-        <DraggableModulesList
-          value={value}
-          setValue={setValue}
-          changeModules={changeModules}
-          deleteModule={deleteModule}
-          changeModule={changeModule}
-          edit={edit}
-          setDiscardoChanges={() => setDiscardChanges(true)}
-        />
-      )}
       <Button
         mode="contained"
         style={{ width: 200 }}
@@ -223,6 +198,33 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       >
         Save
       </Button>
+      {Platform.OS === "web" ? (
+        <DraggableModulesListWeb
+          value={value}
+          setValue={setValue}
+          changeModules={changeModules}
+          deleteModule={deleteModule}
+          changeModule={changeModule}
+          edit={edit}
+          setDiscardoChanges={() => setDiscardChanges(true)}
+          showAddModuleModal={() => {
+            setAddModuleModalVisible(true);
+          }}
+        />
+      ) : (
+        <DraggableModulesList
+          value={value}
+          setValue={setValue}
+          changeModules={changeModules}
+          deleteModule={deleteModule}
+          changeModule={changeModule}
+          edit={edit}
+          setDiscardoChanges={() => setDiscardChanges(true)}
+          showAddModuleModal={() => {
+            setAddModuleModalVisible(true);
+          }}
+        />
+      )}
       <AddModuleModal
         addModule={addModule}
         visible={addModuleModalVisible}

@@ -10,6 +10,7 @@ import { Chip, Divider, IconButton } from "react-native-paper";
 import WebSpecific from "./platformSpecific/WebSpecific";
 import AnimatedOpacityContainer from "./container/AnimatedOpacityContainer/AnimatedOpacityContainer";
 import { MenuItem } from "./items/MenuItem";
+import theme from "../ui/theme";
 
 const styles = StyleSheet.create({
   chip: {
@@ -123,6 +124,7 @@ function FolderFilter(props: Props) {
                 <AnimatedOpacityContainer visible={showAddButton}>
                   <IconButton
                     icon={"plus"}
+                    iconColor={theme.colors.primary}
                     style={{ margin: 0 }}
                     onPress={() => props.setFolderModalVisible(true)}
                     size={20}
@@ -141,7 +143,6 @@ function FolderFilter(props: Props) {
             padding: 4,
             maxHeight: 50,
             width: "100%",
-            //flex: 1,
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
@@ -209,9 +210,12 @@ function FolderFilter(props: Props) {
           </View>
           <IconButton
             icon={"plus"}
-            style={{ margin: 0 }}
+            iconColor={theme.colors.primary}
+            style={{ margin: 0, marginLeft: 4 }}
             onPress={() => props.setFolderModalVisible(true)}
             size={12}
+            mode="contained-tonal"
+            selected={true}
           />
           <WebSpecific>
             <IconButton

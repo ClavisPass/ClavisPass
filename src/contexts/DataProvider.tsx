@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import DataType from "../types/DataType";
 
-interface DataContextType {
+export interface DataContextType {
   data: DataType;
   setData: (data: DataType) => void;
   backup: DataType;

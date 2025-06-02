@@ -6,22 +6,22 @@ import DraggableFlatList, {
 import { Icon, IconButton, Text, TouchableRipple } from "react-native-paper";
 import theme from "../../../ui/theme";
 import { useTheme } from "../../../contexts/ThemeProvider";
-import { useData } from "../../../contexts/DataProvider";
+import { DataContextType } from "../../../contexts/DataProvider";
 import changeFolder from "../../../utils/changeFolder";
 
 type Props = {
+  data: DataContextType;
   folder: string[];
   setSelectedFolder?: (folder: string) => void;
   deleteFolder: (folder: string) => void;
 };
 
 function DraggableFolderList(props: Props) {
-  const dataData = useData();
   const { globalStyles } = useTheme();
   const renderItem = useCallback(
     ({ item, drag, isActive }: RenderItemParams<string>) => {
       return (
-        <View style={globalStyles.folderContainer}>
+        <View style={[globalStyles.folderContainer, { marginBottom: 4 }]}>
           <Pressable onPressIn={drag}>
             <Icon source="drag" size={20} />
           </Pressable>
@@ -76,13 +76,14 @@ function DraggableFolderList(props: Props) {
   return (
     <View style={{ flex: 1, width: "100%" }}>
       <DraggableFlatList
-        ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
         data={props.folder}
         renderItem={renderItem}
         keyExtractor={(item, index) => `drag-item-${item}-${index}`}
-        onDragEnd={({ data }) => {
-          changeFolder(data, dataData);
-          dataData.setShowSave(true);
+        onDragEnd={(event) => {
+          if (event?.data) {
+            changeFolder(event.data, props.data);
+            props.data.setShowSave(true);
+          }
         }}
       />
     </View>

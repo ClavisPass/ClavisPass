@@ -76,7 +76,7 @@
         "decorations": false,
         "transparent": true,
         "center": true,
-        "contentProtected": false,
+        "contentProtected": true,
         "maximizable": false,
         "useHttpsScheme": true
       }

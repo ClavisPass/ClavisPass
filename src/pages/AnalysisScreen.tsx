@@ -224,7 +224,7 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
             backgroundColor: theme.colors.background,
             borderRadius: 16,
             padding: 12,
-            boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+            boxShadow: theme.colors.shadow,
             margin: 8,
             marginTop: 0,
           }}

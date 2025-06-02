@@ -20,7 +20,7 @@ const theme = {
       level4: "#E0E0E0",
       level5: "#BDBDBD"
     },
-    tertiary: "rgba(151, 151, 151, 1)",
+    tertiary: "rgba(226, 226, 226, 1)",
     //tertiaryContainer: "#FFA500",
     surface: "#FFC0CB",
     surfaceVariant: "#F5F5F5",
@@ -45,7 +45,7 @@ const theme = {
     //inverseSurface: "#7FFFD4",
     //inverseOnSurface: "#BDB76B",
     //inversePrimary: "#DA70D6",
-    //shadow: "#DA70D6",
+    shadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
     //scrim: "#D8BFD8",
     //backdrop: "#808080",
   },

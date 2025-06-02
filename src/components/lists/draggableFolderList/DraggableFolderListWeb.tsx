@@ -15,9 +15,10 @@ import { Icon, IconButton, Text, TouchableRipple } from "react-native-paper";
 import theme from "../../../ui/theme";
 import { useTheme } from "../../../contexts/ThemeProvider";
 import changeFolder from "../../../utils/changeFolder";
-import { useData } from "../../../contexts/DataProvider";
+import { DataContextType, useData } from "../../../contexts/DataProvider";
 
 type Props = {
+  data: DataContextType;
   folder: string[];
   setSelectedFolder?: (folder: string) => void;
   deleteFolder: (folder: string) => void;
@@ -45,7 +46,6 @@ const getListStyle = (isDraggingOver: boolean) => ({
 });
 
 function DraggableFolderListWeb(props: Props) {
-  const data = useData();
   const { globalStyles } = useTheme();
 
   const onDragEnd = (result: DropResult) => {
@@ -57,8 +57,8 @@ function DraggableFolderListWeb(props: Props) {
       result.destination.index
     );
 
-    changeFolder(reordered, data);
-    data.setShowSave(true);
+    changeFolder(reordered, props.data);
+    props.data.setShowSave(true);
   };
 
   return (

@@ -1,4 +1,4 @@
-const globalStyles = (background: string) => ({
+const globalStyles = (background: string, tertiary: string) => ({
   container: {
     flex: 1,
     backgroundColor: background,
@@ -13,9 +13,11 @@ const globalStyles = (background: string) => ({
     alignItems: "center",
     width: "100%",
     flexGrow: 1,
+    borderColor: tertiary,
+    borderWidth: 2,
   },
-  textInputStyle: { height: 40, lineHeight: 16, flex: 1 },
-  textInputNoteStyle: { lineHeight: 16, padding: 4 },
+  textInputStyle: { height: 40, lineHeight: 16, flex: 1, backgroundColor: tertiary },
+  textInputNoteStyle: { lineHeight: 16, padding: 4, backgroundColor: tertiary },
   moduleView: {
     display: "flex",
     flexDirection: "row",

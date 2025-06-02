@@ -21,7 +21,8 @@ const theme = {
       level4: "rgb(52, 46, 57)",
       level5: "rgb(56, 49, 62)",
     },
-    tertiary: "rgba(151, 151, 151, 1)",
+    tertiary: "rgba(51, 51, 51, 1)",
+    shadow: "",
   },
 };
 export default theme;

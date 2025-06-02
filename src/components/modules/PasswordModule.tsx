@@ -13,27 +13,17 @@ import CopyToClipboard from "../buttons/CopyToClipboard";
 import * as Progress from "react-native-progress";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
+import PasswordTextbox from "../PasswordTextbox";
 
 function PasswordModule(props: PasswordModuleType & Props) {
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
   const [value, setValue] = useState(props.value);
-  const [secureTextEntry, setSecureTextEntry] = useState(true);
-
-  const [eyeIcon, setEyeIcon] = useState("eye");
 
   const [entropyPercentage, setEntropyPercentage] = useState(0);
   const [progressbarColor, setProgressbarColor] = useState("#238823");
 
   const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (secureTextEntry) {
-      setEyeIcon("eye");
-    } else {
-      setEyeIcon("eye-off");
-    }
-  }, [secureTextEntry]);
 
   useEffect(() => {
     const percentage = passwordEntropy(value) / 200;
@@ -76,24 +66,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
       icon={ModuleIconsEnum.PASSWORD}
     >
       <View style={globalStyles.moduleView}>
-        <TextInput
-          outlineStyle={globalStyles.outlineStyle}
-          style={globalStyles.textInputStyle}
-          value={value}
-          mode="outlined"
-          onChangeText={(text) => setValue(text)}
-          secureTextEntry={secureTextEntry}
-          autoCapitalize="none"
-          autoComplete="password"
-          textContentType="password"
-          right={
-            <TextInput.Icon
-              icon={eyeIcon}
-              color={theme.colors.primary}
-              onPress={() => setSecureTextEntry(!secureTextEntry)}
-            />
-          }
-        />
+        <PasswordTextbox setValue={setValue} value={value} placeholder="" />
         <CopyToClipboard value={value} />
       </View>
       <View style={globalStyles.moduleView}>

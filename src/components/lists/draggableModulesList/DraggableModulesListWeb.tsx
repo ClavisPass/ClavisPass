@@ -13,6 +13,9 @@ import {
 import ValuesType from "../../../types/ValuesType";
 import ModulesType, { ModuleType } from "../../../types/ModulesType";
 import getModule from "../../../utils/getModule";
+import { View } from "react-native";
+import { IconButton } from "react-native-paper";
+import { useTheme } from "../../../contexts/ThemeProvider";
 
 type Props = {
   value: ValuesType;
@@ -22,6 +25,7 @@ type Props = {
   changeModule: (module: ModuleType) => void;
   edit: boolean;
   setDiscardoChanges: () => void;
+  showAddModuleModal: () => void;
 };
 
 const reorder = (list: any, startIndex: number, endIndex: number) => {
@@ -43,6 +47,7 @@ const getListStyle = (isDraggingOver: boolean) => ({
 });
 
 function DraggableModulesListWeb(props: Props) {
+  const {theme} = useTheme();
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
@@ -72,18 +77,21 @@ function DraggableModulesListWeb(props: Props) {
                 index={index}
                 isDragDisabled={!props.edit}
               >
-                {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
+                {(
+                  provided: DraggableProvided,
+                  snapshot: DraggableStateSnapshot
+                ) => (
                   <div
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     style={{
-                        ...getItemStyle(
-                          snapshot.isDragging,
-                          provided.draggableProps.style
-                        ),
-                        marginBottom: 8,
-                      }}
+                      ...getItemStyle(
+                        snapshot.isDragging,
+                        provided.draggableProps.style
+                      ),
+                      marginBottom: 8,
+                    }}
                   >
                     {getModule(
                       item,
@@ -97,6 +105,17 @@ function DraggableModulesListWeb(props: Props) {
               </Draggable>
             ))}
             {provided.placeholder}
+            <View style= {{ display: "flex", alignItems: "center", width: "100%" }}>
+              <IconButton
+                icon={"plus"}
+                iconColor={theme.colors.primary}
+                style={{ margin: 0 }}
+                onPress={props.showAddModuleModal}
+                size={20}
+                selected={true}
+                mode="contained-tonal"
+              />
+            </View>
           </div>
         )}
       </Droppable>

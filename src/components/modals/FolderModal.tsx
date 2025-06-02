@@ -103,7 +103,8 @@ function FolderModal(props: Props) {
             mode={addButtonDisabled ? undefined : "contained-tonal"}
             disabled={addButtonDisabled}
             icon={"plus"}
-            style={{margin: 4}}
+            iconColor={theme.colors.primary}
+            style={{ margin: 4 }}
             onPress={() => {
               changeFolder([...props.folder, searchQuery], data);
               setSearchQuery("");
@@ -114,12 +115,14 @@ function FolderModal(props: Props) {
 
         {Platform.OS === "web" ? (
           <DraggableFolderListWeb
+            data={data}
             folder={props.folder}
             setSelectedFolder={props.setSelectedFolder}
             deleteFolder={deleteFolder}
           />
         ) : (
           <DraggableFolderList
+            data={data}
             folder={props.folder}
             setSelectedFolder={props.setSelectedFolder}
             deleteFolder={deleteFolder}
