@@ -40,7 +40,6 @@ function Header(props: Props) {
         <StatusBar
           animated={true}
           style="dark"
-          backgroundColor="transparent"
           translucent={true}
         />
         <View

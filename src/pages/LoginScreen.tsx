@@ -76,7 +76,7 @@ function LoginScreen({ navigation }: { navigation: any }) {
   }, []);
 
   useEffect(() => {
-    console.log(isOnline);
+    console.log("isOnline:", isOnline);
   }, [isOnline]);
 
   if (!isOnline) {
