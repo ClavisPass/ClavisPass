@@ -30,10 +30,10 @@ export function SubItem(props: Props) {
         }}
       >
         {props.icon && (
-          <Icon color={theme.colors?.tertiary} source={props.icon} size={16} />
+          <Icon color={theme.colors?.primary} source={props.icon} size={16} />
         )}
         <Text
-          style={{ color: theme.colors?.tertiary, userSelect: "none" }}
+          style={{ color: theme.colors?.primary, userSelect: "none" }}
           variant="titleMedium"
         >
           {props.title}

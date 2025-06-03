@@ -46,7 +46,7 @@ export function MenuItem(props: Props) {
             />
           )}
           {props.label ? (
-            <View style={{ display: "flex", flexDirection: "column" }}>
+            <View style={{ display: "flex", flexDirection: "column", margin: 8 }}>
               <Text
                 variant="labelLarge"
                 style={{ userSelect: "none", color: theme.colors.primary }}

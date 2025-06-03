@@ -138,7 +138,7 @@ function ModuleContainer(props: Props) {
             <Icon
               source={props.icon}
               size={16}
-              color={theme.colors?.tertiary}
+              color={theme.colors?.primary}
             />
           ) : null}
           <Pressable
@@ -147,7 +147,7 @@ function ModuleContainer(props: Props) {
           >
             <Text
               variant="bodyMedium"
-              style={{ userSelect: "none", color: theme.colors?.tertiary, margin: 0 }}
+              style={{ userSelect: "none", color: theme.colors?.primary, margin: 0 }}
             >
               {props.title}
             </Text>

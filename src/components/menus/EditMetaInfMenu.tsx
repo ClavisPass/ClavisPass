@@ -13,33 +13,11 @@ import { MenuItem } from "../items/MenuItem";
 type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  setFolderModalVisible: (visible: boolean) => void;
   created: string;
   lastUpdated: string;
-  value: ValuesType;
-  folderList: string[];
-  favButton: ReactNode;
   positionY: number;
-  goBack: () => void;
 };
 function EditMetaInfMenu(props: Props) {
-  const data = useData();
-
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-
-  const deleteValue = (id: string) => {
-    let newData = { ...data.data } as DataType;
-    let valueToChange: any = newData?.values?.filter(
-      (item: ValuesType) => item.id !== id
-    );
-    if (newData) {
-      newData.values = valueToChange;
-      data.setData(newData);
-    }
-    props.setVisible(false);
-    props.goBack();
-  };
-
   return (
     <>
       <Menu
@@ -49,46 +27,13 @@ function EditMetaInfMenu(props: Props) {
         }}
         positionY={props.positionY}
       >
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <MenuItem
-            leadingIcon={"folder-outline"}
-            onPress={() => {
-              props.setFolderModalVisible(true);
-            }}
-          >
-            {props.value.folder === "" ? "None" : props.value.folder}
-          </MenuItem>
-          {props.favButton}
-        </View>
-        <Divider />
         <MenuItem label="Created">{formatDateTime(props.created)}</MenuItem>
+        <Divider />
         <MenuItem label="Last Updated">
           {formatDateTime(props.lastUpdated)}
         </MenuItem>
-        <Divider />
-        <MenuItem
-          leadingIcon={"delete-outline"}
-          onPress={() => {
-            setDeleteModalVisible(true);
-          }}
-        >
-          Delete
-        </MenuItem>
+        
       </Menu>
-      <DeleteModal
-        visible={deleteModalVisible}
-        setVisible={setDeleteModalVisible}
-        onDelete={() => {
-          deleteValue(props.value.id);
-        }}
-      />
     </>
   );
 }

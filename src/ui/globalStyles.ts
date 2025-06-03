@@ -34,14 +34,16 @@ const globalStyles = (background: string, tertiary: string) => ({
   folderContainer: {
     backgroundColor: background,
     borderRadius: 12,
-    borderWidth: 1,
+    borderWidth: 0,
     borderColor: background,
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    height: 50,
+    height: 40,
     padding: 8,
+    paddingTop: 0,
+    paddingBottom: 0,
   },
 });
 

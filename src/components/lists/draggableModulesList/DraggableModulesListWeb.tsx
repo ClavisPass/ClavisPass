@@ -47,7 +47,7 @@ const getListStyle = (isDraggingOver: boolean) => ({
 });
 
 function DraggableModulesListWeb(props: Props) {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
@@ -105,17 +105,21 @@ function DraggableModulesListWeb(props: Props) {
               </Draggable>
             ))}
             {provided.placeholder}
-            <View style= {{ display: "flex", alignItems: "center", width: "100%" }}>
-              <IconButton
-                icon={"plus"}
-                iconColor={theme.colors.primary}
-                style={{ margin: 0 }}
-                onPress={props.showAddModuleModal}
-                size={20}
-                selected={true}
-                mode="contained-tonal"
-              />
-            </View>
+            {props.edit && (
+              <View
+                style={{ display: "flex", alignItems: "center", width: "100%" }}
+              >
+                <IconButton
+                  icon={"plus"}
+                  iconColor={theme.colors.primary}
+                  style={{ margin: 0 }}
+                  onPress={props.showAddModuleModal}
+                  size={20}
+                  selected={true}
+                  mode="contained-tonal"
+                />
+              </View>
+            )}
           </div>
         )}
       </Droppable>
