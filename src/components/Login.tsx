@@ -21,6 +21,7 @@ import {
   isUsingAuthentication,
   loadAuthentication,
 } from "../utils/authenticateUser";
+import Logo from "../ui/Logo";
 
 type Props = {
   userInfo: UserInfoType;
@@ -113,80 +114,111 @@ function Login(props: Props) {
   };
 
   return (
-    <>
+    <View
+      style={{
+        flex: 1,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       {loading ? (
         <ActivityIndicator size={"large"} animating={true} />
       ) : (
-        <>
-          <View style={{ height: 40 }}>
-            <TypeWriterComponent
-              displayName={
-                props.userInfo?.username ? props.userInfo.username : ""
-              }
-            />
+        <View
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "space-between",
+            backgroundColor: theme.colors.background,
+          }}
+        >
+          <View style={{ marginTop: 20 }}>
+            <Logo width={40} height={40} />
+          </View>
+          <View>
+            <View style={{ height: 60 }}>
+              <TypeWriterComponent
+                displayName={
+                  props.userInfo?.username ? props.userInfo.username : ""
+                }
+              />
+            </View>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                width: "100%",
+              }}
+            >
+              {showNewData ? (
+                <>
+                  <PasswordTextbox
+                    autofocus
+                    textInputRef={textInput2Ref}
+                    setCapsLock={setCapsLock}
+                    setValue={setValue}
+                    value={value}
+                    placeholder="New Password"
+                    onSubmitEditing={() => {
+                      textInput3Ref.current.focus();
+                    }}
+                  />
+                  <PasswordTextbox
+                    textInputRef={textInput3Ref}
+                    setCapsLock={setCapsLock}
+                    setValue={setValue2}
+                    value={value2}
+                    placeholder="Confirm Password"
+                  />
+                  <Button
+                    text={"Set Password"}
+                    onPress={newMasterPassword}
+                  ></Button>
+                </>
+              ) : (
+                <>
+                  <PasswordTextbox
+                    setCapsLock={setCapsLock}
+                    textInputRef={textInputRef}
+                    errorColor={error}
+                    autofocus
+                    setValue={setValue}
+                    value={value}
+                    placeholder="Enter Password"
+                    onSubmitEditing={() => login(value, parsedCryptoData)}
+                  />
+                  <Button
+                    text={"Login"}
+                    onPress={() => login(value, parsedCryptoData)}
+                  ></Button>
+                </>
+              )}
+              {capsLock && (
+                <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
+                  Caps Lock is activated
+                </Text>
+              )}
+            </View>
           </View>
           <View
             style={{
+              height: 40,
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
-              justifyContent: "center",
-              gap: 4,
               width: "100%",
             }}
           >
-            {showNewData ? (
-              <>
-                <PasswordTextbox
-                  autofocus
-                  textInputRef={textInput2Ref}
-                  setCapsLock={setCapsLock}
-                  setValue={setValue}
-                  value={value}
-                  placeholder="New Password"
-                  onSubmitEditing={() => {
-                    textInput3Ref.current.focus();
-                  }}
-                />
-                <PasswordTextbox
-                  textInputRef={textInput3Ref}
-                  setCapsLock={setCapsLock}
-                  setValue={setValue2}
-                  value={value2}
-                  placeholder="Confirm Password"
-                />
-                <Button
-                  text={"Set Password"}
-                  onPress={newMasterPassword}
-                ></Button>
-              </>
-            ) : (
-              <>
-                <PasswordTextbox
-                  setCapsLock={setCapsLock}
-                  textInputRef={textInputRef}
-                  errorColor={error}
-                  autofocus
-                  setValue={setValue}
-                  value={value}
-                  placeholder="Enter Password"
-                  onSubmitEditing={() => login(value, parsedCryptoData)}
-                />
-                <Button
-                  text={"Login"}
-                  onPress={() => login(value, parsedCryptoData)}
-                ></Button>
-              </>
-            )}
-            {capsLock && (
-              <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
-                Caps Lock is activated
-              </Text>
-            )}
+            <Button color="black" text={"Auth"} onPress={() => {}}></Button>
           </View>
-        </>
+        </View>
       )}
-    </>
+    </View>
   );
 }
 

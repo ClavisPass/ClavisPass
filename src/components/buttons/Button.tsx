@@ -7,17 +7,16 @@ import { useTheme } from "../../contexts/ThemeProvider";
 
 const styles = StyleSheet.create({
   container: {
+    width: "100%",
     height: 40,
     padding: 0,
     borderRadius: 12,
-    width: 200,
     margin: 0,
     overflow: "hidden",
+    minWidth: 200,
   },
   ripple: {
     flex: 1,
-    width: 200,
-    borderRadius: 50,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -29,42 +28,82 @@ type Props = {
   icon?: string;
   onPress: () => void;
   disabled?: boolean;
+  color?: string;
+  maxWidth?: number;
 };
 
 function Button(props: Props) {
   const { theme } = useTheme();
   return (
-    <LinearGradient
-      colors={props.disabled ? [theme.colors?.surfaceDisabled, theme.colors?.surfaceDisabled] : getColors()}
-      style={styles.container}
-      end={{ x: 0.1, y: 0.2 }}
-      dither={true}
-    >
-      <TouchableRipple
-        disabled={props.disabled}
-        style={styles.ripple}
-        onPress={props.onPress}
-        rippleColor="rgba(0, 0, 0, .32)"
-      >
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          {props.icon && <Icon source={props.icon} size={24} color="white" />}
-          {props.text && (
-            <Text
-              style={{ color: "white", userSelect: "none" }}
-              variant="bodyMedium"
-            >
-              {props.text}
-            </Text>
-          )}
+    <>
+      {props.color ? (
+        <View style={[styles.container, { backgroundColor: props.color, maxWidth: props.maxWidth }]}>
+          <Content
+            disabled={props.disabled}
+            onPress={props.onPress}
+            icon={props.icon}
+            text={props.text}
+          />
         </View>
-      </TouchableRipple>
-    </LinearGradient>
+      ) : (
+        <LinearGradient
+          colors={
+            props.disabled
+              ? [theme.colors?.surfaceDisabled, theme.colors?.surfaceDisabled]
+              : getColors()
+          }
+          style={[styles.container, { maxWidth: props.maxWidth }]}
+          end={{ x: 0.1, y: 0.2 }}
+          dither={true}
+        >
+          <Content
+            disabled={props.disabled}
+            onPress={props.onPress}
+            icon={props.icon}
+            text={props.text}
+          />
+        </LinearGradient>
+      )}
+    </>
+  );
+}
+
+function ColoredContainer({
+  children,
+  color,
+}: {
+  children: React.ReactNode;
+  color?: string;
+}) {
+  return <View style={styles.container}>{children}</View>;
+}
+
+function Content(props: Props) {
+  return (
+    <TouchableRipple
+      disabled={props.disabled}
+      style={styles.ripple}
+      onPress={props.onPress}
+      rippleColor="rgba(0, 0, 0, .32)"
+    >
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
+        {props.icon && <Icon source={props.icon} size={24} color="white" />}
+        {props.text && (
+          <Text
+            style={{ color: "white", userSelect: "none" }}
+            variant="bodyMedium"
+          >
+            {props.text}
+          </Text>
+        )}
+      </View>
+    </TouchableRipple>
   );
 }
 

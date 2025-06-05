@@ -15,6 +15,10 @@ import { useOnline } from "../contexts/OnlineProvider";
 import { useTheme } from "../contexts/ThemeProvider";
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
+import { LinearGradient } from "expo-linear-gradient";
+import getColors from "../ui/linearGradient";
+import { BlurView } from "expo-blur";
+import Logo from "../ui/Logo";
 
 const styles = StyleSheet.create({
   container: {
@@ -29,7 +33,7 @@ const styles = StyleSheet.create({
 function LoginScreen({ navigation }: { navigation: any }) {
   const { setToken, setRefreshToken, loadRefreshToken, tokenType } = useToken();
   const { isOnline } = useOnline();
-  const { headerWhite, setHeaderWhite, darkmode } = useTheme();
+  const { headerWhite, setHeaderWhite, darkmode, theme } = useTheme();
 
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
   const [loading, setLoading] = useState(true);
@@ -38,7 +42,7 @@ function LoginScreen({ navigation }: { navigation: any }) {
 
   useFocusEffect(
     React.useCallback(() => {
-      setHeaderWhite(false);
+      setHeaderWhite(true);
     }, [])
   );
 
@@ -84,33 +88,61 @@ function LoginScreen({ navigation }: { navigation: any }) {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "white" }}>
-      <AnimatedContainer>
-        <StatusBar animated={true} style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent={true} />
+    <AnimatedContainer>
+      <LinearGradient
+        colors={getColors()}
+        style={{
+          flex: 1,
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+        start={{ x: 0, y: 0.5 }}
+        end={{ x: 1, y: 0.5 }}
+        dither={true}
+      >
+        <StatusBar
+          animated={true}
+          style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+          translucent={true}
+        />
         <ContentProtection enabled={false} />
         <View
-          style={{ alignItems: "center", justifyContent: "center", flex: 1 }}
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            height: "70%",
+            borderRadius: 20,
+            padding: 20,
+            overflow: "hidden",
+            backgroundColor: theme.colors.background,
+            margin: 8,
+            minWidth: 300,
+          }}
         >
-          {loading ? (
-            <ActivityIndicator size={"large"} animating={true} />
-          ) : userInfo ? (
-            <Login userInfo={userInfo} />
-          ) : (
-            <View style={styles.container}>
-              <Auth
-                setUserInfo={setUserInfo}
-                navigation={navigation}
-                changeEditTokenVisibility={setEditTokenVisibility}
-              />
-              <EditTokenModal
-                visible={editTokenVisibility}
-                setVisible={setEditTokenVisibility}
-              />
-            </View>
-          )}
+          <View style={{ flex: 1 }}>
+            {loading ? (
+              <ActivityIndicator size={"large"} animating={true} />
+            ) : userInfo ? (
+              <Login userInfo={userInfo} />
+            ) : (
+              <View style={styles.container}>
+                <Auth
+                  setUserInfo={setUserInfo}
+                  navigation={navigation}
+                  changeEditTokenVisibility={setEditTokenVisibility}
+                />
+                <EditTokenModal
+                  visible={editTokenVisibility}
+                  setVisible={setEditTokenVisibility}
+                />
+              </View>
+            )}
+          </View>
         </View>
-      </AnimatedContainer>
-    </View>
+      </LinearGradient>
+    </AnimatedContainer>
   );
 }
 

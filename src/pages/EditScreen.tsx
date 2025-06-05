@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, Platform, View, AppState } from "react-native";
+import { StyleSheet, Platform, View, Animated } from "react-native";
 import ModulesType, { ModuleType } from "../types/ModulesType";
 
 import ModulesEnum from "../enums/ModulesEnum";
@@ -159,6 +159,45 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     }
   }, [value]);
 
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setHeaderWhite(true);
+    }, [])
+  );
+
+  useEffect(() => {
+    if (!edit) {
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 44,
+          duration: 250,
+          useNativeDriver: false,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 250,
+          useNativeDriver: false,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: false,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: false,
+        }),
+      ]).start();
+    }
+  }, [edit]);
+
   return (
     <AnimatedContainer style={globalStyles.container} trigger={edit}>
       <TitlebarHeight />
@@ -272,23 +311,32 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           }}
         />
       )}
-      <View
+      <Animated.View
         style={{
+          height: slideAnim,
+          opacity: fadeAnim,
           width: "100%",
+          margin: 0,
+          padding: 0,
+          paddingLeft: 8,
+          paddingRight: 8,
+          paddingTop: 4,
+          overflow: "hidden",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          marginTop: 8,
         }}
       >
         {!edit && (
           <Button
+            maxWidth={200}
             icon="content-save"
             onPress={saveValue}
             disabled={!discardChanges || value.title === ""}
           />
         )}
-      </View>
+      </Animated.View>
+
       <AddModuleModal
         addModule={addModule}
         visible={addModuleModalVisible}

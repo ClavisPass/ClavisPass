@@ -35,7 +35,7 @@ function TypeWriterComponent(props: Props) {
         typing={1}
         onTypingEnd={() => setStartUsername(1)}
       >
-        {"Hello, "}
+        {"Sup, "}
       </TypeWriter>
       <TypeWriter
         style={[

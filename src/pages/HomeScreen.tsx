@@ -43,7 +43,7 @@ import {
   LexendExa_700Bold,
 } from "@expo-google-fonts/lexend-exa";
 import { getDateTime } from "../utils/Timestamp";
-import ClavisPass from "../ui/ClavisPass";
+import LogoColored from "../ui/LogoColored";
 
 type Props = {
   setShowMenu: (boolean: boolean) => void;
@@ -240,7 +240,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
               gap: 8,
             }}
           >
-            <ClavisPass width={20} height={20} />
+            <LogoColored width={20} height={20} />
             <Text
               style={{
                 fontFamily: "LexendExa_400Regular",
