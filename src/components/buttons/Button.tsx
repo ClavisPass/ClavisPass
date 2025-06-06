@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { DimensionValue, StyleSheet, View } from "react-native";
 import { Icon, Text, TouchableRipple } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../../ui/linearGradient";
@@ -29,7 +29,7 @@ type Props = {
   onPress: () => void;
   disabled?: boolean;
   color?: string;
-  maxWidth?: number;
+  maxWidth?: number | DimensionValue;
 };
 
 function Button(props: Props) {
@@ -66,16 +66,6 @@ function Button(props: Props) {
       )}
     </>
   );
-}
-
-function ColoredContainer({
-  children,
-  color,
-}: {
-  children: React.ReactNode;
-  color?: string;
-}) {
-  return <View style={styles.container}>{children}</View>;
 }
 
 function Content(props: Props) {

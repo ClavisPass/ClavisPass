@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, Platform, View, Animated } from "react-native";
+import { StyleSheet, Platform, View, Animated, Keyboard } from "react-native";
 import ModulesType, { ModuleType } from "../types/ModulesType";
 
 import ModulesEnum from "../enums/ModulesEnum";
@@ -51,6 +51,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const [edit, setEdit] = useState(false);
   const [value, setValue] = useState<ValuesType>({ ...routeValue });
 
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
   const [addModuleModalVisible, setAddModuleModalVisible] = useState(false);
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [discardChangesVisible, setDiscardChangesVisible] = useState(false);
@@ -87,6 +89,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   };
 
   const goBack = () => {
+    setDiscardChangesVisible(false);
     navigation.goBack();
   };
 
@@ -147,7 +150,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       newData.values = valueToChange;
       data.setData(newData);
     }
-    //props.setVisible(false);
     goBack();
   };
 
@@ -162,14 +164,9 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  useFocusEffect(
-    React.useCallback(() => {
-      setHeaderWhite(true);
-    }, [])
-  );
-
   useEffect(() => {
     if (!edit) {
+      console.log("JAAAAAAA");
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 44,

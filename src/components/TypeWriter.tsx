@@ -27,7 +27,7 @@ function TypeWriterComponent(props: Props) {
     >
       <TypeWriter
         style={{
-          fontSize: 24,
+          fontSize: 20,
           userSelect: "none",
           color: theme.colors.onSurface,
         }}
@@ -39,7 +39,7 @@ function TypeWriterComponent(props: Props) {
       </TypeWriter>
       <TypeWriter
         style={[
-          { fontSize: 24, userSelect: "none" },
+          { fontSize: 20, userSelect: "none" },
           { color: theme.colors.primary, fontWeight: "bold" },
         ]}
         minDelay={50}
@@ -49,7 +49,7 @@ function TypeWriterComponent(props: Props) {
         {props.displayName}
       </TypeWriter>
       <TypeWriter
-        style={{ fontSize: 24, userSelect: "none", color: theme.colors.onSurface, }}
+        style={{ fontSize: 20, userSelect: "none", color: theme.colors.onSurface, }}
         minDelay={50}
         typing={startExclamationMark}
       >

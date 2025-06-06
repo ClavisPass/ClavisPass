@@ -58,10 +58,10 @@ type Props = {
 
 function ModuleContainer(props: Props) {
   const { theme } = useTheme();
-  const translateX = useSharedValue(-16);
+  const translateX = useSharedValue(-20);
   const paddingLeft = useSharedValue(4);
   const paddingRight = useSharedValue(4);
-  const translateXDelete = useSharedValue(44);
+  const translateXDelete = useSharedValue(46);
   useEffect(() => {
     if (props.edit) {
       translateX.value = withTiming(0, { duration: 150 });
@@ -69,17 +69,17 @@ function ModuleContainer(props: Props) {
       paddingRight.value = withTiming(50, { duration: 150 });
       translateXDelete.value = withTiming(0, { duration: 150 });
     } else {
-      translateX.value = withTiming(-16, { duration: 150 });
+      translateX.value = withTiming(-20, { duration: 150 });
       paddingLeft.value = withTiming(4, { duration: 150 });
       paddingRight.value = withTiming(4, { duration: 150 });
-      translateXDelete.value = withTiming(44, { duration: 150 });
+      translateXDelete.value = withTiming(46, { duration: 150 });
     }
   }, [props.edit]);
 
   const animatedIconStyle = useAnimatedStyle(() => {
     return {
       position: "absolute",
-      left: 0,
+      left: 4,
       transform: [{ translateX: translateX.value }],
     };
   });
@@ -87,7 +87,7 @@ function ModuleContainer(props: Props) {
   const animatedIconStyleDelete = useAnimatedStyle(() => {
     return {
       position: "absolute",
-      right: 0,
+      right: 4,
       transform: [{ translateX: translateXDelete.value }],
     };
   });
@@ -119,7 +119,7 @@ function ModuleContainer(props: Props) {
         {Platform.OS === "web" ? (
           <Icon source="drag" color={theme.colors?.primary} size={20} />
         ) : (
-          <Pressable onPressIn={props.onDragStart}>
+          <Pressable onPressIn={props.edit ? props.onDragStart : undefined}>
             <Icon source="drag" color={theme.colors?.primary} size={20} />
           </Pressable>
         )}

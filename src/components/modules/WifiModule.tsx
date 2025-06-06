@@ -90,28 +90,30 @@ function WifiModule(props: WifiModuleType & Props) {
           />
         </View>
         <View style={globalStyles.moduleView}>
-          <TextInput
-            placeholder="Password"
-            outlineStyle={globalStyles.outlineStyle}
-            style={globalStyles.textInputStyle}
-            value={value}
-            mode="outlined"
-            onChangeText={(text) => setValue(text)}
-            secureTextEntry={secureTextEntry}
-            autoCapitalize="none"
-            autoComplete="password"
-            textContentType="password"
-            right={
-              <TextInput.Icon
-                icon={eyeIcon}
-                color={theme.colors.primary}
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setSecureTextEntry(!secureTextEntry);
-                }}
-              />
-            }
-          />
+          <View style={{ height: 40, flexGrow: 1 }}>
+            <TextInput
+              placeholder="Password"
+              outlineStyle={globalStyles.outlineStyle}
+              style={globalStyles.textInputStyle}
+              value={value}
+              mode="outlined"
+              onChangeText={(text) => setValue(text)}
+              secureTextEntry={secureTextEntry}
+              autoCapitalize="none"
+              autoComplete="password"
+              textContentType="password"
+              right={
+                <TextInput.Icon
+                  icon={eyeIcon}
+                  color={theme.colors.primary}
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    setSecureTextEntry(!secureTextEntry);
+                  }}
+                />
+              }
+            />
+          </View>
           <CopyToClipboard value={value} />
         </View>
       </View>

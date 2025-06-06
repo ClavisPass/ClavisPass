@@ -1,19 +1,19 @@
 import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 
-import { Button } from "react-native-paper";
-
 import { useToken } from "../../contexts/TokenProvider";
 import { useEffect } from "react";
 
-import { DROPBOX_CLIENT_ID } from '@env';
+import { DROPBOX_CLIENT_ID } from "@env";
+import SettingsItem from "../items/SettingsItem";
 const REDIRECT_URI = AuthSession.makeRedirectUri({});
 const SCOPES = ["account_info.read files.content.read files.content.write"];
 
 WebBrowser.maybeCompleteAuthSession();
 
 function DropboxLoginButton() {
-  const { setToken, setRefreshToken, saveRefreshToken, checkTokenType } = useToken();
+  const { setToken, setRefreshToken, saveRefreshToken, checkTokenType } =
+    useToken();
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
@@ -79,9 +79,9 @@ function DropboxLoginButton() {
   };
 
   return (
-    <Button icon={"dropbox"} mode="contained-tonal" onPress={handleAuth}>
+    <SettingsItem leadingIcon="dropbox" onPress={handleAuth}>
       Sign in with Dropbox
-    </Button>
+    </SettingsItem>
   );
 }
 

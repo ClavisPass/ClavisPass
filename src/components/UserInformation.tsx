@@ -11,7 +11,6 @@ import fetchUserInfo from "../api/fetchUserInfo";
 import DropboxLoginButton from "./buttons/DropboxLoginButton";
 import UserInfoType from "../types/UserInfoType";
 
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import TypeWriterComponent from "./TypeWriter";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -84,33 +83,20 @@ function UserInformation(props: Props) {
                   </View>
                 ) : (
                   <>
-                    <Icon name="wifi-remove" size={20} />
+                    {/*<Icon name="wifi-remove" size={20} />
                     <IconButton
                       icon={"replay"}
                       size={20}
                       onPress={() => {
                         fetch(token);
                       }}
-                    />
+                    />*/}
                   </>
                 )}
               </>
             )}
           </View>
-
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 4,
-              width: "100%",
-            }}
-          >
-            {tokenType === "Dropbox" && <Chip icon="dropbox">Dropbox</Chip>}
-            {tokenType === "GoogleDrive" && (
-              <Chip icon="check">Google Drive</Chip>
-            )}
+          <View>
             <Chip
               onPress={() => {
                 removeToken();
@@ -123,10 +109,7 @@ function UserInformation(props: Props) {
           </View>
         </>
       ) : (
-        <>
-          {/*<GoogleDriveLoginButton />*/}
-          <DropboxLoginButton />
-        </>
+        <DropboxLoginButton />
       )}
     </>
   );

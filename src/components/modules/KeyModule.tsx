@@ -65,15 +65,17 @@ function KeyModule(props: KeyModuleType & Props) {
       icon={ModuleIconsEnum.KEY}
     >
       <View style={globalStyles.moduleView}>
-        <TextInput
-          outlineStyle={globalStyles.outlineStyle}
-          style={globalStyles.textInputStyle}
-          value={value}
-          mode="outlined"
-          onChangeText={(text) => setValue(text)}
-          autoComplete="one-time-code"
-          keyboardType="visible-password"
-        />
+        <View style={{ height: 40, flexGrow: 1 }}>
+          <TextInput
+            outlineStyle={globalStyles.outlineStyle}
+            style={globalStyles.textInputStyle}
+            value={value}
+            mode="outlined"
+            onChangeText={(text) => setValue(text)}
+            autoComplete="one-time-code"
+            keyboardType="visible-password"
+          />
+        </View>
         <CopyToClipboard value={value} />
       </View>
       {keyType !== "false" && (

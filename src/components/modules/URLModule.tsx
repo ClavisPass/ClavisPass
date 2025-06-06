@@ -132,23 +132,25 @@ function URLModule(props: URLModuleType & Props) {
             <Icon color={"lightgray"} source={"web-remove"} size={20} />
           )}
         </View>
-        <TextInput
-          outlineStyle={[
-            globalStyles.outlineStyle,
-            !isValid ? { borderColor: theme.colors.error } : null,
-          ]}
-          style={globalStyles.textInputStyle}
-          value={value}
-          mode="outlined"
-          onChangeText={(text) => {
-            setValue(text);
-          }}
-          onBlur={fillUrl}
-          autoCapitalize="none"
-          autoComplete="url"
-          textContentType="URL"
-          keyboardType="url"
-        />
+        <View style={{ height: 40, flexGrow: 1 }}>
+          <TextInput
+            outlineStyle={[
+              globalStyles.outlineStyle,
+              !isValid ? { borderColor: theme.colors.error } : null,
+            ]}
+            style={globalStyles.textInputStyle}
+            value={value}
+            mode="outlined"
+            onChangeText={(text) => {
+              setValue(text);
+            }}
+            onBlur={fillUrl}
+            autoCapitalize="none"
+            autoComplete="url"
+            textContentType="URL"
+            keyboardType="url"
+          />
+        </View>
         {
           <IconButton
             icon="open-in-new"

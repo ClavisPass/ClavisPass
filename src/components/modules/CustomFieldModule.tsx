@@ -45,14 +45,16 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
       }}
     >
       <View style={globalStyles.moduleView}>
-        <TextInput
-          outlineStyle={globalStyles.outlineStyle}
-          style={globalStyles.textInputStyle}
-          value={value}
-          mode="outlined"
-          onChangeText={(text) => setValue(text)}
-          autoCapitalize="none"
-        />
+        <View style={{ height: 40, flexGrow: 1 }}>
+          <TextInput
+            outlineStyle={globalStyles.outlineStyle}
+            style={globalStyles.textInputStyle}
+            value={value}
+            mode="outlined"
+            onChangeText={(text) => setValue(text)}
+            autoCapitalize="none"
+          />
+        </View>
         <CopyToClipboard value={value} />
       </View>
       <EditCustomFieldModal

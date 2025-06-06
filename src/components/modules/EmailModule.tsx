@@ -109,26 +109,28 @@ function EmailModule(props: EmailModuleType & Props) {
       icon={ModuleIconsEnum.E_MAIL}
     >
       <View style={globalStyles.moduleView}>
-        <TextInput
-          ref={inputRef}
-          onFocus={() => {
-            setAutocompleteVisible(true);
-          }}
-          onBlur={handleBlur}
-          blurOnSubmit={false}
-          outlineStyle={[
-            globalStyles.outlineStyle,
-            !isValid ? { borderColor: theme.colors.error } : null,
-          ]}
-          style={globalStyles.textInputStyle}
-          value={value}
-          mode="outlined"
-          onChangeText={(text) => setValue(text)}
-          autoCapitalize="none"
-          autoComplete="email"
-          textContentType="emailAddress"
-          keyboardType="email-address"
-        />
+        <View style={{ height: 40, flexGrow: 1 }}>
+          <TextInput
+            ref={inputRef}
+            onFocus={() => {
+              setAutocompleteVisible(true);
+            }}
+            onBlur={handleBlur}
+            blurOnSubmit={false}
+            outlineStyle={[
+              globalStyles.outlineStyle,
+              !isValid ? { borderColor: theme.colors.error } : null,
+            ]}
+            style={globalStyles.textInputStyle}
+            value={value}
+            mode="outlined"
+            onChangeText={(text) => setValue(text)}
+            autoCapitalize="none"
+            autoComplete="email"
+            textContentType="emailAddress"
+            keyboardType="email-address"
+          />
+        </View>
         <CopyToClipboard value={value} />
       </View>
       <Autocomplete

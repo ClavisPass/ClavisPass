@@ -37,16 +37,18 @@ function UsernameModule(props: UsernameModuleType & Props) {
       icon={ModuleIconsEnum.USERNAME}
     >
       <View style={globalStyles.moduleView}>
-        <TextInput
-          outlineStyle={globalStyles.outlineStyle}
-          style={globalStyles.textInputStyle}
-          value={value}
-          mode="outlined"
-          onChangeText={(text) => setValue(text)}
-          autoCapitalize="none"
-          autoComplete="username"
-          textContentType="username"
-        />
+        <View style={{ height: 40, flexGrow: 1 }}>
+          <TextInput
+            outlineStyle={globalStyles.outlineStyle}
+            style={globalStyles.textInputStyle}
+            value={value}
+            mode="outlined"
+            onChangeText={(text) => setValue(text)}
+            autoCapitalize="none"
+            autoComplete="username"
+            textContentType="username"
+          />
+        </View>
         <CopyToClipboard value={value} />
       </View>
     </ModuleContainer>

@@ -44,6 +44,8 @@ function Login(props: Props) {
 
   const [error, setError] = useState(false);
 
+  const [autofocus, setAutofocus] = useState(false);
+
   const textInputRef = useRef<any>(null);
   const textInput2Ref = useRef<any>(null);
   const textInput3Ref = useRef<any>(null);
@@ -51,8 +53,14 @@ function Login(props: Props) {
   const [value, setValue] = useState("");
   const [value2, setValue2] = useState("");
 
-  useEffect(() => {
+  const [
+    isUsingAuthenticationButtonVisible,
+    setIsUsingAuthenticationButtonVisible,
+  ] = useState(false);
+
+  const authenticate = () => {
     isUsingAuthentication().then((isAuthenticated) => {
+      setIsUsingAuthenticationButtonVisible(isAuthenticated);
       if (token && tokenType) {
         setLoading(true);
         fetchData(token, tokenType, "clavispass.lock").then((response) => {
@@ -73,11 +81,18 @@ function Login(props: Props) {
                   });
                 }
               });
+            } else {
+              console.log("No authentication available, using password input.");
+              setAutofocus(true);
             }
           }
         });
       }
     });
+  };
+
+  useEffect(() => {
+    authenticate();
   }, [token, tokenType]);
 
   const login = async (value: string, parsedCryptoData: CryptoType | null) => {
@@ -120,6 +135,7 @@ function Login(props: Props) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        width: "100%",
       }}
     >
       {loading ? (
@@ -129,6 +145,7 @@ function Login(props: Props) {
           style={{
             flex: 1,
             display: "flex",
+            width: "100%",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "space-between",
@@ -187,7 +204,7 @@ function Login(props: Props) {
                     setCapsLock={setCapsLock}
                     textInputRef={textInputRef}
                     errorColor={error}
-                    autofocus
+                    autofocus={autofocus}
                     setValue={setValue}
                     value={value}
                     placeholder="Enter Password"
@@ -214,7 +231,14 @@ function Login(props: Props) {
               width: "100%",
             }}
           >
-            <Button color="black" text={"Auth"} onPress={() => {}}></Button>
+            {isUsingAuthenticationButtonVisible && (
+              <Button
+                maxWidth={"100%"}
+                color="black"
+                icon="fingerprint"
+                onPress={authenticate}
+              ></Button>
+            )}
           </View>
         </View>
       )}

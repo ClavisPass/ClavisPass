@@ -121,7 +121,7 @@ function LoginScreen({ navigation }: { navigation: any }) {
             minWidth: 300,
           }}
         >
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 1, display: "flex", width: "100%", alignItems: "center", justifyContent: "center" }}>
             {loading ? (
               <ActivityIndicator size={"large"} animating={true} />
             ) : userInfo ? (
