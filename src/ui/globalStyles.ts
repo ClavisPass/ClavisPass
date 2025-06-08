@@ -42,6 +42,7 @@ const globalStyles = (background: string, tertiary: string) => ({
     padding: 8,
     paddingTop: 0,
     paddingBottom: 0,
+    width: "100%",
   },
 });
 

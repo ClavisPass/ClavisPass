@@ -83,6 +83,7 @@ function FolderModal(props: Props) {
             },
           ]}
         >
+          <View style={{ flexGrow: 1 }}>
           <TextInput
             placeholder="Add Folder..."
             style={[
@@ -98,6 +99,7 @@ function FolderModal(props: Props) {
             onChangeText={(text) => setSearchQuery(text)}
             autoCapitalize="none"
           />
+          </View>
           <IconButton
             selected
             mode={addButtonDisabled ? undefined : "contained-tonal"}

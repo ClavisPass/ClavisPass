@@ -49,14 +49,15 @@ function ChangeMasterPasswordModal(props: Props) {
   const textInput2Ref = useRef<any>(null);
   const textInput3Ref = useRef<any>(null);
 
+  const [passwordNotEqual, setPasswordNotEqual] = useState(true);
+
   const clear = () => {
     setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
   };
 
-  /*useEffect(() => {
-    console.log("ChangeMasterPasswordModal mounted");
+  useEffect(() => {
     setPasswordConfirmed(false);
     clear();
     if (props.visible && token && tokenType) {
@@ -74,13 +75,13 @@ function ChangeMasterPasswordModal(props: Props) {
         }
       });
     }
-  }, [props.visible]);*/
+  }, [props.visible]);
 
-  /*useEffect(() => {
-    if (passwordConfirmed) {
-      textInput2Ref.current.focus();
+  useEffect(() => {
+    if (newPassword !== "" && confirmPassword !== "") {
+      setPasswordNotEqual(newPassword !== confirmPassword);
     }
-  }, [passwordConfirmed]);*/
+  }, [newPassword, confirmPassword]);
 
   const login = async (value: string, parsedCryptoData: CryptoType | null) => {
     try {
@@ -93,10 +94,6 @@ function ChangeMasterPasswordModal(props: Props) {
 
       const parsedData = DataTypeSchema.parse(jsonData);
       setPasswordConfirmed(true);
-      textInput2Ref.current.focus();
-      //setData(parsedData);
-      //setLastUpdated(lastUpdated);
-      //auth.login(value);
     } catch (error) {
       console.error("Error getting Data:", error);
       textInputRef.current.focus();
@@ -118,7 +115,7 @@ function ChangeMasterPasswordModal(props: Props) {
           alignItems: "center",
           justifyContent: "center",
           flexDirection: "column",
-          height: 200,
+          height: 300,
           width: 300,
           cursor: "auto",
           gap: 6,
@@ -128,49 +125,68 @@ function ChangeMasterPasswordModal(props: Props) {
           <ActivityIndicator size={"large"} animating={true} />
         ) : (
           <>
-            {serverHasNewerState ? (
+            {serverHasNewerState && passwordConfirmed ? (
               <>
                 <Text style={{ color: theme.colors.error }}>
                   Server has newer state
                 </Text>
-                <Button text={"Overwrite Server"} onPress={() => {}}></Button>
-                <Button text={"Overwrite Local State"} onPress={() => {}}></Button>
+                <Button text={"Use Server State"} onPress={() => {}}></Button>
+                <Button
+                  color={theme.colors?.secondaryContainer}
+                  text={"Use Local State"}
+                  onPress={() => {}}
+                  white={false}
+                ></Button>
               </>
             ) : (
               <>
                 {passwordConfirmed ? (
                   <>
-                    <PasswordTextbox
-                      autofocus
-                      textInputRef={textInput2Ref}
-                      setValue={setNewPassword}
-                      value={newPassword}
-                      placeholder="New Password"
-                      onSubmitEditing={() => textInput3Ref.current.focus()}
-                    />
-                    <PasswordTextbox
-                      textInputRef={textInput3Ref}
-                      setValue={setConfirmPassword}
-                      value={confirmPassword}
-                      placeholder="Confirm Password"
-                      onSubmitEditing={() => {}}
-                    />
-                    <Button text={"Set Password"} onPress={() => {}}></Button>
+                    <Text>Select new Master Password.</Text>
+                    <View style={{ width: "100%" }}>
+                      <PasswordTextbox
+                        autofocus
+                        textInputRef={textInput2Ref}
+                        setValue={setNewPassword}
+                        value={newPassword}
+                        placeholder="New Password"
+                        onSubmitEditing={() => textInput3Ref.current.focus()}
+                      />
+                    </View>
+                    <View style={{ width: "100%" }}>
+                      <PasswordTextbox
+                        textInputRef={textInput3Ref}
+                        setValue={setConfirmPassword}
+                        value={confirmPassword}
+                        placeholder="Confirm Password"
+                        onSubmitEditing={() => {}}
+                      />
+                    </View>
+                    <Button
+                      disabled={passwordNotEqual}
+                      text={"Set Password"}
+                      onPress={() => {}}
+                    ></Button>
                   </>
                 ) : (
                   <>
-                    <PasswordTextbox
-                      setCapsLock={setCapsLock}
-                      textInputRef={textInputRef}
-                      errorColor={error}
-                      autofocus
-                      setValue={setCurrentPassword}
-                      value={currentPassword}
-                      placeholder="Current Password"
-                      onSubmitEditing={() =>
-                        login(currentPassword, parsedCryptoData)
-                      }
-                    />
+                    <Text>
+                      Enter your current Master Password to change it.
+                    </Text>
+                    <View style={{ width: "100%" }}>
+                      <PasswordTextbox
+                        setCapsLock={setCapsLock}
+                        textInputRef={textInputRef}
+                        errorColor={error}
+                        autofocus
+                        setValue={setCurrentPassword}
+                        value={currentPassword}
+                        placeholder="Current Password"
+                        onSubmitEditing={() =>
+                          login(currentPassword, parsedCryptoData)
+                        }
+                      />
+                    </View>
                     <Button
                       text={"Login"}
                       onPress={() => login(currentPassword, parsedCryptoData)}

@@ -170,7 +170,6 @@ function SettingsScreen({ navigation }: { navigation: any }) {
             >
               Change Master Password
             </SettingsItem>
-            <Button onPress={() => {setShowChangeMasterPasswordModal(true)}} title="test"></Button>
             <SettingsDivider />
             <SettingsSwitch
               label={"Use System Authentication"}

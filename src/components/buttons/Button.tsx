@@ -30,6 +30,7 @@ type Props = {
   disabled?: boolean;
   color?: string;
   maxWidth?: number | DimensionValue;
+  white?: boolean;
 };
 
 function Button(props: Props) {
@@ -68,7 +69,7 @@ function Button(props: Props) {
   );
 }
 
-function Content(props: Props) {
+function Content({white = true, ...props}: Props) {
   return (
     <TouchableRipple
       disabled={props.disabled}
@@ -83,10 +84,10 @@ function Content(props: Props) {
           alignItems: "center",
         }}
       >
-        {props.icon && <Icon source={props.icon} size={24} color="white" />}
+        {props.icon && <Icon source={props.icon} size={24} color={white ? "white" : undefined} />}
         {props.text && (
           <Text
-            style={{ color: "white", userSelect: "none" }}
+            style={{ color: white ? "white" : undefined, userSelect: "none" }}
             variant="bodyMedium"
           >
             {props.text}
