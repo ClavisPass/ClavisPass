@@ -110,8 +110,6 @@ function LoginScreen({ navigation }: { navigation: any }) {
         <ContentProtection enabled={false} />
         <View
           style={{
-            alignItems: "center",
-            justifyContent: "center",
             height: "70%",
             borderRadius: 20,
             padding: 20,
@@ -119,9 +117,10 @@ function LoginScreen({ navigation }: { navigation: any }) {
             backgroundColor: theme.colors.background,
             margin: 8,
             minWidth: 300,
+            display: "flex",
+            justifyContent: "center",
           }}
         >
-          <View style={{ flex: 1, display: "flex", width: "100%", alignItems: "center", justifyContent: "center" }}>
             {loading ? (
               <ActivityIndicator size={"large"} animating={true} />
             ) : userInfo ? (
@@ -140,7 +139,6 @@ function LoginScreen({ navigation }: { navigation: any }) {
               </View>
             )}
           </View>
-        </View>
       </LinearGradient>
     </AnimatedContainer>
   );

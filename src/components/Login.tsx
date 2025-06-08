@@ -129,15 +129,7 @@ function Login(props: Props) {
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "100%",
-      }}
-    >
+    <>
       {loading ? (
         <ActivityIndicator size={"large"} animating={true} />
       ) : (
@@ -145,36 +137,32 @@ function Login(props: Props) {
           style={{
             flex: 1,
             display: "flex",
-            width: "100%",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "space-between",
             backgroundColor: theme.colors.background,
           }}
         >
-          <View style={{ marginTop: 20 }}>
-            <Logo width={40} height={40} />
-          </View>
-          <View>
-            <View style={{ height: 60 }}>
-              <TypeWriterComponent
-                displayName={
-                  props.userInfo?.username ? props.userInfo.username : ""
-                }
-              />
-            </View>
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                width: "100%",
-              }}
-            >
-              {showNewData ? (
-                <>
+          <Logo width={40} height={40} style={{ marginTop: 20 }} />
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              width: "100%",
+            }}
+          >
+            <TypeWriterComponent
+              height={30}
+              displayName={
+                props.userInfo?.username ? props.userInfo.username : ""
+              }
+            />
+            {showNewData ? (
+              <>
+                <View style={{ width: "100%" }}>
                   <PasswordTextbox
                     autofocus
                     textInputRef={textInput2Ref}
@@ -193,13 +181,15 @@ function Login(props: Props) {
                     value={value2}
                     placeholder="Confirm Password"
                   />
-                  <Button
-                    text={"Set Password"}
-                    onPress={newMasterPassword}
-                  ></Button>
-                </>
-              ) : (
-                <>
+                </View>
+                <Button
+                  text={"Set Password"}
+                  onPress={newMasterPassword}
+                ></Button>
+              </>
+            ) : (
+              <>
+                <View style={{ width: "100%" }}>
                   <PasswordTextbox
                     setCapsLock={setCapsLock}
                     textInputRef={textInputRef}
@@ -210,18 +200,18 @@ function Login(props: Props) {
                     placeholder="Enter Password"
                     onSubmitEditing={() => login(value, parsedCryptoData)}
                   />
-                  <Button
-                    text={"Login"}
-                    onPress={() => login(value, parsedCryptoData)}
-                  ></Button>
-                </>
-              )}
-              {capsLock && (
-                <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
-                  Caps Lock is activated
-                </Text>
-              )}
-            </View>
+                </View>
+                <Button
+                  text={"Login"}
+                  onPress={() => login(value, parsedCryptoData)}
+                ></Button>
+              </>
+            )}
+            {capsLock && (
+              <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
+                Caps Lock is activated
+              </Text>
+            )}
           </View>
           <View
             style={{
@@ -242,7 +232,7 @@ function Login(props: Props) {
           </View>
         </View>
       )}
-    </View>
+    </>
   );
 }
 

@@ -5,6 +5,7 @@ import { useTheme } from "../contexts/ThemeProvider";
 
 type Props = {
   displayName: string;
+  height?: number;
 };
 
 function TypeWriterComponent(props: Props) {
@@ -23,6 +24,7 @@ function TypeWriterComponent(props: Props) {
         alignItems: "center",
         justifyContent: "center",
         marginBottom: 8,
+        height: props.height ? props.height : undefined,
       }}
     >
       <TypeWriter
