@@ -4,7 +4,10 @@ import { CommonActions } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { BottomNavigation } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
-import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack";
+import {
+  CardStyleInterpolators,
+  createStackNavigator,
+} from "@react-navigation/stack";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -210,6 +213,7 @@ function HomeStack() {
             open: transitionSpecConfig,
             close: transitionSpecConfig,
           },
+          detachPreviousScreen: false,
         }}
       />
       <Stack.Screen
@@ -221,9 +225,7 @@ function HomeStack() {
             open: transitionSpecConfig,
             close: transitionSpecConfig,
           },
-          cardStyleInterpolator: CardStyleInterpolators.forScaleFromCenterAndroid,
         }}
-        
       />
     </Stack.Navigator>
   );
@@ -246,6 +248,7 @@ function AnalysisStack() {
             open: transitionSpecConfig,
             close: transitionSpecConfig,
           },
+          detachPreviousScreen: false,
         }}
       />
       <Stack.Screen
@@ -281,6 +284,7 @@ function SettingsStack() {
             open: transitionSpecConfig,
             close: transitionSpecConfig,
           },
+          detachPreviousScreen: false,
         }}
       />
       <Stack.Screen

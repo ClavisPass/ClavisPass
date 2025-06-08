@@ -14,6 +14,8 @@ import * as Progress from "react-native-progress";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 import PasswordTextbox from "../PasswordTextbox";
+import PasswordStrengthLevel from "../../enums/PasswordStrengthLevel";
+import getPasswordStrengthColor from "../../utils/getPasswordStrengthColor";
 
 function PasswordModule(props: PasswordModuleType & Props) {
   const didMount = useRef(false);
@@ -21,18 +23,18 @@ function PasswordModule(props: PasswordModuleType & Props) {
   const [value, setValue] = useState(props.value);
 
   const [entropyPercentage, setEntropyPercentage] = useState(0);
-  const [progressbarColor, setProgressbarColor] = useState("#238823");
+  const [progressbarColor, setProgressbarColor] = useState(getPasswordStrengthColor(PasswordStrengthLevel.STRONG));
 
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const percentage = passwordEntropy(value) / 200;
-    setProgressbarColor("#238823");
+    setProgressbarColor(getPasswordStrengthColor(PasswordStrengthLevel.STRONG));
     if (percentage < 0.55) {
-      setProgressbarColor("#FFBF00");
+      setProgressbarColor(getPasswordStrengthColor(PasswordStrengthLevel.MEDIUM));
     }
     if (percentage < 0.4) {
-      setProgressbarColor("#D2222D");
+      setProgressbarColor(getPasswordStrengthColor(PasswordStrengthLevel.WEAK));
     }
 
     if (percentage > 1) {

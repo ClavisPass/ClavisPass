@@ -17,17 +17,21 @@ import passwordEntropy from "../utils/Entropy";
 import AnalysisEntry from "../components/AnalysisEntry";
 import AnalysisEntryGradient from "../components/AnalysisEntryGradient";
 import Divider from "../components/Divider";
+import PasswordStrengthLevel from "../enums/PasswordStrengthLevel";
+import getPasswordStrengthColor from "../utils/getPasswordStrengthColor";
 
 export type CachedPasswordsType = {
   title: string;
   password: string;
   entropy: number;
   type: ModulesEnum;
+  passwordStrengthLevel: PasswordStrengthLevel;
 };
 
 function AnalysisScreen({ navigation }: { navigation: any }) {
   const data = useData();
-  const { theme, globalStyles, headerWhite, setHeaderWhite, darkmode } = useTheme();
+  const { theme, globalStyles, headerWhite, setHeaderWhite, darkmode } =
+    useTheme();
 
   const [cachedPasswordList, setCachedPasswordList] = React.useState<
     CachedPasswordsType[] | null
@@ -42,10 +46,10 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
   const [searchQuery, setSearchQuery] = useState("");
 
   useFocusEffect(
-      React.useCallback(() => {
-        setHeaderWhite(false);
-      }, [])
-    );
+    React.useCallback(() => {
+      setHeaderWhite(false);
+    }, [])
+  );
 
   const filteredValues = useMemo(() => {
     return cachedPasswordList?.filter((item) => {
@@ -69,11 +73,15 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
         getallPasswords.forEach((module: ModuleType) => {
           const entropy = passwordEntropy(module.value);
           const percentage = entropy / 200;
+          let passwordStrengthLevel: PasswordStrengthLevel;
           if (percentage < 0.4) {
+            passwordStrengthLevel = PasswordStrengthLevel.WEAK;
             weakCount++;
           } else if (percentage < 0.55) {
+            passwordStrengthLevel = PasswordStrengthLevel.MEDIUM;
             mediumCount++;
           } else {
+            passwordStrengthLevel = PasswordStrengthLevel.STRONG;
             strongCount++;
           }
           cachedPasswords = [
@@ -83,6 +91,7 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
               password: module.value,
               entropy: entropy,
               type: ModulesEnum.PASSWORD,
+              passwordStrengthLevel: passwordStrengthLevel,
             },
           ];
         });
@@ -95,11 +104,15 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
           const transform = module as WifiModuleType;
           const entropy = passwordEntropy(transform.value);
           const percentage = entropy / 200;
+          let passwordStrengthLevel: PasswordStrengthLevel;
           if (percentage < 0.4) {
+            passwordStrengthLevel = PasswordStrengthLevel.WEAK;
             weakCount++;
           } else if (percentage < 0.55) {
+            passwordStrengthLevel = PasswordStrengthLevel.MEDIUM;
             mediumCount++;
           } else {
+            passwordStrengthLevel = PasswordStrengthLevel.STRONG;
             strongCount++;
           }
           cachedPasswords = [
@@ -109,6 +122,7 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
               password: transform.value,
               entropy: entropy,
               type: ModulesEnum.WIFI,
+              passwordStrengthLevel: passwordStrengthLevel,
             },
           ];
         });
@@ -145,7 +159,11 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
       style={{ marginTop: Constants.statusBarHeight }}
       useFocusEffect={useFocusEffect}
     >
-      <StatusBar animated={true} style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent={true} />
+      <StatusBar
+        animated={true}
+        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        translucent={true}
+      />
       <TitlebarHeight />
       <View
         style={{
@@ -249,15 +267,16 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
           </View>
           <FlashList
             data={filteredValues}
-            ItemSeparatorComponent={() => <Divider/>}
+            ItemSeparatorComponent={() => <Divider />}
             renderItem={({ item, index }) => (
               <View
                 style={{
                   borderRadius: 8,
-                  marginBottom: 0,
-                  gap: 4,
-                  marginTop: 0,
+                  margin: 0,
+                  //gap: 4,
+                  //marginTop: 0,
                   overflow: "hidden",
+                  width: "100%",
                 }}
               >
                 <TouchableRipple
@@ -291,9 +310,16 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
                       </Text>
                       <Text style={{ userSelect: "none" }}>{item.title}</Text>
                     </View>
-                    <Text style={{ userSelect: "none" }}>
-                      {"Entropy: " + item.entropy}
-                    </Text>
+                    <View
+                      style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: 50,
+                        backgroundColor: getPasswordStrengthColor(
+                          item.passwordStrengthLevel
+                        ),
+                      }}
+                    />
                   </View>
                 </TouchableRipple>
               </View>

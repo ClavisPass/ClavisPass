@@ -5,7 +5,7 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
-import NetInfo from "@react-native-community/netinfo";
+import * as Network from "expo-network";
 import { Platform } from "react-native";
 
 interface OnlineContextType {
@@ -22,6 +22,18 @@ export const OnlineProvider = ({ children }: Props) => {
   const [isOnline, setIsOnline] = useState(true);
 
   useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | undefined;
+
+    async function checkNetwork() {
+      try {
+        const state = await Network.getNetworkStateAsync();
+        setIsOnline(!!state.isConnected && state.isInternetReachable !== false);
+      } catch (error) {
+        console.warn("Network check failed", error);
+        setIsOnline(false);
+      }
+    }
+
     if (Platform.OS === "web") {
       const handleOnline = () => setIsOnline(true);
       const handleOffline = () => setIsOnline(false);
@@ -35,19 +47,17 @@ export const OnlineProvider = ({ children }: Props) => {
         window.removeEventListener("offline", handleOffline);
       };
     } else {
-      const unsubscribe = NetInfo.addEventListener((state) => {
-        setIsOnline(!!state.isConnected);
-      });
-      return () => unsubscribe();
+      checkNetwork();
+      interval = setInterval(checkNetwork, 5000);
+
+      return () => {
+        if (interval) clearInterval(interval);
+      };
     }
   }, []);
 
   return (
-    <OnlineContext.Provider
-      value={{
-        isOnline,
-      }}
-    >
+    <OnlineContext.Provider value={{ isOnline }}>
       {children}
     </OnlineContext.Provider>
   );

@@ -4,9 +4,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
-import { getCurrentWebviewWindow, WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { Platform, StyleSheet } from "react-native";
-import isTauri from "../utils/isTauri"; // Deine Hilfsfunktion
 
 type Props = {
   children: ReactNode;
@@ -14,52 +12,45 @@ type Props = {
 
 function Blur(props: Props) {
   const blurValue = useSharedValue(0);
-  const [appWindow, setAppWindow] = useState<WebviewWindow | null>(null);
+  const [isFocused, setIsFocused] = useState(true); // Initial angenommen: Fenster ist fokussiert
 
   useEffect(() => {
-  if (!isTauri()) return;
+    const handleFocus = () => {
+      setIsFocused(true);
+      blurValue.value = withTiming(0, { duration: 200 });
+    };
 
-  let focusListenerUnsub: (() => void) | null = null;
-  let blurListenerUnsub: (() => void) | null = null;
+    const handleBlur = () => {
+      setIsFocused(false);
+      blurValue.value = withTiming(6, { duration: 200 });
+    };
 
-  async function setup() {
-    try {
-      const window = await getCurrentWebviewWindow();
-      setAppWindow(window);
-
-      focusListenerUnsub = await window.listen("tauri://focus", () => {
+    const handleMouseEnter = () => {
+      // Blur nur rückgängig machen, wenn nicht fokussiert
+      if (!isFocused) {
         blurValue.value = withTiming(0, { duration: 200 });
-        document.removeEventListener("mouseenter", handleMouseEnter);
-        document.removeEventListener("mouseleave", handleMouseLeave);
-      });
+      }
+    };
 
-      blurListenerUnsub = await window.listen("tauri://blur", () => {
+    const handleMouseLeave = () => {
+      // Nur bluren, wenn Fenster nicht fokussiert ist
+      if (!isFocused) {
         blurValue.value = withTiming(6, { duration: 200 });
-        document.addEventListener("mouseenter", handleMouseEnter);
-        document.addEventListener("mouseleave", handleMouseLeave);
-      });
-    } catch (error) {
-      console.warn("Failed to getCurrentWebviewWindow or listen:", error);
-    }
-  }
+      }
+    };
 
-  const handleMouseEnter = () => {
-    blurValue.value = withTiming(0, { duration: 200 });
-  };
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("blur", handleBlur);
+    document.addEventListener("mouseenter", handleMouseEnter);
+    document.addEventListener("mouseleave", handleMouseLeave);
 
-  const handleMouseLeave = () => {
-    blurValue.value = withTiming(6, { duration: 200 });
-  };
-
-  setup();
-
-  return () => {
-    focusListenerUnsub && focusListenerUnsub();
-    blurListenerUnsub && blurListenerUnsub();
-    document.removeEventListener("mouseenter", handleMouseEnter);
-    document.removeEventListener("mouseleave", handleMouseLeave);
-  };
-}, []);
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("blur", handleBlur);
+      document.removeEventListener("mouseenter", handleMouseEnter);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, [isFocused]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -67,11 +58,6 @@ function Blur(props: Props) {
       opacity: 1 - blurValue.value / 16,
     };
   });
-
-  // Wenn kein appWindow (z.B. in Expo Go / Web ohne Tauri), render einfach ohne Animation
-  if (Platform.OS === "web" && !appWindow) {
-    return <>{props.children}</>;
-  }
 
   return (
     <Animated.View style={[styles.container, animatedStyle]}>

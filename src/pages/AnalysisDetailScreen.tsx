@@ -5,7 +5,7 @@ import { TitlebarHeight } from "../components/CustomTitlebar";
 import AnimatedContainer from "../components/container/AnimatedContainer";
 import { useTheme } from "../contexts/ThemeProvider";
 import { RootStackParamList } from "../../App";
-import { Icon, Text, TextInput } from "react-native-paper";
+import { Divider, Icon, Text, TextInput } from "react-native-paper";
 import ModulesEnum from "../enums/ModulesEnum";
 import ModuleIconsEnum from "../enums/ModuleIconsEnum";
 import { ScrollView, View } from "react-native";
@@ -14,6 +14,7 @@ import AnalysisEntryGradient from "../components/AnalysisEntryGradient";
 import Pattern from "../components/Pattern";
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
+import getPasswordStrengthColor from "../utils/getPasswordStrengthColor";
 
 type AnalysisDetailScreenProps = StackScreenProps<
   RootStackParamList,
@@ -40,7 +41,8 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
   navigation,
 }) => {
   const { value: routeValue } = route.params!;
-  const { globalStyles, theme, headerWhite, setHeaderWhite, darkmode } = useTheme();
+  const { globalStyles, theme, headerWhite, setHeaderWhite, darkmode } =
+    useTheme();
 
   const [characterAnalysis, setCharacterAnalysis] =
     useState<CharacterAnalysis>(null);
@@ -176,7 +178,11 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
   return (
     <AnimatedContainer style={globalStyles.container} trigger={edit}>
       <TitlebarHeight />
-      <StatusBar animated={true} style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent={true} />
+      <StatusBar
+        animated={true}
+        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        translucent={true}
+      />
       <Header onPress={goBack} leftNode={<Text>{routeValue.title}</Text>}>
         <View style={{ marginRight: 30 }}>
           <Icon
@@ -299,41 +305,65 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
               }
             />
           </View>
-          <Text
-            variant="titleSmall"
-            style={{ marginLeft: 6, userSelect: "none" }}
-          >
-            Patterns
-          </Text>
-          <Pattern pattern={passwordAnalysis?.pattern} />
+          {passwordAnalysis?.pattern &&
+            passwordAnalysis?.pattern.length !== 0 && (
+              <>
+                <Text
+                  variant="titleSmall"
+                  style={{ marginLeft: 6, userSelect: "none" }}
+                >
+                  Patterns
+                </Text>
+                <Pattern pattern={passwordAnalysis?.pattern} />
+              </>
+            )}
+
           {passwordAnalysis?.repeatedSequences &&
-          passwordAnalysis?.repeatedSequences.length !== 0 ? (
-            <>
-              <Text
-                variant="titleSmall"
-                style={{ marginLeft: 6, userSelect: "none" }}
-              >
-                Repeated Sequences
-              </Text>
-              {passwordAnalysis?.repeatedSequences.map((sequence, index) => {
-                return <Pattern pattern={sequence} key={index} />;
-              })}
-            </>
-          ) : null}
+            passwordAnalysis?.repeatedSequences.length !== 0 && (
+              <>
+                <Text
+                  variant="titleSmall"
+                  style={{ marginLeft: 6, userSelect: "none" }}
+                >
+                  Repeated Sequences
+                </Text>
+                {passwordAnalysis?.repeatedSequences.map((sequence, index) => {
+                  return <Pattern pattern={sequence} key={index} />;
+                })}
+              </>
+            )}
           {passwordAnalysis?.sequentialPatterns &&
-          passwordAnalysis?.sequentialPatterns.length !== 0 ? (
-            <>
-              <Text
-                variant="titleSmall"
-                style={{ marginLeft: 6, userSelect: "none" }}
-              >
-                Sequencial Patterns
-              </Text>
-              {passwordAnalysis?.sequentialPatterns.map((pattern, index) => {
-                return <Pattern pattern={pattern} key={index} />;
-              })}
-            </>
-          ) : null}
+            passwordAnalysis?.sequentialPatterns.length !== 0 && (
+              <>
+                <Text
+                  variant="titleSmall"
+                  style={{ marginLeft: 6, userSelect: "none" }}
+                >
+                  Sequencial Patterns
+                </Text>
+                {passwordAnalysis?.sequentialPatterns.map((pattern, index) => {
+                  return <Pattern pattern={pattern} key={index} />;
+                })}
+              </>
+            )}
+          <Divider />
+          <View
+            style={{
+              padding: 6,
+              backgroundColor: getPasswordStrengthColor(
+                routeValue.passwordStrengthLevel
+              ),
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 10,
+              boxShadow: theme.colors.shadow,
+            }}
+          >
+            <Text style={{ color: "white" }}>
+              {routeValue.passwordStrengthLevel}
+            </Text>
+          </View>
         </View>
       </ScrollView>
     </AnimatedContainer>

@@ -55,7 +55,8 @@ function ChangeMasterPasswordModal(props: Props) {
     setConfirmPassword("");
   };
 
-  useEffect(() => {
+  /*useEffect(() => {
+    console.log("ChangeMasterPasswordModal mounted");
     setPasswordConfirmed(false);
     clear();
     if (props.visible && token && tokenType) {
@@ -73,13 +74,13 @@ function ChangeMasterPasswordModal(props: Props) {
         }
       });
     }
-  }, [props.visible]);
+  }, [props.visible]);*/
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (passwordConfirmed) {
       textInput2Ref.current.focus();
     }
-  }, [passwordConfirmed]);
+  }, [passwordConfirmed]);*/
 
   const login = async (value: string, parsedCryptoData: CryptoType | null) => {
     try {

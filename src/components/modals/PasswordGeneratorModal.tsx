@@ -10,7 +10,7 @@ import {
 } from "react-native-paper";
 import getColors from "../../ui/linearGradient";
 import { LinearGradient } from "expo-linear-gradient";
-import Slider from "@react-native-community/slider";
+import { Slider } from '@react-native-assets/slider'
 
 import generatePassword from "../../utils/generatePassword";
 import CopyToClipboard from "../buttons/CopyToClipboard";

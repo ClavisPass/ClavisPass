@@ -19,20 +19,21 @@ function Pattern(props: Props) {
     <View
       style={{
         backgroundColor: theme.colors.background,
-        height: 50,
         borderRadius: 16,
         padding: 12,
         display: "flex",
-        justifyContent: "center",
+        justifyContent: "space-around",
         boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
       }}
     >
       <View
         style={{
+          display: "flex",
           flexDirection: "row",
           gap: 6,
           width: "100%",
           justifyContent: "center",
+          overflow: "hidden",
         }}
       >
         {arrayPattern.map((char, index) => {

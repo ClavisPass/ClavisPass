@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from "react";
 import * as WebBrowser from "expo-web-browser";
 
-import { Chip, ActivityIndicator, IconButton } from "react-native-paper";
+import { Chip, ActivityIndicator, Text, Avatar } from "react-native-paper";
 
 import { View } from "react-native";
 
-import { Image } from "expo-image";
 import { useToken } from "../contexts/TokenProvider";
 import fetchUserInfo from "../api/fetchUserInfo";
 import DropboxLoginButton from "./buttons/DropboxLoginButton";
 import UserInfoType from "../types/UserInfoType";
-
-import TypeWriterComponent from "./TypeWriter";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -50,30 +47,48 @@ function UserInformation(props: Props) {
         <>
           <View
             style={{
+              flex: 1,
               display: "flex",
+              padding: 10,
+              paddingLeft: 4,
+              minWidth: 140,
+              minHeight: 54,
+              height: 30,
               flexDirection: "row",
               alignItems: "center",
-              gap: 4,
-              width: "100%",
-              height: 36,
+              gap: 6,
             }}
           >
             {userInfo ? (
               <>
-                {userInfo.avatar && (
-                  <Image
+                {userInfo.avatar ? (
+                  <Avatar.Image
+                    size={30}
                     style={{
-                      width: 30,
-                      height: 30,
                       margin: 0,
-                      borderRadius: 50,
                     }}
-                    source={userInfo?.avatar}
-                    contentFit="cover"
-                    transition={250}
+                    source={{ uri: userInfo?.avatar }}
                   />
+                ) : (
+                  <Avatar.Text size={30} label={userInfo?.username.charAt(0)} />
                 )}
-                <TypeWriterComponent displayName={userInfo?.username} />
+                <Text
+                  variant="bodyLarge"
+                  style={{ userSelect: "none" }}
+                  ellipsizeMode="tail"
+                  numberOfLines={1}
+                >
+                  {userInfo?.username}
+                </Text>
+                <Chip
+                  onPress={() => {
+                    removeToken();
+                    setUserInfo(null);
+                  }}
+                  icon="logout"
+                >
+                  Logout
+                </Chip>
               </>
             ) : (
               <>
@@ -95,17 +110,6 @@ function UserInformation(props: Props) {
                 )}
               </>
             )}
-          </View>
-          <View>
-            <Chip
-              onPress={() => {
-                removeToken();
-                setUserInfo(null);
-              }}
-              icon="logout"
-            >
-              Logout
-            </Chip>
           </View>
         </>
       ) : (

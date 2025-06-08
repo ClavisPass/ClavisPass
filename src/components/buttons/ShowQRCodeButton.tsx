@@ -3,6 +3,7 @@ import TokenQRCodeModal from "../modals/TokenQRCodeModal";
 import { useState } from "react";
 import { useToken } from "../../contexts/TokenProvider";
 import SettingsItem from "../items/SettingsItem";
+import SettingsDivider from "../SettingsDivider";
 
 function ShowQRCodeButton() {
   const { token, setToken } = useToken();
@@ -16,6 +17,7 @@ function ShowQRCodeButton() {
             visible={qrCodeVisible}
             setVisible={setQrCodeVisible}
           />
+          <SettingsDivider />
         </>
       )}
     </>

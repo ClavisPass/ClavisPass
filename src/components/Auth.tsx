@@ -6,7 +6,6 @@ import { Button } from "react-native-paper";
 
 import ShowQRCodeButton from "./buttons/ShowQRCodeButton";
 import UserInformation from "./UserInformation";
-import EditTokenModal from "./modals/EditTokenModal";
 import UserInfoType from "../types/UserInfoType";
 import SettingsItem from "./items/SettingsItem";
 import SettingsDivider from "./SettingsDivider";
@@ -33,7 +32,7 @@ function Auth(props: Props) {
       </SettingsItem>
       <SettingsDivider />
       <ShowQRCodeButton />
-      <SettingsDivider />
+      
     </>
   );
 }

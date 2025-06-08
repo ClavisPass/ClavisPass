@@ -14,7 +14,7 @@ const globalStyles = (background: string, tertiary: string) => ({
     borderColor: tertiary,
     borderWidth: 2,
   },
-  textInputStyle: { height: 40, lineHeight: 16, backgroundColor: tertiary },
+  textInputStyle: { height: 40, lineHeight: 16, backgroundColor: tertiary, minWidth: 200 },
   textInputNoteStyle: { lineHeight: 16, padding: 4, backgroundColor: tertiary, marginRight: 6 },
   moduleView: {
     display: "flex",

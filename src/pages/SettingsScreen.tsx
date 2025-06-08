@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, ScrollView, View } from "react-native";
+import { StyleSheet, ScrollView, View, Button } from "react-native";
 import { Switch, Text } from "react-native-paper";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import Constants from "expo-constants";
@@ -61,6 +61,9 @@ function SettingsScreen({ navigation }: { navigation: any }) {
   const [useAuthentication, setUseAuthentication] = React.useState(false);
   const [closeBehavior, setCloseBehavior] = React.useState(false);
 
+  const [showChangeMasterPasswordModal, setShowChangeMasterPasswordModal] =
+    useState(false);
+
   useFocusEffect(
       React.useCallback(() => {
         setHeaderWhite(false);
@@ -89,9 +92,6 @@ function SettingsScreen({ navigation }: { navigation: any }) {
     }
     setCloseBehavior(hide);
   };
-
-  const [showChangeMasterPasswordModal, setShowChangeMasterPasswordModal] =
-    useState(false);
 
   const [editTokenVisibility, setEditTokenVisibility] = useState(false);
 
@@ -129,14 +129,14 @@ function SettingsScreen({ navigation }: { navigation: any }) {
         <StatusBar animated={true} style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent={true} />
         <TitlebarHeight />
         <ScrollView style={styles.scrollView}>
-          <SettingsContainer icon="tray-arrow-down" title={"Update"}>
-            <UpdateManager />
-          </SettingsContainer>
           <SettingsContainer icon="cloud-outline" title={"Cloud"}>
             <Auth
               navigation={navigation}
               changeEditTokenVisibility={setEditTokenVisibility}
             />
+          </SettingsContainer>
+          <SettingsContainer icon="tray-arrow-down" title={"Update"}>
+            <UpdateManager />
           </SettingsContainer>
           <WebSpecific>
             <SettingsContainer icon={"cogs"} title={"System"}>
@@ -164,11 +164,13 @@ function SettingsScreen({ navigation }: { navigation: any }) {
           <SettingsContainer icon={"fingerprint"} title={"Authentication"}>
             <SettingsItem
               onPress={() => {
+                console.log("Button pressed");
                 setShowChangeMasterPasswordModal(true);
               }}
             >
               Change Master Password
             </SettingsItem>
+            <Button onPress={() => {setShowChangeMasterPasswordModal(true)}} title="test"></Button>
             <SettingsDivider />
             <SettingsSwitch
               label={"Use System Authentication"}

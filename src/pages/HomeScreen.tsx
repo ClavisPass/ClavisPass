@@ -189,12 +189,37 @@ function HomeScreen({ navigation }: { navigation: any }) {
 
   const searchRef = useRef<any>(null);
 
+  function renderFlashList() {
+    return (
+      <FlashList
+        refreshing={false}
+        onRefresh={refreshData}
+        data={filteredValues}
+        renderItem={({ item }) => (
+          <ListItem
+            item={item}
+            onPress={() => {
+              navigation.navigate("Edit", {
+                value: item,
+              });
+            }}
+          />
+        )}
+        estimatedItemSize={200}
+      />
+    );
+  }
+
   return (
     <AnimatedContainer
       style={{ display: "flex", justifyContent: "center" }}
       useFocusEffect={useFocusEffect}
     >
-      <StatusBar animated={true} style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent={true} />
+      <StatusBar
+        animated={true}
+        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        translucent={true}
+      />
       <ContentProtection enabled={true} />
       <WebSpecific>
         <SearchShortcut searchRef={searchRef} />
@@ -401,24 +426,11 @@ function HomeScreen({ navigation }: { navigation: any }) {
           flexDirection: width > 600 ? "row-reverse" : "column",
         }}
       >
-        <Blur>
-          <FlashList
-            refreshing={false}
-            onRefresh={refreshData}
-            data={filteredValues}
-            renderItem={({ item }) => (
-              <ListItem
-                item={item}
-                onPress={() => {
-                  navigation.navigate("Edit", {
-                    value: item,
-                  });
-                }}
-              />
-            )}
-            estimatedItemSize={200}
-          />
-        </Blur>
+        {Platform.OS === "web" ? (
+          <Blur>{renderFlashList()}</Blur>
+        ) : (
+          renderFlashList()
+        )}
         <FolderFilter
           folder={data.data?.folder}
           selectedFav={selectedFav}

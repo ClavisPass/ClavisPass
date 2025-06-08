@@ -166,7 +166,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   useEffect(() => {
     if (!edit) {
-      console.log("JAAAAAAA");
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 44,
@@ -344,7 +343,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         setVisible={setShowMenu}
         created={routeValue.created}
         lastUpdated={routeValue.lastUpdated}
-        positionY={Constants.statusBarHeight + TITLEBAR_HEIGHT + 60}
+        positionY={Constants.statusBarHeight + TITLEBAR_HEIGHT + 50}
       />
       <FolderModal
         visible={folderModalVisible}

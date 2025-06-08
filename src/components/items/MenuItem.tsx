@@ -46,9 +46,9 @@ export function MenuItem(props: Props) {
             />
           )}
           {props.label ? (
-            <View style={{ display: "flex", flexDirection: "column", margin: 8 }}>
+            <View style={{ display: "flex", flexDirection: "column" }}>
               <Text
-                variant="labelLarge"
+                variant="labelSmall"
                 style={{ userSelect: "none", color: theme.colors.primary }}
                 ellipsizeMode="tail"
                 numberOfLines={1}
@@ -56,7 +56,7 @@ export function MenuItem(props: Props) {
                 {props.label}
               </Text>
               <Text
-                variant="bodyLarge"
+                variant="bodyMedium"
                 style={{ userSelect: "none" }}
                 ellipsizeMode="tail"
                 numberOfLines={1}

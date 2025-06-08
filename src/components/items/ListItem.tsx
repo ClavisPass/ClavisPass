@@ -115,6 +115,7 @@ function ListItem(props: Props) {
                 source={url}
                 contentFit="cover"
                 transition={250}
+                pointerEvents="none"
               />
             ) : (
               <View
