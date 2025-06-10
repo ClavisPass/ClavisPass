@@ -1,4 +1,4 @@
-package com.ricirico.ClavisPass
+package com.ClavisPass.ClavisPass
 
 import android.app.Application
 import android.content.res.Configuration
