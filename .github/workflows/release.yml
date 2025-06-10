@@ -157,19 +157,26 @@ jobs:
       - name: Trigger Android build in Expo Cloud (non-interactive)
         id: eas_build
         run: |
-          eas build --platform android --profile production --non-interactive --wait --json > build-info.json
+          # The --json flag outputs build details to stdout, including the artifacts.
+          # We'll capture it directly to a file to parse easily.
+          eas build --platform android --profile production --non-interactive --wait --output=build-info.json
 
       - name: Get APK download URL
         id: get_apk_url
         run: |
-          apk_url=$(jq -r '.artifacts.buildUrl' build-info.json)
-          echo "APK_URL=$apk_url" >> $GITHUB_ENV
+          # Parse the build URL from the build-info.json file
+          APK_URL=$(jq -r '.artifacts.buildUrl' build-info.json)
+          echo "Discovered APK URL: $APK_URL"
+          echo "APK_URL=$APK_URL" >> $GITHUB_ENV # Set as an environment variable for subsequent steps
 
       - name: Download APK
+        # Ensure the APK is downloaded to a known path
         run: |
           curl -L -o ClavisPass.apk "$APK_URL"
+          ls -l ClavisPass.apk # Verify the file exists and its size
 
       - name: Upload APK artifact
+        # This uploads the APK as a GitHub Action artifact, making it available for the 'build-updater' job
         uses: actions/upload-artifact@v4
         with:
           name: android
@@ -203,6 +210,7 @@ jobs:
 
           export PATH="$HOME/.cargo/bin:$PATH"
 
+          # Use specific filenames as they are created by the build jobs and downloaded by actions/download-artifact
           SIGN_WINDOWS=$(cargo tauri signer sign \
             --private-key "${TAURI_SIGNING_PRIVATE_KEY}" \
             --password "${TAURI_SIGNING_PRIVATE_KEY_PASSWORD}" \
@@ -261,4 +269,4 @@ jobs:
           files: |
             updater.json
             updater.json.sig
-            ClavisPass.apk
+            artifacts/android/ClavisPass.apk # Corrected path to the downloaded APK

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, ScrollView, View, Button } from "react-native";
+import { StyleSheet, ScrollView, View, Button, Platform } from "react-native";
 import { Switch, Text } from "react-native-paper";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import Constants from "expo-constants";
@@ -8,7 +8,7 @@ import AnimatedContainer from "../components/container/AnimatedContainer";
 import { useFocusEffect } from "@react-navigation/native";
 import WebSpecific from "../components/platformSpecific/WebSpecific";
 
-import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
+import { enable, isEnabled, disable } from "@tauri-apps/plugin-autostart";
 import Import, { DocumentTypeEnum } from "../utils/documentPicker/Import";
 import DarkModeSwitch from "../components/DarkModeSwitch";
 
@@ -30,6 +30,10 @@ import SettingsSwitch from "../components/SettingsSwitch";
 import Footer from "../components/Footer";
 import UpdateManager from "../components/UpdateManager";
 import * as store from "../utils/store";
+
+import { open } from "@tauri-apps/plugin-shell";
+
+import * as Linking from "expo-linking";
 
 const styles = StyleSheet.create({
   surface: {
@@ -65,10 +69,10 @@ function SettingsScreen({ navigation }: { navigation: any }) {
     useState(false);
 
   useFocusEffect(
-      React.useCallback(() => {
-        setHeaderWhite(false);
-      }, [])
-    );
+    React.useCallback(() => {
+      setHeaderWhite(false);
+    }, [])
+  );
 
   const changeAuthentication = async (authentication: boolean) => {
     if (authentication) {
@@ -120,13 +124,25 @@ function SettingsScreen({ navigation }: { navigation: any }) {
     });
   }, []);
 
+  const openURL = async (value: string) => {
+    if (Platform.OS === "web") {
+      await open(value);
+    } else {
+      Linking.openURL(value);
+    }
+  };
+
   return (
     <>
       <AnimatedContainer
         style={{ marginTop: Constants.statusBarHeight }}
         useFocusEffect={useFocusEffect}
       >
-        <StatusBar animated={true} style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent={true} />
+        <StatusBar
+          animated={true}
+          style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+          translucent={true}
+        />
         <TitlebarHeight />
         <ScrollView style={styles.scrollView}>
           <SettingsContainer icon="cloud-outline" title={"Cloud"}>
@@ -180,6 +196,26 @@ function SettingsScreen({ navigation }: { navigation: any }) {
             />
             <SettingsDivider />
           </SettingsContainer>
+          <SettingsContainer icon={"database"} title={"Backup"}>
+            <SettingsItem
+              leadingIcon="database-import"
+              onPress={() => {
+                
+              }}
+            >
+              Import Backup
+            </SettingsItem>
+            <SettingsDivider />
+            <SettingsItem
+              leadingIcon="database-export"
+              onPress={() => {
+                
+              }}
+            >
+              Export Backup
+            </SettingsItem>
+            <SettingsDivider />
+          </SettingsContainer>
           <SettingsContainer icon={"import"} title={"Import Passwords"}>
             <Import
               type={DocumentTypeEnum.FIREFOX}
@@ -198,6 +234,26 @@ function SettingsScreen({ navigation }: { navigation: any }) {
               title={"pCloud"}
               icon={"circle-outline"}
             />
+            <SettingsDivider />
+          </SettingsContainer>
+          <SettingsContainer icon={"link-variant"} title={"Links"}>
+            <SettingsItem
+              leadingIcon="web"
+              onPress={() => {
+                openURL("https://clavispass.github.io/ClavisPass/");
+              }}
+            >
+              Website
+            </SettingsItem>
+            <SettingsDivider />
+            <SettingsItem
+              leadingIcon="github"
+              onPress={() => {
+                openURL("https://github.com/ClavisPass/ClavisPass");
+              }}
+            >
+              Github
+            </SettingsItem>
             <SettingsDivider />
           </SettingsContainer>
           <Footer />
