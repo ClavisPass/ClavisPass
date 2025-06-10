@@ -131,56 +131,55 @@ jobs:
             src-tauri/target/release/bundle/dmg/*.dmg
 
   build-android-apk:
-    runs-on: ubuntu-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+  runs-on: ubuntu-latest
+  env:
+    EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
 
-      - name: Install dependencies
-        run: npm install
+    - name: Install dependencies
+      run: npm install
 
-      - name: Install EAS CLI globally
-        run: npm install -g eas-cli@latest
+    - name: Install EAS CLI globally
+      run: npm install -g eas-cli@latest
 
-      - name: Verify EAS authentication
-        run: eas whoami
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    - name: Verify EAS authentication
+      run: eas whoami
+      env:
+        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Trigger Android build in Expo Cloud (non-interactive)
-        id: eas_build
-        run: |
-          # The --json flag outputs build details to stdout, including the artifacts.
-          # We'll capture it directly to a file to parse easily.
-          eas build --platform android --profile production --non-interactive --wait --output=build-info.json
+    - name: Trigger Android build in Expo Cloud (non-interactive)
+      id: eas_build
+      run: |
+        # The --json flag outputs build details to stdout.
+        # We capture this output and save it to a file.
+        eas build --platform android --profile production --non-interactive --wait --json > build-info.json
+        cat build-info.json # For debugging: print the content of the file
 
-      - name: Get APK download URL
-        id: get_apk_url
-        run: |
-          # Parse the build URL from the build-info.json file
-          APK_URL=$(jq -r '.artifacts.buildUrl' build-info.json)
-          echo "Discovered APK URL: $APK_URL"
-          echo "APK_URL=$APK_URL" >> $GITHUB_ENV # Set as an environment variable for subsequent steps
+    - name: Get APK download URL
+      id: get_apk_url
+      run: |
+        # Parse the build URL from the build-info.json file
+        APK_URL=$(jq -r '.[0].artifacts.buildUrl' build-info.json) # Note the '.[0]' for array access
+        echo "Discovered APK URL: $APK_URL"
+        echo "APK_URL=$APK_URL" >> $GITHUB_ENV # Set as an environment variable for subsequent steps
 
-      - name: Download APK
-        # Ensure the APK is downloaded to a known path
-        run: |
-          curl -L -o ClavisPass.apk "$APK_URL"
-          ls -l ClavisPass.apk # Verify the file exists and its size
+    - name: Download APK
+      run: |
+        curl -L -o ClavisPass.apk "$APK_URL"
+        ls -l ClavisPass.apk # Verify the file exists and its size
 
-      - name: Upload APK artifact
-        # This uploads the APK as a GitHub Action artifact, making it available for the 'build-updater' job
-        uses: actions/upload-artifact@v4
-        with:
-          name: android
-          path: ClavisPass.apk
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: android
+        path: ClavisPass.apk
 
   build-updater:
     runs-on: ubuntu-24.04
