@@ -15,7 +15,7 @@
     "name": "ClavisPass",
     "scheme": "clavispass",
     "slug": "clavispass",
-    "version": "1.0.12",
+    "version": "1.0.13",
     "owner": "clavispass",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
