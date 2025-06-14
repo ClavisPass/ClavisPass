@@ -10,6 +10,7 @@
     "ts:check": "tsc",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
+    "tauri build": "tauri build",
     "tauri:generate": "tauri signer generate",
     "tauri:info": "tauri info",
     "tauri:icon": "tauri icon",
