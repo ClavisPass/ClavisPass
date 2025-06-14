@@ -390,7 +390,7 @@ checksum = "b94f61472cee1439c0b966b47e3aca9ae07e45d070759512cd390ea2bebc6675"
 
 [[package]]
 name = "clavis-pass"
-version = "1.0.13"
+version = "1.0.0"
 dependencies = [
  "keytar",
  "serde",
