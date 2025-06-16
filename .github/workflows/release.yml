@@ -236,17 +236,17 @@ jobs:
           SIGN_WINDOWS=$(cargo tauri signer sign \
             --private-key "${TAURI_SIGNING_PRIVATE_KEY}" \
             --password "${TAURI_SIGNING_PRIVATE_KEY_PASSWORD}" \
-            "artifacts/windows/clavis-pass_${VERSION}_x64-setup.exe" | awk '/^Public signature:/{getline; print}')
+            "artifacts/windows/ClavisPass_${VERSION}_x64-setup.exe" | awk '/^Public signature:/{getline; print}')
 
           SIGN_LINUX=$(cargo tauri signer sign \
             --private-key "${TAURI_SIGNING_PRIVATE_KEY}" \
             --password "${TAURI_SIGNING_PRIVATE_KEY_PASSWORD}" \
-            "artifacts/linux/clavis-pass_${VERSION}_amd64.AppImage" | awk '/^Public signature:/{getline; print}')
+            "artifacts/linux/ClavisPass_${VERSION}_amd64.AppImage" | awk '/^Public signature:/{getline; print}')
 
           SIGN_MACOS=$(cargo tauri signer sign \
             --private-key "${TAURI_SIGNING_PRIVATE_KEY}" \
             --password "${TAURI_SIGNING_PRIVATE_KEY_PASSWORD}" \
-            "artifacts/macos/clavis-pass_${VERSION}_aarch64.dmg" | awk '/^Public signature:/{getline; print}')
+            "artifacts/macos/ClavisPass_${VERSION}_aarch64.dmg" | awk '/^Public signature:/{getline; print}')
 
           echo "{
             \"version\": \"${VERSION}\",
@@ -255,15 +255,15 @@ jobs:
             \"platforms\": {
               \"windows-x86_64\": {
                 \"signature\": \"${SIGN_WINDOWS}\",
-                \"url\": \"${RELEASE_URL}/clavis-pass_${VERSION}_x64-setup.exe\"
+                \"url\": \"${RELEASE_URL}/ClavisPass_${VERSION}_x64-setup.exe\"
               },
               \"linux-x86_64\": {
                 \"signature\": \"${SIGN_LINUX}\",
-                \"url\": \"${RELEASE_URL}/clavis-pass_${VERSION}_amd64.AppImage\"
+                \"url\": \"${RELEASE_URL}/ClavisPass_${VERSION}_amd64.AppImage\"
               },
               \"darwin-aarch64\": {
                 \"signature\": \"${SIGN_MACOS}\",
-                \"url\": \"${RELEASE_URL}/clavis-pass_${VERSION}_aarch64.dmg\"
+                \"url\": \"${RELEASE_URL}/ClavisPass_${VERSION}_aarch64.dmg\"
               }
             }
           }" > updater.json

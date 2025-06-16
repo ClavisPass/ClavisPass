@@ -3,6 +3,22 @@
 version = 3
 
 [[package]]
+name = "ClavisPass"
+version = "1.0.2"
+dependencies = [
+ "keytar",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-autostart",
+ "tauri-plugin-global-shortcut",
+ "tauri-plugin-process",
+ "tauri-plugin-shell",
+ "tauri-plugin-updater",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -387,22 +403,6 @@ name = "clap_lex"
 version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b94f61472cee1439c0b966b47e3aca9ae07e45d070759512cd390ea2bebc6675"
-
-[[package]]
-name = "clavis-pass"
-version = "1.0.2"
-dependencies = [
- "keytar",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-autostart",
- "tauri-plugin-global-shortcut",
- "tauri-plugin-process",
- "tauri-plugin-shell",
- "tauri-plugin-updater",
-]
 
 [[package]]
 name = "codespan-reporting"
