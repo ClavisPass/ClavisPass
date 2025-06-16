@@ -3,7 +3,7 @@
   "productName": "ClavisPass",
   "mainBinaryName": "ClavisPass",
   "version": "1.0.3",
-  "identifier": "com.clavispass.app",
+  "identifier": "com.ClavisPass.app",
   "build": {
     "beforeBuildCommand": "npx expo export --platform web",
     "beforeDevCommand": "npm run web",

@@ -153,6 +153,36 @@ jobs:
           path: |
             src-tauri/target/release/bundle/dmg/*.dmg
 
+  expo-ota-update:
+    name: Expo OTA Update
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install EAS CLI globally
+        run: npm install -g eas-cli@latest
+
+      - name: Verify EAS authentication
+        run: eas whoami
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Trigger Expo OTA Update
+        run: eas update --branch production --message "Automated update from GitHub Actions for ${{ github.ref_name || github.sha }}"
+
   # build-android-apk:
   #     runs-on: ubuntu-latest
   #     env:
@@ -206,7 +236,7 @@ jobs:
 
   build-updater:
     runs-on: ubuntu-24.04
-    needs: [build-linux, build-windows, build-macos] # build-android-apk
+    needs: [build-linux, build-windows, build-macos, expo-ota-update] # build-android-apk
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}

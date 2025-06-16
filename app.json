@@ -34,7 +34,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ClavisPass.ClavisPass",
+      "package": "com.ClavisPass.app",
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.CAMERA"
