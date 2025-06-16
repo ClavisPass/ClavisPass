@@ -10,10 +10,10 @@
     "ts:check": "tsc",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
-    "tauri build": "tauri build",
     "tauri:generate": "tauri signer generate",
     "tauri:info": "tauri info",
     "tauri:icon": "tauri icon",
+    "web:build-tauri": "npx expo export --platform web",
     "lint": "eslint .",
     "upgrade": "npx expo install --fix",
     "release": "node release.js"
