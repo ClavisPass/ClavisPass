@@ -42,10 +42,14 @@ jobs:
       - name: Install Tauri CLI
         run: cargo install tauri-cli
 
-      - name: Setup Rust & Tauri
-        uses: tauri-apps/tauri-action@v0.4
-        with:
-          tauriScript: cargo tauri
+      #- name: Setup Rust & Tauri
+      #  uses: tauri-apps/tauri-action@v0.4
+      #  with:
+      #    tauriScript: cargo tauri
+
+      - name: Build Tauri Application
+        run: cargo tauri build --release
+        working-directory: src-tauri
 
       - name: Upload Linux binaries
         uses: softprops/action-gh-release@v1
@@ -53,16 +57,16 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           files: |
-            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/deb/ClavisPass_*.deb
             src-tauri/target/release/bundle/rpm/*.rpm
-            src-tauri/target/release/bundle/appimage/*
+            src-tauri/target/release/bundle/appimage/ClavisPass_*.AppImage
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: linux
           path: |
-            src-tauri/target/release/bundle/appimage/*.AppImage
+            src-tauri/target/release/bundle/appimage/ClavisPass_*.AppImage
 
   build-windows:
     runs-on: windows-latest
@@ -153,87 +157,87 @@ jobs:
           path: |
             src-tauri/target/release/bundle/dmg/*.dmg
 
-  expo-ota-update:
-    name: Expo OTA Update
-    runs-on: ubuntu-latest
-    environment: production
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+ # expo-ota-update:
+ #   name: Expo OTA Update
+ #   runs-on: ubuntu-latest
+ #   environment: production
+ #   env:
+ #     EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+ #   steps:
+ #     - name: Checkout repository
+ #       uses: actions/checkout@v4
+#
+ #     - name: Setup Node.js
+ #       uses: actions/setup-node@v4
+ #       with:
+ #         node-version: 18
+ #         cache: npm
+#
+ #     - name: Install dependencies
+ #       run: npm install
+#
+ #     - name: Install EAS CLI globally
+ #       run: npm install -g eas-cli@latest
+#
+ #     - name: Verify EAS authentication
+ #       run: eas whoami
+ #       env:
+ #         EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+#
+ #     - name: Trigger Expo OTA Update
+ #       run: eas update --branch production --message "Automated update from GitHub Actions for ${{ github.ref_name || github.sha }}"
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: npm
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Install EAS CLI globally
-        run: npm install -g eas-cli@latest
-
-      - name: Verify EAS authentication
-        run: eas whoami
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Trigger Expo OTA Update
-        run: eas update --branch production --message "Automated update from GitHub Actions for ${{ github.ref_name || github.sha }}"
-
-  build-android-apk:
-    runs-on: ubuntu-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Install EAS CLI globally
-        run: npm install -g eas-cli@latest
-
-      - name: Verify EAS authentication
-        run: eas whoami
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Trigger Android build in Expo Cloud (non-interactive)
-        id: eas_build
-        run: |
-          eas build --platform android --profile production --non-interactive --wait --json > build-info.json
-          cat build-info.json
-
-      - name: Get APK download URL
-        id: get_apk_url
-        run: |
-          APK_URL=$(jq -r '.[0].artifacts.buildUrl' build-info.json)
-          echo "Discovered APK URL: $APK_URL"
-          echo "APK_URL=$APK_URL" >> $GITHUB_ENV
-
-      - name: Download APK
-        run: |
-          curl -L -o ClavisPass.apk "$APK_URL"
-          ls -l ClavisPass.apk
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: android
-          path: ClavisPass.apk
+ # build-android-apk:
+ #   runs-on: ubuntu-latest
+ #   env:
+ #     EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+ #   steps:
+ #     - name: Checkout repository
+ #       uses: actions/checkout@v3
+#
+ #     - name: Setup Node.js
+ #       uses: actions/setup-node@v3
+ #       with:
+ #         node-version: 18
+#
+ #     - name: Install dependencies
+ #       run: npm install
+#
+ #     - name: Install EAS CLI globally
+ #       run: npm install -g eas-cli@latest
+#
+ #     - name: Verify EAS authentication
+ #       run: eas whoami
+ #       env:
+ #         EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+#
+ #     - name: Trigger Android build in Expo Cloud (non-interactive)
+ #       id: eas_build
+ #       run: |
+ #         eas build --platform android --profile production --non-interactive --wait --json > build-info.json
+ #         cat build-info.json
+#
+ #     - name: Get APK download URL
+ #       id: get_apk_url
+ #       run: |
+ #         APK_URL=$(jq -r '.[0].artifacts.buildUrl' build-info.json)
+ #         echo "Discovered APK URL: $APK_URL"
+ #         echo "APK_URL=$APK_URL" >> $GITHUB_ENV
+#
+ #     - name: Download APK
+ #       run: |
+ #         curl -L -o ClavisPass.apk "$APK_URL"
+ #         ls -l ClavisPass.apk
+#
+ #     - name: Upload APK artifact
+ #       uses: actions/upload-artifact@v4
+ #       with:
+ #         name: android
+ #         path: ClavisPass.apk
 
   build-updater:
     runs-on: ubuntu-24.04
-    needs: [build-linux, build-windows, build-macos, expo-ota-update, build-android-apk]
+    needs: [build-linux, build-windows, build-macos] #expo-ota-update, build-android-apk
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
