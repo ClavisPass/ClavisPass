@@ -39,6 +39,9 @@ jobs:
       - name: Build Expo Web App for Tauri
         run: npm run web:build-tauri
 
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli
+
       - name: Setup Rust & Tauri
         uses: tauri-apps/tauri-action@v0.4
         with:
@@ -81,6 +84,9 @@ jobs:
       - name: Build Expo Web App for Tauri
         run: npm run web:build-tauri
 
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli
+
       - name: Setup Rust & Tauri
         uses: tauri-apps/tauri-action@v0.4
         with:
@@ -122,6 +128,9 @@ jobs:
 
       - name: Build Expo Web App for Tauri
         run: npm run web:build-tauri
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli
 
       - name: Setup Rust & Tauri
         uses: tauri-apps/tauri-action@v0.4
