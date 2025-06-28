@@ -235,8 +235,8 @@ function HomeScreen({ navigation }: { navigation: any }) {
           padding: 10,
           marginBottom: 4,
           paddingTop: Constants.statusBarHeight,
-          borderBottomLeftRadius: 20,
-          borderBottomRightRadius: 20,
+          borderBottomLeftRadius: 12,
+          borderBottomRightRadius: 12,
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 0 },
           shadowOpacity: 0.4,
@@ -300,6 +300,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
             style={{
               height: 40,
               flex: 1,
+              borderRadius: 10,
               backgroundColor: "rgba(217, 217, 217, 0.21)",
             }}
             placeholder="Search"
