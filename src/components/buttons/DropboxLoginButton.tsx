@@ -9,7 +9,7 @@ import SettingsItem from "../items/SettingsItem";
 import { View } from "react-native";
 
 import { Text } from "react-native-paper";
-const REDIRECT_URI = AuthSession.makeRedirectUri({});
+const REDIRECT_URI = AuthSession.makeRedirectUri({native: "clavispass://redirect"});
 const SCOPES = ["account_info.read files.content.read files.content.write"];
 
 WebBrowser.maybeCompleteAuthSession();
