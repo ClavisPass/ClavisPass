@@ -48,7 +48,7 @@ jobs:
       #    tauriScript: cargo tauri
 
       - name: Build Tauri Application
-        run: cargo tauri build --release
+        run: cargo tauri build -- --release
         working-directory: src-tauri
 
       - name: Upload Linux binaries
