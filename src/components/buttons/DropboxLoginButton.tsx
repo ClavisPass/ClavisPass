@@ -6,6 +6,9 @@ import { useEffect } from "react";
 
 import { DROPBOX_CLIENT_ID } from "@env";
 import SettingsItem from "../items/SettingsItem";
+import { View } from "react-native";
+
+import { Text } from "react-native-paper";
 const REDIRECT_URI = AuthSession.makeRedirectUri({});
 const SCOPES = ["account_info.read files.content.read files.content.write"];
 
@@ -79,9 +82,12 @@ function DropboxLoginButton() {
   };
 
   return (
+    <View>
+      <Text>{REDIRECT_URI}</Text>
     <SettingsItem leadingIcon="dropbox" onPress={handleAuth}>
       Sign in with Dropbox
     </SettingsItem>
+    </View>
   );
 }
 

@@ -228,12 +228,18 @@ jobs:
         run: |
           curl -L -o ClavisPass.apk "$APK_URL"
           ls -l ClavisPass.apk
+      
+      - name: Set version without 'v'
+        run: echo "VERSION_NO_V=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+
+      - name: Rename APK with version
+        run: mv ClavisPass.apk ClavisPass_${{ env.VERSION_NO_V }}_android.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: android
-          path: ClavisPass.apk
+          path: ClavisPass_${{ env.VERSION_NO_V }}_android.apk
 
   build-updater:
     runs-on: ubuntu-24.04
@@ -322,4 +328,4 @@ jobs:
           files: |
             updater.json
             updater.json.sig
-            artifacts/android/ClavisPass.apk
+            artifacts/android/ClavisPass_${{ env.VERSION_NO_V }}_android.apk
