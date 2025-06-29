@@ -140,10 +140,11 @@ function Login(props: Props) {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "space-between",
-            backgroundColor: theme.colors.background,
+            //backgroundColor: theme.colors.background,
+            backgroundColor: "transparent",
           }}
         >
-          <Logo width={40} height={40} style={{ marginTop: 20 }} />
+          <Logo width={40} height={40} style={{ marginTop: 30 }} />
           <View
             style={{
               display: "flex",

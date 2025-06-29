@@ -9,6 +9,7 @@ import UserInformation from "./UserInformation";
 import UserInfoType from "../types/UserInfoType";
 import SettingsItem from "./items/SettingsItem";
 import SettingsDivider from "./SettingsDivider";
+import { View } from "react-native";
 
 type Props = {
   navigation: any;
@@ -18,7 +19,7 @@ type Props = {
 
 function Auth(props: Props) {
   return (
-    <>
+    <View style={{ height: 150 }}>
       <UserInformation
         setUserInfo={props.setUserInfo}
         changeEditTokenVisibility={props.changeEditTokenVisibility}
@@ -32,8 +33,7 @@ function Auth(props: Props) {
       </SettingsItem>
       <SettingsDivider />
       <ShowQRCodeButton />
-      
-    </>
+    </View>
   );
 }
 

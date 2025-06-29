@@ -115,7 +115,7 @@ function ChangeMasterPasswordModal(props: Props) {
           alignItems: "center",
           justifyContent: "center",
           flexDirection: "column",
-          height: 300,
+          height: 200,
           width: 300,
           cursor: "auto",
           gap: 6,
@@ -142,7 +142,11 @@ function ChangeMasterPasswordModal(props: Props) {
               <>
                 {passwordConfirmed ? (
                   <>
-                    <Text>Select new Master Password.</Text>
+                    <View style={{ display: "flex", flexDirection: "column", gap: 6, flexGrow: 1 }}>
+                      <Text variant="headlineSmall" style={{ userSelect: "none" }}>
+                        New Password
+                      </Text>
+                    </View>
                     <View style={{ width: "100%" }}>
                       <PasswordTextbox
                         autofocus
@@ -170,9 +174,14 @@ function ChangeMasterPasswordModal(props: Props) {
                   </>
                 ) : (
                   <>
-                    <Text>
-                      Enter your current Master Password to change it.
-                    </Text>
+                    <View style={{ display: "flex", flexDirection: "column", gap: 6, flexGrow: 1 }}>
+                      <Text variant="headlineSmall" style={{ userSelect: "none" }}>
+                        Verify
+                      </Text>
+                      <Text variant="bodyMedium" style={{ userSelect: "none" }}>
+                        Enter your current Master Password to change it.
+                      </Text>
+                    </View>
                     <View style={{ width: "100%" }}>
                       <PasswordTextbox
                         setCapsLock={setCapsLock}

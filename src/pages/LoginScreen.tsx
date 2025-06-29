@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Image, ImageBackground } from "react-native";
 import AnimatedContainer from "../components/container/AnimatedContainer";
 import ContentProtection from "../components/ContentProtection";
 import { useToken } from "../contexts/TokenProvider";
@@ -19,6 +19,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../ui/linearGradient";
 import { BlurView } from "expo-blur";
 import Logo from "../ui/Logo";
+import Blob1 from "../ui/Blob1";
+import Blob2 from "../ui/Blob2";
 
 const styles = StyleSheet.create({
   container: {
@@ -27,6 +29,12 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     gap: 4,
     margin: 6,
+  },
+  blob: {
+    position: "absolute",
+    width: 420,
+    height: 420,
+    //zIndex: -1,
   },
 });
 
@@ -42,7 +50,7 @@ function LoginScreen({ navigation }: { navigation: any }) {
 
   useFocusEffect(
     React.useCallback(() => {
-      setHeaderWhite(true);
+      setHeaderWhite(false);
     }, [])
   );
 
@@ -89,8 +97,9 @@ function LoginScreen({ navigation }: { navigation: any }) {
 
   return (
     <AnimatedContainer>
-      <LinearGradient
-        colors={getColors()}
+      <ImageBackground
+        source={darkmode?require("../../assets/blurred-bg-dark.png"):require("../../assets/blurred-bg.png")}
+        resizeMode="cover"
         style={{
           flex: 1,
           width: "100%",
@@ -98,29 +107,39 @@ function LoginScreen({ navigation }: { navigation: any }) {
           alignItems: "center",
           justifyContent: "center",
         }}
-        start={{ x: 0, y: 0.5 }}
-        end={{ x: 1, y: 0.5 }}
-        dither={true}
       >
-        <StatusBar
-          animated={true}
-          style={headerWhite ? "light" : darkmode ? "light" : "dark"}
-          translucent={true}
-        />
-        <ContentProtection enabled={false} />
         <View
           style={{
-            height: "70%",
-            borderRadius: 20,
             padding: 20,
-            overflow: "hidden",
-            backgroundColor: theme.colors.background,
-            margin: 8,
-            minWidth: 300,
+            backgroundColor: "rgba(255,255,255,0.2)",
+            flex: 1,
+            width: "100%",
             display: "flex",
+            alignItems: "center",
             justifyContent: "center",
           }}
         >
+          <StatusBar
+            animated={true}
+            style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+            translucent={true}
+          />
+          <ContentProtection enabled={false} />
+          <BlurView
+            intensity={80}
+            style={{
+              height: "70%",
+              borderRadius: 20,
+              padding: 20,
+              overflow: "hidden",
+              //backgroundColor: theme.colors.background,
+              margin: 8,
+              minWidth: 300,
+              display: "flex",
+              justifyContent: "center",
+              boxShadow: theme.colors.shadow,
+            }}
+          >
             {loading ? (
               <ActivityIndicator size={"large"} animating={true} />
             ) : userInfo ? (
@@ -138,8 +157,9 @@ function LoginScreen({ navigation }: { navigation: any }) {
                 />
               </View>
             )}
-          </View>
-      </LinearGradient>
+          </BlurView>
+        </View>
+      </ImageBackground>
     </AnimatedContainer>
   );
 }

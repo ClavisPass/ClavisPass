@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <title>ClavisPass</title>
+    <link rel="icon" type="image/png" href="./assets/favicon.png" />
     <meta
       property="og:title"
       content="Active online software page - Template"
@@ -445,6 +446,7 @@
           </div>
 -->
           <div class="home-banner">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
             <div class="home-container17">
               <div class="home-left3">
                 <span class="home-text139">Downloads</span>
@@ -452,14 +454,18 @@
                   Download ClavisPass for Your Platform
                 </h2>
                 <span class="home-text141"
-                  >Easily access the latest version of ClavisPass for Windows, MacOS, or Linux. Choose your platform and start managing your passwords securely.</span
+                  >Easily access the latest version of ClavisPass for Windows, MacOS, Linux or Android. Choose your platform and start managing your passwords securely.</span
                 >
                 <a class="home-text135" href="https://github.com/ClavisPass/ClavisPass/releases" target="_blank">GitHub Releases -&gt;</a>
               </div>
               <div class="home-image-container3">
-                <div id="releases">Loading releases...</div>
+                <div id="latest-release">Loading latest release...</div>
               </div>
             </div>
+            <div class="home-centered-container1">
+              <div id="releases">Loading releases...</div>
+            </div>
+          </div>
           </div>
         </section>
         <section class="home-faq">
@@ -573,6 +579,48 @@
                   const releasesContainer = document.getElementById('releases');
                   releasesContainer.innerHTML = '';
 
+                  const latestReleaseContainer = document.getElementById('latest-release');
+                  latestReleaseContainer.innerHTML = '';
+
+                  const latest = data[0];
+
+                  if (latest) {
+                    const assets = latest.assets || [];
+                    const findAsset = (keyword) =>
+                      assets.find(asset => asset.name.toLowerCase().includes(keyword));
+
+                      console.log('Latest release:', latest);
+                    const macAsset = findAsset('.dmg');
+                    const winAsset = findAsset('.exe') || findAsset('.msi');
+                    const linuxAsset = findAsset('.AppImage') || findAsset('.deb') || findAsset('.rpm');
+                    const androidAsset = findAsset('.apk');
+
+                    latestReleaseContainer.innerHTML = `
+                    <div style="height: 100%">
+                    <span class="home-text139">Latest Release</span>
+                    <div class="linear-gradient-container">
+                      <h4 class="home-text141" style="color: white">${latest.body}</h4>
+                      <div class="linear-gradient-innercontainer">
+                        <button class="home-sign-in Link linear-gradient-innercontainer-text" ${winAsset ? `onclick="window.open('${winAsset.browser_download_url}', '_blank')"` : 'disabled'}>
+                          Windows
+                        </button>
+                        <span class="home-sign-in linear-gradient-innercontainer-text">|</span>
+                        <button class="home-sign-in Link linear-gradient-innercontainer-text" ${macAsset ? `onclick="window.open('${macAsset.browser_download_url}', '_blank')"` : 'disabled'}>
+                          MacOS
+                        </button>
+                        <span class="home-sign-in linear-gradient-innercontainer-text">|</span>
+                        <button class="home-sign-in Link linear-gradient-innercontainer-text" ${linuxAsset ? `onclick="window.open('${linuxAsset.browser_download_url}', '_blank')"` : 'disabled'}>
+                          Linux
+                        </button>
+                        <span class="home-sign-in linear-gradient-innercontainer-text">|</span>
+                        <button class="home-sign-in Link linear-gradient-innercontainer-text" ${androidAsset ? `onclick="window.open('${androidAsset.browser_download_url}', '_blank')"` : 'disabled'}>
+                          Android
+                        </button>
+                      </div>
+                    </div>
+                    </div>
+                    `;
+                  }
                   data.forEach(release => {
                     const releaseElement = document.createElement('div');
                     releaseElement.classList.add('release-entry');
@@ -586,6 +634,7 @@
                     const macAsset = findAsset('.dmg');
                     const winAsset = findAsset('.exe') || findAsset('.msi');
                     const linuxAsset = findAsset('.AppImage') || findAsset('.deb') || findAsset('.rpm');
+                    const androidAsset = findAsset('.apk');
 
                     releaseElement.innerHTML = `
                       <h3>${release.name}</h3>
@@ -600,6 +649,10 @@
                         <span class="home-sign-in">|</span>
                         <button class="home-sign-in Link" ${linuxAsset ? `onclick="window.open('${linuxAsset.browser_download_url}', '_blank')"` : 'disabled'}>
                           Linux
+                        </button>
+                        <span class="home-sign-in">|</span>
+                        <button class="home-sign-in Link" ${androidAsset ? `onclick="window.open('${androidAsset.browser_download_url}', '_blank')"` : 'disabled'}>
+                          Android
                         </button>
                       </div>
                     `;

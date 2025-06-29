@@ -31,20 +31,14 @@ ClavisPass is a modern, privacy-focused password manager that works *with your o
 | 🖥️ Windows | ✅ Released |
 | 🐧 Linux   | ✅ Released |
 | 🍎 macOS   | ✅ Released |
-| 📱 Android | 🚧 Coming soon |
+| 📱 Android | ✅ Released |
 | 📱 iOS     | 🚧 Coming soon |
 
 ---
 
 ## Installation
 
-### Desktop
-
 Download the latest release for your platform from the [Releases Page](https://github.com/ClavisPass/ClavisPass/releases).
-
-### Mobile
-
-> *Coming soon via Expo and app stores*
 
 ---
 

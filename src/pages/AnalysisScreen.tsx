@@ -1,7 +1,7 @@
 import Constants from "expo-constants";
 import React, { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
-import { Text, TextInput, TouchableRipple } from "react-native-paper";
+import { Icon, Text, TextInput, TouchableRipple } from "react-native-paper";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import { StatusBar } from "expo-status-bar";
 import AnimatedContainer from "../components/container/AnimatedContainer";
@@ -19,6 +19,7 @@ import AnalysisEntryGradient from "../components/AnalysisEntryGradient";
 import Divider from "../components/Divider";
 import PasswordStrengthLevel from "../enums/PasswordStrengthLevel";
 import getPasswordStrengthColor from "../utils/getPasswordStrengthColor";
+import getPasswordStrengthIcon from "../utils/getPasswordStrengthIcon";
 
 export type CachedPasswordsType = {
   title: string;
@@ -310,15 +311,13 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
                       </Text>
                       <Text style={{ userSelect: "none" }}>{item.title}</Text>
                     </View>
-                    <View
-                      style={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: 50,
-                        backgroundColor: getPasswordStrengthColor(
-                          item.passwordStrengthLevel
-                        ),
-                      }}
+
+                    <Icon
+                      source={getPasswordStrengthIcon(item.passwordStrengthLevel)}
+                      size={20}
+                      color={getPasswordStrengthColor(
+                        item.passwordStrengthLevel
+                      )}
                     />
                   </View>
                 </TouchableRipple>

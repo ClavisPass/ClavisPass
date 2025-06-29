@@ -15,6 +15,7 @@ import Pattern from "../components/Pattern";
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import getPasswordStrengthColor from "../utils/getPasswordStrengthColor";
+import getPasswordStrengthIcon from "../utils/getPasswordStrengthIcon";
 
 type AnalysisDetailScreenProps = StackScreenProps<
   RootStackParamList,
@@ -356,10 +357,17 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              flexDirection: "row",
               borderRadius: 10,
+              gap: 6,
               boxShadow: theme.colors.shadow,
             }}
           >
+            <Icon
+              source={getPasswordStrengthIcon(routeValue.passwordStrengthLevel)}
+              size={18}
+              color={"white"}
+            />
             <Text style={{ color: "white" }}>
               {routeValue.passwordStrengthLevel}
             </Text>

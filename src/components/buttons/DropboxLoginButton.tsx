@@ -6,13 +6,19 @@ import { useEffect } from "react";
 
 import { DROPBOX_CLIENT_ID } from "@env";
 import SettingsItem from "../items/SettingsItem";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 
 import { Text } from "react-native-paper";
-const REDIRECT_URI = AuthSession.makeRedirectUri({native: "clavispass://redirect"});
+const REDIRECT_URI = getRedirectUri();
 const SCOPES = ["account_info.read files.content.read files.content.write"];
 
 WebBrowser.maybeCompleteAuthSession();
+
+export function getRedirectUri(): string {
+  return AuthSession.makeRedirectUri({
+    native: "clavispass://redirect",
+  });
+}
 
 function DropboxLoginButton() {
   const { setToken, setRefreshToken, saveRefreshToken, checkTokenType } =
@@ -32,7 +38,6 @@ function DropboxLoginButton() {
     {
       authorizationEndpoint: "https://www.dropbox.com/oauth2/authorize",
       tokenEndpoint: "https://api.dropboxapi.com/oauth2/token",
-      //revocationEndpoint: "https://api.dropboxapi.com/oauth2/token/revoke",
     }
   );
 
@@ -82,12 +87,9 @@ function DropboxLoginButton() {
   };
 
   return (
-    <View>
-      <Text>{REDIRECT_URI}</Text>
     <SettingsItem leadingIcon="dropbox" onPress={handleAuth}>
       Sign in with Dropbox
     </SettingsItem>
-    </View>
   );
 }
 
