@@ -3671,6 +3671,36 @@
   font-size: larger;
 }
 
+.linear-gradient-container {
+  color: white;
+  padding: 30px;
+  border-radius: 30px;
+  background: linear-gradient(0.25turn, #787ff6, #69c4ff);
+  gap: 30px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.linear-gradient-innercontainer{
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  background: white;
+  display: flex;
+  flex-direction: row;
+}
+
+.linear-gradient-innercontainer-text{
+  font-family: "Lexend Exa", sans-serif !important;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  background: linear-gradient(0.25turn, #787ff6, #69c4ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .typewriter {
   overflow: hidden; /* Ensures the content is not revealed until the animation */
   border-right: 0.15em solid #787ff6; /* The typwriter cursor */
