@@ -9,10 +9,12 @@ import { useTheme } from "../../contexts/ThemeProvider";
 import fetchData from "../../api/fetchData";
 import CryptoType, { CryptoTypeSchema } from "../../types/CryptoType";
 import { useToken } from "../../contexts/TokenProvider";
-import { decrypt } from "../../utils/CryptoLayer";
-import { DataTypeSchema } from "../../types/DataType";
+import { decrypt, encrypt } from "../../utils/CryptoLayer";
+import DataType, { DataTypeSchema } from "../../types/DataType";
 import { set } from "zod";
 import { compare, getDateTime } from "../../utils/Timestamp";
+import uploadData from "../../api/uploadData";
+import { useAuth } from "../../contexts/AuthProvider";
 
 type Props = {
   visible: boolean;
@@ -21,7 +23,10 @@ type Props = {
 
 function ChangeMasterPasswordModal(props: Props) {
   const data = useData();
+  const auth = useAuth();
   const { theme } = useTheme();
+
+  const [refreshing, setRefreshing] = useState(false);
 
   const { token, tokenType } = useToken();
 
@@ -40,6 +45,8 @@ function ChangeMasterPasswordModal(props: Props) {
   const [parsedCryptoData, setParsedCryptoData] = useState<CryptoType | null>(
     null
   );
+
+  const [parsedData, setParsedData] = useState<DataType | null>(null);
 
   const [loading, setLoading] = useState(true);
 
@@ -78,10 +85,10 @@ function ChangeMasterPasswordModal(props: Props) {
   }, [props.visible]);
 
   useEffect(() => {
-    if (newPassword !== "" && confirmPassword !== "") {
+    if (newPassword !== "" && confirmPassword !== "" && parsedData) {
       setPasswordNotEqual(newPassword !== confirmPassword);
     }
-  }, [newPassword, confirmPassword]);
+  }, [newPassword, confirmPassword, parsedData]);
 
   const login = async (value: string, parsedCryptoData: CryptoType | null) => {
     try {
@@ -92,7 +99,7 @@ function ChangeMasterPasswordModal(props: Props) {
       const decryptedData = decrypt(parsedCryptoData, value);
       const jsonData = JSON.parse(decryptedData);
 
-      const parsedData = DataTypeSchema.parse(jsonData);
+      setParsedData(DataTypeSchema.parse(jsonData));
       setPasswordConfirmed(true);
     } catch (error) {
       console.error("Error getting Data:", error);
@@ -103,6 +110,24 @@ function ChangeMasterPasswordModal(props: Props) {
         setError(false);
       }, 1000);
     }
+  };
+
+  const uploadPassword = async () => {
+    const lastUpdated = getDateTime();
+    setRefreshing(true);
+    auth.login(newPassword);
+    data.setLastUpdated(lastUpdated);
+    uploadData(
+      token,
+      tokenType,
+      await encrypt(parsedData, newPassword, lastUpdated),
+      "clavispass.lock",
+      () => {
+        data.setData(parsedData);
+        setRefreshing(false);
+        props.setVisible(false);
+      }
+    );
   };
 
   return (
@@ -142,8 +167,18 @@ function ChangeMasterPasswordModal(props: Props) {
               <>
                 {passwordConfirmed ? (
                   <>
-                    <View style={{ display: "flex", flexDirection: "column", gap: 6, flexGrow: 1 }}>
-                      <Text variant="headlineSmall" style={{ userSelect: "none" }}>
+                    <View
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 6,
+                        flexGrow: 1,
+                      }}
+                    >
+                      <Text
+                        variant="headlineSmall"
+                        style={{ userSelect: "none" }}
+                      >
                         New Password
                       </Text>
                     </View>
@@ -163,19 +198,32 @@ function ChangeMasterPasswordModal(props: Props) {
                         setValue={setConfirmPassword}
                         value={confirmPassword}
                         placeholder="Confirm Password"
-                        onSubmitEditing={() => {}}
+                        onSubmitEditing={
+                          passwordNotEqual ? undefined : uploadPassword
+                        }
                       />
                     </View>
                     <Button
                       disabled={passwordNotEqual}
                       text={"Set Password"}
-                      onPress={() => {}}
+                      onPress={uploadPassword}
+                      loading={refreshing}
                     ></Button>
                   </>
                 ) : (
                   <>
-                    <View style={{ display: "flex", flexDirection: "column", gap: 6, flexGrow: 1 }}>
-                      <Text variant="headlineSmall" style={{ userSelect: "none" }}>
+                    <View
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 6,
+                        flexGrow: 1,
+                      }}
+                    >
+                      <Text
+                        variant="headlineSmall"
+                        style={{ userSelect: "none" }}
+                      >
                         Verify
                       </Text>
                       <Text variant="bodyMedium" style={{ userSelect: "none" }}>

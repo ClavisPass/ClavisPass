@@ -1,6 +1,11 @@
 import React from "react";
 import { DimensionValue, StyleSheet, View } from "react-native";
-import { Icon, Text, TouchableRipple } from "react-native-paper";
+import {
+  ActivityIndicator,
+  Icon,
+  Text,
+  TouchableRipple,
+} from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../../ui/linearGradient";
 import { useTheme } from "../../contexts/ThemeProvider";
@@ -31,6 +36,7 @@ type Props = {
   color?: string;
   maxWidth?: number | DimensionValue;
   white?: boolean;
+  loading?: boolean;
 };
 
 function Button(props: Props) {
@@ -38,8 +44,14 @@ function Button(props: Props) {
   return (
     <>
       {props.color ? (
-        <View style={[styles.container, { backgroundColor: props.color, maxWidth: props.maxWidth }]}>
+        <View
+          style={[
+            styles.container,
+            { backgroundColor: props.color, maxWidth: props.maxWidth },
+          ]}
+        >
           <Content
+            loading={props.loading}
             disabled={props.disabled}
             onPress={props.onPress}
             icon={props.icon}
@@ -58,6 +70,7 @@ function Button(props: Props) {
           dither={true}
         >
           <Content
+            loading={props.loading}
             disabled={props.disabled}
             onPress={props.onPress}
             icon={props.icon}
@@ -69,7 +82,15 @@ function Button(props: Props) {
   );
 }
 
-function Content({white = true, ...props}: Props) {
+function Content({ white = true, ...props }: Props) {
+  if (props.loading) {
+    return (
+      <View style={styles.ripple}>
+        <ActivityIndicator color="white" />
+      </View>
+    );
+  }
+
   return (
     <TouchableRipple
       disabled={props.disabled}
@@ -84,15 +105,24 @@ function Content({white = true, ...props}: Props) {
           alignItems: "center",
         }}
       >
-        {props.icon && <Icon source={props.icon} size={24} color={white ? "white" : undefined} />}
-        {props.text && (
-          <Text
-            style={{ color: white ? "white" : undefined, userSelect: "none" }}
-            variant="bodyMedium"
-          >
-            {props.text}
-          </Text>
-        )}
+        {}
+        <>
+          {props.icon && (
+            <Icon
+              source={props.icon}
+              size={24}
+              color={white ? "white" : undefined}
+            />
+          )}
+          {props.text && (
+            <Text
+              style={{ color: white ? "white" : undefined, userSelect: "none" }}
+              variant="bodyMedium"
+            >
+              {props.text}
+            </Text>
+          )}
+        </>
       </View>
     </TouchableRipple>
   );

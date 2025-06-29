@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
 
-import { Text, Button } from "react-native-paper";
-
 // Expo Updates für Mobile
 import * as Updates from "expo-updates";
 // Tauri Updater für Desktop
 import { check, Update as UpdateProp } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
+import SettingsItem from "./items/SettingsItem";
+import SettingsDivider from "./SettingsDivider";
+import Button from "./buttons/Button";
 
 const UpdateManager = () => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -114,15 +115,12 @@ const UpdateManager = () => {
   }, [update]);
 
   return (
-    <View style={{ padding: 20, width: "50%" }}>
-      <Text>{updateMessage}</Text>
-      <Text>{getContentLength}</Text>
-      <Text>{downloaded}</Text>
+    <View >
+      <SettingsItem>{updateMessage}</SettingsItem>
       {updateAvailable && (
-        <Button mode="contained" onPress={applyUpdate}>
-          Update
-        </Button>
+        <Button onPress={applyUpdate} text="Update"/>
       )}
+      <SettingsDivider />
     </View>
   );
 };

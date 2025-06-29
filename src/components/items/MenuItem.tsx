@@ -14,14 +14,7 @@ export function MenuItem(props: Props) {
   const { theme } = useTheme();
   return (
     <View style={{ height: 44 }}>
-      <TouchableRipple
-        onPress={props.onPress}
-        style={{
-          cursor: props.onPress ? "pointer" : "auto",
-          flex: 1,
-        }}
-        rippleColor="rgba(0, 0, 0, .32)"
-      >
+      <Ripple onPress={props.onPress}>
         <View
           style={{
             flex: 1,
@@ -75,7 +68,27 @@ export function MenuItem(props: Props) {
             </Text>
           )}
         </View>
-      </TouchableRipple>
+      </Ripple>
     </View>
   );
+}
+
+function Ripple(props: { onPress?: () => void; children: ReactNode}) {
+  if(props.onPress) {
+    return (
+      <TouchableRipple
+        onPress={props.onPress}
+        style={{
+          cursor: "pointer",
+          flex: 1,
+        }}
+        rippleColor="rgba(0, 0, 0, .32)"
+      >
+        {props.children}
+      </TouchableRipple>
+  );
+  }
+  else{
+    return props.children;
+  }
 }
