@@ -318,7 +318,7 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           body: |
-            ClavisPass Version ${{ VERSION_NO_V }}
+            ClavisPass Version ${{ env.VERSION_NO_V }}
 
             This release includes the latest builds of ClavisPass for Windows, macOS, Linux and Android.
 
