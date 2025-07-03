@@ -19,7 +19,7 @@ type Props = {
 
 function Auth(props: Props) {
   return (
-    <View style={{ height: 150 }}>
+    <View style={{ height: 147 }}>
       <UserInformation
         setUserInfo={props.setUserInfo}
         changeEditTokenVisibility={props.changeEditTokenVisibility}
