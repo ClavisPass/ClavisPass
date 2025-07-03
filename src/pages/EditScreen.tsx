@@ -168,7 +168,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     if (!edit) {
       Animated.parallel([
         Animated.timing(slideAnim, {
-          toValue: 44,
+          toValue: 56,
           duration: 250,
           useNativeDriver: false,
         }),
@@ -220,16 +220,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             }}
           />
         }
-      >
-        <IconButton
-          icon="clipboard-text-clock-outline"
-          size={20}
-          iconColor={theme.colors?.primary}
-          onPress={(event) => {
-            setShowMenu(true);
-          }}
-        />
-      </Header>
+      ></Header>
       <View
         style={{
           width: "100%",
@@ -270,14 +261,16 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             <Text>{value.folder === "" ? "None" : value.folder}</Text>
           </View>
         </ContainerButton>
-        <SquaredContainerButton onPress={changeFav}>
-          <Icon source={favIcon} color={theme.colors?.primary} size={20} />
-        </SquaredContainerButton>
         <SquaredContainerButton
-          onPress={() => setDeleteModalVisible(true)}
-          backgroundColor={theme.colors?.error}
+          onPress={() => {
+            setShowMenu(true);
+          }}
         >
-          <Icon source="trash-can-outline" size={20} color={"white"} />
+          <Icon
+            source={"clipboard-text-clock-outline"}
+            color={theme.colors?.primary}
+            size={20}
+          />
         </SquaredContainerButton>
       </View>
       {Platform.OS === "web" ? (
@@ -312,24 +305,30 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           height: slideAnim,
           opacity: fadeAnim,
           width: "100%",
-          margin: 0,
-          padding: 0,
-          paddingLeft: 8,
-          paddingRight: 8,
-          paddingTop: 4,
-          overflow: "hidden",
+          padding: 8,
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          flexDirection: "row",
+          gap: 8,
         }}
       >
         {!edit && (
-          <Button
-            maxWidth={200}
-            icon="content-save"
-            onPress={saveValue}
-            disabled={!discardChanges || value.title === ""}
-          />
+          <>
+            <ContainerButton onPress={changeFav}>
+              <Icon source={favIcon} color={theme.colors?.primary} size={20} />
+            </ContainerButton>
+            <Button
+              icon="content-save"
+              onPress={saveValue}
+              disabled={!discardChanges || value.title === ""}
+              style={{ flexGrow: 5, width: "50%", boxShadow: theme.colors?.shadow }}
+            />
+            <ContainerButton
+              onPress={() => setDeleteModalVisible(true)}
+              backgroundColor={theme.colors?.error}
+            >
+              <Icon source="trash-can-outline" size={20} color={"white"} />
+            </ContainerButton>
+          </>
         )}
       </Animated.View>
 
@@ -343,7 +342,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         setVisible={setShowMenu}
         created={routeValue.created}
         lastUpdated={routeValue.lastUpdated}
-        positionY={Constants.statusBarHeight + TITLEBAR_HEIGHT + 50}
+        positionY={Constants.statusBarHeight + TITLEBAR_HEIGHT + 104}
       />
       <FolderModal
         visible={folderModalVisible}

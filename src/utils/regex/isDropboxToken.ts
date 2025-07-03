@@ -1,5 +1,5 @@
 function isDropboxToken(token: string) {
-  const regex = /^sl\.[A-Za-z0-9-_]+$/;
+  const regex = /^[A-Za-z0-9_-]{50,}$/;
   if (regex.test(token)) {
     return true;
   } else {

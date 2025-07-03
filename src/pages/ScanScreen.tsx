@@ -14,6 +14,7 @@ import isDropboxToken from "../utils/regex/isDropboxToken";
 import isGoogleDriveToken from "../utils/regex/isGoogleDriveToken";
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
+import { set } from "../utils/store";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -55,10 +56,12 @@ type ScanScreenProps = StackScreenProps<RootStackParamList, "Scan">;
 
 const ScanScreen: React.FC<ScanScreenProps> = ({ route, navigation }) => {
   const { globalStyles, headerWhite, setHeaderWhite, darkmode } = useTheme();
-  const { setToken } = useToken();
+  const { setRefreshToken, setTokenType, renewAccessToken } = useToken();
 
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
+
+  const [trying, setTrying] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -67,19 +70,27 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ route, navigation }) => {
   );
 
   function isValidTokenFormat(token: string) {
-    let tokenType: "Dropbox" | "GoogleDrive" | null = null;
-    if (isDropboxToken(token)) tokenType = "Dropbox";
-    if (isGoogleDriveToken(token)) tokenType = "GoogleDrive";
-
-    if (tokenType) {
-      try {
-        fetchUserInfo(token, tokenType, () => {});
-        return true;
-      } catch (error) {
-        return false;
-      }
+    setTrying(true);
+    if (!isDropboxToken(token)) {
+      console.log("Invalid Dropbox token format.");
+      return;
     }
-    return false;
+    try {
+      renewAccessToken(token).then((data) => {
+        if (data) {
+          setTokenType("Dropbox");
+          setRefreshToken(token);
+          setTrying(false);
+          navigation.goBack();
+          return true;
+        }
+      });
+      setTrying(false);
+      return false;
+    } catch (error) {
+      setTrying(false);
+      return false;
+    }
   }
 
   function toggleCameraFacing() {
@@ -89,7 +100,11 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ route, navigation }) => {
   return (
     <AnimatedContainer style={globalStyles.container}>
       <TitlebarHeight />
-      <StatusBar animated={true} style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent={true} />
+      <StatusBar
+        animated={true}
+        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        translucent={true}
+      />
       <Header
         onPress={() => {
           navigation.goBack();
@@ -116,9 +131,9 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ route, navigation }) => {
           }}
           onBarcodeScanned={(scanningResult) => {
             try {
+              if (trying) return;
               if (isValidTokenFormat(scanningResult.data)) {
-                setToken(scanningResult.data);
-                navigation.goBack();
+                setRefreshToken(scanningResult.data);
               }
             } catch (error) {
               console.error(error);

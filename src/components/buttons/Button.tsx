@@ -1,5 +1,11 @@
 import React from "react";
-import { DimensionValue, StyleSheet, View } from "react-native";
+import {
+  DimensionValue,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle,
+} from "react-native";
 import {
   ActivityIndicator,
   Icon,
@@ -37,6 +43,7 @@ type Props = {
   maxWidth?: number | DimensionValue;
   white?: boolean;
   loading?: boolean;
+  style?: StyleProp<ViewStyle>;
 };
 
 function Button(props: Props) {
@@ -48,6 +55,7 @@ function Button(props: Props) {
           style={[
             styles.container,
             { backgroundColor: props.color, maxWidth: props.maxWidth },
+            props.style,
           ]}
         >
           <Content
@@ -65,7 +73,7 @@ function Button(props: Props) {
               ? [theme.colors?.surfaceDisabled, theme.colors?.surfaceDisabled]
               : getColors()
           }
-          style={[styles.container, { maxWidth: props.maxWidth }]}
+          style={[styles.container, { maxWidth: props.maxWidth }, props.style]}
           end={{ x: 0.1, y: 0.2 }}
           dither={true}
         >

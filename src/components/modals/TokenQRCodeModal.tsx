@@ -13,19 +13,19 @@ type Props = {
 };
 
 function TokenQRCodeModal(props: Props) {
-  const { token } = useToken();
+  const { refreshToken } = useToken();
   const [value, setValue] = useState("");
   const hideModal = () => props.setVisible(false);
   useEffect(() => {
-    if (token) {
+    if (refreshToken) {
       hideModal();
-      setValue(token)
+      setValue(refreshToken)
     }
     else{
       hideModal();
       setValue("")
     }
-  }, [token]);
+  }, [refreshToken]);
   return (
     <Portal>
       <Modal visible={props.visible} onDismiss={hideModal}>

@@ -6,11 +6,11 @@ import SettingsItem from "../items/SettingsItem";
 import SettingsDivider from "../SettingsDivider";
 
 function ShowQRCodeButton() {
-  const { token, setToken } = useToken();
+  const { refreshToken } = useToken();
   const [qrCodeVisible, setQrCodeVisible] = useState(false);
   return (
     <>
-      {token && (
+      {refreshToken && (
         <>
           <SettingsItem leadingIcon={"qrcode"} onPress={() => setQrCodeVisible(true)}>Show QR-Code</SettingsItem>
           <TokenQRCodeModal
