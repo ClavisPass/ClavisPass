@@ -44,7 +44,7 @@ function ModalContainerWeb(props: Props) {
       style={[
         {
           position: "absolute",
-          top: 0,
+          top: 40,
           bottom: 0,
           left: 0,
           right: 0,
@@ -70,7 +70,7 @@ function ModalContainerWeb(props: Props) {
         style={{
           overflow: "hidden",
           backgroundColor: theme.colors?.elevation.level3,
-          borderRadius: 20,
+          borderRadius: 12,
           maxWidth: 400,
           boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
           zIndex: 10000,

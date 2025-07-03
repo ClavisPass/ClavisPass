@@ -21,20 +21,19 @@ import { BlurView } from "expo-blur";
 import Logo from "../ui/Logo";
 import Blob1 from "../ui/Blob1";
 import Blob2 from "../ui/Blob2";
+import SettingsDivider from "../components/SettingsDivider";
 
 const styles = StyleSheet.create({
   container: {
-    width: 200,
+    width: "100%",
     display: "flex",
     flexDirection: "column",
-    gap: 4,
     margin: 6,
   },
   blob: {
     position: "absolute",
     width: 420,
     height: 420,
-    //zIndex: -1,
   },
 });
 
@@ -146,6 +145,7 @@ function LoginScreen({ navigation }: { navigation: any }) {
               <Login userInfo={userInfo} />
             ) : (
               <View style={styles.container}>
+                <SettingsDivider />
                 <Auth
                   setUserInfo={setUserInfo}
                   navigation={navigation}

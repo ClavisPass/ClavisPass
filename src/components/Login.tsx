@@ -144,7 +144,7 @@ function Login(props: Props) {
             backgroundColor: "transparent",
           }}
         >
-          <Logo width={40} height={40} style={{ marginTop: 30 }} />
+          <Logo width={50} height={50} style={{ marginTop: 40 }} />
           <View
             style={{
               display: "flex",

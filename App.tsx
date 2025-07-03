@@ -20,12 +20,17 @@ import EditScreen from "./src/pages/EditScreen";
 import AnalysisScreen, {
   CachedPasswordsType,
 } from "./src/pages/AnalysisScreen";
-import { AuthProvider } from "./src/contexts/AuthProvider";
+import { AuthProvider, useAuth } from "./src/contexts/AuthProvider";
 import { DataProvider } from "./src/contexts/DataProvider";
 import ProtectedRoute from "./src/utils/ProtectedRoute";
 import LoginScreen from "./src/pages/LoginScreen";
 import transitionSpecConfig from "./src/configs/TransitionSpecConfig";
-import { Platform, View } from "react-native";
+import {
+  Platform,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import CustomTitlebar from "./src/components/CustomTitlebar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import GlobalShortcuts from "./src/components/shortcuts/GlobalShortcuts";
@@ -36,6 +41,8 @@ import ScanScreen from "./src/pages/ScanScreen";
 import theme from "./src/ui/theme";
 import AnalysisDetailScreen from "./src/pages/AnalysisDetailScreen";
 import { OnlineProvider } from "./src/contexts/OnlineProvider";
+import LogoutScreen from "./src/pages/LogoutScreen";
+import CustomBottomTab from "./src/ui/CustomBottomTab";
 
 const Tab = createBottomTabNavigator();
 
@@ -63,7 +70,7 @@ export default function App() {
                   <CustomTitlebar />
                   <NavigationContainer>
                     <ProtectedRoute loginScreen={<LoginStack />}>
-                      <Tab.Navigator
+                      {/*<Tab.Navigator
                         initialRouteName="HomeStack"
                         screenOptions={{
                           headerShown: false,
@@ -124,6 +131,20 @@ export default function App() {
                         )}
                       >
                         <Tab.Screen
+                          name="HomeStack"
+                          component={HomeStack}
+                          options={{
+                            tabBarLabel: "Home",
+                            title: "Home",
+
+                            tabBarIcon: ({ color, size }) => {
+                              return (
+                                <Icon name="home" size={size} color={color} />
+                              );
+                            },
+                          }}
+                        />
+                        <Tab.Screen
                           name="AnalysisStack"
                           component={AnalysisStack}
                           options={{
@@ -141,6 +162,35 @@ export default function App() {
                           }}
                         />
                         <Tab.Screen
+                          name="SettingsStack"
+                          component={SettingsStack}
+                          options={{
+                            tabBarLabel: "Settings",
+                            title: "Settings",
+                            tabBarIcon: ({ color, size }) => {
+                              return (
+                                <Icon name="cog" size={size} color={color} />
+                              );
+                            },
+                          }}
+                        />
+                        <Tab.Screen
+                          name="Logout"
+                          component={LogoutScreen}
+                          options={{
+                            tabBarLabel: "Logout",
+                            tabBarIcon: ({ color, size }) => (
+                              <Icon name="logout" color={color} size={size} />
+                            ),
+                          }}
+                        />
+                      </Tab.Navigator>*/}
+                      <Tab.Navigator
+                        initialRouteName="HomeStack"
+                        screenOptions={{ headerShown: false }}
+                        tabBar={(props) => <CustomBottomTab {...props} />}
+                      >
+                        <Tab.Screen
                           name="HomeStack"
                           component={HomeStack}
                           options={{
@@ -155,6 +205,33 @@ export default function App() {
                           }}
                         />
                         <Tab.Screen
+                          name="AnalysisStack"
+                          component={AnalysisStack}
+                          options={{
+                            tabBarLabel: "Analysis",
+                            title: "Analysis",
+                            tabBarIcon: ({ color, size }) => {
+                              return (
+                                <Icon
+                                  name="shield-search"
+                                  size={size}
+                                  color={color}
+                                />
+                              );
+                            },
+                          }}
+                        />
+                        <Tab.Screen
+                          name="AddTrigger"
+                          component={() => null} // Dummy-Screen
+                          options={{
+                            tabBarLabel: "Add",
+                            tabBarIcon: ({ color, size }) => (
+                              <Icon name="plus" size={size} color={color} />
+                            ),
+                          }}
+                        />
+                        <Tab.Screen
                           name="SettingsStack"
                           component={SettingsStack}
                           options={{
@@ -165,6 +242,16 @@ export default function App() {
                                 <Icon name="cog" size={size} color={color} />
                               );
                             },
+                          }}
+                        />
+                        <Tab.Screen
+                          name="Logout"
+                          component={LogoutScreen}
+                          options={{
+                            tabBarLabel: "Logout",
+                            tabBarIcon: ({ color, size }) => (
+                              <Icon name="logout" color={color} size={size} />
+                            ),
                           }}
                         />
                       </Tab.Navigator>
@@ -181,7 +268,9 @@ export default function App() {
 }
 
 export type RootStackParamList = {
-  Home: undefined;
+  Home: {
+    triggerAdd: boolean | undefined;
+  };
   Edit: {
     value: ValuesType;
   };

@@ -44,35 +44,14 @@ import {
 } from "@expo-google-fonts/lexend-exa";
 import { getDateTime } from "../utils/Timestamp";
 import LogoColored from "../ui/LogoColored";
+import { RootStackParamList } from "../../App";
+import { StackScreenProps } from "@react-navigation/stack";
 
-type Props = {
-  setShowMenu: (boolean: boolean) => void;
-  setValueModalVisible: (boolean: boolean) => void;
-};
+type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
 
-function Tools(props: Props) {
-  return (
-    <>
-      <IconButton
-        icon="plus"
-        size={25}
-        onPress={() => props.setValueModalVisible(true)}
-        iconColor="white"
-      />
+const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
+  const triggerAdd = route.params?.triggerAdd ?? false;
 
-      <IconButton
-        icon="sort-variant"
-        size={25}
-        onPress={() => {
-          props.setShowMenu(true);
-        }}
-        iconColor="white"
-      />
-    </>
-  );
-}
-
-function HomeScreen({ navigation }: { navigation: any }) {
   const { theme, headerWhite, setHeaderWhite, darkmode } = useTheme();
   const { width, height } = useWindowDimensions();
   const auth = useAuth();
@@ -98,6 +77,16 @@ function HomeScreen({ navigation }: { navigation: any }) {
 
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (triggerAdd) {
+      console.log("Add-Aktion aus HomeScreen erkannt!");
+      setValueModalVisible(true);
+
+      // Zustand resetten
+      navigation.setParams({ triggerAdd: undefined });
+    }
+  }, [triggerAdd]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -278,14 +267,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
               ClavisPass
             </Text>
           </View>
-          <View style={{ display: "flex", flexDirection: "row" }}>
-            <WebSpecific notIn={true}>
-              <Tools
-                setShowMenu={setShowMenu}
-                setValueModalVisible={setValueModalVisible}
-              />
-            </WebSpecific>
-          </View>
         </View>
         <View
           style={{
@@ -310,12 +291,15 @@ function HomeScreen({ navigation }: { navigation: any }) {
             iconColor={"#ffffff80"}
             placeholderTextColor={"#ffffff80"}
           />
-          <WebSpecific>
-            <Tools
-              setShowMenu={setShowMenu}
-              setValueModalVisible={setValueModalVisible}
-            />
-          </WebSpecific>
+          <IconButton
+            icon="sort-variant"
+            size={25}
+            onPress={() => {
+              setShowMenu(true);
+            }}
+            iconColor="white"
+            style={{marginTop: 0, marginBottom: 0, marginRight: 0 }}
+          />
         </View>
       </LinearGradient>
       <Animated.View
@@ -450,7 +434,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
         positionY={
           Constants.statusBarHeight +
           TITLEBAR_HEIGHT +
-          (Platform.OS === "web" ? 48 : 66)
+          (Platform.OS === "web" ? 48 : 100)
         }
         openEditFolder={() => setFolderModalVisible(true)}
         refreshData={refreshData}
@@ -468,6 +452,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
       />
     </AnimatedContainer>
   );
-}
+};
 
 export default HomeScreen;

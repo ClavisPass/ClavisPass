@@ -15,6 +15,12 @@ const SCOPES = ["account_info.read files.content.read files.content.write"];
 WebBrowser.maybeCompleteAuthSession();
 
 export function getRedirectUri(): string {
+  if (Platform.OS === "web") {
+    //return "http://localhost:1420/redirect"
+    return AuthSession.makeRedirectUri({
+    preferLocalhost: true,
+  });
+  }
   return AuthSession.makeRedirectUri({
     native: "clavispass://redirect",
   });
@@ -87,9 +93,14 @@ function DropboxLoginButton() {
   };
 
   return (
-    <SettingsItem leadingIcon="dropbox" onPress={handleAuth}>
-      Sign in with Dropbox
-    </SettingsItem>
+    <View>
+      <Text>
+        {REDIRECT_URI}
+      </Text>
+      <SettingsItem leadingIcon="dropbox" onPress={handleAuth}>
+        Sign in with Dropbox
+      </SettingsItem>
+    </View>
   );
 }
 

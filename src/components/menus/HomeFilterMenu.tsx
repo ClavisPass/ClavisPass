@@ -18,7 +18,6 @@ type Props = {
   refreshData: () => void;
 };
 function HomeFilterMenu(props: Props) {
-  const auth = useAuth();
   const data = useData();
 
   const sort = (sort: "asc" | "desc") => {
@@ -77,17 +76,6 @@ function HomeFilterMenu(props: Props) {
           />
         </View>
         <Divider />
-        {/* 
-        <MenuItem
-          leadingIcon="folder-outline"
-          onPress={() => {
-            props.openEditFolder();
-            props.setVisible(false);
-          }}
-        >
-          {"Add/Edit Folder"}
-        </MenuItem>
-        */}
         <MenuItem
           leadingIcon="sort-ascending"
           onPress={() => {
@@ -107,10 +95,6 @@ function HomeFilterMenu(props: Props) {
           }}
         >
           {"sort descending"}
-        </MenuItem>
-        <Divider />
-        <MenuItem leadingIcon="logout" onPress={auth.logout}>
-          {"Logout"}
         </MenuItem>
       </>
     </Menu>

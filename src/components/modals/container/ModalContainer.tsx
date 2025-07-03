@@ -20,7 +20,7 @@ const ModalContainer = ({ visible, onDismiss, children }: Props) => {
         contentContainerStyle={[
           {
             margin: 20,
-            borderRadius: 20,
+            borderRadius: 12,
             alignSelf: "center",
             boxShadow: theme.colors?.shadow,
             overflow: "hidden",
