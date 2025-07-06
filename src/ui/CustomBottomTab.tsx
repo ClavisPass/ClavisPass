@@ -23,10 +23,7 @@ const CustomBottomTab = ({
     const isLogout = route.name === "Logout";
     const isFocused = state.index === idx;
 
-    const label =
-      isAdd
-        ? ""
-        : descriptors[route.key].options.title ?? route.name;
+    const label = isAdd ? "" : descriptors[route.key].options.title ?? route.name;
 
     return {
       key: route.key,
@@ -69,16 +66,32 @@ const CustomBottomTab = ({
   });
 
   return (
-    <View style={{ position: "relative" }}>
+    <View style={{ position: "relative", backgroundColor: theme.colors.elevation.level4 }}>
+      {/* Background-Fix unterhalb der Bar */}
       <View
         style={{
           position: "absolute",
-          top: 10,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 12, // Höhe der Rundung
+          backgroundColor: theme.colors.background,
+          borderTopLeftRadius: 12,
+          borderTopRightRadius: 12,
+          zIndex: 0,
+        }}
+      />
+
+      {/* Floating Add Button */}
+      <View
+        style={{
+          position: "absolute",
+          top: 8,
           alignSelf: "center",
           zIndex: 10,
           backgroundColor: theme.colors.background,
           borderRadius: 28,
-          //boxShadow: theme.colors.shadow,
+          shadowColor: "#000",
           shadowOffset: { width: 0, height: 1 },
           shadowOpacity: 0.2,
           shadowRadius: 2,
@@ -100,16 +113,35 @@ const CustomBottomTab = ({
         />
       </View>
 
-      <BottomNavigation.Bar
-        navigationState={{ index: state.index, routes }}
-        onTabPress={({ route }) => route.onPress()}
-        shifting={false}
+      {/* Outer shadow container */}
+      <View
         style={{
-          backgroundColor: theme.colors.background,
-          boxShadow: theme.colors.shadow,
-          borderRadius: 12,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.15,
+          shadowRadius: 12,
+          elevation: 8,
         }}
-      />
+      >
+        {/* Inner container with radius & overflow */}
+        <View
+          style={{
+            overflow: "hidden",
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12,
+            backgroundColor: theme.colors.background,
+          }}
+        >
+          <BottomNavigation.Bar
+            navigationState={{ index: state.index, routes }}
+            onTabPress={({ route }) => route.onPress()}
+            shifting={false}
+            style={{
+              backgroundColor: theme.colors.background,
+            }}
+          />
+        </View>
+      </View>
     </View>
   );
 };

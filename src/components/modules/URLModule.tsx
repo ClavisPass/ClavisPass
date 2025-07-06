@@ -118,6 +118,7 @@ function URLModule(props: URLModuleType & Props) {
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.URL}
+      fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>
         <View style={{ width: 30, alignItems: "center", marginRight: 4 }}>

@@ -63,6 +63,7 @@ function KeyModule(props: KeyModuleType & Props) {
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.KEY}
+      fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>
         <View style={{ height: 40, flexGrow: 1 }}>

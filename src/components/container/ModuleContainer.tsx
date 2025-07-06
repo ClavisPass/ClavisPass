@@ -7,6 +7,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useTheme } from "../../contexts/ThemeProvider";
+import FastAccessType from "../../types/FastAccessType";
 
 const styles = StyleSheet.create({
   container: {
@@ -54,6 +55,7 @@ type Props = {
   modal?: ReactNode;
   icon?: string;
   titlePress?: () => void;
+  fastAccess: FastAccessType | null;
 };
 
 function ModuleContainer(props: Props) {
@@ -132,26 +134,49 @@ function ModuleContainer(props: Props) {
             alignItems: "center",
             gap: 4,
             height: 20,
+            width: "100%",
+            //justifyContent: "space-between",
           }}
         >
-          {props.icon ? (
-            <Icon
-              source={props.icon}
-              size={16}
-              color={theme.colors?.primary}
-            />
-          ) : null}
-          <Pressable
-            onPress={props.titlePress}
-            style={{ cursor: props.titlePress ? "pointer" : "auto" }}
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 4,
+              alignItems: "center",
+            }}
           >
-            <Text
-              variant="bodyMedium"
-              style={{ userSelect: "none", color: theme.colors?.primary, margin: 0 }}
+            {props.icon ? (
+              <Icon
+                source={props.icon}
+                size={16}
+                color={theme.colors?.primary}
+              />
+            ) : null}
+            <Pressable
+              onPress={props.titlePress}
+              style={{ cursor: props.titlePress ? "pointer" : "auto" }}
             >
-              {props.title}
-            </Text>
-          </Pressable>
+              <Text
+                variant="bodyMedium"
+                style={{
+                  userSelect: "none",
+                  color: theme.colors?.primary,
+                  margin: 0,
+                }}
+              >
+                {props.title}
+              </Text>
+            </Pressable>
+            {(props.id === props.fastAccess?.usernameId ||
+            props.id === props.fastAccess?.passwordId) && props.edit ? (
+              <Icon
+                source={"tooltip-account"}
+                size={16}
+                color={theme.colors?.primary}
+              />
+            ) : null}
+          </View>
           {props.modal}
         </View>
         {props.children}

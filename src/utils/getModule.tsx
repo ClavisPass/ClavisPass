@@ -17,13 +17,15 @@ import UsernameModuleType from "../types/modules/UsernameModuleType";
 import UsernameModule from "../components/modules/UsernameModule";
 import WifiModuleType from "../types/modules/WifiModuleType";
 import WifiModule from "../components/modules/WifiModule";
+import FastAccessType from "../types/FastAccessType";
 
 function getModule(
   module: ModuleType,
   edit: boolean,
   onDragStart: () => void,
   deleteModule: (id: string) => void,
-  changeModule: (module: ModuleType) => void
+  changeModule: (module: ModuleType) => void,
+  fastAccess: FastAccessType | null
 ): ReactNode {
   if (module.module === ModulesEnum.CUSTOM_FIELD) {
     const moduleObject = module as CustomFieldModuleType;
@@ -37,6 +39,7 @@ function getModule(
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
+        fastAccess={fastAccess}
       />
     );
   }
@@ -51,6 +54,7 @@ function getModule(
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
+        fastAccess={fastAccess}
       />
     );
   }
@@ -65,6 +69,7 @@ function getModule(
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
+        fastAccess={fastAccess}
       />
     );
   }
@@ -79,6 +84,7 @@ function getModule(
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
+        fastAccess={fastAccess}
       />
     );
   }
@@ -93,6 +99,7 @@ function getModule(
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
+        fastAccess={fastAccess}
       />
     );
   }
@@ -107,6 +114,7 @@ function getModule(
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
+        fastAccess={fastAccess}
       />
     );
   }
@@ -121,6 +129,7 @@ function getModule(
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
+        fastAccess={fastAccess}
       />
     );
   }
@@ -137,6 +146,7 @@ function getModule(
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
+        fastAccess={fastAccess}
       />
     );
   }

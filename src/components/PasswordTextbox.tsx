@@ -5,7 +5,7 @@ import { Platform, View } from "react-native";
 type Props = {
   placeholder?: string;
   value: string;
-  setValue: (value: string) => void;
+  setValue?: (value: string) => void;
   autofocus?: boolean;
   errorColor?: boolean;
   onSubmitEditing?: () => void;
@@ -62,7 +62,7 @@ function PasswordTextbox(props: Props) {
         style={globalStyles.textInputStyle}
         value={props.value}
         mode="outlined"
-        onChangeText={(text) => props.setValue(text)}
+        onChangeText={(text) => props.setValue?.(text)}
         secureTextEntry={secureTextEntry}
         autoCapitalize="none"
         autoComplete="password"

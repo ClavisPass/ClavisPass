@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
 function LoginScreen({ navigation }: { navigation: any }) {
   const { setToken, setRefreshToken, loadRefreshToken, tokenType } = useToken();
   const { isOnline } = useOnline();
-  const { headerWhite, setHeaderWhite, darkmode, theme } = useTheme();
+  const { headerWhite, setHeaderWhite, darkmode, theme, setHeaderSpacing } = useTheme();
 
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
   const [loading, setLoading] = useState(true);
@@ -49,6 +49,7 @@ function LoginScreen({ navigation }: { navigation: any }) {
 
   useFocusEffect(
     React.useCallback(() => {
+      setHeaderSpacing(0);
       setHeaderWhite(false);
     }, [])
   );

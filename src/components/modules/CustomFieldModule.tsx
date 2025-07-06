@@ -43,6 +43,7 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
       titlePress={() => {
         setVisible(true);
       }}
+      fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>
         <View style={{ height: 40, flexGrow: 1 }}>

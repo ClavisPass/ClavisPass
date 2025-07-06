@@ -8,6 +8,7 @@ import ModulesType, { ModuleType } from "../../../types/ModulesType";
 import getModule from "../../../utils/getModule";
 import { IconButton } from "react-native-paper";
 import { useTheme } from "../../../contexts/ThemeProvider";
+import FastAccessType from "../../../types/FastAccessType";
 
 type Props = {
   value: ValuesType;
@@ -18,6 +19,7 @@ type Props = {
   edit: boolean;
   setDiscardoChanges: () => void;
   showAddModuleModal: () => void;
+  fastAccess: FastAccessType | null;
 };
 
 function DraggableModulesList(props: Props) {
@@ -30,7 +32,8 @@ function DraggableModulesList(props: Props) {
         props.edit,
         drag,
         props.deleteModule,
-        props.changeModule
+        props.changeModule,
+        props.fastAccess
       );
     },
     [props.edit, props.value]

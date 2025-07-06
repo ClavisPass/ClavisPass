@@ -85,8 +85,8 @@ This design ensures that your data remains private and can only be decrypted wit
 
 ### Frontend
 - [React Native](https://reactnative.dev/) via [Expo](https://docs.expo.dev/versions/latest/)
-- [react native paper](https://callstack.github.io/react-native-paper/docs/)
-- [material design icons](https://pictogrammers.com/library/mdi/)
+- [React Native Paper](https://callstack.github.io/react-native-paper/docs/)
+- [Material Design Icons](https://pictogrammers.com/library/mdi/)
 
 ### Backend / Plattform
 - [Tauri](https://tauri.app/) – safe Desktop-Framework with Rust

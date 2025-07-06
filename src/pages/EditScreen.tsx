@@ -12,7 +12,7 @@ import ValuesType from "../types/ValuesType";
 import getModuleData from "../utils/getModuleData";
 import AddModuleModal from "../components/modals/AddModuleModal";
 import { getDateTime } from "../utils/Timestamp";
-import { TITLEBAR_HEIGHT, TitlebarHeight } from "../components/CustomTitlebar";
+import { TITLEBAR_HEIGHT } from "../components/CustomTitlebar";
 import { useData } from "../contexts/DataProvider";
 import DataType from "../types/DataType";
 import TitleModule from "../components/modules/TitleModule";
@@ -22,7 +22,6 @@ import DraggableModulesList from "../components/lists/draggableModulesList/Dragg
 import Constants from "expo-constants";
 import FolderModal from "../components/modals/FolderModal";
 import { useTheme } from "../contexts/ThemeProvider";
-import { RootStackParamList } from "../../App";
 import DiscardChangesModal from "../components/modals/DiscardChangesModal";
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
@@ -30,6 +29,13 @@ import ContainerButton from "../components/buttons/ContainerButton";
 import SquaredContainerButton from "../components/buttons/SquaredContainerButton";
 import DeleteModal from "../components/modals/DeleteModal";
 import Button from "../components/buttons/Button";
+import { RootStackParamList } from "../stacks/Stack";
+
+import { AppState } from "react-native";
+import useAppLifecycle from "../hooks/useAppLifecycle";
+import { openFastAccess, hideFastAccess } from "../utils/FastAccess";
+import extractFastAccessObject from "../utils/extractFastAccessObject";
+import FastAccessType from "../types/FastAccessType";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -45,13 +51,17 @@ type EditScreenProps = StackScreenProps<RootStackParamList, "Edit">;
 const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const { value: routeValue } = route.params!;
   const data = useData();
-  const { globalStyles, theme, headerWhite, setHeaderWhite, darkmode } =
-    useTheme();
+  const {
+    globalStyles,
+    theme,
+    headerWhite,
+    setHeaderWhite,
+    darkmode,
+    setHeaderSpacing,
+  } = useTheme();
 
   const [edit, setEdit] = useState(false);
   const [value, setValue] = useState<ValuesType>({ ...routeValue });
-
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const [addModuleModalVisible, setAddModuleModalVisible] = useState(false);
   const [folderModalVisible, setFolderModalVisible] = useState(false);
@@ -63,11 +73,38 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   const [favIcon, setFavIcon] = useState("star-outline");
 
+  const [fastAccessObject, setFastAccessObject] =
+    useState<FastAccessType | null>(
+      extractFastAccessObject(value.modules, value.title)
+    );
+
   useFocusEffect(
     React.useCallback(() => {
+      setHeaderSpacing(220);
       setHeaderWhite(false);
     }, [])
   );
+
+  useEffect(() => {
+    const fastAccess = extractFastAccessObject(value.modules, value.title);
+    setFastAccessObject(fastAccess);
+  }, [value.modules, value.title, value]);
+
+  useAppLifecycle({
+    onBackground: () => {
+      console.log("show popup");
+      if (fastAccessObject === null) return;
+      openFastAccess(
+        fastAccessObject.title,
+        fastAccessObject.username,
+        fastAccessObject.password
+      );
+    },
+    onForeground: () => {
+      console.log("hide popup");
+      hideFastAccess();
+    },
+  });
 
   const saveValue = () => {
     let newData = { ...data.data } as DataType;
@@ -169,12 +206,12 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 56,
-          duration: 250,
+          duration: 150,
           useNativeDriver: false,
         }),
         Animated.timing(fadeAnim, {
           toValue: 1,
-          duration: 250,
+          duration: 150,
           useNativeDriver: false,
         }),
       ]).start();
@@ -182,12 +219,12 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 0,
-          duration: 250,
+          duration: 150,
           useNativeDriver: false,
         }),
         Animated.timing(fadeAnim, {
           toValue: 0,
-          duration: 200,
+          duration: 150,
           useNativeDriver: false,
         }),
       ]).start();
@@ -196,7 +233,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   return (
     <AnimatedContainer style={globalStyles.container} trigger={edit}>
-      <TitlebarHeight />
       <StatusBar
         animated={true}
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
@@ -285,6 +321,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           showAddModuleModal={() => {
             setAddModuleModalVisible(true);
           }}
+          fastAccess={fastAccessObject}
         />
       ) : (
         <DraggableModulesList
@@ -298,6 +335,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           showAddModuleModal={() => {
             setAddModuleModalVisible(true);
           }}
+          fastAccess={fastAccessObject}
         />
       )}
       <Animated.View
@@ -320,7 +358,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
               icon="content-save"
               onPress={saveValue}
               disabled={!discardChanges || value.title === ""}
-              style={{ flexGrow: 5, width: "50%", boxShadow: theme.colors?.shadow }}
+              style={{
+                flexGrow: 5,
+                width: "50%",
+                boxShadow: theme.colors?.shadow,
+              }}
             />
             <ContainerButton
               onPress={() => setDeleteModalVisible(true)}
@@ -342,7 +384,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         setVisible={setShowMenu}
         created={routeValue.created}
         lastUpdated={routeValue.lastUpdated}
-        positionY={Constants.statusBarHeight + TITLEBAR_HEIGHT + 104}
+        positionY={Constants.statusBarHeight + TITLEBAR_HEIGHT + 50}
       />
       <FolderModal
         visible={folderModalVisible}

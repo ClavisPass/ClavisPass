@@ -1,11 +1,11 @@
 enum ModuleIconsEnum {
-  CUSTOM_FIELD = "card-text-outline",
-  E_MAIL = "email-outline",
+  CUSTOM_FIELD = "card-text",
+  E_MAIL = "email",
   KEY = "key-variant",
-  NOTE = "note-outline",
+  NOTE = "note",
   PASSWORD = "form-textbox-password",
   URL = "web",
-  USERNAME = "account-outline",
+  USERNAME = "account",
   WIFI = "wifi",
 }
 

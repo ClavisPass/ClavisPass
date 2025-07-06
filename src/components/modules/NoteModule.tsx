@@ -31,6 +31,7 @@ function NoteModule(props: NoteModuleType & Props) {
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.NOTE}
+      fastAccess={props.fastAccess}
     >
       <TextInput
         outlineStyle={globalStyles.outlineStyle}

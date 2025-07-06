@@ -5,11 +5,11 @@ import theme from "../ui/theme";
 import WebSpecific from "./platformSpecific/WebSpecific";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useAuth } from "../contexts/AuthProvider";
-import { exit } from '@tauri-apps/plugin-process';
+import { exit } from "@tauri-apps/plugin-process";
 import { useTheme } from "../contexts/ThemeProvider";
 import * as store from "../utils/store";
 
-export const TITLEBAR_HEIGHT = Platform.OS === "web" ? 46 : 0;
+export const TITLEBAR_HEIGHT = Platform.OS === "web" ? 40 : 0;
 
 const styles = StyleSheet.create({
   titlebar: {
@@ -45,7 +45,7 @@ export function TitlebarHeight(props: Props) {
 
 function CustomTitlebar() {
   const auth = useAuth();
-  const { headerWhite } = useTheme();
+  const { headerWhite, headerSpacing } = useTheme();
 
   useEffect(() => {
     if (Platform.OS === "web") {
@@ -94,6 +94,8 @@ function CustomTitlebar() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          marginLeft: headerSpacing,
+          paddingRight: headerSpacing,
         }}
       >
         <View
@@ -105,7 +107,7 @@ function CustomTitlebar() {
             justifyContent: "space-between",
           }}
         >
-          <View></View>
+          <View />
           <View
             style={{
               display: "flex",
@@ -124,8 +126,10 @@ function CustomTitlebar() {
                 alignItems: "center",
                 justifyContent: "center",
                 width: 50,
-                height: 38,
+                height: 40,
                 borderRadius: 4,
+                borderTopLeftRadius: 12,
+                borderBottomLeftRadius: 12,
               }}
               rippleColor="rgba(0, 0, 0, 0.158)"
             >
@@ -144,8 +148,9 @@ function CustomTitlebar() {
                 alignItems: "center",
                 justifyContent: "center",
                 width: 50,
-                height: 38,
+                height: 40,
                 borderRadius: 4,
+                borderBottomEndRadius: 12,
               }}
               rippleColor="rgba(0, 0, 0, 0.158)"
             >

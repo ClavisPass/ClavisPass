@@ -3,7 +3,7 @@
   "description": "permissions that were migrated from v1",
   "local": true,
   "windows": [
-    "main"
+    "main", "popup"
   ],
   "permissions": [
     "core:default",
@@ -24,6 +24,9 @@
     "global-shortcut:allow-register-all",
     "global-shortcut:allow-unregister",
     "global-shortcut:allow-unregister-all",
-    "shell:default"
+    "shell:default",
+    "core:window:allow-create",
+    "core:event:allow-emit",
+    "core:event:allow-listen"
   ]
 }

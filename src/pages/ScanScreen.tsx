@@ -7,7 +7,6 @@ import AnimatedContainer from "../components/container/AnimatedContainer";
 import { useTheme } from "../contexts/ThemeProvider";
 import { Button, Icon, IconButton, Text } from "react-native-paper";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
-import { RootStackParamList } from "../../App";
 import { useToken } from "../contexts/TokenProvider";
 import fetchUserInfo from "../api/fetchUserInfo";
 import isDropboxToken from "../utils/regex/isDropboxToken";
@@ -15,6 +14,7 @@ import isGoogleDriveToken from "../utils/regex/isGoogleDriveToken";
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { set } from "../utils/store";
+import { RootStackParamList } from "../stacks/Stack";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
 type ScanScreenProps = StackScreenProps<RootStackParamList, "Scan">;
 
 const ScanScreen: React.FC<ScanScreenProps> = ({ route, navigation }) => {
-  const { globalStyles, headerWhite, setHeaderWhite, darkmode } = useTheme();
+  const { globalStyles, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } = useTheme();
   const { setRefreshToken, setTokenType, renewAccessToken } = useToken();
 
   const [facing, setFacing] = useState<CameraType>("back");
@@ -65,6 +65,7 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ route, navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
+      setHeaderSpacing(40);
       setHeaderWhite(false);
     }, [])
   );
@@ -99,7 +100,6 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ route, navigation }) => {
 
   return (
     <AnimatedContainer style={globalStyles.container}>
-      <TitlebarHeight />
       <StatusBar
         animated={true}
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}

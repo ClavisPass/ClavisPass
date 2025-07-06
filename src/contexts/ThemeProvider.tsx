@@ -19,6 +19,8 @@ interface ThemeContextType {
   globalStyles: any;
   headerWhite: boolean;
   setHeaderWhite: (headerWhite: boolean) => void;
+  headerSpacing: number;
+  setHeaderSpacing: (headerSpacing: number) => void;
 }
 
 export const ThemeContext = createContext<ThemeContextType | null>(null);
@@ -32,6 +34,7 @@ export const ThemeProvider = ({ children }: Props) => {
   const [theme, setTheme] = useState(lightTheme);
   const [isReady, setIsReady] = useState(false);
   const [headerWhite, setHeaderWhite] = useState(false);
+  const [headerSpacing, setHeaderSpacing] = useState(0);
 
   const globalStyles = styles(theme.colors.elevation.level2, theme.colors.tertiary);
 
@@ -59,7 +62,7 @@ export const ThemeProvider = ({ children }: Props) => {
 
   return (
     <ThemeContext.Provider
-      value={{ darkmode, setDarkmode, theme, globalStyles, headerWhite, setHeaderWhite }}
+      value={{ darkmode, setDarkmode, theme, globalStyles, headerWhite, setHeaderWhite, headerSpacing, setHeaderSpacing }}
     >
       <PaperProvider theme={theme}>{children}</PaperProvider>
     </ThemeContext.Provider>

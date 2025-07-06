@@ -34,6 +34,7 @@ import * as store from "../utils/store";
 import { open } from "@tauri-apps/plugin-shell";
 
 import * as Linking from "expo-linking";
+import Header from "../components/Header";
 
 const styles = StyleSheet.create({
   surface: {
@@ -58,7 +59,8 @@ const styles = StyleSheet.create({
 });
 
 function SettingsScreen({ navigation }: { navigation: any }) {
-  const { headerWhite, setHeaderWhite, darkmode } = useTheme();
+  const { headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
+    useTheme();
   const { master } = useAuth();
   const [startup, setStartup] = React.useState(false);
 
@@ -70,6 +72,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
 
   useFocusEffect(
     React.useCallback(() => {
+      setHeaderSpacing(0);
       setHeaderWhite(false);
     }, [])
   );
@@ -133,141 +136,126 @@ function SettingsScreen({ navigation }: { navigation: any }) {
   };
 
   return (
-    <>
-      <AnimatedContainer
-        style={{ marginTop: Constants.statusBarHeight }}
-        useFocusEffect={useFocusEffect}
-      >
-        <StatusBar
-          animated={true}
-          style={headerWhite ? "light" : darkmode ? "light" : "dark"}
-          translucent={true}
-        />
-        <TitlebarHeight />
-        <ScrollView style={styles.scrollView}>
-          <SettingsContainer icon="cloud-outline" title={"Cloud"}>
-            <Auth
-              navigation={navigation}
-              changeEditTokenVisibility={setEditTokenVisibility}
-            />
-          </SettingsContainer>
-          <SettingsContainer icon="tray-arrow-down" title={"Update"}>
-            <UpdateManager />
-          </SettingsContainer>
-          <WebSpecific>
-            <SettingsContainer icon={"cogs"} title={"System"}>
-              <SettingsSwitch
-                label={"Autostart"}
-                value={startup}
-                onValueChange={(checked) => {
-                  changeAutoStart(checked);
-                }}
-              />
-              <SettingsDivider />
-              <SettingsSwitch
-                label={"Minimize to Tray"}
-                value={closeBehavior}
-                onValueChange={(checked) => {
-                  changeCloseBehavior(checked);
-                }}
-              />
-              <SettingsDivider />
-            </SettingsContainer>
-          </WebSpecific>
-          <SettingsContainer icon={"theme-light-dark"} title={"Design"}>
-            <DarkModeSwitch />
-          </SettingsContainer>
-          <SettingsContainer icon={"fingerprint"} title={"Authentication"}>
-            <SettingsItem
-              onPress={() => {
-                console.log("Button pressed");
-                setShowChangeMasterPasswordModal(true);
+    <AnimatedContainer useFocusEffect={useFocusEffect}>
+      <StatusBar
+        animated={true}
+        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        translucent={true}
+      />
+      <Header title="Settings" />
+      <ScrollView style={styles.scrollView}>
+        <SettingsContainer icon="cloud" title={"Cloud"}>
+          <Auth
+            navigation={navigation}
+            changeEditTokenVisibility={setEditTokenVisibility}
+          />
+        </SettingsContainer>
+        <SettingsContainer icon="tray-arrow-down" title={"Update"}>
+          <UpdateManager />
+        </SettingsContainer>
+        <WebSpecific>
+          <SettingsContainer icon={"cogs"} title={"System"}>
+            <SettingsSwitch
+              label={"Autostart"}
+              value={startup}
+              onValueChange={(checked) => {
+                changeAutoStart(checked);
               }}
-            >
-              Change Master Password
-            </SettingsItem>
+            />
             <SettingsDivider />
             <SettingsSwitch
-              label={"Use System Authentication"}
-              value={useAuthentication}
+              label={"Minimize to Tray"}
+              value={closeBehavior}
               onValueChange={(checked) => {
-                changeAuthentication(checked);
+                changeCloseBehavior(checked);
               }}
             />
             <SettingsDivider />
           </SettingsContainer>
-          <SettingsContainer icon={"database"} title={"Backup"}>
-            <SettingsItem
-              leadingIcon="database-import"
-              onPress={() => {
-                
-              }}
-            >
-              Import Backup
-            </SettingsItem>
-            <SettingsDivider />
-            <SettingsItem
-              leadingIcon="database-export"
-              onPress={() => {
-                
-              }}
-            >
-              Export Backup
-            </SettingsItem>
-            <SettingsDivider />
-          </SettingsContainer>
-          <SettingsContainer icon={"import"} title={"Import Passwords"}>
-            <Import
-              type={DocumentTypeEnum.FIREFOX}
-              title={"Firefox"}
-              icon={"firefox"}
-            />
-            <SettingsDivider />
-            <Import
-              type={DocumentTypeEnum.CHROME}
-              title={"Chrome"}
-              icon={"google-chrome"}
-            />
-            <SettingsDivider />
-            <Import
-              type={DocumentTypeEnum.PCLOUD}
-              title={"pCloud"}
-              icon={"circle-outline"}
-            />
-            <SettingsDivider />
-          </SettingsContainer>
-          <SettingsContainer icon={"link-variant"} title={"Links"}>
-            <SettingsItem
-              leadingIcon="web"
-              onPress={() => {
-                openURL("https://clavispass.github.io/ClavisPass/");
-              }}
-            >
-              Website
-            </SettingsItem>
-            <SettingsDivider />
-            <SettingsItem
-              leadingIcon="github"
-              onPress={() => {
-                openURL("https://github.com/ClavisPass/ClavisPass");
-              }}
-            >
-              Github
-            </SettingsItem>
-            <SettingsDivider />
-          </SettingsContainer>
-          <Footer />
-        </ScrollView>
-        <EditTokenModal
-          visible={editTokenVisibility}
-          setVisible={setEditTokenVisibility}
-        />
-        <ChangeMasterPasswordModal
-          visible={showChangeMasterPasswordModal}
-          setVisible={setShowChangeMasterPasswordModal}
-        />
-      </AnimatedContainer>
-    </>
+        </WebSpecific>
+        <SettingsContainer icon={"theme-light-dark"} title={"Design"}>
+          <DarkModeSwitch />
+        </SettingsContainer>
+        <SettingsContainer icon={"fingerprint"} title={"Authentication"}>
+          <SettingsItem
+            onPress={() => {
+              console.log("Button pressed");
+              setShowChangeMasterPasswordModal(true);
+            }}
+          >
+            Change Master Password
+          </SettingsItem>
+          <SettingsDivider />
+          <SettingsSwitch
+            label={"Use System Authentication"}
+            value={useAuthentication}
+            onValueChange={(checked) => {
+              changeAuthentication(checked);
+            }}
+          />
+          <SettingsDivider />
+        </SettingsContainer>
+        <SettingsContainer icon={"database"} title={"Backup"}>
+          <SettingsItem leadingIcon="database-import" onPress={() => {}}>
+            Import Backup
+          </SettingsItem>
+          <SettingsDivider />
+          <SettingsItem leadingIcon="database-export" onPress={() => {}}>
+            Export Backup
+          </SettingsItem>
+          <SettingsDivider />
+        </SettingsContainer>
+        <SettingsContainer icon={"import"} title={"Import Passwords"}>
+          <Import
+            type={DocumentTypeEnum.FIREFOX}
+            title={"Firefox"}
+            icon={"firefox"}
+          />
+          <SettingsDivider />
+          <Import
+            type={DocumentTypeEnum.CHROME}
+            title={"Chrome"}
+            icon={"google-chrome"}
+          />
+          <SettingsDivider />
+          <Import
+            type={DocumentTypeEnum.PCLOUD}
+            title={"pCloud"}
+            icon={"circle-outline"}
+          />
+          <SettingsDivider />
+        </SettingsContainer>
+        <SettingsContainer icon={"link-variant"} title={"Links"}>
+          <SettingsItem
+            leadingIcon="web"
+            onPress={() => {
+              openURL("https://clavispass.github.io/ClavisPass/");
+            }}
+          >
+            Website
+          </SettingsItem>
+          <SettingsDivider />
+          <SettingsItem
+            leadingIcon="github"
+            onPress={() => {
+              openURL("https://github.com/ClavisPass/ClavisPass");
+            }}
+          >
+            Github
+          </SettingsItem>
+          <SettingsDivider />
+        </SettingsContainer>
+        <Footer />
+      </ScrollView>
+      <EditTokenModal
+        visible={editTokenVisibility}
+        setVisible={setEditTokenVisibility}
+      />
+      <ChangeMasterPasswordModal
+        visible={showChangeMasterPasswordModal}
+        setVisible={setShowChangeMasterPasswordModal}
+      />
+    </AnimatedContainer>
   );
 }
 

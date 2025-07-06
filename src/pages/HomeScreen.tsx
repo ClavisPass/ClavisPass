@@ -44,15 +44,15 @@ import {
 } from "@expo-google-fonts/lexend-exa";
 import { getDateTime } from "../utils/Timestamp";
 import LogoColored from "../ui/LogoColored";
-import { RootStackParamList } from "../../App";
 import { StackScreenProps } from "@react-navigation/stack";
+import { RootStackParamList } from "../stacks/Stack";
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const triggerAdd = route.params?.triggerAdd ?? false;
 
-  const { theme, headerWhite, setHeaderWhite, darkmode } = useTheme();
+  const { theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } = useTheme();
   const { width, height } = useWindowDimensions();
   const auth = useAuth();
 
@@ -90,6 +90,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
+      setHeaderSpacing(0);
       setHeaderWhite(true);
     }, [])
   );

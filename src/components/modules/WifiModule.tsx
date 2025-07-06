@@ -61,6 +61,7 @@ function WifiModule(props: WifiModuleType & Props) {
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.WIFI}
+      fastAccess={props.fastAccess}
     >
       <View style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <Picker

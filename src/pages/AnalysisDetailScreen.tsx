@@ -4,7 +4,6 @@ import Header from "../components/Header";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import AnimatedContainer from "../components/container/AnimatedContainer";
 import { useTheme } from "../contexts/ThemeProvider";
-import { RootStackParamList } from "../../App";
 import { Divider, Icon, Text, TextInput } from "react-native-paper";
 import ModulesEnum from "../enums/ModulesEnum";
 import ModuleIconsEnum from "../enums/ModuleIconsEnum";
@@ -16,6 +15,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import getPasswordStrengthColor from "../utils/getPasswordStrengthColor";
 import getPasswordStrengthIcon from "../utils/getPasswordStrengthIcon";
+import { RootStackParamList } from "../stacks/Stack";
 
 type AnalysisDetailScreenProps = StackScreenProps<
   RootStackParamList,
@@ -42,7 +42,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
   navigation,
 }) => {
   const { value: routeValue } = route.params!;
-  const { globalStyles, theme, headerWhite, setHeaderWhite, darkmode } =
+  const { globalStyles, theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
     useTheme();
 
   const [characterAnalysis, setCharacterAnalysis] =
@@ -59,6 +59,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
 
   useFocusEffect(
     React.useCallback(() => {
+      setHeaderSpacing(40);
       setHeaderWhite(false);
     }, [])
   );
@@ -178,21 +179,16 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
 
   return (
     <AnimatedContainer style={globalStyles.container} trigger={edit}>
-      <TitlebarHeight />
       <StatusBar
         animated={true}
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
         translucent={true}
       />
-      <Header onPress={goBack} leftNode={<Text>{routeValue.title}</Text>}>
-        <View style={{ marginRight: 30 }}>
-          <Icon
-            source={getTypeIcon()}
-            color={theme.colors?.primary}
-            size={20}
-          />
-        </View>
-      </Header>
+      <Header
+        onPress={goBack}
+        //leftNode={<Text>{routeValue.title}</Text>}
+        title={routeValue.title}
+      ></Header>
       <ScrollView
         style={{
           width: "100%",
@@ -220,14 +216,24 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
               margin: 0,
               marginBottom: 0,
               marginTop: 0,
+              display: "flex",
+              flexDirection: "row",
+              flexGrow: 1,
+              gap: 6,
+              alignItems: "center",
             }}
           >
+            <Icon
+              source={getTypeIcon()}
+              color={theme.colors?.primary}
+              size={24}
+            />
             <TextInput
               outlineStyle={[
                 globalStyles.outlineStyle,
-                { borderColor: theme.colors.primary, borderWidth: 2 },
+                { borderColor: theme.colors.primary, borderWidth: 2, flexGrow: 1},
               ]}
-              style={[globalStyles.textInputStyle, { userSelect: "none" }]}
+              style={[globalStyles.textInputStyle, { userSelect: "none", flexGrow: 1}]}
               value={routeValue.password}
               mode="outlined"
               secureTextEntry={secureTextEntry}

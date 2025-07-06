@@ -107,6 +107,7 @@ function EmailModule(props: EmailModuleType & Props) {
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.E_MAIL}
+      fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>
         <View style={{ height: 40, flexGrow: 1 }}>

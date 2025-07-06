@@ -35,6 +35,7 @@ function UsernameModule(props: UsernameModuleType & Props) {
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.USERNAME}
+      fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>
         <View style={{ height: 40, flexGrow: 1 }}>

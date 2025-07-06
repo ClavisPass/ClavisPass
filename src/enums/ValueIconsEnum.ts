@@ -2,7 +2,7 @@ enum ValueIconsEnum {
   PASSWORD = "form-textbox-password",
   WIFI = "wifi",
   KEY = "key-variant",
-  BLANK = "checkbox-blank-outline",
+  BLANK = "checkbox-blank",
 }
 
 export default ValueIconsEnum;

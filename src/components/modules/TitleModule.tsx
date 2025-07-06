@@ -31,7 +31,7 @@ function TitleModule(props: Props) {
   }, []);
 
   return (
-    <View style={{ height: 40, flexGrow: 1 }}>
+    <View style={{ height: 36, flexGrow: 1 }}>
       <TextInput
         ref={textInputRef}
         placeholder={"Title..."}
@@ -39,7 +39,7 @@ function TitleModule(props: Props) {
         outlineStyle={[
           {
             borderWidth: 0,
-            height: 40,
+            height: 36,
             borderRadius: 0,
             width: "100%",
             borderColor:
@@ -52,9 +52,9 @@ function TitleModule(props: Props) {
             maxWidth: 200,
           },
         ]}
-        contentStyle={{ margin: 0, padding: 0 }}
+        contentStyle={{ margin: 0, padding: 0, height: 36 }}
         underlineStyle={{ margin: 0, padding: 0 }}
-        style={[{ flex: 1, width: "100%", margin: 0, padding: 0 }]}
+        style={[{ flex: 1, width: "100%", margin: 0, padding: 0, height: 36 }]}
         value={props.value.title}
         mode="outlined"
         onChangeText={(text) => changeTitle(text)}

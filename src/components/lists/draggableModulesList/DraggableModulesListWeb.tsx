@@ -16,6 +16,7 @@ import getModule from "../../../utils/getModule";
 import { View } from "react-native";
 import { IconButton } from "react-native-paper";
 import { useTheme } from "../../../contexts/ThemeProvider";
+import FastAccessType from "../../../types/FastAccessType";
 
 type Props = {
   value: ValuesType;
@@ -26,6 +27,7 @@ type Props = {
   edit: boolean;
   setDiscardoChanges: () => void;
   showAddModuleModal: () => void;
+  fastAccess: FastAccessType | null;
 };
 
 const reorder = (list: any, startIndex: number, endIndex: number) => {
@@ -98,7 +100,8 @@ function DraggableModulesListWeb(props: Props) {
                       props.edit,
                       () => {},
                       props.deleteModule,
-                      props.changeModule
+                      props.changeModule,
+                      props.fastAccess
                     )}
                   </div>
                 )}

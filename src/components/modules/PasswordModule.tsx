@@ -66,6 +66,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.PASSWORD}
+      fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>
         <PasswordTextbox setValue={setValue} value={value} placeholder="" />

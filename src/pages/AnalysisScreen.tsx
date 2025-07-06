@@ -20,6 +20,7 @@ import Divider from "../components/Divider";
 import PasswordStrengthLevel from "../enums/PasswordStrengthLevel";
 import getPasswordStrengthColor from "../utils/getPasswordStrengthColor";
 import getPasswordStrengthIcon from "../utils/getPasswordStrengthIcon";
+import Header from "../components/Header";
 
 export type CachedPasswordsType = {
   title: string;
@@ -31,8 +32,14 @@ export type CachedPasswordsType = {
 
 function AnalysisScreen({ navigation }: { navigation: any }) {
   const data = useData();
-  const { theme, globalStyles, headerWhite, setHeaderWhite, darkmode } =
-    useTheme();
+  const {
+    theme,
+    globalStyles,
+    headerWhite,
+    setHeaderWhite,
+    darkmode,
+    setHeaderSpacing,
+  } = useTheme();
 
   const [cachedPasswordList, setCachedPasswordList] = React.useState<
     CachedPasswordsType[] | null
@@ -48,6 +55,7 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
 
   useFocusEffect(
     React.useCallback(() => {
+      setHeaderSpacing(0);
       setHeaderWhite(false);
     }, [])
   );
@@ -156,16 +164,13 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
   }, [data?.data?.values]);
 
   return (
-    <AnimatedContainer
-      style={{ marginTop: Constants.statusBarHeight }}
-      useFocusEffect={useFocusEffect}
-    >
+    <AnimatedContainer useFocusEffect={useFocusEffect}>
       <StatusBar
         animated={true}
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
         translucent={true}
       />
-      <TitlebarHeight />
+      <Header title="Analysis" />
       <View
         style={{
           flex: 1,
@@ -313,7 +318,9 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
                     </View>
 
                     <Icon
-                      source={getPasswordStrengthIcon(item.passwordStrengthLevel)}
+                      source={getPasswordStrengthIcon(
+                        item.passwordStrengthLevel
+                      )}
                       size={20}
                       color={getPasswordStrengthColor(
                         item.passwordStrengthLevel
