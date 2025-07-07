@@ -1,5 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, ScrollView, View, Button, Platform } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Button,
+  Platform,
+  useWindowDimensions,
+} from "react-native";
 import { Switch, Text } from "react-native-paper";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import Constants from "expo-constants";
@@ -35,6 +42,8 @@ import { open } from "@tauri-apps/plugin-shell";
 
 import * as Linking from "expo-linking";
 import Header from "../components/Header";
+import SettingsQuickSelect from "../components/SettingsQuickSelect";
+import QuickSelectItem from "../types/QuickSelectItem";
 
 const styles = StyleSheet.create({
   surface: {
@@ -63,12 +72,35 @@ function SettingsScreen({ navigation }: { navigation: any }) {
     useTheme();
   const { master } = useAuth();
   const [startup, setStartup] = React.useState(false);
-
+  const { width, height } = useWindowDimensions();
   const [useAuthentication, setUseAuthentication] = React.useState(false);
   const [closeBehavior, setCloseBehavior] = React.useState(false);
 
   const [showChangeMasterPasswordModal, setShowChangeMasterPasswordModal] =
     useState(false);
+
+  const scrollRef = useRef<ScrollView>(null);
+
+  // Refs für Container
+  const authRef = useRef<View>(null);
+  const updateRef = useRef<View>(null);
+  const systemRef = useRef<View>(null);
+  const designRef = useRef<View>(null);
+  const authSettingsRef = useRef<View>(null);
+  const backupRef = useRef<View>(null);
+  const importRef = useRef<View>(null);
+  const linksRef = useRef<View>(null);
+
+  const quickSelectItems: QuickSelectItem[] = [
+    { title: "Cloud", icon: "cloud", ref: authRef },
+    { title: "Update", icon: "tray-arrow-down", ref: updateRef },
+    { title: "System", icon: "cogs", ref: systemRef },
+    { title: "Design", icon: "theme-light-dark", ref: designRef },
+    { title: "Authentication", icon: "fingerprint", ref: authSettingsRef },
+    { title: "Backup", icon: "database", ref: backupRef },
+    { title: "Import Passwords", icon: "import", ref: importRef },
+    { title: "Links", icon: "link-variant", ref: linksRef },
+  ];
 
   useFocusEffect(
     React.useCallback(() => {
@@ -143,110 +175,153 @@ function SettingsScreen({ navigation }: { navigation: any }) {
         translucent={true}
       />
       <Header title="Settings" />
-      <ScrollView style={styles.scrollView}>
-        <SettingsContainer icon="cloud" title={"Cloud"}>
-          <Auth
-            navigation={navigation}
-            changeEditTokenVisibility={setEditTokenVisibility}
-          />
-        </SettingsContainer>
-        <SettingsContainer icon="tray-arrow-down" title={"Update"}>
-          <UpdateManager />
-        </SettingsContainer>
-        <WebSpecific>
-          <SettingsContainer icon={"cogs"} title={"System"}>
-            <SettingsSwitch
-              label={"Autostart"}
-              value={startup}
-              onValueChange={(checked) => {
-                changeAutoStart(checked);
-              }}
+
+      <View
+        style={{
+          flex: 1,
+          width: "100%",
+          padding: 4,
+          flexDirection: width > 600 ? "row" : "column",
+        }}
+      >
+        <SettingsQuickSelect scrollRef={scrollRef} items={quickSelectItems} />
+        <ScrollView ref={scrollRef} style={styles.scrollView}>
+          <SettingsContainer
+            ref={quickSelectItems[0].ref}
+            icon={quickSelectItems[0].icon}
+            title={quickSelectItems[0].title}
+          >
+            <Auth
+              navigation={navigation}
+              changeEditTokenVisibility={setEditTokenVisibility}
             />
+          </SettingsContainer>
+          <SettingsContainer
+            ref={quickSelectItems[1].ref}
+            icon={quickSelectItems[1].icon}
+            title={quickSelectItems[1].title}
+          >
+            <UpdateManager />
+          </SettingsContainer>
+          <WebSpecific>
+            <SettingsContainer
+              ref={quickSelectItems[2].ref}
+              icon={quickSelectItems[2].icon}
+              title={quickSelectItems[2].title}
+            >
+              <SettingsSwitch
+                label={"Autostart"}
+                value={startup}
+                onValueChange={(checked) => {
+                  changeAutoStart(checked);
+                }}
+              />
+              <SettingsDivider />
+              <SettingsSwitch
+                label={"Minimize to Tray"}
+                value={closeBehavior}
+                onValueChange={(checked) => {
+                  changeCloseBehavior(checked);
+                }}
+              />
+              <SettingsDivider />
+            </SettingsContainer>
+          </WebSpecific>
+          <SettingsContainer
+            ref={quickSelectItems[3].ref}
+            icon={quickSelectItems[3].icon}
+            title={quickSelectItems[3].title}
+          >
+            <DarkModeSwitch />
+          </SettingsContainer>
+          <SettingsContainer
+            ref={quickSelectItems[4].ref}
+            icon={quickSelectItems[4].icon}
+            title={quickSelectItems[4].title}
+          >
+            <SettingsItem
+              onPress={() => {
+                console.log("Button pressed");
+                setShowChangeMasterPasswordModal(true);
+              }}
+            >
+              Change Master Password
+            </SettingsItem>
             <SettingsDivider />
             <SettingsSwitch
-              label={"Minimize to Tray"}
-              value={closeBehavior}
+              label={"Use System Authentication"}
+              value={useAuthentication}
               onValueChange={(checked) => {
-                changeCloseBehavior(checked);
+                changeAuthentication(checked);
               }}
             />
             <SettingsDivider />
           </SettingsContainer>
-        </WebSpecific>
-        <SettingsContainer icon={"theme-light-dark"} title={"Design"}>
-          <DarkModeSwitch />
-        </SettingsContainer>
-        <SettingsContainer icon={"fingerprint"} title={"Authentication"}>
-          <SettingsItem
-            onPress={() => {
-              console.log("Button pressed");
-              setShowChangeMasterPasswordModal(true);
-            }}
+          <SettingsContainer
+            ref={quickSelectItems[5].ref}
+            icon={quickSelectItems[5].icon}
+            title={quickSelectItems[5].title}
           >
-            Change Master Password
-          </SettingsItem>
-          <SettingsDivider />
-          <SettingsSwitch
-            label={"Use System Authentication"}
-            value={useAuthentication}
-            onValueChange={(checked) => {
-              changeAuthentication(checked);
-            }}
-          />
-          <SettingsDivider />
-        </SettingsContainer>
-        <SettingsContainer icon={"database"} title={"Backup"}>
-          <SettingsItem leadingIcon="database-import" onPress={() => {}}>
-            Import Backup
-          </SettingsItem>
-          <SettingsDivider />
-          <SettingsItem leadingIcon="database-export" onPress={() => {}}>
-            Export Backup
-          </SettingsItem>
-          <SettingsDivider />
-        </SettingsContainer>
-        <SettingsContainer icon={"import"} title={"Import Passwords"}>
-          <Import
-            type={DocumentTypeEnum.FIREFOX}
-            title={"Firefox"}
-            icon={"firefox"}
-          />
-          <SettingsDivider />
-          <Import
-            type={DocumentTypeEnum.CHROME}
-            title={"Chrome"}
-            icon={"google-chrome"}
-          />
-          <SettingsDivider />
-          <Import
-            type={DocumentTypeEnum.PCLOUD}
-            title={"pCloud"}
-            icon={"circle-outline"}
-          />
-          <SettingsDivider />
-        </SettingsContainer>
-        <SettingsContainer icon={"link-variant"} title={"Links"}>
-          <SettingsItem
-            leadingIcon="web"
-            onPress={() => {
-              openURL("https://clavispass.github.io/ClavisPass/");
-            }}
+            <SettingsItem leadingIcon="database-import" onPress={() => {}}>
+              Import Backup
+            </SettingsItem>
+            <SettingsDivider />
+            <SettingsItem leadingIcon="database-export" onPress={() => {}}>
+              Export Backup
+            </SettingsItem>
+            <SettingsDivider />
+          </SettingsContainer>
+          <SettingsContainer
+            ref={quickSelectItems[6].ref}
+            icon={quickSelectItems[6].icon}
+            title={quickSelectItems[6].title}
           >
-            Website
-          </SettingsItem>
-          <SettingsDivider />
-          <SettingsItem
-            leadingIcon="github"
-            onPress={() => {
-              openURL("https://github.com/ClavisPass/ClavisPass");
-            }}
+            <Import
+              type={DocumentTypeEnum.FIREFOX}
+              title={"Firefox"}
+              icon={"firefox"}
+            />
+            <SettingsDivider />
+            <Import
+              type={DocumentTypeEnum.CHROME}
+              title={"Chrome"}
+              icon={"google-chrome"}
+            />
+            <SettingsDivider />
+            <Import
+              type={DocumentTypeEnum.PCLOUD}
+              title={"pCloud"}
+              icon={"circle-outline"}
+            />
+            <SettingsDivider />
+          </SettingsContainer>
+          <SettingsContainer
+            ref={quickSelectItems[7].ref}
+            icon={quickSelectItems[7].icon}
+            title={quickSelectItems[7].title}
           >
-            Github
-          </SettingsItem>
-          <SettingsDivider />
-        </SettingsContainer>
-        <Footer />
-      </ScrollView>
+            <SettingsItem
+              leadingIcon="web"
+              onPress={() => {
+                openURL("https://clavispass.github.io/ClavisPass/");
+              }}
+            >
+              Website
+            </SettingsItem>
+            <SettingsDivider />
+            <SettingsItem
+              leadingIcon="github"
+              onPress={() => {
+                openURL("https://github.com/ClavisPass/ClavisPass");
+              }}
+            >
+              Github
+            </SettingsItem>
+            <SettingsDivider />
+          </SettingsContainer>
+          <Footer />
+        </ScrollView>
+      </View>
       <EditTokenModal
         visible={editTokenVisibility}
         setVisible={setEditTokenVisibility}

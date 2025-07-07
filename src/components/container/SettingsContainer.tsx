@@ -15,7 +15,12 @@ const styles = StyleSheet.create({
   },
 });
 
-type Props = { children: ReactNode; title: string; icon?: string };
+type Props = {
+  children: ReactNode;
+  title: string;
+  icon?: string;
+  ref?: React.RefObject<View | null>;
+};
 
 export function SubItem(props: Props) {
   const { theme } = useTheme();
@@ -49,6 +54,7 @@ function SettingsContainer(props: Props) {
   const { theme } = useTheme();
   return (
     <View
+      ref={props.ref}
       style={[
         styles.container,
         {

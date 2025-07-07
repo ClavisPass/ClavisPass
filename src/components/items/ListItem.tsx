@@ -90,7 +90,7 @@ function ListItem(props: Props) {
   return (
     <View
       key={props.key}
-      style={[styles.container, { backgroundColor: theme.colors?.background }]}
+      style={[styles.container, { backgroundColor: theme.colors?.background, boxShadow: theme.colors?.shadow }]}
       onPointerEnter={() => Platform.OS === "web" && setHovered(true)}
       onPointerLeave={() => Platform.OS === "web" && setHovered(false)}
     >

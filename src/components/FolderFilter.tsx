@@ -10,7 +10,7 @@ import { Chip, Divider, IconButton } from "react-native-paper";
 import WebSpecific from "./platformSpecific/WebSpecific";
 import AnimatedOpacityContainer from "./container/AnimatedOpacityContainer/AnimatedOpacityContainer";
 import { MenuItem } from "./items/MenuItem";
-import theme from "../ui/theme";
+import { useTheme } from "../contexts/ThemeProvider";
 
 const styles = StyleSheet.create({
   chip: {
@@ -30,6 +30,7 @@ type Props = {
 
 function FolderFilter(props: Props) {
   const { width, height } = useWindowDimensions();
+  const { theme } = useTheme();
 
   const flatListRef: any = useRef<FlatList>(null);
   const [currentOffset, setCurrentOffset] = useState(0);
@@ -61,7 +62,6 @@ function FolderFilter(props: Props) {
             width: 160,
             flexDirection: "row",
             paddingRight: 4,
-            borderRadius: 15,
             overflow: "hidden",
           }}
           onPointerEnter={() => setShowAddButton(true)}

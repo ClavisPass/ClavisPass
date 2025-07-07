@@ -132,18 +132,20 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(|window, event| {
-            if let WindowEvent::Resized(size) = event {
-                let app_handle = window.app_handle();
-                let size_data = WindowSize {
-                    width: size.width as f64,
-                    height: size.height as f64,
-                };
-                save_window_size(&app_handle, size_data);
-            }
+            if window.label() == "main" {
+                if let WindowEvent::Resized(size) = event {
+                    let app_handle = window.app_handle();
+                    let size_data = WindowSize {
+                        width: size.width as f64,
+                        height: size.height as f64,
+                    };
+                    save_window_size(&app_handle, size_data);
+                }
 
-            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                let _ = window.hide();
-                api.prevent_close();
+                if let WindowEvent::CloseRequested { api, .. } = event {
+                    let _ = window.hide();
+                    api.prevent_close();
+                }
             }
         })
         .invoke_handler(tauri::generate_handler![

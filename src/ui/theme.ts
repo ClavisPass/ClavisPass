@@ -45,7 +45,7 @@ const theme = {
     //inverseSurface: "#7FFFD4",
     //inverseOnSurface: "#BDB76B",
     inversePrimary: "rgb(220, 184, 255)",
-    shadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+    shadow: "rgba(99, 99, 99, 0.11) 0px 2px 8px 0px",
     //scrim: "#D8BFD8",
     //backdrop: "#808080",
   },

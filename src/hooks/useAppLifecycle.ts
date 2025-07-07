@@ -8,10 +8,10 @@ export default function useAppLifecycle({
   onBackground: () => void;
   onForeground: () => void;
 }) {
-  const lastVisible = useRef<boolean>(true); // true = sichtbar/fokussiert
+  const lastVisible = useRef<boolean>(true);
   const blocked = useRef(false);
   const timeout = useRef<NodeJS.Timeout | null>(null);
-  const entered = useRef(false);
+  const entered = useRef(true);
 
   const block = () => {
     blocked.current = true;
