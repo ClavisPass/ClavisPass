@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { register } from "@tauri-apps/plugin-global-shortcut";
+import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
 import { Platform } from "react-native";
-import { getCurrentWebviewWindow, WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { useAuth } from "../../contexts/AuthProvider";
 
 function GlobalShortcuts() {
   const auth = useAuth();
-  const [appWindow, setAppWindow] = useState<WebviewWindow | null>(null);
 
   useEffect(() => {
     if (Platform.OS === "web") {
@@ -16,7 +15,8 @@ function GlobalShortcuts() {
       const handleContextMenu = (e: MouseEvent) => e.preventDefault();
       const handleKeyDown = (event: KeyboardEvent) => {
         if (
-          (event.ctrlKey && ["f", "p", "u", "+", "-"].includes(event.key.toLowerCase())) ||
+          (event.ctrlKey &&
+            ["f", "p", "u", "+", "-"].includes(event.key.toLowerCase())) ||
           event.key === "F3"
         ) {
           event.preventDefault();
@@ -27,8 +27,6 @@ function GlobalShortcuts() {
       document.addEventListener("keydown", handleKeyDown);
 
       // Hier RICHTIG die Funktion aufrufen!
-      const windowInstance = getCurrentWebviewWindow();
-      setAppWindow(windowInstance);
 
       return () => {
         document.removeEventListener("contextmenu", handleContextMenu);
@@ -37,11 +35,28 @@ function GlobalShortcuts() {
     }
   }, []);
 
-  useEffect(() => {
-    if (!appWindow) return;
+  const windowInstance = async () => {
+    const win = await WebviewWindow.getByLabel("main");
+    if (!win) {
+      return;
+    }
+    return win;
+  };
 
-    const registerShortcuts = async () => {
-      await register("alt+W", async () => {
+  useEffect(() => {
+    let lastTriggered = 0;
+
+    const registerShortcut = async () => {
+      await register("Alt+W", async () => {
+        const now = Date.now();
+        if (now - lastTriggered < 500) {
+          return;
+        }
+        lastTriggered = now;
+        const appWindow = await windowInstance();
+        if (!appWindow) {
+          return;
+        }
         const stateIsVisible = await appWindow.isVisible();
         const stateIsFocused = await appWindow.isFocused();
 
@@ -56,11 +71,11 @@ function GlobalShortcuts() {
       });
     };
 
-    registerShortcuts();
-
-    // Optional: Aufräumen mit unregister
-
-  }, [appWindow, auth]);
+    registerShortcut();
+    return () => {
+      unregister("Alt+W");
+    };
+  }, []);
 
   return null;
 }

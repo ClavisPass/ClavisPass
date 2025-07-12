@@ -266,6 +266,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
               name={"Entropy"}
               number={routeValue.entropy}
               percentage={(routeValue.entropy / 200) * 100}
+              fixed={true}
             />
             <AnalysisEntry
               name={"Letters"}
@@ -277,6 +278,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
                   ? characterAnalysis?.lettersPercent
                   : 0
               }
+              fixed={true}
             />
           </View>
           <View
@@ -297,6 +299,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
                   ? characterAnalysis?.digitsPercent
                   : 0
               }
+              fixed={true}
             />
             <AnalysisEntry
               name={"Characters"}
@@ -310,6 +313,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
                   ? characterAnalysis?.specialCharactersPercent
                   : 0
               }
+              fixed={true}
             />
           </View>
           {passwordAnalysis?.pattern &&

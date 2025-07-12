@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { View, Pressable } from "react-native";
 import { listen } from "@tauri-apps/api/event";
-import {
-  Icon,
-  Text,
-  TextInput,
-  TouchableRipple,
-} from "react-native-paper";
+import { Icon, Text, TextInput, TouchableRipple } from "react-native-paper";
 import { useTheme } from "../contexts/ThemeProvider";
 import Header from "../components/Header";
 import PasswordTextbox from "../components/PasswordTextbox";
 import CopyToClipboard from "../components/buttons/CopyToClipboard";
 import { hideFastAccess } from "../utils/FastAccess";
+import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 
 export default function FastAccessScreen() {
   const [title, setTitle] = useState("");
@@ -48,6 +44,7 @@ export default function FastAccessScreen() {
               flexDirection: "row",
               marginLeft: 8,
               gap: 4,
+              alignItems: "center",
             }}
           >
             <Icon
@@ -55,35 +52,68 @@ export default function FastAccessScreen() {
               size={20}
               source={"tooltip-account"}
             />
-            <Text variant="bodyLarge" style={{ color: theme.colors.primary }}>
+            <Text
+              variant="bodyLarge"
+              style={{ color: theme.colors.primary, userSelect: "none" }}
+            >
               {title}
             </Text>
           </View>
         }
       >
-        <TouchableRipple
-          onPress={() => {
-            hideFastAccess();
-          }}
-          style={{
-            cursor: "pointer",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 50,
-            height: 40,
-            borderRadius: 4,
-            borderBottomEndRadius: 12,
-          }}
-          rippleColor="rgba(0, 0, 0, 0.158)"
-        >
-          <Icon
-            source={"window-close"}
-            size={20}
-            color={theme.colors.primary}
-          />
-        </TouchableRipple>
+        <View style={{ display: "flex", flexDirection: "row" }}>
+          <TouchableRipple
+            onPress={async () => {
+              const win = await WebviewWindow.getByLabel("main");
+              if (!win) {
+                return;
+              }
+              await win.show();
+              await win.unminimize();
+              await win.setFocus();
+            }}
+            style={{
+              cursor: "pointer",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 50,
+              height: 40,
+              borderRadius: 4,
+            }}
+            rippleColor="rgba(0, 0, 0, 0.158)"
+          >
+            <Icon
+              source={"open-in-app"}
+              size={20}
+              color={theme.colors.primary}
+            />
+          </TouchableRipple>
+          <TouchableRipple
+            onPress={() => {
+              hideFastAccess();
+            }}
+            style={{
+              cursor: "pointer",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 50,
+              height: 40,
+              borderRadius: 4,
+              borderBottomEndRadius: 12,
+            }}
+            rippleColor="rgba(0, 0, 0, 0.158)"
+          >
+            <Icon
+              source={"window-close"}
+              size={20}
+              color={theme.colors.primary}
+            />
+          </TouchableRipple>
+        </View>
       </Header>
       <View style={{ flex: 1, width: "100%", padding: 8, paddingTop: 0 }}>
         <View style={globalStyles.moduleView}>

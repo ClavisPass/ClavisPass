@@ -23,7 +23,6 @@ export async function openFastAccess(
       }
       await positionPopupBottomRight();
       await win.show();
-      await win.setFocus();
     } catch (err) {
       console.error("Fenster konnte nicht sichtbar gemacht werden:", err);
     }
@@ -107,7 +106,7 @@ export async function positionPopupBottomRight() {
   const windowHeight = 150;
 
   const x = screenX + width - windowWidth - 20;
-  const y = screenY + height - windowHeight - 20;
+  const y = screenY + height - windowHeight - 60;
 
   await win.setPosition(new LogicalPosition(x, y));
 }

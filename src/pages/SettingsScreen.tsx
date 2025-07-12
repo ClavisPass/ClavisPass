@@ -3,13 +3,9 @@ import {
   StyleSheet,
   ScrollView,
   View,
-  Button,
   Platform,
   useWindowDimensions,
 } from "react-native";
-import { Switch, Text } from "react-native-paper";
-import { TitlebarHeight } from "../components/CustomTitlebar";
-import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
 import AnimatedContainer from "../components/container/AnimatedContainer";
 import { useFocusEffect } from "@react-navigation/native";
@@ -72,7 +68,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
     useTheme();
   const { master } = useAuth();
   const [startup, setStartup] = React.useState(false);
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const [useAuthentication, setUseAuthentication] = React.useState(false);
   const [closeBehavior, setCloseBehavior] = React.useState(false);
 
@@ -98,7 +94,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
     { title: "Design", icon: "theme-light-dark", ref: designRef },
     { title: "Authentication", icon: "fingerprint", ref: authSettingsRef },
     { title: "Backup", icon: "database", ref: backupRef },
-    { title: "Import Passwords", icon: "import", ref: importRef },
+    { title: "Import", icon: "import", ref: importRef },
     { title: "Links", icon: "link-variant", ref: linksRef },
   ];
 
@@ -224,6 +220,10 @@ function SettingsScreen({ navigation }: { navigation: any }) {
                   changeCloseBehavior(checked);
                 }}
               />
+              <SettingsDivider />
+              <SettingsItem leadingIcon="keyboard">
+                Show/Hide ALT+W
+              </SettingsItem>
               <SettingsDivider />
             </SettingsContainer>
           </WebSpecific>

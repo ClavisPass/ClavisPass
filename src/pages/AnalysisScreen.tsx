@@ -1,6 +1,6 @@
 import Constants from "expo-constants";
 import React, { useEffect, useMemo, useState } from "react";
-import { View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import { Icon, Text, TextInput, TouchableRipple } from "react-native-paper";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import { StatusBar } from "expo-status-bar";
@@ -40,6 +40,8 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
     darkmode,
     setHeaderSpacing,
   } = useTheme();
+
+  const { width } = useWindowDimensions();
 
   const [cachedPasswordList, setCachedPasswordList] = React.useState<
     CachedPasswordsType[] | null
@@ -175,13 +177,14 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
         style={{
           flex: 1,
           display: "flex",
-          flexDirection: "column",
+          flexDirection: width > 600 ? "row-reverse" : "column",
           width: "100%",
         }}
       >
         <View
           style={{
             margin: 8,
+            marginLeft: width > 600 ? 0 : 8,
             marginTop: 0,
             display: "flex",
             flexDirection: "column",
@@ -191,9 +194,9 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
           <View
             style={{
               display: "flex",
-              flexDirection: "row",
+              flexDirection: width > 600 ? "column" : "row",
               justifyContent: "space-evenly",
-              height: 80,
+              height: width > 600 ? undefined : 80,
               gap: 8,
             }}
           >
@@ -216,9 +219,9 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
             style={{
               width: "100%",
               display: "flex",
-              flexDirection: "row",
+              flexDirection: width > 600 ? "column" : "row",
               justifyContent: "space-evenly",
-              height: 80,
+              height: width > 600 ? undefined : 80,
               gap: 8,
             }}
           >

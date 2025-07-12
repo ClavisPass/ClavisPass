@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import { useTheme } from "../contexts/ThemeProvider";
 import CircularProgressBar from "./CircularProgressBar";
 import { Text } from "react-native-paper";
@@ -9,17 +9,19 @@ type Props = {
   name: string;
   percentage: number;
   number: number;
+  fixed?: boolean;
 };
 
 function AnalysisEntryGradient(props: Props) {
   const { theme } = useTheme();
+  const { width } = useWindowDimensions();
   return (
     <LinearGradient
       colors={getColors()}
       dither={true}
       end={{ x: 0.1, y: 0.2 }}
       style={{
-        flex: 1,
+        flex: (width > 600) && !props.fixed ? undefined : 1,
         backgroundColor: theme.colors.background,
         borderRadius: 16,
         padding: 12,
@@ -49,7 +51,10 @@ function AnalysisEntryGradient(props: Props) {
           >
             {props.number}
           </Text>
-          <Text variant="titleSmall" style={{ color: "white", userSelect: "none" }}>
+          <Text
+            variant="titleSmall"
+            style={{ color: "white", userSelect: "none" }}
+          >
             {props.name}
           </Text>
         </View>

@@ -8,6 +8,7 @@ import { useAuth } from "../contexts/AuthProvider";
 import { exit } from "@tauri-apps/plugin-process";
 import { useTheme } from "../contexts/ThemeProvider";
 import * as store from "../utils/store";
+import showMainWindow from "../utils/showMainWindow";
 
 export const TITLEBAR_HEIGHT = Platform.OS === "web" ? 40 : 0;
 
@@ -49,6 +50,7 @@ function CustomTitlebar() {
 
   useEffect(() => {
     if (Platform.OS === "web") {
+      showMainWindow();
       if (document) {
         document
           .getElementById("titlebar")
@@ -128,8 +130,6 @@ function CustomTitlebar() {
                 width: 50,
                 height: 40,
                 borderRadius: 4,
-                borderTopLeftRadius: 12,
-                borderBottomLeftRadius: 12,
               }}
               rippleColor="rgba(0, 0, 0, 0.158)"
             >

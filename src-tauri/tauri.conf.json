@@ -62,8 +62,8 @@
         "fullscreen": false,
         "resizable": true,
         "title": "ClavisPass",
-        "width": 450,
-        "height": 750,
+        "width": 601,
+        "height": 400,
         "minWidth": 350,
         "minHeight": 350,
         "decorations": false,
@@ -71,7 +71,8 @@
         "center": true,
         "contentProtected": true,
         "maximizable": false,
-        "useHttpsScheme": true
+        "useHttpsScheme": true,
+        "visible": false
       },
       {
         "label": "popup",
@@ -84,9 +85,12 @@
         "resizable": false,
         "skipTaskbar": true,
         "transparent": true,
-        "focus": true,
         "fullscreen": false,
-        "visible": false
+        "visible": false,
+        "contentProtected": true,
+        "title": "ClavisPass - Fast Access",
+        "incognito": true
+
       }
     ],
     "security": {
