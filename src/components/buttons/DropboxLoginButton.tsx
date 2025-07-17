@@ -2,13 +2,14 @@ import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 
 import { useToken } from "../../contexts/TokenProvider";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { DROPBOX_CLIENT_ID } from "@env";
 import SettingsItem from "../items/SettingsItem";
 import { Platform, View } from "react-native";
 
 import { Text } from "react-native-paper";
+import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 const REDIRECT_URI = getRedirectUri();
 const SCOPES = ["account_info.read files.content.read files.content.write"];
 
@@ -16,10 +17,12 @@ WebBrowser.maybeCompleteAuthSession();
 
 export function getRedirectUri(): string {
   if (Platform.OS === "web") {
-    //return "http://localhost:1420/redirect"
-    return AuthSession.makeRedirectUri({
-    preferLocalhost: true,
-  });
+    const isDev = process.env.NODE_ENV === "development";
+    if (isDev)
+      return AuthSession.makeRedirectUri({
+        preferLocalhost: true,
+      });
+    return "clavispass://redirect";
   }
   return AuthSession.makeRedirectUri({
     native: "clavispass://redirect",
@@ -29,6 +32,8 @@ export function getRedirectUri(): string {
 function DropboxLoginButton() {
   const { setToken, setRefreshToken, saveRefreshToken, checkTokenType } =
     useToken();
+
+  const [test, setTest] = useState(["test"]);
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
@@ -88,15 +93,21 @@ function DropboxLoginButton() {
     }
   }, [response]);
 
+  useEffect(() => {
+    setTest(["testtest "]);
+    onOpenUrl((url) => {
+      console.log("🔗 Received deep link while running:", url);
+      setTest(["Received Deep Link: ", url[0]]);
+    });
+  }, []);
+
   const handleAuth = async () => {
     promptAsync();
   };
 
   return (
     <View>
-      <Text>
-        {REDIRECT_URI}
-      </Text>
+      <Text>{test}</Text>
       <SettingsItem leadingIcon="dropbox" onPress={handleAuth}>
         Sign in with Dropbox
       </SettingsItem>

@@ -20,10 +20,17 @@ import AnalysisStack from "./src/stacks/AnalysisStack";
 import SettingsStack from "./src/stacks/SettingsStack";
 import LoginStack from "./src/stacks/LoginStack";
 import FastAccessScreen from "./src/pages/FastAccessScreen";
+import { register } from "@tauri-apps/plugin-deep-link";
 
 const Tab = createBottomTabNavigator();
 
+const protocol = async () => {
+  await register("clavispass");
+};
+
 export function AppWithNavigation() {
+  protocol().catch(console.error);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider>

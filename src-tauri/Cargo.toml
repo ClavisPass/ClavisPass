@@ -37,6 +37,8 @@ crate-type = ["cdylib", "rlib"]
 tauri-plugin-autostart = "2"
 tauri-plugin-global-shortcut = "2"
 tauri-plugin-updater = "2"
+tauri-plugin-deep-link = "2.0"
+tauri-plugin-single-instance = "2"
 
 [[bin]]
 name = "app_main"

@@ -27,6 +27,9 @@
     "shell:default",
     "core:window:allow-create",
     "core:event:allow-emit",
-    "core:event:allow-listen"
+    "core:event:allow-listen",
+    "deep-link:allow-register",
+    "deep-link:allow-unregister",
+    "deep-link:default"
   ]
 }
