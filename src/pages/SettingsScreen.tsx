@@ -40,6 +40,7 @@ import * as Linking from "expo-linking";
 import Header from "../components/Header";
 import SettingsQuickSelect from "../components/SettingsQuickSelect";
 import QuickSelectItem from "../types/QuickSelectItem";
+import SettingsShortcutItem from "../components/items/SettingsShortcutItem";
 
 const styles = StyleSheet.create({
   surface: {
@@ -71,6 +72,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
   const { width } = useWindowDimensions();
   const [useAuthentication, setUseAuthentication] = React.useState(false);
   const [closeBehavior, setCloseBehavior] = React.useState(false);
+  const [hideOnStartup, setHideOnStartup] = React.useState(false);
 
   const [showChangeMasterPasswordModal, setShowChangeMasterPasswordModal] =
     useState(false);
@@ -88,14 +90,14 @@ function SettingsScreen({ navigation }: { navigation: any }) {
   const linksRef = useRef<View>(null);
 
   const quickSelectItems: QuickSelectItem[] = [
-    { title: "Cloud", icon: "cloud", ref: authRef },
-    { title: "Update", icon: "tray-arrow-down", ref: updateRef },
-    { title: "System", icon: "cogs", ref: systemRef },
-    { title: "Design", icon: "theme-light-dark", ref: designRef },
-    { title: "Authentication", icon: "fingerprint", ref: authSettingsRef },
-    { title: "Backup", icon: "database", ref: backupRef },
-    { title: "Import", icon: "import", ref: importRef },
-    { title: "Links", icon: "link-variant", ref: linksRef },
+    { title: "Cloud", icon: "cloud", ref: authRef, plattform: null },
+    { title: "Update", icon: "tray-arrow-down", ref: updateRef, plattform: null },
+    { title: "System", icon: "cogs", ref: systemRef, plattform: "web" },
+    { title: "Design", icon: "theme-light-dark", ref: designRef, plattform: null },
+    { title: "Authentication", icon: "fingerprint", ref: authSettingsRef, plattform: null },
+    { title: "Backup", icon: "database", ref: backupRef, plattform: null },
+    { title: "Import", icon: "import", ref: importRef, plattform: null },
+    { title: "Links", icon: "link-variant", ref: linksRef, plattform: null },
   ];
 
   useFocusEffect(
@@ -128,6 +130,15 @@ function SettingsScreen({ navigation }: { navigation: any }) {
     setCloseBehavior(hide);
   };
 
+  const changeStartBehavior = async (hidden: boolean) => {
+    if (hidden) {
+      store.set("START_BEHAVIOR", "hidden");
+    } else {
+      store.set("START_BEHAVIOR", "shown");
+    }
+    setHideOnStartup(hidden);
+  };
+
   const [editTokenVisibility, setEditTokenVisibility] = useState(false);
 
   const changeAutoStart = async (startup: boolean) => {
@@ -153,6 +164,9 @@ function SettingsScreen({ navigation }: { navigation: any }) {
     store.get("CLOSE_BEHAVIOR").then((stored) => {
       setCloseBehavior(stored === "hide");
     });
+    store.get("START_BEHAVIOR").then((stored) => {
+      setHideOnStartup(stored === "hidden");
+    });
   }, []);
 
   const openURL = async (value: string) => {
@@ -176,7 +190,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
         style={{
           flex: 1,
           width: "100%",
-          padding: 4,
+          padding: 0,
           flexDirection: width > 600 ? "row" : "column",
         }}
       >
@@ -214,6 +228,14 @@ function SettingsScreen({ navigation }: { navigation: any }) {
               />
               <SettingsDivider />
               <SettingsSwitch
+                label={"Start minimized"}
+                value={hideOnStartup}
+                onValueChange={(checked) => {
+                  changeStartBehavior(checked);
+                }}
+              />
+              <SettingsDivider />
+              <SettingsSwitch
                 label={"Minimize to Tray"}
                 value={closeBehavior}
                 onValueChange={(checked) => {
@@ -221,9 +243,9 @@ function SettingsScreen({ navigation }: { navigation: any }) {
                 }}
               />
               <SettingsDivider />
-              <SettingsItem leadingIcon="keyboard">
-                Show/Hide ALT+W
-              </SettingsItem>
+              <SettingsShortcutItem shortcut="ALT+W">
+                Show/Hide
+              </SettingsShortcutItem>
               <SettingsDivider />
             </SettingsContainer>
           </WebSpecific>

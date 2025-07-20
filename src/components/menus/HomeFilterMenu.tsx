@@ -1,6 +1,5 @@
 import React from "react";
 import { Divider, IconButton } from "react-native-paper";
-import { useAuth } from "../../contexts/AuthProvider";
 import DataType from "../../types/DataType";
 import { View } from "react-native";
 import theme from "../../ui/theme";
@@ -37,6 +36,64 @@ function HomeFilterMenu(props: Props) {
             return -1;
           }
           if (a.title < b.title) {
+            return 1;
+          }
+        }
+
+        return 0;
+      });
+      props.setData(newData);
+    }
+  };
+
+  const sortCreated = (sort: "asc" | "desc") => {
+    let newData = { ...props.data } as DataType;
+    if (newData) {
+      newData.values = newData.values.sort(function (a, b) {
+        let aDate = new Date(a.created);
+        let bDate = new Date(b.created);
+        if (sort == "asc") {
+          if (aDate < bDate) {
+            return -1;
+          }
+          if (aDate > bDate) {
+            return 1;
+          }
+        }
+        if (sort == "desc") {
+          if (aDate > bDate) {
+            return -1;
+          }
+          if (aDate < bDate) {
+            return 1;
+          }
+        }
+
+        return 0;
+      });
+      props.setData(newData);
+    }
+  };
+
+  const sortLastUpdated = (sort: "asc" | "desc") => {
+    let newData = { ...props.data } as DataType;
+    if (newData) {
+      newData.values = newData.values.sort(function (a, b) {
+        let aDate = new Date(a.lastUpdated);
+        let bDate = new Date(b.lastUpdated);
+        if (sort == "asc") {
+          if (aDate < bDate) {
+            return -1;
+          }
+          if (aDate > bDate) {
+            return 1;
+          }
+        }
+        if (sort == "desc") {
+          if (aDate > bDate) {
+            return -1;
+          }
+          if (aDate < bDate) {
             return 1;
           }
         }
@@ -84,8 +141,9 @@ function HomeFilterMenu(props: Props) {
             props.setVisible(false);
           }}
         >
-          {"sort ascending"}
+          {"Sort Ascending"}
         </MenuItem>
+        <Divider />
         <MenuItem
           leadingIcon="sort-descending"
           onPress={() => {
@@ -94,7 +152,29 @@ function HomeFilterMenu(props: Props) {
             props.setVisible(false);
           }}
         >
-          {"sort descending"}
+          {"Sort Descending"}
+        </MenuItem>
+        <Divider />
+        <MenuItem
+          leadingIcon="sort-clock-ascending"
+          onPress={() => {
+            sortCreated("asc");
+            data.setShowSave(true);
+            props.setVisible(false);
+          }}
+        >
+          {"Created"}
+        </MenuItem>
+        <Divider />
+        <MenuItem
+          leadingIcon="sort-clock-ascending"
+          onPress={() => {
+            sortLastUpdated("asc");
+            data.setShowSave(true);
+            props.setVisible(false);
+          }}
+        >
+          {"Last Updated"}
         </MenuItem>
       </>
     </Menu>

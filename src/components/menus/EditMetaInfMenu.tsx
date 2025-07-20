@@ -1,12 +1,6 @@
-import { ReactNode, useState } from "react";
 import { Divider } from "react-native-paper";
 import { formatDateTime } from "../../utils/Timestamp";
-import { View } from "react-native";
 import Menu from "./Menu";
-import { useData } from "../../contexts/DataProvider";
-import ValuesType from "../../types/ValuesType";
-import DataType from "../../types/DataType";
-import DeleteModal from "../modals/DeleteModal";
 import React from "react";
 import { MenuItem } from "../items/MenuItem";
 

@@ -24,7 +24,7 @@ function WifiModule(props: WifiModuleType & Props) {
   const [name, setName] = useState(props.wifiName);
   const [value, setValue] = useState(props.value);
 
-  const [wifiType, setWifiType] = useState<"WEP" | "WPA" | "blank">(
+  const [wifiType, setWifiType] = useState<"WPA" | "WEP" | "blank">(
     props.wifiType
   );
 
@@ -69,8 +69,8 @@ function WifiModule(props: WifiModuleType & Props) {
           onValueChange={(itemValue, itemIndex) => setWifiType(itemValue)}
           style={[globalStyles.outlineStyle, { padding: 10 }]}
         >
-          <Picker.Item label="WEP" value="WEP" />
           <Picker.Item label="WPA" value="WPA" />
+          <Picker.Item label="WEP" value="WEP" />
           <Picker.Item label="blank" value="blank" />
         </Picker>
 

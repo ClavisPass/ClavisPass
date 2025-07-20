@@ -90,7 +90,6 @@ function SettingsQuickSelect(props: Props) {
             maxWidth: 240,
             width: 160,
             flexDirection: "row",
-            paddingRight: 4,
             overflow: "hidden",
           }}
         >
@@ -99,22 +98,33 @@ function SettingsQuickSelect(props: Props) {
             data={props.items}
             style={{ flexShrink: 1 }}
             onScroll={handleScroll}
-            renderItem={({ item, index }) => (
-              <>
-                {index !== 0 ? <Divider style={{ marginRight: 4 }} /> : null}
-                <MenuItem
-                  key={index}
-                  leadingIcon={item.icon}
-                  onPress={() => {
-                    scrollToRef(item.ref);
-                  }}
-                >
-                  {item.title}
-                </MenuItem>
-              </>
-            )}
+            renderItem={({ item, index }) => {
+              const isMobile =
+                Platform.OS === "ios" || Platform.OS === "android";
+
+              const shouldRender =
+                item.plattform === null ||
+                item.plattform === Platform.OS ||
+                (item.plattform === "mobile" && isMobile);
+
+              if (!shouldRender) return null;
+              return (
+                <>
+                  {index !== 0 ? <Divider style={{ marginRight: 4 }} /> : null}
+                  <MenuItem
+                    key={index}
+                    leadingIcon={item.icon}
+                    onPress={() => {
+                      scrollToRef(item.ref);
+                    }}
+                  >
+                    {item.title}
+                  </MenuItem>
+                </>
+              );
+            }}
           />
-          <Divider style={{ width: 1, height: "100%" }} />
+          <Divider style={{ width: 1, height: "100%", margin: 0 }} />
         </View>
       ) : (
         <View
@@ -146,19 +156,30 @@ function SettingsQuickSelect(props: Props) {
               showsHorizontalScrollIndicator={false}
               style={{ flexShrink: 1 }}
               onScroll={handleScroll}
-              renderItem={({ item, index }) => (
-                <Chip
-                  key={index}
-                  icon={item.icon}
-                  showSelectedOverlay={true}
-                  onPress={() => {
-                    scrollToRef(item.ref);
-                  }}
-                  style={styles.chip}
-                >
-                  {item.title}
-                </Chip>
-              )}
+              renderItem={({ item, index }) => {
+                const isMobile =
+                  Platform.OS === "ios" || Platform.OS === "android";
+
+                const shouldRender =
+                  item.plattform === null ||
+                  item.plattform === Platform.OS ||
+                  (item.plattform === "mobile" && isMobile);
+
+                if (!shouldRender) return null;
+                return (
+                  <Chip
+                    key={index}
+                    icon={item.icon}
+                    showSelectedOverlay={true}
+                    onPress={() => {
+                      scrollToRef(item.ref);
+                    }}
+                    style={styles.chip}
+                  >
+                    {item.title}
+                  </Chip>
+                );
+              }}
             />
           </View>
           <WebSpecific>

@@ -63,7 +63,7 @@ function ListItem(props: Props) {
     } else {
       determineIcon();
     }
-  }, [props.item]);
+  }, [props.item, props.item.modules]);
 
   const copyToClipboard = async (value: string) => {
     await Clipboard.setStringAsync(value);

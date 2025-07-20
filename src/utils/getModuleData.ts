@@ -84,7 +84,7 @@ function getModuleData(module: ModulesEnum) {
       module: module,
       value: "",
       wifiName: "",
-      wifiType: "WEP",
+      wifiType: "WPA",
     };
     return moduleData as ModuleType;
   }

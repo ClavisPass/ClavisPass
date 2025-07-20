@@ -37,6 +37,9 @@ const UpdateManager = () => {
         setUpdateAvailable(true);
         setUpdateMessage("Update Available");
       }
+      else{
+        setUpdateMessage("No updates available");
+      }
     } catch (error) {
       setUpdateMessage("Error while checking for updates");
     }
@@ -57,6 +60,9 @@ const UpdateManager = () => {
       if (update) {
         setUpdateAvailable(true);
         setUpdateMessage("Update Available");
+      }
+      else{
+        setUpdateMessage("No updates available");
       }
     } catch (error) {
       setUpdateMessage("Error while checking for updates");
@@ -118,7 +124,7 @@ const UpdateManager = () => {
     <View >
       <SettingsItem>{updateMessage}</SettingsItem>
       {updateAvailable && (
-        <Button onPress={applyUpdate} text="Update"/>
+        <Button onPress={applyUpdate} text="Install Update"/>
       )}
       <SettingsDivider />
     </View>

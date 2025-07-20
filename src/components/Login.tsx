@@ -163,7 +163,7 @@ function Login(props: Props) {
             />
             {showNewData ? (
               <>
-                <View style={{ width: "100%" }}>
+                <View style={{ width: "100%", display: "flex", flexDirection: "column", gap: 6 }}>
                   <PasswordTextbox
                     autofocus
                     textInputRef={textInput2Ref}

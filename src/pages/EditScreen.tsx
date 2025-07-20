@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, Platform, View, Animated, Keyboard } from "react-native";
+import { Platform, View, Animated } from "react-native";
 import ModulesType, { ModuleType } from "../types/ModulesType";
 
 import ModulesEnum from "../enums/ModulesEnum";
 
 import type { StackScreenProps } from "@react-navigation/stack";
-import { Icon, IconButton, Text } from "react-native-paper";
+import { Icon, Text } from "react-native-paper";
 import Header from "../components/Header";
 import EditMetaInfMenu from "../components/menus/EditMetaInfMenu";
 import ValuesType from "../types/ValuesType";
@@ -31,20 +31,10 @@ import DeleteModal from "../components/modals/DeleteModal";
 import Button from "../components/buttons/Button";
 import { RootStackParamList } from "../stacks/Stack";
 
-import { AppState } from "react-native";
 import useAppLifecycle from "../hooks/useAppLifecycle";
 import { openFastAccess, hideFastAccess } from "../utils/FastAccess";
 import extractFastAccessObject from "../utils/extractFastAccessObject";
 import FastAccessType from "../types/FastAccessType";
-
-const styles = StyleSheet.create({
-  scrollView: {
-    minWidth: 0,
-  },
-  scrollViewStyle: {
-    overflow: "visible",
-  },
-});
 
 type EditScreenProps = StackScreenProps<RootStackParamList, "Edit">;
 

@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { View, StyleSheet, Image, ImageBackground } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, ImageBackground } from "react-native";
 import AnimatedContainer from "../components/container/AnimatedContainer";
 import ContentProtection from "../components/ContentProtection";
 import { useToken } from "../contexts/TokenProvider";
@@ -15,12 +15,7 @@ import { useOnline } from "../contexts/OnlineProvider";
 import { useTheme } from "../contexts/ThemeProvider";
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import { LinearGradient } from "expo-linear-gradient";
-import getColors from "../ui/linearGradient";
 import { BlurView } from "expo-blur";
-import Logo from "../ui/Logo";
-import Blob1 from "../ui/Blob1";
-import Blob2 from "../ui/Blob2";
 import SettingsDivider from "../components/SettingsDivider";
 
 const styles = StyleSheet.create({
@@ -132,7 +127,6 @@ function LoginScreen({ navigation }: { navigation: any }) {
               borderRadius: 20,
               padding: 20,
               overflow: "hidden",
-              //backgroundColor: theme.colors.background,
               margin: 8,
               minWidth: 300,
               display: "flex",

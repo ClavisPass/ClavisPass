@@ -10,6 +10,10 @@ const storeSchema = {
     values: ["hide", "exit"],
     default: "exit",
   },
+  START_BEHAVIOR: {
+    values: ["shown", "hidden"],
+    default: "shown",
+  },
 } as const;
 
 type StoreSchema = typeof storeSchema;

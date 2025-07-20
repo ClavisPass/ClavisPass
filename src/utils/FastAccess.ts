@@ -5,7 +5,6 @@ import * as Notifications from "expo-notifications";
 import * as Clipboard from "expo-clipboard";
 import { currentMonitor, LogicalPosition } from "@tauri-apps/api/window";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { invoke } from "@tauri-apps/api/core";
 
 let notificationListenerSet = false;
 
@@ -28,6 +27,12 @@ export async function openFastAccess(
     }
 
     emit("show-popup", { title, username, password });
+    return;
+  }
+
+  const { status } = await Notifications.requestPermissionsAsync();
+  if (status !== "granted") {
+    console.warn("Permission denied");
     return;
   }
 
@@ -77,7 +82,8 @@ export async function openFastAccess(
 export async function hideFastAccess() {
   if (Platform.OS === "web") {
     try {
-      await invoke("plugin:window|hide", { label: "popup" });
+      let tauri = require("@tauri-apps/api/core");
+      await tauri.invoke("plugin:window|hide", { label: "popup" });
     } catch (err) {
       console.error("Fehler beim Verstecken des Fensters:", err);
     }

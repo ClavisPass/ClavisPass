@@ -248,15 +248,19 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
         <View
           style={{
             flex: 1,
-            backgroundColor: theme.colors.background,
-            borderRadius: 16,
-            padding: 12,
-            boxShadow: theme.colors.shadow,
-            margin: 8,
-            marginTop: 0,
+            padding: 8,
+            paddingTop: 0,
           }}
         >
-          <View style={{ height: 40 }}>
+          <View
+            style={{
+              height: 40,
+              backgroundColor: theme.colors?.background,
+              boxShadow: theme.colors?.shadow,
+              marginBottom: 4,
+              borderRadius: 12,
+            }}
+          >
             <TextInput
               placeholder="Search"
               placeholderTextColor={"lightgray"}
@@ -264,28 +268,36 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
                 globalStyles.textInputStyle,
                 {
                   borderColor: theme.colors.primary,
-                  borderBottomWidth: 1,
+                  borderBottomWidth: 0,
                   backgroundColor: "transparent",
+                  borderRadius: 12,
                 },
               ]}
+              outlineStyle={{
+                borderWidth: 0,
+              }}
               value={searchQuery}
-              mode="flat"
+              mode="outlined"
               onChangeText={setSearchQuery}
               autoCapitalize="none"
             />
           </View>
           <FlashList
             data={filteredValues}
-            ItemSeparatorComponent={() => <Divider />}
+            //ItemSeparatorComponent={() => <Divider />}
             renderItem={({ item, index }) => (
               <View
                 style={{
-                  borderRadius: 8,
+                  borderRadius: 12,
                   margin: 0,
                   //gap: 4,
                   //marginTop: 0,
+                  marginBottom: 4,
                   overflow: "hidden",
                   width: "100%",
+                  backgroundColor: theme.colors?.background,
+                  boxShadow: theme.colors?.shadow,
+                  height: 40,
                 }}
               >
                 <TouchableRipple
