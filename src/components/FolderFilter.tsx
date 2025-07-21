@@ -15,7 +15,7 @@ import { useTheme } from "../contexts/ThemeProvider";
 const styles = StyleSheet.create({
   chip: {
     marginRight: 4,
-    borderRadius: 15,
+    borderRadius: 12,
   },
 });
 
@@ -113,7 +113,7 @@ function FolderFilter(props: Props) {
             )}
             ListFooterComponent={
               <View
-              key={"lastitem-0"}
+                key={"lastitem-0"}
                 style={{
                   width: "100%",
                   display: "flex",
@@ -141,6 +141,8 @@ function FolderFilter(props: Props) {
         <View
           style={{
             padding: 4,
+            paddingTop: 8,
+            paddingBottom: 4,
             maxHeight: 50,
             width: "100%",
             display: "flex",

@@ -96,6 +96,18 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     },
   });
 
+  /*useEffect(() => {
+    const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      if (!discardChanges) return;
+
+      e.preventDefault();
+
+      setDiscardChangesVisible(true);
+    });
+
+    return unsubscribe;
+  }, [navigation, discardChanges]);*/
+
   const saveValue = () => {
     let newData = { ...data.data } as DataType;
     let valueToChange: any = newData?.values.find(
@@ -177,6 +189,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       newData.values = valueToChange;
       data.setData(newData);
     }
+    data.setShowSave(true);
     goBack();
   };
 

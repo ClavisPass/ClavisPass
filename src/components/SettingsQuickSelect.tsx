@@ -19,7 +19,7 @@ import QuickSelectItem from "../types/QuickSelectItem";
 const styles = StyleSheet.create({
   chip: {
     marginRight: 4,
-    borderRadius: 15,
+    borderRadius: 12,
   },
 });
 

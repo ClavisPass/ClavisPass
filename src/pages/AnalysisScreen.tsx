@@ -1,7 +1,14 @@
 import Constants from "expo-constants";
 import React, { useEffect, useMemo, useState } from "react";
 import { useWindowDimensions, View } from "react-native";
-import { Icon, Text, TextInput, TouchableRipple } from "react-native-paper";
+import {
+  Icon,
+  IconButton,
+  Searchbar,
+  Text,
+  TextInput,
+  TouchableRipple,
+} from "react-native-paper";
 import { TitlebarHeight } from "../components/CustomTitlebar";
 import { StatusBar } from "expo-status-bar";
 import AnimatedContainer from "../components/container/AnimatedContainer";
@@ -21,6 +28,8 @@ import PasswordStrengthLevel from "../enums/PasswordStrengthLevel";
 import getPasswordStrengthColor from "../utils/getPasswordStrengthColor";
 import getPasswordStrengthIcon from "../utils/getPasswordStrengthIcon";
 import Header from "../components/Header";
+import { LinearGradient } from "expo-linear-gradient";
+import getColors from "../ui/linearGradient";
 
 export type CachedPasswordsType = {
   title: string;
@@ -248,53 +257,62 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
         <View
           style={{
             flex: 1,
-            padding: 8,
-            paddingTop: 0,
+            padding: 0,
           }}
         >
-          <View
+          <LinearGradient
+            colors={getColors()}
+            dither={true}
             style={{
-              height: 40,
-              backgroundColor: theme.colors?.background,
-              boxShadow: theme.colors?.shadow,
-              marginBottom: 4,
+              display: "flex",
+              flexDirection: "row",
+              padding: 10,
               borderRadius: 12,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 0 },
+              shadowOpacity: 0.4,
+              shadowRadius: 6,
+              elevation: 5,
+              margin: 8,
+              marginTop: 0,
+              alignItems: "center",
             }}
+            end={{ x: 0.1, y: 0.2 }}
           >
-            <TextInput
-              placeholder="Search"
-              placeholderTextColor={"lightgray"}
-              style={[
-                globalStyles.textInputStyle,
-                {
-                  borderColor: theme.colors.primary,
-                  borderBottomWidth: 0,
-                  backgroundColor: "transparent",
-                  borderRadius: 12,
-                },
-              ]}
-              outlineStyle={{
-                borderWidth: 0,
+            <Searchbar
+              inputStyle={{ height: 40, minHeight: 40, color: "white" }}
+              style={{
+                height: 40,
+                flex: 1,
+                borderRadius: 10,
+                backgroundColor: "rgba(217, 217, 217, 0.21)",
               }}
-              value={searchQuery}
-              mode="outlined"
+              placeholder="Search"
               onChangeText={setSearchQuery}
-              autoCapitalize="none"
+              value={searchQuery}
+              loading={false}
+              iconColor={"#ffffff80"}
+              placeholderTextColor={"#ffffff80"}
             />
-          </View>
+            <IconButton
+              icon="filter-variant"
+              size={25}
+              onPress={() => {}}
+              iconColor="white"
+              style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
+            />
+          </LinearGradient>
           <FlashList
             data={filteredValues}
-            //ItemSeparatorComponent={() => <Divider />}
             renderItem={({ item, index }) => (
               <View
                 style={{
                   borderRadius: 12,
-                  margin: 0,
-                  //gap: 4,
-                  //marginTop: 0,
+                  margin: 8,
                   marginBottom: 4,
+                  marginTop: 0,
                   overflow: "hidden",
-                  width: "100%",
+                  //width: "100%",
                   backgroundColor: theme.colors?.background,
                   boxShadow: theme.colors?.shadow,
                   height: 40,

@@ -2,9 +2,7 @@
   "identifier": "migrated",
   "description": "permissions that were migrated from v1",
   "local": true,
-  "windows": [
-    "main", "popup"
-  ],
+  "windows": ["main", "popup"],
   "permissions": [
     "core:default",
     "core:window:allow-center",
@@ -30,6 +28,9 @@
     "core:event:allow-listen",
     "deep-link:allow-register",
     "deep-link:allow-unregister",
-    "deep-link:default"
+    "deep-link:default",
+    "dialog:allow-save",
+    "dialog:default",
+    "fs:allow-write-text-file"
   ]
 }

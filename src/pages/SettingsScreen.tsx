@@ -41,6 +41,8 @@ import Header from "../components/Header";
 import SettingsQuickSelect from "../components/SettingsQuickSelect";
 import QuickSelectItem from "../types/QuickSelectItem";
 import SettingsShortcutItem from "../components/items/SettingsShortcutItem";
+import BackupImportButton from "../components/buttons/BackupImportButton";
+import BackupExportButton from "../components/buttons/BackupExportButton";
 
 const styles = StyleSheet.create({
   surface: {
@@ -284,13 +286,9 @@ function SettingsScreen({ navigation }: { navigation: any }) {
             icon={quickSelectItems[5].icon}
             title={quickSelectItems[5].title}
           >
-            <SettingsItem leadingIcon="database-import" onPress={() => {}}>
-              Import Backup
-            </SettingsItem>
+            <BackupImportButton />
             <SettingsDivider />
-            <SettingsItem leadingIcon="database-export" onPress={() => {}}>
-              Export Backup
-            </SettingsItem>
+            <BackupExportButton />
             <SettingsDivider />
           </SettingsContainer>
           <SettingsContainer
