@@ -5,6 +5,7 @@ import {
   IconButton,
   TouchableRipple,
   ActivityIndicator,
+  Icon,
 } from "react-native-paper";
 
 import { Text } from "react-native-paper";
@@ -46,15 +47,19 @@ import { getDateTime } from "../utils/Timestamp";
 import LogoColored from "../ui/LogoColored";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../stacks/Stack";
+import { useOnline } from "../contexts/OnlineProvider";
+import { saveBackup } from "../utils/Backup";
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const triggerAdd = route.params?.triggerAdd ?? false;
 
-  const { theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } = useTheme();
+  const { theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
+    useTheme();
   const { width, height } = useWindowDimensions();
   const auth = useAuth();
+  const { isOnline } = useOnline();
 
   const [fontsLoaded] = useFonts({
     LexendExa_400Regular,
@@ -182,6 +187,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   function renderFlashList() {
     return (
       <FlashList
+        contentContainerStyle={{ paddingRight: 4 }}
         refreshing={false}
         onRefresh={refreshData}
         data={filteredValues}
@@ -299,7 +305,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               setShowMenu(true);
             }}
             iconColor="white"
-            style={{marginTop: 0, marginBottom: 0, marginRight: 0 }}
+            style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
           />
         </View>
       </LinearGradient>
@@ -338,66 +344,74 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 <ActivityIndicator color="white" />
               ) : (
                 <>
-                  <View style={{ backgroundColor: "#00000017" }}>
-                    <TouchableRipple
-                      onPress={async () => {
-                        setRefreshing(true);
-                        const lastUpdated = getDateTime();
-                        uploadData(
-                          token,
-                          tokenType,
-                          await encrypt(
-                            data.data,
-                            auth.master ? auth.master : "",
-                            lastUpdated
-                          ),
-                          "clavispass.lock",
-                          () => {
-                            data.setShowSave(false);
-                            setRefreshing(false);
-                          }
-                        );
-                      }}
-                      rippleColor="rgba(0, 0, 0, .32)"
-                      style={{
-                        height: 40,
-                        width: 100,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Text
-                        variant="bodyLarge"
-                        style={{ color: "white", userSelect: "none" }}
+                  {isOnline ? (
+                    <>
+                      <View style={{ backgroundColor: "#00000017" }}>
+                        <TouchableRipple
+                          onPress={async () => {
+                            setRefreshing(true);
+                            const lastUpdated = getDateTime();
+                            const encryptedData = await encrypt(
+                              data.data,
+                              auth.master ? auth.master : "",
+                              lastUpdated
+                            );
+                            uploadData(
+                              token,
+                              tokenType,
+                              encryptedData,
+                              "clavispass.lock",
+                              () => {
+                                saveBackup(encryptedData);
+                                data.setShowSave(false);
+                                setRefreshing(false);
+                              }
+                            );
+                          }}
+                          rippleColor="rgba(0, 0, 0, .32)"
+                          style={{
+                            height: 40,
+                            width: 100,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text
+                            variant="bodyLarge"
+                            style={{ color: "white", userSelect: "none" }}
+                          >
+                            Save
+                          </Text>
+                        </TouchableRipple>
+                      </View>
+                      <TouchableRipple
+                        onPress={refreshData}
+                        rippleColor="rgba(0, 0, 0, .32)"
+                        style={{
+                          height: 40,
+                          width: 100,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "pointer",
+                        }}
                       >
-                        Save
-                      </Text>
-                    </TouchableRipple>
-                  </View>
-                  <TouchableRipple
-                    onPress={refreshData}
-                    rippleColor="rgba(0, 0, 0, .32)"
-                    style={{
-                      height: 40,
-                      width: 100,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <Text
-                      variant="bodyLarge"
-                      style={{
-                        textDecorationLine: "underline",
-                        color: "white",
-                        userSelect: "none",
-                      }}
-                    >
-                      Reset
-                    </Text>
-                  </TouchableRipple>
+                        <Text
+                          variant="bodyLarge"
+                          style={{
+                            textDecorationLine: "underline",
+                            color: "white",
+                            userSelect: "none",
+                          }}
+                        >
+                          Reset
+                        </Text>
+                      </TouchableRipple>
+                    </>
+                  ) : (
+                    <Icon source="cloud-off-outline" color="white" size={20} />
+                  )}
                 </>
               )}
             </View>
@@ -409,6 +423,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           flex: 1,
           width: "100%",
           padding: 4,
+          paddingRight: 0,
           flexDirection: width > 600 ? "row-reverse" : "column",
         }}
       >

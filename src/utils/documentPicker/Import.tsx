@@ -113,7 +113,7 @@ function Import(props: Props) {
             : pickDocument
         }
       >
-        {props.title} Passwords
+        Import {props.title} Passwords
       </SettingsItem>
       {props.type === DocumentTypeEnum.PCLOUD && (
         <Modal

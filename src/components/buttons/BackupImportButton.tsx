@@ -5,7 +5,6 @@ import { CryptoTypeSchema } from "../../types/CryptoType";
 import { DataTypeSchema } from "../../types/DataType";
 
 import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
 
 function BackupImportButton() {
   const data = useData();

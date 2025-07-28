@@ -31,7 +31,7 @@ function TokenQRCodeModal(props: Props) {
       <Modal visible={props.visible} onDismiss={hideModal}>
         <LinearGradient
           colors={getColors()}
-          style={{ padding: 6, borderRadius: 20 }}
+          style={{ padding: 6, borderRadius: 12 }}
           end={{ x: 0.1, y: 0.2 }}
           dither={true}
         >
@@ -39,14 +39,14 @@ function TokenQRCodeModal(props: Props) {
             style={{
               backgroundColor: "white",
               padding: 20,
-              borderRadius: 20,
+              borderRadius: 12,
             }}
           >
             <QRCode
-              size={256}
+              size={200}
               style={{ height: "auto", width: "auto" }}
               value={value}
-              viewBox="0 0 256 256"
+              viewBox="0 0 200 200"
             />
           </View>
         </LinearGradient>

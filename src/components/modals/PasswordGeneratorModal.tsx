@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import {
-  Button,
   IconButton,
   Portal,
   Switch,
@@ -10,12 +9,14 @@ import {
 } from "react-native-paper";
 import getColors from "../../ui/linearGradient";
 import { LinearGradient } from "expo-linear-gradient";
-import { Slider } from '@react-native-assets/slider'
+import { Slider } from "@react-native-assets/slider";
 
 import generatePassword from "../../utils/generatePassword";
 import CopyToClipboard from "../buttons/CopyToClipboard";
 import Modal from "./Modal";
 import { useTheme } from "../../contexts/ThemeProvider";
+import SettingsDivider from "../SettingsDivider";
+import Button from "../buttons/Button";
 
 const styles = StyleSheet.create({
   container: {
@@ -25,6 +26,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     margin: 4,
+    height: 40,
   },
 });
 
@@ -62,7 +64,7 @@ function PasswordGeneratorModal(props: Props) {
       <Modal visible={props.visible} onDismiss={hideModal}>
         <LinearGradient
           colors={getColors()}
-          style={{ padding: 3, width: 300, borderRadius: 20 }}
+          style={{ padding: 3, width: 300, borderRadius: 12 }}
           end={{ x: 0.1, y: 0.2 }}
           dither={true}
         >
@@ -70,7 +72,7 @@ function PasswordGeneratorModal(props: Props) {
             style={{
               backgroundColor: theme.colors?.background,
               padding: 16,
-              borderRadius: 20,
+              borderRadius: 12,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -91,8 +93,9 @@ function PasswordGeneratorModal(props: Props) {
                 //width: "100%",
                 display: "flex",
                 flexDirection: "row",
-                margin: 2,
+                //margin: 2,
                 alignItems: "center",
+                height: 40,
               }}
             >
               <IconButton
@@ -115,11 +118,16 @@ function PasswordGeneratorModal(props: Props) {
               />
               <CopyToClipboard value={genPassword} />
             </View>
+            <SettingsDivider />
             <View style={styles.container}>
               <Text style={{ userSelect: "none" }} variant="bodyLarge">
-                {"Password Length: " + valueSlider}
+                {"Password Length: "}
+              </Text>
+              <Text style={{ userSelect: "none" }} variant="bodyLarge">
+                {valueSlider}
               </Text>
             </View>
+            <SettingsDivider />
             <View style={styles.container}>
               <Text variant="bodyLarge">{"include Uppercase"}</Text>
               <Switch
@@ -129,6 +137,7 @@ function PasswordGeneratorModal(props: Props) {
                 }}
               />
             </View>
+            <SettingsDivider />
             <View style={styles.container}>
               <Text style={{ userSelect: "none" }} variant="bodyLarge">
                 {"include Numbers"}
@@ -138,6 +147,7 @@ function PasswordGeneratorModal(props: Props) {
                 onValueChange={() => setNumberInclude(!numberInclude)}
               />
             </View>
+            <SettingsDivider />
             <View style={styles.container}>
               <Text style={{ userSelect: "none" }} variant="bodyLarge">
                 {"include Symbols"}
@@ -148,15 +158,14 @@ function PasswordGeneratorModal(props: Props) {
               />
             </View>
             <Button
-              style={{ width: 200 }}
-              mode="contained-tonal"
+              maxWidth={200}
+              text="Use"
               onPress={() => {
                 props.changePassword(genPassword);
                 hideModal();
               }}
-            >
-              Use
-            </Button>
+              color={theme.colors.primary}
+            />
           </View>
         </LinearGradient>
       </Modal>

@@ -6,6 +6,7 @@ import theme from "../../ui/theme";
 import Menu from "./Menu";
 import { useData } from "../../contexts/DataProvider";
 import { MenuItem } from "../items/MenuItem";
+import { useOnline } from "../../contexts/OnlineProvider";
 
 type Props = {
   visible: boolean;
@@ -18,6 +19,7 @@ type Props = {
 };
 function HomeFilterMenu(props: Props) {
   const data = useData();
+  const { isOnline } = useOnline();
 
   const sort = (sort: "asc" | "desc") => {
     let newData = { ...props.data } as DataType;
@@ -123,6 +125,7 @@ function HomeFilterMenu(props: Props) {
         >
           <MenuItem>{props.data?.values.length + " Entries"}</MenuItem>
           <IconButton
+            disabled={!isOnline}
             icon="refresh"
             size={20}
             iconColor={theme.colors.primary}

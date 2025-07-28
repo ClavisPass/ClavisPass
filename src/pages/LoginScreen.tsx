@@ -17,6 +17,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { BlurView } from "expo-blur";
 import SettingsDivider from "../components/SettingsDivider";
+import Backup from "../components/Backup";
 
 const styles = StyleSheet.create({
   container: {
@@ -35,7 +36,8 @@ const styles = StyleSheet.create({
 function LoginScreen({ navigation }: { navigation: any }) {
   const { setToken, setRefreshToken, loadRefreshToken, tokenType } = useToken();
   const { isOnline } = useOnline();
-  const { headerWhite, setHeaderWhite, darkmode, theme, setHeaderSpacing } = useTheme();
+  const { headerWhite, setHeaderWhite, darkmode, theme, setHeaderSpacing } =
+    useTheme();
 
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
   const [loading, setLoading] = useState(true);
@@ -82,18 +84,14 @@ function LoginScreen({ navigation }: { navigation: any }) {
     login();
   }, []);
 
-  useEffect(() => {
-    console.log("isOnline:", isOnline);
-  }, [isOnline]);
-
-  if (!isOnline) {
-    return <Text>OFFLINE</Text>;
-  }
-
   return (
     <AnimatedContainer>
       <ImageBackground
-        source={darkmode?require("../../assets/blurred-bg-dark.png"):require("../../assets/blurred-bg.png")}
+        source={
+          darkmode
+            ? require("../../assets/blurred-bg-dark.png")
+            : require("../../assets/blurred-bg.png")
+        }
         resizeMode="cover"
         style={{
           flex: 1,
@@ -134,23 +132,29 @@ function LoginScreen({ navigation }: { navigation: any }) {
               boxShadow: theme.colors.shadow,
             }}
           >
-            {loading ? (
-              <ActivityIndicator size={"large"} animating={true} />
-            ) : userInfo ? (
-              <Login userInfo={userInfo} />
+            {isOnline ? (
+              <>
+                {loading ? (
+                  <ActivityIndicator size={"large"} animating={true} />
+                ) : userInfo ? (
+                  <Login userInfo={userInfo} />
+                ) : (
+                  <View style={styles.container}>
+                    <SettingsDivider />
+                    <Auth
+                      setUserInfo={setUserInfo}
+                      navigation={navigation}
+                      changeEditTokenVisibility={setEditTokenVisibility}
+                    />
+                    <EditTokenModal
+                      visible={editTokenVisibility}
+                      setVisible={setEditTokenVisibility}
+                    />
+                  </View>
+                )}
+              </>
             ) : (
-              <View style={styles.container}>
-                <SettingsDivider />
-                <Auth
-                  setUserInfo={setUserInfo}
-                  navigation={navigation}
-                  changeEditTokenVisibility={setEditTokenVisibility}
-                />
-                <EditTokenModal
-                  visible={editTokenVisibility}
-                  setVisible={setEditTokenVisibility}
-                />
-              </View>
+              <Backup />
             )}
           </BlurView>
         </View>

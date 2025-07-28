@@ -98,8 +98,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
     { title: "Design", icon: "theme-light-dark", ref: designRef, plattform: null },
     { title: "Authentication", icon: "fingerprint", ref: authSettingsRef, plattform: null },
     { title: "Backup", icon: "database", ref: backupRef, plattform: null },
-    { title: "Import", icon: "import", ref: importRef, plattform: null },
-    { title: "Links", icon: "link-variant", ref: linksRef, plattform: null },
+    { title: "Links", icon: "link-variant", ref: linksRef, plattform: "mobile" },
   ];
 
   useFocusEffect(
@@ -290,12 +289,6 @@ function SettingsScreen({ navigation }: { navigation: any }) {
             <SettingsDivider />
             <BackupExportButton />
             <SettingsDivider />
-          </SettingsContainer>
-          <SettingsContainer
-            ref={quickSelectItems[6].ref}
-            icon={quickSelectItems[6].icon}
-            title={quickSelectItems[6].title}
-          >
             <Import
               type={DocumentTypeEnum.FIREFOX}
               title={"Firefox"}
@@ -316,9 +309,9 @@ function SettingsScreen({ navigation }: { navigation: any }) {
             <SettingsDivider />
           </SettingsContainer>
           <SettingsContainer
-            ref={quickSelectItems[7].ref}
-            icon={quickSelectItems[7].icon}
-            title={quickSelectItems[7].title}
+            ref={quickSelectItems[6].ref}
+            icon={quickSelectItems[6].icon}
+            title={quickSelectItems[6].title}
           >
             <SettingsItem
               leadingIcon="web"

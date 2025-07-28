@@ -83,7 +83,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   useAppLifecycle({
     onBackground: () => {
       console.log("show popup");
-      if (fastAccessObject === null) return;
+      if (fastAccessObject === null || (fastAccessObject.username === "" && fastAccessObject.password === "")) return;
       openFastAccess(
         fastAccessObject.title,
         fastAccessObject.username,
