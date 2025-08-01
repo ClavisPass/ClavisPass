@@ -133,7 +133,7 @@ function URLModule(props: URLModuleType & Props) {
             <Icon color={"lightgray"} source={"web-remove"} size={20} />
           )}
         </View>
-        <View style={{ height: 40, flexGrow: 1 }}>
+        <View style={{ height: 40, flex: 1 }}>
           <TextInput
             outlineStyle={[
               globalStyles.outlineStyle,

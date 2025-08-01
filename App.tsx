@@ -40,7 +40,7 @@ export function AppWithNavigation() {
               <DataProvider>
                 <View
                   style={{
-                    borderRadius: Platform.OS === "web" ? 10 : 0,
+                    borderRadius: Platform.OS === "web" ? 12 : 0,
                     borderColor:
                       Platform.OS === "web" ? theme.colors.primary : undefined,
                     borderWidth: Platform.OS === "web" ? 1 : 0,
@@ -175,7 +175,7 @@ export default function App() {
   if (view === null)
     return (
       <View>
-        <Text>Lade...</Text>
+        <Text>Loading...</Text>
       </View>
     );
 

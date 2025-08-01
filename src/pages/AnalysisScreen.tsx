@@ -30,6 +30,7 @@ import getPasswordStrengthIcon from "../utils/getPasswordStrengthIcon";
 import Header from "../components/Header";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../ui/linearGradient";
+import FilterAnalysisModal from "../components/modals/FilterAnalysisModal";
 
 export type CachedPasswordsType = {
   title: string;
@@ -41,14 +42,11 @@ export type CachedPasswordsType = {
 
 function AnalysisScreen({ navigation }: { navigation: any }) {
   const data = useData();
-  const {
-    theme,
-    globalStyles,
-    headerWhite,
-    setHeaderWhite,
-    darkmode,
-    setHeaderSpacing,
-  } = useTheme();
+  const { theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
+    useTheme();
+
+  const [FilterAnalysisModalVisible, setFilterAnalysisModalVisible] =
+    useState(false);
 
   const { width } = useWindowDimensions();
 
@@ -64,6 +62,10 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
 
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [showStrong, setShowStrong] = useState(true);
+  const [showMedium, setShowMedium] = useState(true);
+  const [showWeak, setShowWeak] = useState(true);
+
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(0);
@@ -73,9 +75,19 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
 
   const filteredValues = useMemo(() => {
     return cachedPasswordList?.filter((item) => {
-      return item.title.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesQuery = item.title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+
+      const strength = item.passwordStrengthLevel;
+      const matchesStrength =
+        (strength === PasswordStrengthLevel.STRONG && showStrong) ||
+        (strength === PasswordStrengthLevel.MEDIUM && showMedium) ||
+        (strength === PasswordStrengthLevel.WEAK && showWeak);
+
+      return matchesQuery && matchesStrength;
     });
-  }, [cachedPasswordList, searchQuery]);
+  }, [cachedPasswordList, searchQuery, showStrong, showMedium, showWeak]);
 
   const findPasswords = (values: any) => {
     let cachedPasswords: CachedPasswordsType[] = [];
@@ -297,7 +309,9 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
             <IconButton
               icon="filter-variant"
               size={25}
-              onPress={() => {}}
+              onPress={() => {
+                setFilterAnalysisModalVisible(true);
+              }}
               iconColor="white"
               style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
             />
@@ -367,6 +381,16 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
           />
         </View>
       </View>
+      <FilterAnalysisModal
+        visible={FilterAnalysisModalVisible}
+        setVisible={setFilterAnalysisModalVisible}
+        strong={showStrong}
+        setStrong={setShowStrong}
+        medium={showMedium}
+        setMedium={setShowMedium}
+        weak={showWeak}
+        setWeak={setShowWeak}
+      />
     </AnimatedContainer>
   );
 }

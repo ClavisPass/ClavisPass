@@ -110,7 +110,7 @@ function EmailModule(props: EmailModuleType & Props) {
       fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>
-        <View style={{ height: 40, flexGrow: 1 }}>
+        <View style={{ height: 40, flex: 1 }}>
           <TextInput
             ref={inputRef}
             onFocus={() => {

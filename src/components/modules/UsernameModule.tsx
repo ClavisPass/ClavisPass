@@ -38,10 +38,11 @@ function UsernameModule(props: UsernameModuleType & Props) {
       fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>
-        <View style={{ height: 40, flexGrow: 1 }}>
+        <View style={{ height: 40, flex: 1 }}>
           <TextInput
             outlineStyle={globalStyles.outlineStyle}
             style={globalStyles.textInputStyle}
+            contentStyle={{ textAlignVertical: "center", paddingVertical: 0 }}
             value={value}
             mode="outlined"
             onChangeText={(text) => setValue(text)}

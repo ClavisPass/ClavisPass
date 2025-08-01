@@ -56,7 +56,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const [addModuleModalVisible, setAddModuleModalVisible] = useState(false);
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [discardChangesVisible, setDiscardChangesVisible] = useState(false);
-  const [discardChanges, setDiscardChanges] = useState(false);
+  const discardChangesRef = useRef(false);
   const [showMenu, setShowMenu] = useState(false);
 
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -83,7 +83,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   useAppLifecycle({
     onBackground: () => {
       console.log("show popup");
-      if (fastAccessObject === null || (fastAccessObject.username === "" && fastAccessObject.password === "")) return;
+      if (
+        fastAccessObject === null ||
+        (fastAccessObject.username === "" && fastAccessObject.password === "")
+      )
+        return;
       openFastAccess(
         fastAccessObject.title,
         fastAccessObject.username,
@@ -96,17 +100,15 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     },
   });
 
-  /*useEffect(() => {
+  useEffect(() => {
     const unsubscribe = navigation.addListener("beforeRemove", (e) => {
-      if (!discardChanges) return;
-
+      if (!discardChangesRef.current) return;
       e.preventDefault();
-
       setDiscardChangesVisible(true);
     });
 
     return unsubscribe;
-  }, [navigation, discardChanges]);*/
+  }, [navigation]);
 
   const saveValue = () => {
     let newData = { ...data.data } as DataType;
@@ -128,6 +130,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   };
 
   const goBack = () => {
+    discardChangesRef.current = false;
     setDiscardChangesVisible(false);
     navigation.goBack();
   };
@@ -139,7 +142,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       newElement as ModuleType,
     ];
     changeModules(newModules);
-    setDiscardChanges(true);
+    discardChangesRef.current = true;
   };
 
   const changeModules = (modules: ModulesType) => {
@@ -154,14 +157,14 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     newValue.folder = folder;
     setValue(newValue);
     setFolderModalVisible(false);
-    setDiscardChanges(true);
+    discardChangesRef.current = true;
   };
 
   const changeFav = () => {
     const newValue = { ...value };
     newValue.fav = !value.fav;
     setValue(newValue);
-    setDiscardChanges(true);
+    discardChangesRef.current = true;
   };
 
   const deleteModule = (id: string) => {
@@ -169,7 +172,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       ...value.modules.filter((item: ModuleType) => item.id !== id),
     ];
     changeModules(newModules);
-    setDiscardChanges(true);
+    discardChangesRef.current = true;
   };
 
   const changeModule = (module: ModuleType) => {
@@ -177,7 +180,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     const newModules = [...value.modules];
     newModules[index] = module;
     changeModules(newModules);
-    setDiscardChanges(true);
+    discardChangesRef.current = true;
   };
 
   const deleteValue = (id: string) => {
@@ -243,7 +246,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       />
       <Header
         onPress={() => {
-          if (discardChanges) {
+          if (discardChangesRef.current) {
             setDiscardChangesVisible(true);
           } else {
             goBack();
@@ -255,7 +258,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             setValue={setValue}
             disabled={edit}
             discardChanges={() => {
-              setDiscardChanges(true);
+              discardChangesRef.current = true;
             }}
           />
         }
@@ -320,7 +323,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           deleteModule={deleteModule}
           changeModule={changeModule}
           edit={edit}
-          setDiscardoChanges={() => setDiscardChanges(true)}
+          setDiscardoChanges={() => (discardChangesRef.current = true)}
           showAddModuleModal={() => {
             setAddModuleModalVisible(true);
           }}
@@ -334,7 +337,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           deleteModule={deleteModule}
           changeModule={changeModule}
           edit={edit}
-          setDiscardoChanges={() => setDiscardChanges(true)}
+          setDiscardoChanges={() => (discardChangesRef.current = true)}
           showAddModuleModal={() => {
             setAddModuleModalVisible(true);
           }}
@@ -360,7 +363,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             <Button
               icon="content-save"
               onPress={saveValue}
-              disabled={!discardChanges || value.title === ""}
+              disabled={!discardChangesRef.current || value.title === ""}
               style={{
                 flexGrow: 5,
                 width: "50%",

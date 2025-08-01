@@ -1,15 +1,9 @@
 import React from "react";
-import { StyleSheet } from "react-native";
 import { IconButton } from "react-native-paper";
 
 import * as Clipboard from "expo-clipboard";
 import theme from "../../ui/theme";
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 8,
-  },
-});
+import { View } from "react-native";
 
 type Props = {
   value: string;
@@ -32,13 +26,15 @@ function CopyToClipboard(props: Props) {
     onToggleSnackBar();
   };
   return (
-    <IconButton
-      icon={icon}
-      iconColor={theme.colors.primary}
-      size={20}
-      onPress={copyToClipboard}
-      disabled={props.disabled}
-    />
+    <View style={{ width: 48 }}>
+      <IconButton
+        icon={icon}
+        iconColor={theme.colors.primary}
+        size={20}
+        onPress={copyToClipboard}
+        disabled={props.disabled}
+      />
+    </View>
   );
 }
 

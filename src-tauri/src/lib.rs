@@ -57,10 +57,12 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-            let _ = app
-                .get_webview_window("main")
-                .expect("no main window")
-                .set_focus();
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.set_focus();
+                let _ = window.show();
+            } else {
+                println!("main window not ready yet");
+            }
         }))
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
@@ -144,6 +146,9 @@ pub fn run() {
         })
         .on_window_event(|window, event| {
             if window.label() == "main" {
+                if let WindowEvent::Focused(true) = event {
+                    window.show().unwrap();
+                }
                 if let WindowEvent::Resized(size) = event {
                     let app_handle = window.app_handle();
                     let size_data = WindowSize {

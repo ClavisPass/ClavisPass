@@ -75,7 +75,7 @@ function WifiModule(props: WifiModuleType & Props) {
         </Picker>
 
         <View style={globalStyles.moduleView}>
-          <View style={{ height: 40, flexGrow: 1 }}>
+          <View style={{ height: 40, flex: 1 }}>
             <TextInput
               placeholder="Wifi Name"
               outlineStyle={globalStyles.outlineStyle}
@@ -85,15 +85,17 @@ function WifiModule(props: WifiModuleType & Props) {
               onChangeText={(text) => setName(text)}
             />
           </View>
-          <IconButton
-            iconColor={theme.colors.primary}
-            icon="qrcode"
-            size={20}
-            onPress={showModal}
-          />
+          <View style={{ width: 48 }}>
+            <IconButton
+              iconColor={theme.colors.primary}
+              icon="qrcode"
+              size={20}
+              onPress={showModal}
+            />
+          </View>
         </View>
         <View style={globalStyles.moduleView}>
-          <View style={{ height: 40, flexGrow: 1 }}>
+          <View style={{ height: 40, flex: 1 }}>
             <TextInput
               placeholder="Password"
               outlineStyle={globalStyles.outlineStyle}

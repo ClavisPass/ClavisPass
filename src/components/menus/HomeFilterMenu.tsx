@@ -21,7 +21,16 @@ function HomeFilterMenu(props: Props) {
   const data = useData();
   const { isOnline } = useOnline();
 
-  const sort = (sort: "asc" | "desc") => {
+  const [sortByTitleMode, setSortByTitleMode] = React.useState<"asc" | "desc">("asc");
+  const [sortByTitleIcon, setSortByTitleIcon] = React.useState<"sort-alphabetical-ascending" | "sort-alphabetical-descending">("sort-alphabetical-ascending");
+
+  const [sortByCreatedMode, setSortByCreatedMode] = React.useState<"asc" | "desc">("asc");
+  const [sortByCreatedIcon, setSortByCreatedIcon] = React.useState<"sort-bool-ascending-variant" | "sort-bool-descending-variant">("sort-bool-ascending-variant");
+
+  const [sortByLastUpdatedMode, setSortByLastUpdatedMode] = React.useState<"asc" | "desc">("asc");
+  const [sortByLastUpdatedIcon, setSortByLastUpdatedIcon] = React.useState<"sort-clock-ascending" | "sort-clock-descending">("sort-clock-ascending");
+
+  const sortByTitle = (sort: "asc" | "desc") => {
     let newData = { ...props.data } as DataType;
     if (newData) {
       newData.values = newData.values.sort(function (a, b) {
@@ -44,11 +53,19 @@ function HomeFilterMenu(props: Props) {
 
         return 0;
       });
+
+      if (sort == "asc") {
+        setSortByTitleMode("desc");
+        setSortByTitleIcon("sort-alphabetical-descending");
+      } else {
+        setSortByTitleMode("asc");
+        setSortByTitleIcon("sort-alphabetical-ascending");
+      }
       props.setData(newData);
     }
   };
 
-  const sortCreated = (sort: "asc" | "desc") => {
+  const sortByCreated = (sort: "asc" | "desc") => {
     let newData = { ...props.data } as DataType;
     if (newData) {
       newData.values = newData.values.sort(function (a, b) {
@@ -73,11 +90,18 @@ function HomeFilterMenu(props: Props) {
 
         return 0;
       });
+      if (sort == "asc") {
+        setSortByCreatedMode("desc");
+        setSortByCreatedIcon("sort-bool-descending-variant");
+      } else {
+        setSortByCreatedMode("asc");
+        setSortByCreatedIcon("sort-bool-ascending-variant");
+      }
       props.setData(newData);
     }
   };
 
-  const sortLastUpdated = (sort: "asc" | "desc") => {
+  const sortByLastUpdated = (sort: "asc" | "desc") => {
     let newData = { ...props.data } as DataType;
     if (newData) {
       newData.values = newData.values.sort(function (a, b) {
@@ -102,6 +126,13 @@ function HomeFilterMenu(props: Props) {
 
         return 0;
       });
+      if (sort == "asc") {
+        setSortByLastUpdatedMode("desc");
+        setSortByLastUpdatedIcon("sort-clock-descending");
+      } else {
+        setSortByLastUpdatedMode("asc");
+        setSortByLastUpdatedIcon("sort-clock-ascending");
+      }
       props.setData(newData);
     }
   };
@@ -137,47 +168,33 @@ function HomeFilterMenu(props: Props) {
         </View>
         <Divider />
         <MenuItem
-          leadingIcon="sort-ascending"
+          leadingIcon={sortByTitleIcon}
           onPress={() => {
-            sort("asc");
+            sortByTitle(sortByTitleMode);
             data.setShowSave(true);
-            props.setVisible(false);
           }}
         >
-          {"Sort Ascending"}
+          {"Sort by Title"}
         </MenuItem>
         <Divider />
         <MenuItem
-          leadingIcon="sort-descending"
+          leadingIcon={sortByCreatedIcon}
           onPress={() => {
-            sort("desc");
+            sortByCreated(sortByCreatedMode);
             data.setShowSave(true);
-            props.setVisible(false);
           }}
         >
-          {"Sort Descending"}
+          {"Sort by Created"}
         </MenuItem>
         <Divider />
         <MenuItem
-          leadingIcon="sort-clock-ascending"
+          leadingIcon={sortByLastUpdatedIcon}
           onPress={() => {
-            sortCreated("asc");
+            sortByLastUpdated(sortByLastUpdatedMode);
             data.setShowSave(true);
-            props.setVisible(false);
           }}
         >
-          {"Created"}
-        </MenuItem>
-        <Divider />
-        <MenuItem
-          leadingIcon="sort-clock-ascending"
-          onPress={() => {
-            sortLastUpdated("asc");
-            data.setShowSave(true);
-            props.setVisible(false);
-          }}
-        >
-          {"Last Updated"}
+          {"Sort by Last Updated"}
         </MenuItem>
       </>
     </Menu>

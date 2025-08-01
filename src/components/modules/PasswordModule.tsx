@@ -23,7 +23,9 @@ function PasswordModule(props: PasswordModuleType & Props) {
   const [value, setValue] = useState(props.value);
 
   const [entropyPercentage, setEntropyPercentage] = useState(0);
-  const [progressbarColor, setProgressbarColor] = useState(getPasswordStrengthColor(PasswordStrengthLevel.STRONG));
+  const [progressbarColor, setProgressbarColor] = useState(
+    getPasswordStrengthColor(PasswordStrengthLevel.STRONG)
+  );
 
   const [visible, setVisible] = useState(false);
 
@@ -31,7 +33,9 @@ function PasswordModule(props: PasswordModuleType & Props) {
     const percentage = passwordEntropy(value) / 200;
     setProgressbarColor(getPasswordStrengthColor(PasswordStrengthLevel.STRONG));
     if (percentage < 0.55) {
-      setProgressbarColor(getPasswordStrengthColor(PasswordStrengthLevel.MEDIUM));
+      setProgressbarColor(
+        getPasswordStrengthColor(PasswordStrengthLevel.MEDIUM)
+      );
     }
     if (percentage < 0.4) {
       setProgressbarColor(getPasswordStrengthColor(PasswordStrengthLevel.WEAK));
@@ -69,7 +73,9 @@ function PasswordModule(props: PasswordModuleType & Props) {
       fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>
-        <PasswordTextbox setValue={setValue} value={value} placeholder="" />
+        <View style={{ height: 40, flex: 1 }}>
+          <PasswordTextbox setValue={setValue} value={value} placeholder="" />
+        </View>
         <CopyToClipboard value={value} />
       </View>
       <View style={globalStyles.moduleView}>
