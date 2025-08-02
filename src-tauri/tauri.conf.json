@@ -15,14 +15,7 @@
     "active": true,
     "category": "DeveloperTool",
     "copyright": "",
-    "targets": [
-      "msi",
-      "nsis",
-      "deb",
-      "appimage",
-      "dmg",
-      "app"
-    ],
+    "targets": ["msi", "nsis", "deb", "appimage", "dmg", "app"],
     "externalBin": [],
     "icon": [
       "icons/32x32.png",
@@ -53,6 +46,15 @@
     }
   },
   "plugins": {
+    "cli": {
+      "args": [
+        {
+          "name": "hidden",
+          "description": "Don’t show window at startup",
+          "takesValue": false
+        }
+      ]
+    },
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE4NjM3RTZGMjIyN0Q1RDIKUldUUzFTY2liMzVqcUxhWUgyaXBTdHlqVERBQnFlZ3U2ZVlZMmtndnI5T056bGM0TDBOU0lWb3UK",
       "endpoints": [

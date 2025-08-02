@@ -15,8 +15,6 @@ import { ValuesListType } from "../../types/ValuesType";
 import ModulesEnum from "../../enums/ModulesEnum";
 import { ModuleType } from "../../types/ModulesType";
 
-import theme from "../../ui/theme";
-
 function EmailModule(props: EmailModuleType & Props) {
   const didMount = useRef(false);
   const inputRef = useRef<any>(null);
@@ -24,7 +22,7 @@ function EmailModule(props: EmailModuleType & Props) {
   const data = useData();
   const [isValid, setIsValid] = useState(false);
 
-  const { globalStyles } = useTheme();
+  const { globalStyles, theme } = useTheme();
   const [value, setValue] = useState(props.value);
 
   const [autocompleteVisible, setAutocompleteVisible] = useState(false);

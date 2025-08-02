@@ -175,6 +175,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           data.setLastUpdated(parsedCryptoData.lastUpdated);
           setRefreshing(false);
           data.setShowSave(false);
+
+          setSelectedFolder("");
+          setSelectedFav(false);
         }
       });
     } else {

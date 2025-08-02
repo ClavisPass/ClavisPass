@@ -3,8 +3,6 @@ import { Platform } from "react-native";
 let SecureStore: any;
 let tauri: any;
 
-const SERVICE_NAME = "ClavisPass";
-
 if (Platform.OS === "ios" || Platform.OS === "android") {
   SecureStore = require("expo-secure-store");
 }

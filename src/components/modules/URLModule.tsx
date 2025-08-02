@@ -12,7 +12,6 @@ import { open } from "@tauri-apps/plugin-shell";
 import * as Linking from "expo-linking";
 
 import validator from "validator";
-import theme from "../../ui/theme";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 
@@ -20,7 +19,7 @@ import { Image } from "expo-image";
 
 function URLModule(props: URLModuleType & Props) {
   const didMount = useRef(false);
-  const { globalStyles } = useTheme();
+  const { globalStyles, theme } = useTheme();
   const [value, setValue] = useState(props.value);
   const [isValid, setIsValid] = useState(false);
 

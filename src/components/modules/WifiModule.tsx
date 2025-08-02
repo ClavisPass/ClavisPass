@@ -7,14 +7,13 @@ import WifiModuleType from "../../types/modules/WifiModuleType";
 import CopyToClipboard from "../buttons/CopyToClipboard";
 import ModuleContainer from "../container/ModuleContainer";
 import Props from "../../types/ModuleProps";
-import theme from "../../ui/theme";
 import WifiQRCodeModal from "../modals/WifiQRCodeModal";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 
 function WifiModule(props: WifiModuleType & Props) {
   const didMount = useRef(false);
-  const { globalStyles } = useTheme();
+  const { globalStyles, theme } = useTheme();
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
   const [visible, setVisible] = useState(false);

@@ -7,19 +7,16 @@ import ModulesEnum from "../enums/ModulesEnum";
 import type { StackScreenProps } from "@react-navigation/stack";
 import { Icon, Text } from "react-native-paper";
 import Header from "../components/Header";
-import EditMetaInfMenu from "../components/menus/EditMetaInfMenu";
 import ValuesType from "../types/ValuesType";
 import getModuleData from "../utils/getModuleData";
 import AddModuleModal from "../components/modals/AddModuleModal";
 import { getDateTime } from "../utils/Timestamp";
-import { TITLEBAR_HEIGHT } from "../components/CustomTitlebar";
 import { useData } from "../contexts/DataProvider";
 import DataType from "../types/DataType";
 import TitleModule from "../components/modules/TitleModule";
 import AnimatedContainer from "../components/container/AnimatedContainer";
 import DraggableModulesListWeb from "../components/lists/draggableModulesList/DraggableModulesListWeb";
 import DraggableModulesList from "../components/lists/draggableModulesList/DraggableModulesList";
-import Constants from "expo-constants";
 import FolderModal from "../components/modals/FolderModal";
 import { useTheme } from "../contexts/ThemeProvider";
 import DiscardChangesModal from "../components/modals/DiscardChangesModal";
@@ -82,20 +79,9 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   useAppLifecycle({
     onBackground: () => {
-      console.log("show popup");
-      if (
-        fastAccessObject === null ||
-        (fastAccessObject.username === "" && fastAccessObject.password === "")
-      )
-        return;
-      openFastAccess(
-        fastAccessObject.title,
-        fastAccessObject.username,
-        fastAccessObject.password
-      );
+      showFastAccess();
     },
     onForeground: () => {
-      console.log("hide popup");
       hideFastAccess();
     },
   });
@@ -109,6 +95,19 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
     return unsubscribe;
   }, [navigation]);
+
+  const showFastAccess = () => {
+    if (
+      fastAccessObject === null ||
+      (fastAccessObject.username === "" && fastAccessObject.password === "")
+    )
+      return;
+    openFastAccess(
+      fastAccessObject.title,
+      fastAccessObject.username,
+      fastAccessObject.password
+    );
+  };
 
   const saveValue = () => {
     let newData = { ...data.data } as DataType;
@@ -204,17 +203,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     }
   }, [value]);
 
-  const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (!edit) {
       Animated.parallel([
-        Animated.timing(slideAnim, {
-          toValue: 56,
-          duration: 150,
-          useNativeDriver: false,
-        }),
         Animated.timing(fadeAnim, {
           toValue: 1,
           duration: 150,
@@ -223,11 +216,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       ]).start();
     } else {
       Animated.parallel([
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 150,
-          useNativeDriver: false,
-        }),
         Animated.timing(fadeAnim, {
           toValue: 0,
           duration: 150,
@@ -303,13 +291,9 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             <Text>{value.folder === "" ? "None" : value.folder}</Text>
           </View>
         </ContainerButton>
-        <SquaredContainerButton
-          onPress={() => {
-            setShowMenu(true);
-          }}
-        >
+        <SquaredContainerButton onPress={showFastAccess}>
           <Icon
-            source={"clipboard-text-clock-outline"}
+            source={"tooltip-account"}
             color={theme.colors?.primary}
             size={20}
           />
@@ -346,7 +330,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       )}
       <Animated.View
         style={{
-          height: slideAnim,
           opacity: fadeAnim,
           width: "100%",
           padding: 8,
@@ -384,13 +367,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         addModule={addModule}
         visible={addModuleModalVisible}
         setVisible={setAddModuleModalVisible}
-      />
-      <EditMetaInfMenu
-        visible={showMenu}
-        setVisible={setShowMenu}
-        created={routeValue.created}
-        lastUpdated={routeValue.lastUpdated}
-        positionY={Constants.statusBarHeight + TITLEBAR_HEIGHT + 50}
       />
       <FolderModal
         visible={folderModalVisible}

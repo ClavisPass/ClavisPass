@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 
-import { IconButton, TextInput } from "react-native-paper";
+import { IconButton } from "react-native-paper";
 
 import PasswordModuleType from "../../types/modules/PasswordModuleType";
 import ModuleContainer from "../container/ModuleContainer";

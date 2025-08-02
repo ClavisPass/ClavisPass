@@ -17,6 +17,7 @@ import { View } from "react-native";
 import { IconButton } from "react-native-paper";
 import { useTheme } from "../../../contexts/ThemeProvider";
 import FastAccessType from "../../../types/FastAccessType";
+import MetaInformationModule from "../../modules/MetaInformationModule";
 
 type Props = {
   value: ValuesType;
@@ -108,7 +109,7 @@ function DraggableModulesListWeb(props: Props) {
               </Draggable>
             ))}
             {provided.placeholder}
-            {props.edit && (
+            {props.edit ? (
               <View
                 style={{ display: "flex", alignItems: "center", width: "100%" }}
               >
@@ -122,6 +123,11 @@ function DraggableModulesListWeb(props: Props) {
                   mode="contained-tonal"
                 />
               </View>
+            ) : (
+              <MetaInformationModule
+                lastUpdated={props.value.lastUpdated}
+                created={props.value.created}
+              />
             )}
           </div>
         )}

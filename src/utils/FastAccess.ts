@@ -36,6 +36,15 @@ export async function openFastAccess(
     return;
   }
 
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldPlaySound: false,
+      shouldShowBanner: true,
+      shouldShowList: false,
+      shouldSetBadge: false,
+    }),
+  });
+
   await Notifications.setNotificationCategoryAsync("PASSWORD_POPUP", [
     {
       identifier: "COPY_USERNAME",
@@ -72,8 +81,10 @@ export async function openFastAccess(
     content: {
       title,
       categoryIdentifier: "PASSWORD_POPUP",
+      body: username,
       sound: false,
       data: { username: username, password: password },
+      priority: Notifications.AndroidNotificationPriority.MAX,
     },
     trigger: null,
   });

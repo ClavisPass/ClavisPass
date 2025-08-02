@@ -1,5 +1,11 @@
 import React, { useCallback } from "react";
-import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View } from "react-native";
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
@@ -9,6 +15,7 @@ import getModule from "../../../utils/getModule";
 import { IconButton } from "react-native-paper";
 import { useTheme } from "../../../contexts/ThemeProvider";
 import FastAccessType from "../../../types/FastAccessType";
+import MetaInformationModule from "../../modules/MetaInformationModule";
 
 type Props = {
   value: ValuesType;
@@ -78,7 +85,12 @@ function DraggableModulesList(props: Props) {
                     mode="contained-tonal"
                   />
                 </View>
-              ) : null
+              ) : (
+                <MetaInformationModule
+                  lastUpdated={props.value.lastUpdated}
+                  created={props.value.created}
+                />
+              )
             }
           />
         </View>
@@ -86,6 +98,5 @@ function DraggableModulesList(props: Props) {
     </KeyboardAvoidingView>
   );
 }
-
 
 export default DraggableModulesList;
