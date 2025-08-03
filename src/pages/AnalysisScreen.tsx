@@ -1,4 +1,3 @@
-import Constants from "expo-constants";
 import React, { useEffect, useMemo, useState } from "react";
 import { useWindowDimensions, View } from "react-native";
 import {
@@ -6,10 +5,8 @@ import {
   IconButton,
   Searchbar,
   Text,
-  TextInput,
   TouchableRipple,
 } from "react-native-paper";
-import { TitlebarHeight } from "../components/CustomTitlebar";
 import { StatusBar } from "expo-status-bar";
 import AnimatedContainer from "../components/container/AnimatedContainer";
 import { useFocusEffect } from "@react-navigation/native";
@@ -23,7 +20,6 @@ import { useTheme } from "../contexts/ThemeProvider";
 import passwordEntropy from "../utils/Entropy";
 import AnalysisEntry from "../components/AnalysisEntry";
 import AnalysisEntryGradient from "../components/AnalysisEntryGradient";
-import Divider from "../components/Divider";
 import PasswordStrengthLevel from "../enums/PasswordStrengthLevel";
 import getPasswordStrengthColor from "../utils/getPasswordStrengthColor";
 import getPasswordStrengthIcon from "../utils/getPasswordStrengthIcon";
@@ -326,7 +322,6 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
                   marginBottom: 4,
                   marginTop: 0,
                   overflow: "hidden",
-                  //width: "100%",
                   backgroundColor: theme.colors?.background,
                   boxShadow: theme.colors?.shadow,
                   height: 40,

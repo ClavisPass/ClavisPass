@@ -138,7 +138,7 @@ function ListItem(props: Props) {
             style={{
               display: "flex",
               flexDirection: "row",
-              gap: 10,
+              gap: 2,
               alignItems: "center",
             }}
           >
@@ -153,9 +153,9 @@ function ListItem(props: Props) {
                     <IconButton
                       icon={"account"}
                       mode={"contained-tonal"}
-                      size={20}
+                      size={22}
                       iconColor={theme.colors?.primary}
-                      style={{ margin: 0, padding: 0, height: 30, width: 30 }}
+                      style={{ margin: 0, padding: 0, height: 30, width: 30, borderRadius: 12, borderBottomRightRadius: 0, borderTopRightRadius: 0 }}
                       onPress={() => {
                         copyToClipboard(fastAccessObject.username);
                       }}
@@ -163,9 +163,9 @@ function ListItem(props: Props) {
                     <IconButton
                       icon={"form-textbox-password"}
                       mode={"contained"}
-                      size={20}
+                      size={22}
                       iconColor={theme.colors?.primary}
-                      style={{ margin: 0, padding: 0, height: 30, width: 30 }}
+                      style={{ margin: 0, padding: 0, height: 30, width: 30, borderRadius: 12, borderBottomLeftRadius: 0, borderTopLeftRadius: 0 }}
                       onPress={() => {
                         copyToClipboard(fastAccessObject.password);
                       }}

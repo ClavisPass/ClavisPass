@@ -32,6 +32,7 @@ import useAppLifecycle from "../hooks/useAppLifecycle";
 import { openFastAccess, hideFastAccess } from "../utils/FastAccess";
 import extractFastAccessObject from "../utils/extractFastAccessObject";
 import FastAccessType from "../types/FastAccessType";
+import * as store from "../utils/store";
 
 type EditScreenProps = StackScreenProps<RootStackParamList, "Edit">;
 
@@ -78,8 +79,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   }, [value.modules, value.title, value]);
 
   useAppLifecycle({
-    onBackground: () => {
-      showFastAccess();
+    onBackground: async () => {
+      const stored = await store.get("FAST_ACCESS");
+      if (stored === "auto") {
+        showFastAccess();
+      }
     },
     onForeground: () => {
       hideFastAccess();
@@ -107,6 +111,18 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       fastAccessObject.username,
       fastAccessObject.password
     );
+  };
+
+  const openFastAccessFeature = async () => {
+    if (Platform.OS === "web") {
+      const tauri = require("@tauri-apps/api/webviewWindow");
+      const win = await tauri.WebviewWindow.getByLabel("main");
+      if (!win) {
+        return;
+      }
+      win.minimize();
+    }
+    showFastAccess();
   };
 
   const saveValue = () => {
@@ -291,7 +307,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             <Text>{value.folder === "" ? "None" : value.folder}</Text>
           </View>
         </ContainerButton>
-        <SquaredContainerButton onPress={showFastAccess}>
+        <SquaredContainerButton onPress={openFastAccessFeature}>
           <Icon
             source={"tooltip-account"}
             color={theme.colors?.primary}

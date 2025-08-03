@@ -40,7 +40,7 @@ export function AppWithNavigation() {
               <DataProvider>
                 <View
                   style={{
-                    borderRadius: Platform.OS === "web" ? 12 : 0,
+                    borderRadius: Platform.OS === "web" ? 6 : 0,
                     borderColor:
                       Platform.OS === "web" ? theme.colors.primary : undefined,
                     borderWidth: Platform.OS === "web" ? 1 : 0,

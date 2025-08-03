@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import {
+  Divider,
   IconButton,
   Portal,
   Switch,
@@ -27,6 +28,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     margin: 4,
     height: 40,
+    padding: 8
   },
 });
 
@@ -71,14 +73,14 @@ function PasswordGeneratorModal(props: Props) {
           <View
             style={{
               backgroundColor: theme.colors?.background,
-              padding: 16,
+              padding: 8,
               borderRadius: 12,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <View style={{ width: "100%", height: 40 }}>
+            <View style={{ width: "100%", height: 40, marginBottom: 8 }}>
               <TextInput
                 outlineStyle={[globalStyles.outlineStyle]}
                 style={[globalStyles.textInputStyle, { textAlign: "center" }]}
@@ -88,6 +90,9 @@ function PasswordGeneratorModal(props: Props) {
                 readOnly={true}
               />
             </View>
+            <Divider
+              style={{ marginBottom: 0, marginTop: 0, height: 1, width: 270 }}
+            />
             <View
               style={{
                 //width: "100%",
@@ -118,7 +123,9 @@ function PasswordGeneratorModal(props: Props) {
               />
               <CopyToClipboard value={genPassword} />
             </View>
-            <SettingsDivider />
+            <Divider
+              style={{ marginBottom: 0, marginTop: 0, height: 1, width: 270 }}
+            />
             <View style={styles.container}>
               <Text style={{ userSelect: "none" }} variant="bodyLarge">
                 {"Password Length: "}
@@ -127,9 +134,11 @@ function PasswordGeneratorModal(props: Props) {
                 {valueSlider}
               </Text>
             </View>
-            <SettingsDivider />
+            <Divider
+              style={{ marginBottom: 0, marginTop: 0, height: 1, width: 270 }}
+            />
             <View style={styles.container}>
-              <Text variant="bodyLarge">{"include Uppercase"}</Text>
+              <Text variant="bodyLarge">{"Include Uppercase"}</Text>
               <Switch
                 value={upperInclude}
                 onValueChange={() => {
@@ -137,26 +146,33 @@ function PasswordGeneratorModal(props: Props) {
                 }}
               />
             </View>
-            <SettingsDivider />
+            <Divider
+              style={{ marginBottom: 0, marginTop: 0, height: 1, width: 270 }}
+            />
             <View style={styles.container}>
               <Text style={{ userSelect: "none" }} variant="bodyLarge">
-                {"include Numbers"}
+                {"Include Numbers"}
               </Text>
               <Switch
                 value={numberInclude}
                 onValueChange={() => setNumberInclude(!numberInclude)}
               />
             </View>
-            <SettingsDivider />
+            <Divider
+              style={{ marginBottom: 0, marginTop: 0, height: 1, width: 270 }}
+            />
             <View style={styles.container}>
               <Text style={{ userSelect: "none" }} variant="bodyLarge">
-                {"include Symbols"}
+                {"Include Symbols"}
               </Text>
               <Switch
                 value={symbolInclude}
                 onValueChange={() => setSymbolInclude(!symbolInclude)}
               />
             </View>
+            <Divider
+              style={{ marginBottom: 8, marginTop: 0, height: 1, width: 270 }}
+            />
             <Button
               maxWidth={200}
               text="Use"

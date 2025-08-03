@@ -11,12 +11,12 @@ const theme = {
     primaryContainer: "rgba(120, 126, 245, 1)",
     secondary: "#69C4FF",
     secondaryContainer: "rgba(120, 126, 245, 0.09)",
-    background: "#1F1F1F",
+    background: "#292929ff",
     //shadowColor: "grey",
     elevation: {
       level0: "transparent",
       level1: "rgb(39, 35, 41)",
-      level2: "#181818", //rgb(44, 40, 48)
+      level2: "#000000", //rgb(44, 40, 48)
       level3: "#2c2c2c",
       level4: "rgb(52, 46, 57)",
       level5: "rgb(56, 49, 62)",

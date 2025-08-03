@@ -75,30 +75,59 @@ function SettingsScreen({ navigation }: { navigation: any }) {
   const [useAuthentication, setUseAuthentication] = React.useState(false);
   const [closeBehavior, setCloseBehavior] = React.useState(false);
   const [hideOnStartup, setHideOnStartup] = React.useState(false);
+  const [fastAccess, setFastAccess] = React.useState(false);
 
   const [showChangeMasterPasswordModal, setShowChangeMasterPasswordModal] =
     useState(false);
 
   const scrollRef = useRef<ScrollView>(null);
 
-  // Refs für Container
+  // Refs for Container
   const authRef = useRef<View>(null);
   const updateRef = useRef<View>(null);
   const systemRef = useRef<View>(null);
   const designRef = useRef<View>(null);
   const authSettingsRef = useRef<View>(null);
+  const fastAccessRef = useRef<View>(null);
   const backupRef = useRef<View>(null);
   const importRef = useRef<View>(null);
   const linksRef = useRef<View>(null);
 
   const quickSelectItems: QuickSelectItem[] = [
     { title: "Cloud", icon: "cloud", ref: authRef, plattform: null },
-    { title: "Update", icon: "tray-arrow-down", ref: updateRef, plattform: null },
+    {
+      title: "Update",
+      icon: "tray-arrow-down",
+      ref: updateRef,
+      plattform: null,
+    },
     { title: "System", icon: "cogs", ref: systemRef, plattform: "web" },
-    { title: "Design", icon: "theme-light-dark", ref: designRef, plattform: null },
-    { title: "Authentication", icon: "fingerprint", ref: authSettingsRef, plattform: null },
+    {
+      title: "Design",
+      icon: "theme-light-dark",
+      ref: designRef,
+      plattform: null,
+    },
+    {
+      title: "Authentication",
+      icon: "fingerprint",
+      ref: authSettingsRef,
+      plattform: null,
+    },
+    {
+      title: "Fast Access",
+      icon: "tooltip-account",
+      ref: fastAccessRef,
+      plattform: null,
+    },
     { title: "Backup", icon: "database", ref: backupRef, plattform: null },
-    { title: "Links", icon: "link-variant", ref: linksRef, plattform: "mobile" },
+    {
+      title: "Import",
+      icon: "import",
+      ref: importRef,
+      plattform: null,
+    },
+    { title: "Links", icon: "link-variant", ref: linksRef, plattform: null },
   ];
 
   useFocusEffect(
@@ -140,6 +169,15 @@ function SettingsScreen({ navigation }: { navigation: any }) {
     setHideOnStartup(hidden);
   };
 
+  const changeFastAccessBehavior = async (auto: boolean) => {
+    if (auto) {
+      store.set("FAST_ACCESS", "auto");
+    } else {
+      store.set("FAST_ACCESS", "disabled");
+    }
+    setFastAccess(auto);
+  };
+
   const [editTokenVisibility, setEditTokenVisibility] = useState(false);
 
   const changeAutoStart = async (startup: boolean) => {
@@ -167,6 +205,9 @@ function SettingsScreen({ navigation }: { navigation: any }) {
     });
     store.get("START_BEHAVIOR").then((stored) => {
       setHideOnStartup(stored === "hidden");
+    });
+    store.get("FAST_ACCESS").then((stored) => {
+      setFastAccess(stored === "auto");
     });
   }, []);
 
@@ -264,7 +305,6 @@ function SettingsScreen({ navigation }: { navigation: any }) {
           >
             <SettingsItem
               onPress={() => {
-                console.log("Button pressed");
                 setShowChangeMasterPasswordModal(true);
               }}
             >
@@ -285,10 +325,30 @@ function SettingsScreen({ navigation }: { navigation: any }) {
             icon={quickSelectItems[5].icon}
             title={quickSelectItems[5].title}
           >
+            <SettingsSwitch
+              label={"Auto Open Fast Access"}
+              value={fastAccess}
+              onValueChange={(checked) => {
+                changeFastAccessBehavior(checked);
+              }}
+            />
+            <SettingsDivider />
+          </SettingsContainer>
+          <SettingsContainer
+            ref={quickSelectItems[6].ref}
+            icon={quickSelectItems[6].icon}
+            title={quickSelectItems[6].title}
+          >
             <BackupImportButton />
             <SettingsDivider />
             <BackupExportButton />
             <SettingsDivider />
+          </SettingsContainer>
+          <SettingsContainer
+            ref={quickSelectItems[7].ref}
+            icon={quickSelectItems[7].icon}
+            title={quickSelectItems[7].title}
+          >
             <Import
               type={DocumentTypeEnum.FIREFOX}
               title={"Firefox"}
@@ -309,9 +369,9 @@ function SettingsScreen({ navigation }: { navigation: any }) {
             <SettingsDivider />
           </SettingsContainer>
           <SettingsContainer
-            ref={quickSelectItems[6].ref}
-            icon={quickSelectItems[6].icon}
-            title={quickSelectItems[6].title}
+            ref={quickSelectItems[8].ref}
+            icon={quickSelectItems[8].icon}
+            title={quickSelectItems[8].title}
           >
             <SettingsItem
               leadingIcon="web"

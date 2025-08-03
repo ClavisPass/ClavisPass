@@ -14,6 +14,10 @@ const storeSchema = {
     values: ["shown", "hidden"],
     default: "shown",
   },
+  FAST_ACCESS: {
+    values: ["disabled", "auto"],
+    default: "disabled",
+  },
 } as const;
 
 type StoreSchema = typeof storeSchema;

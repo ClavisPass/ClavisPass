@@ -140,7 +140,6 @@ function Login(props: Props) {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "space-between",
-            //backgroundColor: theme.colors.background,
             backgroundColor: "transparent",
           }}
         >
