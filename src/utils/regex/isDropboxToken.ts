@@ -6,5 +6,4 @@ function isDropboxToken(token: string) {
     return false;
   }
 }
-
 export default isDropboxToken;

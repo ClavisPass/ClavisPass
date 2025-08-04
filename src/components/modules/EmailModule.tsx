@@ -14,6 +14,7 @@ import { useData } from "../../contexts/DataProvider";
 import { ValuesListType } from "../../types/ValuesType";
 import ModulesEnum from "../../enums/ModulesEnum";
 import { ModuleType } from "../../types/ModulesType";
+import validateEmail from "../../utils/regex/validateEmail";
 
 function EmailModule(props: EmailModuleType & Props) {
   const didMount = useRef(false);
@@ -27,12 +28,6 @@ function EmailModule(props: EmailModuleType & Props) {
 
   const [autocompleteVisible, setAutocompleteVisible] = useState(false);
   const [isSuggestionClicked, setIsSuggestionClicked] = React.useState(false);
-
-  function validateEmail(email: string) {
-    if (email === "") return true;
-    const regex = /^[a-zA-Z0–9._-]+@[a-zA-Z0–9.-]+\.[a-zA-Z]{2,4}$/;
-    return regex.test(email);
-  }
 
   const findEmails = () => {
     let cachedEMails: string[] = [];

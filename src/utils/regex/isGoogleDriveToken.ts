@@ -6,5 +6,4 @@ function isGoogleDriveToken(token: string) {
     return false;
   }
 }
-
 export default isGoogleDriveToken;
