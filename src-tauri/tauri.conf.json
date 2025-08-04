@@ -53,6 +53,9 @@
     }
   },
   "plugins": {
+    "deepLink": {
+        "customProtocol": "clavispass"
+      },
     "cli": {
       "args": [
         {
@@ -88,7 +91,8 @@
         "contentProtected": true,
         "maximizable": false,
         "useHttpsScheme": true,
-        "visible": false
+        "visible": false,
+        "devtools": true
       },
       {
         "label": "popup",

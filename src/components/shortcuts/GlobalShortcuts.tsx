@@ -16,7 +16,7 @@ function GlobalShortcuts() {
       const handleKeyDown = (event: KeyboardEvent) => {
         if (
           (event.ctrlKey &&
-            ["f", "p", "u", "+", "-"].includes(event.key.toLowerCase())) ||
+            ["f", "p", "u", "+", "-", "j"].includes(event.key.toLowerCase())) ||
           event.key === "F3"
         ) {
           event.preventDefault();
@@ -25,8 +25,6 @@ function GlobalShortcuts() {
 
       document.addEventListener("contextmenu", handleContextMenu);
       document.addEventListener("keydown", handleKeyDown);
-
-      // Hier RICHTIG die Funktion aufrufen!
 
       return () => {
         document.removeEventListener("contextmenu", handleContextMenu);

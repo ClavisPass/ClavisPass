@@ -1,21 +1,44 @@
-import { View } from "react-native";
+import { Pressable, TouchableWithoutFeedback, View } from "react-native";
 import { useTheme } from "../contexts/ThemeProvider";
 import { Text } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../ui/linearGradient";
 import Constants from "expo-constants";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useRef } from "react";
+import { useDevMode } from "../contexts/DevModeProvider";
 
 function Footer() {
   const { theme } = useTheme();
+  const { setDevMode } = useDevMode();
   const appName =
     Constants.expoConfig && "name" in Constants.expoConfig
       ? (Constants.expoConfig as any).name
       : Constants.manifest && "name" in Constants.manifest
         ? (Constants.manifest as any).name
         : "App";
-  const appVersion = Constants.expoConfig?.version ?? 'unknown';
+  const appVersion = Constants.expoConfig?.version ?? "unknown";
   const year = new Date().getFullYear();
+
+  const tapCount = useRef(0);
+  const timeout = useRef<NodeJS.Timeout | null>(null);
+
+  const handleDevModeToggle = () => {
+    console.log(`Tap count: ${tapCount.current}`);
+    console.log(`Timeout: ${timeout.current}`);
+    tapCount.current += 1;
+    if (!timeout.current) {
+      timeout.current = setTimeout(() => {
+        tapCount.current = 0;
+      }, 3000);
+    }
+    if (tapCount.current >= 5) {
+      tapCount.current = 0;
+      clearTimeout(timeout.current);
+      setDevMode(true);
+    }
+  };
+
   return (
     <LinearGradient
       colors={getColors()}
@@ -56,7 +79,8 @@ function Footer() {
           >{`${appName} ${year}`}</Text>
         </View>
         <Text
-          style={{ color: "white", userSelect: "none" }}
+          onPress={handleDevModeToggle}
+          style={{ color: "white", userSelect: "none", cursor: "auto" }}
         >{`Version ${appVersion}`}</Text>
       </View>
     </LinearGradient>

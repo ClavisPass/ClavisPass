@@ -43,6 +43,7 @@ import QuickSelectItem from "../types/QuickSelectItem";
 import SettingsShortcutItem from "../components/items/SettingsShortcutItem";
 import BackupImportButton from "../components/buttons/BackupImportButton";
 import BackupExportButton from "../components/buttons/BackupExportButton";
+import { useDevMode } from "../contexts/DevModeProvider";
 
 const styles = StyleSheet.create({
   surface: {
@@ -70,6 +71,7 @@ function SettingsScreen({ navigation }: { navigation: any }) {
   const { headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
     useTheme();
   const { master } = useAuth();
+  const { devMode } = useDevMode();
   const [startup, setStartup] = React.useState(false);
   const { width } = useWindowDimensions();
   const [useAuthentication, setUseAuthentication] = React.useState(false);
@@ -361,12 +363,16 @@ function SettingsScreen({ navigation }: { navigation: any }) {
               icon={"google-chrome"}
             />
             <SettingsDivider />
-            <Import
-              type={DocumentTypeEnum.PCLOUD}
-              title={"pCloud"}
-              icon={"circle-outline"}
-            />
-            <SettingsDivider />
+            {devMode && (
+              <>
+                <Import
+                  type={DocumentTypeEnum.PCLOUD}
+                  title={"pCloud"}
+                  icon={"circle-outline"}
+                />
+                <SettingsDivider />
+              </>
+            )}
           </SettingsContainer>
           <SettingsContainer
             ref={quickSelectItems[8].ref}
