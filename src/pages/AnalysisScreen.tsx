@@ -70,19 +70,42 @@ function AnalysisScreen({ navigation }: { navigation: any }) {
   );
 
   const filteredValues = useMemo(() => {
-    return cachedPasswordList?.filter((item) => {
-      const matchesQuery = item.title
+    if (!cachedPasswordList) return [];
+
+    const normalizeText = (text: string) =>
+      text
         .toLowerCase()
-        .includes(searchQuery.toLowerCase());
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "");
 
-      const strength = item.passwordStrengthLevel;
-      const matchesStrength =
-        (strength === PasswordStrengthLevel.STRONG && showStrong) ||
-        (strength === PasswordStrengthLevel.MEDIUM && showMedium) ||
-        (strength === PasswordStrengthLevel.WEAK && showWeak);
+    const normalizedQuery = normalizeText(searchQuery.trim());
 
-      return matchesQuery && matchesStrength;
-    });
+    return cachedPasswordList
+      .map((item) => {
+        const normalizedTitle = normalizeText(item.title);
+
+        let relevance = Infinity;
+        if (normalizedTitle.startsWith(normalizedQuery)) {
+          relevance = 0;
+        } else {
+          const index = normalizedTitle.indexOf(normalizedQuery);
+          if (index !== -1) {
+            relevance = index + 1;
+          }
+        }
+
+        return { ...item, _relevance: relevance };
+      })
+      .filter((item) => {
+        const strength = item.passwordStrengthLevel;
+        const matchesStrength =
+          (strength === PasswordStrengthLevel.STRONG && showStrong) ||
+          (strength === PasswordStrengthLevel.MEDIUM && showMedium) ||
+          (strength === PasswordStrengthLevel.WEAK && showWeak);
+
+        return item._relevance !== Infinity && matchesStrength;
+      })
+      .sort((a, b) => a._relevance - b._relevance);
   }, [cachedPasswordList, searchQuery, showStrong, showMedium, showWeak]);
 
   const findPasswords = (values: any) => {

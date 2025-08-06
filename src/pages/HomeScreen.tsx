@@ -132,29 +132,42 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   }, [data.showSave]);
 
   const filteredValues = useMemo(() => {
-    return data.data?.values.filter((item) => {
-      let folderFilter = false;
-      if (selectedFolder != "") {
-        if (item.folder == selectedFolder) {
-          folderFilter = true;
+    if (!data.data?.values) return [];
+
+    const normalizeText = (text: string) =>
+      text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "");
+
+    const normalizedQuery = normalizeText(searchQuery.trim());
+
+    return data.data.values
+      .filter((item) => {
+        const folderMatch =
+          selectedFolder === "" || item.folder === selectedFolder;
+        const favMatch = !selectedFav || item.fav;
+
+        return folderMatch && favMatch;
+      })
+      .map((item) => {
+        const title = normalizeText(item.title);
+
+        // Relevanzbewertung: niedriger Score = besser
+        let relevance = Infinity;
+        if (title.startsWith(normalizedQuery)) {
+          relevance = 0; // beste Treffer
+        } else {
+          const index = title.indexOf(normalizedQuery);
+          if (index !== -1) {
+            relevance = index + 1; // später gefundene Treffer
+          }
         }
-      } else {
-        folderFilter = true;
-      }
-      let favFilter = false;
-      if (selectedFav) {
-        if (item.fav) {
-          favFilter = true;
-        }
-      } else {
-        favFilter = true;
-      }
-      return (
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        folderFilter &&
-        favFilter
-      );
-    });
+
+        return { ...item, _relevance: relevance };
+      })
+      .filter((item) => item._relevance !== Infinity)
+      .sort((a, b) => a._relevance - b._relevance);
   }, [data.data, searchQuery, selectedFolder, selectedFav]);
 
   const refreshData = () => {

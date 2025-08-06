@@ -3,7 +3,6 @@ import { View } from "react-native";
 import { useTheme } from "../../contexts/ThemeProvider";
 import { MenuItem } from "../items/MenuItem";
 import { formatDateTime } from "../../utils/Timestamp";
-import { Divider } from "react-native-paper";
 
 type MetaInformationModuleType = {
   lastUpdated: string;
