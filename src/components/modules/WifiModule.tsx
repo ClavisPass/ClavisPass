@@ -1,4 +1,3 @@
-import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useRef, useState } from "react";
 import { View, Keyboard } from "react-native";
 import { IconButton, TextInput } from "react-native-paper";
@@ -10,11 +9,31 @@ import Props from "../../types/ModuleProps";
 import WifiQRCodeModal from "../modals/WifiQRCodeModal";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
+import { Dropdown, DropdownInputProps } from "react-native-paper-dropdown";
 
 function WifiModule(props: WifiModuleType & Props) {
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
   const [secureTextEntry, setSecureTextEntry] = useState(true);
+
+  const OPTIONS = [
+    { label: "WPA", value: "WPA" },
+    { label: "WEP", value: "WEP" },
+    { label: "blank", value: "blank" },
+  ];
+
+  const CustomDropdownInput = ({
+    selectedLabel,
+    rightIcon,
+  }: DropdownInputProps) => (
+    <TextInput
+      outlineStyle={[globalStyles.outlineStyle]}
+      style={globalStyles.textInputStyle}
+      mode="outlined"
+      value={selectedLabel}
+      right={rightIcon}
+    />
+  );
 
   const [visible, setVisible] = useState(false);
 
@@ -63,15 +82,26 @@ function WifiModule(props: WifiModuleType & Props) {
       fastAccess={props.fastAccess}
     >
       <View style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <Picker
-          selectedValue={wifiType}
-          onValueChange={(itemValue, itemIndex) => setWifiType(itemValue)}
-          style={[globalStyles.outlineStyle, { padding: 10 }]}
-        >
-          <Picker.Item label="WPA" value="WPA" />
-          <Picker.Item label="WEP" value="WEP" />
-          <Picker.Item label="blank" value="blank" />
-        </Picker>
+        <View style={{marginRight: 6, borderRadius: 12, overflow: "hidden"}}>
+          <Dropdown
+            CustomDropdownInput={CustomDropdownInput}
+            menuContentStyle={{
+              borderRadius: 12,
+              backgroundColor: theme.colors.background,
+              boxShadow: theme.colors.shadow,
+              overflow: "hidden",
+            }}
+            mode={"flat"}
+            hideMenuHeader={true}
+            options={OPTIONS}
+            value={wifiType}
+            onSelect={(value?: string) => {
+              if (value === "WPA" || value === "WEP" || value === "blank") {
+                setWifiType(value);
+              }
+            }}
+          />
+        </View>
 
         <View style={globalStyles.moduleView}>
           <View style={{ height: 40, flex: 1 }}>

@@ -7,11 +7,12 @@ type Props = {
   children: ReactNode;
   visible: boolean;
   onDismiss: () => void;
+  top?: number;
 };
 function Modal(props: Props) {
   if (Platform.OS === "web")
     return (
-      <ModalContainerWeb visible={props.visible} onDismiss={props.onDismiss}>
+      <ModalContainerWeb visible={props.visible} onDismiss={props.onDismiss} top={props.top}>
         {props.children}
       </ModalContainerWeb>
     );

@@ -115,6 +115,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   const openFastAccessFeature = async () => {
     if (Platform.OS === "web") {
+      if (
+        fastAccessObject === null ||
+        (fastAccessObject.username === "" && fastAccessObject.password === "")
+      )
+        return;
       const tauri = require("@tauri-apps/api/webviewWindow");
       const win = await tauri.WebviewWindow.getByLabel("main");
       if (!win) {
@@ -212,6 +217,9 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   };
 
   useEffect(() => {
+    if (value.modules.length === 0) {
+      setEdit(true);
+    }
     if (value.fav) {
       setFavIcon("star");
     } else {

@@ -13,15 +13,16 @@ type Props = {
 
 function EditCustomFieldModal(props: Props) {
   const { globalStyles } = useTheme();
-  const inputRef = useRef<any>();
+  const inputRef = useRef<any>(null);
 
   useEffect(() => {
     if (props.visible) {
-      inputRef.current.focus();
+      inputRef?.current?.focus();
     }
   }, [props.visible]);
   return (
     <Modal
+      top={-6}
       visible={props.visible}
       onDismiss={() => {
         props.setVisible(false);
@@ -32,11 +33,12 @@ function EditCustomFieldModal(props: Props) {
           backgroundColor: "transparent",
           padding: 10,
           display: "flex",
+          maxHeight: 60,
         }}
       >
         <TextInput
           ref={inputRef}
-          outlineStyle={globalStyles.outlineStyle}
+          outlineStyle={[globalStyles.outlineStyle]}
           style={globalStyles.textInputStyle}
           value={props.title}
           mode="outlined"

@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react";
-import { Platform, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -13,6 +13,7 @@ type Props = {
   children: ReactNode;
   visible: boolean;
   onDismiss: () => void;
+  top?: number
 };
 
 function ModalContainerWeb(props: Props) {
@@ -44,7 +45,7 @@ function ModalContainerWeb(props: Props) {
       style={[
         {
           position: "absolute",
-          top: 40,
+          top: props.top || 40,
           bottom: 0,
           left: 0,
           right: 0,
