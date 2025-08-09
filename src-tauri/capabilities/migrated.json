@@ -31,6 +31,8 @@
     "deep-link:default",
     "dialog:allow-save",
     "dialog:default",
-    "fs:allow-write-text-file"
+    "fs:allow-write-text-file",
+    "oauth:allow-cancel",
+    "oauth:allow-start"
   ]
 }

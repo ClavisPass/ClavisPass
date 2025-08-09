@@ -41,7 +41,7 @@ function NoteModule(props: NoteModuleType & Props) {
         onChangeText={(text) => setValue(text)}
         autoCapitalize="none"
         multiline={true}
-        numberOfLines={4}
+        numberOfLines={6}
       />
     </ModuleContainer>
   );

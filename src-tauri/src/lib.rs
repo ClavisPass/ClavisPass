@@ -10,6 +10,7 @@ use tauri::{
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 use tauri_plugin_deep_link;
 use tauri_plugin_global_shortcut;
+use tauri_plugin_oauth;
 use tauri_plugin_shell;
 use tauri_plugin_single_instance;
 use tauri_plugin_updater;
@@ -54,6 +55,7 @@ fn load_window_size(app_handle: &AppHandle) -> Option<WindowSize> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_oauth::init())
         .plugin(tauri_plugin_cli::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
@@ -168,7 +170,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::save_key,
             commands::get_key,
-            commands::remove_key
+            commands::remove_key,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,4 +1,5 @@
 use keytar::{delete_password, get_password, set_password};
+use tauri;
 
 #[tauri::command]
 pub fn save_key(key: &str, value: &str) {

@@ -43,7 +43,7 @@ function UserInformation(props: Props) {
   return (
     <View
       style={{
-        height: 56,
+        height: token ? 56 : 44,
         width: "100%",
       }}>
       {token ? (
