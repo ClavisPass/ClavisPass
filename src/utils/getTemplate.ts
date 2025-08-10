@@ -19,6 +19,13 @@ function getTemplate(template: TemplateEnum) {
   if (template == TemplateEnum.BLANK) {
     return value;
   }
+  if (template == TemplateEnum.DIGITAL_CARD) {
+    const digitalCard = getModuleData(ModulesEnum.DIGITAL_CARD);
+    if (digitalCard) {
+      value.modules = [digitalCard];
+    }
+    return value;
+  }
   const note = getModuleData(ModulesEnum.NOTE);
   if (template == TemplateEnum.PASSWORD) {
     const username = getModuleData(ModulesEnum.USERNAME);

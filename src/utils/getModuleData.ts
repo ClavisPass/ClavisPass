@@ -1,6 +1,7 @@
 import ModulesEnum from "../enums/ModulesEnum";
 import { ModuleType } from "../types/ModulesType";
 import CustomFieldModuleType from "../types/modules/CustomFieldModuleType";
+import DigitalCardModuleType from "../types/modules/DigitalCardModuleType";
 import EmailModuleType from "../types/modules/EmailModuleType";
 import KeyModuleType from "../types/modules/KeyModuleType";
 import NoteModuleType from "../types/modules/NoteModuleType";
@@ -85,6 +86,15 @@ function getModuleData(module: ModulesEnum) {
       value: "",
       wifiName: "",
       wifiType: "WPA",
+    };
+    return moduleData as ModuleType;
+  }
+  if (module === ModulesEnum.DIGITAL_CARD) {
+    const moduleData: DigitalCardModuleType = {
+      id: id,
+      module: module,
+      value: "",
+      type: "QR-Code",
     };
     return moduleData as ModuleType;
   }

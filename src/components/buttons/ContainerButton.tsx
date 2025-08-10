@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Icon, TouchableRipple } from "react-native-paper";
+import { TouchableRipple } from "react-native-paper";
 import { useTheme } from "../../contexts/ThemeProvider";
 
 const styles = StyleSheet.create({
@@ -36,19 +36,21 @@ function ContainerButton(props: Props) {
       style={[
         styles.container,
         {
-          backgroundColor: props.backgroundColor || theme.colors?.background,
+          backgroundColor: theme.colors?.background,
           boxShadow: theme.colors?.shadow,
           flexGrow: props.flexGrow || 1,
         },
       ]}
     >
-      <TouchableRipple
-        style={styles.ripple}
-        onPress={props.onPress}
-        rippleColor="rgba(0, 0, 0, .32)"
-      >
-        {props.children}
-      </TouchableRipple>
+      <View style={{ flex: 1, backgroundColor: props.backgroundColor || undefined }}>
+        <TouchableRipple
+          style={styles.ripple}
+          onPress={props.onPress}
+          rippleColor="rgba(0, 0, 0, .32)"
+        >
+          {props.children}
+        </TouchableRipple>
+      </View>
     </View>
   );
 }

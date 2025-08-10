@@ -4,6 +4,7 @@ import Modal from "./Modal";
 import { View } from "react-native";
 import { MenuItem } from "../items/MenuItem";
 import Divider from "../Divider";
+import CategoryItem from "../items/CategoryItem";
 
 type Props = {
   addModule: (module: ModulesEnum) => void;
@@ -15,78 +16,98 @@ function AddModuleModal(props: Props) {
   const hideModal = () => props.setVisible(false);
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
-      <View style={{ width: 280, minHeight: 354 }}>
-        <MenuItem
-          leadingIcon={ModuleIconsEnum.USERNAME}
-          onPress={() => {
-            props.addModule(ModulesEnum.USERNAME);
-          }}
-        >
-          {"Username"}
-        </MenuItem>
-        <Divider />
-        <MenuItem
-          leadingIcon={ModuleIconsEnum.E_MAIL}
-          onPress={() => {
-            props.addModule(ModulesEnum.E_MAIL);
-          }}
-        >
-          {"E-Mail"}
-        </MenuItem>
-        <Divider />
-        <MenuItem
-          leadingIcon={ModuleIconsEnum.PASSWORD}
-          onPress={() => {
-            props.addModule(ModulesEnum.PASSWORD);
-          }}
-        >
-          {"Password"}
-        </MenuItem>
-        <Divider />
-        <MenuItem
-          leadingIcon={ModuleIconsEnum.URL}
-          onPress={() => {
-            props.addModule(ModulesEnum.URL);
-          }}
-        >
-          {"URL"}
-        </MenuItem>
-        <Divider />
-        <MenuItem
-          leadingIcon={ModuleIconsEnum.WIFI}
-          onPress={() => {
-            props.addModule(ModulesEnum.WIFI);
-          }}
-        >
-          {"Wifi"}
-        </MenuItem>
-        <Divider />
-        <MenuItem
-          leadingIcon={ModuleIconsEnum.KEY}
-          onPress={() => {
-            props.addModule(ModulesEnum.KEY);
-          }}
-        >
-          {"Key"}
-        </MenuItem>
-        <Divider />
-        <MenuItem
-          leadingIcon={ModuleIconsEnum.CUSTOM_FIELD}
-          onPress={() => {
-            props.addModule(ModulesEnum.CUSTOM_FIELD);
-          }}
-        >
-          {"Custom Field"}
-        </MenuItem>
-        <Divider />
-        <MenuItem
-          leadingIcon={ModuleIconsEnum.NOTE}
-          onPress={() => {
-            props.addModule(ModulesEnum.NOTE);
-          }}
-        >
-          {"Note"}
-        </MenuItem>
+      <View
+        style={{
+          width: 280,
+          height: 368,
+          display: "flex",
+          flexDirection: "column",
+          padding: 8,
+          gap: 8,
+        }}
+      >
+        <View style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}>
+          <CategoryItem
+            leadingIcon={ModuleIconsEnum.USERNAME}
+            onPress={() => {
+              props.addModule(ModulesEnum.USERNAME);
+            }}
+          >
+            {"Username"}
+          </CategoryItem>
+          <CategoryItem
+            leadingIcon={ModuleIconsEnum.E_MAIL}
+            onPress={() => {
+              props.addModule(ModulesEnum.E_MAIL);
+            }}
+          >
+            {"E-Mail"}
+          </CategoryItem>
+        </View>
+        <View style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}>
+          <CategoryItem
+            leadingIcon={ModuleIconsEnum.PASSWORD}
+            onPress={() => {
+              props.addModule(ModulesEnum.PASSWORD);
+            }}
+          >
+            {"Password"}
+          </CategoryItem>
+          <CategoryItem
+            leadingIcon={ModuleIconsEnum.URL}
+            onPress={() => {
+              props.addModule(ModulesEnum.URL);
+            }}
+          >
+            {"URL"}
+          </CategoryItem>
+        </View>
+        <View style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}>
+          <CategoryItem
+            leadingIcon={ModuleIconsEnum.WIFI}
+            onPress={() => {
+              props.addModule(ModulesEnum.WIFI);
+            }}
+          >
+            {"Wifi"}
+          </CategoryItem>
+          <CategoryItem
+            leadingIcon={ModuleIconsEnum.DIGITAL_CARD}
+            onPress={() => {
+              props.addModule(ModulesEnum.DIGITAL_CARD);
+            }}
+          >
+            {"Digital Card"}
+          </CategoryItem>
+        </View>
+        <View style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}>
+          <CategoryItem
+            leadingIcon={ModuleIconsEnum.KEY}
+            onPress={() => {
+              props.addModule(ModulesEnum.KEY);
+            }}
+          >
+            {"Key"}
+          </CategoryItem>
+          <CategoryItem
+            leadingIcon={ModuleIconsEnum.CUSTOM_FIELD}
+            onPress={() => {
+              props.addModule(ModulesEnum.CUSTOM_FIELD);
+            }}
+          >
+            {"Custom Field"}
+          </CategoryItem>
+        </View>
+        <View style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}>
+          <CategoryItem
+            leadingIcon={ModuleIconsEnum.NOTE}
+            onPress={() => {
+              props.addModule(ModulesEnum.NOTE);
+            }}
+          >
+            {"Note"}
+          </CategoryItem>
+        </View>
       </View>
     </Modal>
   );

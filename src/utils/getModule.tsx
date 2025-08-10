@@ -18,6 +18,8 @@ import UsernameModule from "../components/modules/UsernameModule";
 import WifiModuleType from "../types/modules/WifiModuleType";
 import WifiModule from "../components/modules/WifiModule";
 import FastAccessType from "../types/FastAccessType";
+import DigitalCardModuleType from "../types/modules/DigitalCardModuleType";
+import DigitalCardModule from "../components/modules/DigitalCardModule";
 
 function getModule(
   module: ModuleType,
@@ -142,6 +144,22 @@ function getModule(
         wifiName={moduleObject.wifiName}
         wifiType={moduleObject.wifiType}
         value={moduleObject.value}
+        edit={edit}
+        onDragStart={onDragStart}
+        deleteModule={deleteModule}
+        changeModule={changeModule}
+        fastAccess={fastAccess}
+      />
+    );
+  }
+  if (module.module === ModulesEnum.DIGITAL_CARD) {
+    const moduleObject = module as DigitalCardModuleType;
+    return (
+      <DigitalCardModule
+        id={moduleObject.id}
+        module={moduleObject.module}
+        value={moduleObject.value}
+        type={moduleObject.type}
         edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}

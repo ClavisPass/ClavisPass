@@ -2,6 +2,7 @@ enum TemplateEnum {
   PASSWORD,
   WIFI,
   KEY,
+  DIGITAL_CARD,
   BLANK,
 }
 

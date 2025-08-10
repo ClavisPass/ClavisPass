@@ -8,6 +8,7 @@ enum ModulesEnum {
   URL = "URL",
   USERNAME = "USERNAME",
   WIFI = "WIFI",
+  DIGITAL_CARD = "DIGITAL_CARD",
 }
 
 export default ModulesEnum;

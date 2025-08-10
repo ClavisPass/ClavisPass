@@ -7,6 +7,7 @@ enum ModuleIconsEnum {
   URL = "web",
   USERNAME = "account",
   WIFI = "wifi",
+  DIGITAL_CARD = "credit-card",
 }
 
 export default ModuleIconsEnum;
