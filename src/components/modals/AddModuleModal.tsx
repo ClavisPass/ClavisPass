@@ -107,6 +107,14 @@ function AddModuleModal(props: Props) {
           >
             {"Note"}
           </CategoryItem>
+          <CategoryItem
+            leadingIcon={ModuleIconsEnum.TASK}
+            onPress={() => {
+              props.addModule(ModulesEnum.TASK);
+            }}
+          >
+            {"Task"}
+          </CategoryItem>
         </View>
       </View>
     </Modal>

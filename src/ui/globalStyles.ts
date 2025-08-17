@@ -22,6 +22,8 @@ const globalStyles = (background: string, tertiary: string) => ({
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
+    paddingLeft: 10
+
   },
   fab: {
     position: "absolute",

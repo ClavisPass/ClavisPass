@@ -66,7 +66,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
       id={props.id}
       title={"Password"}
       edit={props.edit}
-      delete={props.edit}
+      deletable={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.PASSWORD}

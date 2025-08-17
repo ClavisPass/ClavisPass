@@ -8,6 +8,7 @@ enum ModuleIconsEnum {
   USERNAME = "account",
   WIFI = "wifi",
   DIGITAL_CARD = "credit-card",
+  TASK = "checkbox-marked",
 }
 
 export default ModuleIconsEnum;

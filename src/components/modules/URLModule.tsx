@@ -113,7 +113,7 @@ function URLModule(props: URLModuleType & Props) {
       id={props.id}
       title={"URL"}
       edit={props.edit}
-      delete={props.edit}
+      deletable={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.URL}

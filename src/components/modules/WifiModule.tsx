@@ -75,7 +75,7 @@ function WifiModule(props: WifiModuleType & Props) {
       id={props.id}
       title="Wifi"
       edit={props.edit}
-      delete={props.edit}
+      deletable={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.WIFI}

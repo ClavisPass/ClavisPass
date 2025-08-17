@@ -96,7 +96,7 @@ function EmailModule(props: EmailModuleType & Props) {
       id={props.id}
       title={"E-Mail"}
       edit={props.edit}
-      delete={props.edit}
+      deletable={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.E_MAIL}

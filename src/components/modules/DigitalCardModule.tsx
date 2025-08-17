@@ -73,7 +73,7 @@ function DigitalCardModule(props: DigitalCardModuleType & Props) {
       id={props.id}
       title="Digital Card"
       edit={props.edit}
-      delete={props.edit}
+      deletable={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.DIGITAL_CARD}

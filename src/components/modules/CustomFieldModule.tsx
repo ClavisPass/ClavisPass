@@ -36,7 +36,7 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
       id={props.id}
       title={props.title}
       edit={props.edit}
-      delete={props.edit}
+      deletable={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.CUSTOM_FIELD}

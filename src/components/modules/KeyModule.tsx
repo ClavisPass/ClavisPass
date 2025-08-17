@@ -33,7 +33,7 @@ function KeyModule(props: KeyModuleType & Props) {
       id={props.id}
       title={"Key"}
       edit={props.edit}
-      delete={props.edit}
+      deletable={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.KEY}

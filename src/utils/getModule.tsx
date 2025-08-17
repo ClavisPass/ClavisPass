@@ -20,6 +20,8 @@ import WifiModule from "../components/modules/WifiModule";
 import FastAccessType from "../types/FastAccessType";
 import DigitalCardModuleType from "../types/modules/DigitalCardModuleType";
 import DigitalCardModule from "../components/modules/DigitalCardModule";
+import TaskModule from "../components/modules/TaskModule";
+import TaskModuleType from "../types/modules/TaskModuleType";
 
 function getModule(
   module: ModuleType,
@@ -160,6 +162,22 @@ function getModule(
         module={moduleObject.module}
         value={moduleObject.value}
         type={moduleObject.type}
+        edit={edit}
+        onDragStart={onDragStart}
+        deleteModule={deleteModule}
+        changeModule={changeModule}
+        fastAccess={fastAccess}
+      />
+    );
+  }
+  if (module.module === ModulesEnum.TASK) {
+    const moduleObject = module as TaskModuleType;
+    return (
+      <TaskModule
+        id={moduleObject.id}
+        module={moduleObject.module}
+        value={moduleObject.value}
+        completed={moduleObject.completed}
         edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}

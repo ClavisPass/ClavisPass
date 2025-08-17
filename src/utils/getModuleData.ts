@@ -6,6 +6,7 @@ import EmailModuleType from "../types/modules/EmailModuleType";
 import KeyModuleType from "../types/modules/KeyModuleType";
 import NoteModuleType from "../types/modules/NoteModuleType";
 import PasswordModuleType from "../types/modules/PasswordModuleType";
+import TaskModuleType from "../types/modules/TaskModuleType";
 import TitleModuleType from "../types/modules/TitleModuleType";
 import URLModuleType from "../types/modules/URLModuleType";
 import UsernameModuleType from "../types/modules/UsernameModuleType";
@@ -95,6 +96,15 @@ function getModuleData(module: ModulesEnum) {
       module: module,
       value: "",
       type: "QR-Code",
+    };
+    return moduleData as ModuleType;
+  }
+  if (module === ModulesEnum.TASK) {
+    const moduleData: TaskModuleType = {
+      id: id,
+      module: module,
+      value: "",
+      completed: false,
     };
     return moduleData as ModuleType;
   }

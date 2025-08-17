@@ -1,21 +1,17 @@
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode } from "react";
 import { View, StyleSheet, Pressable, Platform } from "react-native";
-import { Icon, IconButton, Text } from "react-native-paper";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import { Icon, Text } from "react-native-paper";
 import { useTheme } from "../../contexts/ThemeProvider";
 import FastAccessType from "../../types/FastAccessType";
+import { EditRowControlsContainer } from "./EditRowControlsContainer";
 
-const styles = StyleSheet.create({
+const moduleStyles = StyleSheet.create({
   container: {
     display: "flex",
     flexDirection: "row",
     flex: 1,
   },
-  innercontainer: {
+  inner: {
     padding: 10,
     marginLeft: 8,
     marginRight: 8,
@@ -25,31 +21,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
-  draggable: {
-    borderWidth: 1,
-    borderRadius: 6,
-    borderColor: "lightgrey",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 6,
-  },
-  content: {
-    flex: 1,
-    paddingLeft: 6,
-  },
-  delete: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
 });
 
-type Props = {
+export type ModuleContainerProps = {
   id: string;
   children: ReactNode;
   title: string;
   edit: boolean;
-  delete: boolean;
+  deletable?: boolean;
   onDragStart?: () => void;
   deleteModule?: (id: string) => void;
   modal?: ReactNode;
@@ -58,75 +37,39 @@ type Props = {
   fastAccess: FastAccessType | null;
 };
 
-function ModuleContainer(props: Props) {
+export default function ModuleContainer({
+  id,
+  children,
+  title,
+  edit,
+  deletable = true,
+  onDragStart,
+  deleteModule,
+  modal,
+  icon,
+  titlePress,
+  fastAccess,
+}: ModuleContainerProps) {
   const { theme } = useTheme();
-  const translateX = useSharedValue(-20);
-  const paddingLeft = useSharedValue(4);
-  const paddingRight = useSharedValue(4);
-  const translateXDelete = useSharedValue(46);
-  useEffect(() => {
-    if (props.edit) {
-      translateX.value = withTiming(0, { duration: 150 });
-      paddingLeft.value = withTiming(24, { duration: 150 });
-      paddingRight.value = withTiming(50, { duration: 150 });
-      translateXDelete.value = withTiming(0, { duration: 150 });
-    } else {
-      translateX.value = withTiming(-20, { duration: 150 });
-      paddingLeft.value = withTiming(4, { duration: 150 });
-      paddingRight.value = withTiming(4, { duration: 150 });
-      translateXDelete.value = withTiming(46, { duration: 150 });
-    }
-  }, [props.edit]);
 
-  const animatedIconStyle = useAnimatedStyle(() => {
-    return {
-      position: "absolute",
-      left: 4,
-      transform: [{ translateX: translateX.value }],
-    };
-  });
-
-  const animatedIconStyleDelete = useAnimatedStyle(() => {
-    return {
-      position: "absolute",
-      right: 4,
-      transform: [{ translateX: translateXDelete.value }],
-    };
-  });
-
-  const animatedContainerStyle = useAnimatedStyle(() => {
-    return {
-      overflow: "hidden",
-      paddingLeft: paddingLeft.value,
-      paddingRight: paddingRight.value,
-    };
-  });
   return (
-    <Animated.View
-      key={props.id}
+    <EditRowControlsContainer
+      id={id}
+      edit={edit}
+      onDragStart={onDragStart}
+      onDelete={deletable ? deleteModule : undefined}
       style={[
-        styles.container,
-        styles.innercontainer,
+        moduleStyles.container,
+        moduleStyles.inner,
         {
           backgroundColor: theme.colors?.background,
-          boxShadow: theme.colors?.shadow,
-        },
-        animatedContainerStyle,
-        Platform.OS !== "web" && {
-          marginBottom: 8,
+          boxShadow: (theme.colors as any)?.shadow,
+          ...(Platform.OS !== "web" ? { marginBottom: 8 } : {}),
+          borderRadius: 12,
         },
       ]}
     >
-      <Animated.View style={animatedIconStyle}>
-        {Platform.OS === "web" ? (
-          <Icon source="drag" color={theme.colors?.primary} size={20} />
-        ) : (
-          <Pressable onPressIn={props.edit ? props.onDragStart : undefined}>
-            <Icon source="drag" color={theme.colors?.primary} size={20} />
-          </Pressable>
-        )}
-      </Animated.View>
-      <View style={[styles.content]}>
+      <View style={{ flex: 1 }}>
         <View
           style={{
             display: "flex",
@@ -135,7 +78,6 @@ function ModuleContainer(props: Props) {
             gap: 4,
             height: 20,
             width: "100%",
-            //justifyContent: "space-between",
           }}
         >
           <View
@@ -144,18 +86,16 @@ function ModuleContainer(props: Props) {
               flexDirection: "row",
               gap: 4,
               alignItems: "center",
+              marginLeft: 10,
             }}
           >
-            {props.icon ? (
-              <Icon
-                source={props.icon}
-                size={16}
-                color={theme.colors?.primary}
-              />
+            {icon ? (
+              <Icon source={icon} size={16} color={theme.colors?.primary} />
             ) : null}
+
             <Pressable
-              onPress={props.titlePress}
-              style={{ cursor: props.titlePress ? "pointer" : "auto" }}
+              onPress={titlePress}
+              style={{ cursor: titlePress ? "pointer" : "auto" }}
             >
               <Text
                 variant="bodyMedium"
@@ -165,11 +105,12 @@ function ModuleContainer(props: Props) {
                   margin: 0,
                 }}
               >
-                {props.title}
+                {title}
               </Text>
             </Pressable>
-            {(props.id === props.fastAccess?.usernameId ||
-            props.id === props.fastAccess?.passwordId) && props.edit ? (
+
+            {(id === fastAccess?.usernameId || id === fastAccess?.passwordId) &&
+            edit ? (
               <Icon
                 source={"tooltip-account"}
                 size={16}
@@ -177,23 +118,11 @@ function ModuleContainer(props: Props) {
               />
             ) : null}
           </View>
-          {props.modal}
+
+          {modal}
         </View>
-        {props.children}
+        {children}
       </View>
-      <Animated.View style={[styles.delete, animatedIconStyleDelete]}>
-        <IconButton
-          animated={true}
-          selected={props.edit}
-          mode="contained-tonal"
-          icon="close"
-          iconColor={theme.colors?.error}
-          size={20}
-          onPress={() => props.deleteModule?.(props.id)}
-        />
-      </Animated.View>
-    </Animated.View>
+    </EditRowControlsContainer>
   );
 }
-
-export default ModuleContainer;
