@@ -8,6 +8,8 @@ import { TitleModuleTypeSchema } from "./modules/TitleModuleType";
 import { URLModuleTypeSchema } from "./modules/URLModuleType";
 import { UsernameModuleTypeSchema } from "./modules/UsernameModuleType";
 import { WifiModuleTypeSchema } from "./modules/WifiModuleType";
+import { TaskModuleTypeSchema } from "./modules/TaskModuleType";
+import { DigitalCardModuleTypeSchema } from "./modules/DigitalCardModuleType";
 
 export const ModuleTypeSchema = CustomFieldModuleTypeSchema.or(
   EmnailModuleTypeSchema
@@ -18,7 +20,9 @@ export const ModuleTypeSchema = CustomFieldModuleTypeSchema.or(
   .or(TitleModuleTypeSchema)
   .or(URLModuleTypeSchema)
   .or(UsernameModuleTypeSchema)
-  .or(WifiModuleTypeSchema);
+  .or(WifiModuleTypeSchema)
+  .or(DigitalCardModuleTypeSchema)
+  .or(TaskModuleTypeSchema);
 
 export type ModuleType = z.infer<typeof ModuleTypeSchema>;
 

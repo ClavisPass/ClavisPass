@@ -86,7 +86,7 @@ export default function ModuleContainer({
               flexDirection: "row",
               gap: 4,
               alignItems: "center",
-              marginLeft: 10,
+              marginLeft: 6,
             }}
           >
             {icon ? (
