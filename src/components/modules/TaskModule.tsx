@@ -24,7 +24,7 @@ function TaskModule(props: TaskModuleType & Props) {
     } else {
       didMount.current = true;
     }
-  }, [value]);
+  }, [value, checked]);
 
   return (
     <View

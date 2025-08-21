@@ -18,6 +18,8 @@ import { StatusBar } from "expo-status-bar";
 import { BlurView } from "expo-blur";
 import SettingsDivider from "../components/SettingsDivider";
 import Backup from "../components/Backup";
+import { StackScreenProps } from "@react-navigation/stack";
+import { RootStackParamList } from "../stacks/Stack";
 
 const styles = StyleSheet.create({
   container: {
@@ -33,7 +35,9 @@ const styles = StyleSheet.create({
   },
 });
 
-function LoginScreen({ navigation }: { navigation: any }) {
+type LoginScreenProps = StackScreenProps<RootStackParamList, "Login">;
+
+const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { setToken, setRefreshToken, loadRefreshToken, tokenType } = useToken();
   const { isOnline } = useOnline();
   const { headerWhite, setHeaderWhite, darkmode, theme, setHeaderSpacing } =

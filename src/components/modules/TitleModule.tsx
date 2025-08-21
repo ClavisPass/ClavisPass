@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-import { TextInput } from "react-native-paper";
+import { Icon, TextInput } from "react-native-paper";
 import ValuesType from "../../types/ValuesType";
 import { useTheme } from "../../contexts/ThemeProvider";
 import { View } from "react-native";
@@ -31,7 +31,15 @@ function TitleModule(props: Props) {
   }, []);
 
   return (
-    <View style={{ height: 36, flexGrow: 1 }}>
+    <View
+      style={{
+        height: 36,
+        width: 200,
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+      }}
+    >
       <TextInput
         ref={textInputRef}
         placeholder={"Title..."}
@@ -58,6 +66,15 @@ function TitleModule(props: Props) {
         value={props.value.title}
         mode="outlined"
         onChangeText={(text) => changeTitle(text)}
+        right={
+          props.value.title == "" && (
+            <TextInput.Icon
+              icon="alert-circle"
+              size={20}
+              color={theme.colors?.error}
+            />
+          )
+        }
       />
     </View>
   );

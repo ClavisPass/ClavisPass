@@ -40,7 +40,7 @@ function DiscardChangesModal(props: Props) {
           }}
         >
           <Button
-          style={{ borderRadius: 10 }}
+          style={{ borderRadius: 12 }}
             mode="contained-tonal"
             onPress={() => {
               props.setVisible(false);
@@ -48,7 +48,7 @@ function DiscardChangesModal(props: Props) {
           >
             Cancel
           </Button>
-          <Button style={{ borderRadius: 10 }} mode="contained" onPress={props.onDiscard}>
+          <Button style={{ borderRadius: 12 }} mode="contained" onPress={props.onDiscard}>
             Discard
           </Button>
         </View>

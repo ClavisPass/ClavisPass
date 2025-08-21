@@ -71,26 +71,50 @@ function ListItem(props: Props) {
 
   const determineIcon = () => {
     setUrl("");
+    const wifiResult = props.item.modules.filter(
+      (module) => module.module === ModulesEnum.WIFI
+    );
+    if (wifiResult.length > 0) {
+      setIcon("wifi");
+      return
+    }
+
     const keyResult = props.item.modules.filter(
       (module) => module.module === ModulesEnum.KEY
     );
     if (keyResult.length > 0) {
       setIcon("key-variant");
-    } else {
-      const wifiResult = props.item.modules.filter(
-        (module) => module.module === ModulesEnum.WIFI
-      );
-      if (wifiResult.length > 0) {
-        setIcon("wifi");
-      } else {
-        setIcon("lock");
-      }
+      return
     }
+
+    const taskResult = props.item.modules.filter(
+      (module) => module.module === ModulesEnum.TASK
+    );
+    if (taskResult.length > 0) {
+      setIcon("checkbox-multiple-marked");
+      return
+    }
+
+    const digitalCardResult = props.item.modules.filter(
+      (module) => module.module === ModulesEnum.DIGITAL_CARD
+    );
+    if (digitalCardResult.length > 0) {
+      setIcon("credit-card-multiple");
+      return
+    }
+
+    setIcon("lock");
   };
   return (
     <View
       key={props.key}
-      style={[styles.container, { backgroundColor: theme.colors?.background, boxShadow: theme.colors?.shadow }]}
+      style={[
+        styles.container,
+        {
+          backgroundColor: theme.colors?.background,
+          boxShadow: theme.colors?.shadow,
+        },
+      ]}
       onPointerEnter={() => Platform.OS === "web" && setHovered(true)}
       onPointerLeave={() => Platform.OS === "web" && setHovered(false)}
     >
@@ -155,7 +179,15 @@ function ListItem(props: Props) {
                       mode={"contained-tonal"}
                       size={22}
                       iconColor={theme.colors?.primary}
-                      style={{ margin: 0, padding: 0, height: 30, width: 30, borderRadius: 12, borderBottomRightRadius: 0, borderTopRightRadius: 0 }}
+                      style={{
+                        margin: 0,
+                        padding: 0,
+                        height: 30,
+                        width: 30,
+                        borderRadius: 12,
+                        borderBottomRightRadius: 0,
+                        borderTopRightRadius: 0,
+                      }}
                       onPress={() => {
                         copyToClipboard(fastAccessObject.username);
                       }}
@@ -165,7 +197,15 @@ function ListItem(props: Props) {
                       mode={"contained"}
                       size={22}
                       iconColor={theme.colors?.primary}
-                      style={{ margin: 0, padding: 0, height: 30, width: 30, borderRadius: 12, borderBottomLeftRadius: 0, borderTopLeftRadius: 0 }}
+                      style={{
+                        margin: 0,
+                        padding: 0,
+                        height: 30,
+                        width: 30,
+                        borderRadius: 12,
+                        borderBottomLeftRadius: 0,
+                        borderTopLeftRadius: 0,
+                      }}
                       onPress={() => {
                         copyToClipboard(fastAccessObject.password);
                       }}

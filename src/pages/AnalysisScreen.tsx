@@ -27,6 +27,8 @@ import Header from "../components/Header";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../ui/linearGradient";
 import FilterAnalysisModal from "../components/modals/FilterAnalysisModal";
+import { StackScreenProps } from "@react-navigation/stack/lib/typescript/src/types";
+import { RootStackParamList } from "../stacks/Stack";
 
 export type CachedPasswordsType = {
   title: string;
@@ -36,7 +38,9 @@ export type CachedPasswordsType = {
   passwordStrengthLevel: PasswordStrengthLevel;
 };
 
-function AnalysisScreen({ navigation }: { navigation: any }) {
+type AnalysisScreenProps = StackScreenProps<RootStackParamList, "Analysis">;
+
+const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   const data = useData();
   const { theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
     useTheme();

@@ -22,6 +22,8 @@ import DigitalCardModuleType from "../types/modules/DigitalCardModuleType";
 import DigitalCardModule from "../components/modules/DigitalCardModule";
 import TaskModule from "../components/modules/TaskModule";
 import TaskModuleType from "../types/modules/TaskModuleType";
+import { StackNavigationProp } from "@react-navigation/stack/lib/typescript/src/types";
+import { RootStackParamList } from "../stacks/Stack";
 
 function getModule(
   module: ModuleType,
@@ -29,7 +31,8 @@ function getModule(
   onDragStart: () => void,
   deleteModule: (id: string) => void,
   changeModule: (module: ModuleType) => void,
-  fastAccess: FastAccessType | null
+  fastAccess: FastAccessType | null,
+  navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>
 ): ReactNode {
   if (module.module === ModulesEnum.CUSTOM_FIELD) {
     const moduleObject = module as CustomFieldModuleType;
@@ -167,6 +170,7 @@ function getModule(
         deleteModule={deleteModule}
         changeModule={changeModule}
         fastAccess={fastAccess}
+        navigation={navigation}
       />
     );
   }

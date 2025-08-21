@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { View, Platform, useWindowDimensions, Animated } from "react-native";
+import { View, Platform, useWindowDimensions, Animated, InteractionManager } from "react-native";
 import {
   Searchbar,
   IconButton,
@@ -85,7 +85,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   useEffect(() => {
     if (triggerAdd) {
-      console.log("Add-Aktion aus HomeScreen erkannt!");
       setValueModalVisible(true);
 
       // Zustand resetten
@@ -95,8 +94,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      setHeaderSpacing(0);
-      setHeaderWhite(true);
+      let task = InteractionManager.runAfterInteractions(() => {
+        setHeaderSpacing(0);
+        setHeaderWhite(true);
+      });
+      return () => task?.cancel?.();
     }, [])
   );
 
@@ -217,7 +219,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             }}
           />
         )}
-        estimatedItemSize={200}
+        estimatedItemSize={120}
       />
     );
   }

@@ -16,6 +16,11 @@ export type RootStackParamList = {
   Settings: undefined;
   Login: undefined;
   Scan: undefined;
+  DigitalCardScan: {
+    setData: (data: string, type: string) => void;
+  };
+  Logout: undefined;
+  AddTrigger: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();

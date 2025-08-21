@@ -20,6 +20,12 @@ import DigitalCardType, {
 import CopyToClipboard from "../buttons/CopyToClipboard";
 import QRCode from "react-qr-code";
 import Barcode from "@kichiyaki/react-native-barcode-generator";
+import { StackNavigationProp } from "@react-navigation/stack/lib/typescript/src/types";
+import { RootStackParamList } from "../../stacks/Stack";
+
+type DigitalCardModuleProps = {
+  navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>
+}
 
 function isDigitalCardType(x: unknown): x is DigitalCardType {
   return (
@@ -27,7 +33,7 @@ function isDigitalCardType(x: unknown): x is DigitalCardType {
   );
 }
 
-function DigitalCardModule(props: DigitalCardModuleType & Props) {
+function DigitalCardModule(props: DigitalCardModuleType & Props & DigitalCardModuleProps) {
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
 
@@ -106,6 +112,14 @@ function DigitalCardModule(props: DigitalCardModuleType & Props) {
               iconColor={theme.colors.primary}
               icon="barcode-scan"
               size={20}
+              onPress={() => {
+                props.navigation.navigate("DigitalCardScan", {
+                  setData: (data: string, type: string) => {
+                    setType(type as DigitalCardType);
+                    setValue(data);
+                  },
+                });
+              }}
             />
           </View>
 

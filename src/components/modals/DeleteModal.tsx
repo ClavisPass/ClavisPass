@@ -39,6 +39,7 @@ function DeleteModal(props: Props) {
           }}
         >
           <Button
+          style={{ borderRadius: 12 }}
             mode="contained-tonal"
             onPress={() => {
               props.setVisible(false);
@@ -47,6 +48,7 @@ function DeleteModal(props: Props) {
             Cancel
           </Button>
           <Button
+          style={{ borderRadius: 12 }}
             buttonColor="#D2222D"
             mode="contained"
             onPress={props.onDelete}

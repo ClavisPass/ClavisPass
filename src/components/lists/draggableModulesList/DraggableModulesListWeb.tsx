@@ -18,6 +18,8 @@ import { IconButton } from "react-native-paper";
 import { useTheme } from "../../../contexts/ThemeProvider";
 import FastAccessType from "../../../types/FastAccessType";
 import MetaInformationModule from "../../modules/MetaInformationModule";
+import { StackNavigationProp } from "@react-navigation/stack/lib/typescript/src/types";
+import { RootStackParamList } from "../../../stacks/Stack";
 
 type Props = {
   value: ValuesType;
@@ -29,6 +31,7 @@ type Props = {
   setDiscardoChanges: () => void;
   showAddModuleModal: () => void;
   fastAccess: FastAccessType | null;
+  navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>
 };
 
 const reorder = (list: any, startIndex: number, endIndex: number) => {
@@ -102,7 +105,8 @@ function DraggableModulesListWeb(props: Props) {
                       () => {},
                       props.deleteModule,
                       props.changeModule,
-                      props.fastAccess
+                      props.fastAccess,
+                      props.navigation
                     )}
                   </div>
                 )}

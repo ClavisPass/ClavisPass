@@ -2,6 +2,7 @@ import Stack from "./Stack";
 import transitionSpecConfig from "../configs/TransitionSpecConfig";
 import HomeScreen from "../pages/HomeScreen";
 import EditScreen from "../pages/EditScreen";
+import DigitalCardScanScreen from "../pages/DigitalCardScanScreen";
 
 function HomeStack() {
   return (
@@ -22,12 +23,22 @@ function HomeStack() {
             open: transitionSpecConfig,
             close: transitionSpecConfig,
           },
-          detachPreviousScreen: false,
         }}
       />
       <Stack.Screen
         name="Edit"
         component={EditScreen}
+        options={{
+          headerShown: false,
+          transitionSpec: {
+            open: transitionSpecConfig,
+            close: transitionSpecConfig,
+          },
+        }}
+      />
+      <Stack.Screen
+        name="DigitalCardScan"
+        component={DigitalCardScanScreen}
         options={{
           headerShown: false,
           transitionSpec: {

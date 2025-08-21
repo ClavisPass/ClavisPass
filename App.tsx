@@ -20,38 +20,13 @@ import AnalysisStack from "./src/stacks/AnalysisStack";
 import SettingsStack from "./src/stacks/SettingsStack";
 import LoginStack from "./src/stacks/LoginStack";
 import FastAccessScreen from "./src/pages/FastAccessScreen";
-import { onOpenUrl, register } from "@tauri-apps/plugin-deep-link";
 import { DevModeProvider } from "./src/contexts/DevModeProvider";
+import LogoutStack from "./src/stacks/LogoutStack";
+import AddTriggerStack from "./src/stacks/AddTriggerStack";
 
 const Tab = createBottomTabNavigator();
 
-const protocol = async () => {
-  await register("clavispass");
-};
-
 export function AppWithNavigation() {
-  //protocol().catch(console.error);
-
-  useEffect(() => {
-    const cleanup = onOpenUrl((event) => {
-      console.log("Deep link received:", event);
-      try {
-        const url = new URL(event as any);
-        const code = url.searchParams.get("code");
-        if (code) {
-          console.log("Received code:", code);
-          // hier z.B. Auth weiterleiten
-        }
-      } catch (err) {
-        console.error("Fehler beim Parsen der URL:", err);
-      }
-    });
-
-    return () => {
-      cleanup.then((off) => off()); // Event-Listener entfernen, wenn Component unmountet
-    };
-  }, []);
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider>
@@ -114,7 +89,7 @@ export function AppWithNavigation() {
                           />
                           <Tab.Screen
                             name="AddTrigger"
-                            component={() => null}
+                            component={AddTriggerStack}
                             options={{
                               tabBarLabel: "Add",
                               tabBarIcon: ({ color, size }) => (
@@ -137,7 +112,7 @@ export function AppWithNavigation() {
                           />
                           <Tab.Screen
                             name="Logout"
-                            component={() => null}
+                            component={LogoutStack}
                             options={{
                               tabBarLabel: "Logout",
                               tabBarIcon: ({ color, size }) => (

@@ -16,6 +16,8 @@ import { IconButton } from "react-native-paper";
 import { useTheme } from "../../../contexts/ThemeProvider";
 import FastAccessType from "../../../types/FastAccessType";
 import MetaInformationModule from "../../modules/MetaInformationModule";
+import { StackNavigationProp } from "@react-navigation/stack/lib/typescript/src/types";
+import { RootStackParamList } from "../../../stacks/Stack";
 
 type Props = {
   value: ValuesType;
@@ -27,6 +29,7 @@ type Props = {
   setDiscardoChanges: () => void;
   showAddModuleModal: () => void;
   fastAccess: FastAccessType | null;
+  navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>
 };
 
 function DraggableModulesList(props: Props) {
@@ -40,7 +43,8 @@ function DraggableModulesList(props: Props) {
         drag,
         props.deleteModule,
         props.changeModule,
-        props.fastAccess
+        props.fastAccess,
+        props.navigation
       );
     },
     [props.edit, props.value]

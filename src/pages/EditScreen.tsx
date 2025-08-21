@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Platform, View, Animated } from "react-native";
+import { Platform, View, Animated, InteractionManager } from "react-native";
 import ModulesType, { ModuleType } from "../types/ModulesType";
 
 import ModulesEnum from "../enums/ModulesEnum";
@@ -68,8 +68,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      setHeaderSpacing(220);
-      setHeaderWhite(false);
+      let task = InteractionManager.runAfterInteractions(() => {
+        setHeaderSpacing(220);
+        setHeaderWhite(false);
+      });
+      return () => task?.cancel?.();
     }, [])
   );
 
@@ -336,6 +339,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             setAddModuleModalVisible(true);
           }}
           fastAccess={fastAccessObject}
+          navigation={navigation}
         />
       ) : (
         <DraggableModulesList
@@ -350,6 +354,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             setAddModuleModalVisible(true);
           }}
           fastAccess={fastAccessObject}
+          navigation={navigation}
         />
       )}
       <Animated.View

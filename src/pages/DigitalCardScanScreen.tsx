@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import type { StackScreenProps } from "@react-navigation/stack";
 import Header from "../components/Header";
@@ -6,11 +6,10 @@ import AnimatedContainer from "../components/container/AnimatedContainer";
 import { useTheme } from "../contexts/ThemeProvider";
 import { Button, Icon, IconButton, Text } from "react-native-paper";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
-import { useToken } from "../contexts/TokenProvider";
-import isDropboxToken from "../utils/regex/isDropboxToken";
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { RootStackParamList } from "../stacks/Stack";
+import DigitalCardType from "../types/DigitalCardType";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -48,9 +47,27 @@ const styles = StyleSheet.create({
   },
 });
 
-type ScanScreenProps = StackScreenProps<RootStackParamList, "Scan">;
+export const BARCODE_TYPE_MAP: Record<string, DigitalCardType | undefined> = {
+  qr: "QR-Code",
+  code39: "CODE39",
+  code128: "CODE128",
+  ean13: "EAN13",
+  ean8: "EAN8",
+  itf14: "ITF14",
+  codabar: "codabar",
+  upc_a: "UPC",
+  upc_e: "UPCE",
+};
 
-const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
+type DigitalCardScanScreenProps = StackScreenProps<
+  RootStackParamList,
+  "DigitalCardScan"
+>;
+
+const DigitalCardScanScreen: React.FC<DigitalCardScanScreenProps> = ({
+  route,
+  navigation,
+}) => {
   const {
     globalStyles,
     headerWhite,
@@ -58,12 +75,13 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
     darkmode,
     setHeaderSpacing,
   } = useTheme();
-  const { setRefreshToken, setTokenType, renewAccessToken } = useToken();
+
+  const { setData } = route.params;
+
+  const lockedRef = useRef(false);
 
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
-
-  const [trying, setTrying] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -72,33 +90,41 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
     }, [])
   );
 
-  function isValidTokenFormat(token: string) {
-    setTrying(true);
-    if (!isDropboxToken(token)) {
-      console.log("Invalid Dropbox token format.");
-      return;
-    }
-    try {
-      renewAccessToken(token).then((data) => {
-        if (data) {
-          setTokenType("Dropbox");
-          setRefreshToken(token);
-          setTrying(false);
-          navigation.goBack();
-          return true;
-        }
-      });
-      setTrying(false);
-      return false;
-    } catch (error) {
-      setTrying(false);
-      return false;
-    }
-  }
-
   function toggleCameraFacing() {
     setFacing((current) => (current === "back" ? "front" : "back"));
   }
+
+  function mapBarcodeType(expoType: string): DigitalCardType | undefined {
+    return BARCODE_TYPE_MAP[expoType] ?? undefined;
+  }
+
+  const handleScanned = useCallback(
+    (res: { data: string; type: string }) => {
+      if (lockedRef.current) return;
+      lockedRef.current = true;
+
+      const value = (res?.data ?? "").trim();
+
+      if (!value) {
+        lockedRef.current = false;
+        return;
+      }
+
+      try {
+        const mappedType = mapBarcodeType(res.type);
+        if (!mappedType) {
+          console.log("Nicht unterstützter Barcode-Typ:", res.type);
+          return;
+        }
+        setData(value, mappedType);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        navigation.goBack();
+      }
+    },
+    [navigation, setData]
+  );
 
   return (
     <AnimatedContainer style={globalStyles.container}>
@@ -131,18 +157,23 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
           facing={facing}
           //mirror={false}
           barcodeScannerSettings={{
-            barcodeTypes: ["qr"],
+            barcodeTypes: [
+              "aztec",
+              "ean13",
+              "ean8",
+              "qr",
+              "pdf417",
+              "upc_e",
+              "datamatrix",
+              "code39",
+              "code93",
+              "itf14",
+              "codabar",
+              "code128",
+              "upc_a",
+            ],
           }}
-          onBarcodeScanned={(scanningResult) => {
-            try {
-              if (trying) return;
-              if (isValidTokenFormat(scanningResult.data)) {
-                setRefreshToken(scanningResult.data);
-              }
-            } catch (error) {
-              console.error(error);
-            }
-          }}
+          onBarcodeScanned={handleScanned}
         >
           <View style={styles.buttonContainer}>
             <Icon source={"scan-helper"} size={200} />
@@ -162,4 +193,4 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
   );
 };
 
-export default ScanScreen;
+export default DigitalCardScanScreen;

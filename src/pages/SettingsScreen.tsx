@@ -44,6 +44,8 @@ import SettingsShortcutItem from "../components/items/SettingsShortcutItem";
 import BackupImportButton from "../components/buttons/BackupImportButton";
 import BackupExportButton from "../components/buttons/BackupExportButton";
 import { useDevMode } from "../contexts/DevModeProvider";
+import { StackScreenProps } from "@react-navigation/stack/lib/typescript/src/types";
+import { RootStackParamList } from "../stacks/Stack";
 
 const styles = StyleSheet.create({
   surface: {
@@ -67,7 +69,9 @@ const styles = StyleSheet.create({
   },
 });
 
-function SettingsScreen({ navigation }: { navigation: any }) {
+type SettingsScreenProps = StackScreenProps<RootStackParamList, "Settings">;
+
+const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const { headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
     useTheme();
   const { master } = useAuth();

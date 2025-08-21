@@ -1,5 +1,5 @@
 import React, { EffectCallback, ReactNode, useEffect } from "react";
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import { Platform, StyleProp, View, ViewStyle } from "react-native";
 
 import Animated, {
   Easing,
@@ -20,6 +20,19 @@ function AnimatedContainer(props: Props) {
   const opacity = useSharedValue(0);
 
   const { globalStyles, theme } = useTheme();
+
+  if (Platform.OS !== "web") {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: theme.colors?.elevation.level2,
+        }}
+      >
+        {props.children}
+      </View>
+    );
+  }
 
   const config = {
     duration: 400,
