@@ -27,6 +27,7 @@ type Props = {
   onPress: () => void;
   flexGrow?: number;
   backgroundColor?: string;
+  disabled?: boolean;
 };
 
 function ContainerButton(props: Props) {
@@ -44,6 +45,7 @@ function ContainerButton(props: Props) {
     >
       <View style={{ flex: 1, backgroundColor: props.backgroundColor || undefined }}>
         <TouchableRipple
+          disabled={props.disabled}
           style={styles.ripple}
           onPress={props.onPress}
           rippleColor="rgba(0, 0, 0, .32)"

@@ -3,9 +3,6 @@ import { View } from "react-native";
 import ValueIconsEnum from "../../enums/ValueIconsEnum";
 import TemplateEnum from "../../enums/TemplateEnum";
 import getTemplate from "../../utils/getTemplate";
-import { TextInput } from "react-native-paper";
-import { MenuItem } from "../items/MenuItem";
-import Divider from "../Divider";
 import CategoryItem from "../items/CategoryItem";
 
 type Props = {
@@ -34,15 +31,9 @@ function AddValueModal(props: Props) {
           gap: 8,
         }}
       >
-        <CategoryItem
-          leadingIcon={ValueIconsEnum.BLANK}
-          onPress={() => {
-            navigateToAddValue(TemplateEnum.BLANK);
-          }}
+        <View
+          style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
         >
-          {"Blank"}
-        </CategoryItem>
-        <View style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}>
           <CategoryItem
             leadingIcon={ValueIconsEnum.PASSWORD}
             onPress={() => {
@@ -60,7 +51,9 @@ function AddValueModal(props: Props) {
             {"Wifi"}
           </CategoryItem>
         </View>
-        <View style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}>
+        <View
+          style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
+        >
           <CategoryItem
             leadingIcon={ValueIconsEnum.KEY}
             onPress={() => {
@@ -76,6 +69,26 @@ function AddValueModal(props: Props) {
             }}
           >
             {"Digital Card"}
+          </CategoryItem>
+        </View>
+        <View
+          style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
+        >
+          <CategoryItem
+            leadingIcon={ValueIconsEnum.TASKLIST}
+            onPress={() => {
+              navigateToAddValue(TemplateEnum.TASKLIST);
+            }}
+          >
+            {"Tasklist"}
+          </CategoryItem>
+          <CategoryItem
+            leadingIcon={ValueIconsEnum.BLANK}
+            onPress={() => {
+              navigateToAddValue(TemplateEnum.BLANK);
+            }}
+          >
+            {"Empty"}
           </CategoryItem>
         </View>
       </View>

@@ -26,27 +26,34 @@ function getTemplate(template: TemplateEnum) {
     }
     return value;
   }
-  const note = getModuleData(ModulesEnum.NOTE);
   if (template == TemplateEnum.PASSWORD) {
     const username = getModuleData(ModulesEnum.USERNAME);
     const email = getModuleData(ModulesEnum.E_MAIL);
     const password = getModuleData(ModulesEnum.PASSWORD);
-    if (username && email && password && note) {
-      value.modules = [username, email, password, note];
+    if (username && email && password) {
+      value.modules = [username, email, password];
     }
     return value;
   }
   if (template == TemplateEnum.WIFI) {
     const wifi = getModuleData(ModulesEnum.WIFI);
-    if (wifi && note) {
-      value.modules = [wifi, note];
+    if (wifi) {
+      value.modules = [wifi];
     }
     return value;
   }
   if (template == TemplateEnum.KEY) {
     const key = getModuleData(ModulesEnum.KEY);
-    if (key && note) {
-      value.modules = [key, note];
+    if (key) {
+      value.modules = [key];
+    }
+    return value;
+  }
+  if (template == TemplateEnum.TASKLIST) {
+    const task1 = getModuleData(ModulesEnum.TASK);
+    const task2 = getModuleData(ModulesEnum.TASK);
+    if (task1 && task2) {
+      value.modules = [task1, task2];
     }
     return value;
   }

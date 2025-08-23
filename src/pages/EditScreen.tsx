@@ -215,6 +215,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       newData.values = valueToChange;
       data.setData(newData);
     }
+    setDeleteModalVisible(false);
     data.setShowSave(true);
     goBack();
   };
@@ -383,6 +384,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
               }}
             />
             <ContainerButton
+              disabled={!discardChangesRef.current}
               onPress={() => setDeleteModalVisible(true)}
               backgroundColor={theme.colors?.error}
             >

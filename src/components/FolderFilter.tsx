@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
   chip: {
     marginRight: 4,
     borderRadius: 12,
+    overflow: "hidden"
   },
 });
 

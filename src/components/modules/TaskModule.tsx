@@ -12,12 +12,16 @@ function TaskModule(props: TaskModuleType & Props) {
   const [value, setValue] = useState(props.value);
   const [checked, setChecked] = useState(props.completed);
 
+  // NEU: dynamische Höhe für das TextInput
+  const [inputHeight, setInputHeight] = useState<number>(0);
+  const MIN_HEIGHT = 30; // Grundhöhe einer Zeile (anpassen, wenn du 'dense' nutzt)
+
   useEffect(() => {
     if (didMount.current) {
       const newModule: TaskModuleType = {
         id: props.id,
         module: props.module,
-        value: value,
+        value,
         completed: checked,
       };
       props.changeModule(newModule);
@@ -35,7 +39,7 @@ function TaskModule(props: TaskModuleType & Props) {
         borderRadius: 12,
         backgroundColor: theme.colors.background,
         boxShadow: theme.colors.shadow,
-        flex: 1,
+        alignSelf: "stretch",
       }}
     >
       <EditRowControlsContainer
@@ -49,33 +53,55 @@ function TaskModule(props: TaskModuleType & Props) {
             globalStyles.moduleView,
             {
               padding: 0,
+              justifyContent: "flex-start",
+              width: undefined,
+              flex: 1,
             },
           ]}
         >
           <Checkbox
             status={checked ? "checked" : "unchecked"}
-            onPress={() => {
-              setChecked(!checked);
-            }}
+            onPress={() => setChecked(!checked)}
           />
-          <View style={{ height: 40, flex: 1, flexGrow: 1 }}>
+          <View style={{ flex: 1 }}>
             <TextInput
-              placeholder="Task..."
+              placeholder="..."
+              mode="outlined"
+              multiline
+              scrollEnabled={false}
+              dense
+              onContentSizeChange={(e) =>
+                setInputHeight(e.nativeEvent.contentSize.height)
+              }
               outlineStyle={[
                 globalStyles.outlineStyle,
                 { borderWidth: 0, padding: 0 },
               ]}
-              contentStyle={checked ? { color: "gray" } : undefined}
+              contentStyle={[
+                checked
+                  ? { color: "gray", textDecorationLine: "line-through" }
+                  : null,
+                {
+                  textAlignVertical: "top",
+                  paddingHorizontal: 0,
+                  paddingVertical: 0,
+                  margin: 0,
+                  borderWidth: 0
+                },
+              ]}
               style={[
                 globalStyles.textInputStyle,
                 {
                   backgroundColor: "transparent",
                   padding: 0,
+                  paddingHorizontal: 0,
+                  paddingVertical: 0,
+                  borderWidth: 0,
+                  height: Math.max(MIN_HEIGHT, inputHeight),
                 },
               ]}
               value={value}
-              mode="outlined"
-              onChangeText={(text) => setValue(text)}
+              onChangeText={setValue}
             />
           </View>
         </View>
