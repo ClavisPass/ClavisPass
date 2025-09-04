@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { View } from "react-native";
 import TypeWriter from "react-native-typewriter";
 import { useTheme } from "../contexts/ThemeProvider";
@@ -14,6 +14,22 @@ function TypeWriterComponent(props: Props) {
   const [startExclamationMark, setStartExclamationMark] = useState<-1 | 0 | 1>(
     0
   );
+
+  const greetings = [
+    "Hi, ",
+    "Hey, ",
+    "Hello, ",
+    "What's up, ",
+    "Yo, ",
+    "Welcome, ",
+    "Good to see you, ",
+    "Sup, "
+  ];
+
+  const randomGreeting = useMemo(() => {
+    const index = Math.floor(Math.random() * greetings.length);
+    return greetings[index];
+  }, []);
 
   return (
     <View
@@ -37,7 +53,7 @@ function TypeWriterComponent(props: Props) {
         typing={1}
         onTypingEnd={() => setStartUsername(1)}
       >
-        {"Sup, "}
+        {randomGreeting}
       </TypeWriter>
       <TypeWriter
         style={[
@@ -51,7 +67,11 @@ function TypeWriterComponent(props: Props) {
         {props.displayName}
       </TypeWriter>
       <TypeWriter
-        style={{ fontSize: 20, userSelect: "none", color: theme.colors.onSurface, }}
+        style={{
+          fontSize: 20,
+          userSelect: "none",
+          color: theme.colors.onSurface,
+        }}
         minDelay={50}
         typing={startExclamationMark}
       >

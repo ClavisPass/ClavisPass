@@ -29,7 +29,7 @@ type Props = {
   setDiscardoChanges: () => void;
   showAddModuleModal: () => void;
   fastAccess: FastAccessType | null;
-  navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>
+  navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>;
 };
 
 function DraggableModulesList(props: Props) {
@@ -56,49 +56,48 @@ function DraggableModulesList(props: Props) {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={40}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={{ flex: 1, width: "100%" }}>
-          <DraggableFlatList
-            data={props.value.modules}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-            onDragEnd={({ data }) => {
-              props.setValue({
-                ...props.value,
-                modules: data,
-              });
-              props.setDiscardoChanges();
-            }}
-            keyboardShouldPersistTaps="handled"
-            ListFooterComponent={
-              props.edit ? (
-                <View
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    width: "100%",
-                  }}
-                >
-                  <IconButton
-                    icon={"plus"}
-                    iconColor={theme.colors.primary}
-                    style={{ margin: 0 }}
-                    onPress={props.showAddModuleModal}
-                    size={20}
-                    selected={true}
-                    mode="contained-tonal"
-                  />
-                </View>
-              ) : (
-                <MetaInformationModule
-                  lastUpdated={props.value.lastUpdated}
-                  created={props.value.created}
+      <View style={{ flex: 1, width: "100%" }}>
+        <DraggableFlatList
+          data={props.value.modules}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          onDragEnd={({ data }) => {
+            props.setValue({
+              ...props.value,
+              modules: data,
+            });
+            props.setDiscardoChanges();
+          }}
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="on-drag"
+          ListFooterComponent={
+            props.edit ? (
+              <View
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  width: "100%",
+                }}
+              >
+                <IconButton
+                  icon={"plus"}
+                  iconColor={theme.colors.primary}
+                  style={{ margin: 0 }}
+                  onPress={props.showAddModuleModal}
+                  size={20}
+                  selected={true}
+                  mode="contained-tonal"
                 />
-              )
-            }
-          />
-        </View>
-      </TouchableWithoutFeedback>
+              </View>
+            ) : (
+              <MetaInformationModule
+                lastUpdated={props.value.lastUpdated}
+                created={props.value.created}
+              />
+            )
+          }
+        />
+      </View>
     </KeyboardAvoidingView>
   );
 }

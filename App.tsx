@@ -23,113 +23,128 @@ import FastAccessScreen from "./src/pages/FastAccessScreen";
 import { DevModeProvider } from "./src/contexts/DevModeProvider";
 import LogoutStack from "./src/stacks/LogoutStack";
 import AddTriggerStack from "./src/stacks/AddTriggerStack";
+import { AutocompleteDropdownContextProvider } from "react-native-autocomplete-dropdown";
 
 const Tab = createBottomTabNavigator();
 
 export function AppWithNavigation() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider>
-        <OnlineProvider>
-          <AuthProvider>
-            <TokenProvider>
-              <DataProvider>
-                <DevModeProvider>
-                  <View
-                    style={{
-                      borderRadius: Platform.OS === "web" ? 6 : 0,
-                      borderColor:
-                        Platform.OS === "web"
-                          ? theme.colors.primary
-                          : undefined,
-                      borderWidth: Platform.OS === "web" ? 1 : 0,
-                      overflow: "hidden",
-                      flex: 1,
-                    }}
-                  >
-                    <GlobalShortcuts />
-                    <CustomTitlebar />
-                    <NavigationContainer>
-                      <ProtectedRoute loginScreen={<LoginStack />}>
-                        <Tab.Navigator
-                          initialRouteName="HomeStack"
-                          screenOptions={{ headerShown: false }}
-                          tabBar={(props) => <CustomBottomTab {...props} />}
-                        >
-                          <Tab.Screen
-                            name="HomeStack"
-                            component={HomeStack}
-                            options={{
-                              tabBarLabel: "Home",
-                              title: "Home",
+      <AutocompleteDropdownContextProvider>
+        <ThemeProvider>
+          <OnlineProvider>
+            <AuthProvider>
+              <TokenProvider>
+                <DataProvider>
+                  <DevModeProvider>
+                    <View
+                      style={{
+                        borderRadius: Platform.OS === "web" ? 6 : 0,
+                        borderColor:
+                          Platform.OS === "web"
+                            ? theme.colors.primary
+                            : undefined,
+                        borderWidth: Platform.OS === "web" ? 1 : 0,
+                        overflow: "hidden",
+                        flex: 1,
+                      }}
+                    >
+                      <GlobalShortcuts />
+                      <CustomTitlebar />
+                      <NavigationContainer>
+                        <ProtectedRoute loginScreen={<LoginStack />}>
+                          <Tab.Navigator
+                            initialRouteName="HomeStack"
+                            screenOptions={{ headerShown: false }}
+                            tabBar={(props) => <CustomBottomTab {...props} />}
+                          >
+                            <Tab.Screen
+                              name="HomeStack"
+                              component={HomeStack}
+                              options={{
+                                tabBarLabel: "Home",
+                                title: "Home",
 
-                              tabBarIcon: ({ color, size }) => {
-                                return (
-                                  <Icon name="home" size={size} color={color} />
-                                );
-                              },
-                            }}
-                          />
-                          <Tab.Screen
-                            name="AnalysisStack"
-                            component={AnalysisStack}
-                            options={{
-                              tabBarLabel: "Analysis",
-                              title: "Analysis",
-                              tabBarIcon: ({ color, size }) => {
-                                return (
+                                tabBarIcon: ({ color, size }) => {
+                                  return (
+                                    <Icon
+                                      name="home"
+                                      size={size}
+                                      color={color}
+                                    />
+                                  );
+                                },
+                              }}
+                            />
+                            <Tab.Screen
+                              name="AnalysisStack"
+                              component={AnalysisStack}
+                              options={{
+                                tabBarLabel: "Analysis",
+                                title: "Analysis",
+                                tabBarIcon: ({ color, size }) => {
+                                  return (
+                                    <Icon
+                                      name="shield-search"
+                                      size={size}
+                                      color={color}
+                                    />
+                                  );
+                                },
+                              }}
+                            />
+                            <Tab.Screen
+                              name="AddTrigger"
+                              component={AddTriggerStack}
+                              options={{
+                                tabBarLabel: "Add",
+                                tabBarIcon: ({ color, size }) => (
+                                  <Icon name="plus" size={size} color={color} />
+                                ),
+                              }}
+                            />
+                            <Tab.Screen
+                              name="SettingsStack"
+                              component={SettingsStack}
+                              options={{
+                                tabBarLabel: "Settings",
+                                title: "Settings",
+                                tabBarIcon: ({ color, size }) => {
+                                  return (
+                                    <Icon
+                                      name="cog"
+                                      size={size}
+                                      color={color}
+                                    />
+                                  );
+                                },
+                              }}
+                            />
+                            <Tab.Screen
+                              name="Logout"
+                              component={LogoutStack}
+                              options={{
+                                tabBarLabel: "Logout",
+                                tabBarIcon: ({ color, size }) => (
                                   <Icon
-                                    name="shield-search"
-                                    size={size}
+                                    name="logout"
                                     color={color}
+                                    size={size}
                                   />
-                                );
-                              },
-                            }}
-                          />
-                          <Tab.Screen
-                            name="AddTrigger"
-                            component={AddTriggerStack}
-                            options={{
-                              tabBarLabel: "Add",
-                              tabBarIcon: ({ color, size }) => (
-                                <Icon name="plus" size={size} color={color} />
-                              ),
-                            }}
-                          />
-                          <Tab.Screen
-                            name="SettingsStack"
-                            component={SettingsStack}
-                            options={{
-                              tabBarLabel: "Settings",
-                              title: "Settings",
-                              tabBarIcon: ({ color, size }) => {
-                                return (
-                                  <Icon name="cog" size={size} color={color} />
-                                );
-                              },
-                            }}
-                          />
-                          <Tab.Screen
-                            name="Logout"
-                            component={LogoutStack}
-                            options={{
-                              tabBarLabel: "Logout",
-                              tabBarIcon: ({ color, size }) => (
-                                <Icon name="logout" color={color} size={size} />
-                              ),
-                            }}
-                          />
-                        </Tab.Navigator>
-                      </ProtectedRoute>
-                    </NavigationContainer>
-                  </View>
-                </DevModeProvider>
-              </DataProvider>
-            </TokenProvider>
-          </AuthProvider>
-        </OnlineProvider>
-      </ThemeProvider>
+                                ),
+                              }}
+                            />
+                          </Tab.Navigator>
+                        </ProtectedRoute>
+                      </NavigationContainer>
+                    </View>
+                  </DevModeProvider>
+                </DataProvider>
+              </TokenProvider>
+            </AuthProvider>
+          </OnlineProvider>
+        </ThemeProvider>
+      </AutocompleteDropdownContextProvider>
     </GestureHandlerRootView>
   );
 }
