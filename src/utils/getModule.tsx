@@ -24,6 +24,8 @@ import TaskModule from "../components/modules/TaskModule";
 import TaskModuleType from "../types/modules/TaskModuleType";
 import { StackNavigationProp } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../stacks/Stack";
+import UnknownModule from "../components/modules/UnknownModule";
+import createUniqueID from "./createUniqueID";
 
 function getModule(
   module: ModuleType,
@@ -190,7 +192,17 @@ function getModule(
       />
     );
   }
-  return <></>;
+  return (
+    <UnknownModule
+      module={module}
+      id={module.id ? module.id : createUniqueID()}
+      edit={edit}
+      onDragStart={onDragStart}
+      deleteModule={deleteModule}
+      changeModule={changeModule}
+      fastAccess={fastAccess}
+    />
+  );
 }
 
 export default getModule;

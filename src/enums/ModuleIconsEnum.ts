@@ -9,6 +9,7 @@ enum ModuleIconsEnum {
   WIFI = "wifi",
   DIGITAL_CARD = "credit-card",
   TASK = "checkbox-marked",
+  UNKNOWN = "help-circle-outline",
 }
 
 export default ModuleIconsEnum;

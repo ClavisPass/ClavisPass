@@ -10,6 +10,7 @@ enum ModulesEnum {
   WIFI = "WIFI",
   DIGITAL_CARD = "DIGITAL_CARD",
   TASK = "TASK",
+  UNKNOWN = "UNKNOWN",
 }
 
 export default ModulesEnum;
