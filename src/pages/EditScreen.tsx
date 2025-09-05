@@ -33,6 +33,7 @@ import { openFastAccess, hideFastAccess } from "../utils/FastAccess";
 import extractFastAccessObject from "../utils/extractFastAccessObject";
 import FastAccessType from "../types/FastAccessType";
 import * as store from "../utils/store";
+import FolderType from "../types/FolderType";
 
 type EditScreenProps = StackScreenProps<RootStackParamList, "Edit">;
 
@@ -55,7 +56,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [discardChangesVisible, setDiscardChangesVisible] = useState(false);
   const discardChangesRef = useRef(false);
-  const [showMenu, setShowMenu] = useState(false);
 
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
@@ -175,7 +175,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     setAddModuleModalVisible(false);
   };
 
-  const changeSelectedFolder = (folder: string) => {
+  const changeSelectedFolder = (folder: FolderType | null) => {
     const newValue = { ...value };
     newValue.folder = folder;
     setValue(newValue);
@@ -316,7 +316,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             }}
           >
             <Icon source="folder" size={20} color={theme.colors?.primary} />
-            <Text>{value.folder === "" ? "None" : value.folder}</Text>
+            <Text>{value.folder === null || value.folder.name === "" ? "None" : value.folder.name}</Text>
           </View>
         </ContainerButton>
         <SquaredContainerButton onPress={openFastAccessFeature}>

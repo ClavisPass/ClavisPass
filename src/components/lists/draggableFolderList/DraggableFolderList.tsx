@@ -8,18 +8,19 @@ import theme from "../../../ui/theme";
 import { useTheme } from "../../../contexts/ThemeProvider";
 import { DataContextType } from "../../../contexts/DataProvider";
 import changeFolder from "../../../utils/changeFolder";
+import FolderType from "../../../types/FolderType";
 
 type Props = {
   data: DataContextType;
-  folder: string[];
-  setSelectedFolder?: (folder: string) => void;
-  deleteFolder: (folder: string) => void;
+  folder: FolderType[];
+  setSelectedFolder?: (folder: FolderType) => void;
+  deleteFolder: (folder: FolderType) => void;
 };
 
 function DraggableFolderList(props: Props) {
   const { globalStyles } = useTheme();
   const renderItem = useCallback(
-    ({ item, drag, isActive }: RenderItemParams<string>) => {
+    ({ item, drag, isActive }: RenderItemParams<FolderType>) => {
       return (
         <View style={[globalStyles.folderContainer, { marginBottom: 4 }]}>
           <Pressable onPressIn={drag}>
@@ -54,7 +55,7 @@ function DraggableFolderList(props: Props) {
                 }}
                 variant="bodyMedium"
               >
-                {item}
+                {item.name}
               </Text>
             </>
           </TouchableRipple>
@@ -77,7 +78,7 @@ function DraggableFolderList(props: Props) {
       <DraggableFlatList
         data={props.folder}
         renderItem={renderItem}
-        keyExtractor={(item, index) => `drag-item-${item}-${index}`}
+        keyExtractor={(item, index) => `drag-item-${item.id}-${index}`}
         onDragEnd={(event) => {
           if (event?.data) {
             changeFolder(event.data, props.data);

@@ -49,6 +49,7 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../stacks/Stack";
 import { useOnline } from "../contexts/OnlineProvider";
 import { saveBackup } from "../utils/Backup";
+import FolderType from "../types/FolderType";
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
 
@@ -67,7 +68,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   });
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFolder, setSelectedFolder] = useState("");
+  const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
   const [selectedFav, setSelectedFav] = useState(false);
 
   const [refreshing, setRefreshing] = useState(false);
@@ -147,7 +148,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     return data.data.values
       .filter((item) => {
         const folderMatch =
-          selectedFolder === "" || item.folder === selectedFolder;
+          selectedFolder === null || item.folder?.id === selectedFolder.id;
         const favMatch = !selectedFav || item.fav;
 
         return folderMatch && favMatch;
@@ -191,7 +192,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           setRefreshing(false);
           data.setShowSave(false);
 
-          setSelectedFolder("");
+          setSelectedFolder(null);
           setSelectedFav(false);
         }
       });

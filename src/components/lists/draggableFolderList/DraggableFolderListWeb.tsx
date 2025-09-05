@@ -16,15 +16,16 @@ import theme from "../../../ui/theme";
 import { useTheme } from "../../../contexts/ThemeProvider";
 import changeFolder from "../../../utils/changeFolder";
 import { DataContextType, useData } from "../../../contexts/DataProvider";
+import FolderType from "../../../types/FolderType";
 
 type Props = {
   data: DataContextType;
-  folder: string[];
-  setSelectedFolder?: (folder: string) => void;
-  deleteFolder: (folder: string) => void;
+  folder: FolderType[];
+  setSelectedFolder?: (folder: FolderType) => void;
+  deleteFolder: (folder: FolderType) => void;
 };
 
-const reorder = (list: string[], startIndex: number, endIndex: number) => {
+const reorder = (list: FolderType[], startIndex: number, endIndex: number) => {
   const result = [...list];
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
@@ -70,10 +71,10 @@ function DraggableFolderListWeb(props: Props) {
             ref={provided.innerRef}
             style={getListStyle(snapshot.isDraggingOver)}
           >
-            {props.folder.map((item: string, index: number) => (
+            {props.folder.map((item: FolderType, index: number) => (
               <Draggable
-                key={item + "-" + index}
-                draggableId={item + "-" + index}
+                key={item.id + "-" + index}
+                draggableId={item.id + "-" + index}
                 index={index}
               >
                 {(
@@ -128,7 +129,7 @@ function DraggableFolderListWeb(props: Props) {
                               }}
                               variant="bodyMedium"
                             >
-                              {item}
+                              {item.name}
                             </Text>
                           </>
                         </TouchableRipple>

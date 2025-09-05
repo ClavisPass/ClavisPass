@@ -7,12 +7,14 @@ import DraggableFolderList from "../lists/draggableFolderList/DraggableFolderLis
 import { useTheme } from "../../contexts/ThemeProvider";
 import changeFolder from "../../utils/changeFolder";
 import { useData } from "../../contexts/DataProvider";
+import FolderType from "../../types/FolderType";
+import createUniqueID from "../../utils/createUniqueID";
 
 type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  folder: string[];
-  setSelectedFolder?: (folder: string) => void;
+  folder: FolderType[];
+  setSelectedFolder?: (folder: FolderType | null) => void;
 };
 
 function FolderModal(props: Props) {
@@ -22,7 +24,7 @@ function FolderModal(props: Props) {
   const [searchQuery, setSearchQuery] = useState("");
   const filteredValues = useMemo(() => {
     return props.folder.filter((item) => {
-      return item === searchQuery;
+      return item.name === searchQuery;
     });
   }, [props.folder, searchQuery]);
   const [addButtonDisabled, setAddButtonDisabled] = useState(true);
@@ -52,9 +54,9 @@ function FolderModal(props: Props) {
     }
   }, [addButtonDisabled]);
 
-  const deleteFolder = (folder: string) => {
-    const newFolder: string[] = [
-      ...props.folder.filter((item: string) => item !== folder),
+  const deleteFolder = (folder: FolderType) => {
+    const newFolder: FolderType[] = [
+      ...props.folder.filter((item: FolderType) => item.id !== folder.id),
     ];
     changeFolder(newFolder, data);
     data.setShowSave(true);
@@ -84,21 +86,21 @@ function FolderModal(props: Props) {
           ]}
         >
           <View style={{ flexGrow: 1 }}>
-          <TextInput
-            placeholder="Add Folder..."
-            style={[
-              globalStyles.textInputStyle,
-              {
-                borderColor: theme.colors.primary,
-                borderBottomWidth: 0,
-                backgroundColor: "transparent",
-              },
-            ]}
-            value={searchQuery}
-            mode="flat"
-            onChangeText={(text) => setSearchQuery(text)}
-            autoCapitalize="none"
-          />
+            <TextInput
+              placeholder="Add Folder..."
+              style={[
+                globalStyles.textInputStyle,
+                {
+                  borderColor: theme.colors.primary,
+                  borderBottomWidth: 0,
+                  backgroundColor: "transparent",
+                },
+              ]}
+              value={searchQuery}
+              mode="flat"
+              onChangeText={(text) => setSearchQuery(text)}
+              autoCapitalize="none"
+            />
           </View>
           <IconButton
             selected
@@ -108,7 +110,10 @@ function FolderModal(props: Props) {
             iconColor={theme.colors.primary}
             style={{ margin: 4 }}
             onPress={() => {
-              changeFolder([...props.folder, searchQuery], data);
+              changeFolder(
+                [...props.folder, { id: createUniqueID(), name: searchQuery }],
+                data
+              );
               setSearchQuery("");
               data.setShowSave(true);
             }}

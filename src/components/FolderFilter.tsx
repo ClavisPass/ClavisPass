@@ -11,21 +11,22 @@ import WebSpecific from "./platformSpecific/WebSpecific";
 import AnimatedOpacityContainer from "./container/AnimatedOpacityContainer/AnimatedOpacityContainer";
 import { MenuItem } from "./items/MenuItem";
 import { useTheme } from "../contexts/ThemeProvider";
+import FolderType from "../types/FolderType";
 
 const styles = StyleSheet.create({
   chip: {
     marginRight: 4,
     borderRadius: 12,
-    overflow: "hidden"
+    overflow: "hidden",
   },
 });
 
 type Props = {
-  folder: string[] | undefined;
+  folder: FolderType[] | undefined;
   selectedFav: boolean;
   setSelectedFav: (selectedFav: boolean) => void;
-  selectedFolder: string;
-  setSelectedFolder: (selectedFolder: string) => void;
+  selectedFolder: FolderType | null;
+  setSelectedFolder: (selectedFolder: FolderType | null) => void;
   setFolderModalVisible: (folderModalVisible: boolean) => void;
 };
 
@@ -70,12 +71,17 @@ function FolderFilter(props: Props) {
         >
           <FlatList
             ref={flatListRef}
-            data={["Favorite", ...(props.folder ? props.folder : [])]}
+            data={
+              [
+                { id: "fav", name: "Favorite" },
+                ...(props.folder ? props.folder : []),
+              ] as FolderType[]
+            }
             style={{ flexShrink: 1 }}
             onScroll={handleScroll}
             renderItem={({ item, index }) => (
               <>
-                {index === 0 && item === "Favorite" ? (
+                {index === 0 && item.id === "fav" ? (
                   <MenuItem
                     key={index}
                     leadingIcon={"star"}
@@ -97,16 +103,18 @@ function FolderFilter(props: Props) {
                     <MenuItem
                       key={index}
                       leadingIcon={"folder"}
-                      selected={props.selectedFolder == item ? true : false}
+                      selected={
+                        props.selectedFolder?.id === item.id ? true : false
+                      }
                       onPress={() => {
                         if (props.selectedFolder != item) {
-                          props.setSelectedFolder("" + item);
+                          props.setSelectedFolder(item);
                         } else {
-                          props.setSelectedFolder("");
+                          props.setSelectedFolder(null);
                         }
                       }}
                     >
-                      {item}
+                      {item.name}
                     </MenuItem>
                   </>
                 )}
@@ -164,14 +172,19 @@ function FolderFilter(props: Props) {
           >
             <FlatList
               ref={flatListRef}
-              data={["Favorite", ...(props.folder ? props.folder : [])]}
+              data={
+                [
+                  { id: "fav", name: "Favorite" },
+                  ...(props.folder ? props.folder : []),
+                ] as FolderType[]
+              }
               horizontal={true}
               showsHorizontalScrollIndicator={false}
               style={{ flexShrink: 1 }}
               onScroll={handleScroll}
               renderItem={({ item, index }) => (
                 <>
-                  {index === 0 && item === "Favorite" ? (
+                  {index === 0 && item.id === "fav" ? (
                     <Chip
                       key={index}
                       icon={"star"}
@@ -197,14 +210,14 @@ function FolderFilter(props: Props) {
                       showSelectedOverlay={true}
                       onPress={() => {
                         if (props.selectedFolder != item) {
-                          props.setSelectedFolder("" + item);
+                          props.setSelectedFolder(item);
                         } else {
-                          props.setSelectedFolder("");
+                          props.setSelectedFolder(null);
                         }
                       }}
                       style={styles.chip}
                     >
-                      {item}
+                      {item.name}
                     </Chip>
                   )}
                 </>

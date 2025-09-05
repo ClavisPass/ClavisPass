@@ -1,14 +1,15 @@
 import { z } from "zod";
 import { ModulesTypeSchema } from "./ModulesType";
+import { FolderSchema } from "./FolderType";
 
 export const ValuesTypeSchema = z.object({
   id: z.string(),
-  modules: ModulesTypeSchema,
+  modules: ModulesTypeSchema.default([]),
   title: z.string(),
   fav: z.boolean(),
   created: z.string().datetime(),
   lastUpdated: z.string().datetime(),
-  folder: z.string(),
+  folder: FolderSchema.nullable().default(null),
 });
 
 export const ValuesListTypeSchema = z.array(ValuesTypeSchema);
