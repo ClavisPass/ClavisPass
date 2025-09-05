@@ -2,7 +2,7 @@ import DataType from "../types/DataType";
 
 function getEmptyData() {
   let data: DataType = {
-    version: "",
+    version: "1",
     folder: [],
     values: [],
   };
