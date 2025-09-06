@@ -4,11 +4,14 @@ import ValueIconsEnum from "../../enums/ValueIconsEnum";
 import TemplateEnum from "../../enums/TemplateEnum";
 import getTemplate from "../../utils/getTemplate";
 import CategoryItem from "../items/CategoryItem";
+import FolderType from "../../types/FolderType";
 
 type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
   navigation: any;
+  favorite: boolean;
+  folder: FolderType | null;
 };
 
 function AddValueModal(props: Props) {
@@ -16,6 +19,8 @@ function AddValueModal(props: Props) {
   const navigateToAddValue = (template: TemplateEnum) => {
     props.navigation.navigate("Edit", {
       value: getTemplate(template),
+      favorite: props.favorite,
+      folder: props.folder,
     });
     props.setVisible(false);
   };

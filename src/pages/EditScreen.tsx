@@ -38,7 +38,11 @@ import FolderType from "../types/FolderType";
 type EditScreenProps = StackScreenProps<RootStackParamList, "Edit">;
 
 const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
-  const { value: routeValue } = route.params!;
+  const {
+    value: routeValue,
+    favorite: routeFavorite,
+    folder: routeFolder,
+  } = route.params!;
   const data = useData();
   const {
     globalStyles,
@@ -102,6 +106,15 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
     return unsubscribe;
   }, [navigation]);
+
+  useEffect(() => {
+    if (routeFavorite !== undefined && routeFavorite !== null) {
+      changeFav(routeFavorite);
+    }
+    if (routeFolder !== undefined && routeFolder !== null) {
+      changeSelectedFolder(routeFolder);
+    }
+  }, [routeFavorite, routeFolder]);
 
   const showFastAccess = () => {
     if (
@@ -183,9 +196,9 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     discardChangesRef.current = true;
   };
 
-  const changeFav = () => {
+  const changeFav = (favorite?: boolean) => {
     const newValue = { ...value };
-    newValue.fav = !value.fav;
+    newValue.fav = favorite === undefined ? !value.fav : favorite;
     setValue(newValue);
     discardChangesRef.current = true;
   };
@@ -316,7 +329,13 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             }}
           >
             <Icon source="folder" size={20} color={theme.colors?.primary} />
-            <Text>{value.folder === null || value.folder.name === "" ? "None" : value.folder.name}</Text>
+            <Text>
+              {value.folder === null ||
+              value.folder.name === "" ||
+              value.folder === undefined
+                ? "None"
+                : value.folder.name}
+            </Text>
           </View>
         </ContainerButton>
         <SquaredContainerButton onPress={openFastAccessFeature}>

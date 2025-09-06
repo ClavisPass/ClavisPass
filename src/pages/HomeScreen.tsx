@@ -1,5 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { View, Platform, useWindowDimensions, Animated, InteractionManager } from "react-native";
+import {
+  View,
+  Platform,
+  useWindowDimensions,
+  Animated,
+  InteractionManager,
+} from "react-native";
 import {
   Searchbar,
   IconButton,
@@ -484,6 +490,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         visible={valueModalVisible}
         setVisible={setValueModalVisible}
         navigation={navigation}
+        favorite={selectedFav}
+        folder={selectedFolder}
       />
     </AnimatedContainer>
   );

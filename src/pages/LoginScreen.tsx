@@ -131,6 +131,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               overflow: "hidden",
               margin: 8,
               minWidth: 300,
+              maxWidth: 300,
               display: "flex",
               justifyContent: "center",
               boxShadow: theme.colors.shadow,

@@ -13,7 +13,7 @@ import FolderType from "../../../types/FolderType";
 type Props = {
   data: DataContextType;
   folder: FolderType[];
-  setSelectedFolder?: (folder: FolderType) => void;
+  setSelectedFolder?: (folder: FolderType | null) => void;
   deleteFolder: (folder: FolderType) => void;
 };
 
@@ -75,6 +75,41 @@ function DraggableFolderList(props: Props) {
 
   return (
     <View style={{ flex: 1, width: "100%" }}>
+      {props.setSelectedFolder && (
+        <View style={[globalStyles.folderContainer, { marginBottom: 4 }]}>
+          <Icon source="minus" size={20} />
+
+          <TouchableRipple
+            style={{
+              borderRadius: 12,
+              padding: 10,
+              flex: 1,
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 4,
+              marginRight: 30,
+              overflow: "hidden",
+            }}
+            onPress={() => props.setSelectedFolder?.(null)}
+            rippleColor="rgba(0, 0, 0, .32)"
+          >
+            <>
+              <Icon source="folder" size={20} color={theme.colors.primary} />
+              <Text
+                style={{
+                  userSelect: "none",
+                  fontWeight: "bold",
+                  fontSize: 15,
+                }}
+                variant="bodyMedium"
+              >
+                {"None"}
+              </Text>
+            </>
+          </TouchableRipple>
+        </View>
+      )}
       <DraggableFlatList
         data={props.folder}
         renderItem={renderItem}

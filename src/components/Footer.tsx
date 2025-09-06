@@ -24,8 +24,6 @@ function Footer() {
   const timeout = useRef<NodeJS.Timeout | null>(null);
 
   const handleDevModeToggle = () => {
-    console.log(`Tap count: ${tapCount.current}`);
-    console.log(`Timeout: ${timeout.current}`);
     tapCount.current += 1;
     if (!timeout.current) {
       timeout.current = setTimeout(() => {

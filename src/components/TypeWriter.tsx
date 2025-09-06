@@ -23,7 +23,19 @@ function TypeWriterComponent(props: Props) {
     "Yo, ",
     "Welcome, ",
     "Good to see you, ",
-    "Sup, "
+    "Sup, ",
+    "Yo yo, ",
+    "Hey there, ",
+    "What's good, ",
+    "Alright, ",
+    "Oii, ",
+    "Long time no see, ",
+    "Wassup, ",
+    "Yo fam, ",
+    "Hey bud, ",
+    "Ayo, ",
+    "Hey dude, ",
+    "Yo chief, ",
   ];
 
   const randomGreeting = useMemo(() => {
@@ -40,6 +52,7 @@ function TypeWriterComponent(props: Props) {
         alignItems: "center",
         justifyContent: "center",
         marginBottom: 8,
+        minHeight: 28,
         height: props.height ? props.height : undefined,
       }}
     >

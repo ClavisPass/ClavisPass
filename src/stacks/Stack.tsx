@@ -1,6 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import ValuesType from "../types/ValuesType";
 import { CachedPasswordsType } from "../pages/AnalysisScreen";
+import FolderType from "../types/FolderType";
 
 export type RootStackParamList = {
   Home: {
@@ -8,6 +9,8 @@ export type RootStackParamList = {
   };
   Edit: {
     value: ValuesType;
+    favorite?: boolean;
+    folder?: FolderType | null;
   };
   Analysis: undefined;
   AnalysisDetail: {

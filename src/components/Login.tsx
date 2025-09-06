@@ -152,17 +152,24 @@ function Login(props: Props) {
               justifyContent: "center",
               gap: 8,
               width: "100%",
+              marginBottom: 0,
             }}
           >
             <TypeWriterComponent
-              height={30}
               displayName={
                 props.userInfo?.username ? props.userInfo.username : ""
               }
             />
             {showNewData ? (
               <>
-                <View style={{ width: "100%", display: "flex", flexDirection: "column", gap: 6 }}>
+                <View
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 6,
+                  }}
+                >
                   <PasswordTextbox
                     autofocus
                     textInputRef={textInput2Ref}
