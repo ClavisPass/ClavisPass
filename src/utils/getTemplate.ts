@@ -11,7 +11,7 @@ function getTemplate(template: TemplateEnum) {
     id: createUniqueID(),
     title: "",
     modules: [],
-    folder: "",
+    folder: null,
     fav: false,
     created: dateTime,
     lastUpdated: dateTime,

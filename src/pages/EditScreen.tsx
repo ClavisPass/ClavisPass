@@ -108,11 +108,16 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   }, [navigation]);
 
   useEffect(() => {
-    if (routeFavorite !== undefined && routeFavorite !== null) {
-      changeFav(routeFavorite);
-    }
-    if (routeFolder !== undefined && routeFolder !== null) {
-      changeSelectedFolder(routeFolder);
+    if (routeFavorite !== undefined && routeFavorite === true) {
+      if (routeFolder !== undefined && routeFolder !== null) {
+        changeMultipleEntries(routeFolder, routeFavorite);
+      } else {
+        changeFav(routeFavorite);
+      }
+    } else {
+      if (routeFolder !== undefined && routeFolder !== null) {
+        changeSelectedFolder(routeFolder);
+      }
     }
   }, [routeFavorite, routeFolder]);
 
@@ -188,6 +193,18 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     setAddModuleModalVisible(false);
   };
 
+  const changeMultipleEntries = (
+    folder: FolderType | null,
+    favorite?: boolean
+  ) => {
+    const newValue = { ...value };
+    newValue.folder = folder;
+    newValue.fav = favorite === undefined ? !value.fav : favorite;
+    setValue(newValue);
+    setFolderModalVisible(false);
+    discardChangesRef.current = true;
+  };
+
   const changeSelectedFolder = (folder: FolderType | null) => {
     const newValue = { ...value };
     newValue.folder = folder;
@@ -242,7 +259,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     } else {
       setFavIcon("star-outline");
     }
-  }, [value]);
+  }, [value, value.fav]);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -389,7 +406,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       >
         {!edit && (
           <>
-            <ContainerButton onPress={changeFav}>
+            <ContainerButton onPress={() => changeFav(!value.fav)}>
               <Icon source={favIcon} color={theme.colors?.primary} size={20} />
             </ContainerButton>
             <Button
@@ -403,7 +420,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
               }}
             />
             <ContainerButton
-              disabled={!discardChangesRef.current}
               onPress={() => setDeleteModalVisible(true)}
               backgroundColor={theme.colors?.error}
             >

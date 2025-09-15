@@ -221,7 +221,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             item={item}
             onPress={() => {
               navigation.navigate("Edit", {
-                value: item,
+                value: item
               });
             }}
           />
