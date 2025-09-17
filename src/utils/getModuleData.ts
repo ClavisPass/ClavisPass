@@ -6,6 +6,7 @@ import EmailModuleType from "../types/modules/EmailModuleType";
 import KeyModuleType from "../types/modules/KeyModuleType";
 import NoteModuleType from "../types/modules/NoteModuleType";
 import PasswordModuleType from "../types/modules/PasswordModuleType";
+import PhoneNumberModuleType from "../types/modules/PhoneNumberModuleType";
 import TaskModuleType from "../types/modules/TaskModuleType";
 import TitleModuleType from "../types/modules/TitleModuleType";
 import URLModuleType from "../types/modules/URLModuleType";
@@ -105,6 +106,14 @@ function getModuleData(module: ModulesEnum) {
       module: module,
       value: "",
       completed: false,
+    };
+    return moduleData as ModuleType;
+  }
+  if (module === ModulesEnum.PHONE_NUMBER) {
+    const moduleData: PhoneNumberModuleType = {
+      id: id,
+      module: module,
+      value: "",
     };
     return moduleData as ModuleType;
   }

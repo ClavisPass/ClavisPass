@@ -378,7 +378,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
               size={18}
               color={"white"}
             />
-            <Text style={{ color: "white" }}>
+            <Text style={{ color: "white", userSelect: "none" }}>
               {routeValue.passwordStrengthLevel}
             </Text>
           </View>

@@ -26,6 +26,8 @@ import { StackNavigationProp } from "@react-navigation/stack/lib/typescript/src/
 import { RootStackParamList } from "../stacks/Stack";
 import UnknownModule from "../components/modules/UnknownModule";
 import createUniqueID from "./createUniqueID";
+import PhoneNumberModuleType from "../types/modules/PhoneNumberModuleType";
+import PhoneNumberModule from "../components/modules/PhoneNumberModule";
 
 function getModule(
   module: ModuleType,
@@ -184,6 +186,21 @@ function getModule(
         module={moduleObject.module}
         value={moduleObject.value}
         completed={moduleObject.completed}
+        edit={edit}
+        onDragStart={onDragStart}
+        deleteModule={deleteModule}
+        changeModule={changeModule}
+        fastAccess={fastAccess}
+      />
+    );
+  }
+  if (module.module === ModulesEnum.PHONE_NUMBER) {
+    const moduleObject = module as PhoneNumberModuleType;
+    return (
+      <PhoneNumberModule
+        id={moduleObject.id}
+        module={moduleObject.module}
+        value={moduleObject.value}
         edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}

@@ -346,7 +346,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             }}
           >
             <Icon source="folder" size={20} color={theme.colors?.primary} />
-            <Text>
+            <Text style={{ userSelect: "none" }}>
               {value.folder === null ||
               value.folder.name === "" ||
               value.folder === undefined

@@ -21,7 +21,7 @@ function UnknownModule(props: { module: any; id: string } & Props) {
       icon={ModuleIconsEnum.UNKNOWN}
       fastAccess={props.fastAccess}
     >
-      <View style={globalStyles.moduleView}>
+      <View style={[globalStyles.moduleView, {display: 'flex', flexDirection: 'column', gap: 4}]}>
         {Object.entries(props.module ?? {})
           .filter(([key]) => key !== "id")
           .map(([key, val]) => (
@@ -29,7 +29,7 @@ function UnknownModule(props: { module: any; id: string } & Props) {
               <Text style={{ fontWeight: "600" }}>{key}: </Text>
               <Text>
                 {typeof val === "object" && val !== null
-                  ? JSON.stringify(val)
+                  ? JSON.stringify(val, null, 2)
                   : String(val)}
               </Text>
             </Text>

@@ -9,6 +9,7 @@ enum ModuleIconsEnum {
   WIFI = "wifi",
   DIGITAL_CARD = "credit-card",
   TASK = "checkbox-marked",
+  PHONE_NUMBER = "phone",
   UNKNOWN = "help-circle-outline",
 }
 

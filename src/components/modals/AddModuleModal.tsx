@@ -1,9 +1,7 @@
 import ModulesEnum from "../../enums/ModulesEnum";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import Modal from "./Modal";
-import { View } from "react-native";
-import { MenuItem } from "../items/MenuItem";
-import Divider from "../Divider";
+import { Dimensions, ScrollView, View } from "react-native";
 import CategoryItem from "../items/CategoryItem";
 
 type Props = {
@@ -13,20 +11,29 @@ type Props = {
 };
 
 function AddModuleModal(props: Props) {
+  const { height } = Dimensions.get("window");
   const hideModal = () => props.setVisible(false);
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
-      <View
+      <ScrollView
         style={{
           width: 280,
-          height: 368,
+          height: height > 700 ? 368 : 296,
           display: "flex",
           flexDirection: "column",
           padding: 8,
-          gap: 8,
+          paddingBottom: 0,
         }}
       >
-        <View style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}>
+        <View
+          style={{
+            height: 64,
+            display: "flex",
+            flexDirection: "row",
+            gap: 8,
+            marginBottom: 8,
+          }}
+        >
           <CategoryItem
             leadingIcon={ModuleIconsEnum.USERNAME}
             onPress={() => {
@@ -44,7 +51,15 @@ function AddModuleModal(props: Props) {
             {"E-Mail"}
           </CategoryItem>
         </View>
-        <View style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}>
+        <View
+          style={{
+            height: 64,
+            display: "flex",
+            flexDirection: "row",
+            gap: 8,
+            marginBottom: 8,
+          }}
+        >
           <CategoryItem
             leadingIcon={ModuleIconsEnum.PASSWORD}
             onPress={() => {
@@ -54,22 +69,30 @@ function AddModuleModal(props: Props) {
             {"Password"}
           </CategoryItem>
           <CategoryItem
-            leadingIcon={ModuleIconsEnum.URL}
-            onPress={() => {
-              props.addModule(ModulesEnum.URL);
-            }}
-          >
-            {"URL"}
-          </CategoryItem>
-        </View>
-        <View style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}>
-          <CategoryItem
             leadingIcon={ModuleIconsEnum.WIFI}
             onPress={() => {
               props.addModule(ModulesEnum.WIFI);
             }}
           >
             {"Wifi"}
+          </CategoryItem>
+        </View>
+        <View
+          style={{
+            height: 64,
+            display: "flex",
+            flexDirection: "row",
+            gap: 8,
+            marginBottom: 8,
+          }}
+        >
+          <CategoryItem
+            leadingIcon={ModuleIconsEnum.URL}
+            onPress={() => {
+              props.addModule(ModulesEnum.URL);
+            }}
+          >
+            {"URL"}
           </CategoryItem>
           <CategoryItem
             leadingIcon={ModuleIconsEnum.DIGITAL_CARD}
@@ -80,7 +103,15 @@ function AddModuleModal(props: Props) {
             {"Digital Card"}
           </CategoryItem>
         </View>
-        <View style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}>
+        <View
+          style={{
+            height: 64,
+            display: "flex",
+            flexDirection: "row",
+            gap: 8,
+            marginBottom: 8,
+          }}
+        >
           <CategoryItem
             leadingIcon={ModuleIconsEnum.KEY}
             onPress={() => {
@@ -98,14 +129,22 @@ function AddModuleModal(props: Props) {
             {"Custom Field"}
           </CategoryItem>
         </View>
-        <View style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}>
+        <View
+          style={{
+            height: 64,
+            display: "flex",
+            flexDirection: "row",
+            gap: 8,
+            marginBottom: 8,
+          }}
+        >
           <CategoryItem
-            leadingIcon={ModuleIconsEnum.NOTE}
+            leadingIcon={ModuleIconsEnum.PHONE_NUMBER}
             onPress={() => {
-              props.addModule(ModulesEnum.NOTE);
+              props.addModule(ModulesEnum.PHONE_NUMBER);
             }}
           >
-            {"Note"}
+            {"Phone Number"}
           </CategoryItem>
           <CategoryItem
             leadingIcon={ModuleIconsEnum.TASK}
@@ -116,7 +155,25 @@ function AddModuleModal(props: Props) {
             {"Task"}
           </CategoryItem>
         </View>
-      </View>
+        <View
+          style={{
+            height: 64,
+            display: "flex",
+            flexDirection: "row",
+            gap: 8,
+            marginBottom: 8,
+          }}
+        >
+          <CategoryItem
+            leadingIcon={ModuleIconsEnum.NOTE}
+            onPress={() => {
+              props.addModule(ModulesEnum.NOTE);
+            }}
+          >
+            {"Note"}
+          </CategoryItem>
+        </View>
+      </ScrollView>
     </Modal>
   );
 }
