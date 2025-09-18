@@ -19,7 +19,7 @@ export default (fileData: string) => {
           id: createUniqueID(),
           title: current[1],
           modules: [],
-          folder: "",
+          folder: null,
           fav: false,
           created: dateTime,
           lastUpdated: dateTime,

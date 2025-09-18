@@ -16,7 +16,7 @@ export default (fileData: string, secret: string) => {
         id: createUniqueID(),
         title: decrypt(current.titel, secret),
         modules: [],
-        folder: "",
+        folder: null,
         fav: false,
         created: dateTime,
         lastUpdated: dateTime,

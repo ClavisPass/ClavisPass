@@ -3,7 +3,7 @@ import DataType from "../types/DataType";
 export function getData() {
   const data: DataType = {
     version: "",
-    folder: ["idk", "Wifi", "stuff", "test", "yo"],
+    folder: [{id: "3123124", name: "Wifi" }, {id: "546343473", name: "test" }],
     values: [
       {
         id: "123345346672385696545",
@@ -16,7 +16,7 @@ export function getData() {
         fav: true,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "",
+        folder: null,
       },
       {
         id: "1232432453473455436672345",
@@ -30,7 +30,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "",
+        folder: null,
       },
       {
         id: "123346345345363437734345",
@@ -48,7 +48,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "Wifi",
+        folder: {id: "3123124", name: "Wifi" },
       },
       {
         id: "1232342353056342566745",
@@ -64,7 +64,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "wifi",
+        folder: {id: "3123124", name: "Wifi" },
       },
       {
         id: "1232342353295695455266745",
@@ -81,7 +81,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "wifi",
+        folder: {id: "3123124", name: "Wifi" },
       },
       {
         id: "1232342353734725455266745",
@@ -98,7 +98,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "wifi",
+        folder: {id: "3123124", name: "Wifi" },
       },
       {
         id: "123234235323473475455266745",
@@ -115,7 +115,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "wifi",
+        folder: {id: "3123124", name: "Wifi" },
       },
       {
         id: "123234235373474325455266745",
@@ -132,7 +132,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "wifi",
+        folder: {id: "3123124", name: "Wifi" },
       },
       {
         id: "123234235334534525455266745",
@@ -149,7 +149,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "wifi",
+        folder: {id: "3123124", name: "Wifi" },
       },
       {
         id: "12323423532545523666745",
@@ -166,7 +166,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "wifi",
+        folder: {id: "3123124", name: "Wifi" },
       },
       {
         id: "123234237345325455266745",
@@ -183,7 +183,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "wifi",
+        folder: {id: "3123124", name: "Wifi" },
       },
       {
         id: "1232342355325455266745",
@@ -200,7 +200,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "wifi",
+        folder: {id: "3123124", name: "Wifi" },
       },
       {
         id: "1232342353325455266745",
@@ -217,7 +217,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "wifi",
+        folder: {id: "3123124", name: "Wifi" },
       },
       {
         id: "1232342353254552667454",
@@ -234,7 +234,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "wifi",
+        folder: {id: "3123124", name: "Wifi" },
       },
       {
         id: "1232342353254552667456",
@@ -251,7 +251,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "wifi",
+        folder: {id: "3123124", name: "Wifi" },
       },
       {
         id: "123243245347egsge3455436672345",
@@ -265,7 +265,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "",
+        folder: null,
       },
       {
         id: "123243245347egsge3455436672345",
@@ -279,7 +279,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "",
+        folder: null,
       },
       {
         id: "123243245347egsge3455436672345",
@@ -293,7 +293,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "",
+        folder: null,
       },
       {
         id: "123243245347egsge3455436672345",
@@ -307,7 +307,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "",
+        folder: null,
       },
       {
         id: "123243245347egsge3455436672345",
@@ -321,7 +321,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "",
+        folder: null,
       },
       {
         id: "123243245347egsge3455436672345",
@@ -335,7 +335,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "",
+        folder: null,
       },
       {
         id: "123243245347egsge3455436672345",
@@ -349,7 +349,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "",
+        folder: null,
       },
       {
         id: "123243245347egsge3455436672345",
@@ -363,7 +363,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "",
+        folder: null,
       },
       {
         id: "123243245347egsge3455436672345",
@@ -377,7 +377,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "",
+        folder: null,
       },
       {
         id: "123243245347egsge3455436672345",
@@ -391,7 +391,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "",
+        folder: null,
       },
       {
         id: "123243245347egsge3455436672345",
@@ -405,7 +405,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "",
+        folder: null,
       },
       {
         id: "123243245347egsge3455436672345",
@@ -419,7 +419,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "",
+        folder: null,
       },
       {
         id: "123243245347egsge3455436672345",
@@ -433,7 +433,7 @@ export function getData() {
         fav: false,
         created: "2024-06-12T20:48:33.139Z",
         lastUpdated: "2024-06-12T20:48:33.139Z",
-        folder: "",
+        folder: null,
       },
     ],
   };

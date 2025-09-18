@@ -25,7 +25,7 @@ function CategoryItem(props: Props) {
           cursor: "pointer",
           flex: 1,
         }}
-        rippleColor="rgba(0, 0, 0, .32)"
+        //rippleColor="rgba(0, 0, 0, .32)"
       >
         <View
           style={{

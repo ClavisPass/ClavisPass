@@ -226,7 +226,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             }}
           />
         )}
-        estimatedItemSize={120}
       />
     );
   }

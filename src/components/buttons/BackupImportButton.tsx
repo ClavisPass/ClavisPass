@@ -27,6 +27,7 @@ function BackupImportButton() {
         const parsedData = DataTypeSchema.parse(jsonData);
         data.setData(parsedData);
         data.setLastUpdated(parsedCryptoData.lastUpdated);
+        data.setShowSave(true);
       }
     } catch (error) {
       console.error("Fehler beim Importieren des Backups:", error);

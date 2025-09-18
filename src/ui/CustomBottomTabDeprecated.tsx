@@ -2,7 +2,7 @@ import React from "react";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { View } from "react-native";
 import { BottomNavigation, IconButton, Text } from "react-native-paper";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from "../contexts/ThemeProvider";
 import { useAuth } from "../contexts/AuthProvider";
 import { useOnline } from "../contexts/OnlineProvider";

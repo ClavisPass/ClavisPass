@@ -126,7 +126,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
           (module) => module.module === ModulesEnum.PASSWORD
         );
         getallPasswords.forEach((module: ModuleType) => {
-          const entropy = passwordEntropy(module.value);
+          const entropy = passwordEntropy(String(module.value));
           const percentage = entropy / 200;
           let passwordStrengthLevel: PasswordStrengthLevel;
           if (percentage < 0.4) {
@@ -143,7 +143,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
             ...(cachedPasswords ? cachedPasswords : []),
             {
               title: item.title,
-              password: module.value,
+              password: String(module.value),
               entropy: entropy,
               type: ModulesEnum.PASSWORD,
               passwordStrengthLevel: passwordStrengthLevel,
@@ -399,7 +399,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                 </TouchableRipple>
               </View>
             )}
-            estimatedItemSize={200}
           />
         </View>
       </View>
