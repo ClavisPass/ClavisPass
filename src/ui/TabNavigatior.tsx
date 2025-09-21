@@ -5,7 +5,7 @@ import AnalysisStack from "../stacks/AnalysisStack";
 import AddTriggerStack from "../stacks/AddTriggerStack";
 import SettingsStack from "../stacks/SettingsStack";
 import LogoutStack from "../stacks/LogoutStack";
-import CustomBottomTabBarDeprecated from "./CustomBottomTabDeprecated";
+import CustomBottomTabBar from "./CustomBottomTab";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const Tab = createBottomTabNavigator();
@@ -14,7 +14,7 @@ export default function TabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{ headerShown: false }}
-      tabBar={(props) => <CustomBottomTabBarDeprecated {...props} />}
+      tabBar={(props) => <CustomBottomTabBar {...props} />}
       initialRouteName="HomeStack"
     >
       <Tab.Screen

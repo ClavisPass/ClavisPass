@@ -87,13 +87,13 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.ClavisPass.ClavisPass'
+    namespace 'com.ClavisPass.app'
     defaultConfig {
-        applicationId 'com.ClavisPass.ClavisPass'
+        applicationId 'com.ClavisPass.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0.12"
+        versionName "1.1.4"
     }
     signingConfigs {
         debug {

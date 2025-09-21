@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flex: 1,
+    overflow: "hidden",
   },
 });
 

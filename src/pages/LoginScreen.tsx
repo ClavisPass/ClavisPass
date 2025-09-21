@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ImageBackground } from "react-native";
-import AnimatedContainer from "../components/container/AnimatedContainer";
+import Animated, { Easing, FadeIn, FadeOut } from "react-native-reanimated";
 import ContentProtection from "../components/ContentProtection";
 import { useToken } from "../contexts/TokenProvider";
 import fetchUserInfo from "../api/fetchUserInfo";
 import Auth from "../components/Auth";
 import UserInfoType from "../types/UserInfoType";
 import EditTokenModal from "../components/modals/EditTokenModal";
-import { ActivityIndicator } from "react-native-paper";
 import Login from "../components/Login";
 import generateNewToken from "../api/generateNewToken";
-import { Text } from "react-native-paper";
 import { useOnline } from "../contexts/OnlineProvider";
 import { useTheme } from "../contexts/ThemeProvider";
 import { useFocusEffect } from "@react-navigation/native";
@@ -20,6 +18,7 @@ import SettingsDivider from "../components/SettingsDivider";
 import Backup from "../components/Backup";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../stacks/Stack";
+import AnimatedLogo from "../ui/AnimatedLogo";
 
 const styles = StyleSheet.create({
   container: {
@@ -27,11 +26,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     margin: 6,
-  },
-  blob: {
-    position: "absolute",
-    width: 420,
-    height: 420,
   },
 });
 
@@ -45,7 +39,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
   const [loading, setLoading] = useState(true);
-
   const [editTokenVisibility, setEditTokenVisibility] = useState(false);
 
   useFocusEffect(
@@ -58,23 +51,22 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const login = async () => {
     try {
       const refreshToken = await loadRefreshToken();
-      if (refreshToken === null || refreshToken === "") {
+      if (!refreshToken) {
         setLoading(false);
         return;
       }
 
-      const accessToken = await generateNewToken(refreshToken).then((data) => {
-        return data.accessToken;
-      });
-      if (accessToken === null) {
+      const accessToken = await generateNewToken(refreshToken).then(
+        (data) => data.accessToken
+      );
+      if (!accessToken) {
         setLoading(false);
         return;
       }
 
-      //const tokenType = await checkTokenType(refreshToken);
       setToken(accessToken);
-      //setTokenType(tokenType);
       setRefreshToken(refreshToken);
+
       fetchUserInfo(accessToken, tokenType, setUserInfo, () => {
         setLoading(false);
       });
@@ -88,16 +80,35 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     login();
   }, []);
 
+  // eindeutiger Key je nach State, damit FadeIn/FadeOut funktionieren
+  const currentKey = isOnline
+    ? loading
+      ? "loading"
+      : userInfo
+        ? "userInfo"
+        : "auth"
+    : "offline";
+
   return (
-    <AnimatedContainer>
-      <ImageBackground
-        source={
-          darkmode
-            ? require("../../assets/blurred-bg-dark.png")
-            : require("../../assets/blurred-bg.png")
-        }
-        resizeMode="cover"
+    <ImageBackground
+      source={
+        darkmode
+          ? require("../../assets/blurred-bg-dark.png")
+          : require("../../assets/blurred-bg.png")
+      }
+      resizeMode="cover"
+      style={{
+        flex: 1,
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <View
         style={{
+          padding: 20,
+          backgroundColor: darkmode ? undefined : "rgba(255,255,255,0.2)",
           flex: 1,
           width: "100%",
           display: "flex",
@@ -105,67 +116,61 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           justifyContent: "center",
         }}
       >
-        <View
+        <StatusBar
+          animated={true}
+          style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+          translucent={true}
+        />
+        <ContentProtection enabled={false} />
+
+        <BlurView
+          intensity={80}
           style={{
+            height: "70%",
+            borderRadius: 20,
             padding: 20,
-            backgroundColor: darkmode ? undefined : "rgba(255,255,255,0.2)",
-            flex: 1,
-            width: "100%",
+            overflow: "hidden",
+            margin: 8,
+            minWidth: 300,
+            maxWidth: 300,
             display: "flex",
-            alignItems: "center",
             justifyContent: "center",
+            boxShadow: theme.colors.shadow,
           }}
         >
-          <StatusBar
-            animated={true}
-            style={headerWhite ? "light" : darkmode ? "light" : "dark"}
-            translucent={true}
-          />
-          <ContentProtection enabled={false} />
-          <BlurView
-            intensity={80}
-            style={{
-              height: "70%",
-              borderRadius: 20,
-              padding: 20,
-              overflow: "hidden",
-              margin: 8,
-              minWidth: 300,
-              maxWidth: 300,
-              display: "flex",
-              justifyContent: "center",
-              boxShadow: theme.colors.shadow,
-            }}
+          <Animated.View
+            key={currentKey}
+            entering={FadeIn.duration(500).easing(Easing.bezier(0.4, 0, 0.2, 1))}
+            exiting={FadeOut.duration(500).easing(Easing.bezier(0.4, 0, 0.2, 1))}
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
           >
             {isOnline ? (
-              <>
-                {loading ? (
-                  <ActivityIndicator size={"large"} animating={true} />
-                ) : userInfo ? (
-                  <Login userInfo={userInfo} />
-                ) : (
-                  <View style={styles.container}>
-                    <SettingsDivider />
-                    <Auth
-                      setUserInfo={setUserInfo}
-                      navigation={navigation}
-                      changeEditTokenVisibility={setEditTokenVisibility}
-                    />
-                    <EditTokenModal
-                      visible={editTokenVisibility}
-                      setVisible={setEditTokenVisibility}
-                    />
-                  </View>
-                )}
-              </>
+              loading ? (
+                <AnimatedLogo />
+              ) : userInfo ? (
+                <Login userInfo={userInfo} />
+              ) : (
+                <View style={styles.container}>
+                  <SettingsDivider />
+                  <Auth
+                    setUserInfo={setUserInfo}
+                    navigation={navigation}
+                    changeEditTokenVisibility={setEditTokenVisibility}
+                  />
+                  <EditTokenModal
+                    visible={editTokenVisibility}
+                    setVisible={setEditTokenVisibility}
+                  />
+                </View>
+              )
             ) : (
               <Backup />
             )}
-          </BlurView>
-        </View>
-      </ImageBackground>
-    </AnimatedContainer>
+          </Animated.View>
+        </BlurView>
+      </View>
+    </ImageBackground>
   );
-}
+};
 
 export default LoginScreen;

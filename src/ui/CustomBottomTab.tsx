@@ -1,8 +1,8 @@
 import React from "react";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { BottomNavigation, IconButton, Text } from "react-native-paper";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../contexts/ThemeProvider";
 import { useAuth } from "../contexts/AuthProvider";
 import { useOnline } from "../contexts/OnlineProvider";
@@ -73,7 +73,9 @@ const CustomBottomTab = ({
     <View
       style={{
         position: "relative",
-        backgroundColor: isOnline ? theme.colors.elevation.level4 : theme.colors.secondary,
+        backgroundColor: isOnline
+          ? theme.colors.elevation.level4
+          : theme.colors.secondary,
       }}
     >
       {/* Background-Fix unterhalb der Bar */}
@@ -113,19 +115,25 @@ const CustomBottomTab = ({
         </View>
       )}
       <View
-        style={{
-          position: "absolute",
-          top: isOnline ? 8 : 24,
-          alignSelf: "center",
-          zIndex: 10,
-          backgroundColor: theme.colors.background,
-          borderRadius: 28,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.2,
-          shadowRadius: 2,
-          elevation: 3,
-        }}
+        style={[
+          {
+            position: "absolute",
+            top: isOnline ? 8 : 24,
+            alignSelf: "center",
+            zIndex: 10,
+            backgroundColor: theme.colors.background,
+            borderRadius: 28,
+          },
+          Platform.OS === "web"
+            ? {
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: -2 },
+                shadowOpacity: 0.15,
+                shadowRadius: 12,
+                elevation: 8,
+              }
+            : {},
+        ]}
       >
         <IconButton
           icon="plus"
@@ -144,15 +152,18 @@ const CustomBottomTab = ({
 
       {/* Outer shadow container */}
       <View
-        style={{
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.15,
-          shadowRadius: 12,
-          elevation: 8,
-        }}
+        style={[
+          Platform.OS === "web"
+            ? {
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: -2 },
+                shadowOpacity: 0.15,
+                shadowRadius: 12,
+                elevation: 8,
+              }
+            : {},
+        ]}
       >
-        {/* Inner container with radius & overflow */}
         <View
           style={{
             overflow: "hidden",
