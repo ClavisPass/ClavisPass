@@ -10,12 +10,14 @@
     "name": "ClavisPass",
     "scheme": "clavispass",
     "slug": "clavispass",
-    "version": "1.1.5",
+    "version": "1.2.0",
     "owner": "clavispass",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -29,7 +31,9 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.clavispass.app",
-      "permissions": ["android.permission.CAMERA"],
+      "permissions": [
+        "android.permission.CAMERA"
+      ],
       "runtimeVersion": "1.0.0"
     },
     "web": {
