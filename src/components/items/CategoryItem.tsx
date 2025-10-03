@@ -1,7 +1,8 @@
 import { ReactNode } from "react";
 import { View } from "react-native";
-import { TouchableRipple, Text, Icon } from "react-native-paper";
+import { Text, Icon } from "react-native-paper";
 import { useTheme } from "../../contexts/ThemeProvider";
+import AnimatedPressable from "../AnimatedPressable";
 
 type Props = {
   children: ReactNode;
@@ -19,13 +20,12 @@ function CategoryItem(props: Props) {
         backgroundColor: theme.colors?.secondaryContainer,
       }}
     >
-      <TouchableRipple
+      <AnimatedPressable
         onPress={props.onPress}
         style={{
           cursor: "pointer",
           flex: 1,
         }}
-        //rippleColor="rgba(0, 0, 0, .32)"
       >
         <View
           style={{
@@ -50,7 +50,7 @@ function CategoryItem(props: Props) {
             {props.children}
           </Text>
         </View>
-      </TouchableRipple>
+      </AnimatedPressable>
     </View>
   );
 }

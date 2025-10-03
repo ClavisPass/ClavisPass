@@ -8,7 +8,7 @@ import {
   ViewStyle,
   LayoutChangeEvent,
 } from "react-native";
-import { Divider, TextInput, TouchableRipple } from "react-native-paper";
+import { Divider, TextInput } from "react-native-paper";
 
 import EmailModuleType from "../../types/modules/EmailModuleType";
 import ModuleContainer from "../container/ModuleContainer";
@@ -21,6 +21,7 @@ import { ValuesListType } from "../../types/ValuesType";
 import ModulesEnum from "../../enums/ModulesEnum";
 import { ModuleType } from "../../types/ModulesType";
 import validateEmail from "../../utils/regex/validateEmail";
+import AnimatedPressable from "../AnimatedPressable";
 
 const ITEM_HEIGHT = 44;
 const MAX_VISIBLE_ITEMS = 6;
@@ -202,9 +203,8 @@ function EmailModule(props: EmailModuleType & Props) {
               >
                 {filteredItems.map((item) => (
                   <>
-                    <TouchableRipple
+                    <AnimatedPressable
                       key={item.id}
-                      rippleColor="rgba(0, 0, 0, .32)"
                       onPress={() => {
                         setValue(item.title);
                         interactingListRef.current = false;
@@ -226,7 +226,7 @@ function EmailModule(props: EmailModuleType & Props) {
                       >
                         {item.title}
                       </Text>
-                    </TouchableRipple>
+                    </AnimatedPressable>
                     <Divider />
                   </>
                 ))}

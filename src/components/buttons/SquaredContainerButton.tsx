@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Icon, TouchableRipple } from "react-native-paper";
 import { useTheme } from "../../contexts/ThemeProvider";
+import AnimatedPressable from "../AnimatedPressable";
 
 const styles = StyleSheet.create({
   container: {
@@ -39,13 +39,12 @@ function SquaredContainerButton(props: Props) {
         },
       ]}
     >
-      <TouchableRipple
+      <AnimatedPressable
         style={styles.ripple}
         onPress={props.onPress}
-        rippleColor="rgba(0, 0, 0, .32)"
       >
         {props.children}
-      </TouchableRipple>
+      </AnimatedPressable>
     </View>
   );
 }

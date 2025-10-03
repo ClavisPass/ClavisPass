@@ -9,7 +9,6 @@ import {
 import {
   Searchbar,
   IconButton,
-  TouchableRipple,
   ActivityIndicator,
   Icon,
 } from "react-native-paper";
@@ -56,6 +55,7 @@ import { RootStackParamList } from "../stacks/Stack";
 import { useOnline } from "../contexts/OnlineProvider";
 import { saveBackup } from "../utils/Backup";
 import FolderType from "../types/FolderType";
+import AnimatedPressable from "../components/AnimatedPressable";
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
 
@@ -371,7 +371,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                   {isOnline ? (
                     <>
                       <View style={{ backgroundColor: "#00000017" }}>
-                        <TouchableRipple
+                        <AnimatedPressable
                           onPress={async () => {
                             setRefreshing(true);
                             const lastUpdated = getDateTime();
@@ -392,7 +392,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                               }
                             );
                           }}
-                          rippleColor="rgba(0, 0, 0, .32)"
                           style={{
                             height: 40,
                             width: 100,
@@ -407,11 +406,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                           >
                             Save
                           </Text>
-                        </TouchableRipple>
+                        </AnimatedPressable>
                       </View>
-                      <TouchableRipple
+                      <AnimatedPressable
                         onPress={refreshData}
-                        rippleColor="rgba(0, 0, 0, .32)"
                         style={{
                           height: 40,
                           width: 100,
@@ -431,7 +429,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                         >
                           Reset
                         </Text>
-                      </TouchableRipple>
+                      </AnimatedPressable>
                     </>
                   ) : (
                     <Icon source="cloud-off-outline" color="white" size={20} />

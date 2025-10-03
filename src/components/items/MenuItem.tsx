@@ -1,7 +1,8 @@
 import { ReactNode } from "react";
 import { View } from "react-native";
-import { TouchableRipple, Text, Icon } from "react-native-paper";
+import { Text, Icon } from "react-native-paper";
 import { useTheme } from "../../contexts/ThemeProvider";
+import AnimatedPressable from "../AnimatedPressable";
 
 type Props = {
   children: ReactNode;
@@ -76,16 +77,15 @@ export function MenuItem(props: Props) {
 function Ripple(props: { onPress?: () => void; children: ReactNode}) {
   if(props.onPress) {
     return (
-      <TouchableRipple
+      <AnimatedPressable
         onPress={props.onPress}
         style={{
           cursor: "pointer",
           flex: 1,
         }}
-        rippleColor="rgba(0, 0, 0, .32)"
       >
         {props.children}
-      </TouchableRipple>
+      </AnimatedPressable>
   );
   }
   else{

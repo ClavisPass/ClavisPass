@@ -8,7 +8,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { useTheme } from "../contexts/ThemeProvider";
 
-import { Text, TouchableRipple } from "react-native-paper";
+import { Text } from "react-native-paper";
+import AnimatedPressable from "./AnimatedPressable";
 
 type Props = {
   visible: boolean;
@@ -91,17 +92,16 @@ function Autocomplete(props: Props) {
             <ScrollView keyboardShouldPersistTaps="handled">
               {props.data.map((item, index) => (
                 <View key={index}>
-                  <TouchableRipple
+                  <AnimatedPressable
                     style={{}}
                     onPressIn={() => props.setIsSuggestionClicked(true)}
                     onPressOut={() => {
                       props.setValue(item);
                       props.setVisible(false);
                     }}
-                    rippleColor="rgba(0, 0, 0, .32)"
                   >
                     <Text style={{ margin: 4 }}>{item}</Text>
-                  </TouchableRipple>
+                  </AnimatedPressable>
                 </View>
               ))}
             </ScrollView>

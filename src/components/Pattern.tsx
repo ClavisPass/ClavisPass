@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { Text } from "react-native-paper";
 import { useTheme } from "../contexts/ThemeProvider";
+import { ScrollView } from "react-native-gesture-handler";
 
 type Props = {
   pattern: string | undefined;
@@ -26,13 +27,14 @@ function Pattern(props: Props) {
         boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
       }}
     >
-      <View
+      <ScrollView
+        horizontal
         style={{
           display: "flex",
           flexDirection: "row",
-          gap: 6,
+          gap: 2,
           width: "100%",
-          justifyContent: "center",
+          //justifyContent: "center",
           overflow: "hidden",
         }}
       >
@@ -41,6 +43,7 @@ function Pattern(props: Props) {
             <View
               key={index}
               style={{
+                marginRight: 4,
                 padding: 6,
                 borderRadius: 10,
                 backgroundColor: theme.colors.primary,
@@ -51,13 +54,16 @@ function Pattern(props: Props) {
                 justifyContent: "center",
               }}
             >
-              <Text variant="bodyLarge" style={{ color: "white", userSelect: "none" }}>
+              <Text
+                variant="bodyLarge"
+                style={{ color: "white", userSelect: "none" }}
+              >
                 {char}
               </Text>
             </View>
           );
         })}
-      </View>
+      </ScrollView>
     </View>
   );
 }

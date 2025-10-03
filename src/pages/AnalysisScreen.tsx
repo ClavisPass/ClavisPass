@@ -5,7 +5,6 @@ import {
   IconButton,
   Searchbar,
   Text,
-  TouchableRipple,
 } from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
 import AnimatedContainer from "../components/container/AnimatedContainer";
@@ -29,6 +28,7 @@ import getColors from "../ui/linearGradient";
 import FilterAnalysisModal from "../components/modals/FilterAnalysisModal";
 import { StackScreenProps } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../stacks/Stack";
+import AnimatedPressable from "../components/AnimatedPressable";
 
 export type CachedPasswordsType = {
   title: string;
@@ -354,8 +354,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                   height: 40,
                 }}
               >
-                <TouchableRipple
-                  rippleColor="rgba(0, 0, 0, .32)"
+                <AnimatedPressable
                   onPress={() => {
                     navigation.navigate("AnalysisDetail", {
                       value: item,
@@ -396,7 +395,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                       )}
                     />
                   </View>
-                </TouchableRipple>
+                </AnimatedPressable>
               </View>
             )}
           />

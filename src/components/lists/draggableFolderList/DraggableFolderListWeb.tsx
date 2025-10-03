@@ -11,12 +11,13 @@ import {
 } from "@hello-pangea/dnd";
 
 import { View } from "react-native";
-import { Icon, IconButton, Text, TouchableRipple } from "react-native-paper";
+import { Icon, IconButton, Text } from "react-native-paper";
 import theme from "../../../ui/theme";
 import { useTheme } from "../../../contexts/ThemeProvider";
 import changeFolder from "../../../utils/changeFolder";
 import { DataContextType, useData } from "../../../contexts/DataProvider";
 import FolderType from "../../../types/FolderType";
+import AnimatedPressable from "../../AnimatedPressable";
 
 type Props = {
   data: DataContextType;
@@ -75,7 +76,7 @@ function DraggableFolderListWeb(props: Props) {
               <View style={[globalStyles.folderContainer, { marginBottom: 4 }]}>
                 <Icon source="minus" size={20} />
 
-                <TouchableRipple
+                <AnimatedPressable
                   style={{
                     borderRadius: 12,
                     padding: 10,
@@ -87,7 +88,6 @@ function DraggableFolderListWeb(props: Props) {
                     marginRight: 30
                   }}
                   onPress={() => props.setSelectedFolder?.(null)}
-                  rippleColor="rgba(0, 0, 0, .32)"
                 >
                   <>
                     <Icon
@@ -106,7 +106,7 @@ function DraggableFolderListWeb(props: Props) {
                       {"None"}
                     </Text>
                   </>
-                </TouchableRipple>
+                </AnimatedPressable>
               </View>
             )}
             {props.folder.map((item: FolderType, index: number) => (
@@ -136,7 +136,7 @@ function DraggableFolderListWeb(props: Props) {
                       <View style={globalStyles.folderContainer}>
                         <Icon source="drag" size={20} />
 
-                        <TouchableRipple
+                        <AnimatedPressable
                           style={{
                             borderRadius: 12,
                             padding: 10,
@@ -151,7 +151,6 @@ function DraggableFolderListWeb(props: Props) {
                               ? () => props.setSelectedFolder?.(item)
                               : undefined
                           }
-                          rippleColor="rgba(0, 0, 0, .32)"
                         >
                           <>
                             <Icon
@@ -170,7 +169,7 @@ function DraggableFolderListWeb(props: Props) {
                               {item.name}
                             </Text>
                           </>
-                        </TouchableRipple>
+                        </AnimatedPressable>
 
                         <IconButton
                           icon="close"

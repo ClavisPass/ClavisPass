@@ -3,12 +3,13 @@ import { Pressable, View } from "react-native";
 import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
-import { Icon, IconButton, Text, TouchableRipple } from "react-native-paper";
+import { Icon, IconButton, Text } from "react-native-paper";
 import theme from "../../../ui/theme";
 import { useTheme } from "../../../contexts/ThemeProvider";
 import { DataContextType } from "../../../contexts/DataProvider";
 import changeFolder from "../../../utils/changeFolder";
 import FolderType from "../../../types/FolderType";
+import AnimatedPressable from "../../AnimatedPressable";
 
 type Props = {
   data: DataContextType;
@@ -26,7 +27,7 @@ function DraggableFolderList(props: Props) {
           <Pressable onPressIn={drag}>
             <Icon source="drag" size={20} />
           </Pressable>
-          <TouchableRipple
+          <AnimatedPressable
             style={{
               borderRadius: 12,
               padding: 10,
@@ -43,7 +44,6 @@ function DraggableFolderList(props: Props) {
                   }
                 : undefined
             }
-            rippleColor="rgba(0, 0, 0, .32)"
           >
             <>
               <Icon source="folder" color={theme.colors.primary} size={20} />
@@ -58,7 +58,7 @@ function DraggableFolderList(props: Props) {
                 {item.name}
               </Text>
             </>
-          </TouchableRipple>
+          </AnimatedPressable>
           <IconButton
             icon="close"
             size={14}
@@ -79,7 +79,7 @@ function DraggableFolderList(props: Props) {
         <View style={[globalStyles.folderContainer, { marginBottom: 4 }]}>
           <Icon source="minus" size={20} />
 
-          <TouchableRipple
+          <AnimatedPressable
             style={{
               borderRadius: 12,
               padding: 10,
@@ -92,7 +92,6 @@ function DraggableFolderList(props: Props) {
               overflow: "hidden",
             }}
             onPress={() => props.setSelectedFolder?.(null)}
-            rippleColor="rgba(0, 0, 0, .32)"
           >
             <>
               <Icon source="folder" size={20} color={theme.colors.primary} />
@@ -107,7 +106,7 @@ function DraggableFolderList(props: Props) {
                 {"None"}
               </Text>
             </>
-          </TouchableRipple>
+          </AnimatedPressable>
         </View>
       )}
       <DraggableFlatList

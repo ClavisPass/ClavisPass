@@ -10,11 +10,11 @@ import {
   ActivityIndicator,
   Icon,
   Text,
-  TouchableRipple,
 } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../../ui/linearGradient";
 import { useTheme } from "../../contexts/ThemeProvider";
+import AnimatedPressable from "../AnimatedPressable";
 
 const styles = StyleSheet.create({
   container: {
@@ -100,11 +100,10 @@ function Content({ white = true, ...props }: Props) {
   }
 
   return (
-    <TouchableRipple
+    <AnimatedPressable
       disabled={props.disabled}
       style={styles.ripple}
       onPress={props.onPress}
-      rippleColor="rgba(0, 0, 0, .32)"
     >
       <View
         style={{
@@ -132,7 +131,7 @@ function Content({ white = true, ...props }: Props) {
           )}
         </>
       </View>
-    </TouchableRipple>
+    </AnimatedPressable>
   );
 }
 

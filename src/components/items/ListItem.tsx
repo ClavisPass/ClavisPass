@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Platform } from "react-native";
-import { Icon, IconButton, Text, TouchableRipple } from "react-native-paper";
+import { Icon, IconButton, Text } from "react-native-paper";
 import ValuesType from "../../types/ValuesType";
 import ModulesEnum from "../../enums/ModulesEnum";
 
@@ -10,6 +10,7 @@ import { Image } from "expo-image";
 import { useTheme } from "../../contexts/ThemeProvider";
 
 import extractFastAccessObject from "../../utils/extractFastAccessObject";
+import AnimatedPressable from "../AnimatedPressable";
 
 const styles = StyleSheet.create({
   container: {
@@ -119,11 +120,10 @@ function ListItem(props: Props) {
       onPointerEnter={() => Platform.OS === "web" && setHovered(true)}
       onPointerLeave={() => Platform.OS === "web" && setHovered(false)}
     >
-      <TouchableRipple
+      <AnimatedPressable
         key={props.key}
         style={styles.ripple}
         onPress={props.onPress}
-        rippleColor="rgba(0, 0, 0, .32)"
       >
         <>
           <View
@@ -221,7 +221,7 @@ function ListItem(props: Props) {
             />
           </View>
         </>
-      </TouchableRipple>
+      </AnimatedPressable>
     </View>
   );
 }

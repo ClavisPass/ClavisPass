@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { View, Pressable } from "react-native";
+import { View } from "react-native";
 import { listen } from "@tauri-apps/api/event";
-import { Icon, Text, TextInput, TouchableRipple } from "react-native-paper";
+import { Icon, Text, TextInput } from "react-native-paper";
 import { useTheme } from "../contexts/ThemeProvider";
 import Header from "../components/Header";
 import PasswordTextbox from "../components/PasswordTextbox";
 import CopyToClipboard from "../components/buttons/CopyToClipboard";
 import { hideFastAccess } from "../utils/FastAccess";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import AnimatedPressable from "../components/AnimatedPressable";
 
 export default function FastAccessScreen() {
   const [title, setTitle] = useState("");
@@ -62,7 +63,7 @@ export default function FastAccessScreen() {
         }
       >
         <View style={{ display: "flex", flexDirection: "row" }}>
-          <TouchableRipple
+          <AnimatedPressable
             onPress={async () => {
               const win = await WebviewWindow.getByLabel("main");
               if (!win) {
@@ -82,15 +83,14 @@ export default function FastAccessScreen() {
               height: 40,
               borderRadius: 4,
             }}
-            rippleColor="rgba(0, 0, 0, 0.158)"
           >
             <Icon
               source={"open-in-app"}
               size={20}
               color={theme.colors.primary}
             />
-          </TouchableRipple>
-          <TouchableRipple
+          </AnimatedPressable>
+          <AnimatedPressable
             onPress={() => {
               hideFastAccess();
             }}
@@ -105,14 +105,13 @@ export default function FastAccessScreen() {
               borderRadius: 4,
               borderBottomEndRadius: 12,
             }}
-            rippleColor="rgba(0, 0, 0, 0.158)"
           >
             <Icon
               source={"window-close"}
               size={20}
               color={theme.colors.primary}
             />
-          </TouchableRipple>
+          </AnimatedPressable>
         </View>
       </Header>
       <View style={{ flex: 1, width: "100%", padding: 8, paddingTop: 0 }}>

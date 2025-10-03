@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Platform, View, StyleSheet } from "react-native";
-import { Icon, TouchableRipple } from "react-native-paper";
+import { Icon } from "react-native-paper";
 import theme from "../ui/theme";
 import WebSpecific from "./platformSpecific/WebSpecific";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -9,6 +9,7 @@ import { exit } from "@tauri-apps/plugin-process";
 import { useTheme } from "../contexts/ThemeProvider";
 import * as store from "../utils/store";
 import showMainWindow from "../utils/showMainWindow";
+import AnimatedPressable from "./AnimatedPressable";
 
 export const TITLEBAR_HEIGHT = Platform.OS === "web" ? 40 : 0;
 
@@ -119,7 +120,7 @@ function CustomTitlebar() {
               paddingLeft: 16,
             }}
           >
-            <TouchableRipple
+            <AnimatedPressable
               onPress={minimizeWindow}
               style={{
                 cursor: "pointer",
@@ -131,15 +132,14 @@ function CustomTitlebar() {
                 height: 40,
                 borderRadius: 4,
               }}
-              rippleColor="rgba(0, 0, 0, 0.158)"
             >
               <Icon
                 source={"window-minimize"}
                 size={20}
                 color={headerWhite ? "white" : theme.colors.primary}
               />
-            </TouchableRipple>
-            <TouchableRipple
+            </AnimatedPressable>
+            <AnimatedPressable
               onPress={closeWindow}
               style={{
                 cursor: "pointer",
@@ -152,14 +152,13 @@ function CustomTitlebar() {
                 borderRadius: 4,
                 borderBottomEndRadius: 12,
               }}
-              rippleColor="rgba(0, 0, 0, 0.158)"
             >
               <Icon
                 source={"window-close"}
                 size={20}
                 color={headerWhite ? "white" : theme.colors.primary}
               />
-            </TouchableRipple>
+            </AnimatedPressable>
           </View>
         </View>
       </View>
