@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -12,6 +12,9 @@ import AnimatedOpacityContainer from "./container/AnimatedOpacityContainer/Anima
 import { MenuItem } from "./items/MenuItem";
 import { useTheme } from "../contexts/ThemeProvider";
 import FolderType from "../types/FolderType";
+import { clamp } from "react-native-reanimated";
+import { DraggableHandle } from "./DraggableHandle";
+import { get, set } from "../utils/store";
 
 const styles = StyleSheet.create({
   chip: {
@@ -39,6 +42,19 @@ function FolderFilter(props: Props) {
 
   const [showAddButton, setShowAddButton] = useState(false);
 
+  const [sidebarWidth, setSidebarWidth] = useState(180);
+  const MIN_W = 20;
+  const MAX_W = 420;
+
+  const handleResize = useCallback(
+    (dx: number) => {
+      setSidebarWidth((w) =>
+        clamp(w + dx, MIN_W, Math.min(MAX_W, Math.max(MIN_W, width * 0.6)))
+      );
+    },
+    [width]
+  );
+
   const handleScroll = (event: any) => {
     const offsetY = event.nativeEvent.contentOffset.x;
     setCurrentOffset(offsetY);
@@ -55,13 +71,43 @@ function FolderFilter(props: Props) {
     });
   };
 
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const saved = await get("SIDEBAR_WIDTH");
+        const clamped = clamp(
+          saved ?? 180,
+          MIN_W,
+          Math.min(MAX_W, Math.max(MIN_W, width * 0.6))
+        );
+        if (isMounted) setSidebarWidth(clamped);
+      } catch (e) {}
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, [width]);
+
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      set("SIDEBAR_WIDTH", sidebarWidth);
+    }, 150);
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, [sidebarWidth]);
+
   return (
     <>
       {width > 600 ? (
         <View
           style={{
-            maxWidth: 240,
-            width: 160,
+            maxWidth: Math.min(MAX_W, width * 0.6),
+            width: sidebarWidth,
+            minWidth: MIN_W,
             flexDirection: "row",
             paddingRight: 4,
             overflow: "hidden",
@@ -70,6 +116,7 @@ function FolderFilter(props: Props) {
           onPointerLeave={() => setShowAddButton(false)}
         >
           <FlatList
+            showsVerticalScrollIndicator={false}
             ref={flatListRef}
             data={
               [
@@ -144,7 +191,26 @@ function FolderFilter(props: Props) {
               </View>
             }
           />
-          <Divider style={{ width: 1, height: "100%" }} />
+          <View
+            style={{
+              width: 6,
+              height: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Divider style={{ width: 1, height: "100%" }} />
+            <DraggableHandle
+              onDeltaX={handleResize}
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                right: 0,
+                bottom: 0,
+              }}
+            />
+          </View>
         </View>
       ) : (
         <View

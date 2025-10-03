@@ -320,14 +320,14 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         }}
       >
         <ContainerButton
-          backgroundColor={edit ? theme.colors?.secondaryContainer : undefined}
+          backgroundColor={edit ? theme.colors?.primary : undefined}
           onPress={() => {
             setEdit(!edit);
           }}
         >
           <Icon
             source="square-edit-outline"
-            color={theme.colors?.primary}
+            color={edit ? "white" : theme.colors?.primary}
             size={20}
           />
         </ContainerButton>

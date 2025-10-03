@@ -5,13 +5,8 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import {
-  View,
-  Animated,
-  Easing,
-  StyleSheet,
-} from "react-native";
-import { IconButton, TextInput } from "react-native-paper";
+import { View, Animated, Easing, StyleSheet } from "react-native";
+import { Button, IconButton, TextInput } from "react-native-paper";
 import { Dropdown, DropdownInputProps } from "react-native-paper-dropdown";
 
 import ModuleContainer from "../container/ModuleContainer";
@@ -214,7 +209,15 @@ function DigitalCardModule(
             style={[styles.layer, shownStyle]}
             pointerEvents={editValue ? "auto" : "none"}
           >
-            <View style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1, paddingTop: 5 }}>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+                flex: 1,
+                paddingTop: 5,
+              }}
+            >
               <View style={globalStyles.moduleView}>
                 <View style={{ borderRadius: 12, overflow: "hidden", flex: 1 }}>
                   <Dropdown
@@ -266,10 +269,34 @@ function DigitalCardModule(
                 paddingRight: 48,
               }}
             >
-              {type === "QR-Code" ? (
-                <QRCode value={value} size={90} />
+              {value !== "" ? (
+                type === "QR-Code" ? (
+                  <QRCode value={value} size={90} />
+                ) : (
+                  <Barcode
+                    height={70}
+                    format={type}
+                    value={value}
+                    text={value}
+                  />
+                )
               ) : (
-                <Barcode height={70} format={type} value={value} text={value} />
+                <Button
+                  style={{ borderRadius: 12 }}
+                  icon={"barcode-scan"}
+                  mode="contained-tonal"
+                  textColor={theme.colors.primary}
+                  onPress={() => {
+                    props.navigation.navigate("DigitalCardScan", {
+                      setData: (data: string, scanType: string) => {
+                        setType(scanType as DigitalCardType);
+                        setValue(data);
+                      },
+                    });
+                  }}
+                >
+                  Scan Code
+                </Button>
               )}
             </View>
           </Animated.View>

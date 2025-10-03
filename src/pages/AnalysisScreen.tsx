@@ -1,6 +1,18 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useWindowDimensions, View } from "react-native";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useDeferredValue,
+  startTransition,
+} from "react";
 import {
+  InteractionManager,
+  ScrollView,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import {
+  ActivityIndicator,
   Icon,
   IconButton,
   Searchbar,
@@ -32,6 +44,7 @@ import AnimatedPressable from "../components/AnimatedPressable";
 
 export type CachedPasswordsType = {
   title: string;
+  normalizedTitle: string;
   password: string;
   entropy: number;
   type: ModulesEnum;
@@ -40,181 +53,157 @@ export type CachedPasswordsType = {
 
 type AnalysisScreenProps = StackScreenProps<RootStackParamList, "Analysis">;
 
+type CacheResult = {
+  list: CachedPasswordsType[];
+  counts: { weak: number; medium: number; strong: number };
+  avgEntropy: number;
+  avgEntropyPct: number;
+};
+
+const normalize = (t: string) =>
+  t
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "");
+
+function buildCache(values: ValuesListType): CacheResult {
+  const out: CachedPasswordsType[] = [];
+  let weak = 0,
+    medium = 0,
+    strong = 0,
+    entropySum = 0;
+
+  for (const item of values) {
+    const normalizedItemTitle = normalize(item.title);
+
+    for (const mod of item.modules) {
+      const isPwd = mod.module === ModulesEnum.PASSWORD;
+      const isWifi = mod.module === ModulesEnum.WIFI;
+      if (!isPwd && !isWifi) continue;
+
+      const pwd = isPwd ? String(mod.value) : (mod as WifiModuleType).value;
+      const title = isPwd
+        ? item.title
+        : ((mod as WifiModuleType).wifiName ?? item.title);
+      const normalizedTitle = isPwd ? normalizedItemTitle : normalize(title);
+
+      const entropy = passwordEntropy(pwd);
+      entropySum += entropy;
+      const p = entropy / 200;
+
+      let level: PasswordStrengthLevel;
+      if (p < 0.4) {
+        level = PasswordStrengthLevel.WEAK;
+        weak++;
+      } else if (p < 0.55) {
+        level = PasswordStrengthLevel.MEDIUM;
+        medium++;
+      } else {
+        level = PasswordStrengthLevel.STRONG;
+        strong++;
+      }
+
+      out.push({
+        title,
+        normalizedTitle,
+        password: pwd,
+        entropy,
+        type: isPwd ? ModulesEnum.PASSWORD : ModulesEnum.WIFI,
+        passwordStrengthLevel: level,
+      });
+    }
+  }
+
+  const avg = out.length ? entropySum / out.length : 0;
+  return {
+    list: out,
+    counts: { weak, medium, strong },
+    avgEntropy: Math.floor(avg),
+    avgEntropyPct: (avg / 200) * 100,
+  };
+}
+
 const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   const data = useData();
   const { theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
     useTheme();
-
-  const [FilterAnalysisModalVisible, setFilterAnalysisModalVisible] =
-    useState(false);
-
   const { width } = useWindowDimensions();
 
-  const [cachedPasswordList, setCachedPasswordList] = React.useState<
-    CachedPasswordsType[] | null
-  >(null);
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
 
-  const [averageEntropy, setAverageEntropy] = useState(0);
-  const [averageEntropyPercentage, setAverageEntropyPercentage] = useState(0);
-  const [strong, setStrong] = useState(0);
-  const [medium, setMedium] = useState(0);
-  const [weak, setWeak] = useState(0);
-
-  const [searchQuery, setSearchQuery] = useState("");
+  const [cache, setCache] = useState<CacheResult | null>(null);
 
   const [showStrong, setShowStrong] = useState(true);
   const [showMedium, setShowMedium] = useState(true);
   const [showWeak, setShowWeak] = useState(true);
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const deferredQuery = useDeferredValue(searchQuery.trim());
+
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(0);
       setHeaderWhite(false);
-    }, [])
+    }, [setHeaderSpacing, setHeaderWhite])
   );
 
-  const filteredValues = useMemo(() => {
-    if (!cachedPasswordList) return [];
-
-    const normalizeText = (text: string) =>
-      text
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/\p{Diacritic}/gu, "");
-
-    const normalizedQuery = normalizeText(searchQuery.trim());
-
-    return cachedPasswordList
-      .map((item) => {
-        const normalizedTitle = normalizeText(item.title);
-
-        let relevance = Infinity;
-        if (normalizedTitle.startsWith(normalizedQuery)) {
-          relevance = 0;
-        } else {
-          const index = normalizedTitle.indexOf(normalizedQuery);
-          if (index !== -1) {
-            relevance = index + 1;
-          }
-        }
-
-        return { ...item, _relevance: relevance };
-      })
-      .filter((item) => {
-        const strength = item.passwordStrengthLevel;
-        const matchesStrength =
-          (strength === PasswordStrengthLevel.STRONG && showStrong) ||
-          (strength === PasswordStrengthLevel.MEDIUM && showMedium) ||
-          (strength === PasswordStrengthLevel.WEAK && showWeak);
-
-        return item._relevance !== Infinity && matchesStrength;
-      })
-      .sort((a, b) => a._relevance - b._relevance);
-  }, [cachedPasswordList, searchQuery, showStrong, showMedium, showWeak]);
-
-  const findPasswords = (values: any) => {
-    let cachedPasswords: CachedPasswordsType[] = [];
-    if (values) {
-      let cachedData = [...values] as ValuesListType;
-
-      let weakCount = 0;
-      let mediumCount = 0;
-      let strongCount = 0;
-
-      cachedData.forEach((item) => {
-        const getallPasswords = item.modules.filter(
-          (module) => module.module === ModulesEnum.PASSWORD
-        );
-        getallPasswords.forEach((module: ModuleType) => {
-          const entropy = passwordEntropy(String(module.value));
-          const percentage = entropy / 200;
-          let passwordStrengthLevel: PasswordStrengthLevel;
-          if (percentage < 0.4) {
-            passwordStrengthLevel = PasswordStrengthLevel.WEAK;
-            weakCount++;
-          } else if (percentage < 0.55) {
-            passwordStrengthLevel = PasswordStrengthLevel.MEDIUM;
-            mediumCount++;
-          } else {
-            passwordStrengthLevel = PasswordStrengthLevel.STRONG;
-            strongCount++;
-          }
-          cachedPasswords = [
-            ...(cachedPasswords ? cachedPasswords : []),
-            {
-              title: item.title,
-              password: String(module.value),
-              entropy: entropy,
-              type: ModulesEnum.PASSWORD,
-              passwordStrengthLevel: passwordStrengthLevel,
-            },
-          ];
-        });
-
-        const getallWifiPasswords = item.modules.filter(
-          (module) => module.module === ModulesEnum.WIFI
-        );
-
-        getallWifiPasswords.forEach((module: ModuleType) => {
-          const transform = module as WifiModuleType;
-          const entropy = passwordEntropy(transform.value);
-          const percentage = entropy / 200;
-          let passwordStrengthLevel: PasswordStrengthLevel;
-          if (percentage < 0.4) {
-            passwordStrengthLevel = PasswordStrengthLevel.WEAK;
-            weakCount++;
-          } else if (percentage < 0.55) {
-            passwordStrengthLevel = PasswordStrengthLevel.MEDIUM;
-            mediumCount++;
-          } else {
-            passwordStrengthLevel = PasswordStrengthLevel.STRONG;
-            strongCount++;
-          }
-          cachedPasswords = [
-            ...(cachedPasswords ? cachedPasswords : []),
-            {
-              title: transform.wifiName,
-              password: transform.value,
-              entropy: entropy,
-              type: ModulesEnum.WIFI,
-              passwordStrengthLevel: passwordStrengthLevel,
-            },
-          ];
-        });
-      });
-      setWeak(weakCount);
-      setMedium(mediumCount);
-      setStrong(strongCount);
-    }
-
-    return cachedPasswords;
-  };
-
-  const calculateAverageEntropy = (passwords: CachedPasswordsType[]) => {
-    if (passwords.length === 0) return 0;
-    const totalEntropy = passwords
-      .map((item) => item.entropy)
-      .reduce((sum, current) => sum + current, 0);
-
-    const entropy = totalEntropy / passwords.length;
-    setAverageEntropy(Math.floor(entropy));
-    setAverageEntropyPercentage((entropy / 200) * 100);
-  };
-
+  // Initiales Rechnen nach First Paint, als "transition" markiert
   useEffect(() => {
-    if (data?.data?.values) {
-      const passwords = findPasswords(data?.data?.values);
-      setCachedPasswordList(passwords);
-      calculateAverageEntropy(passwords);
-    }
+    if (!data?.data?.values) return;
+    let cancelled = false;
+
+    InteractionManager.runAfterInteractions(() => {
+      if (cancelled) return;
+      if (data?.data?.values) {
+        const result = buildCache(data.data.values as ValuesListType);
+        startTransition(() => {
+          if (!cancelled) setCache(result);
+        });
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [data?.data?.values]);
+
+  const filteredValues = useMemo(() => {
+    if (!cache) return [];
+    const q = deferredQuery ? normalize(deferredQuery) : "";
+
+    const matchesStrength = (lvl: PasswordStrengthLevel) =>
+      (lvl === PasswordStrengthLevel.STRONG && showStrong) ||
+      (lvl === PasswordStrengthLevel.MEDIUM && showMedium) ||
+      (lvl === PasswordStrengthLevel.WEAK && showWeak);
+
+    // Relevanz-basiertes Filtern/Sortieren
+    const mapped = cache.list.map((it) => {
+      if (!q) return { it, rel: 0 };
+      if (!matchesStrength(it.passwordStrengthLevel))
+        return { it, rel: Infinity };
+      const t = it.normalizedTitle;
+      if (t.startsWith(q)) return { it, rel: 0 };
+      const idx = t.indexOf(q);
+      return { it, rel: idx === -1 ? Infinity : idx + 1 };
+    });
+
+    return mapped
+      .filter((x) => x.rel !== Infinity)
+      .sort((a, b) => a.rel - b.rel)
+      .map((x) => x.it);
+  }, [cache, deferredQuery, showStrong, showMedium, showWeak]);
+
+  const total = cache?.list.length ?? 0;
+  const strongCount = cache?.counts.strong ?? 0;
+  const mediumCount = cache?.counts.medium ?? 0;
+  const weakCount = cache?.counts.weak ?? 0;
 
   return (
     <AnimatedContainer useFocusEffect={useFocusEffect}>
       <StatusBar
-        animated={true}
+        animated
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
-        translucent={true}
+        translucent
       />
       <Header title="Analysis" />
       <View
@@ -225,14 +214,17 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
           width: "100%",
         }}
       >
-        <View
+        <ScrollView
+          showsHorizontalScrollIndicator={false}
           style={{
+            maxWidth: width > 600 ? 180 : undefined,
             margin: 8,
             marginLeft: width > 600 ? 0 : 8,
             marginTop: 0,
             display: "flex",
             flexDirection: "column",
             gap: 8,
+            flexGrow: 0,
           }}
         >
           <View
@@ -242,21 +234,18 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
               justifyContent: "space-evenly",
               height: width > 600 ? undefined : 80,
               gap: 8,
+              marginBottom: 8,
             }}
           >
             <AnalysisEntryGradient
               name={"avg. Entropy"}
-              number={averageEntropy}
-              percentage={averageEntropyPercentage}
+              number={cache?.avgEntropy ?? 0}
+              percentage={cache?.avgEntropyPct ?? 0}
             />
             <AnalysisEntry
               name={"Strong"}
-              number={strong}
-              percentage={
-                cachedPasswordList
-                  ? (strong / cachedPasswordList.length) * 100
-                  : 0
-              }
+              number={strongCount}
+              percentage={total ? (strongCount / total) * 100 : 0}
             />
           </View>
           <View
@@ -271,33 +260,20 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
           >
             <AnalysisEntry
               name={"Medium"}
-              number={medium}
-              percentage={
-                cachedPasswordList
-                  ? (medium / cachedPasswordList.length) * 100
-                  : 0
-              }
+              number={mediumCount}
+              percentage={total ? (mediumCount / total) * 100 : 0}
             />
             <AnalysisEntry
               name={"Weak"}
-              number={weak}
-              percentage={
-                cachedPasswordList
-                  ? (weak / cachedPasswordList.length) * 100
-                  : 0
-              }
+              number={weakCount}
+              percentage={total ? (weakCount / total) * 100 : 0}
             />
           </View>
-        </View>
-        <View
-          style={{
-            flex: 1,
-            padding: 0,
-          }}
-        >
+        </ScrollView>
+        <View style={{ flex: 1, padding: 0 }}>
           <LinearGradient
             colors={getColors()}
-            dither={true}
+            dither
             style={{
               display: "flex",
               flexDirection: "row",
@@ -323,24 +299,25 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                 backgroundColor: "rgba(217, 217, 217, 0.21)",
               }}
               placeholder="Search"
-              onChangeText={setSearchQuery}
+              onChangeText={(t) => startTransition(() => setSearchQuery(t))}
               value={searchQuery}
-              loading={false}
               iconColor={"#ffffff80"}
               placeholderTextColor={"#ffffff80"}
             />
             <IconButton
               icon="filter-variant"
               size={25}
-              onPress={() => {
-                setFilterAnalysisModalVisible(true);
-              }}
+              onPress={() => setFilterModalVisible(true)}
               iconColor="white"
               style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
             />
           </LinearGradient>
           <FlashList
             data={filteredValues}
+            keyExtractor={(item, idx) => `${item.title}:${idx}:${item.type}`}
+            //estimatedItemSize={40}
+            removeClippedSubviews
+            //initialNumToRender={20}
             renderItem={({ item, index }) => (
               <View
                 style={{
@@ -356,9 +333,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
               >
                 <AnimatedPressable
                   onPress={() => {
-                    navigation.navigate("AnalysisDetail", {
-                      value: item,
-                    });
+                    navigation.navigate("AnalysisDetail", { value: item });
                   }}
                 >
                   <View
@@ -380,11 +355,10 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                           userSelect: "none",
                         }}
                       >
-                        {index + 1 + "."}
+                        {index + 1}.
                       </Text>
                       <Text style={{ userSelect: "none" }}>{item.title}</Text>
                     </View>
-
                     <Icon
                       source={getPasswordStrengthIcon(
                         item.passwordStrengthLevel
@@ -398,21 +372,34 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                 </AnimatedPressable>
               </View>
             )}
+            ListEmptyComponent={
+              <View style={{ padding: 24, alignItems: "center" }}>
+                {cache ? (
+                  <Text style={{ opacity: 0.6 }}>No results</Text>
+                ) : (
+                  <ActivityIndicator
+                    size="small"
+                    color={theme.colors.primary}
+                  />
+                )}
+              </View>
+            }
           />
         </View>
       </View>
+
       <FilterAnalysisModal
-        visible={FilterAnalysisModalVisible}
-        setVisible={setFilterAnalysisModalVisible}
+        visible={filterModalVisible}
+        setVisible={setFilterModalVisible}
         strong={showStrong}
-        setStrong={setShowStrong}
+        setStrong={(v) => startTransition(() => setShowStrong(v))}
         medium={showMedium}
-        setMedium={setShowMedium}
+        setMedium={(v) => startTransition(() => setShowMedium(v))}
         weak={showWeak}
-        setWeak={setShowWeak}
+        setWeak={(v) => startTransition(() => setShowWeak(v))}
       />
     </AnimatedContainer>
   );
-}
+};
 
 export default AnalysisScreen;

@@ -88,12 +88,13 @@ function SettingsQuickSelect(props: Props) {
         <View
           style={{
             maxWidth: 240,
-            width: 160,
+            width: 180,
             flexDirection: "row",
             overflow: "hidden",
           }}
         >
           <FlatList
+          showsVerticalScrollIndicator={false}
             ref={flatListRef}
             data={props.items}
             style={{ flexShrink: 1 }}

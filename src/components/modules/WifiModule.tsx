@@ -82,7 +82,7 @@ function WifiModule(props: WifiModuleType & Props) {
       fastAccess={props.fastAccess}
     >
       <View style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        <View style={{ marginRight: 6, borderRadius: 12, overflow: "hidden" }}>
+        <View style={[{ marginLeft: 6, marginRight: 48, borderRadius: 12, overflow: "hidden" }]}>
           <Dropdown
             CustomDropdownInput={CustomDropdownInput}
             menuContentStyle={{
