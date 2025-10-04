@@ -41,6 +41,7 @@ import FilterAnalysisModal from "../components/modals/FilterAnalysisModal";
 import { StackScreenProps } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../stacks/Stack";
 import AnimatedPressable from "../components/AnimatedPressable";
+import { Skeleton } from "moti/skeleton";
 
 export type CachedPasswordsType = {
   title: string;
@@ -315,9 +316,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
           <FlashList
             data={filteredValues}
             keyExtractor={(item, idx) => `${item.title}:${idx}:${item.type}`}
-            //estimatedItemSize={40}
             removeClippedSubviews
-            //initialNumToRender={20}
             renderItem={({ item, index }) => (
               <View
                 style={{
@@ -373,16 +372,81 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
               </View>
             )}
             ListEmptyComponent={
-              <View style={{ padding: 24, alignItems: "center" }}>
+              <>
                 {cache ? (
-                  <Text style={{ opacity: 0.6 }}>No results</Text>
+                  <View style={{ alignItems: "center", marginTop: 32 }}>
+                    <Text style={{ opacity: 0.6 }}>No results</Text>
+                  </View>
                 ) : (
-                  <ActivityIndicator
-                    size="small"
-                    color={theme.colors.primary}
-                  />
+                  <View
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 4,
+                      flexDirection: "column",
+                      marginLeft: 8,
+                      marginRight: 8,
+                    }}
+                  >
+                    <Skeleton
+                      show
+                      height={40}
+                      width={"100%"}
+                      radius={12}
+                      colorMode="light"
+                    />
+                    <Skeleton
+                      show
+                      height={40}
+                      width={"100%"}
+                      radius={12}
+                      colorMode="light"
+                    />
+                    <Skeleton
+                      show
+                      height={40}
+                      width={"100%"}
+                      radius={12}
+                      colorMode="light"
+                    />
+                    <Skeleton
+                      show
+                      height={40}
+                      width={"100%"}
+                      radius={12}
+                      colorMode="light"
+                    />
+                    <Skeleton
+                      show
+                      height={40}
+                      width={"100%"}
+                      radius={12}
+                      colorMode="light"
+                    />
+                    <Skeleton
+                      show
+                      height={40}
+                      width={"100%"}
+                      radius={12}
+                      colorMode="light"
+                    />
+                    <Skeleton
+                      show
+                      height={40}
+                      width={"100%"}
+                      radius={12}
+                      colorMode="light"
+                    />
+                    <Skeleton
+                      show
+                      height={40}
+                      width={"100%"}
+                      radius={12}
+                      colorMode="light"
+                    />
+                  </View>
                 )}
-              </View>
+              </>
             }
           />
         </View>

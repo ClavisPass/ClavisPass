@@ -12,6 +12,7 @@ import { TaskModuleTypeSchema } from "./modules/TaskModuleType";
 import { DigitalCardModuleTypeSchema } from "./modules/DigitalCardModuleType";
 import { UnknownModuleTypeSchema } from "./modules/UnknownModuleType";
 import { PhoneNumberModuleTypeSchema } from "./modules/PhoneNumberModuleType";
+import { TotpModuleTypeSchema } from "./modules/TotpModuleType";
 
 export const ModuleTypeSchema = CustomFieldModuleTypeSchema.or(
   EmnailModuleTypeSchema
@@ -26,6 +27,7 @@ export const ModuleTypeSchema = CustomFieldModuleTypeSchema.or(
   .or(DigitalCardModuleTypeSchema)
   .or(TaskModuleTypeSchema)
   .or(PhoneNumberModuleTypeSchema)
+  .or(TotpModuleTypeSchema)
   .or(UnknownModuleTypeSchema);
 
 export type ModuleType = z.infer<typeof ModuleTypeSchema>;

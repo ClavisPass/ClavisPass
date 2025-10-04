@@ -9,6 +9,7 @@ import PasswordModuleType from "../types/modules/PasswordModuleType";
 import PhoneNumberModuleType from "../types/modules/PhoneNumberModuleType";
 import TaskModuleType from "../types/modules/TaskModuleType";
 import TitleModuleType from "../types/modules/TitleModuleType";
+import TotpModuleType from "../types/modules/TotpModuleType";
 import URLModuleType from "../types/modules/URLModuleType";
 import UsernameModuleType from "../types/modules/UsernameModuleType";
 import WifiModuleType from "../types/modules/WifiModuleType";
@@ -111,6 +112,14 @@ function getModuleData(module: ModulesEnum) {
   }
   if (module === ModulesEnum.PHONE_NUMBER) {
     const moduleData: PhoneNumberModuleType = {
+      id: id,
+      module: module,
+      value: "",
+    };
+    return moduleData as ModuleType;
+  }
+  if (module === ModulesEnum.TOTP) {
+    const moduleData: TotpModuleType = {
       id: id,
       module: module,
       value: "",

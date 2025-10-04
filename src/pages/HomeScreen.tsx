@@ -221,7 +221,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             item={item}
             onPress={() => {
               navigation.navigate("Edit", {
-                value: item
+                value: item,
               });
             }}
           />
@@ -472,7 +472,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         positionY={
           Constants.statusBarHeight +
           TITLEBAR_HEIGHT +
-          (Platform.OS === "web" ? 48 : 100)
+          (Platform.OS === "web" ? 48 : 90)
         }
         openEditFolder={() => setFolderModalVisible(true)}
         refreshData={refreshData}

@@ -22,6 +22,9 @@ export type RootStackParamList = {
   DigitalCardScan: {
     setData: (data: string, type: string) => void;
   };
+  TotpScan: {
+    setOtpauth: (uri: string) => void;
+  };
   Logout: undefined;
   AddTrigger: undefined;
 };

@@ -165,6 +165,14 @@ function AddModuleModal(props: Props) {
           }}
         >
           <CategoryItem
+            leadingIcon={ModuleIconsEnum.TOTP}
+            onPress={() => {
+              props.addModule(ModulesEnum.TOTP);
+            }}
+          >
+            {"Two-Factor Auth"}
+          </CategoryItem>
+          <CategoryItem
             leadingIcon={ModuleIconsEnum.NOTE}
             onPress={() => {
               props.addModule(ModulesEnum.NOTE);

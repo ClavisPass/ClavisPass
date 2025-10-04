@@ -11,6 +11,7 @@ enum ModulesEnum {
   DIGITAL_CARD = "DIGITAL_CARD",
   TASK = "TASK",
   PHONE_NUMBER = "PHONE_NUMBER",
+  TOTP = "TOTP",
   UNKNOWN = "UNKNOWN",
 }
 

@@ -1,38 +1,24 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-  useCallback,
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, Animated, Easing, StyleSheet } from "react-native";
-import { Button, IconButton, TextInput } from "react-native-paper";
-import { Dropdown, DropdownInputProps } from "react-native-paper-dropdown";
+import { Button, IconButton, Text, TextInput } from "react-native-paper";
+import * as Progress from "react-native-progress";
 
 import ModuleContainer from "../container/ModuleContainer";
-import Props from "../../types/ModuleProps";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
+import Props from "../../types/ModuleProps";
+import { codeFromUri, parseOtpauth } from "../../utils/totp";
 import { useTheme } from "../../contexts/ThemeProvider";
-import DigitalCardModuleType from "../../types/modules/DigitalCardModuleType";
-import DigitalCardType, {
-  DIGITAL_CARD_TYPES,
-} from "../../types/DigitalCardType";
-import QRCode from "react-qr-code";
-import Barcode from "@kichiyaki/react-native-barcode-generator";
-import { StackNavigationProp } from "@react-navigation/stack/lib/typescript/src/types";
+import TotpModuleType from "../../types/modules/TotpModuleType";
+import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../stacks/Stack";
+import CopyToClipboard from "../buttons/CopyToClipboard";
+import CircularProgressBar from "../CircularProgressBar";
+import { AnimatedCircularProgress } from "react-native-circular-progress";
 
-type DigitalCardModuleProps = {
+type TotpModuleModuleProps = {
   navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>;
 };
 
-function isDigitalCardType(x: unknown): x is DigitalCardType {
-  return (
-    typeof x === "string" && DIGITAL_CARD_TYPES.includes(x as DigitalCardType)
-  );
-}
-
-/** Cross-platform Toggle Transition (opacity + translateY + slight scale) */
 function useToggleTransition(show: boolean, duration = 220) {
   const progress = React.useRef(new Animated.Value(show ? 1 : 0)).current;
 
@@ -98,61 +84,72 @@ const styles = StyleSheet.create({
   },
 });
 
-function DigitalCardModule(
-  props: DigitalCardModuleType & Props & DigitalCardModuleProps
-) {
+function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
 
-  const OPTIONS = useMemo(
-    () => DIGITAL_CARD_TYPES.map((t) => ({ label: t, value: t })),
-    []
-  );
-
-  const CustomDropdownInput = useCallback(
-    ({ selectedLabel, rightIcon }: DropdownInputProps) => (
-      <TextInput
-        outlineStyle={[globalStyles.outlineStyle]}
-        style={globalStyles.textInputStyle}
-        mode="outlined"
-        value={selectedLabel}
-        right={rightIcon}
-      />
-    ),
-    [globalStyles]
-  );
-
-  const [value, setValue] = useState(props.value);
-  const [type, setType] = useState<DigitalCardType>(
-    props.type as DigitalCardType
-  );
   const [editValue, setEditValue] = useState(false);
 
   const { shownStyle, hiddenStyle } = useToggleTransition(editValue);
 
+  const [value, setValue] = useState(props.value);
+  const [code, setCode] = useState<string>("------");
+  const [remaining, setRemaining] = useState<number>(30);
+  const [importVisible, setImportVisible] = useState(false);
+
+  const info = useMemo(() => {
+    try {
+      return parseOtpauth(value);
+    } catch {
+      return undefined;
+    }
+  }, [value]);
+
   useEffect(() => {
     if (didMount.current) {
-      const newModule: DigitalCardModuleType = {
+      const newModule: TotpModuleType = {
         id: props.id,
         module: props.module,
-        type,
         value,
       };
       props.changeModule(newModule);
     } else {
       didMount.current = true;
     }
-  }, [type, value]);
+  }, [value]);
+
+  // tick: code + remaining jede Sekunde
+  useEffect(() => {
+    let timer: any;
+    const tick = () => {
+      try {
+        const { code, remaining } = codeFromUri(value);
+        setCode(code);
+        setRemaining(remaining);
+      } catch {
+        setCode("------");
+        setRemaining(0);
+      }
+    };
+    tick();
+    timer = setInterval(tick, 1000);
+    return () => clearInterval(timer);
+  }, [value]);
+
+  const progress = useMemo(() => {
+    const p = info?.period ?? 30;
+    return 1 - remaining / p;
+  }, [remaining, info?.period]);
 
   return (
     <ModuleContainer
       id={props.id}
-      title="Digital Card"
+      title={"Two-Factor Auth"}
       edit={props.edit}
       deletable={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      icon={ModuleIconsEnum.DIGITAL_CARD}
+      icon={ModuleIconsEnum.TOTP}
       fastAccess={props.fastAccess}
     >
       <View
@@ -182,11 +179,8 @@ function DigitalCardModule(
             icon="barcode-scan"
             size={20}
             onPress={() => {
-              props.navigation.navigate("DigitalCardScan", {
-                setData: (data: string, scanType: string) => {
-                  setType(scanType as DigitalCardType);
-                  setValue(data);
-                },
+              props.navigation.navigate("TotpScan", {
+                setOtpauth: (uri: string) => setValue(uri),
               });
             }}
           />
@@ -216,37 +210,16 @@ function DigitalCardModule(
                 paddingTop: 5,
               }}
             >
-              <View style={globalStyles.moduleView}>
-                <View style={{ borderRadius: 12, overflow: "hidden", flex: 1 }}>
-                  <Dropdown
-                    CustomDropdownInput={CustomDropdownInput}
-                    menuContentStyle={{
-                      borderRadius: 12,
-                      backgroundColor: theme.colors.background,
-                      boxShadow: theme.colors.shadow,
-                      overflow: "hidden",
-                    }}
-                    mode="flat"
-                    hideMenuHeader
-                    options={OPTIONS}
-                    value={type}
-                    onSelect={(v?: string) => {
-                      if (isDigitalCardType(v)) setType(v);
-                    }}
-                  />
-                </View>
-              </View>
-              <View style={globalStyles.moduleView}>
-                <View style={{ height: 40, flex: 1 }}>
-                  <TextInput
-                    placeholder="Card Number"
-                    outlineStyle={globalStyles.outlineStyle}
-                    style={globalStyles.textInputStyle}
-                    value={value}
-                    mode="outlined"
-                    onChangeText={setValue}
-                  />
-                </View>
+              <View style={{ height: 40, flex: 1 }}>
+                <TextInput
+                  outlineStyle={globalStyles.outlineStyle}
+                  style={globalStyles.textInputStyle}
+                  value={value}
+                  mode="outlined"
+                  onChangeText={(text) => setValue(text)}
+                  autoComplete="one-time-code"
+                  keyboardType="visible-password"
+                />
               </View>
             </View>
           </Animated.View>
@@ -262,21 +235,69 @@ function DigitalCardModule(
                 alignItems: "center",
                 justifyContent: "center",
                 flexDirection: "row",
-                height: 96,
-                paddingRight: 48,
+
               }}
             >
               {value !== "" ? (
-                type === "QR-Code" ? (
-                  <QRCode value={value} size={90} />
-                ) : (
-                  <Barcode
-                    height={70}
-                    format={type}
-                    value={value}
-                    text={value}
-                  />
-                )
+                <View
+                  style={[
+                    globalStyles.moduleView,
+                    {
+                      flex: 1,
+                      display: "flex",
+                      justifyContent: "space-between",
+                    },
+                  ]}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ opacity: 0.7, marginTop: 4, marginLeft: 6 }}>
+                      {info?.issuer ? `${info.issuer} • ` : ""}
+                      {info?.account ?? ""}
+                    </Text>
+                    <View style={[globalStyles.moduleView, {alignItems: "flex-start", justifyContent: "flex-start"}]}>
+                      <Text
+                        style={{
+                          fontSize: 34,
+                          fontVariant: ["tabular-nums"],
+                          letterSpacing: 2,
+                          color: theme.colors.primary,
+                        }}
+                      >
+                        {code
+                          ? `${code.slice(0, 3)} ${code.slice(3)}`
+                          : "--- ---"}
+                      </Text>
+                      <CopyToClipboard value={code} />
+                    </View>
+                  </View>
+                  <View style={{ width: 60, height: 60 }}>
+                    <AnimatedCircularProgress
+                      size={60}
+                      width={6}
+                      fill={(1 - remaining / (info?.period ?? 30)) * 100}
+                      tintColor={theme.colors.primary}
+                      backgroundColor="#d3d3d341"
+                      rotation={0}
+                      lineCap="round"
+                    >
+                      {() => (
+                        <Text
+                          variant="bodyMedium"
+                          style={[
+                            { color: theme.colors.primary },
+                            {
+                              fontWeight: "bold",
+                              fontSize: 16,
+                              userSelect: "none",
+                            },
+                          ]}
+                        >
+                          {`${remaining}s`}
+                        </Text>
+                      )}
+                    </AnimatedCircularProgress>
+                  </View>
+                </View>
               ) : (
                 <Button
                   style={{ borderRadius: 12 }}
@@ -284,11 +305,8 @@ function DigitalCardModule(
                   mode="contained-tonal"
                   textColor={theme.colors.primary}
                   onPress={() => {
-                    props.navigation.navigate("DigitalCardScan", {
-                      setData: (data: string, scanType: string) => {
-                        setType(scanType as DigitalCardType);
-                        setValue(data);
-                      },
+                    props.navigation.navigate("TotpScan", {
+                      setOtpauth: (uri: string) => setValue(uri),
                     });
                   }}
                 >
@@ -303,4 +321,4 @@ function DigitalCardModule(
   );
 }
 
-export default DigitalCardModule;
+export default TotpModule;

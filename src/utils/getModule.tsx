@@ -28,6 +28,8 @@ import UnknownModule from "../components/modules/UnknownModule";
 import createUniqueID from "./createUniqueID";
 import PhoneNumberModuleType from "../types/modules/PhoneNumberModuleType";
 import PhoneNumberModule from "../components/modules/PhoneNumberModule";
+import TotpModule from "../components/modules/TotpModule";
+import TotpModuleType from "../types/modules/TotpModuleType";
 
 function getModule(
   module: ModuleType,
@@ -206,6 +208,22 @@ function getModule(
         deleteModule={deleteModule}
         changeModule={changeModule}
         fastAccess={fastAccess}
+      />
+    );
+  }
+  if (module.module === ModulesEnum.TOTP) {
+    const moduleObject = module as TotpModuleType;
+    return (
+      <TotpModule
+        id={moduleObject.id}
+        module={moduleObject.module}
+        value={moduleObject.value}
+        edit={edit}
+        onDragStart={onDragStart}
+        deleteModule={deleteModule}
+        changeModule={changeModule}
+        fastAccess={fastAccess}
+        navigation={navigation}
       />
     );
   }

@@ -74,25 +74,25 @@ const CustomBottomTab = ({
       style={{
         position: "relative",
         backgroundColor: isOnline
-          ? theme.colors.elevation.level4
+          ? Platform.OS === "web"
+            ? theme.colors.elevation.level4
+            : theme.colors.elevation.level2
           : theme.colors.secondary,
       }}
     >
-      {/* Background-Fix unterhalb der Bar */}
       <View
         style={{
           position: "absolute",
           bottom: 0,
           left: 0,
           right: 0,
-          height: 12, // Höhe der Rundung
+          height: 12,
           backgroundColor: theme.colors.background,
           borderTopLeftRadius: 12,
           borderTopRightRadius: 12,
           zIndex: 0,
         }}
       />
-      {/* Floating Add Button */}
       {!isOnline && (
         <View
           style={{
@@ -124,15 +124,13 @@ const CustomBottomTab = ({
             backgroundColor: theme.colors.background,
             borderRadius: 28,
           },
-          Platform.OS === "web"
-            ? {
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: -2 },
-                shadowOpacity: 0.15,
-                shadowRadius: 12,
-                elevation: 8,
-              }
-            : {},
+          {
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.15,
+            shadowRadius: 12,
+            elevation: 8,
+          },
         ]}
       >
         <IconButton
@@ -150,18 +148,15 @@ const CustomBottomTab = ({
         />
       </View>
 
-      {/* Outer shadow container */}
       <View
         style={[
-          Platform.OS === "web"
-            ? {
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: -2 },
-                shadowOpacity: 0.15,
-                shadowRadius: 12,
-                elevation: 8,
-              }
-            : {},
+          {
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.15,
+            shadowRadius: 12,
+            elevation: 8,
+          },
         ]}
       >
         <View

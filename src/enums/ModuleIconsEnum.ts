@@ -11,6 +11,7 @@ enum ModuleIconsEnum {
   TASK = "checkbox-marked",
   PHONE_NUMBER = "phone",
   UNKNOWN = "help-circle-outline",
+  TOTP = "two-factor-authentication",
 }
 
 export default ModuleIconsEnum;

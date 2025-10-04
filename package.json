@@ -74,6 +74,7 @@
     "expo-web-browser": "~15.0.8",
     "libphonenumber-js": "^1.12.17",
     "moti": "^0.30.0",
+    "otpauth": "^9.4.1",
     "papaparse": "^5.4.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",

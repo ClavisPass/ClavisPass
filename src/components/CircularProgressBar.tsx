@@ -8,6 +8,7 @@ type Props = {
   fill: number;
   maxValue: number;
   color: string;
+  unit?: string;
 };
 
 function CircularProgressBar(props: Props) {
@@ -24,7 +25,7 @@ function CircularProgressBar(props: Props) {
       >
         {(fill: number) => (
           <Text variant="bodyMedium" style={[{color: props.color}, {fontWeight: "bold", fontSize: 16, userSelect: "none"}]}>
-            {`${Math.round(fill)}%`}
+            {`${Math.round(fill)}${props.unit ?? "%"}`}
           </Text>
         )}
       </AnimatedCircularProgress>
