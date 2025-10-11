@@ -30,6 +30,8 @@ import PhoneNumberModuleType from "../types/modules/PhoneNumberModuleType";
 import PhoneNumberModule from "../components/modules/PhoneNumberModule";
 import TotpModule from "../components/modules/TotpModule";
 import TotpModuleType from "../types/modules/TotpModuleType";
+import ExpiryModuleType from "../types/modules/ExpiryModuleType";
+import ExpiryModule from "../components/modules/ExpiryModule";
 
 function getModule(
   module: ModuleType,
@@ -224,6 +226,22 @@ function getModule(
         changeModule={changeModule}
         fastAccess={fastAccess}
         navigation={navigation}
+      />
+    );
+  }
+  if (module.module === ModulesEnum.EXPIRY) {
+    const moduleObject = module as ExpiryModuleType;
+    return (
+      <ExpiryModule
+        id={moduleObject.id}
+        module={moduleObject.module}
+        value={moduleObject.value}
+        warnBeforeMs={moduleObject.warnBeforeMs}
+        edit={edit}
+        onDragStart={onDragStart}
+        deleteModule={deleteModule}
+        changeModule={changeModule}
+        fastAccess={fastAccess}
       />
     );
   }

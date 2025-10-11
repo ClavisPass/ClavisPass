@@ -12,6 +12,7 @@ enum ModulesEnum {
   TASK = "TASK",
   PHONE_NUMBER = "PHONE_NUMBER",
   TOTP = "TOTP",
+  EXPIRY = "EXPIRY",
   UNKNOWN = "UNKNOWN",
 }
 

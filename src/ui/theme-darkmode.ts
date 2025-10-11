@@ -23,6 +23,7 @@ const theme = {
     },
     tertiary: "rgba(51, 51, 51, 1)",
     shadow: "",
+    surface: "#292929ff",
     surfaceDisabled: "rgba(231, 225, 229, 0.12)",
     onSurfaceDisabled: "rgba(231, 225, 229, 0.38)",
     inversePrimary: "rgb(120, 69, 172)",

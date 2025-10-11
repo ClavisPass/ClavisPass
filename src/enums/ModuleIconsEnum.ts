@@ -12,6 +12,7 @@ enum ModuleIconsEnum {
   PHONE_NUMBER = "phone",
   UNKNOWN = "help-circle-outline",
   TOTP = "two-factor-authentication",
+  EXPIRY = "calendar",
 }
 
 export default ModuleIconsEnum;

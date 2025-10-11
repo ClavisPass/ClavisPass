@@ -22,7 +22,7 @@ const theme = {
     },
     tertiary: "rgba(226, 226, 226, 1)",
     //tertiaryContainer: "#FFA500",
-    surface: "#FFC0CB",
+    surface: "#ffffff",
     surfaceVariant: "#F5F5F5",
     surfaceDisabled: "rgba(29, 27, 30, 0.12)",
     onSurfaceDisabled: "rgba(29, 27, 30, 0.38)",

@@ -181,6 +181,24 @@ function AddModuleModal(props: Props) {
             {"Note"}
           </CategoryItem>
         </View>
+        <View
+          style={{
+            height: 64,
+            display: "flex",
+            flexDirection: "row",
+            gap: 8,
+            marginBottom: 8,
+          }}
+        >
+          <CategoryItem
+            leadingIcon={ModuleIconsEnum.EXPIRY}
+            onPress={() => {
+              props.addModule(ModulesEnum.EXPIRY);
+            }}
+          >
+            {"Expiry"}
+          </CategoryItem>
+        </View>
       </ScrollView>
     </Modal>
   );

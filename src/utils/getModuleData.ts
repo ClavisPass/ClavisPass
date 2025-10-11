@@ -3,6 +3,7 @@ import { ModuleType } from "../types/ModulesType";
 import CustomFieldModuleType from "../types/modules/CustomFieldModuleType";
 import DigitalCardModuleType from "../types/modules/DigitalCardModuleType";
 import EmailModuleType from "../types/modules/EmailModuleType";
+import ExpiryModuleType from "../types/modules/ExpiryModuleType";
 import KeyModuleType from "../types/modules/KeyModuleType";
 import NoteModuleType from "../types/modules/NoteModuleType";
 import PasswordModuleType from "../types/modules/PasswordModuleType";
@@ -120,6 +121,14 @@ function getModuleData(module: ModulesEnum) {
   }
   if (module === ModulesEnum.TOTP) {
     const moduleData: TotpModuleType = {
+      id: id,
+      module: module,
+      value: "",
+    };
+    return moduleData as ModuleType;
+  }
+  if (module === ModulesEnum.EXPIRY) {
+    const moduleData: ExpiryModuleType = {
       id: id,
       module: module,
       value: "",

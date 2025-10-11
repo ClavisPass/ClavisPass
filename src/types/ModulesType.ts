@@ -13,6 +13,7 @@ import { DigitalCardModuleTypeSchema } from "./modules/DigitalCardModuleType";
 import { UnknownModuleTypeSchema } from "./modules/UnknownModuleType";
 import { PhoneNumberModuleTypeSchema } from "./modules/PhoneNumberModuleType";
 import { TotpModuleTypeSchema } from "./modules/TotpModuleType";
+import { ExpiryModuleTypeSchema } from "./modules/ExpiryModuleType";
 
 export const ModuleTypeSchema = CustomFieldModuleTypeSchema.or(
   EmnailModuleTypeSchema
@@ -28,6 +29,7 @@ export const ModuleTypeSchema = CustomFieldModuleTypeSchema.or(
   .or(TaskModuleTypeSchema)
   .or(PhoneNumberModuleTypeSchema)
   .or(TotpModuleTypeSchema)
+  .or(ExpiryModuleTypeSchema)
   .or(UnknownModuleTypeSchema);
 
 export type ModuleType = z.infer<typeof ModuleTypeSchema>;

@@ -46,6 +46,7 @@ import BackupExportButton from "../components/buttons/BackupExportButton";
 import { useDevMode } from "../contexts/DevModeProvider";
 import { StackScreenProps } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../stacks/Stack";
+import SettingsDropdownItem from "../components/items/SettingsDropdownItem";
 
 const styles = StyleSheet.create({
   surface: {
@@ -110,7 +111,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
       },
       { title: "System", icon: "cogs", ref: systemRef, plattform: "web" },
       {
-        title: "Design",
+        title: "Display",
         icon: "theme-light-dark",
         ref: designRef,
         plattform: null,
@@ -306,6 +307,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             title={quickSelectItems[3].title}
           >
             <DarkModeSwitch />
+            <SettingsDivider />
+            <SettingsDropdownItem
+              options={[
+                { label: "Option 1", value: "option1" },
+                { label: "Option 2", value: "option2" },
+              ]}
+            />
+            <SettingsDivider />
           </SettingsContainer>
           <SettingsContainer
             ref={quickSelectItems[4].ref}

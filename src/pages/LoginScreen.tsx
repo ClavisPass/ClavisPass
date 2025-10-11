@@ -142,7 +142,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             key={currentKey}
             entering={FadeIn.duration(500).easing(Easing.bezier(0.4, 0, 0.2, 1))}
             exiting={FadeOut.duration(500).easing(Easing.bezier(0.4, 0, 0.2, 1))}
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+            style={{ flex: 1, justifyContent: "space-between", alignItems: "center" }}
           >
             {isOnline ? (
               loading ? (
