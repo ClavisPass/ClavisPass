@@ -90,7 +90,7 @@ export default function ModuleContainer({
             }}
           >
             {icon ? (
-              <Icon source={icon} size={16} color={theme.colors?.primary} />
+              <Icon source={icon} size={14} color={theme.colors?.primary} />
             ) : null}
 
             <Pressable
@@ -98,12 +98,11 @@ export default function ModuleContainer({
               style={{ cursor: titlePress ? "pointer" : "auto" }}
             >
               <Text
-                variant="bodyMedium"
+                variant="labelSmall"
                 style={{
-                  userSelect: "none",
-                  color: theme.colors?.primary,
-                  margin: 0,
+                  opacity: 0.7,
                 }}
+                accessibilityRole="header"
               >
                 {title}
               </Text>

@@ -38,7 +38,7 @@ export function SubItem(props: Props) {
           <Icon color={theme.colors?.primary} source={props.icon} size={16} />
         )}
         <Text
-          style={{ color: theme.colors?.primary, userSelect: "none" }}
+          style={{ userSelect: "none", opacity: 0.7, }}
           variant="titleMedium"
         >
           {props.title}

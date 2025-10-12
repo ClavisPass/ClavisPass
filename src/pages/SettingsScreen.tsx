@@ -310,9 +310,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             <SettingsDivider />
             <SettingsDropdownItem
               options={[
-                { label: "Option 1", value: "option1" },
-                { label: "Option 2", value: "option2" },
+                { label: "English", value: "english" },
+                { label: "Deutsch", value: "german" },
               ]}
+              leadingIcon="earth"
             />
             <SettingsDivider />
           </SettingsContainer>

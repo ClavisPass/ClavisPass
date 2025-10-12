@@ -29,7 +29,7 @@ export default function ExpiryPickerModal({
   return (
     <Portal>
       <Dialog
-        style={{ borderRadius: 12 }}
+        style={{ borderRadius: 12, width: 400, alignSelf: "center" }}
         visible={visible}
         onDismiss={() => setVisible(false)}
       >
@@ -43,6 +43,46 @@ export default function ExpiryPickerModal({
             >
               {date ? "Date: " + date.toLocaleDateString() : "Date"}
             </Button>
+            <View
+              style={{
+                flexDirection: "row",
+                gap: 6,
+                justifyContent: "center",
+              }}
+            >
+              <Button
+                style={{ borderRadius: 12 }}
+                compact
+                onPress={() => setDate(new Date(Date.now()))}
+              >
+                Current
+              </Button>
+              <Button
+                style={{ borderRadius: 12 }}
+                compact
+                onPress={() => setDate(new Date(Date.now() + 24 * 3600 * 1000))}
+              >
+                +1 T
+              </Button>
+              <Button
+                style={{ borderRadius: 12 }}
+                compact
+                onPress={() =>
+                  setDate(new Date(Date.now() + 7 * 24 * 3600 * 1000))
+                }
+              >
+                +7 T
+              </Button>
+              <Button
+                style={{ borderRadius: 12 }}
+                compact
+                onPress={() =>
+                  setDate(new Date(Date.now() + 30 * 24 * 3600 * 1000))
+                }
+              >
+                +30 T
+              </Button>
+            </View>
             <Button
               style={{ borderRadius: 12 }}
               mode="outlined"
@@ -54,6 +94,7 @@ export default function ExpiryPickerModal({
         </Dialog.Content>
         <Dialog.Actions>
           <Button
+            mode="contained-tonal"
             style={{ borderRadius: 12 }}
             onPress={() => setVisible(false)}
           >

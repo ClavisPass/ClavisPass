@@ -108,7 +108,7 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
         </View>
       ) : (
         <View
-          style={[globalStyles.moduleView, { justifyContent: "flex-start" }]}
+          style={[globalStyles.moduleView, { justifyContent: "center" }]}
         >
           <Button
             style={{ borderRadius: 12 }}
@@ -118,39 +118,6 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
           >
             Set expiry date
           </Button>
-          <View style={{ flexDirection: "row", gap: 6, marginLeft: 8 }}>
-            <Button
-              style={{ borderRadius: 12 }}
-              compact
-              onPress={() =>
-                setValue(new Date(Date.now() + 24 * 3600 * 1000).toISOString())
-              }
-            >
-              +1 T
-            </Button>
-            <Button
-              style={{ borderRadius: 12 }}
-              compact
-              onPress={() =>
-                setValue(
-                  new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString()
-                )
-              }
-            >
-              +7 T
-            </Button>
-            <Button
-              style={{ borderRadius: 12 }}
-              compact
-              onPress={() =>
-                setValue(
-                  new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString()
-                )
-              }
-            >
-              +30 T
-            </Button>
-          </View>
         </View>
       )}
 
