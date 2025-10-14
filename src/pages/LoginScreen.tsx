@@ -3,7 +3,7 @@ import { View, StyleSheet, ImageBackground } from "react-native";
 import Animated, { Easing, FadeIn, FadeOut } from "react-native-reanimated";
 import ContentProtection from "../components/ContentProtection";
 import { useToken } from "../contexts/TokenProvider";
-import fetchUserInfo from "../api/fetchUserInfo";
+import fetchUserInfo from "../api/fetchUserInfo/fetchUserInfo";
 import Auth from "../components/Auth";
 import UserInfoType from "../types/UserInfoType";
 import EditTokenModal from "../components/modals/EditTokenModal";

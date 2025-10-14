@@ -3,7 +3,7 @@ import { useAuth } from "../contexts/AuthProvider";
 import UserInfoType from "../types/UserInfoType";
 import Button from "./buttons/Button";
 import TypeWriterComponent from "./TypeWriter";
-import fetchData from "../api/fetchData";
+import fetchData from "../api/fetchData/fetchData";
 import { useToken } from "../contexts/TokenProvider";
 import { ActivityIndicator } from "react-native-paper";
 import { View } from "react-native";

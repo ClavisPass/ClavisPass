@@ -1,4 +1,4 @@
-import CryptoType from "../types/CryptoType";
+import CryptoType from "../../types/CryptoType";
 
 const uploadFileToDropbox = async (
   token: string,
@@ -32,15 +32,4 @@ const uploadFileToDropbox = async (
   callback?.();
 };
 
-const uploadData = async (
-  token: string | null,
-  tokenType: string | null,
-  fileContent: CryptoType,
-  fileName: string,
-  callback?: () => void
-) => {
-  if (token && tokenType)
-    uploadFileToDropbox(token, fileContent, fileName, callback);
-};
-
-export default uploadData;
+export default uploadFileToDropbox;

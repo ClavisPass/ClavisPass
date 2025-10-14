@@ -6,14 +6,14 @@ import PasswordTextbox from "../PasswordTextbox";
 import { ActivityIndicator, Text } from "react-native-paper";
 import Button from "../buttons/Button";
 import { useTheme } from "../../contexts/ThemeProvider";
-import fetchData from "../../api/fetchData";
+import fetchData from "../../api/fetchData/fetchData";
 import CryptoType, { CryptoTypeSchema } from "../../types/CryptoType";
 import { useToken } from "../../contexts/TokenProvider";
 import { decrypt, encrypt } from "../../utils/CryptoLayer";
 import DataType, { DataTypeSchema } from "../../types/DataType";
 import { set } from "zod";
 import { compare, getDateTime } from "../../utils/Timestamp";
-import uploadData from "../../api/uploadData";
+import uploadData from "../../api/uploadData/uploadData";
 import { useAuth } from "../../contexts/AuthProvider";
 
 type Props = {

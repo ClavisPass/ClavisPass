@@ -5,7 +5,7 @@ import { Skeleton } from "moti/skeleton";
 import { View } from "react-native";
 import { MotiView } from "moti";
 import { useToken } from "../contexts/TokenProvider";
-import fetchUserInfo from "../api/fetchUserInfo";
+import fetchUserInfo from "../api/fetchUserInfo/fetchUserInfo";
 import DropboxLoginButton from "./buttons/DropboxLoginButton";
 import UserInfoType from "../types/UserInfoType";
 

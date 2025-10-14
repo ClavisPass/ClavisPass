@@ -30,21 +30,4 @@ const fetchFileFromDropbox = async (
   }
 };
 
-const fetchData = async (
-  token: string | null,
-  tokenType: string | null,
-  fileName: string
-): Promise<string | null> => {
-  if (token && tokenType) {
-    try {
-      const data = await fetchFileFromDropbox(token, fileName);
-      return data; // Gibt das validierte DataType-Objekt zurück, wenn erfolgreich
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      return null;
-    }
-  }
-  return null;
-};
-
-export default fetchData;
+export default fetchFileFromDropbox;
