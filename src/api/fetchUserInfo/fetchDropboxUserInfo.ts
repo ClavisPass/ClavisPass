@@ -3,7 +3,7 @@ import UserInfoType from "../../types/UserInfoType";
 const fetchDropboxUserInfo = async (
   token: string,
   setUserInfo: (data: UserInfoType) => void,
-  callback?: ()=> void
+  callback?: () => void
 ) => {
   if (token) {
     try {
@@ -33,8 +33,7 @@ const fetchDropboxUserInfo = async (
       console.error("Network error:", error);
       callback?.();
     }
-  }
-  else{
+  } else {
     callback?.();
   }
 };
