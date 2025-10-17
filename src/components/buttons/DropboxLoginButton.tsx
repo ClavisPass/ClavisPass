@@ -74,7 +74,6 @@ function DropboxLoginButton() {
     [saveRefreshToken, setRefreshToken, setToken]
   );
 
-  // --- Mobile (Expo) ---
   const MOBILE_REDIRECT_URI = useMemo(
     () => (isMobile ? getMobileRedirectUri() : "http://127.0.0.1/unused"),
     [isMobile]
@@ -98,7 +97,7 @@ function DropboxLoginButton() {
   useEffect(() => {
     if (!isMobile) return;
     if (response?.type === "success") {
-      const { code } = response.params; // kein eigener state-Check auf Mobile
+      const { code } = response.params;
       const verifier = request?.codeVerifier || "";
       exchangeToken(code, MOBILE_REDIRECT_URI, verifier);
     }
@@ -110,9 +109,11 @@ function DropboxLoginButton() {
     exchangeToken,
   ]);
 
-  // --- Desktop (Tauri) ---
-  const closeAuthWindowIfAny = useCallback(() => {
+  const closeAuthWindowIfAny = useCallback(async () => {
     try {
+      const tauri = require("@tauri-apps/api/webviewWindow");
+      const win = await tauri.WebviewWindow.getByLabel("DropboxAuth");
+      win.close();
       if (popupRef.current && !popupRef.current.closed)
         popupRef.current.close();
     } catch {}
@@ -140,7 +141,7 @@ function DropboxLoginButton() {
     try {
       prePopup.document.title = "Dropbox Login …";
       prePopup.document.body.innerHTML =
-        "<p style='font-family:system-ui;margin:16px'>Öffne Dropbox …</p>";
+        "<p style='font-family:system-ui;margin:16px'></p>";
     } catch {}
 
     try {

@@ -140,9 +140,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         >
           <Animated.View
             key={currentKey}
-            entering={FadeIn.duration(500).easing(Easing.bezier(0.4, 0, 0.2, 1))}
-            exiting={FadeOut.duration(500).easing(Easing.bezier(0.4, 0, 0.2, 1))}
-            style={{ flex: 1, justifyContent: "space-between", alignItems: "center" }}
+            entering={FadeIn.duration(500).easing(
+              Easing.bezier(0.4, 0, 0.2, 1)
+            )}
+            exiting={FadeOut.duration(500).easing(
+              Easing.bezier(0.4, 0, 0.2, 1)
+            )}
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
           >
             {isOnline ? (
               loading ? (

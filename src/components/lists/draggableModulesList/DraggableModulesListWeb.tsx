@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   DragDropContext,
   Droppable,
@@ -14,12 +14,15 @@ import ValuesType from "../../../types/ValuesType";
 import ModulesType, { ModuleType } from "../../../types/ModulesType";
 import getModule from "../../../utils/getModule";
 import { View } from "react-native";
-import { IconButton } from "react-native-paper";
+import { Chip, IconButton } from "react-native-paper";
 import { useTheme } from "../../../contexts/ThemeProvider";
 import FastAccessType from "../../../types/FastAccessType";
 import MetaInformationModule from "../../modules/MetaInformationModule";
 import { StackNavigationProp } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../../../stacks/Stack";
+import ModulesEnum from "../../../enums/ModulesEnum";
+import predictNextModule from "../../../utils/predictNextModule";
+import getModuleNameByEnum from "../../../utils/getModuleNameByEnum";
 
 type Props = {
   value: ValuesType;
@@ -27,11 +30,12 @@ type Props = {
   changeModules: (data: ModulesType) => void;
   deleteModule: (id: string) => void;
   changeModule: (module: ModuleType) => void;
+  addModule: (module: ModulesEnum) => void;
   edit: boolean;
   setDiscardoChanges: () => void;
   showAddModuleModal: () => void;
   fastAccess: FastAccessType | null;
-  navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>
+  navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>;
 };
 
 const reorder = (list: any, startIndex: number, endIndex: number) => {
@@ -54,6 +58,9 @@ const getListStyle = (isDraggingOver: boolean) => ({
 
 function DraggableModulesListWeb(props: Props) {
   const { theme } = useTheme();
+  const [modulePrediction, setModulePrediction] = useState<ModulesEnum | null>(
+    null
+  );
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
@@ -66,6 +73,10 @@ function DraggableModulesListWeb(props: Props) {
     props.changeModules(reordered);
     props.setDiscardoChanges();
   };
+
+  useEffect(() => {
+    setModulePrediction(predictNextModule(props.value.modules));
+  }, [props.value.modules]);
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -115,8 +126,23 @@ function DraggableModulesListWeb(props: Props) {
             {provided.placeholder}
             {props.edit ? (
               <View
-                style={{ display: "flex", alignItems: "center", width: "100%" }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  width: "100%",
+                }}
               >
+                {modulePrediction && (
+                  <Chip
+                    icon={"plus"}
+                    onPress={() => {
+                      props.addModule(modulePrediction);
+                    }}
+                    style={{ position: "absolute", left: 8 }}
+                  >
+                    {getModuleNameByEnum(modulePrediction)}
+                  </Chip>
+                )}
                 <IconButton
                   icon={"plus"}
                   iconColor={theme.colors.primary}

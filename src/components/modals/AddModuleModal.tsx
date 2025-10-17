@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback, useEffect } from "react"; // [CHANGED]
 import { useWindowDimensions, View, ScrollView } from "react-native";
 import {
   Searchbar,
@@ -12,6 +12,8 @@ import Modal from "./Modal";
 import ModulesEnum from "../../enums/ModulesEnum";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import AnimatedPressable from "../AnimatedPressable";
+
+import * as store from "../../utils/store";
 
 type ModuleCategory = "Common" | "Security" | "Contact" | "Utility";
 
@@ -28,9 +30,9 @@ type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
 
-  favorites?: ModulesEnum[];
+  favorites?: ModulesEnum[]; // controlled optional
   recent?: ModulesEnum[];
-  onToggleFavorite?: (module: ModulesEnum, isFavorite: boolean) => void;
+  onToggleFavorite?: (module: ModulesEnum, isFavorite: boolean) => void; // controlled handler optional
   onSelect?: (module: ModulesEnum) => void;
 };
 
@@ -242,6 +244,23 @@ export default function AddModuleModalCompactFav(props: Props) {
   const [localFavs, setLocalFavs] = useState<ModulesEnum[]>([]);
   const favs = props.favorites ?? localFavs;
 
+  // [NEW] Beim Mount Favoriten aus dem Store laden (nur wenn uncontrolled)
+  useEffect(() => {
+    if (props.favorites) return; // controlled → Quelle ist Parent
+    (async () => {
+      const stored = await store.get("FAVORITE_MODULES");
+      setLocalFavs(Array.isArray(stored) ? stored : []);
+    })();
+  }, [props.favorites]);
+
+  // [NEW] Wenn controlled und sich favorites-Prop ändert, Store spiegeln
+  useEffect(() => {
+    if (!props.favorites) return;
+    // Deduplizieren & speichern
+    const uniq = Array.from(new Set(props.favorites));
+    store.set("FAVORITE_MODULES", uniq).catch(() => {});
+  }, [props.favorites]);
+
   const categories: ModuleCategory[] = [
     "Common",
     "Security",
@@ -304,18 +323,42 @@ export default function AddModuleModalCompactFav(props: Props) {
   );
 
   const isFavorite = (id: ModulesEnum) => favs.includes(id);
+
+  const persistFavs = useCallback(async (arr: ModulesEnum[]) => {
+    const uniq = Array.from(new Set(arr));
+    try {
+      await store.set("FAVORITE_MODULES", uniq);
+    } catch {
+      // optional: loggen
+    }
+  }, []);
+
   const toggleFavorite = (id: ModulesEnum) => {
     const nowFav = !isFavorite(id);
+
+    // Falls Parent Interesse hat, zuerst informieren (controlled hook-in)
     if (props.onToggleFavorite) props.onToggleFavorite(id, nowFav);
-    else {
+
+    // Unabhängig davon: wenn uncontrolled → lokalen State + Store updaten
+    if (!props.favorites) {
       setLocalFavs((prev) => {
         const set = new Set(prev);
         nowFav ? set.add(id) : set.delete(id);
-        return Array.from(set);
+        const arr = Array.from(set);
+        persistFavs(arr); // [NEW]
+        return arr;
       });
+    } else {
+      // controlled: optional Store spiegeln, wenn Parent keinen Handler liefert
+      if (!props.onToggleFavorite) {
+        const base = new Set(props.favorites);
+        nowFav ? base.add(id) : base.delete(id);
+        persistFavs(Array.from(base)); // [NEW]
+      }
     }
   };
 
+  const { height: _h, width: _w } = useWindowDimensions();
   const containerWidth = Math.min(400, winW - 32);
   const containerMaxHeight = Math.max(360, Math.min(640, winH - 160));
   const columns = 2;

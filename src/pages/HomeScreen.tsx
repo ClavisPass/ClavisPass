@@ -57,6 +57,8 @@ import { saveBackup } from "../utils/Backup";
 import FolderType from "../types/FolderType";
 import AnimatedPressable from "../components/AnimatedPressable";
 
+import * as store from "../utils/store";
+
 type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
@@ -91,10 +93,19 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    store.get("FAVORITE_FILTER").then((stored) => {
+      setSelectedFav(stored);
+    });
+  }, []);
+
+  const saveSelectedFavState = (fav: boolean) => {
+    setSelectedFav(fav);
+    store.set("FAVORITE_FILTER", fav);
+  }
+
+  useEffect(() => {
     if (triggerAdd) {
       setValueModalVisible(true);
-
-      // Zustand resetten
       navigation.setParams({ triggerAdd: undefined });
     }
   }, [triggerAdd]);
@@ -199,7 +210,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           data.setShowSave(false);
 
           setSelectedFolder(null);
-          setSelectedFav(false);
+          saveSelectedFavState(false);
         }
       });
     } else {
@@ -457,7 +468,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         <FolderFilter
           folder={data.data?.folder}
           selectedFav={selectedFav}
-          setSelectedFav={setSelectedFav}
+          setSelectedFav={saveSelectedFavState}
           selectedFolder={selectedFolder}
           setSelectedFolder={setSelectedFolder}
           setFolderModalVisible={setFolderModalVisible}

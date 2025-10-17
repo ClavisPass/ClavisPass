@@ -370,6 +370,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           changeModules={changeModules}
           deleteModule={deleteModule}
           changeModule={changeModule}
+          addModule={addModule}
           edit={edit}
           setDiscardoChanges={() => (discardChangesRef.current = true)}
           showAddModuleModal={() => {
@@ -385,6 +386,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           changeModules={changeModules}
           deleteModule={deleteModule}
           changeModule={changeModule}
+          addModule={addModule}
           edit={edit}
           setDiscardoChanges={() => (discardChangesRef.current = true)}
           showAddModuleModal={() => {

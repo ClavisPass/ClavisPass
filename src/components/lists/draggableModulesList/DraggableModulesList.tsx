@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -12,12 +12,15 @@ import DraggableFlatList, {
 import ValuesType from "../../../types/ValuesType";
 import ModulesType, { ModuleType } from "../../../types/ModulesType";
 import getModule from "../../../utils/getModule";
-import { IconButton } from "react-native-paper";
+import { Chip, IconButton } from "react-native-paper";
 import { useTheme } from "../../../contexts/ThemeProvider";
 import FastAccessType from "../../../types/FastAccessType";
 import MetaInformationModule from "../../modules/MetaInformationModule";
 import { StackNavigationProp } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../../../stacks/Stack";
+import ModulesEnum from "../../../enums/ModulesEnum";
+import predictNextModule from "../../../utils/predictNextModule";
+import getModuleNameByEnum from "../../../utils/getModuleNameByEnum";
 
 type Props = {
   value: ValuesType;
@@ -25,6 +28,7 @@ type Props = {
   changeModules: (data: ModulesType) => void;
   deleteModule: (id: string) => void;
   changeModule: (module: ModuleType) => void;
+  addModule: (module: ModulesEnum) => void;
   edit: boolean;
   setDiscardoChanges: () => void;
   showAddModuleModal: () => void;
@@ -34,6 +38,10 @@ type Props = {
 
 function DraggableModulesList(props: Props) {
   const { theme } = useTheme();
+
+  const [modulePrediction, setModulePrediction] = useState<ModulesEnum | null>(
+    null
+  );
 
   const renderItem = useCallback(
     ({ item, drag, isActive }: RenderItemParams<ModuleType>) => {
@@ -49,6 +57,10 @@ function DraggableModulesList(props: Props) {
     },
     [props.edit, props.value]
   );
+
+  useEffect(() => {
+    setModulePrediction(predictNextModule(props.value.modules));
+  }, [props.value.modules]);
 
   return (
     <KeyboardAvoidingView
@@ -79,6 +91,17 @@ function DraggableModulesList(props: Props) {
                   width: "100%",
                 }}
               >
+                {modulePrediction && (
+                  <Chip
+                    icon={"plus"}
+                    onPress={() => {
+                      props.addModule(modulePrediction);
+                    }}
+                    style={{ position: "absolute", left: 8 }}
+                  >
+                    {getModuleNameByEnum(modulePrediction)}
+                  </Chip>
+                )}
                 <IconButton
                   icon={"plus"}
                   iconColor={theme.colors.primary}

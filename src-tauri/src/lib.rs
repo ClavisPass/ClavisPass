@@ -3,8 +3,7 @@
 use serde::{Deserialize, Serialize};
 use std::{
     fs,
-    path::PathBuf,
-    sync::atomic::{AtomicUsize, Ordering},
+    path::PathBuf
 };
 use tauri::{
     menu::{Menu, MenuItem},
@@ -61,9 +60,6 @@ fn load_window_size(app_handle: &AppHandle) -> Option<WindowSize> {
     None
 }
 
-// Label-Zähler für Popups (window.open)
-static POPUP_COUNTER: AtomicUsize = AtomicUsize::new(0);
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -89,7 +85,6 @@ pub fn run() {
             Some(vec!["--hidden"]),
         ))
         .setup(|app| {
-            // ----------------- Hauptfenster mit deinen Settings -----------------
             let app_handle = app.handle().clone();
 
             let builder = WebviewWindowBuilder::new(
@@ -100,28 +95,25 @@ pub fn run() {
             .title("ClavisPass")
             .fullscreen(false)
             .resizable(true)
-            .inner_size(601.0, 400.0)          // <— 2x f64
-            .min_inner_size(350.0, 350.0)      // <— 2x f64
+            .inner_size(601.0, 400.0)
+            .min_inner_size(350.0, 350.0)
             .decorations(false)
             .transparent(true)
             .content_protected(true)
             .maximizable(false)
-            .use_https_scheme(true)            // ggf. entfernen, falls nicht nötig
-            .visible(false)                    // zeigst du später selbst
+            .use_https_scheme(true)
+            .visible(false)
             .devtools(true);
 
-            // Clone für on_new_window-Closure (Borrow-Checker)
             let app_handle_for_new_window = app.handle().clone();
 
             let main_window = builder
                 .on_new_window(move |_url, features| {
-                    // ⚠️ Popup-Flow: keine festen Optionen setzen, nur Features aus window.open übernehmen
-                    let id = POPUP_COUNTER.fetch_add(1, Ordering::Relaxed);
-                    let popup_label = format!("popup-{}", id);
+                    let popup_label = "DropboxAuth";
 
                     let popup = WebviewWindowBuilder::new(
                         &app_handle_for_new_window,
-                        &popup_label,
+                        popup_label,
                         WebviewUrl::External(Url::parse("about:blank").unwrap()),
                     )
                     .window_features(features)
@@ -130,12 +122,9 @@ pub fn run() {
 
                     NewWindowResponse::Create { window: popup }
                 })
-                .build()?; // erstellt "main"
+                .build()?;
 
-            // Nach dem Build zentrieren (Builder-API hat kein .center(true))
             let _ = main_window.center();
-
-            // ----------------- Rest deines Setup-Codes -----------------
 
             #[cfg(desktop)]
             {
