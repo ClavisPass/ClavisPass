@@ -15,9 +15,9 @@ const SCOPES = [
   "files.content.read",
   "files.content.write",
 ];
+
 const isMobile = Platform.OS === "ios" || Platform.OS === "android";
-// wie gewünscht:
-const isTauri = Platform.OS === "web";
+const isWeb = Platform.OS === "web";
 
 // -------- Helpers --------
 function getMobileRedirectUri() {
@@ -110,7 +110,7 @@ function DropboxLoginButton() {
     exchangeToken,
   ]);
 
-  // --- Tauri (Desktop) ---
+  // --- Desktop (Tauri) ---
   const closeAuthWindowIfAny = useCallback(() => {
     try {
       if (popupRef.current && !popupRef.current.closed)
@@ -122,6 +122,26 @@ function DropboxLoginButton() {
   const handleTauriAuth = useCallback(async () => {
     if (busyRef.current) return;
     busyRef.current = true;
+
+    const prePopup = window.open(
+      "about:blank",
+      "DropboxAuth",
+      "width=720,height=840"
+    );
+
+    if (!prePopup) {
+      console.warn(
+        "Popup konnte nicht geöffnet werden (Popup-Blocker/Policy)."
+      );
+      busyRef.current = false;
+      return;
+    }
+    popupRef.current = prePopup;
+    try {
+      prePopup.document.title = "Dropbox Login …";
+      prePopup.document.body.innerHTML =
+        "<p style='font-family:system-ui;margin:16px'>Öffne Dropbox …</p>";
+    } catch {}
 
     try {
       // 1) Lokalen Listener starten (feste/mehrere Ports optional)
@@ -200,6 +220,8 @@ function DropboxLoginButton() {
         stateRef.current = null;
       }, 120_000);
 
+      console.log("Redirect URI: ", redirectUri);
+
       // 5) Auth-URL
       const authUrl =
         "https://www.dropbox.com/oauth2/authorize?" +
@@ -214,15 +236,14 @@ function DropboxLoginButton() {
           state: stateRef.current!,
         }).toString();
 
-      // 6) Externes Fenster öffnen
-      popupRef.current = window.open(authUrl) ?? null;
-      if (!popupRef.current) {
-        console.warn("Popup konnte nicht geöffnet werden (Popup-Blocker?).");
+      // 6) Im bereits geöffneten Fenster navigieren (kein weiteres window.open nötig)
+      try {
+        prePopup.location.href = authUrl;
+      } catch (e) {
+        console.warn("Konnte Popup nicht navigieren:", e);
       }
     } catch (err) {
       console.error("OAuth flow failed (Tauri):", err);
-      busyRef.current = false;
-
       // Cleanup
       try {
         if (portRef.current != null) await cancel(portRef.current);
@@ -240,6 +261,7 @@ function DropboxLoginButton() {
       }
       stateRef.current = null;
       closeAuthWindowIfAny();
+      busyRef.current = false;
     }
   }, [exchangeToken, closeAuthWindowIfAny]);
 
@@ -273,10 +295,9 @@ function DropboxLoginButton() {
 
   // Button
   const handleAuth = useCallback(() => {
-    if (isTauri) {
+    if (isWeb) {
       handleTauriAuth();
     } else if (isMobile) {
-      // kein eigener state auf Mobile – Expo handhabt das intern
       promptAsync();
     } else {
       console.error("Unsupported platform for this auth flow.");

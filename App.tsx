@@ -19,10 +19,35 @@ import FastAccessScreen from "./src/pages/FastAccessScreen";
 import { DevModeProvider } from "./src/contexts/DevModeProvider";
 import { AutocompleteDropdownContextProvider } from "react-native-autocomplete-dropdown";
 import TabNavigator from "./src/ui/TabNavigatior";
+import { onOpenUrl, register } from "@tauri-apps/plugin-deep-link";
 
 const Tab = createBottomTabNavigator();
 
+const protocol = async () => {
+  await register("clavispass");
+};
+
 export function AppWithNavigation() {
+  protocol();
+  useEffect(() => {
+    const cleanup = onOpenUrl((event) => {
+      console.log("Deep link received:", event);
+      try {
+        const url = new URL(event as any);
+        const code = url.searchParams.get("code");
+        if (code) {
+          console.log("Received code:", code);
+          // hier z.B. Auth weiterleiten
+        }
+      } catch (err) {
+        console.error("Fehler beim Parsen der URL:", err);
+      }
+    });
+
+    return () => {
+      cleanup.then((off) => off());
+    };
+  }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AutocompleteDropdownContextProvider>

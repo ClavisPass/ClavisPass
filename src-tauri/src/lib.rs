@@ -1,11 +1,20 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use serde::{Deserialize, Serialize};
-use std::{fs, path::PathBuf};
+use std::{
+    fs,
+    path::PathBuf,
+    sync::atomic::{AtomicUsize, Ordering},
+};
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{TrayIconBuilder, TrayIconEvent},
-    AppHandle, LogicalSize, Manager, Size, WindowEvent,
+    AppHandle, Manager, Size, WindowEvent,
+    // Wichtig: diese Typen so importieren
+    webview::NewWindowResponse,
+    Url,
+    WebviewUrl,
+    WebviewWindowBuilder,
 };
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 use tauri_plugin_deep_link;
@@ -52,6 +61,9 @@ fn load_window_size(app_handle: &AppHandle) -> Option<WindowSize> {
     None
 }
 
+// Label-Zähler für Popups (window.open)
+static POPUP_COUNTER: AtomicUsize = AtomicUsize::new(0);
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -77,6 +89,54 @@ pub fn run() {
             Some(vec!["--hidden"]),
         ))
         .setup(|app| {
+            // ----------------- Hauptfenster mit deinen Settings -----------------
+            let app_handle = app.handle().clone();
+
+            let builder = WebviewWindowBuilder::new(
+                &app_handle,
+                "main",
+                WebviewUrl::App("index.html".into()),
+            )
+            .title("ClavisPass")
+            .fullscreen(false)
+            .resizable(true)
+            .inner_size(601.0, 400.0)          // <— 2x f64
+            .min_inner_size(350.0, 350.0)      // <— 2x f64
+            .decorations(false)
+            .transparent(true)
+            .content_protected(true)
+            .maximizable(false)
+            .use_https_scheme(true)            // ggf. entfernen, falls nicht nötig
+            .visible(false)                    // zeigst du später selbst
+            .devtools(true);
+
+            // Clone für on_new_window-Closure (Borrow-Checker)
+            let app_handle_for_new_window = app.handle().clone();
+
+            let main_window = builder
+                .on_new_window(move |_url, features| {
+                    // ⚠️ Popup-Flow: keine festen Optionen setzen, nur Features aus window.open übernehmen
+                    let id = POPUP_COUNTER.fetch_add(1, Ordering::Relaxed);
+                    let popup_label = format!("popup-{}", id);
+
+                    let popup = WebviewWindowBuilder::new(
+                        &app_handle_for_new_window,
+                        &popup_label,
+                        WebviewUrl::External(Url::parse("about:blank").unwrap()),
+                    )
+                    .window_features(features)
+                    .build()
+                    .expect("failed to build popup window");
+
+                    NewWindowResponse::Create { window: popup }
+                })
+                .build()?; // erstellt "main"
+
+            // Nach dem Build zentrieren (Builder-API hat kein .center(true))
+            let _ = main_window.center();
+
+            // ----------------- Rest deines Setup-Codes -----------------
+
             #[cfg(desktop)]
             {
                 let autostart_manager = app.autolaunch();
@@ -94,6 +154,7 @@ pub fn run() {
                     eprintln!("Failed to disable autostart: {}", e);
                 }
             }
+
             // Tray setup
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let show_i = MenuItem::with_id(app, "show", "Show", true, None::<&str>)?;
@@ -105,7 +166,6 @@ pub fn run() {
                 .show_menu_on_left_click(false)
                 .on_tray_icon_event(|tray, event| {
                     if let TrayIconEvent::Click { button, .. } = event {
-                        // Nur bei Linksklick (Primary)
                         if button == tauri::tray::MouseButton::Left {
                             let app = tray.app_handle();
                             if let Some(window) = app.get_webview_window("main") {
@@ -134,13 +194,13 @@ pub fn run() {
                 )
                 .build(app)?;
 
-            // Restore window size
-            let app_handle = app.handle();
+            // Fenstergröße wiederherstellen
+            let app_handle2 = app.handle();
             if let Some(main_window) = app.get_webview_window("main") {
-                if let Some(size) = load_window_size(&app_handle) {
+                if let Some(size) = load_window_size(&app_handle2) {
                     if size.width > 0.0 && size.height > 0.0 {
                         let _ = main_window
-                            .set_size(Size::Logical(LogicalSize::new(size.width, size.height)));
+                            .set_size(Size::Logical(tauri::LogicalSize::new(size.width, size.height)));
                     }
                 }
             }
@@ -160,7 +220,6 @@ pub fn run() {
                     };
                     save_window_size(&app_handle, size_data);
                 }
-
                 if let WindowEvent::CloseRequested { api, .. } = event {
                     let _ = window.hide();
                     api.prevent_close();
