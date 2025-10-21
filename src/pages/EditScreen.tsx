@@ -124,7 +124,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const showFastAccess = () => {
     if (
       fastAccessObject === null ||
-      (fastAccessObject.username === "" && fastAccessObject.password === "")
+      (fastAccessObject.username === "" || fastAccessObject.password === "")
     )
       return;
     openFastAccess(
@@ -138,7 +138,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     if (Platform.OS === "web") {
       if (
         fastAccessObject === null ||
-        (fastAccessObject.username === "" && fastAccessObject.password === "")
+        (fastAccessObject.username === "" || fastAccessObject.password === "")
       )
         return;
       const tauri = require("@tauri-apps/api/webviewWindow");
@@ -355,13 +355,19 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             </Text>
           </View>
         </ContainerButton>
-        <SquaredContainerButton onPress={openFastAccessFeature}>
-          <Icon
-            source={"tooltip-account"}
-            color={theme.colors?.primary}
-            size={20}
-          />
-        </SquaredContainerButton>
+        {fastAccessObject === null ||
+        (fastAccessObject.username === "" ||
+          fastAccessObject.password === "") ? null : (
+          <SquaredContainerButton
+            onPress={openFastAccessFeature}
+          >
+            <Icon
+              source={"tooltip-account"}
+              color={theme.colors?.primary}
+              size={20}
+            />
+          </SquaredContainerButton>
+        )}
       </View>
       {Platform.OS === "web" ? (
         <DraggableModulesListWeb

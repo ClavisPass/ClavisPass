@@ -1,5 +1,16 @@
-import React, { useMemo, useState, useCallback, useEffect } from "react"; // [CHANGED]
-import { useWindowDimensions, View, ScrollView } from "react-native";
+import React, {
+  useMemo,
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react"; // [CHANGED]
+import {
+  useWindowDimensions,
+  View,
+  ScrollView,
+  Dimensions,
+} from "react-native";
 import {
   Searchbar,
   Text,
@@ -15,7 +26,7 @@ import AnimatedPressable from "../AnimatedPressable";
 
 import * as store from "../../utils/store";
 
-type ModuleCategory = "Common" | "Security" | "Contact" | "Utility";
+type ModuleCategory = "Common" | "Security" | "vCard" | "Utility";
 
 type ModuleMeta = {
   id: ModulesEnum;
@@ -76,8 +87,8 @@ const MODULES: ModuleMeta[] = [
     id: ModulesEnum.DIGITAL_CARD,
     label: "Digital Card",
     icon: ModuleIconsEnum.DIGITAL_CARD,
-    category: "Contact",
-    keywords: ["vcard", "kontakt", "profile"],
+    category: "Utility",
+    keywords: ["card", "kontakt", "profile"],
   },
   {
     id: ModulesEnum.KEY,
@@ -97,7 +108,7 @@ const MODULES: ModuleMeta[] = [
     id: ModulesEnum.PHONE_NUMBER,
     label: "Phone Number",
     icon: ModuleIconsEnum.PHONE_NUMBER,
-    category: "Contact",
+    category: "vCard",
     keywords: ["telefon", "mobil", "kontakt"],
   },
   {
@@ -143,16 +154,11 @@ function TinyFilterChip({
 }) {
   return (
     <Chip
+      //icon={icon}
       selected={selected}
-      mode={selected ? "flat" : "outlined"}
+      showSelectedOverlay={true}
       onPress={onPress}
-      style={{ height: 28, borderRadius: 12 }}
-      textStyle={{
-        fontSize: 12,
-        lineHeight: 14,
-        includeFontPadding: false as any,
-      }}
-      accessibilityLabel={`Filter ${label}${selected ? " aktiv" : ""}`}
+      style={{ borderRadius: 12, marginRight: 4 }}
     >
       {label}
     </Chip>
@@ -244,6 +250,20 @@ export default function AddModuleModalCompactFav(props: Props) {
   const [localFavs, setLocalFavs] = useState<ModulesEnum[]>([]);
   const favs = props.favorites ?? localFavs;
 
+  const ScrollViewRef: any = useRef<ScrollView>(null);
+  const [currentOffset, setCurrentOffset] = useState(0);
+
+  const change = (direction: "+" | "-") => {
+    const { width } = Dimensions.get("window");
+    let nextOffset = 0;
+    if (direction === "+") nextOffset = currentOffset + width - 100;
+    if (direction === "-") nextOffset = currentOffset - width - 100;
+    ScrollViewRef?.current?.scrollToOffset({
+      animated: true,
+      offset: nextOffset,
+    });
+  };
+
   // [NEW] Beim Mount Favoriten aus dem Store laden (nur wenn uncontrolled)
   useEffect(() => {
     if (props.favorites) return; // controlled → Quelle ist Parent
@@ -264,7 +284,7 @@ export default function AddModuleModalCompactFav(props: Props) {
   const categories: ModuleCategory[] = [
     "Common",
     "Security",
-    "Contact",
+    "vCard",
     "Utility",
   ];
   const [activeCats, setActiveCats] = useState<Set<ModuleCategory>>(new Set());
@@ -384,7 +404,7 @@ export default function AddModuleModalCompactFav(props: Props) {
   const catIcon = (c: ModuleCategory) =>
     c === "Security"
       ? "shield-lock-outline"
-      : c === "Contact"
+      : c === "vCard"
         ? "account-box-outline"
         : c === "Utility"
           ? "wrench-outline"
@@ -401,15 +421,26 @@ export default function AddModuleModalCompactFav(props: Props) {
         }}
       >
         <Searchbar
+          inputStyle={{ height: 40, minHeight: 40 }}
+          style={{
+            height: 40,
+            borderRadius: 10,
+            backgroundColor: "rgba(217, 217, 217, 0.21)",
+          }}
           placeholder="Search"
-          value={query}
           onChangeText={setQuery}
-          style={{ height: 40, borderRadius: 12 }}
+          value={query}
         />
 
-        <View style={{ flexDirection: "row", gap: 6 }}>
+        <ScrollView
+          ref={ScrollViewRef}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          horizontal
+          style={{ gap: 6, maxHeight: 36 }}
+        >
           {(
-            ["Common", "Security", "Contact", "Utility"] as ModuleCategory[]
+            ["Common", "Security", "vCard", "Utility"] as ModuleCategory[]
           ).map((c) => {
             const selected = activeCats.has(c);
             return (
@@ -422,7 +453,7 @@ export default function AddModuleModalCompactFav(props: Props) {
               />
             );
           })}
-        </View>
+        </ScrollView>
 
         <ScrollView
           style={{ flex: 1 }}

@@ -90,7 +90,7 @@ export default function ModuleContainer({
             }}
           >
             {icon ? (
-              <Icon source={icon} size={14} color={theme.colors?.primary} />
+              <Icon source={icon} size={14} color={theme.colors?.primary}/>
             ) : null}
 
             <Pressable

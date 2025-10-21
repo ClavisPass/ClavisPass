@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View } from "react-native";
-import { Button, Chip, IconButton, Text } from "react-native-paper";
-import * as Progress from "react-native-progress";
+import { Button, IconButton, Text } from "react-native-paper";
 
 import ModuleContainer from "../container/ModuleContainer";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
@@ -76,9 +75,23 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
         <View style={{ flex: 1 }}>
           {value ? (
             <>
-              <Text style={{ fontSize: 16, fontWeight: "600" }}>
-                {formatAbsoluteLocal(value, "de-DE")}
-              </Text>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text
+                  style={{
+                    fontSize: 24,
+                    color: theme.colors.primary,
+                  }}
+                >
+                  {formatAbsoluteLocal(value, "de-DE")}
+                </Text>
+                <IconButton
+                  style={{ margin: 0, marginLeft: 8, marginRight: 8 }}
+                  iconColor={theme.colors.primary}
+                  icon="pencil"
+                  size={18}
+                  onPress={() => setPickerVisible(true)}
+                />
+              </View>
               <Text style={{ opacity: 0.7, marginTop: 2 }}>
                 {statusInfo.status === "expired"
                   ? `Expired (${formatRelative(statusInfo.remainingMs)})`
@@ -89,32 +102,14 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
         </View>
       </View>
 
-      {value ? (
-        <View style={globalStyles.moduleView}>
-          <IconButton
-            style={{ margin: 0, marginLeft: 8, marginRight: 8 }}
-            iconColor={theme.colors.primary}
-            icon="pencil"
-            size={18}
-            onPress={() => setPickerVisible(true)}
-          />
-          <IconButton
-            style={{ margin: 0, marginLeft: 0, marginRight: 8 }}
-            iconColor={theme.colors.primary}
-            icon="delete-outline"
-            size={18}
-            onPress={() => setValue("")}
-          />
-        </View>
-      ) : (
-        <View
-          style={[globalStyles.moduleView, { justifyContent: "center" }]}
-        >
+      {value ? null : (
+        <View style={[globalStyles.moduleView, { justifyContent: "center" }]}>
           <Button
             style={{ borderRadius: 12 }}
             mode="contained-tonal"
             onPress={() => setPickerVisible(true)}
             icon="calendar"
+            textColor={theme.colors.primary}
           >
             Set expiry date
           </Button>

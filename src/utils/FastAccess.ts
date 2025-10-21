@@ -8,6 +8,33 @@ import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 
 let notificationListenerSet = false;
 
+async function ensurePopupWindow() {
+  let win = await WebviewWindow.getByLabel("popup");
+  if (win) return win;
+
+  win = new WebviewWindow("popup", {
+    width: 320,
+    height: 150,
+    decorations: false,
+    resizable: false,
+    alwaysOnTop: true,
+    visible: false,
+    focus: true,
+    title: "Fast Access",
+  });
+
+  await new Promise<void>((resolve, reject) => {
+    win.once("tauri://created", async () => {
+      await positionPopupBottomRight();
+      await win.show();
+      resolve();
+    });
+    win.once("tauri://error", (e) => reject(e));
+  });
+
+  return win;
+}
+
 export async function openFastAccess(
   title: string,
   username: string,
@@ -15,17 +42,12 @@ export async function openFastAccess(
 ) {
   if (Platform.OS === "web") {
     try {
-      const win = await WebviewWindow.getByLabel("popup");
-      if (!win) {
-        console.warn("Popup-Fenster nicht gefunden");
-        return;
-      }
+      const win = await ensurePopupWindow();
       await positionPopupBottomRight();
       await win.show();
     } catch (err) {
-      console.error("Fenster konnte nicht sichtbar gemacht werden:", err);
+      console.error("Popup-Fenster konnte nicht erstellt/gezeigt werden:", err);
     }
-
     emit("show-popup", { title, username, password });
     return;
   }

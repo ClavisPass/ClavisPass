@@ -99,10 +99,10 @@ export function EditRowControlsContainer({
       {showDrag && (
         <Animated.View style={animatedDrag}>
           {Platform.OS === "web" ? (
-            <Icon source="drag" color={theme.colors?.primary} size={20} />
+            <Icon source="drag" size={20} />
           ) : (
             <Pressable onPressIn={edit ? onDragStart : undefined}>
-              <Icon source="drag" color={theme.colors?.primary} size={20} />
+              <Icon source="drag" size={20} />
             </Pressable>
           )}
         </Animated.View>
@@ -111,7 +111,7 @@ export function EditRowControlsContainer({
       {showDelete && (
         <Animated.View
           style={[
-            { justifyContent: "center", alignItems: "center" },
+            {  alignItems: "center" },
             animatedDelete,
           ]}
         >
@@ -120,8 +120,7 @@ export function EditRowControlsContainer({
             selected={edit}
             mode="contained-tonal"
             icon="close"
-            iconColor={theme.colors?.error}
-            size={20}
+            size={12}
             onPress={() => onDelete?.(id)}
             tabIndex={-1 as any}
           />

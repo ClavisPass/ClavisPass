@@ -25,6 +25,7 @@ type Props = {
   children?: React.ReactNode;
   onPress: () => void;
   backgroundColor?: string;
+  disabled?: boolean;
 };
 
 function SquaredContainerButton(props: Props) {
@@ -34,12 +35,15 @@ function SquaredContainerButton(props: Props) {
       style={[
         styles.container,
         {
-          backgroundColor: props.backgroundColor ? props.backgroundColor : theme.colors?.background,
+          backgroundColor: props.backgroundColor
+            ? props.backgroundColor
+            : theme.colors?.background,
           boxShadow: theme.colors?.shadow,
         },
       ]}
     >
       <AnimatedPressable
+        disabled={props.disabled}
         style={styles.ripple}
         onPress={props.onPress}
       >

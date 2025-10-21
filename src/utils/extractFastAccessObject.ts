@@ -36,6 +36,9 @@ const extractFastAccessObject = (modules: ModulesType, title: string) => {
       break;
     }
   }
+  if (username === "" || password === "") {
+    return null;
+  }
   const fastAccessObject: FastAccessType = {
     title: title,
     username: username,

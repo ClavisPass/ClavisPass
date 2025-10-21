@@ -32,61 +32,6 @@ function isDigitalCardType(x: unknown): x is DigitalCardType {
   );
 }
 
-/** Cross-platform Toggle Transition (opacity + translateY + slight scale) */
-function useToggleTransition(show: boolean, duration = 220) {
-  const progress = React.useRef(new Animated.Value(show ? 1 : 0)).current;
-
-  React.useEffect(() => {
-    Animated.timing(progress, {
-      toValue: show ? 1 : 0,
-      duration,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start();
-  }, [show, duration, progress]);
-
-  const shownStyle = {
-    opacity: progress,
-    transform: [
-      {
-        translateY: progress.interpolate({
-          inputRange: [0, 1],
-          outputRange: [8, 0],
-        }),
-      },
-      {
-        scale: progress.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0.98, 1],
-        }),
-      },
-    ],
-  } as const;
-
-  const hiddenStyle = {
-    opacity: progress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [1, 0],
-    }),
-    transform: [
-      {
-        translateY: progress.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0, -8],
-        }),
-      },
-      {
-        scale: progress.interpolate({
-          inputRange: [0, 1],
-          outputRange: [1, 0.98],
-        }),
-      },
-    ],
-  } as const;
-
-  return { shownStyle, hiddenStyle };
-}
-
 const styles = StyleSheet.create({
   switcher: {
     position: "relative",
@@ -128,8 +73,6 @@ function DigitalCardModule(
   );
   const [editValue, setEditValue] = useState(false);
 
-  const { shownStyle, hiddenStyle } = useToggleTransition(editValue);
-
   useEffect(() => {
     if (didMount.current) {
       const newModule: DigitalCardModuleType = {
@@ -155,148 +98,42 @@ function DigitalCardModule(
       icon={ModuleIconsEnum.DIGITAL_CARD}
       fastAccess={props.fastAccess}
     >
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "space-between",
-          paddingRight: 10,
-        }}
-      >
+      <View style={globalStyles.moduleView}>
         <View
           style={{
+            flex: 1,
             display: "flex",
-            flexDirection: "column",
-            height: "100%",
             alignItems: "center",
             justifyContent: "center",
-            paddingLeft: 4,
+            flexDirection: "row",
+            height: 96,
+            //paddingRight: 48,
           }}
         >
-          <IconButton
-            selected
-            mode="contained-tonal"
-            iconColor={theme.colors.primary}
-            icon="barcode-scan"
-            size={20}
-            onPress={() => {
-              props.navigation.navigate("DigitalCardScan", {
-                setData: (data: string, scanType: string) => {
-                  setType(scanType as DigitalCardType);
-                  setValue(data);
-                },
-              });
-            }}
-          />
-          <IconButton
-            selected
-            mode="contained-tonal"
-            iconColor={theme.colors.primary}
-            icon="swap-horizontal"
-            size={20}
-            onPress={() => {
-              setEditValue((s) => !s);
-            }}
-          />
-        </View>
-
-        <View style={styles.switcher}>
-          <Animated.View
-            style={[styles.layer, shownStyle]}
-            pointerEvents={editValue ? "auto" : "none"}
-          >
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 6,
-                flex: 1,
-                paddingTop: 5,
+          {value !== "" ? (
+            type === "QR-Code" ? (
+              <QRCode value={value} size={90} />
+            ) : (
+              <Barcode height={70} format={type} value={value} text={value} />
+            )
+          ) : (
+            <Button
+              style={{ borderRadius: 12 }}
+              icon={"barcode-scan"}
+              mode="contained-tonal"
+              textColor={theme.colors.primary}
+              onPress={() => {
+                props.navigation.navigate("DigitalCardScan", {
+                  setData: (data: string, scanType: string) => {
+                    setType(scanType as DigitalCardType);
+                    setValue(data);
+                  },
+                });
               }}
             >
-              <View style={globalStyles.moduleView}>
-                <View style={{ borderRadius: 12, overflow: "hidden", flex: 1 }}>
-                  <Dropdown
-                    CustomDropdownInput={CustomDropdownInput}
-                    menuContentStyle={{
-                      borderRadius: 12,
-                      backgroundColor: theme.colors.background,
-                      boxShadow: theme.colors.shadow,
-                      overflow: "hidden",
-                    }}
-                    mode="flat"
-                    hideMenuHeader
-                    options={OPTIONS}
-                    value={type}
-                    onSelect={(v?: string) => {
-                      if (isDigitalCardType(v)) setType(v);
-                    }}
-                  />
-                </View>
-              </View>
-              <View style={globalStyles.moduleView}>
-                <View style={{ height: 40, flex: 1 }}>
-                  <TextInput
-                    placeholder="Card Number"
-                    outlineStyle={globalStyles.outlineStyle}
-                    style={globalStyles.textInputStyle}
-                    value={value}
-                    mode="outlined"
-                    onChangeText={setValue}
-                  />
-                </View>
-              </View>
-            </View>
-          </Animated.View>
-
-          <Animated.View
-            style={[styles.layer, hiddenStyle]}
-            pointerEvents={editValue ? "none" : "auto"}
-          >
-            <View
-              style={{
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "row",
-                height: 96,
-                paddingRight: 48,
-              }}
-            >
-              {value !== "" ? (
-                type === "QR-Code" ? (
-                  <QRCode value={value} size={90} />
-                ) : (
-                  <Barcode
-                    height={70}
-                    format={type}
-                    value={value}
-                    text={value}
-                  />
-                )
-              ) : (
-                <Button
-                  style={{ borderRadius: 12 }}
-                  icon={"barcode-scan"}
-                  mode="contained-tonal"
-                  textColor={theme.colors.primary}
-                  onPress={() => {
-                    props.navigation.navigate("DigitalCardScan", {
-                      setData: (data: string, scanType: string) => {
-                        setType(scanType as DigitalCardType);
-                        setValue(data);
-                      },
-                    });
-                  }}
-                >
-                  Scan Code
-                </Button>
-              )}
-            </View>
-          </Animated.View>
+              Scan Code
+            </Button>
+          )}
         </View>
       </View>
     </ModuleContainer>
