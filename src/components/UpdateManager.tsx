@@ -6,11 +6,11 @@ import * as Updates from "expo-updates";
 // Tauri Updater für Desktop
 import { check, Update as UpdateProp } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
-import SettingsItem from "./items/SettingsItem";
-import SettingsDivider from "./SettingsDivider";
-import Button from "./buttons/Button";
+import { useTheme } from "../contexts/ThemeProvider";
+import { Button, Icon, Text } from "react-native-paper";
 
 const UpdateManager = () => {
+  const { theme } = useTheme();
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [updateMessage, setUpdateMessage] = useState(
     "Searching for updates..."
@@ -36,8 +36,7 @@ const UpdateManager = () => {
       if (update.isAvailable) {
         setUpdateAvailable(true);
         setUpdateMessage("Update Available");
-      }
-      else{
+      } else {
         setUpdateMessage("No updates available");
       }
     } catch (error) {
@@ -60,8 +59,7 @@ const UpdateManager = () => {
       if (update) {
         setUpdateAvailable(true);
         setUpdateMessage("Update Available");
-      }
-      else{
+      } else {
         setUpdateMessage("No updates available");
       }
     } catch (error) {
@@ -120,13 +118,45 @@ const UpdateManager = () => {
     }
   }, [update]);
 
+  if (!updateAvailable) return null;
+
   return (
-    <View >
-      <SettingsItem>{updateMessage}</SettingsItem>
-      {updateAvailable && (
-        <Button onPress={applyUpdate} text="Install Update"/>
-      )}
-      <SettingsDivider />
+    <View
+      style={{
+        width: "100%",
+        backgroundColor: theme.colors.background,
+      }}
+    >
+      <View
+        style={{
+          width: "100%",
+          backgroundColor: theme.colors.secondaryContainer,
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingLeft: 10,
+        }}
+      >
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <Icon source={"tray-arrow-down"} size={24} color={theme.colors.primary} />
+          <Text ellipsizeMode="clip" style={{ color: theme.colors.primary }}>
+            {updateMessage}
+          </Text>
+        </View>
+        <Button
+          mode="contained-tonal"
+          labelStyle={{ color: theme.colors.primary }}
+          style={{
+            borderRadius: 12,
+            borderBottomRightRadius: 0,
+            borderTopRightRadius: 0,
+          }}
+          onPress={applyUpdate}
+        >
+          Update
+        </Button>
+      </View>
     </View>
   );
 };

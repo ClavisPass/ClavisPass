@@ -20,6 +20,7 @@ import { DevModeProvider } from "./src/contexts/DevModeProvider";
 import { AutocompleteDropdownContextProvider } from "react-native-autocomplete-dropdown";
 import TabNavigator from "./src/ui/TabNavigatior";
 import { onOpenUrl, register } from "@tauri-apps/plugin-deep-link";
+import UpdateManager from "./src/components/UpdateManager";
 
 const Tab = createBottomTabNavigator();
 
@@ -74,6 +75,7 @@ export function AppWithNavigation() {
                       <NavigationContainer>
                         <ProtectedRoute loginScreen={<LoginStack />}>
                           <TabNavigator />
+                          <UpdateManager />
                         </ProtectedRoute>
                       </NavigationContainer>
                     </View>

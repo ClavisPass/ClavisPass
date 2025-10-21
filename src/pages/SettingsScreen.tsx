@@ -103,12 +103,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const quickSelectItems: QuickSelectItem[] = useMemo(
     () => [
       { title: "Cloud", icon: "cloud", ref: authRef, plattform: null },
-      {
-        title: "Update",
-        icon: "tray-arrow-down",
-        ref: updateRef,
-        plattform: null,
-      },
       { title: "System", icon: "cogs", ref: systemRef, plattform: "web" },
       {
         title: "Display",
@@ -258,18 +252,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               changeEditTokenVisibility={setEditTokenVisibility}
             />
           </SettingsContainer>
-          <SettingsContainer
-            ref={quickSelectItems[1].ref}
-            icon={quickSelectItems[1].icon}
-            title={quickSelectItems[1].title}
-          >
-            <UpdateManager />
-          </SettingsContainer>
           <WebSpecific>
             <SettingsContainer
-              ref={quickSelectItems[2].ref}
-              icon={quickSelectItems[2].icon}
-              title={quickSelectItems[2].title}
+              ref={quickSelectItems[1].ref}
+              icon={quickSelectItems[1].icon}
+              title={quickSelectItems[1].title}
             >
               <SettingsSwitch
                 label={"Autostart"}
@@ -302,9 +289,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             </SettingsContainer>
           </WebSpecific>
           <SettingsContainer
-            ref={quickSelectItems[3].ref}
-            icon={quickSelectItems[3].icon}
-            title={quickSelectItems[3].title}
+            ref={quickSelectItems[2].ref}
+            icon={quickSelectItems[2].icon}
+            title={quickSelectItems[2].title}
           >
             <DarkModeSwitch />
             <SettingsDivider />
@@ -318,9 +305,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             <SettingsDivider />
           </SettingsContainer>
           <SettingsContainer
-            ref={quickSelectItems[4].ref}
-            icon={quickSelectItems[4].icon}
-            title={quickSelectItems[4].title}
+            ref={quickSelectItems[3].ref}
+            icon={quickSelectItems[3].icon}
+            title={quickSelectItems[3].title}
           >
             <SettingsItem
               onPress={() => {
@@ -340,9 +327,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             <SettingsDivider />
           </SettingsContainer>
           <SettingsContainer
-            ref={quickSelectItems[5].ref}
-            icon={quickSelectItems[5].icon}
-            title={quickSelectItems[5].title}
+            ref={quickSelectItems[4].ref}
+            icon={quickSelectItems[4].icon}
+            title={quickSelectItems[4].title}
           >
             <SettingsSwitch
               label={"Auto Open Fast Access"}
@@ -354,9 +341,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             <SettingsDivider />
           </SettingsContainer>
           <SettingsContainer
-            ref={quickSelectItems[6].ref}
-            icon={quickSelectItems[6].icon}
-            title={quickSelectItems[6].title}
+            ref={quickSelectItems[5].ref}
+            icon={quickSelectItems[5].icon}
+            title={quickSelectItems[5].title}
           >
             <BackupImportButton />
             <SettingsDivider />
@@ -364,9 +351,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             <SettingsDivider />
           </SettingsContainer>
           <SettingsContainer
-            ref={quickSelectItems[7].ref}
-            icon={quickSelectItems[7].icon}
-            title={quickSelectItems[7].title}
+            ref={quickSelectItems[6].ref}
+            icon={quickSelectItems[6].icon}
+            title={quickSelectItems[6].title}
           >
             <Import
               type={DocumentTypeEnum.FIREFOX}
@@ -392,9 +379,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             )}
           </SettingsContainer>
           <SettingsContainer
-            ref={quickSelectItems[8].ref}
-            icon={quickSelectItems[8].icon}
-            title={quickSelectItems[8].title}
+            ref={quickSelectItems[7].ref}
+            icon={quickSelectItems[7].icon}
+            title={quickSelectItems[7].title}
           >
             <SettingsItem
               leadingIcon="web"
