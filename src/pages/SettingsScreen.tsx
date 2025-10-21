@@ -91,7 +91,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 
   // Refs for Container
   const authRef = useRef<View>(null);
-  const updateRef = useRef<View>(null);
   const systemRef = useRef<View>(null);
   const designRef = useRef<View>(null);
   const authSettingsRef = useRef<View>(null);
@@ -102,7 +101,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 
   const quickSelectItems: QuickSelectItem[] = useMemo(
     () => [
-      { title: "Cloud", icon: "cloud", ref: authRef, plattform: null },
+      { title: "Sync", icon: "sync", ref: authRef, plattform: null },
       { title: "System", icon: "cogs", ref: systemRef, plattform: "web" },
       {
         title: "Display",
