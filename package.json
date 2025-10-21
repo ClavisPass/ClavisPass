@@ -34,7 +34,7 @@
     "@react-navigation/native": "^6.1.14",
     "@react-navigation/stack": "^6.3.25",
     "@shopify/flash-list": "2.0.2",
-    "@tauri-apps/api": "^2.8.0",
+    "@tauri-apps/api": "^2.9.0",
     "@tauri-apps/plugin-autostart": "^2.5.0",
     "@tauri-apps/plugin-cli": "^2.4.0",
     "@tauri-apps/plugin-deep-link": "^2.4.0",
