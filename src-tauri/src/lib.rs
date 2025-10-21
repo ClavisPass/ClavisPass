@@ -1,19 +1,19 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use serde::{Deserialize, Serialize};
-use std::{
-    fs,
-    path::PathBuf
-};
+use std::{fs, path::PathBuf};
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{TrayIconBuilder, TrayIconEvent},
-    AppHandle, Manager, Size, WindowEvent,
     // Wichtig: diese Typen so importieren
     webview::NewWindowResponse,
+    AppHandle,
+    Manager,
+    Size,
     Url,
     WebviewUrl,
     WebviewWindowBuilder,
+    WindowEvent,
 };
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 use tauri_plugin_deep_link;
@@ -87,7 +87,7 @@ pub fn run() {
         .setup(|app| {
             let app_handle = app.handle().clone();
 
-            let builder = WebviewWindowBuilder::new(
+            let mut builder = WebviewWindowBuilder::new(
                 &app_handle,
                 "main",
                 WebviewUrl::App("index.html".into()),
@@ -98,12 +98,16 @@ pub fn run() {
             .inner_size(601.0, 400.0)
             .min_inner_size(350.0, 350.0)
             .decorations(false)
-            .transparent(true)
             .content_protected(true)
             .maximizable(false)
             .use_https_scheme(true)
             .visible(false)
             .devtools(true);
+
+            #[cfg(not(target_os = "macos"))]
+            {
+                builder = builder.transparent(true);
+            }
 
             let app_handle_for_new_window = app.handle().clone();
 
@@ -188,8 +192,10 @@ pub fn run() {
             if let Some(main_window) = app.get_webview_window("main") {
                 if let Some(size) = load_window_size(&app_handle2) {
                     if size.width > 0.0 && size.height > 0.0 {
-                        let _ = main_window
-                            .set_size(Size::Logical(tauri::LogicalSize::new(size.width, size.height)));
+                        let _ = main_window.set_size(Size::Logical(tauri::LogicalSize::new(
+                            size.width,
+                            size.height,
+                        )));
                     }
                 }
             }
