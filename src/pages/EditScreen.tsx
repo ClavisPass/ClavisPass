@@ -124,7 +124,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const showFastAccess = () => {
     if (
       fastAccessObject === null ||
-      (fastAccessObject.username === "" || fastAccessObject.password === "")
+      fastAccessObject.username === "" ||
+      fastAccessObject.password === ""
     )
       return;
     openFastAccess(
@@ -138,7 +139,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     if (Platform.OS === "web") {
       if (
         fastAccessObject === null ||
-        (fastAccessObject.username === "" || fastAccessObject.password === "")
+        fastAccessObject.username === "" ||
+        fastAccessObject.password === ""
       )
         return;
       const tauri = require("@tauri-apps/api/webviewWindow");
@@ -356,11 +358,9 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           </View>
         </ContainerButton>
         {fastAccessObject === null ||
-        (fastAccessObject.username === "" ||
-          fastAccessObject.password === "") ? null : (
-          <SquaredContainerButton
-            onPress={openFastAccessFeature}
-          >
+        fastAccessObject.username === "" ||
+        fastAccessObject.password === "" ? null : (
+          <SquaredContainerButton onPress={openFastAccessFeature}>
             <Icon
               source={"tooltip-account"}
               color={theme.colors?.primary}
@@ -436,7 +436,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           </>
         )}
       </Animated.View>
-
       <AddModuleModal
         addModule={addModule}
         visible={addModuleModalVisible}

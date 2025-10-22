@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   switcher: {
     position: "relative",
     flex: 1,
-    minHeight: 96, // sorgt dafür, dass der Container nicht einklappt
+    minHeight: 96,
   },
   layer: {
     ...StyleSheet.absoluteFillObject,
@@ -34,12 +34,9 @@ function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
 
-  const [editValue, setEditValue] = useState(false);
-
   const [value, setValue] = useState(props.value);
   const [code, setCode] = useState<string>("------");
   const [remaining, setRemaining] = useState<number>(30);
-  const [importVisible, setImportVisible] = useState(false);
 
   const info = useMemo(() => {
     try {
@@ -62,7 +59,6 @@ function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
     }
   }, [value]);
 
-  // tick: code + remaining jede Sekunde
   useEffect(() => {
     let timer: any;
     const tick = () => {
@@ -105,16 +101,18 @@ function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
               display: "flex",
               flexDirection: "row",
               gap: 8,
+              alignItems: "center",
             }}
           >
             <AnimatedCircularProgress
               size={54}
               width={6}
               fill={(1 - remaining / (info?.period ?? 30)) * 100}
-              tintColor={theme.colors.tertiary}
+              tintColor={theme.colors.primary}
               backgroundColor="#d3d3d341"
               rotation={0}
               lineCap="round"
+              style={{ alignItems: "center", justifyContent: "center" }}
             >
               {() => (
                 <Text
@@ -133,10 +131,6 @@ function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
               )}
             </AnimatedCircularProgress>
             <View>
-              <Text style={{ opacity: 0.7 }}>
-                {info?.issuer ? `${info.issuer} • ` : ""}
-                {info?.account ?? ""}
-              </Text>
               <View
                 style={{
                   display: "flex",
@@ -154,8 +148,12 @@ function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
                 >
                   {code ? `${code.slice(0, 3)} ${code.slice(3)}` : "--- ---"}
                 </Text>
-                <CopyToClipboard value={code} />
+                <CopyToClipboard value={code} margin={0}/>
               </View>
+              <Text style={{ opacity: 0.7 }}>
+                {info?.issuer ? `${info.issuer} • ` : ""}
+                {info?.account ?? ""}
+              </Text>
             </View>
           </View>
         ) : (

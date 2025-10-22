@@ -7,14 +7,24 @@ import SettingsStack from "../stacks/SettingsStack";
 import LogoutStack from "../stacks/LogoutStack";
 import CustomBottomTabBar from "./CustomBottomTab";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useWindowDimensions } from "react-native";
+import LeftSideTabBar from "./LeftSideBar";
 
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
+  const { width, height } = useWindowDimensions();
   return (
     <Tab.Navigator
       screenOptions={{ headerShown: false }}
-      tabBar={(props) => <CustomBottomTabBar {...props} />}
+      sceneContainerStyle={width > 600 ? { marginLeft: 88 } : undefined}
+      tabBar={(props) =>
+        width > 600 ? (
+          <LeftSideTabBar {...props} />
+        ) : (
+          <CustomBottomTabBar {...props} />
+        )
+      }
       initialRouteName="HomeStack"
     >
       <Tab.Screen

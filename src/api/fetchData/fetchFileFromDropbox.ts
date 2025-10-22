@@ -1,5 +1,5 @@
 const fetchFileFromDropbox = async (
-  token: string,
+  accessToken: string,
   fileName: string
 ): Promise<string | null> => {
   try {
@@ -8,7 +8,7 @@ const fetchFileFromDropbox = async (
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
           "Dropbox-API-Arg": JSON.stringify({
             path: `/${fileName}`,
           }),
@@ -22,7 +22,6 @@ const fetchFileFromDropbox = async (
     }
 
     const fileContent = await response.text();
-
     return fileContent;
   } catch (error) {
     console.error("Error downloading file:", error);

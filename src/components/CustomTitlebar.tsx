@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Platform, View, StyleSheet } from "react-native";
+import { Platform, View, StyleSheet, useWindowDimensions } from "react-native";
 import { Icon } from "react-native-paper";
 import theme from "../ui/theme";
 import WebSpecific from "./platformSpecific/WebSpecific";
@@ -48,6 +48,7 @@ export function TitlebarHeight(props: Props) {
 function CustomTitlebar() {
   const auth = useAuth();
   const { headerWhite, headerSpacing } = useTheme();
+  const { width, height } = useWindowDimensions();
 
   useEffect(() => {
     if (Platform.OS === "web") {
@@ -97,7 +98,7 @@ function CustomTitlebar() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          marginLeft: headerSpacing,
+          marginLeft: headerSpacing + (width > 600 ? 88 : 0),
           paddingRight: headerSpacing,
         }}
       >

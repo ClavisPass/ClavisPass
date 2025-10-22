@@ -230,7 +230,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         translucent={true}
       />
       <Header title="Settings" />
-
       <View
         style={{
           flex: 1,
@@ -299,7 +298,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 { label: "English", value: "english" },
                 { label: "Deutsch", value: "german" },
               ]}
-              leadingIcon="earth"
             />
             <SettingsDivider />
           </SettingsContainer>

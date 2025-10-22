@@ -8,6 +8,7 @@ import { View } from "react-native";
 type Props = {
   value: string;
   disabled?: boolean;
+  margin?: number;
 };
 
 function CopyToClipboard(props: Props) {
@@ -33,6 +34,7 @@ function CopyToClipboard(props: Props) {
         size={20}
         onPress={copyToClipboard}
         disabled={props.disabled}
+        style={{ margin: props.margin ?? undefined }}
       />
     </View>
   );
