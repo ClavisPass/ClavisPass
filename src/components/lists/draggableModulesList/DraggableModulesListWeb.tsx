@@ -31,7 +31,6 @@ type Props = {
   deleteModule: (id: string) => void;
   changeModule: (module: ModuleType) => void;
   addModule: (module: ModulesEnum) => void;
-  edit: boolean;
   setDiscardoChanges: () => void;
   showAddModuleModal: () => void;
   fastAccess: FastAccessType | null;
@@ -92,7 +91,7 @@ function DraggableModulesListWeb(props: Props) {
                 key={item.id}
                 draggableId={item.id}
                 index={index}
-                isDragDisabled={!props.edit}
+                //isDragDisabled={!props.edit}
               >
                 {(
                   provided: DraggableProvided,
@@ -112,7 +111,6 @@ function DraggableModulesListWeb(props: Props) {
                   >
                     {getModule(
                       item,
-                      props.edit,
                       () => {},
                       props.deleteModule,
                       props.changeModule,
@@ -124,41 +122,35 @@ function DraggableModulesListWeb(props: Props) {
               </Draggable>
             ))}
             {provided.placeholder}
-            {props.edit ? (
-              <View
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  width: "100%",
-                }}
-              >
-                {modulePrediction && (
-                  <Chip
-                    icon={"plus"}
-                    onPress={() => {
-                      props.addModule(modulePrediction);
-                    }}
-                    style={{ position: "absolute", left: 8 }}
-                  >
-                    {getModuleNameByEnum(modulePrediction)}
-                  </Chip>
-                )}
-                <IconButton
+            <View
+              style={{
+                display: "flex",
+                alignItems: "center",
+                width: "100%",
+                paddingBottom: 8,
+              }}
+            >
+              {modulePrediction && (
+                <Chip
                   icon={"plus"}
-                  iconColor={theme.colors.primary}
-                  style={{ margin: 0 }}
-                  onPress={props.showAddModuleModal}
-                  size={20}
-                  selected={true}
-                  mode="contained-tonal"
-                />
-              </View>
-            ) : (
-              <MetaInformationModule
-                lastUpdated={props.value.lastUpdated}
-                created={props.value.created}
+                  onPress={() => {
+                    props.addModule(modulePrediction);
+                  }}
+                  style={{ position: "absolute", left: 8 }}
+                >
+                  {getModuleNameByEnum(modulePrediction)}
+                </Chip>
+              )}
+              <IconButton
+                icon={"plus"}
+                iconColor={theme.colors.primary}
+                style={{ margin: 0 }}
+                onPress={props.showAddModuleModal}
+                size={20}
+                selected={true}
+                mode="contained-tonal"
               />
-            )}
+            </View>
           </div>
         )}
       </Droppable>

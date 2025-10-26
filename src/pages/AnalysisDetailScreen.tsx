@@ -42,8 +42,14 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
   navigation,
 }) => {
   const { value: routeValue } = route.params!;
-  const { globalStyles, theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
-    useTheme();
+  const {
+    globalStyles,
+    theme,
+    headerWhite,
+    setHeaderWhite,
+    darkmode,
+    setHeaderSpacing,
+  } = useTheme();
 
   const [characterAnalysis, setCharacterAnalysis] =
     useState<CharacterAnalysis>(null);
@@ -231,15 +237,23 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             <TextInput
               outlineStyle={[
                 globalStyles.outlineStyle,
-                { borderColor: theme.colors.primary, borderWidth: 2, flexGrow: 1},
+                {
+                  borderColor: theme.colors.primary,
+                  borderWidth: 2,
+                  flexGrow: 1,
+                },
               ]}
-              style={[globalStyles.textInputStyle, { userSelect: "none", flexGrow: 1}]}
+              style={[
+                globalStyles.textInputStyle,
+                { userSelect: "none", flexGrow: 1 },
+              ]}
               value={routeValue.password}
               mode="outlined"
               secureTextEntry={secureTextEntry}
               readOnly={true}
               right={
                 <TextInput.Icon
+                  animated
                   icon={eyeIcon}
                   color={theme.colors.primary}
                   onPress={() => setSecureTextEntry(!secureTextEntry)}

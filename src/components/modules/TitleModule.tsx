@@ -8,7 +8,6 @@ import { View } from "react-native";
 type Props = {
   value: ValuesType;
   setValue: (value: ValuesType) => void;
-  disabled: boolean;
   discardChanges: () => void;
 };
 

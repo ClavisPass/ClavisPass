@@ -14,8 +14,6 @@ function UnknownModule(props: { module: any; id: string } & Props) {
     <ModuleContainer
       id={props.id}
       title={"Unknown Module"}
-      edit={props.edit}
-      deletable={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.UNKNOWN}

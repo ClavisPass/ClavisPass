@@ -74,15 +74,22 @@ function WifiModule(props: WifiModuleType & Props) {
     <ModuleContainer
       id={props.id}
       title="Wifi"
-      edit={props.edit}
-      deletable={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.WIFI}
       fastAccess={props.fastAccess}
     >
       <View style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        <View style={[{ marginLeft: 6, marginRight: 48, borderRadius: 12, overflow: "hidden" }]}>
+        <View
+          style={[
+            {
+              marginLeft: 6,
+              marginRight: 48,
+              borderRadius: 12,
+              overflow: "hidden",
+            },
+          ]}
+        >
           <Dropdown
             CustomDropdownInput={CustomDropdownInput}
             menuContentStyle={{
@@ -138,6 +145,7 @@ function WifiModule(props: WifiModuleType & Props) {
               textContentType="password"
               right={
                 <TextInput.Icon
+                  animated
                   icon={eyeIcon}
                   color={theme.colors.primary}
                   onPress={() => {

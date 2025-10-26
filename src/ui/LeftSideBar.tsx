@@ -6,6 +6,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../contexts/ThemeProvider";
 import { useAuth } from "../contexts/AuthProvider";
 import { useOnline } from "../contexts/OnlineProvider";
+import Animated from "react-native-reanimated";
+import AnimatedPressable from "../components/AnimatedPressable";
 
 const SIDEBAR_WIDTH = 88;
 export const sidebarWidth = SIDEBAR_WIDTH;
@@ -138,11 +140,9 @@ export default function LeftSideTabBar({
               : "transparent";
 
         return (
-          <Pressable
+          <AnimatedPressable
             key={route.key}
             onPress={onPress}
-            accessibilityRole="button"
-            accessibilityState={isFocused ? { selected: true } : {}}
             style={[
               styles.item,
               { backgroundColor: bgActive, opacity: isOnline ? 1 : 0.85 },
@@ -163,7 +163,7 @@ export default function LeftSideTabBar({
                 </Text>
               ) : null}
             </View>
-          </Pressable>
+          </AnimatedPressable>
         );
       })}
     </View>

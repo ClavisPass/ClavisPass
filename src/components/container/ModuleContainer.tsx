@@ -13,13 +13,13 @@ const moduleStyles = StyleSheet.create({
   },
   inner: {
     padding: 10,
+    paddingTop: 0,
     marginLeft: 8,
     marginRight: 8,
     borderRadius: 12,
     display: "flex",
     flexDirection: "row",
     flex: 1,
-    alignItems: "center",
   },
 });
 
@@ -27,8 +27,6 @@ export type ModuleContainerProps = {
   id: string;
   children: ReactNode;
   title: string;
-  edit: boolean;
-  deletable?: boolean;
   onDragStart?: () => void;
   deleteModule?: (id: string) => void;
   modal?: ReactNode;
@@ -41,8 +39,6 @@ export default function ModuleContainer({
   id,
   children,
   title,
-  edit,
-  deletable = true,
   onDragStart,
   deleteModule,
   modal,
@@ -55,9 +51,8 @@ export default function ModuleContainer({
   return (
     <EditRowControlsContainer
       id={id}
-      edit={edit}
       onDragStart={onDragStart}
-      onDelete={deletable ? deleteModule : undefined}
+      onDelete={deleteModule}
       style={[
         moduleStyles.container,
         moduleStyles.inner,
@@ -76,7 +71,7 @@ export default function ModuleContainer({
             flexDirection: "row",
             alignItems: "center",
             gap: 4,
-            height: 20,
+            height: 28,
             width: "100%",
           }}
         >
@@ -87,10 +82,11 @@ export default function ModuleContainer({
               gap: 4,
               alignItems: "center",
               marginLeft: 6,
+              marginTop: 8,
             }}
           >
             {icon ? (
-              <Icon source={icon} size={14} color={theme.colors?.primary}/>
+              <Icon source={icon} size={14} color={theme.colors?.primary} />
             ) : null}
 
             <Pressable
@@ -108,11 +104,10 @@ export default function ModuleContainer({
               </Text>
             </Pressable>
 
-            {(id === fastAccess?.usernameId || id === fastAccess?.passwordId) &&
-            edit ? (
+            {id === fastAccess?.usernameId || id === fastAccess?.passwordId ? (
               <Icon
                 source={"tooltip-account"}
-                size={16}
+                size={14}
                 color={theme.colors?.primary}
               />
             ) : null}

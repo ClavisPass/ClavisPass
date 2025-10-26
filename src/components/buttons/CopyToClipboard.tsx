@@ -29,12 +29,13 @@ function CopyToClipboard(props: Props) {
   return (
     <View style={{ width: 48 }}>
       <IconButton
+        animated
         icon={icon}
         iconColor={theme.colors.primary}
         size={20}
         onPress={copyToClipboard}
         disabled={props.disabled}
-        style={{ margin: props.margin ?? undefined }}
+        style={{ margin: props.margin ?? 6 }}
       />
     </View>
   );

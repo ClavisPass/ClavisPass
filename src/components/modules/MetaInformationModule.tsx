@@ -18,11 +18,12 @@ function MetaInformationModule(props: MetaInformationModuleType) {
         flexDirection: "row",
         alignItems: "center",
         padding: 4,
+        paddingBottom: 0,
         backgroundColor: theme.colors.background,
         boxShadow: theme.colors?.shadow,
-        borderRadius: 12,
-        marginHorizontal: 8,
-        marginBottom: 8,
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 12,
+        width: "100%",
       }}
     >
       <View style={{ flex: 1, justifyContent: "flex-start" }}>

@@ -91,15 +91,15 @@ function CustomTitlebar() {
     <WebSpecific>
       <View
         style={{
+          left: 0,
+          right: 0,
           position: "absolute",
-          width: "100%",
           backgroundColor: "transparent",
           zIndex: 2,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           marginLeft: headerSpacing + (width > 600 ? 88 : 0),
-          paddingRight: headerSpacing,
         }}
       >
         <View

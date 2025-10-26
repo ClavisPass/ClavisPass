@@ -1,5 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Platform, View, Animated, InteractionManager } from "react-native";
+import {
+  Platform,
+  View,
+  Animated,
+  InteractionManager,
+  useWindowDimensions,
+} from "react-native";
 import ModulesType, { ModuleType } from "../types/ModulesType";
 
 import ModulesEnum from "../enums/ModulesEnum";
@@ -34,6 +40,8 @@ import extractFastAccessObject from "../utils/extractFastAccessObject";
 import FastAccessType from "../types/FastAccessType";
 import * as store from "../utils/store";
 import FolderType from "../types/FolderType";
+import MetaInformationModule from "../components/modules/MetaInformationModule";
+import WebSpecific from "../components/platformSpecific/WebSpecific";
 
 type EditScreenProps = StackScreenProps<RootStackParamList, "Edit">;
 
@@ -52,8 +60,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     darkmode,
     setHeaderSpacing,
   } = useTheme();
-
-  const [edit, setEdit] = useState(false);
+  const { width, height } = useWindowDimensions();
   const [value, setValue] = useState<ValuesType>({ ...routeValue });
 
   const [addModuleModalVisible, setAddModuleModalVisible] = useState(false);
@@ -253,9 +260,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    if (value.modules.length === 0) {
-      setEdit(true);
-    }
     if (value.fav) {
       setFavIcon("star");
     } else {
@@ -263,30 +267,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     }
   }, [value, value.fav]);
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    if (!edit) {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 150,
-          useNativeDriver: false,
-        }),
-      ]).start();
-    } else {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 150,
-          useNativeDriver: false,
-        }),
-      ]).start();
-    }
-  }, [edit]);
-
   return (
-    <AnimatedContainer style={globalStyles.container} trigger={edit}>
+    <AnimatedContainer style={globalStyles.container}>
       <StatusBar
         animated={true}
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
@@ -304,7 +286,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           <TitleModule
             value={value}
             setValue={setValue}
-            disabled={edit}
             discardChanges={() => {
               discardChangesRef.current = true;
             }}
@@ -321,18 +302,21 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           gap: 8,
         }}
       >
-        <ContainerButton
-          backgroundColor={edit ? theme.colors?.primary : undefined}
-          onPress={() => {
-            setEdit(!edit);
-          }}
-        >
-          <Icon
-            source="square-edit-outline"
-            color={edit ? "white" : theme.colors?.primary}
-            size={20}
-          />
-        </ContainerButton>
+        {width > 600 && (
+          <View style={{}}>
+            <Button
+              icon="content-save"
+              onPress={saveValue}
+              disabled={!discardChangesRef.current || value.title === ""}
+              style={{
+                boxShadow: theme.colors?.shadow,
+              }}
+            />
+          </View>
+        )}
+        <SquaredContainerButton onPress={() => changeFav(!value.fav)}>
+          <Icon source={favIcon} color={theme.colors?.primary} size={20} />
+        </SquaredContainerButton>
         <ContainerButton
           flexGrow={5}
           onPress={() => {
@@ -363,11 +347,16 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           <SquaredContainerButton onPress={openFastAccessFeature}>
             <Icon
               source={"tooltip-account"}
-              color={theme.colors?.primary}
+              color={theme.colors.primary}
               size={20}
             />
           </SquaredContainerButton>
         )}
+        <SquaredContainerButton
+          onPress={() => setDeleteModalVisible(true)}
+        >
+          <Icon source="trash-can-outline" size={20} color={theme.colors?.error} />
+        </SquaredContainerButton>
       </View>
       {Platform.OS === "web" ? (
         <DraggableModulesListWeb
@@ -377,13 +366,10 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           deleteModule={deleteModule}
           changeModule={changeModule}
           addModule={addModule}
-          edit={edit}
           setDiscardoChanges={() => (discardChangesRef.current = true)}
-          showAddModuleModal={() => {
-            setAddModuleModalVisible(true);
-          }}
           fastAccess={fastAccessObject}
           navigation={navigation}
+          showAddModuleModal={() => setAddModuleModalVisible(true)}
         />
       ) : (
         <DraggableModulesList
@@ -393,49 +379,28 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           deleteModule={deleteModule}
           changeModule={changeModule}
           addModule={addModule}
-          edit={edit}
           setDiscardoChanges={() => (discardChangesRef.current = true)}
-          showAddModuleModal={() => {
-            setAddModuleModalVisible(true);
-          }}
           fastAccess={fastAccessObject}
           navigation={navigation}
+          showAddModuleModal={() => setAddModuleModalVisible(true)}
         />
       )}
-      <Animated.View
-        style={{
-          opacity: fadeAnim,
-          width: "100%",
-          padding: 8,
-          display: "flex",
-          flexDirection: "row",
-          gap: 8,
-        }}
-      >
-        {!edit && (
-          <>
-            <ContainerButton onPress={() => changeFav(!value.fav)}>
-              <Icon source={favIcon} color={theme.colors?.primary} size={20} />
-            </ContainerButton>
-            <Button
-              icon="content-save"
-              onPress={saveValue}
-              disabled={!discardChangesRef.current || value.title === ""}
-              style={{
-                flexGrow: 5,
-                width: "50%",
-                boxShadow: theme.colors?.shadow,
-              }}
-            />
-            <ContainerButton
-              onPress={() => setDeleteModalVisible(true)}
-              backgroundColor={theme.colors?.error}
-            >
-              <Icon source="trash-can-outline" size={20} color={"white"} />
-            </ContainerButton>
-          </>
-        )}
-      </Animated.View>
+      {!(width > 600) && (
+        <View style={{ padding: 8, width: "100%" }}>
+          <Button
+            icon="content-save"
+            onPress={saveValue}
+            disabled={!discardChangesRef.current || value.title === ""}
+            style={{
+              boxShadow: theme.colors?.shadow,
+            }}
+          />
+        </View>
+      )}
+      <MetaInformationModule
+        lastUpdated={value.lastUpdated}
+        created={value.created}
+      />
       <AddModuleModal
         addModule={addModule}
         visible={addModuleModalVisible}

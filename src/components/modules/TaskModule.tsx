@@ -44,9 +44,8 @@ function TaskModule(props: TaskModuleType & Props) {
     >
       <EditRowControlsContainer
         id={props.id}
-        edit={props.edit}
         onDragStart={props.onDragStart}
-        onDelete={props.edit ? props.deleteModule : undefined}
+        onDelete={props.deleteModule}
       >
         <View
           style={[

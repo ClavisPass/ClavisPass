@@ -1,11 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, View } from "react-native";
 import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
@@ -15,7 +9,6 @@ import getModule from "../../../utils/getModule";
 import { Chip, IconButton } from "react-native-paper";
 import { useTheme } from "../../../contexts/ThemeProvider";
 import FastAccessType from "../../../types/FastAccessType";
-import MetaInformationModule from "../../modules/MetaInformationModule";
 import { StackNavigationProp } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../../../stacks/Stack";
 import ModulesEnum from "../../../enums/ModulesEnum";
@@ -29,7 +22,6 @@ type Props = {
   deleteModule: (id: string) => void;
   changeModule: (module: ModuleType) => void;
   addModule: (module: ModulesEnum) => void;
-  edit: boolean;
   setDiscardoChanges: () => void;
   showAddModuleModal: () => void;
   fastAccess: FastAccessType | null;
@@ -47,7 +39,6 @@ function DraggableModulesList(props: Props) {
     ({ item, drag, isActive }: RenderItemParams<ModuleType>) => {
       return getModule(
         item,
-        props.edit,
         drag,
         props.deleteModule,
         props.changeModule,
@@ -55,7 +46,7 @@ function DraggableModulesList(props: Props) {
         props.navigation
       );
     },
-    [props.edit, props.value]
+    [props.value]
   );
 
   useEffect(() => {
@@ -83,41 +74,35 @@ function DraggableModulesList(props: Props) {
           keyboardShouldPersistTaps="always"
           keyboardDismissMode="on-drag"
           ListFooterComponent={
-            props.edit ? (
-              <View
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  width: "100%",
-                }}
-              >
-                {modulePrediction && (
-                  <Chip
-                    icon={"plus"}
-                    onPress={() => {
-                      props.addModule(modulePrediction);
-                    }}
-                    style={{ position: "absolute", left: 8 }}
-                  >
-                    {getModuleNameByEnum(modulePrediction)}
-                  </Chip>
-                )}
-                <IconButton
+            <View
+              style={{
+                display: "flex",
+                alignItems: "center",
+                width: "100%",
+                paddingBottom: 8,
+              }}
+            >
+              {modulePrediction && (
+                <Chip
                   icon={"plus"}
-                  iconColor={theme.colors.primary}
-                  style={{ margin: 0 }}
-                  onPress={props.showAddModuleModal}
-                  size={20}
-                  selected={true}
-                  mode="contained-tonal"
-                />
-              </View>
-            ) : (
-              <MetaInformationModule
-                lastUpdated={props.value.lastUpdated}
-                created={props.value.created}
+                  onPress={() => {
+                    props.addModule(modulePrediction);
+                  }}
+                  style={{ position: "absolute", left: 8 }}
+                >
+                  {getModuleNameByEnum(modulePrediction)}
+                </Chip>
+              )}
+              <IconButton
+                icon={"plus"}
+                iconColor={theme.colors.primary}
+                style={{ margin: 0 }}
+                onPress={props.showAddModuleModal}
+                size={20}
+                selected={true}
+                mode="contained-tonal"
               />
-            )
+            </View>
           }
         />
       </View>

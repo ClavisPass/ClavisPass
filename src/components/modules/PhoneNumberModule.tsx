@@ -50,8 +50,6 @@ function PhoneNumberModule(props: PhoneNumberModuleType & Props) {
     <ModuleContainer
       id={props.id}
       title={"Phone Number"}
-      edit={props.edit}
-      deletable={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.PHONE_NUMBER}

@@ -32,8 +32,6 @@ function KeyModule(props: KeyModuleType & Props) {
     <ModuleContainer
       id={props.id}
       title={"Key"}
-      edit={props.edit}
-      deletable={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.KEY}

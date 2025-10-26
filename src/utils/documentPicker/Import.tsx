@@ -136,6 +136,7 @@ function Import(props: Props) {
               textContentType="password"
               right={
                 <TextInput.Icon
+                  animated
                   icon={eyeIcon}
                   color={theme.colors.primary}
                   onPress={() => setSecureTextEntry(!secureTextEntry)}

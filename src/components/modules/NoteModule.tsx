@@ -26,8 +26,6 @@ function NoteModule(props: NoteModuleType & Props) {
     <ModuleContainer
       id={props.id}
       title={"Note"}
-      edit={props.edit}
-      deletable={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.NOTE}

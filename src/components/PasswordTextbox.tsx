@@ -71,6 +71,7 @@ function PasswordTextbox(props: Props) {
         onKeyPress={(e) => handleKeyPress(e)}
         right={
           <TextInput.Icon
+            animated
             icon={eyeIcon}
             color={theme.colors.primary}
             onPress={() => setSecureTextEntry(!secureTextEntry)}

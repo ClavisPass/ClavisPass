@@ -190,7 +190,7 @@ function ListItem(props: Props) {
                         borderTopRightRadius: 0,
                       }}
                       onPress={() => {
-                        copyToClipboard(fastAccessObject.username);
+                        copyToClipboard(fastAccessObject ? fastAccessObject.username : "");
                       }}
                     />
                     <IconButton
@@ -208,7 +208,7 @@ function ListItem(props: Props) {
                         borderTopLeftRadius: 0,
                       }}
                       onPress={() => {
-                        copyToClipboard(fastAccessObject.password);
+                        copyToClipboard(fastAccessObject ? fastAccessObject.password : "");
                       }}
                     />
                   </>

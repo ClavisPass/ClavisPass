@@ -108,7 +108,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       <View
         style={{
           padding: 20,
-          backgroundColor: darkmode ? undefined : "rgba(255,255,255,0.2)",
           flex: 1,
           width: "100%",
           display: "flex",

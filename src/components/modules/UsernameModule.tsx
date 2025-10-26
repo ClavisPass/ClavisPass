@@ -30,8 +30,6 @@ function UsernameModule(props: UsernameModuleType & Props) {
     <ModuleContainer
       id={props.id}
       title={"Username"}
-      edit={props.edit}
-      deletable={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.USERNAME}

@@ -85,8 +85,6 @@ function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
     <ModuleContainer
       id={props.id}
       title={"Two-Factor Auth"}
-      edit={props.edit}
-      deletable={props.edit}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.TOTP}

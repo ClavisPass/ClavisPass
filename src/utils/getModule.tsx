@@ -35,7 +35,6 @@ import ExpiryModule from "../components/modules/ExpiryModule";
 
 function getModule(
   module: ModuleType,
-  edit: boolean,
   onDragStart: () => void,
   deleteModule: (id: string) => void,
   changeModule: (module: ModuleType) => void,
@@ -50,7 +49,6 @@ function getModule(
         module={moduleObject.module}
         title={moduleObject.title}
         value={moduleObject.value}
-        edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
@@ -65,7 +63,6 @@ function getModule(
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
-        edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
@@ -80,7 +77,6 @@ function getModule(
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
-        edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
@@ -95,7 +91,6 @@ function getModule(
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
-        edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
@@ -110,7 +105,6 @@ function getModule(
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
-        edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
@@ -125,7 +119,6 @@ function getModule(
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
-        edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
@@ -140,7 +133,6 @@ function getModule(
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
-        edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
@@ -157,7 +149,6 @@ function getModule(
         wifiName={moduleObject.wifiName}
         wifiType={moduleObject.wifiType}
         value={moduleObject.value}
-        edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
@@ -173,7 +164,6 @@ function getModule(
         module={moduleObject.module}
         value={moduleObject.value}
         type={moduleObject.type}
-        edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
@@ -190,7 +180,6 @@ function getModule(
         module={moduleObject.module}
         value={moduleObject.value}
         completed={moduleObject.completed}
-        edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
@@ -205,7 +194,6 @@ function getModule(
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
-        edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
@@ -220,7 +208,6 @@ function getModule(
         id={moduleObject.id}
         module={moduleObject.module}
         value={moduleObject.value}
-        edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
@@ -237,7 +224,6 @@ function getModule(
         module={moduleObject.module}
         value={moduleObject.value}
         warnBeforeMs={moduleObject.warnBeforeMs}
-        edit={edit}
         onDragStart={onDragStart}
         deleteModule={deleteModule}
         changeModule={changeModule}
@@ -249,7 +235,6 @@ function getModule(
     <UnknownModule
       module={module}
       id={module.id ? module.id : createUniqueID()}
-      edit={edit}
       onDragStart={onDragStart}
       deleteModule={deleteModule}
       changeModule={changeModule}
