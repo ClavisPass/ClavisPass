@@ -7,6 +7,7 @@ import Menu from "./Menu";
 import { useData } from "../../contexts/DataProvider";
 import { MenuItem } from "../items/MenuItem";
 import { useOnline } from "../../contexts/OnlineProvider";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   visible: boolean;
@@ -20,6 +21,7 @@ type Props = {
 function HomeFilterMenu(props: Props) {
   const data = useData();
   const { isOnline } = useOnline();
+  const { t } = useTranslation();
 
   const [sortByTitleMode, setSortByTitleMode] = React.useState<"asc" | "desc">("asc");
   const [sortByTitleIcon, setSortByTitleIcon] = React.useState<"sort-alphabetical-ascending" | "sort-alphabetical-descending">("sort-alphabetical-ascending");
@@ -154,7 +156,7 @@ function HomeFilterMenu(props: Props) {
             alignItems: "center",
           }}
         >
-          <MenuItem>{props.data?.values.length + " Entries"}</MenuItem>
+          <MenuItem>{`${props.data?.values.length} ${t("home:entries")}`}</MenuItem>
           <IconButton
             disabled={!isOnline}
             icon="refresh"
@@ -174,7 +176,7 @@ function HomeFilterMenu(props: Props) {
             data.setShowSave(true);
           }}
         >
-          {"Sort by Title"}
+          {t("home:sortByTitle")}
         </MenuItem>
         <Divider />
         <MenuItem
@@ -184,7 +186,7 @@ function HomeFilterMenu(props: Props) {
             data.setShowSave(true);
           }}
         >
-          {"Sort by Created"}
+          {t("home:sortByCreated")}
         </MenuItem>
         <Divider />
         <MenuItem
@@ -194,7 +196,7 @@ function HomeFilterMenu(props: Props) {
             data.setShowSave(true);
           }}
         >
-          {"Sort by Last Updated"}
+          {t("home:sortByLastUpdated")}
         </MenuItem>
       </>
     </Menu>

@@ -6,6 +6,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../contexts/ThemeProvider";
 import { useAuth } from "../contexts/AuthProvider";
 import { useOnline } from "../contexts/OnlineProvider";
+import { useTranslation } from "react-i18next";
 
 const CustomBottomTab = ({
   state,
@@ -15,6 +16,7 @@ const CustomBottomTab = ({
   const { theme } = useTheme();
   const auth = useAuth();
   const { isOnline } = useOnline();
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     auth.logout();
@@ -27,7 +29,7 @@ const CustomBottomTab = ({
 
     const label = isAdd
       ? ""
-      : (descriptors[route.key].options.title ?? route.name);
+      : t(`bar:${descriptors[route.key].options.title ?? route.name}`);
 
     return {
       key: route.key,
@@ -88,8 +90,8 @@ const CustomBottomTab = ({
           right: 0,
           height: 12,
           backgroundColor: theme.colors.background,
-          borderTopLeftRadius: 12,
-          borderTopRightRadius: 12,
+          borderTopWidth: 1,
+          borderTopColor: theme.colors.outlineVariant,
           zIndex: 0,
         }}
       />
@@ -162,8 +164,8 @@ const CustomBottomTab = ({
         <View
           style={{
             overflow: "hidden",
-            borderTopLeftRadius: 12,
-            borderTopRightRadius: 12,
+            borderTopWidth: 1,
+            borderTopColor: theme.colors.outlineVariant,
             backgroundColor: theme.colors.background,
           }}
         >

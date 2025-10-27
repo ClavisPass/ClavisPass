@@ -1,13 +1,13 @@
 import * as React from "react";
-import { View, Pressable, Platform, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { IconButton, Text } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../contexts/ThemeProvider";
 import { useAuth } from "../contexts/AuthProvider";
 import { useOnline } from "../contexts/OnlineProvider";
-import Animated from "react-native-reanimated";
 import AnimatedPressable from "../components/AnimatedPressable";
+import { useTranslation } from "react-i18next";
 
 const SIDEBAR_WIDTH = 88;
 export const sidebarWidth = SIDEBAR_WIDTH;
@@ -20,6 +20,7 @@ export default function LeftSideTabBar({
   const { theme } = useTheme();
   const auth = useAuth();
   const { isOnline } = useOnline();
+  const { t } = useTranslation();
 
   const handleLogout = () => auth.logout();
   const goAdd = () =>
@@ -159,7 +160,7 @@ export default function LeftSideTabBar({
                   ]}
                   numberOfLines={1}
                 >
-                  {label + ""}
+                  {t(`bar:${label}`)}
                 </Text>
               ) : null}
             </View>

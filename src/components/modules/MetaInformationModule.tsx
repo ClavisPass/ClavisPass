@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useTheme } from "../../contexts/ThemeProvider";
 import { MenuItem } from "../items/MenuItem";
-import { formatDateTime } from "../../utils/Timestamp";
+
+import * as store from "../../utils/store";
+import { formatAbsoluteLocal } from "../../utils/expiry";
 
 type MetaInformationModuleType = {
   lastUpdated: string;
@@ -11,6 +13,18 @@ type MetaInformationModuleType = {
 
 function MetaInformationModule(props: MetaInformationModuleType) {
   const { theme } = useTheme();
+
+  const [dateFormat, setDateFormat] = useState<string>("");
+  const [timeFormat, setTimeFormat] = useState<string>("");
+
+  useEffect(() => {
+    store.get("DATE_FORMAT").then((stored) => {
+      setDateFormat(stored);
+    });
+    store.get("TIME_FORMAT").then((stored) => {
+      setTimeFormat(stored);
+    });
+  }, []);
 
   return (
     <View
@@ -27,7 +41,9 @@ function MetaInformationModule(props: MetaInformationModuleType) {
       }}
     >
       <View style={{ flex: 1, justifyContent: "flex-start" }}>
-        <MenuItem label="Created">{formatDateTime(props.created)}</MenuItem>
+        <MenuItem label="Created">
+          {formatAbsoluteLocal(props.created, dateFormat, timeFormat)}
+        </MenuItem>
       </View>
       <View
         style={{
@@ -39,7 +55,7 @@ function MetaInformationModule(props: MetaInformationModuleType) {
       />
       <View style={{ flex: 1, justifyContent: "flex-start" }}>
         <MenuItem label="Last Updated">
-          {formatDateTime(props.lastUpdated)}
+          {formatAbsoluteLocal(props.lastUpdated, dateFormat, timeFormat)}
         </MenuItem>
       </View>
     </View>

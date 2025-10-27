@@ -14,6 +14,8 @@ import { useTheme } from "../../contexts/ThemeProvider";
 import ExpiryPickerModal from "../modals/ExpiryPickerModal";
 import ExpiryModuleType from "../../types/modules/ExpiryModuleType";
 
+import * as store from "../../utils/store";
+
 function ExpiryModule(props: ExpiryModuleType & Props) {
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
@@ -23,6 +25,9 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
   const [value, setValue] = useState<string>(props.value ?? "");
   const [tick, setTick] = useState(0);
   const [pickerVisible, setPickerVisible] = useState(false);
+
+  const [dateFormat, setDateFormat] = useState<string>("");
+  const [timeFormat, setTimeFormat] = useState<string>("");
 
   useEffect(() => {
     if (didMount.current) {
@@ -60,6 +65,15 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
       ? 1 - Math.min(1, Math.max(0, statusInfo.remainingMs / warnBeforeMs))
       : 1;
 
+  useEffect(() => {
+    store.get("DATE_FORMAT").then((stored) => {
+      setDateFormat(stored);
+    });
+    store.get("TIME_FORMAT").then((stored) => {
+      setTimeFormat(stored);
+    });
+  }, []);
+
   return (
     <ModuleContainer
       id={props.id}
@@ -80,7 +94,7 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
                     color: theme.colors.primary,
                   }}
                 >
-                  {formatAbsoluteLocal(value, "de-DE")}
+                  {formatAbsoluteLocal(value, dateFormat, timeFormat)}
                 </Text>
                 <IconButton
                   style={{ margin: 0, marginLeft: 8, marginRight: 8 }}

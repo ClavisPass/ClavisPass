@@ -56,6 +56,7 @@ import { useOnline } from "../contexts/OnlineProvider";
 import { saveBackup } from "../utils/Backup";
 import FolderType from "../types/FolderType";
 import AnimatedPressable from "../components/AnimatedPressable";
+import { useTranslation } from "react-i18next";
 
 import * as store from "../utils/store";
 
@@ -66,6 +67,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   const { theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
     useTheme();
+  const { t } = useTranslation();
   const { width, height } = useWindowDimensions();
   const auth = useAuth();
   const { isOnline } = useOnline();
@@ -101,7 +103,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const saveSelectedFavState = (fav: boolean) => {
     setSelectedFav(fav);
     store.set("FAVORITE_FILTER", fav);
-  }
+  };
 
   useEffect(() => {
     if (triggerAdd) {
@@ -326,7 +328,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               borderRadius: 10,
               backgroundColor: "rgba(217, 217, 217, 0.21)",
             }}
-            placeholder="Search"
+            placeholder={t("home:search")}
             onChangeText={setSearchQuery}
             value={searchQuery}
             loading={false}

@@ -21,6 +21,9 @@ import { AutocompleteDropdownContextProvider } from "react-native-autocomplete-d
 import TabNavigator from "./src/ui/TabNavigatior";
 import { onOpenUrl, register } from "@tauri-apps/plugin-deep-link";
 import UpdateManager from "./src/components/UpdateManager";
+import * as store from "./src/utils/store";
+import { i18n, initI18n } from "./src/i18n";
+import { AppLanguage, toAppLanguage } from "./src/i18n/types";
 
 const Tab = createBottomTabNavigator();
 
@@ -38,7 +41,6 @@ export function AppWithNavigation() {
         const code = url.searchParams.get("code");
         if (code) {
           console.log("Received code:", code);
-          // hier z.B. Auth weiterleiten
         }
       } catch (err) {
         console.error("Fehler beim Parsen der URL:", err);
@@ -49,6 +51,17 @@ export function AppWithNavigation() {
       cleanup.then((off) => off());
     };
   }, []);
+
+  useEffect(() => {
+    store.get("LANGUAGE").then((stored) => {
+      const lang = toAppLanguage(stored);
+      initLanguage(lang);
+    });
+  }, []);
+
+  const initLanguage = async (lang: AppLanguage) => {
+    await initI18n(lang);
+  };
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AutocompleteDropdownContextProvider>

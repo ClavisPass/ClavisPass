@@ -15,6 +15,7 @@ import FolderType from "../types/FolderType";
 import { clamp } from "react-native-reanimated";
 import { DraggableHandle } from "./DraggableHandle";
 import { get, set } from "../utils/store";
+import { useTranslation } from "react-i18next";
 
 const styles = StyleSheet.create({
   chip: {
@@ -36,6 +37,7 @@ type Props = {
 function FolderFilter(props: Props) {
   const { width, height } = useWindowDimensions();
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   const flatListRef: any = useRef<FlatList>(null);
   const [currentOffset, setCurrentOffset] = useState(0);
@@ -142,7 +144,7 @@ function FolderFilter(props: Props) {
                       }
                     }}
                   >
-                    {"Favorite"}
+                    {t("home:favorite")}
                   </MenuItem>
                 ) : (
                   <>

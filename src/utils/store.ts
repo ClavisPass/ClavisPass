@@ -87,6 +87,21 @@ export const storeSchema = {
     validate: (v: unknown): v is ModulesEnum[] =>
       normalizeFavoriteModules(v) !== null,
   },
+  LANGUAGE: {
+    type: "enum",
+    values: ["en", "de"] as const,
+    default: "en",
+  },
+  DATE_FORMAT: {
+    type: "enum",
+    values: ["en-US", "de-DE"] as const,
+    default: "en-US",
+  },
+  TIME_FORMAT: {
+    type: "enum",
+    values: ["en-US", "de-DE"] as const,
+    default: "en-US",
+  },
 } as const satisfies Record<
   string,
   | EnumDef<readonly string[], string>

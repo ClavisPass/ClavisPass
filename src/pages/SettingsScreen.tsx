@@ -31,7 +31,6 @@ import SettingsContainer from "../components/container/SettingsContainer";
 import SettingsItem from "../components/items/SettingsItem";
 import SettingsSwitch from "../components/SettingsSwitch";
 import Footer from "../components/Footer";
-import UpdateManager from "../components/UpdateManager";
 import * as store from "../utils/store";
 
 import { open } from "@tauri-apps/plugin-shell";
@@ -47,6 +46,9 @@ import { useDevMode } from "../contexts/DevModeProvider";
 import { StackScreenProps } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../stacks/Stack";
 import SettingsDropdownItem from "../components/items/SettingsDropdownItem";
+import { formatAbsoluteDate, formatAbsoluteTime } from "../utils/expiry";
+import { AppLanguage } from "../i18n/types";
+import { i18n } from "../i18n";
 
 const styles = StyleSheet.create({
   surface: {
@@ -84,12 +86,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const [hideOnStartup, setHideOnStartup] = React.useState(false);
   const [fastAccess, setFastAccess] = React.useState(false);
 
+  const [language, setLanguage] = useState<string>("");
+  const [dateFormat, setDateFormat] = useState<string>("");
+  const [timeFormat, setTimeFormat] = useState<string>("");
+
   const [showChangeMasterPasswordModal, setShowChangeMasterPasswordModal] =
     useState(false);
 
   const scrollRef = useRef<ScrollView>(null);
 
-  // Refs for Container
   const authRef = useRef<View>(null);
   const systemRef = useRef<View>(null);
   const designRef = useRef<View>(null);
@@ -212,6 +217,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     store.get("FAST_ACCESS").then((stored) => {
       setFastAccess(stored === "auto");
     });
+    store.get("LANGUAGE").then((stored) => {
+      setLanguage(stored);
+    });
+    store.get("DATE_FORMAT").then((stored) => {
+      setDateFormat(stored);
+    });
+    store.get("TIME_FORMAT").then((stored) => {
+      setTimeFormat(stored);
+    });
   }, []);
 
   const openURL = async (value: string) => {
@@ -294,9 +308,55 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             <DarkModeSwitch />
             <SettingsDivider />
             <SettingsDropdownItem
+              value={language}
+              setValue={(language) => {
+                setLanguage(language);
+                i18n.changeLanguage(language); 
+                store.set("LANGUAGE", language as AppLanguage);
+              }}
+              label="Language"
               options={[
-                { label: "English", value: "english" },
-                { label: "Deutsch", value: "german" },
+                { label: "English", value: "en" },
+                { label: "Deutsch", value: "de" },
+              ]}
+            />
+            <SettingsDivider />
+            <SettingsDropdownItem
+              value={dateFormat}
+              setValue={(dateFormat) => {
+                setDateFormat(dateFormat);
+                store.set("DATE_FORMAT", dateFormat as "de-DE" | "en-US");
+              }}
+              label="Date format"
+              dropdownMaxWidth={120}
+              options={[
+                {
+                  label: formatAbsoluteDate(new Date().toISOString(), "de-DE"),
+                  value: "de-DE",
+                },
+                {
+                  label: formatAbsoluteDate(new Date().toISOString(), "en-US"),
+                  value: "en-US",
+                },
+              ]}
+            />
+            <SettingsDivider />
+            <SettingsDropdownItem
+              value={timeFormat}
+              setValue={(timeFormat) => {
+                setTimeFormat(timeFormat);
+                store.set("TIME_FORMAT", timeFormat as "de-DE" | "en-US");
+              }}
+              label="Time format"
+              options={[
+                {
+                  label: formatAbsoluteTime(new Date().toISOString(), "de-DE"),
+                  value: "de-DE",
+                },
+                {
+                  label: formatAbsoluteTime(new Date().toISOString(), "en-US"),
+                  value: "en-US",
+                },
               ]}
             />
             <SettingsDivider />

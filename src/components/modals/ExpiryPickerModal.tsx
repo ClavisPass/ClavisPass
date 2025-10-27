@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View } from "react-native";
-import { Button, Dialog, Portal, Text } from "react-native-paper";
+import { Button, Portal, Text } from "react-native-paper";
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
 import { toIsoUtcFromLocal } from "../../utils/expiry";
 import Modal from "./Modal";
