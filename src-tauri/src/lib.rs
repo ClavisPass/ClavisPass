@@ -87,7 +87,7 @@ pub fn run() {
         .setup(|app| {
             let app_handle = app.handle().clone();
 
-            let mut builder = WebviewWindowBuilder::new(
+            let builder = WebviewWindowBuilder::new(
                 &app_handle,
                 "main",
                 WebviewUrl::App("index.html".into()),
@@ -103,11 +103,6 @@ pub fn run() {
             .use_https_scheme(true)
             .visible(false)
             .devtools(true);
-
-            #[cfg(not(target_os = "macos"))]
-            {
-                builder = builder.transparent(true);
-            }
 
             let app_handle_for_new_window = app.handle().clone();
 

@@ -4,6 +4,7 @@ import Divider from "../Divider";
 import SettingsSwitch from "../SettingsSwitch";
 import getPasswordStrengthIcon from "../../utils/getPasswordStrengthIcon";
 import PasswordStrengthLevel from "../../enums/PasswordStrengthLevel";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   visible: boolean;
@@ -17,27 +18,28 @@ type Props = {
 };
 
 function FilterAnalysisModal(props: Props) {
+  const { t } = useTranslation();
   const hideModal = () => props.setVisible(false);
 
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
       <View style={{ width: 280, height: 177 }}>
         <SettingsSwitch
-          label="Strong"
+          label={t("analysis:strong")}
           leadingIcon={getPasswordStrengthIcon(PasswordStrengthLevel.STRONG)}
           value={props.strong}
           onValueChange={props.setStrong}
         />
         <Divider />
         <SettingsSwitch
-          label="Medium"
+          label={t("analysis:medium")}
           leadingIcon={getPasswordStrengthIcon(PasswordStrengthLevel.MEDIUM)}
           value={props.medium}
           onValueChange={props.setMedium}
         />
         <Divider />
         <SettingsSwitch
-          label="Weak"
+          label={t("analysis:weak")}
           leadingIcon={getPasswordStrengthIcon(PasswordStrengthLevel.WEAK)}
           value={props.weak}
           onValueChange={props.setWeak}

@@ -11,6 +11,7 @@ import Modal from "../../components/modals/Modal";
 import { useTheme } from "../../contexts/ThemeProvider";
 import { View } from "react-native";
 import SettingsItem from "../../components/items/SettingsItem";
+import { useTranslation } from "react-i18next";
 
 export enum DocumentTypeEnum {
   FIREFOX,
@@ -26,6 +27,7 @@ type Props = {
 
 function Import(props: Props) {
   const data = useData();
+  const { t } = useTranslation();
   const { globalStyles, theme } = useTheme();
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -113,7 +115,7 @@ function Import(props: Props) {
             : pickDocument
         }
       >
-        Import {props.title} Passwords
+        {t("settings:importPasswords", { title: props.title })}
       </SettingsItem>
       {props.type === DocumentTypeEnum.PCLOUD && (
         <Modal

@@ -87,8 +87,8 @@ function SettingsQuickSelect(props: Props) {
       {width > 600 ? (
         <View
           style={{
-            maxWidth: 240,
-            width: 150,
+            maxWidth: 280,
+            width: 180,
             flexDirection: "row",
             overflow: "hidden",
           }}

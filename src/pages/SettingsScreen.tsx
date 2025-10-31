@@ -49,6 +49,7 @@ import SettingsDropdownItem from "../components/items/SettingsDropdownItem";
 import { formatAbsoluteDate, formatAbsoluteTime } from "../utils/expiry";
 import { AppLanguage } from "../i18n/types";
 import { i18n } from "../i18n";
+import { useTranslation } from "react-i18next";
 
 const styles = StyleSheet.create({
   surface: {
@@ -79,6 +80,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     useTheme();
   const { master } = useAuth();
   const { devMode } = useDevMode();
+  const { t } = useTranslation();
+
   const [startup, setStartup] = React.useState(false);
   const { width } = useWindowDimensions();
   const [useAuthentication, setUseAuthentication] = React.useState(false);
@@ -106,36 +109,56 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 
   const quickSelectItems: QuickSelectItem[] = useMemo(
     () => [
-      { title: "Sync", icon: "sync", ref: authRef, plattform: null },
-      { title: "System", icon: "cogs", ref: systemRef, plattform: "web" },
       {
-        title: "Display",
+        title: t("settings:sync"),
+        icon: "sync",
+        ref: authRef,
+        plattform: null,
+      },
+      {
+        title: t("settings:system"),
+        icon: "cogs",
+        ref: systemRef,
+        plattform: "web",
+      },
+      {
+        title: t("settings:appearance"),
         icon: "theme-light-dark",
         ref: designRef,
         plattform: null,
       },
       {
-        title: "Authentication",
+        title: t("settings:authentication"),
         icon: "fingerprint",
         ref: authSettingsRef,
         plattform: null,
       },
       {
-        title: "Fast Access",
+        title: t("settings:fastAccess"),
         icon: "tooltip-account",
         ref: fastAccessRef,
         plattform: null,
       },
-      { title: "Backup", icon: "database", ref: backupRef, plattform: null },
       {
-        title: "Import",
+        title: t("settings:backup"),
+        icon: "database",
+        ref: backupRef,
+        plattform: null,
+      },
+      {
+        title: t("settings:import"),
         icon: "import",
         ref: importRef,
         plattform: null,
       },
-      { title: "Links", icon: "link-variant", ref: linksRef, plattform: null },
+      {
+        title: t("settings:links"),
+        icon: "link-variant",
+        ref: linksRef,
+        plattform: null,
+      },
     ],
-    []
+    [language]
   );
 
   useFocusEffect(
@@ -271,7 +294,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               title={quickSelectItems[1].title}
             >
               <SettingsSwitch
-                label={"Autostart"}
+                label={t("settings:autostart")}
                 value={startup}
                 onValueChange={(checked) => {
                   changeAutoStart(checked);
@@ -279,7 +302,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               />
               <SettingsDivider />
               <SettingsSwitch
-                label={"Start minimized"}
+                label={t("settings:startMinimized")}
                 value={hideOnStartup}
                 onValueChange={(checked) => {
                   changeStartBehavior(checked);
@@ -287,7 +310,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               />
               <SettingsDivider />
               <SettingsSwitch
-                label={"Minimize to Tray"}
+                label={t("settings:minimizeToTray")}
                 value={closeBehavior}
                 onValueChange={(checked) => {
                   changeCloseBehavior(checked);
@@ -295,7 +318,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               />
               <SettingsDivider />
               <SettingsShortcutItem shortcut="ALT+W">
-                Show/Hide
+                {t("settings:showHide")}
               </SettingsShortcutItem>
               <SettingsDivider />
             </SettingsContainer>
@@ -311,10 +334,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               value={language}
               setValue={(language) => {
                 setLanguage(language);
-                i18n.changeLanguage(language); 
+                i18n.changeLanguage(language);
                 store.set("LANGUAGE", language as AppLanguage);
               }}
-              label="Language"
+              label={t("settings:language")}
               options={[
                 { label: "English", value: "en" },
                 { label: "Deutsch", value: "de" },
@@ -327,7 +350,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 setDateFormat(dateFormat);
                 store.set("DATE_FORMAT", dateFormat as "de-DE" | "en-US");
               }}
-              label="Date format"
+              label={t("settings:dateFormat")}
               dropdownMaxWidth={120}
               options={[
                 {
@@ -347,7 +370,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 setTimeFormat(timeFormat);
                 store.set("TIME_FORMAT", timeFormat as "de-DE" | "en-US");
               }}
-              label="Time format"
+              label={t("settings:timeFormat")}
               options={[
                 {
                   label: formatAbsoluteTime(new Date().toISOString(), "de-DE"),
@@ -371,11 +394,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 setShowChangeMasterPasswordModal(true);
               }}
             >
-              Change Master Password
+              {t("settings:changeMasterPassword")}
             </SettingsItem>
             <SettingsDivider />
             <SettingsSwitch
-              label={"Use System Authentication"}
+              label={t("settings:useSystemAuth")}
               value={useAuthentication}
               onValueChange={(checked) => {
                 changeAuthentication(checked);
@@ -389,7 +412,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             title={quickSelectItems[4].title}
           >
             <SettingsSwitch
-              label={"Auto Open Fast Access"}
+              label={t("settings:autoOpenFastAccess")}
               value={fastAccess}
               onValueChange={(checked) => {
                 changeFastAccessBehavior(checked);
@@ -446,7 +469,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 openURL("https://clavispass.github.io/ClavisPass/");
               }}
             >
-              Website
+              {t("settings:website")}
             </SettingsItem>
             <SettingsDivider />
             <SettingsItem

@@ -5,9 +5,11 @@ import { CryptoTypeSchema } from "../../types/CryptoType";
 import { DataTypeSchema } from "../../types/DataType";
 
 import * as DocumentPicker from "expo-document-picker";
+import { useTranslation } from "react-i18next";
 
 function BackupImportButton() {
   const data = useData();
+  const { t } = useTranslation();
 
   const importBackup = async () => {
     try {
@@ -36,7 +38,7 @@ function BackupImportButton() {
 
   return (
     <SettingsItem leadingIcon="database-import" onPress={importBackup}>
-      Import Backup
+      {t("settings:importBackup")}
     </SettingsItem>
   );
 }

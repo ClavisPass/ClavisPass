@@ -120,58 +120,46 @@ function FolderFilter(props: Props) {
           <FlatList
             showsVerticalScrollIndicator={false}
             ref={flatListRef}
-            data={
-              [
-                { id: "fav", name: "Favorite" },
-                ...(props.folder ? props.folder : []),
-              ] as FolderType[]
-            }
+            data={[...(props.folder ? props.folder : [])] as FolderType[]}
             style={{ flexShrink: 1 }}
             onScroll={handleScroll}
             renderItem={({ item, index }) => (
               <>
-                {index === 0 && item.id === "fav" ? (
-                  <MenuItem
-                    key={index}
-                    leadingIcon={"star"}
-                    selected={props.selectedFav}
-                    onPress={() => {
-                      props.setSelectedFav(!props.selectedFav);
-                      if (props.selectedFav) {
-                        props.setSelectedFav(false);
-                      } else {
-                        props.setSelectedFav(true);
-                      }
-                    }}
-                  >
-                    {t("home:favorite")}
-                  </MenuItem>
-                ) : (
-                  <>
-                    <Divider style={{ marginRight: 4 }} />
-                    <MenuItem
-                      key={index}
-                      leadingIcon={"folder"}
-                      selected={
-                        props.selectedFolder?.id === item.id ? true : false
-                      }
-                      onPress={() => {
-                        if (props.selectedFolder != item) {
-                          props.setSelectedFolder(item);
-                        } else {
-                          props.setSelectedFolder(null);
-                        }
-                      }}
-                    >
-                      {item.name}
-                    </MenuItem>
-                  </>
-                )}
+                <Divider style={{ marginRight: 4 }} />
+                <MenuItem
+                  key={index}
+                  leadingIcon={"folder"}
+                  selected={props.selectedFolder?.id === item.id ? true : false}
+                  onPress={() => {
+                    if (props.selectedFolder != item) {
+                      props.setSelectedFolder(item);
+                    } else {
+                      props.setSelectedFolder(null);
+                    }
+                  }}
+                >
+                  {item.name}
+                </MenuItem>
               </>
             )}
+            ListHeaderComponent={
+              <MenuItem
+                leadingIcon={"star"}
+                selected={props.selectedFav}
+                onPress={() => {
+                  props.setSelectedFav(!props.selectedFav);
+                  if (props.selectedFav) {
+                    props.setSelectedFav(false);
+                  } else {
+                    props.setSelectedFav(true);
+                  }
+                }}
+              >
+                {t("home:favorite")}
+              </MenuItem>
+            }
             ListFooterComponent={
               <View
-                key={"lastitem-0"}
                 style={{
                   width: "100%",
                   display: "flex",
@@ -240,67 +228,87 @@ function FolderFilter(props: Props) {
           >
             <FlatList
               ref={flatListRef}
-              data={
-                [
-                  { id: "fav", name: "Favorite" },
-                  ...(props.folder ? props.folder : []),
-                ] as FolderType[]
-              }
+              data={[...(props.folder ? props.folder : [])] as FolderType[]}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
               style={{ flexShrink: 1 }}
               onScroll={handleScroll}
+              ListHeaderComponent={
+                <View style={{ display: "flex", flexDirection: "row" }}>
+                  <Chip
+                    icon={"star"}
+                    selected={props.selectedFav}
+                    showSelectedOverlay={true}
+                    onPress={() => {
+                      props.setSelectedFav(!props.selectedFav);
+                      if (props.selectedFav) {
+                        props.setSelectedFav(false);
+                      } else {
+                        props.setSelectedFav(true);
+                      }
+                    }}
+                    style={styles.chip}
+                  >
+                    {"Favorite"}
+                  </Chip>
+                  <Chip
+                    icon={"star"}
+                    selected={props.selectedFav}
+                    showSelectedOverlay={true}
+                    onPress={() => {
+                      props.setSelectedFav(!props.selectedFav);
+                      if (props.selectedFav) {
+                        props.setSelectedFav(false);
+                      } else {
+                        props.setSelectedFav(true);
+                      }
+                    }}
+                    style={styles.chip}
+                  >
+                    {"Favorite"}
+                  </Chip>
+                </View>
+              }
               renderItem={({ item, index }) => (
-                <>
-                  {index === 0 && item.id === "fav" ? (
-                    <Chip
-                      key={index}
-                      icon={"star"}
-                      selected={props.selectedFav}
-                      showSelectedOverlay={true}
-                      onPress={() => {
-                        props.setSelectedFav(!props.selectedFav);
-                        if (props.selectedFav) {
-                          props.setSelectedFav(false);
-                        } else {
-                          props.setSelectedFav(true);
-                        }
-                      }}
-                      style={styles.chip}
-                    >
-                      {"Favorite"}
-                    </Chip>
-                  ) : (
-                    <Chip
-                      key={index}
-                      icon={"folder"}
-                      selected={props.selectedFolder == item ? true : false}
-                      showSelectedOverlay={true}
-                      onPress={() => {
-                        if (props.selectedFolder != item) {
-                          props.setSelectedFolder(item);
-                        } else {
-                          props.setSelectedFolder(null);
-                        }
-                      }}
-                      style={styles.chip}
-                    >
-                      {item.name}
-                    </Chip>
-                  )}
-                </>
+                <Chip
+                  key={index}
+                  icon={"folder"}
+                  selected={props.selectedFolder == item ? true : false}
+                  showSelectedOverlay={true}
+                  onPress={() => {
+                    if (props.selectedFolder != item) {
+                      props.setSelectedFolder(item);
+                    } else {
+                      props.setSelectedFolder(null);
+                    }
+                  }}
+                  style={styles.chip}
+                >
+                  {item.name}
+                </Chip>
               )}
+              ListFooterComponent={
+                <View
+                  style={{
+                    flex: 1,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <IconButton
+                    icon={"plus"}
+                    iconColor={theme.colors.primary}
+                    style={{ marginLeft: 0, alignSelf: "center" }}
+                    onPress={() => props.setFolderModalVisible(true)}
+                    size={12}
+                    mode="contained-tonal"
+                    selected={true}
+                  />
+                </View>
+              }
             />
           </View>
-          <IconButton
-            icon={"plus"}
-            iconColor={theme.colors.primary}
-            style={{ margin: 0, marginLeft: 4 }}
-            onPress={() => props.setFolderModalVisible(true)}
-            size={12}
-            mode="contained-tonal"
-            selected={true}
-          />
           <WebSpecific>
             <IconButton
               icon={"chevron-right"}

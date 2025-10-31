@@ -16,6 +16,7 @@ import { StatusBar } from "expo-status-bar";
 import getPasswordStrengthColor from "../utils/getPasswordStrengthColor";
 import getPasswordStrengthIcon from "../utils/getPasswordStrengthIcon";
 import { RootStackParamList } from "../stacks/Stack";
+import { useTranslation } from "react-i18next";
 
 type AnalysisDetailScreenProps = StackScreenProps<
   RootStackParamList,
@@ -50,6 +51,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
     darkmode,
     setHeaderSpacing,
   } = useTheme();
+  const { t } = useTranslation();
 
   const [characterAnalysis, setCharacterAnalysis] =
     useState<CharacterAnalysis>(null);
@@ -211,10 +213,15 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
           }}
         >
           <Text
-            variant="titleSmall"
-            style={{ marginLeft: 6, userSelect: "none" }}
+            variant="labelSmall"
+            style={{
+              opacity: 0.7,
+              userSelect: "none",
+              marginLeft: 6,
+            }}
+            accessibilityRole="header"
           >
-            Your Password
+            {t("analysisDetail:yourPassword")}
           </Text>
           <View
             style={{
@@ -262,10 +269,15 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             />
           </View>
           <Text
-            variant="titleSmall"
-            style={{ marginLeft: 6, userSelect: "none" }}
+            variant="labelSmall"
+            style={{
+              opacity: 0.7,
+              userSelect: "none",
+              marginLeft: 6,
+            }}
+            accessibilityRole="header"
           >
-            Statistics
+            {t("analysisDetail:statistics")}
           </Text>
           <View
             style={{
@@ -277,13 +289,13 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             }}
           >
             <AnalysisEntryGradient
-              name={"Entropy"}
+              name={t("analysisDetail:entropy")}
               number={routeValue.entropy}
               percentage={(routeValue.entropy / 200) * 100}
               fixed={true}
             />
             <AnalysisEntry
-              name={"Letters"}
+              name={t("analysisDetail:letters")}
               number={
                 characterAnalysis?.letters ? characterAnalysis?.letters : 0
               }
@@ -306,7 +318,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             }}
           >
             <AnalysisEntry
-              name={"Digits"}
+              name={t("analysisDetail:digits")}
               number={characterAnalysis?.digits ? characterAnalysis?.digits : 0}
               percentage={
                 characterAnalysis?.digitsPercent
@@ -316,7 +328,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
               fixed={true}
             />
             <AnalysisEntry
-              name={"Characters"}
+              name={t("analysisDetail:characters")}
               number={
                 characterAnalysis?.specialCharacters
                   ? characterAnalysis?.specialCharacters
@@ -334,10 +346,15 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             passwordAnalysis?.pattern.length !== 0 && (
               <>
                 <Text
-                  variant="titleSmall"
-                  style={{ marginLeft: 6, userSelect: "none" }}
+                  variant="labelSmall"
+                  style={{
+                    opacity: 0.7,
+                    userSelect: "none",
+                    marginLeft: 6,
+                  }}
+                  accessibilityRole="header"
                 >
-                  Patterns
+                  {t("analysisDetail:pattern")}
                 </Text>
                 <Pattern pattern={passwordAnalysis?.pattern} />
               </>
@@ -347,10 +364,15 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             passwordAnalysis?.repeatedSequences.length !== 0 && (
               <>
                 <Text
-                  variant="titleSmall"
-                  style={{ marginLeft: 6, userSelect: "none" }}
+                  variant="labelSmall"
+                  style={{
+                    opacity: 0.7,
+                    userSelect: "none",
+                    marginLeft: 6,
+                  }}
+                  accessibilityRole="header"
                 >
-                  Repeated Sequences
+                  {t("analysisDetail:repeatedSequences")}
                 </Text>
                 {passwordAnalysis?.repeatedSequences.map((sequence, index) => {
                   return <Pattern pattern={sequence} key={index} />;
@@ -393,7 +415,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
               color={"white"}
             />
             <Text style={{ color: "white", userSelect: "none" }}>
-              {routeValue.passwordStrengthLevel}
+              {t(`analysis:${routeValue.passwordStrengthLevel.toLowerCase()}`)}
             </Text>
           </View>
         </View>

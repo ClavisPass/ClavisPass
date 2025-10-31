@@ -11,6 +11,7 @@ import { useTheme } from "../../contexts/ThemeProvider";
 
 import extractFastAccessObject from "../../utils/extractFastAccessObject";
 import AnimatedPressable from "../AnimatedPressable";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 const styles = StyleSheet.create({
   container: {
@@ -38,6 +39,7 @@ type Props = {
   item: ValuesType;
   onPress: () => void;
   key?: React.Key;
+  index: number;
 };
 
 function ListItem(props: Props) {
@@ -78,7 +80,7 @@ function ListItem(props: Props) {
     );
     if (wifiResult.length > 0) {
       setIcon("wifi");
-      return
+      return;
     }
 
     const keyResult = props.item.modules.filter(
@@ -86,7 +88,7 @@ function ListItem(props: Props) {
     );
     if (keyResult.length > 0) {
       setIcon("key-variant");
-      return
+      return;
     }
 
     const taskResult = props.item.modules.filter(
@@ -94,7 +96,7 @@ function ListItem(props: Props) {
     );
     if (taskResult.length > 0) {
       setIcon("checkbox-multiple-marked");
-      return
+      return;
     }
 
     const digitalCardResult = props.item.modules.filter(
@@ -102,13 +104,14 @@ function ListItem(props: Props) {
     );
     if (digitalCardResult.length > 0) {
       setIcon("credit-card-multiple");
-      return
+      return;
     }
 
     setIcon("lock");
   };
   return (
-    <View
+    <Animated.View
+      entering={FadeInDown.delay(props.index * 50).duration(250)}
       key={props.key}
       style={[
         styles.container,
@@ -190,7 +193,9 @@ function ListItem(props: Props) {
                         borderTopRightRadius: 0,
                       }}
                       onPress={() => {
-                        copyToClipboard(fastAccessObject ? fastAccessObject.username : "");
+                        copyToClipboard(
+                          fastAccessObject ? fastAccessObject.username : ""
+                        );
                       }}
                     />
                     <IconButton
@@ -208,7 +213,9 @@ function ListItem(props: Props) {
                         borderTopLeftRadius: 0,
                       }}
                       onPress={() => {
-                        copyToClipboard(fastAccessObject ? fastAccessObject.password : "");
+                        copyToClipboard(
+                          fastAccessObject ? fastAccessObject.password : ""
+                        );
                       }}
                     />
                   </>
@@ -222,7 +229,7 @@ function ListItem(props: Props) {
           </View>
         </>
       </AnimatedPressable>
-    </View>
+    </Animated.View>
   );
 }
 

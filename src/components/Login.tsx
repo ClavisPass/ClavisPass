@@ -141,9 +141,14 @@ function Login(props: Props) {
             alignItems: "center",
             justifyContent: "space-between",
             backgroundColor: "transparent",
+            width: "100%",
           }}
         >
-          <Logo width={50} height={50} style={{ marginTop: 40 }} />
+          <Logo
+            width={50}
+            height={50}
+            style={{ alignSelf: "center", flexGrow: 1 }}
+          />
           <View
             style={{
               display: "flex",
@@ -222,10 +227,11 @@ function Login(props: Props) {
           </View>
           <View
             style={{
-              height: 40,
               display: "flex",
               alignItems: "center",
               width: "100%",
+              flexGrow: 1,
+              justifyContent: "flex-end",
             }}
           >
             {isUsingAuthenticationButtonVisible && (

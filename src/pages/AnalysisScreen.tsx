@@ -11,13 +11,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import {
-  ActivityIndicator,
-  Icon,
-  IconButton,
-  Searchbar,
-  Text,
-} from "react-native-paper";
+import { Icon, IconButton, Searchbar, Text } from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
 import AnimatedContainer from "../components/container/AnimatedContainer";
 import { useFocusEffect } from "@react-navigation/native";
@@ -25,7 +19,6 @@ import { FlashList } from "@shopify/flash-list";
 import { useData } from "../contexts/DataProvider";
 import { ValuesListType } from "../types/ValuesType";
 import ModulesEnum from "../enums/ModulesEnum";
-import { ModuleType } from "../types/ModulesType";
 import WifiModuleType from "../types/modules/WifiModuleType";
 import { useTheme } from "../contexts/ThemeProvider";
 import passwordEntropy from "../utils/Entropy";
@@ -42,6 +35,8 @@ import { StackScreenProps } from "@react-navigation/stack/lib/typescript/src/typ
 import { RootStackParamList } from "../stacks/Stack";
 import AnimatedPressable from "../components/AnimatedPressable";
 import { Skeleton } from "moti/skeleton";
+import { useTranslation } from "react-i18next";
+import Animated, { FadeIn, FadeInDown, FadeOut } from "react-native-reanimated";
 
 export type CachedPasswordsType = {
   title: string;
@@ -129,6 +124,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   const { theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
     useTheme();
   const { width } = useWindowDimensions();
+  const { t } = useTranslation();
 
   const [filterModalVisible, setFilterModalVisible] = useState(false);
 
@@ -206,7 +202,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
         translucent
       />
-      <Header title="Analysis" />
+      <Header title={t("bar:Analysis")} />
       <View
         style={{
           flex: 1,
@@ -239,12 +235,12 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
             }}
           >
             <AnalysisEntryGradient
-              name={"avg. Entropy"}
+              name={t("analysis:averageEntropy")}
               number={cache?.avgEntropy ?? 0}
               percentage={cache?.avgEntropyPct ?? 0}
             />
             <AnalysisEntry
-              name={"Strong"}
+              name={t("analysis:strong")}
               number={strongCount}
               percentage={total ? (strongCount / total) * 100 : 0}
             />
@@ -260,12 +256,12 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
             }}
           >
             <AnalysisEntry
-              name={"Medium"}
+              name={t("analysis:medium")}
               number={mediumCount}
               percentage={total ? (mediumCount / total) * 100 : 0}
             />
             <AnalysisEntry
-              name={"Weak"}
+              name={t("analysis:weak")}
               number={weakCount}
               percentage={total ? (weakCount / total) * 100 : 0}
             />
@@ -318,7 +314,8 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
             keyExtractor={(item, idx) => `${item.title}:${idx}:${item.type}`}
             removeClippedSubviews
             renderItem={({ item, index }) => (
-              <View
+              <Animated.View
+                entering={FadeInDown.delay(index * 50).duration(250)}
                 style={{
                   borderRadius: 12,
                   margin: 8,
@@ -369,7 +366,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                     />
                   </View>
                 </AnimatedPressable>
-              </View>
+              </Animated.View>
             )}
             ListEmptyComponent={
               <>
@@ -377,75 +374,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                   <View style={{ alignItems: "center", marginTop: 32 }}>
                     <Text style={{ opacity: 0.6 }}>No results</Text>
                   </View>
-                ) : (
-                  <View
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 4,
-                      flexDirection: "column",
-                      marginLeft: 8,
-                      marginRight: 8,
-                    }}
-                  >
-                    <Skeleton
-                      show
-                      height={40}
-                      width={"100%"}
-                      radius={12}
-                      colorMode="light"
-                    />
-                    <Skeleton
-                      show
-                      height={40}
-                      width={"100%"}
-                      radius={12}
-                      colorMode="light"
-                    />
-                    <Skeleton
-                      show
-                      height={40}
-                      width={"100%"}
-                      radius={12}
-                      colorMode="light"
-                    />
-                    <Skeleton
-                      show
-                      height={40}
-                      width={"100%"}
-                      radius={12}
-                      colorMode="light"
-                    />
-                    <Skeleton
-                      show
-                      height={40}
-                      width={"100%"}
-                      radius={12}
-                      colorMode="light"
-                    />
-                    <Skeleton
-                      show
-                      height={40}
-                      width={"100%"}
-                      radius={12}
-                      colorMode="light"
-                    />
-                    <Skeleton
-                      show
-                      height={40}
-                      width={"100%"}
-                      radius={12}
-                      colorMode="light"
-                    />
-                    <Skeleton
-                      show
-                      height={40}
-                      width={"100%"}
-                      radius={12}
-                      colorMode="light"
-                    />
-                  </View>
-                )}
+                ) : null}
               </>
             }
           />

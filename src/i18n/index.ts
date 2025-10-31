@@ -10,12 +10,16 @@ export const resources = {
     bar: en.bar,
     home: en.home,
     settings: en.settings,
+    analysis: en.analysis,
+    analysisDetail: en.analysisDetail,
   },
   de: {
     [DEFAULT_NS]: de.common,
     bar: de.bar,
     home: de.home,
     settings: de.settings,
+    analysis: de.analysis,
+    analysisDetail: de.analysisDetail,
   },
 } as const;
 

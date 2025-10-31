@@ -229,9 +229,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         refreshing={false}
         onRefresh={refreshData}
         data={filteredValues}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <ListItem
             item={item}
+            index={index}
             onPress={() => {
               navigation.navigate("Edit", {
                 value: item,

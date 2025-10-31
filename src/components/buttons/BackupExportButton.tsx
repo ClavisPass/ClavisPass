@@ -5,9 +5,11 @@ import { Platform } from "react-native";
 
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
+import { useTranslation } from "react-i18next";
 
 function BackupExportButton() {
   const data = useData();
+  const { t } = useTranslation();
 
   const exportBackup = async () => {
     try {
@@ -60,7 +62,7 @@ function BackupExportButton() {
 
   return (
     <SettingsItem leadingIcon="database-export" onPress={exportBackup}>
-      Export Backup
+      {t("settings:exportBackup")}
     </SettingsItem>
   );
 }

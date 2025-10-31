@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   DragDropContext,
   Droppable,
@@ -57,25 +57,48 @@ const getListStyle = (isDraggingOver: boolean) => ({
 
 function DraggableModulesListWeb(props: Props) {
   const { theme } = useTheme();
-  const [modulePrediction, setModulePrediction] = useState<ModulesEnum | null>(
-    null
-  );
+  const [modulePrediction, setModulePrediction] = useState<ModulesEnum | null>(null);
+
+  // ⬇️ Refs für Scrollen
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollToBottom = () => {
+    // Methode 1: Sentinel
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    // (Optional) Methode 2: direkt scrollen
+    // if (listRef.current) {
+    //   listRef.current.scroll({ top: listRef.current.scrollHeight, behavior: "smooth" });
+    // }
+  };
+
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
-
     const reordered = reorder(
       props.value.modules,
       result.source.index,
       result.destination.index
     );
-
     props.changeModules(reordered);
     props.setDiscardoChanges();
+    // (typisch: nach Reorder nicht auto scrollen)
   };
 
+  // 🧠 Vorhersage aktualisieren
   useEffect(() => {
     setModulePrediction(predictNextModule(props.value.modules));
   }, [props.value.modules]);
+
+  // ✅ Auto-Scroll wenn Anzahl der Module steigt (neues Element unten)
+  const modulesLength = props.value.modules.length;
+  const prevLenRef = useRef(modulesLength);
+  useEffect(() => {
+    if (modulesLength > prevLenRef.current) {
+      // neues Item hinzugekommen -> nach unten
+      scrollToBottom();
+    }
+    prevLenRef.current = modulesLength;
+  }, [modulesLength]);
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -83,16 +106,15 @@ function DraggableModulesListWeb(props: Props) {
         {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
           <div
             {...provided.droppableProps}
-            ref={provided.innerRef}
+            // ⬇️ beide Refs kombinieren (Pangea braucht seinen innerRef)
+            ref={(el) => {
+              provided.innerRef(el);
+              listRef.current = el;
+            }}
             style={getListStyle(snapshot.isDraggingOver)}
           >
             {props.value.modules.map((item: ModuleType, index: number) => (
-              <Draggable
-                key={item.id}
-                draggableId={item.id}
-                index={index}
-                //isDragDisabled={!props.edit}
-              >
+              <Draggable key={item.id} draggableId={item.id} index={index}>
                 {(
                   provided: DraggableProvided,
                   snapshot: DraggableStateSnapshot
@@ -121,13 +143,20 @@ function DraggableModulesListWeb(props: Props) {
                 )}
               </Draggable>
             ))}
+
             {provided.placeholder}
+
+            {/* ⬇️ Scroll-Sentinel am Ende */}
+            <div ref={bottomRef} style={{ height: 1 }} />
+
+            {/* Footer mit Add-Buttons */}
             <View
               style={{
                 display: "flex",
                 alignItems: "center",
                 width: "100%",
                 paddingBottom: 8,
+                position: "relative",
               }}
             >
               {modulePrediction && (
@@ -135,17 +164,21 @@ function DraggableModulesListWeb(props: Props) {
                   icon={"plus"}
                   onPress={() => {
                     props.addModule(modulePrediction);
+                    setTimeout(scrollToBottom, 0);
                   }}
                   style={{ position: "absolute", left: 8 }}
                 >
                   {getModuleNameByEnum(modulePrediction)}
                 </Chip>
               )}
+
               <IconButton
                 icon={"plus"}
                 iconColor={theme.colors.primary}
                 style={{ margin: 0 }}
-                onPress={props.showAddModuleModal}
+                onPress={() => {
+                  props.showAddModuleModal();
+                }}
                 size={20}
                 selected={true}
                 mode="contained-tonal"
