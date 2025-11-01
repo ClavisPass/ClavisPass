@@ -16,6 +16,7 @@ import { clamp } from "react-native-reanimated";
 import { DraggableHandle } from "./DraggableHandle";
 import { get, set } from "../utils/store";
 import { useTranslation } from "react-i18next";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const styles = StyleSheet.create({
   chip: {
@@ -135,6 +136,8 @@ function FolderFilter(props: Props) {
                   leadingIcon={"folder"}
                   selected={props.selectedFolder?.id === item.id ? true : false}
                   onPress={() => {
+                    props.setSelected2FA(false);
+                    props.setSelectedCard(false);
                     if (props.selectedFolder != item) {
                       props.setSelectedFolder(item);
                     } else {
@@ -155,6 +158,7 @@ function FolderFilter(props: Props) {
                     props.setSelected2FA(!props.selected2FA);
                     props.setSelectedCard(false);
                     props.setSelectedFav(false);
+                    props.setSelectedFolder(null);
                   }}
                 >
                   {t("home:twofa")}
@@ -167,6 +171,7 @@ function FolderFilter(props: Props) {
                     props.setSelectedCard(!props.selectedCard);
                     props.setSelected2FA(false);
                     props.setSelectedFav(false);
+                    props.setSelectedFolder(null);
                   }}
                 >
                   {t("home:card")}
@@ -263,52 +268,57 @@ function FolderFilter(props: Props) {
               ListHeaderComponent={
                 <View style={{ display: "flex", flexDirection: "row" }}>
                   <Chip
-                    icon={"two-factor-authentication"}
-                    selected={props.selectedFav}
+                    icon={() => null}
+                    selected={props.selected2FA}
                     showSelectedOverlay={true}
                     onPress={() => {
-                      props.setSelectedFav(!props.selectedFav);
-                      if (props.selectedFav) {
-                        props.setSelectedFav(false);
-                      } else {
-                        props.setSelectedFav(true);
-                      }
+                      props.setSelected2FA(!props.selected2FA);
+                      props.setSelectedCard(false);
+                      props.setSelectedFav(false);
+                      props.setSelectedFolder(null);
                     }}
                     style={styles.chip}
                   >
-                    2FA
+                    <MaterialCommunityIcons
+                      name="two-factor-authentication"
+                      size={18}
+                      color={theme.colors.primary}
+                    />
                   </Chip>
                   <Chip
-                    icon={"credit-card-multiple"}
-                    selected={props.selectedFav}
+                    icon={() => null}
+                    selected={props.selectedCard}
                     showSelectedOverlay={true}
                     onPress={() => {
-                      props.setSelectedFav(!props.selectedFav);
-                      if (props.selectedFav) {
-                        props.setSelectedFav(false);
-                      } else {
-                        props.setSelectedFav(true);
-                      }
+                      props.setSelectedCard(!props.selectedCard);
+                      props.setSelected2FA(false);
+                      props.setSelectedFav(false);
+                      props.setSelectedFolder(null);
                     }}
                     style={styles.chip}
                   >
-                    Cards
+                    <MaterialCommunityIcons
+                      name="credit-card-multiple"
+                      size={18}
+                      color={theme.colors.primary}
+                    />
                   </Chip>
                   <Chip
-                    icon={"star"}
+                    icon={() => null}
                     selected={props.selectedFav}
                     showSelectedOverlay={true}
                     onPress={() => {
                       props.setSelectedFav(!props.selectedFav);
-                      if (props.selectedFav) {
-                        props.setSelectedFav(false);
-                      } else {
-                        props.setSelectedFav(true);
-                      }
+                      props.setSelected2FA(false);
+                      props.setSelectedCard(false);
                     }}
                     style={styles.chip}
                   >
-                    {t("home:favorite")}
+                    <MaterialCommunityIcons
+                      name="star"
+                      size={18}
+                      color={theme.colors.primary}
+                    />
                   </Chip>
                 </View>
               }
@@ -319,6 +329,8 @@ function FolderFilter(props: Props) {
                   selected={props.selectedFolder == item ? true : false}
                   showSelectedOverlay={true}
                   onPress={() => {
+                    props.setSelected2FA(false);
+                    props.setSelectedCard(false);
                     if (props.selectedFolder != item) {
                       props.setSelectedFolder(item);
                     } else {

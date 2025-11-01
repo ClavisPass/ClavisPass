@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { View, Animated, Easing, StyleSheet } from "react-native";
-import { Button, IconButton, Text, TextInput } from "react-native-paper";
-import * as Progress from "react-native-progress";
+import { View } from "react-native";
+import { Button, Text } from "react-native-paper";
 
 import ModuleContainer from "../container/ModuleContainer";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
@@ -12,23 +11,107 @@ import TotpModuleType from "../../types/modules/TotpModuleType";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../stacks/Stack";
 import CopyToClipboard from "../buttons/CopyToClipboard";
-import CircularProgressBar from "../CircularProgressBar";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
+
+export function Totp(props: { value: string }) {
+  const { theme } = useTheme();
+
+  const [code, setCode] = useState<string>("------");
+  const [remaining, setRemaining] = useState<number>(30);
+
+  const info = useMemo(() => {
+    try {
+      return parseOtpauth(props.value);
+    } catch {
+      return undefined;
+    }
+  }, [props.value]);
+
+  useEffect(() => {
+    let timer: any;
+    const tick = () => {
+      try {
+        const { code, remaining } = codeFromUri(props.value);
+        setCode(code);
+        setRemaining(remaining);
+      } catch {
+        setCode("------");
+        setRemaining(0);
+      }
+    };
+    tick();
+    timer = setInterval(tick, 1000);
+    return () => clearInterval(timer);
+  }, [props.value]);
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "row",
+        gap: 8,
+        alignItems: "center",
+      }}
+    >
+      <AnimatedCircularProgress
+        size={54}
+        width={6}
+        fill={(1 - remaining / (info?.period ?? 30)) * 100}
+        tintColor={theme.colors.primary}
+        backgroundColor="#d3d3d341"
+        rotation={0}
+        lineCap="round"
+        style={{ alignItems: "center", justifyContent: "center" }}
+      >
+        {() => (
+          <Text
+            variant="bodyMedium"
+            style={[
+              { color: theme.colors.primary },
+              {
+                fontWeight: "bold",
+                fontSize: 16,
+                userSelect: "none",
+              },
+            ]}
+          >
+            {`${remaining}s`}
+          </Text>
+        )}
+      </AnimatedCircularProgress>
+      <View>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 34,
+              fontVariant: ["tabular-nums"],
+              letterSpacing: 2,
+              color: theme.colors.primary,
+            }}
+          >
+            {code ? `${code.slice(0, 3)} ${code.slice(3)}` : "--- ---"}
+          </Text>
+          <CopyToClipboard value={code} margin={0} />
+        </View>
+        <Text style={{ opacity: 0.7 }}>
+          {info?.issuer ? `${info.issuer} • ` : ""}
+          {info?.account ?? ""}
+        </Text>
+      </View>
+    </View>
+  );
+}
 
 type TotpModuleModuleProps = {
   navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>;
 };
-
-const styles = StyleSheet.create({
-  switcher: {
-    position: "relative",
-    flex: 1,
-    minHeight: 96,
-  },
-  layer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-});
 
 function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
   const didMount = useRef(false);
@@ -92,68 +175,7 @@ function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
     >
       <View style={globalStyles.moduleView}>
         {value !== "" ? (
-          <View
-            style={{
-              paddingTop: 8,
-              flex: 1,
-              display: "flex",
-              flexDirection: "row",
-              gap: 8,
-              alignItems: "center",
-            }}
-          >
-            <AnimatedCircularProgress
-              size={54}
-              width={6}
-              fill={(1 - remaining / (info?.period ?? 30)) * 100}
-              tintColor={theme.colors.primary}
-              backgroundColor="#d3d3d341"
-              rotation={0}
-              lineCap="round"
-              style={{ alignItems: "center", justifyContent: "center" }}
-            >
-              {() => (
-                <Text
-                  variant="bodyMedium"
-                  style={[
-                    { color: theme.colors.primary },
-                    {
-                      fontWeight: "bold",
-                      fontSize: 16,
-                      userSelect: "none",
-                    },
-                  ]}
-                >
-                  {`${remaining}s`}
-                </Text>
-              )}
-            </AnimatedCircularProgress>
-            <View>
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 34,
-                    fontVariant: ["tabular-nums"],
-                    letterSpacing: 2,
-                    color: theme.colors.primary,
-                  }}
-                >
-                  {code ? `${code.slice(0, 3)} ${code.slice(3)}` : "--- ---"}
-                </Text>
-                <CopyToClipboard value={code} margin={0}/>
-              </View>
-              <Text style={{ opacity: 0.7 }}>
-                {info?.issuer ? `${info.issuer} • ` : ""}
-                {info?.account ?? ""}
-              </Text>
-            </View>
-          </View>
+          <Totp value={value} />
         ) : (
           <Button
             style={{ borderRadius: 12 }}

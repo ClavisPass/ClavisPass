@@ -34,9 +34,8 @@ import FilterAnalysisModal from "../components/modals/FilterAnalysisModal";
 import { StackScreenProps } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../stacks/Stack";
 import AnimatedPressable from "../components/AnimatedPressable";
-import { Skeleton } from "moti/skeleton";
 import { useTranslation } from "react-i18next";
-import Animated, { FadeIn, FadeInDown, FadeOut } from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 export type CachedPasswordsType = {
   title: string;
@@ -144,7 +143,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
     }, [setHeaderSpacing, setHeaderWhite])
   );
 
-  // Initiales Rechnen nach First Paint, als "transition" markiert
   useEffect(() => {
     if (!data?.data?.values) return;
     let cancelled = false;

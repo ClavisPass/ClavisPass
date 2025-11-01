@@ -59,6 +59,11 @@ import AnimatedPressable from "../components/AnimatedPressable";
 import { useTranslation } from "react-i18next";
 
 import * as store from "../utils/store";
+import TotpItem from "../components/items/TotpItem";
+import ModulesEnum from "../enums/ModulesEnum";
+import CardItem from "../components/items/CardItem";
+import DigitalCardType from "../types/DigitalCardType";
+import DigitalCardModuleType from "../types/modules/DigitalCardModuleType";
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
 
@@ -215,6 +220,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
           setSelectedFolder(null);
           saveSelectedFavState(false);
+          setSelected2FA(false);
+          setSelectedCard(false);
         }
       });
     } else {
@@ -225,7 +232,84 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const searchRef = useRef<any>(null);
 
   function renderFlashList() {
-    return (
+    if (selectedCard) {
+      let cardEntries = [];
+      if (data.data?.values) {
+        for (const item of data.data.values) {
+          for (const mod of item.modules) {
+            const isCard = mod.module === ModulesEnum.DIGITAL_CARD;
+            const moduleType = mod as DigitalCardModuleType;
+            if (!isCard) continue;
+            cardEntries.push({
+              key: `${item.id}:${mod.id}`,
+              item: item,
+              value: moduleType.value,
+              type: moduleType.type,
+              title: item.title,
+            });
+          }
+        }
+      }
+      return (
+        <FlashList
+          contentContainerStyle={{ paddingRight: 4 }}
+          refreshing={false}
+          onRefresh={refreshData}
+          data={cardEntries}
+          renderItem={({ item, index }) => (
+            <CardItem
+              title={item.title}
+              value={item.value}
+              type={item.type}
+              item={item.item}
+              index={index}
+              onPress={() => {
+                navigation.navigate("Edit", {
+                  value: item.item,
+                });
+              }}
+            />
+          )}
+        />
+      );
+    }
+    if (selected2FA) {
+      let totpEntries = [];
+      if (data.data?.values) {
+        for (const item of data.data.values) {
+          for (const mod of item.modules) {
+            const isTOTP = mod.module === ModulesEnum.TOTP;
+            if (!isTOTP) continue;
+            totpEntries.push({
+              key: `${item.id}:${mod.id}`,
+              item: item,
+              value: mod.value as string,
+            });
+          }
+        }
+      }
+      return (
+        <FlashList
+          contentContainerStyle={{ paddingRight: 4 }}
+          refreshing={false}
+          onRefresh={refreshData}
+          data={totpEntries}
+          renderItem={({ item, index }) => (
+            <TotpItem
+              value={item.value}
+              item={item.item}
+              index={index}
+              onPress={() => {
+                navigation.navigate("Edit", {
+                  value: item.item,
+                });
+              }}
+            />
+          )}
+        />
+      );
+    }
+    const flashList = (
       <FlashList
         contentContainerStyle={{ paddingRight: 4 }}
         refreshing={false}
@@ -244,6 +328,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         )}
       />
     );
+    if (Platform.OS === "web") return <Blur>{flashList}</Blur>;
+    else return flashList;
   }
 
   return (
@@ -465,11 +551,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           flexDirection: width > 600 ? "row-reverse" : "column",
         }}
       >
-        {Platform.OS === "web" ? (
-          <Blur>{renderFlashList()}</Blur>
-        ) : (
-          renderFlashList()
-        )}
+        {renderFlashList()}
         <FolderFilter
           folder={data.data?.folder}
           selectedFav={selectedFav}

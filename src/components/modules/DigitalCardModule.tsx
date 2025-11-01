@@ -105,7 +105,6 @@ function DigitalCardModule(
             justifyContent: "center",
             flexDirection: "row",
             height: 96,
-            //paddingRight: 48,
           }}
         >
           {value !== "" ? (

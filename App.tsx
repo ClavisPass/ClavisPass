@@ -141,12 +141,7 @@ export default function App() {
     detectWindow();
   }, []);
 
-  if (view === null)
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
+  if (view === null) return <></>;
 
   if (view === "popup")
     return (
