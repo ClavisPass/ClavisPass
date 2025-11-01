@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { View } from "react-native";
 import TypeWriter from "react-native-typewriter";
 import { useTheme } from "../contexts/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   displayName: string;
@@ -10,32 +11,33 @@ type Props = {
 
 function TypeWriterComponent(props: Props) {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const [startUsername, setStartUsername] = useState<-1 | 0 | 1>(0);
   const [startExclamationMark, setStartExclamationMark] = useState<-1 | 0 | 1>(
     0
   );
 
   const greetings = [
-    "Hi ",
-    "Hey ",
-    "Hello ",
-    "What's up ",
-    "Yo ",
-    "Welcome ",
-    "Good to see you ",
-    "Sup ",
-    "Yo yo ",
-    "Hey there ",
-    "What's good ",
-    "Alright ",
-    "Oii ",
-    "Long time no see ",
-    "Wassup ",
-    "Yo fam ",
-    "Hey bud ",
-    "Ayo ",
-    "Hey dude ",
-    "Yo chief ",
+    t("greetings:1"),
+    t("greetings:2"),
+    t("greetings:3"),
+    t("greetings:4"),
+    t("greetings:5"),
+    t("greetings:6"),
+    t("greetings:7"),
+    t("greetings:8"),
+    t("greetings:9"),
+    t("greetings:10"),
+    t("greetings:11"),
+    t("greetings:12"),
+    t("greetings:13"),
+    t("greetings:14"),
+    t("greetings:15"),
+    t("greetings:16"),
+    t("greetings:17"),
+    t("greetings:18"),
+    t("greetings:19"),
+    t("greetings:20"),
   ];
 
   const randomGreeting = useMemo(() => {

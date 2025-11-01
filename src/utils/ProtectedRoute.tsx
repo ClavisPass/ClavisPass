@@ -15,18 +15,15 @@ const ProtectedRoute = ({ children, loginScreen }: Props) => {
   const isAuthed = auth.master != null;
 
   return (
-    // Fester Container, kein Layout-Animation hier
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Animated.View
-        key={isAuthed ? "authed" : "login"}
-        entering={FadeIn.duration(220)}
-        exiting={FadeOut.duration(180)}
-        style={[StyleSheet.absoluteFill, { backgroundColor: theme.colors.background }]}
-        collapsable={false}
-      >
-        {isAuthed ? children : loginScreen}
-      </Animated.View>
-    </View>
+    <Animated.View
+      //key={isAuthed ? "authed" : "login"}
+      entering={FadeIn.duration(150)}
+      exiting={FadeOut.duration(150)}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      collapsable={false}
+    >
+      {isAuthed ? children : loginScreen}
+    </Animated.View>
   );
 };
 

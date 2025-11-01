@@ -32,10 +32,14 @@ type Props = {
   selectedFolder: FolderType | null;
   setSelectedFolder: (selectedFolder: FolderType | null) => void;
   setFolderModalVisible: (folderModalVisible: boolean) => void;
+  selectedCard: boolean;
+  setSelectedCard: (selectedCard: boolean) => void;
+  selected2FA: boolean;
+  setSelected2FA: (selected2FA: boolean) => void;
 };
 
 function FolderFilter(props: Props) {
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const { theme } = useTheme();
   const { t } = useTranslation();
 
@@ -143,20 +147,43 @@ function FolderFilter(props: Props) {
               </>
             )}
             ListHeaderComponent={
-              <MenuItem
-                leadingIcon={"star"}
-                selected={props.selectedFav}
-                onPress={() => {
-                  props.setSelectedFav(!props.selectedFav);
-                  if (props.selectedFav) {
+              <>
+                <MenuItem
+                  leadingIcon={"two-factor-authentication"}
+                  selected={props.selected2FA}
+                  onPress={() => {
+                    props.setSelected2FA(!props.selected2FA);
+                    props.setSelectedCard(false);
                     props.setSelectedFav(false);
-                  } else {
-                    props.setSelectedFav(true);
-                  }
-                }}
-              >
-                {t("home:favorite")}
-              </MenuItem>
+                  }}
+                >
+                  {t("home:twofa")}
+                </MenuItem>
+                <Divider style={{ marginRight: 4 }} />
+                <MenuItem
+                  leadingIcon={"credit-card-multiple"}
+                  selected={props.selectedCard}
+                  onPress={() => {
+                    props.setSelectedCard(!props.selectedCard);
+                    props.setSelected2FA(false);
+                    props.setSelectedFav(false);
+                  }}
+                >
+                  {t("home:card")}
+                </MenuItem>
+                <Divider style={{ marginRight: 4 }} />
+                <MenuItem
+                  leadingIcon={"star"}
+                  selected={props.selectedFav}
+                  onPress={() => {
+                    props.setSelectedFav(!props.selectedFav);
+                    props.setSelected2FA(false);
+                    props.setSelectedCard(false);
+                  }}
+                >
+                  {t("home:favorite")}
+                </MenuItem>
+              </>
             }
             ListFooterComponent={
               <View
@@ -236,7 +263,7 @@ function FolderFilter(props: Props) {
               ListHeaderComponent={
                 <View style={{ display: "flex", flexDirection: "row" }}>
                   <Chip
-                    icon={"star"}
+                    icon={"two-factor-authentication"}
                     selected={props.selectedFav}
                     showSelectedOverlay={true}
                     onPress={() => {
@@ -249,7 +276,23 @@ function FolderFilter(props: Props) {
                     }}
                     style={styles.chip}
                   >
-                    {"Favorite"}
+                    2FA
+                  </Chip>
+                  <Chip
+                    icon={"credit-card-multiple"}
+                    selected={props.selectedFav}
+                    showSelectedOverlay={true}
+                    onPress={() => {
+                      props.setSelectedFav(!props.selectedFav);
+                      if (props.selectedFav) {
+                        props.setSelectedFav(false);
+                      } else {
+                        props.setSelectedFav(true);
+                      }
+                    }}
+                    style={styles.chip}
+                  >
+                    Cards
                   </Chip>
                   <Chip
                     icon={"star"}
@@ -265,7 +308,7 @@ function FolderFilter(props: Props) {
                     }}
                     style={styles.chip}
                   >
-                    {"Favorite"}
+                    {t("home:favorite")}
                   </Chip>
                 </View>
               }

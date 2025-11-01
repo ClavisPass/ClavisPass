@@ -13,6 +13,8 @@ const de: TranslationSchema = {
   home: {
     search: "Suche",
     favorite: "Favorit",
+    card: "Karten",
+    twofa: "Zwei-Faktor",
     entries: "Einträge",
     sortByTitle: "Nach Titel sortieren",
     sortByCreated: "Nach Erstellungsdatum sortieren",
@@ -36,10 +38,10 @@ const de: TranslationSchema = {
     timeFormat: "Zeitformat",
     changeMasterPassword: "Master-Passwort ändern",
     useSystemAuth: "Systemauthentifizierung verwenden",
-    autoOpenFastAccess: "Schnellen Zugriff automatisch öffnen",
+    autoOpenFastAccess: "Automatisch öffnen",
     importBackup: "Importieren",
     exportBackup: "Exportieren",
-    importPasswords: "{{title}}-Passwörter importieren",
+    importPasswords: "{{title}} Passwörter",
     website: "Webseite",
   },
   analysis: {
@@ -57,7 +59,29 @@ const de: TranslationSchema = {
     statistics: "Statistiken",
     pattern: "Muster",
     repeatedSequences: "Wiederholte Sequenzen",
-  }
+  },
+  greetings: {
+    1: "Hi ",
+    2: "Hey ",
+    3: "Hallo ",
+    4: "Na ",
+    5: "Servus ",
+    6: "Moin ",
+    7: "Willkommen ",
+    8: "Schön dich zu sehen ",
+    9: "Alles klar ",
+    10: "Yo ",
+    11: "Grüß dich ",
+    12: "Na du ",
+    13: "Gude ",
+    14: "Lange nicht gesehen ",
+    15: "Was geht ",
+    16: "Alles fit ",
+    17: "Hey du ",
+    18: "Na Chef ",
+    19: "Ahoi ",
+    20: "Hallöchen ",
+  },
 };
 
 export default de;

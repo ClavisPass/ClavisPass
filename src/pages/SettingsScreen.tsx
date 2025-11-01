@@ -266,7 +266,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
         translucent={true}
       />
-      <Header title="Settings" />
+      <Header title={t("bar:Settings")} />
       <View
         style={{
           flex: 1,

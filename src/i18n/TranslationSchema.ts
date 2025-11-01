@@ -11,6 +11,8 @@ export type TranslationSchema = {
   home: {
     search: string;
     favorite: string;
+    card: string;
+    twofa: string;
     entries: string;
     sortByTitle: string;
     sortByCreated: string;
@@ -55,6 +57,28 @@ export type TranslationSchema = {
     statistics: string;
     pattern: string;
     repeatedSequences: string;
+  };
+  greetings: {
+    1: string;
+    2: string;
+    3: string;
+    4: string;
+    5: string;
+    6: string;
+    7: string;
+    8: string;
+    9: string;
+    10: string;
+    11: string;
+    12: string;
+    13: string;
+    14: string;
+    15: string;
+    16: string;
+    17: string;
+    18: string;
+    19: string;
+    20: string;
   };
 };
 export const DEFAULT_NS = "common" as const;

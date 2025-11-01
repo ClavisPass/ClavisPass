@@ -61,6 +61,7 @@ function Footer() {
           flexDirection: "row",
           gap: 10,
           justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
         <View
@@ -71,14 +72,14 @@ function Footer() {
             alignItems: "center",
           }}
         >
-          <Icon color={"white"} name="copyright" size={20} />
+          <Icon color={"white"} name="copyright" size={16} />
           <Text
             style={{ color: "white", userSelect: "none" }}
           >{`${appName} ${year}`}</Text>
         </View>
         <Text
           onPress={handleDevModeToggle}
-          style={{ color: "white", userSelect: "none", cursor: "auto" }}
+          style={{ color: "white", userSelect: "none", cursor: undefined }}
         >{`Version ${appVersion}`}</Text>
       </View>
     </LinearGradient>

@@ -80,6 +80,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
   const [selectedFav, setSelectedFav] = useState(false);
+  const [selected2FA, setSelected2FA] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(false);
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -475,6 +477,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           selectedFolder={selectedFolder}
           setSelectedFolder={setSelectedFolder}
           setFolderModalVisible={setFolderModalVisible}
+          selected2FA={selected2FA}
+          setSelected2FA={setSelected2FA}
+          selectedCard={selectedCard}
+          setSelectedCard={setSelectedCard}
         />
       </View>
 

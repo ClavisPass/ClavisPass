@@ -12,6 +12,7 @@ export const resources = {
     settings: en.settings,
     analysis: en.analysis,
     analysisDetail: en.analysisDetail,
+    greetings: en.greetings,
   },
   de: {
     [DEFAULT_NS]: de.common,
@@ -20,6 +21,7 @@ export const resources = {
     settings: de.settings,
     analysis: de.analysis,
     analysisDetail: de.analysisDetail,
+    greetings: de.greetings,
   },
 } as const;
 
@@ -29,7 +31,7 @@ export async function initI18n(initialLng: keyof typeof resources) {
     resources,
     lng: initialLng,
     fallbackLng: "en",
-    ns: [DEFAULT_NS, "settings"],
+    ns: [DEFAULT_NS, "settings", "bar", "home", "analysis", "analysisDetail", "greetings"],
     defaultNS: DEFAULT_NS,
     interpolation: { escapeValue: false },
     returnNull: false,
