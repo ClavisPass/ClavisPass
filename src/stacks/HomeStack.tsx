@@ -4,6 +4,7 @@ import HomeScreen from "../pages/HomeScreen";
 import EditScreen from "../pages/EditScreen";
 import DigitalCardScanScreen from "../pages/DigitalCardScanScreen";
 import TotpScanScreen from "../pages/TotpScanScreen";
+import CardDetailsScreen from "../pages/CardDetailsScreen";
 
 function HomeStack() {
   return (
@@ -51,6 +52,17 @@ function HomeStack() {
       <Stack.Screen
         name="TotpScan"
         component={TotpScanScreen}
+        options={{
+          headerShown: false,
+          transitionSpec: {
+            open: transitionSpecConfig,
+            close: transitionSpecConfig,
+          },
+        }}
+      />
+      <Stack.Screen
+        name="CardDetails"
+        component={CardDetailsScreen}
         options={{
           headerShown: false,
           transitionSpec: {

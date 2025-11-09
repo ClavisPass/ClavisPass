@@ -25,6 +25,7 @@ import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import AnimatedPressable from "../AnimatedPressable";
 
 import * as store from "../../utils/store";
+import { useTranslation } from "react-i18next";
 
 type ModuleCategory = "Common" | "Security" | "vCard" | "Utility";
 
@@ -46,100 +47,6 @@ type Props = {
   onToggleFavorite?: (module: ModulesEnum, isFavorite: boolean) => void; // controlled handler optional
   onSelect?: (module: ModulesEnum) => void;
 };
-
-const MODULES: ModuleMeta[] = [
-  {
-    id: ModulesEnum.USERNAME,
-    label: "Username",
-    icon: ModuleIconsEnum.USERNAME,
-    category: "Common",
-    keywords: ["user", "login", "account"],
-  },
-  {
-    id: ModulesEnum.E_MAIL,
-    label: "E-Mail",
-    icon: ModuleIconsEnum.E_MAIL,
-    category: "Common",
-    keywords: ["mail", "email", "kontakt"],
-  },
-  {
-    id: ModulesEnum.PASSWORD,
-    label: "Password",
-    icon: ModuleIconsEnum.PASSWORD,
-    category: "Security",
-    keywords: ["passwort", "credential", "login"],
-  },
-  {
-    id: ModulesEnum.WIFI,
-    label: "Wi-Fi",
-    icon: ModuleIconsEnum.WIFI,
-    category: "Utility",
-    keywords: ["wlan", "network", "ssid"],
-  },
-  {
-    id: ModulesEnum.URL,
-    label: "URL",
-    icon: ModuleIconsEnum.URL,
-    category: "Common",
-    keywords: ["link", "website", "http"],
-  },
-  {
-    id: ModulesEnum.DIGITAL_CARD,
-    label: "Digital Card",
-    icon: ModuleIconsEnum.DIGITAL_CARD,
-    category: "Utility",
-    keywords: ["card", "kontakt", "profile"],
-  },
-  {
-    id: ModulesEnum.KEY,
-    label: "Key",
-    icon: ModuleIconsEnum.KEY,
-    category: "Security",
-    keywords: ["ssh", "api", "token"],
-  },
-  {
-    id: ModulesEnum.CUSTOM_FIELD,
-    label: "Custom Field",
-    icon: ModuleIconsEnum.CUSTOM_FIELD,
-    category: "Utility",
-    keywords: ["frei", "meta", "notizen"],
-  },
-  {
-    id: ModulesEnum.PHONE_NUMBER,
-    label: "Phone Number",
-    icon: ModuleIconsEnum.PHONE_NUMBER,
-    category: "vCard",
-    keywords: ["telefon", "mobil", "kontakt"],
-  },
-  {
-    id: ModulesEnum.TASK,
-    label: "Task",
-    icon: ModuleIconsEnum.TASK,
-    category: "Utility",
-    keywords: ["todo", "aufgabe", "reminder"],
-  },
-  {
-    id: ModulesEnum.TOTP,
-    label: "Two-Factor Auth",
-    icon: ModuleIconsEnum.TOTP,
-    category: "Security",
-    keywords: ["2fa", "otp", "totp", "mfa"],
-  },
-  {
-    id: ModulesEnum.NOTE,
-    label: "Note",
-    icon: ModuleIconsEnum.NOTE,
-    category: "Utility",
-    keywords: ["notiz", "text", "memo"],
-  },
-  {
-    id: ModulesEnum.EXPIRY,
-    label: "Expiry",
-    icon: ModuleIconsEnum.EXPIRY,
-    category: "Utility",
-    keywords: ["ablauf", "gültig", "verfall"],
-  },
-];
 
 function TinyFilterChip({
   label,
@@ -242,7 +149,8 @@ function ModuleTile({
 }
 
 export default function AddModuleModalCompactFav(props: Props) {
-  const theme = useTheme();
+  const { t } = useTranslation();
+
   const { height: winH, width: winW } = useWindowDimensions();
   const hideModal = () => props.setVisible(false);
 
@@ -252,6 +160,100 @@ export default function AddModuleModalCompactFav(props: Props) {
 
   const ScrollViewRef: any = useRef<ScrollView>(null);
   const [currentOffset, setCurrentOffset] = useState(0);
+
+  const MODULES: ModuleMeta[] = [
+  {
+    id: ModulesEnum.USERNAME,
+    label: t("modules:username"),
+    icon: ModuleIconsEnum.USERNAME,
+    category: "Common",
+    keywords: ["user", "login", "account"],
+  },
+  {
+    id: ModulesEnum.E_MAIL,
+    label: t("modules:email"),
+    icon: ModuleIconsEnum.E_MAIL,
+    category: "Common",
+    keywords: ["mail", "email", "kontakt"],
+  },
+  {
+    id: ModulesEnum.PASSWORD,
+    label: t("modules:password"),
+    icon: ModuleIconsEnum.PASSWORD,
+    category: "Security",
+    keywords: ["passwort", "credential", "login"],
+  },
+  {
+    id: ModulesEnum.WIFI,
+    label: t("modules:wifi"),
+    icon: ModuleIconsEnum.WIFI,
+    category: "Utility",
+    keywords: ["wlan", "network", "ssid"],
+  },
+  {
+    id: ModulesEnum.URL,
+    label: t("modules:url"),
+    icon: ModuleIconsEnum.URL,
+    category: "Common",
+    keywords: ["link", "website", "http"],
+  },
+  {
+    id: ModulesEnum.DIGITAL_CARD,
+    label: t("modules:digitalCard"),
+    icon: ModuleIconsEnum.DIGITAL_CARD,
+    category: "Utility",
+    keywords: ["card", "kontakt", "profile"],
+  },
+  {
+    id: ModulesEnum.KEY,
+    label: t("modules:key"),
+    icon: ModuleIconsEnum.KEY,
+    category: "Security",
+    keywords: ["ssh", "api", "token"],
+  },
+  {
+    id: ModulesEnum.CUSTOM_FIELD,
+    label: t("modules:customField"),
+    icon: ModuleIconsEnum.CUSTOM_FIELD,
+    category: "Utility",
+    keywords: ["frei", "meta", "notizen"],
+  },
+  {
+    id: ModulesEnum.PHONE_NUMBER,
+    label: t("modules:phoneNumber"),
+    icon: ModuleIconsEnum.PHONE_NUMBER,
+    category: "vCard",
+    keywords: ["telefon", "mobil", "kontakt"],
+  },
+  {
+    id: ModulesEnum.TASK,
+    label: t("modules:task"),
+    icon: ModuleIconsEnum.TASK,
+    category: "Utility",
+    keywords: ["todo", "aufgabe", "reminder"],
+  },
+  {
+    id: ModulesEnum.TOTP,
+    label: t("modules:totp"),
+    icon: ModuleIconsEnum.TOTP,
+    category: "Security",
+    keywords: ["2fa", "otp", "totp", "mfa"],
+  },
+  {
+    id: ModulesEnum.NOTE,
+    label: t("modules:note"),
+    icon: ModuleIconsEnum.NOTE,
+    category: "Utility",
+    keywords: ["notiz", "text", "memo"],
+  },
+  {
+    id: ModulesEnum.EXPIRY,
+    label: t("modules:expiry"),
+    icon: ModuleIconsEnum.EXPIRY,
+    category: "Utility",
+    keywords: ["ablauf", "gültig", "verfall"],
+  },
+];
 
   const change = (direction: "+" | "-") => {
     const { width } = Dimensions.get("window");

@@ -16,9 +16,11 @@ import { useTheme } from "../../contexts/ThemeProvider";
 import PasswordTextbox from "../PasswordTextbox";
 import PasswordStrengthLevel from "../../enums/PasswordStrengthLevel";
 import getPasswordStrengthColor from "../../utils/getPasswordStrengthColor";
+import { useTranslation } from "react-i18next";
 
 function PasswordModule(props: PasswordModuleType & Props) {
   const didMount = useRef(false);
+  const { t } = useTranslation();
   const { globalStyles, theme } = useTheme();
   const [value, setValue] = useState(props.value);
 
@@ -64,7 +66,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
   return (
     <ModuleContainer
       id={props.id}
-      title={"Password"}
+      title={t("modules:password")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.PASSWORD}

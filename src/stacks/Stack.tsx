@@ -2,6 +2,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import ValuesType from "../types/ValuesType";
 import { CachedPasswordsType } from "../pages/AnalysisScreen";
 import FolderType from "../types/FolderType";
+import DigitalCardType from "../types/DigitalCardType";
 
 export type RootStackParamList = {
   Home: {
@@ -27,6 +28,11 @@ export type RootStackParamList = {
   };
   Logout: undefined;
   AddTrigger: undefined;
+  CardDetails: {
+    value: string;
+    title: string;
+    type: DigitalCardType;
+  };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();

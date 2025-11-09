@@ -22,6 +22,7 @@ import ModulesEnum from "../../enums/ModulesEnum";
 import { ModuleType } from "../../types/ModulesType";
 import validateEmail from "../../utils/regex/validateEmail";
 import AnimatedPressable from "../AnimatedPressable";
+import { useTranslation } from "react-i18next";
 
 const ITEM_HEIGHT = 44;
 const MAX_VISIBLE_ITEMS = 6;
@@ -31,6 +32,7 @@ function EmailModule(props: EmailModuleType & Props) {
 
   const data = useData();
   const { globalStyles, theme } = useTheme();
+  const { t } = useTranslation();
 
   const [value, setValue] = useState<string>(props.value ?? "");
   const [isValid, setIsValid] = useState<boolean>(false);
@@ -139,7 +141,7 @@ function EmailModule(props: EmailModuleType & Props) {
   return (
     <ModuleContainer
       id={props.id}
-      title={"E-Mail"}
+      title={t("modules:email")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.E_MAIL}

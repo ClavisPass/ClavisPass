@@ -81,6 +81,14 @@ export const storeSchema = {
     type: "boolean",
     default: false,
   },
+  TWOFA_FILTER: {
+    type: "boolean",
+    default: false,
+  },
+  CARD_FILTER: {
+    type: "boolean",
+    default: false,
+  },
   FAVORITE_MODULES: {
     type: "json",
     default: [] as ModulesEnum[],

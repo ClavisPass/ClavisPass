@@ -143,7 +143,7 @@ export default function LeftSideTabBar({
         return (
           <AnimatedPressable
             key={route.key}
-            onPress={onPress}
+            onPress={name === "AddTrigger" ? undefined : onPress}
             style={[
               styles.item,
               { backgroundColor: bgActive, opacity: isOnline ? 1 : 0.85 },

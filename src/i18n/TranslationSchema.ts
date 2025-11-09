@@ -6,7 +6,7 @@ export type TranslationSchema = {
     Logout: string;
   };
   common: {
-    language: string;
+    none: string;
   };
   home: {
     search: string;
@@ -79,6 +79,33 @@ export type TranslationSchema = {
     18: string;
     19: string;
     20: string;
+  };
+  modules: {
+    customField: string;
+    digitalCard: string;
+    email: string;
+    expiry: string;
+    key: string;
+    note: string;
+    password: string;
+    phoneNumber: string;
+    task: string;
+    title: string;
+    totp: string;
+    unknown: string;
+    url: string;
+    username: string;
+    wifi: string;
+    created: string; 
+    lastUpdated: string;
+  };
+  moduleTemplates: {
+    password: string;
+    wifi: string;
+    key: string;
+    digitalCard: string;
+    tasklist: string;
+    empty: string;
   };
 };
 export const DEFAULT_NS = "common" as const;

@@ -10,10 +10,12 @@ import WifiQRCodeModal from "../modals/WifiQRCodeModal";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 import { Dropdown, DropdownInputProps } from "react-native-paper-dropdown";
+import { useTranslation } from "react-i18next";
 
 function WifiModule(props: WifiModuleType & Props) {
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
+  const { t } = useTranslation();
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
   const OPTIONS = [
@@ -73,7 +75,7 @@ function WifiModule(props: WifiModuleType & Props) {
   return (
     <ModuleContainer
       id={props.id}
-      title="Wifi"
+      title={t("modules:wifi")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.WIFI}

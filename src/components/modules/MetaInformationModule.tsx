@@ -5,6 +5,7 @@ import { MenuItem } from "../items/MenuItem";
 
 import * as store from "../../utils/store";
 import { formatAbsoluteLocal } from "../../utils/expiry";
+import { useTranslation } from "react-i18next";
 
 type MetaInformationModuleType = {
   lastUpdated: string;
@@ -13,6 +14,7 @@ type MetaInformationModuleType = {
 
 function MetaInformationModule(props: MetaInformationModuleType) {
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   const [dateFormat, setDateFormat] = useState<string>("");
   const [timeFormat, setTimeFormat] = useState<string>("");
@@ -41,7 +43,7 @@ function MetaInformationModule(props: MetaInformationModuleType) {
       }}
     >
       <View style={{ flex: 1, justifyContent: "flex-start" }}>
-        <MenuItem label="Created">
+        <MenuItem label={t("modules:created")}>
           {formatAbsoluteLocal(props.created, dateFormat, timeFormat)}
         </MenuItem>
       </View>
@@ -54,7 +56,7 @@ function MetaInformationModule(props: MetaInformationModuleType) {
         }}
       />
       <View style={{ flex: 1, justifyContent: "flex-start" }}>
-        <MenuItem label="Last Updated">
+        <MenuItem label={t("modules:lastUpdated")}>
           {formatAbsoluteLocal(props.lastUpdated, dateFormat, timeFormat)}
         </MenuItem>
       </View>

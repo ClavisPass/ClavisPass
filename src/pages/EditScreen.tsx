@@ -41,7 +41,7 @@ import FastAccessType from "../types/FastAccessType";
 import * as store from "../utils/store";
 import FolderType from "../types/FolderType";
 import MetaInformationModule from "../components/modules/MetaInformationModule";
-import WebSpecific from "../components/platformSpecific/WebSpecific";
+import { useTranslation } from "react-i18next";
 
 type EditScreenProps = StackScreenProps<RootStackParamList, "Edit">;
 
@@ -60,6 +60,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     darkmode,
     setHeaderSpacing,
   } = useTheme();
+  const { t } = useTranslation();
   const { width, height } = useWindowDimensions();
   const [value, setValue] = useState<ValuesType>({ ...routeValue });
 
@@ -336,7 +337,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
               {value.folder === null ||
               value.folder.name === "" ||
               value.folder === undefined
-                ? "None"
+                ? t("common:none")
                 : value.folder.name}
             </Text>
           </View>

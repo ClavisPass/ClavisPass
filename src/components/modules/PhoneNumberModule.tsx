@@ -9,10 +9,12 @@ import { useTheme } from "../../contexts/ThemeProvider";
 import PhoneNumberModuleType from "../../types/modules/PhoneNumberModuleType";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import * as Linking from 'expo-linking';
+import { useTranslation } from "react-i18next";
 
 function PhoneNumberModule(props: PhoneNumberModuleType & Props) {
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
+  const { t } = useTranslation();
   const [value, setValue] = useState(props.value);
 
   const [formattedNumber, setFormattedNumber] = useState("");
@@ -49,7 +51,7 @@ function PhoneNumberModule(props: PhoneNumberModuleType & Props) {
   return (
     <ModuleContainer
       id={props.id}
-      title={"Phone Number"}
+      title={t("modules:phoneNumber")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.PHONE_NUMBER}

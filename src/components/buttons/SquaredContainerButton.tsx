@@ -35,9 +35,9 @@ function SquaredContainerButton(props: Props) {
       style={[
         styles.container,
         {
-          backgroundColor: props.backgroundColor
-            ? props.backgroundColor
-            : theme.colors?.background,
+          backgroundColor: props.disabled
+            ? theme.colors.surfaceDisabled
+            : (props.backgroundColor ?? theme.colors.background),
           boxShadow: theme.colors?.shadow,
         },
       ]}

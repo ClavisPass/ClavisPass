@@ -18,6 +18,7 @@ import changeFolder from "../../../utils/changeFolder";
 import { DataContextType, useData } from "../../../contexts/DataProvider";
 import FolderType from "../../../types/FolderType";
 import AnimatedPressable from "../../AnimatedPressable";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   data: DataContextType;
@@ -49,6 +50,7 @@ const getListStyle = (isDraggingOver: boolean) => ({
 
 function DraggableFolderListWeb(props: Props) {
   const { globalStyles } = useTheme();
+  const { t } = useTranslation();
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
@@ -103,7 +105,7 @@ function DraggableFolderListWeb(props: Props) {
                       }}
                       variant="bodyMedium"
                     >
-                      {"None"}
+                      {t("common:none")}
                     </Text>
                   </>
                 </AnimatedPressable>

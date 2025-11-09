@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   ripple: {
-    padding: 0,
+    padding: 8,
     paddingLeft: 8,
     paddingRight: 8,
     display: "flex",
@@ -37,6 +37,7 @@ type Props = {
   value: string;
   type: DigitalCardType;
   item: ValuesType;
+  onPressEdit: () => void;
   onPress: () => void;
   key?: React.Key;
   index: number;
@@ -57,13 +58,25 @@ function CardItem(props: Props) {
         },
       ]}
     >
-      <AnimatedPressable
-        key={props.key}
-        style={styles.ripple}
-        onPress={props.onPress}
+      <View
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+        }}
       >
-        <View style={{ flex: 1, display: "flex", flexDirection: "column", padding: 8 }}>
+        <AnimatedPressable
+          key={props.key}
+          style={styles.ripple}
+          onPress={props.onPressEdit}
+        >
           <Text>{props.title}</Text>
+        </AnimatedPressable>
+        <AnimatedPressable
+          key={props.key}
+          style={styles.ripple}
+          onPress={props.onPress}
+        >
           <View
             style={{
               flex: 1,
@@ -87,8 +100,8 @@ function CardItem(props: Props) {
               )
             ) : null}
           </View>
-        </View>
-      </AnimatedPressable>
+        </AnimatedPressable>
+      </View>
     </Animated.View>
   );
 }

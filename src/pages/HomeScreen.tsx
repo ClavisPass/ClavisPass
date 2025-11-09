@@ -62,7 +62,6 @@ import * as store from "../utils/store";
 import TotpItem from "../components/items/TotpItem";
 import ModulesEnum from "../enums/ModulesEnum";
 import CardItem from "../components/items/CardItem";
-import DigitalCardType from "../types/DigitalCardType";
 import DigitalCardModuleType from "../types/modules/DigitalCardModuleType";
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
@@ -105,11 +104,27 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     store.get("FAVORITE_FILTER").then((stored) => {
       setSelectedFav(stored);
     });
+    store.get("TWOFA_FILTER").then((stored) => {
+      setSelected2FA(stored);
+    });
+    store.get("CARD_FILTER").then((stored) => {
+      setSelectedCard(stored);
+    });
   }, []);
 
   const saveSelectedFavState = (fav: boolean) => {
     setSelectedFav(fav);
     store.set("FAVORITE_FILTER", fav);
+  };
+
+  const saveSelected2FAState = (twoFA: boolean) => {
+    setSelected2FA(twoFA);
+    store.set("TWOFA_FILTER", twoFA);
+  };
+
+  const saveSelectedCardState = (card: boolean) => {
+    setSelectedCard(card);
+    store.set("CARD_FILTER", card);
   };
 
   useEffect(() => {
@@ -161,43 +176,55 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   }, [data.showSave]);
 
   const filteredValues = useMemo(() => {
-    if (!data.data?.values) return [];
+  const values = data.data?.values ?? [];
 
-    const normalizeText = (text: string) =>
-      text
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/\p{Diacritic}/gu, "");
+  const normalizeText = (text: string) =>
+    text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "");
 
-    const normalizedQuery = normalizeText(searchQuery.trim());
+  const normalizedQuery = normalizeText(searchQuery.trim());
+  const hasQuery = normalizedQuery.length > 0;
 
-    return data.data.values
-      .filter((item) => {
-        const folderMatch =
-          selectedFolder === null || item.folder?.id === selectedFolder.id;
-        const favMatch = !selectedFav || item.fav;
+  // 1) Wenn es eine Query gibt: NICHT nach fav/folder filtern (alles durchsuchen)
+  // 2) Wenn es KEINE Query gibt: normal nach fav/folder filtern
+  const prefiltered = values.filter((item) => {
+    if (hasQuery) return true;
 
-        return folderMatch && favMatch;
-      })
-      .map((item) => {
-        const title = normalizeText(item.title);
+    const folderMatch =
+      selectedFolder === null || item.folder?.id === selectedFolder.id;
+    const favMatch = !selectedFav || item.fav;
+    return folderMatch && favMatch;
+  });
 
-        // Relevanzbewertung: niedriger Score = besser
-        let relevance = Infinity;
-        if (title.startsWith(normalizedQuery)) {
-          relevance = 0; // beste Treffer
-        } else {
-          const index = title.indexOf(normalizedQuery);
-          if (index !== -1) {
-            relevance = index + 1; // später gefundene Treffer
-          }
-        }
+  const withRelevance = prefiltered.map((item) => {
+    if (!hasQuery) return { ...item, _relevance: 0 as number };
 
-        return { ...item, _relevance: relevance };
-      })
-      .filter((item) => item._relevance !== Infinity)
-      .sort((a, b) => a._relevance - b._relevance);
-  }, [data.data, searchQuery, selectedFolder, selectedFav]);
+    const title = normalizeText(item.title);
+
+    let relevance = Infinity;
+    if (title.startsWith(normalizedQuery)) {
+      relevance = 0;
+    } else {
+      const index = title.indexOf(normalizedQuery);
+      if (index !== -1) {
+        relevance = index + 1;
+      }
+    }
+
+    return { ...item, _relevance: relevance };
+  });
+
+  const result = hasQuery
+    ? withRelevance
+        .filter((item) => item._relevance !== Infinity)
+        .sort((a, b) => a._relevance - b._relevance)
+    : withRelevance;
+
+  return result;
+}, [data.data, searchQuery, selectedFolder, selectedFav]);
+
 
   const refreshData = () => {
     const master = auth.master;
@@ -220,8 +247,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
           setSelectedFolder(null);
           saveSelectedFavState(false);
-          setSelected2FA(false);
-          setSelectedCard(false);
+          saveSelected2FAState(false);
+          saveSelectedCardState(false);
         }
       });
     } else {
@@ -232,7 +259,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const searchRef = useRef<any>(null);
 
   function renderFlashList() {
-    if (selectedCard) {
+    if (selectedCard && searchQuery === "") {
       let cardEntries = [];
       if (data.data?.values) {
         for (const item of data.data.values) {
@@ -263,9 +290,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               type={item.type}
               item={item.item}
               index={index}
-              onPress={() => {
+              onPressEdit={() => {
                 navigation.navigate("Edit", {
                   value: item.item,
+                });
+              }}
+              onPress={() => {
+                navigation.navigate("CardDetails", {
+                  value: item.value,
+                  title: item.title,
+                  type: item.type,
                 });
               }}
             />
@@ -273,7 +307,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         />
       );
     }
-    if (selected2FA) {
+    if (selected2FA && searchQuery === "") {
       let totpEntries = [];
       if (data.data?.values) {
         for (const item of data.data.values) {
@@ -560,9 +594,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           setSelectedFolder={setSelectedFolder}
           setFolderModalVisible={setFolderModalVisible}
           selected2FA={selected2FA}
-          setSelected2FA={setSelected2FA}
+          setSelected2FA={saveSelected2FAState}
           selectedCard={selectedCard}
-          setSelectedCard={setSelectedCard}
+          setSelectedCard={saveSelectedCardState}
         />
       </View>
 

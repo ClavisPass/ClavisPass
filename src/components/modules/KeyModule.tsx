@@ -8,10 +8,12 @@ import CopyToClipboard from "../buttons/CopyToClipboard";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 import identifyKeyType from "../../utils/regex/identifyKeyType";
+import { useTranslation } from "react-i18next";
 
 function KeyModule(props: KeyModuleType & Props) {
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
+  const { t } = useTranslation();
   const [value, setValue] = useState(props.value);
   const [keyType, setKeyType] = useState(identifyKeyType(value));
   useEffect(() => {
@@ -31,7 +33,7 @@ function KeyModule(props: KeyModuleType & Props) {
   return (
     <ModuleContainer
       id={props.id}
-      title={"Key"}
+      title={t("modules:key")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.KEY}

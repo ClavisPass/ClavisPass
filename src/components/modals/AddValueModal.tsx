@@ -5,6 +5,7 @@ import TemplateEnum from "../../enums/TemplateEnum";
 import getTemplate from "../../utils/getTemplate";
 import CategoryItem from "../items/CategoryItem";
 import FolderType from "../../types/FolderType";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   visible: boolean;
@@ -15,6 +16,7 @@ type Props = {
 };
 
 function AddValueModal(props: Props) {
+  const { t } = useTranslation();
   const hideModal = () => props.setVisible(false);
   const navigateToAddValue = (template: TemplateEnum) => {
     props.navigation.navigate("Edit", {
@@ -45,7 +47,7 @@ function AddValueModal(props: Props) {
               navigateToAddValue(TemplateEnum.PASSWORD);
             }}
           >
-            {"Password"}
+            {t("moduleTemplates:password")}
           </CategoryItem>
           <CategoryItem
             leadingIcon={ValueIconsEnum.WIFI}
@@ -53,7 +55,7 @@ function AddValueModal(props: Props) {
               navigateToAddValue(TemplateEnum.WIFI);
             }}
           >
-            {"Wifi"}
+            {t("moduleTemplates:wifi")}
           </CategoryItem>
         </View>
         <View
@@ -65,7 +67,7 @@ function AddValueModal(props: Props) {
               navigateToAddValue(TemplateEnum.KEY);
             }}
           >
-            {"Key"}
+            {t("moduleTemplates:key")}
           </CategoryItem>
           <CategoryItem
             leadingIcon={ValueIconsEnum.DIGITAL_CARD}
@@ -73,7 +75,7 @@ function AddValueModal(props: Props) {
               navigateToAddValue(TemplateEnum.DIGITAL_CARD);
             }}
           >
-            {"Digital Card"}
+            {t("moduleTemplates:digitalCard")}
           </CategoryItem>
         </View>
         <View
@@ -85,7 +87,7 @@ function AddValueModal(props: Props) {
               navigateToAddValue(TemplateEnum.TASKLIST);
             }}
           >
-            {"Tasklist"}
+            {t("moduleTemplates:tasklist")}
           </CategoryItem>
           <CategoryItem
             leadingIcon={ValueIconsEnum.BLANK}
@@ -93,7 +95,7 @@ function AddValueModal(props: Props) {
               navigateToAddValue(TemplateEnum.BLANK);
             }}
           >
-            {"Empty"}
+            {t("moduleTemplates:empty")}
           </CategoryItem>
         </View>
       </View>

@@ -8,7 +8,7 @@ const de: TranslationSchema = {
     Logout: "Abmelden",
   },
   common: {
-    language: "Sprache",
+    none: "Keins",
   },
   home: {
     search: "Suche",
@@ -81,6 +81,33 @@ const de: TranslationSchema = {
     18: "Na Chef ",
     19: "Ahoi ",
     20: "Hallöchen ",
+  },
+  modules: {
+    customField: "Benutzerdefiniert",
+    digitalCard: "Digitale Karte",
+    email: "E-Mail",
+    expiry: "Ablauf",
+    key: "Schlüssel",
+    note: "Notiz",
+    password: "Passwort",
+    phoneNumber: "Telefonnummer",
+    task: "Aufgabe",
+    title: "Titel",
+    totp: "TOTP",
+    unknown: "Unbekannt",
+    url: "URL",
+    username: "Benutzername",
+    wifi: "WiFi",
+    created: "Erstellt",
+    lastUpdated: "Zuletzt aktualisiert",
+  },
+  moduleTemplates: {
+    password: "Passwort",
+    wifi: "WiFi",
+    key: "Schlüssel",
+    digitalCard: "Digitale Karte",
+    tasklist: "Aufgabenliste",
+    empty: "Leer",
   },
 };
 

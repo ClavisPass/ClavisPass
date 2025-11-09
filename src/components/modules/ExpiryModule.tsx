@@ -15,10 +15,12 @@ import ExpiryPickerModal from "../modals/ExpiryPickerModal";
 import ExpiryModuleType from "../../types/modules/ExpiryModuleType";
 
 import * as store from "../../utils/store";
+import { useTranslation } from "react-i18next";
 
 function ExpiryModule(props: ExpiryModuleType & Props) {
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
+  const { t } = useTranslation();
 
   const warnBeforeMs = props.warnBeforeMs ?? 24 * 60 * 60 * 1000;
 
@@ -77,7 +79,7 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
   return (
     <ModuleContainer
       id={props.id}
-      title={"Expiry"}
+      title={t("modules:expiry")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.EXPIRY}

@@ -7,13 +7,15 @@ import ModuleContainer from "../container/ModuleContainer";
 import Props from "../../types/ModuleProps";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 function UnknownModule(props: { module: any; id: string } & Props) {
   const { globalStyles } = useTheme();
+  const { t } = useTranslation();
   return (
     <ModuleContainer
       id={props.id}
-      title={"Unknown Module"}
+      title={t("modules:unknownModule")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.UNKNOWN}

@@ -10,6 +10,7 @@ import { DataContextType } from "../../../contexts/DataProvider";
 import changeFolder from "../../../utils/changeFolder";
 import FolderType from "../../../types/FolderType";
 import AnimatedPressable from "../../AnimatedPressable";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   data: DataContextType;
@@ -20,6 +21,7 @@ type Props = {
 
 function DraggableFolderList(props: Props) {
   const { globalStyles } = useTheme();
+  const { t } = useTranslation();
   const renderItem = useCallback(
     ({ item, drag, isActive }: RenderItemParams<FolderType>) => {
       return (
@@ -103,7 +105,7 @@ function DraggableFolderList(props: Props) {
                 }}
                 variant="bodyMedium"
               >
-                {"None"}
+                {t("common:none")}
               </Text>
             </>
           </AnimatedPressable>

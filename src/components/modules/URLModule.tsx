@@ -16,10 +16,12 @@ import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 
 import { Image } from "expo-image";
+import { useTranslation } from "react-i18next";
 
 function URLModule(props: URLModuleType & Props) {
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
+  const { t } = useTranslation();
   const [value, setValue] = useState(props.value);
   const [isValid, setIsValid] = useState(false);
 
@@ -111,7 +113,7 @@ function URLModule(props: URLModuleType & Props) {
   return (
     <ModuleContainer
       id={props.id}
-      title={"URL"}
+      title={t("modules:url")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.URL}

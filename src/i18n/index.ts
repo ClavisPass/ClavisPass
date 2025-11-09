@@ -13,6 +13,8 @@ export const resources = {
     analysis: en.analysis,
     analysisDetail: en.analysisDetail,
     greetings: en.greetings,
+    modules: en.modules,
+    moduleTemplates: en.moduleTemplates,
   },
   de: {
     [DEFAULT_NS]: de.common,
@@ -22,6 +24,8 @@ export const resources = {
     analysis: de.analysis,
     analysisDetail: de.analysisDetail,
     greetings: de.greetings,
+    modules: de.modules,
+    moduleTemplates: de.moduleTemplates,
   },
 } as const;
 

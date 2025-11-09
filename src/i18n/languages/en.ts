@@ -8,7 +8,7 @@ const en: TranslationSchema = {
     Logout: "Logout",
   },
   common: {
-    language: "Language",
+    none: "None",
   },
   home: {
     search: "Search",
@@ -81,7 +81,34 @@ const en: TranslationSchema = {
     18: "Ayo ",
     19: "Hey dude ",
     20: "Yo chief ",
-  }
+  },
+  modules: {
+    customField: "Custom Field",
+    digitalCard: "Digital Card",
+    email: "E-Mail",
+    expiry: "Expiry",
+    key: "Key",
+    note: "Note",
+    password: "Password",
+    phoneNumber: "Phone Number",
+    task: "Task",
+    title: "Title",
+    totp: "TOTP",
+    unknown: "Unknown",
+    url: "URL",
+    username: "Username",
+    wifi: "WiFi",
+    created: "Created",
+    lastUpdated: "Last Updated",
+  },
+  moduleTemplates: {
+    password: "Password",
+    wifi: "WiFi",
+    key: "Key",
+    digitalCard: "Digital Card",
+    tasklist: "Tasklist",
+    empty: "Empty",
+  },
 };
 
 export default en;

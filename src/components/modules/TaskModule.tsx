@@ -5,10 +5,12 @@ import Props from "../../types/ModuleProps";
 import { useTheme } from "../../contexts/ThemeProvider";
 import TaskModuleType from "../../types/modules/TaskModuleType";
 import { EditRowControlsContainer } from "../container/EditRowControlsContainer";
+import { useTranslation } from "react-i18next";
 
 function TaskModule(props: TaskModuleType & Props) {
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
+  const { t } = useTranslation();
   const [value, setValue] = useState(props.value);
   const [checked, setChecked] = useState(props.completed);
 

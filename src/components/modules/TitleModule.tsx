@@ -4,6 +4,7 @@ import { Icon, TextInput } from "react-native-paper";
 import ValuesType from "../../types/ValuesType";
 import { useTheme } from "../../contexts/ThemeProvider";
 import { View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   value: ValuesType;
@@ -13,6 +14,7 @@ type Props = {
 
 function TitleModule(props: Props) {
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   const textInputRef = useRef<any>(null);
 
@@ -41,7 +43,7 @@ function TitleModule(props: Props) {
     >
       <TextInput
         ref={textInputRef}
-        placeholder={"Title..."}
+        placeholder={`${t("modules:title")}...`}
         placeholderTextColor={"lightgrey"}
         outlineStyle={[
           {

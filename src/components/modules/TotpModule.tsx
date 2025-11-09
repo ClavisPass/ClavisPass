@@ -12,6 +12,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../stacks/Stack";
 import CopyToClipboard from "../buttons/CopyToClipboard";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
+import { useTranslation } from "react-i18next";
 
 export function Totp(props: { value: string }) {
   const { theme } = useTheme();
@@ -116,6 +117,7 @@ type TotpModuleModuleProps = {
 function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
+  const { t } = useTranslation();
 
   const [value, setValue] = useState(props.value);
   const [code, setCode] = useState<string>("------");
@@ -167,7 +169,7 @@ function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
   return (
     <ModuleContainer
       id={props.id}
-      title={"Two-Factor Auth"}
+      title={t("modules:totp")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.TOTP}

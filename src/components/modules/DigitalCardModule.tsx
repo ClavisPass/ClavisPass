@@ -5,9 +5,9 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { View, Animated, Easing, StyleSheet } from "react-native";
-import { Button, IconButton, TextInput } from "react-native-paper";
-import { Dropdown, DropdownInputProps } from "react-native-paper-dropdown";
+import { View, StyleSheet } from "react-native";
+import { Button, TextInput } from "react-native-paper";
+import { DropdownInputProps } from "react-native-paper-dropdown";
 
 import ModuleContainer from "../container/ModuleContainer";
 import Props from "../../types/ModuleProps";
@@ -21,6 +21,7 @@ import QRCode from "react-qr-code";
 import Barcode from "@kichiyaki/react-native-barcode-generator";
 import { StackNavigationProp } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../../stacks/Stack";
+import { useTranslation } from "react-i18next";
 
 type DigitalCardModuleProps = {
   navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>;
@@ -48,6 +49,7 @@ function DigitalCardModule(
 ) {
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
+  const { t } = useTranslation();
 
   const OPTIONS = useMemo(
     () => DIGITAL_CARD_TYPES.map((t) => ({ label: t, value: t })),
@@ -90,7 +92,7 @@ function DigitalCardModule(
   return (
     <ModuleContainer
       id={props.id}
-      title="Digital Card"
+      title={t("modules:digitalCard")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.DIGITAL_CARD}

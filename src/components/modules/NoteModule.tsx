@@ -5,9 +5,11 @@ import ModuleContainer from "../container/ModuleContainer";
 import Props from "../../types/ModuleProps";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 function NoteModule(props: NoteModuleType & Props) {
   const didMount = useRef(false);
+  const { t } = useTranslation();
   const { globalStyles } = useTheme();
   const [value, setValue] = useState(props.value);
   useEffect(() => {
@@ -25,7 +27,7 @@ function NoteModule(props: NoteModuleType & Props) {
   return (
     <ModuleContainer
       id={props.id}
-      title={"Note"}
+      title={t("modules:note")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.NOTE}

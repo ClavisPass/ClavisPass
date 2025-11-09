@@ -9,10 +9,12 @@ import CopyToClipboard from "../buttons/CopyToClipboard";
 import Props from "../../types/ModuleProps";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 function UsernameModule(props: UsernameModuleType & Props) {
   const didMount = useRef(false);
   const { globalStyles } = useTheme();
+  const { t } = useTranslation();
   const [value, setValue] = useState(props.value);
   useEffect(() => {
     if (didMount.current) {
@@ -29,7 +31,7 @@ function UsernameModule(props: UsernameModuleType & Props) {
   return (
     <ModuleContainer
       id={props.id}
-      title={"Username"}
+      title={t("modules:username")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
       icon={ModuleIconsEnum.USERNAME}
