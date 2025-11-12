@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import {
   DragDropContext,
   Droppable,
@@ -23,6 +23,7 @@ import { RootStackParamList } from "../../../stacks/Stack";
 import ModulesEnum from "../../../enums/ModulesEnum";
 import predictNextModule from "../../../utils/predictNextModule";
 import getModuleNameByEnum from "../../../utils/getModuleNameByEnum";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   value: ValuesType;
@@ -57,6 +58,7 @@ const getListStyle = (isDraggingOver: boolean) => ({
 
 function DraggableModulesListWeb(props: Props) {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const [modulePrediction, setModulePrediction] = useState<ModulesEnum | null>(null);
 
   // ⬇️ Refs für Scrollen
@@ -168,7 +170,7 @@ function DraggableModulesListWeb(props: Props) {
                   }}
                   style={{ position: "absolute", left: 8 }}
                 >
-                  {getModuleNameByEnum(modulePrediction)}
+                  {getModuleNameByEnum(modulePrediction, t)}
                 </Chip>
               )}
 

@@ -1,39 +1,39 @@
 import ModulesEnum from "../enums/ModulesEnum";
 
-const getModuleNameByEnum = (moduleEnum: ModulesEnum): string => {
+const getModuleNameByEnum = (moduleEnum: ModulesEnum, t: any): string => {
   switch (moduleEnum) {
     case ModulesEnum.CUSTOM_FIELD:
-      return "Custom Field";
+      return t("modules:customField");
     case ModulesEnum.E_MAIL:
-      return "E-Mail";
+      return t("modules:email");
     case ModulesEnum.KEY:
-      return "Key";
+      return t("modules:key");
     case ModulesEnum.NOTE:
-      return "Note";
+      return t("modules:note");
     case ModulesEnum.PASSWORD:
-      return "Password";
+      return t("modules:password");
     case ModulesEnum.TITLE:
-      return "Title";
+      return t("modules:title");
     case ModulesEnum.URL:
-      return "URL";
+      return t("modules:url");
     case ModulesEnum.USERNAME:
-      return "Username";
+      return t("modules:username");
     case ModulesEnum.WIFI:
-      return "WiFi";
+      return t("modules:wifi");
     case ModulesEnum.DIGITAL_CARD:
-      return "Digital Card";
+      return t("modules:digitalCard");
     case ModulesEnum.TASK:
-      return "Task";
+      return t("modules:task");
     case ModulesEnum.PHONE_NUMBER:
-      return "Phone Number";
+      return t("modules:phoneNumber");
     case ModulesEnum.TOTP:
-      return "TOTP";
+      return t("modules:totp");
     case ModulesEnum.EXPIRY:
-      return "Expiry";
+      return t("modules:expiry");
     case ModulesEnum.UNKNOWN:
-      return "Unknown";
+      return t("modules:unknown");
     default:
-      return "Unknown";
+      return t("modules:unknown");
   }
 };
 

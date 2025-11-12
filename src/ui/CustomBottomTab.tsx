@@ -1,6 +1,6 @@
 import React from "react";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { Platform, View } from "react-native";
+import { Easing, Platform, View } from "react-native";
 import { BottomNavigation, IconButton, Text } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../contexts/ThemeProvider";
@@ -176,6 +176,24 @@ const CustomBottomTab = ({
             style={{
               backgroundColor: theme.colors.background,
             }}
+            activeIndicatorStyle={{
+              backgroundColor: "rgba(0,0,0,0.06)",
+              borderRadius: 12,
+            }}
+            renderLabel={({ route, focused }) => (
+              <Text
+                style={{
+                  fontSize: 10,
+                  textAlign: "center",
+                  color: focused ? theme.colors.onSurface : "#777",
+                }}
+              >
+                {route.title}
+              </Text>
+            )}
+            animationEasing={Easing.bezier(0.2, 0.7, 0.3, 1)}
+            activeColor={theme.colors.primary}
+            inactiveColor={"#777"}
           />
         </View>
       </View>

@@ -15,6 +15,7 @@ import ModulesEnum from "../../../enums/ModulesEnum";
 import predictNextModule from "../../../utils/predictNextModule";
 import getModuleNameByEnum from "../../../utils/getModuleNameByEnum";
 import { InteractionManager } from "react-native";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   value: ValuesType;
@@ -31,6 +32,7 @@ type Props = {
 
 function DraggableModulesList(props: Props) {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const [modulePrediction, setModulePrediction] = useState<ModulesEnum | null>(null);
 
   // ⬇️ Ref auf die Liste + Content-Höhe für Fallback
@@ -138,7 +140,7 @@ function DraggableModulesList(props: Props) {
                   }}
                   style={{ position: "absolute", left: 8 }}
                 >
-                  {getModuleNameByEnum(modulePrediction)}
+                  {getModuleNameByEnum(modulePrediction, t)}
                 </Chip>
               )}
               <IconButton
