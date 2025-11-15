@@ -1,11 +1,6 @@
-import React, { ReactNode, useEffect } from "react";
-import { View, Pressable, Platform, ViewStyle, StyleProp } from "react-native";
+import React, { ReactNode } from "react";
+import { View, Pressable, Platform, ViewStyle, StyleProp, StyleSheet } from "react-native";
 import { Icon, IconButton } from "react-native-paper";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
 import { useTheme } from "../../contexts/ThemeProvider";
 
 export type EditRowControlsContainerProps = {
@@ -30,7 +25,8 @@ export function EditRowControlsContainer({
   return (
     <View
       style={[
-        { flexDirection: "row", flex: 1, paddingLeft: 16, paddingRight: 4 },
+        { flexDirection: "row", flex: 1, paddingLeft: 16, paddingRight: 4, borderColor: theme.colors.outlineVariant,
+                          borderWidth: StyleSheet.hairlineWidth, },
         style,
       ]}
     >

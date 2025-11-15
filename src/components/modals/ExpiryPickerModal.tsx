@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Button, Portal, Text } from "react-native-paper";
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
 import { toIsoUtcFromLocal } from "../../utils/expiry";
 import Modal from "./Modal";
+
+import { useTheme } from "../../contexts/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   visible: boolean;
@@ -18,6 +21,8 @@ export default function ExpiryPickerModal({
   initialIso,
   onConfirm,
 }: Props) {
+  const { theme } = useTheme();
+  const { t } = useTranslation();
   const init = initialIso ? new Date(initialIso) : new Date();
   const [date, setDate] = useState<Date | undefined>(init);
   const [time, setTime] = useState<{ hours: number; minutes: number }>({
@@ -33,7 +38,6 @@ export default function ExpiryPickerModal({
         <View
           style={{
             padding: 14,
-            borderRadius: 20,
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
@@ -41,10 +45,13 @@ export default function ExpiryPickerModal({
             cursor: "auto",
             gap: 6,
             width: 280,
+            borderRadius: 12,
+            borderWidth: StyleSheet.hairlineWidth,
+            borderColor: theme.colors.outlineVariant,
           }}
         >
           <Text variant="headlineSmall" style={{ userSelect: "none" }}>
-            Set Expiry
+            {t("common:setExpiry")}
           </Text>
           <View style={{ gap: 12 }}>
             <Button
@@ -66,7 +73,7 @@ export default function ExpiryPickerModal({
                 compact
                 onPress={() => setDate(new Date(Date.now()))}
               >
-                Current
+                {t("common:current")}
               </Button>
               <Button
                 style={{ borderRadius: 12 }}
@@ -116,7 +123,7 @@ export default function ExpiryPickerModal({
                   setTime({ hours: now.getHours(), minutes: now.getMinutes() });
                 }}
               >
-                Current
+                {t("common:current")}
               </Button>
               <Button
                 style={{ borderRadius: 12 }}
@@ -179,7 +186,7 @@ export default function ExpiryPickerModal({
               mode="contained-tonal"
               onPress={() => setVisible(false)}
             >
-              Cancel
+              {t("common:cancel")}
             </Button>
             <Button
               style={{ borderRadius: 12 }}
@@ -191,7 +198,7 @@ export default function ExpiryPickerModal({
                 setVisible(false);
               }}
             >
-              Save
+              {t("common:save")}
             </Button>
           </View>
 

@@ -11,7 +11,7 @@ const theme = {
     primaryContainer: "rgba(120, 126, 245, 1)",
     secondary: "#69C4FF",
     secondaryContainer: "rgba(120, 126, 245, 0.09)",
-    background: "#292929ff",
+    background: "#1b1b1bff",
     //shadowColor: "grey",
     elevation: {
       level0: "transparent",

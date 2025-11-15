@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { View, Platform } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
@@ -30,6 +30,9 @@ function Header(props: Props) {
         borderBottomRightRadius: 12,
         boxShadow: theme.colors?.shadow,
         justifyContent: "center",
+        borderWidth: StyleSheet.hairlineWidth,
+        borderTopWidth: 0,
+        borderColor: theme.colors.outlineVariant,
       }}
     >
       <View

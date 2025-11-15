@@ -4,21 +4,15 @@ import React, {
   useCallback,
   useEffect,
   useRef,
-} from "react"; // [CHANGED]
+} from "react";
 import {
   useWindowDimensions,
   View,
   ScrollView,
   Dimensions,
+  StyleSheet,
 } from "react-native";
-import {
-  Searchbar,
-  Text,
-  Icon,
-  useTheme,
-  IconButton,
-  Chip,
-} from "react-native-paper";
+import { Searchbar, Text, Icon, IconButton, Chip } from "react-native-paper";
 import Modal from "./Modal";
 import ModulesEnum from "../../enums/ModulesEnum";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
@@ -26,6 +20,7 @@ import AnimatedPressable from "../AnimatedPressable";
 
 import * as store from "../../utils/store";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 type ModuleCategory = "Common" | "Security" | "vCard" | "Utility";
 
@@ -85,7 +80,7 @@ function ModuleTile({
   onToggleFavorite: () => void;
   isFavorite: boolean;
 }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
 
   return (
     <View style={{ flex: 1, padding: 4 }}>
@@ -150,6 +145,7 @@ function ModuleTile({
 
 export default function AddModuleModalCompactFav(props: Props) {
   const { t } = useTranslation();
+  const { theme } = useTheme();
 
   const { height: winH, width: winW } = useWindowDimensions();
   const hideModal = () => props.setVisible(false);
@@ -162,98 +158,98 @@ export default function AddModuleModalCompactFav(props: Props) {
   const [currentOffset, setCurrentOffset] = useState(0);
 
   const MODULES: ModuleMeta[] = [
-  {
-    id: ModulesEnum.USERNAME,
-    label: t("modules:username"),
-    icon: ModuleIconsEnum.USERNAME,
-    category: "Common",
-    keywords: ["user", "login", "account"],
-  },
-  {
-    id: ModulesEnum.E_MAIL,
-    label: t("modules:email"),
-    icon: ModuleIconsEnum.E_MAIL,
-    category: "Common",
-    keywords: ["mail", "email", "kontakt"],
-  },
-  {
-    id: ModulesEnum.PASSWORD,
-    label: t("modules:password"),
-    icon: ModuleIconsEnum.PASSWORD,
-    category: "Security",
-    keywords: ["passwort", "credential", "login"],
-  },
-  {
-    id: ModulesEnum.WIFI,
-    label: t("modules:wifi"),
-    icon: ModuleIconsEnum.WIFI,
-    category: "Utility",
-    keywords: ["wlan", "network", "ssid"],
-  },
-  {
-    id: ModulesEnum.URL,
-    label: t("modules:url"),
-    icon: ModuleIconsEnum.URL,
-    category: "Common",
-    keywords: ["link", "website", "http"],
-  },
-  {
-    id: ModulesEnum.DIGITAL_CARD,
-    label: t("modules:digitalCard"),
-    icon: ModuleIconsEnum.DIGITAL_CARD,
-    category: "Utility",
-    keywords: ["card", "kontakt", "profile"],
-  },
-  {
-    id: ModulesEnum.KEY,
-    label: t("modules:key"),
-    icon: ModuleIconsEnum.KEY,
-    category: "Security",
-    keywords: ["ssh", "api", "token"],
-  },
-  {
-    id: ModulesEnum.CUSTOM_FIELD,
-    label: t("modules:customField"),
-    icon: ModuleIconsEnum.CUSTOM_FIELD,
-    category: "Utility",
-    keywords: ["frei", "meta", "notizen"],
-  },
-  {
-    id: ModulesEnum.PHONE_NUMBER,
-    label: t("modules:phoneNumber"),
-    icon: ModuleIconsEnum.PHONE_NUMBER,
-    category: "vCard",
-    keywords: ["telefon", "mobil", "kontakt"],
-  },
-  {
-    id: ModulesEnum.TASK,
-    label: t("modules:task"),
-    icon: ModuleIconsEnum.TASK,
-    category: "Utility",
-    keywords: ["todo", "aufgabe", "reminder"],
-  },
-  {
-    id: ModulesEnum.TOTP,
-    label: t("modules:totp"),
-    icon: ModuleIconsEnum.TOTP,
-    category: "Security",
-    keywords: ["2fa", "otp", "totp", "mfa"],
-  },
-  {
-    id: ModulesEnum.NOTE,
-    label: t("modules:note"),
-    icon: ModuleIconsEnum.NOTE,
-    category: "Utility",
-    keywords: ["notiz", "text", "memo"],
-  },
-  {
-    id: ModulesEnum.EXPIRY,
-    label: t("modules:expiry"),
-    icon: ModuleIconsEnum.EXPIRY,
-    category: "Utility",
-    keywords: ["ablauf", "gültig", "verfall"],
-  },
-];
+    {
+      id: ModulesEnum.USERNAME,
+      label: t("modules:username"),
+      icon: ModuleIconsEnum.USERNAME,
+      category: "Common",
+      keywords: ["user", "login", "account"],
+    },
+    {
+      id: ModulesEnum.E_MAIL,
+      label: t("modules:email"),
+      icon: ModuleIconsEnum.E_MAIL,
+      category: "Common",
+      keywords: ["mail", "email", "kontakt"],
+    },
+    {
+      id: ModulesEnum.PASSWORD,
+      label: t("modules:password"),
+      icon: ModuleIconsEnum.PASSWORD,
+      category: "Security",
+      keywords: ["passwort", "credential", "login"],
+    },
+    {
+      id: ModulesEnum.WIFI,
+      label: t("modules:wifi"),
+      icon: ModuleIconsEnum.WIFI,
+      category: "Utility",
+      keywords: ["wlan", "network", "ssid"],
+    },
+    {
+      id: ModulesEnum.URL,
+      label: t("modules:url"),
+      icon: ModuleIconsEnum.URL,
+      category: "Common",
+      keywords: ["link", "website", "http"],
+    },
+    {
+      id: ModulesEnum.DIGITAL_CARD,
+      label: t("modules:digitalCard"),
+      icon: ModuleIconsEnum.DIGITAL_CARD,
+      category: "Utility",
+      keywords: ["card", "kontakt", "profile"],
+    },
+    {
+      id: ModulesEnum.KEY,
+      label: t("modules:key"),
+      icon: ModuleIconsEnum.KEY,
+      category: "Security",
+      keywords: ["ssh", "api", "token"],
+    },
+    {
+      id: ModulesEnum.CUSTOM_FIELD,
+      label: t("modules:customField"),
+      icon: ModuleIconsEnum.CUSTOM_FIELD,
+      category: "Utility",
+      keywords: ["frei", "meta", "notizen"],
+    },
+    {
+      id: ModulesEnum.PHONE_NUMBER,
+      label: t("modules:phoneNumber"),
+      icon: ModuleIconsEnum.PHONE_NUMBER,
+      category: "vCard",
+      keywords: ["telefon", "mobil", "kontakt"],
+    },
+    {
+      id: ModulesEnum.TASK,
+      label: t("modules:task"),
+      icon: ModuleIconsEnum.TASK,
+      category: "Utility",
+      keywords: ["todo", "aufgabe", "reminder"],
+    },
+    {
+      id: ModulesEnum.TOTP,
+      label: t("modules:totp"),
+      icon: ModuleIconsEnum.TOTP,
+      category: "Security",
+      keywords: ["2fa", "otp", "totp", "mfa"],
+    },
+    {
+      id: ModulesEnum.NOTE,
+      label: t("modules:note"),
+      icon: ModuleIconsEnum.NOTE,
+      category: "Utility",
+      keywords: ["notiz", "text", "memo"],
+    },
+    {
+      id: ModulesEnum.EXPIRY,
+      label: t("modules:expiry"),
+      icon: ModuleIconsEnum.EXPIRY,
+      category: "Utility",
+      keywords: ["ablauf", "gültig", "verfall"],
+    },
+  ];
 
   const change = (direction: "+" | "-") => {
     const { width } = Dimensions.get("window");
@@ -420,6 +416,9 @@ export default function AddModuleModalCompactFav(props: Props) {
           height: containerMaxHeight,
           padding: 8,
           gap: 8,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: theme.colors.outlineVariant,
+          borderRadius: 12,
         }}
       >
         <Searchbar
@@ -441,20 +440,20 @@ export default function AddModuleModalCompactFav(props: Props) {
           horizontal
           style={{ gap: 6, maxHeight: 36 }}
         >
-          {(
-            ["Common", "Security", "vCard", "Utility"] as ModuleCategory[]
-          ).map((c) => {
-            const selected = activeCats.has(c);
-            return (
-              <TinyFilterChip
-                key={c}
-                label={c}
-                icon={catIcon(c)}
-                selected={selected}
-                onPress={() => toggleCat(c)}
-              />
-            );
-          })}
+          {(["Common", "Security", "vCard", "Utility"] as ModuleCategory[]).map(
+            (c) => {
+              const selected = activeCats.has(c);
+              return (
+                <TinyFilterChip
+                  key={c}
+                  label={c}
+                  icon={catIcon(c)}
+                  selected={selected}
+                  onPress={() => toggleCat(c)}
+                />
+              );
+            }
+          )}
         </ScrollView>
 
         <ScrollView

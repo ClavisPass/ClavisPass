@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useTheme } from "../../contexts/ThemeProvider";
 import { MenuItem } from "../items/MenuItem";
 
@@ -40,6 +40,9 @@ function MetaInformationModule(props: MetaInformationModuleType) {
         borderTopLeftRadius: 12,
         borderTopRightRadius: 12,
         width: "100%",
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: theme.colors.outlineVariant,
+        borderBottomWidth: 0,
       }}
     >
       <View style={{ flex: 1, justifyContent: "flex-start" }}>

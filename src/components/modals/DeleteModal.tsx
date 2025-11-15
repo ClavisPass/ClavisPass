@@ -1,6 +1,8 @@
 import Modal from "./Modal";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Button, Text } from "react-native-paper";
+import { useTheme } from "../../contexts/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   visible: boolean;
@@ -9,6 +11,8 @@ type Props = {
 };
 
 function DeleteModal(props: Props) {
+  const { theme } = useTheme();
+  const {t} = useTranslation();
   const hideModal = () => props.setVisible(false);
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
@@ -20,14 +24,17 @@ function DeleteModal(props: Props) {
           flexDirection: "column",
           padding: 14,
           justifyContent: "space-between",
+          borderRadius: 12,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: theme.colors.outlineVariant,
         }}
       >
         <View style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <Text variant="headlineSmall" style={{ userSelect: "none" }}>
-            Delete?
+            {`${t("common:delete")}?`}
           </Text>
           <Text variant="bodyMedium" style={{ userSelect: "none" }}>
-            Do you want to delete this entry?
+            {t("common:deleteEntryText")}
           </Text>
         </View>
         <View
@@ -39,21 +46,21 @@ function DeleteModal(props: Props) {
           }}
         >
           <Button
-          style={{ borderRadius: 12 }}
+            style={{ borderRadius: 12 }}
             mode="contained-tonal"
             onPress={() => {
               props.setVisible(false);
             }}
           >
-            Cancel
+            {t("common:cancel")}
           </Button>
           <Button
-          style={{ borderRadius: 12 }}
+            style={{ borderRadius: 12 }}
             buttonColor="#D2222D"
             mode="contained"
             onPress={props.onDelete}
           >
-            Delete
+            {t("common:delete")}
           </Button>
         </View>
       </View>

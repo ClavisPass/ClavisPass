@@ -1,6 +1,6 @@
 import React from "react";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { Easing, Platform, View } from "react-native";
+import { Easing, Platform, View, StyleSheet } from "react-native";
 import { BottomNavigation, IconButton, Text } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../contexts/ThemeProvider";
@@ -90,7 +90,7 @@ const CustomBottomTab = ({
           right: 0,
           height: 12,
           backgroundColor: theme.colors.background,
-          borderTopWidth: 1,
+          borderTopWidth: 0,
           borderTopColor: theme.colors.outlineVariant,
           zIndex: 0,
         }}
@@ -164,7 +164,7 @@ const CustomBottomTab = ({
         <View
           style={{
             overflow: "hidden",
-            borderTopWidth: 1,
+            borderTopWidth: StyleSheet.hairlineWidth,
             borderTopColor: theme.colors.outlineVariant,
             backgroundColor: theme.colors.background,
           }}

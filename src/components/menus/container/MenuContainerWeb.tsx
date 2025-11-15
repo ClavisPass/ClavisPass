@@ -61,9 +61,24 @@ function MenuContainerWeb({
 
   const menuStyle = useAnimatedStyle(() => {
     // sanftes Grow & Drop
-    const scale = interpolate(progress.value, [0, 1], [0.92, 1], Extrapolate.CLAMP);
-    const translateY = interpolate(progress.value, [0, 1], [-8, 0], Extrapolate.CLAMP);
-    const opacity = interpolate(progress.value, [0, 1], [0.9, 1], Extrapolate.CLAMP);
+    const scale = interpolate(
+      progress.value,
+      [0, 1],
+      [0.92, 1],
+      Extrapolate.CLAMP
+    );
+    const translateY = interpolate(
+      progress.value,
+      [0, 1],
+      [-8, 0],
+      Extrapolate.CLAMP
+    );
+    const opacity = interpolate(
+      progress.value,
+      [0, 1],
+      [0.9, 1],
+      Extrapolate.CLAMP
+    );
     return {
       transform: [{ scale }, { translateY }],
       opacity,
@@ -83,7 +98,9 @@ function MenuContainerWeb({
           {
             position: "absolute",
             top: positionY + offsetY,
-            ...(typeof positionX === "number" ? { left: positionX } : { right: 4 }),
+            ...(typeof positionX === "number"
+              ? { left: positionX }
+              : { right: 4 }),
             zIndex: 1,
           },
           menuStyle,
@@ -104,6 +121,8 @@ function MenuContainerWeb({
             elevation: 6,
             display: "flex",
             flexDirection: "column",
+            borderWidth: StyleSheet.hairlineWidth,
+            borderColor: theme.colors.outlineVariant,
           }}
         >
           {children}

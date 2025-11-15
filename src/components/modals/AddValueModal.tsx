@@ -1,11 +1,12 @@
 import Modal from "./Modal";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import ValueIconsEnum from "../../enums/ValueIconsEnum";
 import TemplateEnum from "../../enums/TemplateEnum";
 import getTemplate from "../../utils/getTemplate";
 import CategoryItem from "../items/CategoryItem";
 import FolderType from "../../types/FolderType";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 type Props = {
   visible: boolean;
@@ -17,6 +18,7 @@ type Props = {
 
 function AddValueModal(props: Props) {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const hideModal = () => props.setVisible(false);
   const navigateToAddValue = (template: TemplateEnum) => {
     props.navigation.navigate("Edit", {
@@ -36,6 +38,9 @@ function AddValueModal(props: Props) {
           flexDirection: "column",
           padding: 8,
           gap: 8,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: theme.colors.outlineVariant,
+          borderRadius: 12,
         }}
       >
         <View

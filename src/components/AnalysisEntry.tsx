@@ -1,4 +1,4 @@
-import { useWindowDimensions, View } from "react-native";
+import { useWindowDimensions, View, StyleSheet } from "react-native";
 import { useTheme } from "../contexts/ThemeProvider";
 import CircularProgressBar from "./CircularProgressBar";
 import { Text } from "react-native-paper";
@@ -16,13 +16,15 @@ function AnalysisEntry(props: Props) {
   return (
     <View
       style={{
-        flex: (width > 600) && !props.fixed ? undefined : 1,
+        flex: width > 600 && !props.fixed ? undefined : 1,
         backgroundColor: theme.colors.background,
-        borderRadius: 16,
+        borderRadius: 12,
         padding: 12,
         display: "flex",
         justifyContent: "center",
         boxShadow: theme.colors.shadow,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: theme.colors.outlineVariant,
       }}
     >
       <View style={{ display: "flex", flexDirection: "row", gap: 10 }}>

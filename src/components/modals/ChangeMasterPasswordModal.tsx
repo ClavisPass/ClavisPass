@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import Modal from "./Modal";
 import { useData } from "../../contexts/DataProvider";
 import { useEffect, useRef, useState } from "react";
@@ -11,10 +11,10 @@ import CryptoType, { CryptoTypeSchema } from "../../types/CryptoType";
 import { useToken } from "../../contexts/TokenProvider";
 import { decrypt, encrypt } from "../../utils/CryptoLayer";
 import DataType, { DataTypeSchema } from "../../types/DataType";
-import { set } from "zod";
 import { compare, getDateTime } from "../../utils/Timestamp";
 import uploadData from "../../api/uploadData/uploadData";
 import { useAuth } from "../../contexts/AuthProvider";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   visible: boolean;
@@ -25,6 +25,7 @@ function ChangeMasterPasswordModal(props: Props) {
   const data = useData();
   const auth = useAuth();
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -135,7 +136,6 @@ function ChangeMasterPasswordModal(props: Props) {
       <View
         style={{
           padding: 16,
-          borderRadius: 20,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -144,6 +144,9 @@ function ChangeMasterPasswordModal(props: Props) {
           width: 300,
           cursor: "auto",
           gap: 6,
+          borderRadius: 12,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: theme.colors.outlineVariant,
         }}
       >
         {loading ? (
@@ -252,7 +255,7 @@ function ChangeMasterPasswordModal(props: Props) {
                 )}
                 {capsLock && (
                   <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
-                    Caps Lock is activated
+                    {t("common:capslockOn")}
                   </Text>
                 )}
               </>

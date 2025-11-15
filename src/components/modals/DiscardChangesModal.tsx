@@ -1,6 +1,8 @@
 import Modal from "./Modal";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Button, Text } from "react-native-paper";
+import { useTheme } from "../../contexts/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   visible: boolean;
@@ -9,6 +11,8 @@ type Props = {
 };
 
 function DiscardChangesModal(props: Props) {
+  const { theme } = useTheme();
+  const { t } = useTranslation();
   const hideModal = () => props.setVisible(false);
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
@@ -20,15 +24,17 @@ function DiscardChangesModal(props: Props) {
           flexDirection: "column",
           padding: 14,
           justifyContent: "space-between",
+          borderRadius: 12,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: theme.colors.outlineVariant,
         }}
       >
         <View style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <Text variant="headlineSmall" style={{ userSelect: "none" }}>
-            Discard Changes?
+            {t("common:discardChangesTitle")}
           </Text>
           <Text variant="bodyMedium" style={{ userSelect: "none" }}>
-            You have unsaved changes. Are you shure to discard them and leave
-            the screen?
+            {t("common:discardChangesText")}
           </Text>
         </View>
         <View
@@ -40,16 +46,20 @@ function DiscardChangesModal(props: Props) {
           }}
         >
           <Button
-          style={{ borderRadius: 12 }}
+            style={{ borderRadius: 12 }}
             mode="contained-tonal"
             onPress={() => {
               props.setVisible(false);
             }}
           >
-            Cancel
+            {t("common:cancel")}
           </Button>
-          <Button style={{ borderRadius: 12 }} mode="contained" onPress={props.onDiscard}>
-            Discard
+          <Button
+            style={{ borderRadius: 12 }}
+            mode="contained"
+            onPress={props.onDiscard}
+          >
+            {t("common:discard")}
           </Button>
         </View>
       </View>

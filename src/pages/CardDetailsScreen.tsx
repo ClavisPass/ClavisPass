@@ -81,7 +81,7 @@ const CardDetailsScreen: React.FC<CardDetailsScreenProps> = ({
         <View
           style={{
             padding: 16,
-            backgroundColor: theme.colors.background,
+            backgroundColor: "white",
             borderRadius: 12,
           }}
         >

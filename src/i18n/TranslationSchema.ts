@@ -7,6 +7,24 @@ export type TranslationSchema = {
   };
   common: {
     none: string;
+    capslockOn: string;
+    cancel: string;
+    delete: string;
+    deleteEntryText: string;
+    discardChangesText: string;
+    discardChangesTitle: string;
+    discard: string;
+    change: string;
+    save: string;
+    setExpiry: string;
+    current: string;
+    addFolder: string;
+    passwordLength: string;
+    includeUppercase: string;
+    includeNumbers: string;
+    includeSymbols: string;
+    use: string;
+    reset: string;
   };
   home: {
     search: string;

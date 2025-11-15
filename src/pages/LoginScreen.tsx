@@ -124,9 +124,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
         <BlurView
           intensity={80}
+          tint={darkmode ? "dark" : undefined}
           style={{
             height: "70%",
-            borderRadius: 20,
+            borderRadius: 12,
             padding: 20,
             overflow: "hidden",
             margin: 8,
@@ -135,6 +136,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             display: "flex",
             justifyContent: "center",
             boxShadow: theme.colors.shadow,
+            borderWidth: StyleSheet.hairlineWidth,
+            borderColor: darkmode ? theme.colors.outlineVariant : "white",
           }}
         >
           <Animated.View

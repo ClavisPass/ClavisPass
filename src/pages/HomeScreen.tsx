@@ -176,55 +176,54 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   }, [data.showSave]);
 
   const filteredValues = useMemo(() => {
-  const values = data.data?.values ?? [];
+    const values = data.data?.values ?? [];
 
-  const normalizeText = (text: string) =>
-    text
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/\p{Diacritic}/gu, "");
+    const normalizeText = (text: string) =>
+      text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "");
 
-  const normalizedQuery = normalizeText(searchQuery.trim());
-  const hasQuery = normalizedQuery.length > 0;
+    const normalizedQuery = normalizeText(searchQuery.trim());
+    const hasQuery = normalizedQuery.length > 0;
 
-  // 1) Wenn es eine Query gibt: NICHT nach fav/folder filtern (alles durchsuchen)
-  // 2) Wenn es KEINE Query gibt: normal nach fav/folder filtern
-  const prefiltered = values.filter((item) => {
-    if (hasQuery) return true;
+    // 1) Wenn es eine Query gibt: NICHT nach fav/folder filtern (alles durchsuchen)
+    // 2) Wenn es KEINE Query gibt: normal nach fav/folder filtern
+    const prefiltered = values.filter((item) => {
+      if (hasQuery) return true;
 
-    const folderMatch =
-      selectedFolder === null || item.folder?.id === selectedFolder.id;
-    const favMatch = !selectedFav || item.fav;
-    return folderMatch && favMatch;
-  });
+      const folderMatch =
+        selectedFolder === null || item.folder?.id === selectedFolder.id;
+      const favMatch = !selectedFav || item.fav;
+      return folderMatch && favMatch;
+    });
 
-  const withRelevance = prefiltered.map((item) => {
-    if (!hasQuery) return { ...item, _relevance: 0 as number };
+    const withRelevance = prefiltered.map((item) => {
+      if (!hasQuery) return { ...item, _relevance: 0 as number };
 
-    const title = normalizeText(item.title);
+      const title = normalizeText(item.title);
 
-    let relevance = Infinity;
-    if (title.startsWith(normalizedQuery)) {
-      relevance = 0;
-    } else {
-      const index = title.indexOf(normalizedQuery);
-      if (index !== -1) {
-        relevance = index + 1;
+      let relevance = Infinity;
+      if (title.startsWith(normalizedQuery)) {
+        relevance = 0;
+      } else {
+        const index = title.indexOf(normalizedQuery);
+        if (index !== -1) {
+          relevance = index + 1;
+        }
       }
-    }
 
-    return { ...item, _relevance: relevance };
-  });
+      return { ...item, _relevance: relevance };
+    });
 
-  const result = hasQuery
-    ? withRelevance
-        .filter((item) => item._relevance !== Infinity)
-        .sort((a, b) => a._relevance - b._relevance)
-    : withRelevance;
+    const result = hasQuery
+      ? withRelevance
+          .filter((item) => item._relevance !== Infinity)
+          .sort((a, b) => a._relevance - b._relevance)
+      : withRelevance;
 
-  return result;
-}, [data.data, searchQuery, selectedFolder, selectedFav]);
-
+    return result;
+  }, [data.data, searchQuery, selectedFolder, selectedFav]);
 
   const refreshData = () => {
     const master = auth.master;
@@ -540,7 +539,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                             variant="bodyLarge"
                             style={{ color: "white", userSelect: "none" }}
                           >
-                            Save
+                            {t("common:save")}
                           </Text>
                         </AnimatedPressable>
                       </View>
@@ -563,7 +562,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                             userSelect: "none",
                           }}
                         >
-                          Reset
+                          {t("common:reset")}
                         </Text>
                       </AnimatedPressable>
                     </>

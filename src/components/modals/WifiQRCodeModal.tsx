@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../../ui/linearGradient";
 import QRCode from "react-qr-code";
 import Modal from "./Modal";
 import { Portal } from "react-native-paper";
+
+import { useTheme } from "../../contexts/ThemeProvider";
 
 type Props = {
   visible: boolean;
@@ -15,6 +17,7 @@ type Props = {
 };
 
 function WifiQRCodeModal(props: Props) {
+  const { theme } = useTheme();
   const [value, setValue] = useState("");
   const hideModal = () => props.setVisible(false);
 
@@ -34,7 +37,12 @@ function WifiQRCodeModal(props: Props) {
       <Modal visible={props.visible} onDismiss={hideModal}>
         <LinearGradient
           colors={getColors()}
-          style={{ padding: 6, borderRadius: 12 }}
+          style={{
+            padding: 6,
+            borderRadius: 12,
+            borderWidth: StyleSheet.hairlineWidth,
+            borderColor: theme.colors.outlineVariant,
+          }}
           end={{ x: 0.1, y: 0.2 }}
           dither={true}
         >

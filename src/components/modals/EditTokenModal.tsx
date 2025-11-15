@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { TextInput, Text, Button } from "react-native-paper";
 import Modal from "./Modal";
 import { useState } from "react";
@@ -6,6 +6,7 @@ import { useTheme } from "../../contexts/ThemeProvider";
 import { useToken } from "../../contexts/TokenProvider";
 import isDropboxToken from "../../utils/regex/isDropboxToken";
 import isGoogleDriveToken from "../../utils/regex/isGoogleDriveToken";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   visible: boolean;
@@ -13,8 +14,10 @@ type Props = {
 };
 
 function EditTokenModal(props: Props) {
-  const { globalStyles } = useTheme();
+  const { globalStyles, theme } = useTheme();
   const { token, setToken } = useToken();
+
+  const { t } = useTranslation();
 
   const [value, setValue] = useState("" + token);
   return (
@@ -31,7 +34,10 @@ function EditTokenModal(props: Props) {
           display: "flex",
           zIndex: 1,
           height: 120,
-          width: "auto"
+          width: "auto",
+          borderRadius: 12,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: theme.colors.outlineVariant,
         }}
       >
         <Text>Access Token:</Text>
@@ -45,7 +51,9 @@ function EditTokenModal(props: Props) {
         />
         <Button
           disabled={
-            isDropboxToken(value) || isGoogleDriveToken(value) || value === token
+            isDropboxToken(value) ||
+            isGoogleDriveToken(value) ||
+            value === token
               ? false
               : true
           }
@@ -54,7 +62,7 @@ function EditTokenModal(props: Props) {
             props.setVisible(false);
           }}
         >
-          Change
+          {t("common:change")}
         </Button>
       </View>
     </Modal>

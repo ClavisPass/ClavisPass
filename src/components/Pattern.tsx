@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Text } from "react-native-paper";
 import { useTheme } from "../contexts/ThemeProvider";
 import { ScrollView } from "react-native-gesture-handler";
@@ -20,11 +20,13 @@ function Pattern(props: Props) {
     <View
       style={{
         backgroundColor: theme.colors.background,
-        borderRadius: 16,
+        borderRadius: 12,
         padding: 12,
         display: "flex",
         justifyContent: "space-around",
         boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: theme.colors.outlineVariant,
       }}
     >
       <ScrollView

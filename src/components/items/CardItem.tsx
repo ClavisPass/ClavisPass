@@ -55,6 +55,8 @@ function CardItem(props: Props) {
         {
           backgroundColor: theme.colors?.background,
           boxShadow: theme.colors?.shadow,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: theme.colors.outlineVariant,
         },
       ]}
     >
@@ -67,40 +69,52 @@ function CardItem(props: Props) {
       >
         <AnimatedPressable
           key={props.key}
-          style={styles.ripple}
+          style={[
+            styles.ripple,
+            {
+              borderColor: theme.colors.outlineVariant,
+              borderBottomWidth: StyleSheet.hairlineWidth,
+            },
+          ]}
           onPress={props.onPressEdit}
         >
           <Text>{props.title}</Text>
         </AnimatedPressable>
-        <AnimatedPressable
-          key={props.key}
-          style={styles.ripple}
-          onPress={props.onPress}
+
+        <View
+          style={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "row",
+            height: 120,
+            overflow: "hidden",
+          }}
         >
-          <View
-            style={{
-              flex: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "row",
-              height: 96,
-            }}
+          <AnimatedPressable
+            key={props.key}
+            style={[styles.ripple, {justifyContent: "center",  alignItems: "center"}]}
+            onPress={props.onPress}
           >
-            {props.value !== "" ? (
-              props.type === "QR-Code" ? (
-                <QRCode value={props.value} size={90} />
-              ) : (
-                <Barcode
-                  height={70}
-                  format={props.type}
-                  value={props.value}
-                  text={props.value}
-                />
-              )
-            ) : null}
-          </View>
-        </AnimatedPressable>
+            <View
+              style={{ padding: 8, backgroundColor: "white", borderRadius: 12 }}
+            >
+              {props.value !== "" ? (
+                props.type === "QR-Code" ? (
+                  <QRCode value={props.value} size={90} />
+                ) : (
+                  <Barcode
+                    height={70}
+                    format={props.type}
+                    value={props.value}
+                    text={props.value}
+                  />
+                )
+              ) : null}
+            </View>
+          </AnimatedPressable>
+        </View>
       </View>
     </Animated.View>
   );

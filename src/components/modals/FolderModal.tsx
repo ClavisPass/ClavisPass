@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Platform, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import { Platform, View, StyleSheet } from "react-native";
 import { IconButton, TextInput } from "react-native-paper";
 import Modal from "./Modal";
 import DraggableFolderListWeb from "../lists/draggableFolderList/DraggableFolderListWeb";
@@ -9,6 +9,7 @@ import changeFolder from "../../utils/changeFolder";
 import { useData } from "../../contexts/DataProvider";
 import FolderType from "../../types/FolderType";
 import createUniqueID from "../../utils/createUniqueID";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   visible: boolean;
@@ -21,6 +22,7 @@ function FolderModal(props: Props) {
   const data = useData();
   const { theme } = useTheme();
   const { globalStyles } = useTheme();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const filteredValues = useMemo(() => {
     return props.folder.filter((item) => {
@@ -67,7 +69,6 @@ function FolderModal(props: Props) {
       <View
         style={{
           padding: 16,
-          borderRadius: 20,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -75,6 +76,9 @@ function FolderModal(props: Props) {
           height: 350,
           cursor: "auto",
           gap: 6,
+          borderRadius: 12,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: theme.colors.outlineVariant,
         }}
       >
         <View
@@ -87,7 +91,7 @@ function FolderModal(props: Props) {
         >
           <View style={{ flexGrow: 1 }}>
             <TextInput
-              placeholder="Add Folder..."
+              placeholder={t("common:addFolder")}
               style={[
                 globalStyles.textInputStyle,
                 {

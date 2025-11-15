@@ -2,7 +2,6 @@ import React, { ReactNode } from "react";
 import { View, StyleSheet } from "react-native";
 import { Divider, Icon, Text } from "react-native-paper";
 import { useTheme } from "../../contexts/ThemeProvider";
-import SettingsDivider from "../SettingsDivider";
 
 const styles = StyleSheet.create({
   container: {
@@ -60,6 +59,8 @@ function SettingsContainer(props: Props) {
         {
           backgroundColor: theme.colors?.background,
           borderRadius: 12,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: theme.colors.outlineVariant,
           overflow: "hidden",
           boxShadow: theme.colors?.shadow,
         },

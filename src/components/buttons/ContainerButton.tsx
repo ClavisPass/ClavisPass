@@ -40,6 +40,8 @@ function ContainerButton(props: Props) {
           backgroundColor: theme.colors?.background,
           boxShadow: theme.colors?.shadow,
           flexGrow: props.flexGrow || 1,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: theme.colors.outlineVariant,
         },
       ]}
     >

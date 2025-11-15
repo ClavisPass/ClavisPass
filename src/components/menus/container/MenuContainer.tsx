@@ -99,6 +99,8 @@ export default function MenuContainer({
             shadowOpacity: 0.25,
             shadowRadius: 8,
             elevation: 6,
+            borderWidth: StyleSheet.hairlineWidth,
+                      borderColor: theme.colors.outlineVariant,
           }}
         >
           {children}

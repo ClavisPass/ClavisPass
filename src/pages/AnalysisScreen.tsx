@@ -10,6 +10,7 @@ import {
   ScrollView,
   useWindowDimensions,
   View,
+  StyleSheet,
 } from "react-native";
 import { Icon, IconButton, Searchbar, Text } from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
@@ -323,6 +324,8 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                   backgroundColor: theme.colors?.background,
                   boxShadow: theme.colors?.shadow,
                   height: 40,
+                  borderColor: theme.colors.outlineVariant,
+                  borderWidth: StyleSheet.hairlineWidth,
                 }}
               >
                 <AnimatedPressable

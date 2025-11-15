@@ -49,6 +49,8 @@ function TotpItem(props: Props) {
         {
           backgroundColor: theme.colors?.background,
           boxShadow: theme.colors?.shadow,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: theme.colors.outlineVariant,
         },
       ]}
     >

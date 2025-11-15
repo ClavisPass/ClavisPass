@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { TextInput } from "react-native-paper";
 import Modal from "./Modal";
 import { useEffect, useRef } from "react";
@@ -12,7 +12,7 @@ type Props = {
 };
 
 function EditCustomFieldModal(props: Props) {
-  const { globalStyles } = useTheme();
+  const { globalStyles, theme } = useTheme();
   const inputRef = useRef<any>(null);
 
   useEffect(() => {
@@ -34,6 +34,9 @@ function EditCustomFieldModal(props: Props) {
           padding: 10,
           display: "flex",
           maxHeight: 60,
+          borderRadius: 12,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: theme.colors.outlineVariant,
         }}
       >
         <TextInput

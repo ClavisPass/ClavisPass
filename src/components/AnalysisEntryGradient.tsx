@@ -21,9 +21,9 @@ function AnalysisEntryGradient(props: Props) {
       dither={true}
       end={{ x: 0.1, y: 0.2 }}
       style={{
-        flex: (width > 600) && !props.fixed ? undefined : 1,
+        flex: width > 600 && !props.fixed ? undefined : 1,
         backgroundColor: theme.colors.background,
-        borderRadius: 16,
+        borderRadius: 12,
         padding: 12,
         display: "flex",
         justifyContent: "center",

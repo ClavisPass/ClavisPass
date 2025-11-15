@@ -16,8 +16,8 @@ import generatePassword from "../../utils/generatePassword";
 import CopyToClipboard from "../buttons/CopyToClipboard";
 import Modal from "./Modal";
 import { useTheme } from "../../contexts/ThemeProvider";
-import SettingsDivider from "../SettingsDivider";
 import Button from "../buttons/Button";
+import { useTranslation } from "react-i18next";
 
 const styles = StyleSheet.create({
   container: {
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     margin: 4,
     height: 40,
-    padding: 8
+    padding: 8,
   },
 });
 
@@ -40,6 +40,7 @@ type Props = {
 
 function PasswordGeneratorModal(props: Props) {
   const { globalStyles, theme } = useTheme();
+  const {t} = useTranslation();
   const [valueSlider, setvalueSlider] = useState(20);
 
   const [upperInclude, setupperInclude] = useState(true);
@@ -64,12 +65,6 @@ function PasswordGeneratorModal(props: Props) {
   return (
     <Portal>
       <Modal visible={props.visible} onDismiss={hideModal}>
-        <LinearGradient
-          colors={getColors()}
-          style={{ padding: 3, width: 300, borderRadius: 12 }}
-          end={{ x: 0.1, y: 0.2 }}
-          dither={true}
-        >
           <View
             style={{
               backgroundColor: theme.colors?.background,
@@ -78,6 +73,9 @@ function PasswordGeneratorModal(props: Props) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              borderWidth: StyleSheet.hairlineWidth,
+              borderColor: theme.colors.outlineVariant,
+              width: 300,
             }}
           >
             <View style={{ width: "100%", height: 40, marginBottom: 8 }}>
@@ -95,10 +93,8 @@ function PasswordGeneratorModal(props: Props) {
             />
             <View
               style={{
-                //width: "100%",
                 display: "flex",
                 flexDirection: "row",
-                //margin: 2,
                 alignItems: "center",
                 height: 40,
               }}
@@ -128,7 +124,7 @@ function PasswordGeneratorModal(props: Props) {
             />
             <View style={styles.container}>
               <Text style={{ userSelect: "none" }} variant="bodyLarge">
-                {"Password Length: "}
+                {t("common:passwordLength")}
               </Text>
               <Text style={{ userSelect: "none" }} variant="bodyLarge">
                 {valueSlider}
@@ -138,7 +134,7 @@ function PasswordGeneratorModal(props: Props) {
               style={{ marginBottom: 0, marginTop: 0, height: 1, width: 270 }}
             />
             <View style={styles.container}>
-              <Text variant="bodyLarge">{"Include Uppercase"}</Text>
+              <Text variant="bodyLarge">{t("common:includeUppercase")}</Text>
               <Switch
                 value={upperInclude}
                 onValueChange={() => {
@@ -151,7 +147,7 @@ function PasswordGeneratorModal(props: Props) {
             />
             <View style={styles.container}>
               <Text style={{ userSelect: "none" }} variant="bodyLarge">
-                {"Include Numbers"}
+                {t("common:includeNumbers")}
               </Text>
               <Switch
                 value={numberInclude}
@@ -163,7 +159,7 @@ function PasswordGeneratorModal(props: Props) {
             />
             <View style={styles.container}>
               <Text style={{ userSelect: "none" }} variant="bodyLarge">
-                {"Include Symbols"}
+                {t("common:includeSymbols")}
               </Text>
               <Switch
                 value={symbolInclude}
@@ -174,8 +170,8 @@ function PasswordGeneratorModal(props: Props) {
               style={{ marginBottom: 8, marginTop: 0, height: 1, width: 270 }}
             />
             <Button
-              maxWidth={200}
-              text="Use"
+              maxWidth={300}
+              text={t("common:use")}
               onPress={() => {
                 props.changePassword(genPassword);
                 hideModal();
@@ -183,7 +179,6 @@ function PasswordGeneratorModal(props: Props) {
               color={theme.colors.primary}
             />
           </View>
-        </LinearGradient>
       </Modal>
     </Portal>
   );

@@ -2,12 +2,12 @@ import React from "react";
 import { Divider, IconButton } from "react-native-paper";
 import DataType from "../../types/DataType";
 import { View } from "react-native";
-import theme from "../../ui/theme";
 import Menu from "./Menu";
 import { useData } from "../../contexts/DataProvider";
 import { MenuItem } from "../items/MenuItem";
 import { useOnline } from "../../contexts/OnlineProvider";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 type Props = {
   visible: boolean;
@@ -19,6 +19,7 @@ type Props = {
   refreshData: () => void;
 };
 function HomeFilterMenu(props: Props) {
+  const { theme } = useTheme();
   const data = useData();
   const { isOnline } = useOnline();
   const { t } = useTranslation();

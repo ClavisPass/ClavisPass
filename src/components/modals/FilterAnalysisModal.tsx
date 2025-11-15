@@ -1,10 +1,11 @@
 import Modal from "./Modal";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import Divider from "../Divider";
 import SettingsSwitch from "../SettingsSwitch";
 import getPasswordStrengthIcon from "../../utils/getPasswordStrengthIcon";
 import PasswordStrengthLevel from "../../enums/PasswordStrengthLevel";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "../../contexts/ThemeProvider";
 
 type Props = {
   visible: boolean;
@@ -18,12 +19,21 @@ type Props = {
 };
 
 function FilterAnalysisModal(props: Props) {
+  const { theme } = useTheme();
   const { t } = useTranslation();
   const hideModal = () => props.setVisible(false);
 
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
-      <View style={{ width: 280, height: 177 }}>
+      <View
+        style={{
+          width: 280,
+          height: 177,
+          borderRadius: 12,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: theme.colors.outlineVariant,
+        }}
+      >
         <SettingsSwitch
           label={t("analysis:strong")}
           leadingIcon={getPasswordStrengthIcon(PasswordStrengthLevel.STRONG)}
