@@ -73,7 +73,8 @@ function DraggableModulesList(props: Props) {
         props.deleteModule,
         props.changeModule,
         props.fastAccess,
-        props.navigation
+        props.navigation,
+        props.value.title
       );
     },
     [props.value, props.fastAccess, props.navigation, props.deleteModule, props.changeModule]

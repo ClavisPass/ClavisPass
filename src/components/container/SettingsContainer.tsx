@@ -50,7 +50,7 @@ export function SubItem(props: Props) {
 }
 
 function SettingsContainer(props: Props) {
-  const { theme } = useTheme();
+  const { theme, darkmode } = useTheme();
   return (
     <View
       ref={props.ref}
@@ -60,7 +60,7 @@ function SettingsContainer(props: Props) {
           backgroundColor: theme.colors?.background,
           borderRadius: 12,
           borderWidth: StyleSheet.hairlineWidth,
-          borderColor: theme.colors.outlineVariant,
+          borderColor: darkmode ? theme.colors.outlineVariant : "white",
           overflow: "hidden",
           boxShadow: theme.colors?.shadow,
         },

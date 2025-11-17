@@ -581,6 +581,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           width: "100%",
           padding: 4,
           paddingRight: 0,
+          paddingLeft: width > 600 ? 0 : 4,
           flexDirection: width > 600 ? "row-reverse" : "column",
         }}
       >

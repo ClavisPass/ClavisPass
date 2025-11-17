@@ -139,7 +139,8 @@ function DraggableModulesListWeb(props: Props) {
                       props.deleteModule,
                       props.changeModule,
                       props.fastAccess,
-                      props.navigation
+                      props.navigation,
+                      props.value.title
                     )}
                   </div>
                 )}

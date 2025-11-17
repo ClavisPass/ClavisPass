@@ -11,7 +11,7 @@ type Props = {
 };
 
 function AnalysisEntry(props: Props) {
-  const { theme } = useTheme();
+  const { theme, darkmode } = useTheme();
   const { width } = useWindowDimensions();
   return (
     <View
@@ -24,7 +24,7 @@ function AnalysisEntry(props: Props) {
         justifyContent: "center",
         boxShadow: theme.colors.shadow,
         borderWidth: StyleSheet.hairlineWidth,
-        borderColor: theme.colors.outlineVariant,
+        borderColor: darkmode ? theme.colors.outlineVariant : "white",
       }}
     >
       <View style={{ display: "flex", flexDirection: "row", gap: 10 }}>

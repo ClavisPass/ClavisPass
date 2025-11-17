@@ -22,9 +22,11 @@ import Barcode from "@kichiyaki/react-native-barcode-generator";
 import { StackNavigationProp } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../../stacks/Stack";
 import { useTranslation } from "react-i18next";
+import AnimatedPressable from "../AnimatedPressable";
 
 type DigitalCardModuleProps = {
   navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>;
+  title: string;
 };
 
 function isDigitalCardType(x: unknown): x is DigitalCardType {
@@ -99,41 +101,56 @@ function DigitalCardModule(
       fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>
-        <View
-          style={{
-            flex: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "row",
-            height: 96,
+        <AnimatedPressable
+          key={props.key}
+          style={[{ borderRadius: 12 }]}
+          onPress={() => {
+            props.navigation.navigate("CardDetails", {
+              value: value,
+              title: props.title,
+              type: type,
+            });
           }}
         >
-          {value !== "" ? (
-            type === "QR-Code" ? (
-              <QRCode value={value} size={90} />
+          <View
+            style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "row",
+              height: 112,
+              borderRadius: 12,
+              padding: 8,
+              backgroundColor: "white",
+            }}
+          >
+            {value !== "" ? (
+              type === "QR-Code" ? (
+                <QRCode value={value} size={90} />
+              ) : (
+                <Barcode height={70} format={type} value={value} text={value} />
+              )
             ) : (
-              <Barcode height={70} format={type} value={value} text={value} />
-            )
-          ) : (
-            <Button
-              style={{ borderRadius: 12 }}
-              icon={"barcode-scan"}
-              mode="contained-tonal"
-              textColor={theme.colors.primary}
-              onPress={() => {
-                props.navigation.navigate("DigitalCardScan", {
-                  setData: (data: string, scanType: string) => {
-                    setType(scanType as DigitalCardType);
-                    setValue(data);
-                  },
-                });
-              }}
-            >
-              Scan Code
-            </Button>
-          )}
-        </View>
+              <Button
+                style={{ borderRadius: 12 }}
+                icon={"barcode-scan"}
+                mode="contained-tonal"
+                textColor={theme.colors.primary}
+                onPress={() => {
+                  props.navigation.navigate("DigitalCardScan", {
+                    setData: (data: string, scanType: string) => {
+                      setType(scanType as DigitalCardType);
+                      setValue(data);
+                    },
+                  });
+                }}
+              >
+                Scan Code
+              </Button>
+            )}
+          </View>
+        </AnimatedPressable>
       </View>
     </ModuleContainer>
   );

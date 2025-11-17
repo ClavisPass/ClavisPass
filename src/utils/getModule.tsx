@@ -39,7 +39,8 @@ function getModule(
   deleteModule: (id: string) => void,
   changeModule: (module: ModuleType) => void,
   fastAccess: FastAccessType | null,
-  navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>
+  navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>,
+  title: string
 ): ReactNode {
   if (module.module === ModulesEnum.CUSTOM_FIELD) {
     const moduleObject = module as CustomFieldModuleType;
@@ -169,6 +170,7 @@ function getModule(
         changeModule={changeModule}
         fastAccess={fastAccess}
         navigation={navigation}
+        title={title}
       />
     );
   }

@@ -9,7 +9,7 @@ import Barcode from "@kichiyaki/react-native-barcode-generator";
 import QRCode from "react-qr-code";
 import DigitalCardType from "../../types/DigitalCardType";
 
-import { Text } from "react-native-paper";
+import { Divider, Text } from "react-native-paper";
 
 const styles = StyleSheet.create({
   container: {
@@ -44,7 +44,7 @@ type Props = {
 };
 
 function CardItem(props: Props) {
-  const { theme } = useTheme();
+  const { theme, darkmode } = useTheme();
 
   return (
     <Animated.View
@@ -56,7 +56,7 @@ function CardItem(props: Props) {
           backgroundColor: theme.colors?.background,
           boxShadow: theme.colors?.shadow,
           borderWidth: StyleSheet.hairlineWidth,
-          borderColor: theme.colors.outlineVariant,
+          borderColor: darkmode ? theme.colors.outlineVariant : "white",
         },
       ]}
     >
@@ -69,18 +69,12 @@ function CardItem(props: Props) {
       >
         <AnimatedPressable
           key={props.key}
-          style={[
-            styles.ripple,
-            {
-              borderColor: theme.colors.outlineVariant,
-              borderBottomWidth: StyleSheet.hairlineWidth,
-            },
-          ]}
+          style={[styles.ripple]}
           onPress={props.onPressEdit}
         >
           <Text>{props.title}</Text>
         </AnimatedPressable>
-
+        <Divider />
         <View
           style={{
             flex: 1,
@@ -94,7 +88,10 @@ function CardItem(props: Props) {
         >
           <AnimatedPressable
             key={props.key}
-            style={[styles.ripple, {justifyContent: "center",  alignItems: "center"}]}
+            style={[
+              styles.ripple,
+              { justifyContent: "center", alignItems: "center" },
+            ]}
             onPress={props.onPress}
           >
             <View

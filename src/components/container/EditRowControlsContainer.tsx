@@ -1,5 +1,12 @@
 import React, { ReactNode } from "react";
-import { View, Pressable, Platform, ViewStyle, StyleProp, StyleSheet } from "react-native";
+import {
+  View,
+  Pressable,
+  Platform,
+  ViewStyle,
+  StyleProp,
+  StyleSheet,
+} from "react-native";
 import { Icon, IconButton } from "react-native-paper";
 import { useTheme } from "../../contexts/ThemeProvider";
 
@@ -20,17 +27,32 @@ export function EditRowControlsContainer({
   style,
   contentStyle,
 }: EditRowControlsContainerProps) {
-  const { theme } = useTheme();
+  const { theme, darkmode } = useTheme();
 
   return (
     <View
       style={[
-        { flexDirection: "row", flex: 1, paddingLeft: 16, paddingRight: 4, borderColor: theme.colors.outlineVariant,
-                          borderWidth: StyleSheet.hairlineWidth, },
+        {
+          flexDirection: "row",
+          flex: 1,
+          paddingLeft: 16,
+          paddingRight: 4,
+          borderRadius: 12,
+          borderColor: darkmode ? theme.colors.outlineVariant : "white",
+          borderWidth: StyleSheet.hairlineWidth,
+        },
         style,
       ]}
     >
-      <View style={{ position: "absolute", left: 2, top: 0, bottom: 0, justifyContent: "center" }}>
+      <View
+        style={{
+          position: "absolute",
+          left: 2,
+          top: 0,
+          bottom: 0,
+          justifyContent: "center",
+        }}
+      >
         {Platform.OS === "web" ? (
           <Icon source="drag" size={20} />
         ) : (

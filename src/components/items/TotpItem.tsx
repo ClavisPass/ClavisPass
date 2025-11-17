@@ -38,7 +38,7 @@ type Props = {
 };
 
 function TotpItem(props: Props) {
-  const { theme } = useTheme();
+  const { theme, darkmode } = useTheme();
 
   return (
     <Animated.View
@@ -50,7 +50,7 @@ function TotpItem(props: Props) {
           backgroundColor: theme.colors?.background,
           boxShadow: theme.colors?.shadow,
           borderWidth: StyleSheet.hairlineWidth,
-          borderColor: theme.colors.outlineVariant,
+          borderColor: darkmode ? theme.colors.outlineVariant : "white",
         },
       ]}
     >

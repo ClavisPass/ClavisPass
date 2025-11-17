@@ -174,9 +174,9 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
 
     // Relevanz-basiertes Filtern/Sortieren
     const mapped = cache.list.map((it) => {
-      if (!q) return { it, rel: 0 };
       if (!matchesStrength(it.passwordStrengthLevel))
         return { it, rel: Infinity };
+      if (!q) return { it, rel: 0 };
       const t = it.normalizedTitle;
       if (t.startsWith(q)) return { it, rel: 0 };
       const idx = t.indexOf(q);
@@ -324,7 +324,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                   backgroundColor: theme.colors?.background,
                   boxShadow: theme.colors?.shadow,
                   height: 40,
-                  borderColor: theme.colors.outlineVariant,
+                  borderColor: darkmode ? theme.colors.outlineVariant : "white",
                   borderWidth: StyleSheet.hairlineWidth,
                 }}
               >

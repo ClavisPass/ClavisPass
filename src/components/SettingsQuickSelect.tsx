@@ -29,8 +29,7 @@ type Props = {
 };
 
 function SettingsQuickSelect(props: Props) {
-  const { width, height } = useWindowDimensions();
-  const { theme } = useTheme();
+  const { width } = useWindowDimensions();
 
   const flatListRef: any = useRef<FlatList>(null);
   const [currentOffset, setCurrentOffset] = useState(0);
@@ -111,7 +110,7 @@ function SettingsQuickSelect(props: Props) {
               if (!shouldRender) return null;
               return (
                 <>
-                  {index !== 0 ? <Divider style={{ marginRight: 4 }} /> : null}
+                  {index !== 0 ? <Divider /> : null}
                   <MenuItem
                     key={index}
                     leadingIcon={item.icon}

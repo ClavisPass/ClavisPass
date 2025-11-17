@@ -29,7 +29,7 @@ type Props = {
 };
 
 function SquaredContainerButton(props: Props) {
-  const { theme } = useTheme();
+  const { theme, darkmode } = useTheme();
   return (
     <View
       style={[
@@ -40,7 +40,7 @@ function SquaredContainerButton(props: Props) {
             : (props.backgroundColor ?? theme.colors.background),
           boxShadow: theme.colors?.shadow,
           borderWidth: StyleSheet.hairlineWidth,
-          borderColor: theme.colors.outlineVariant,
+          borderColor: darkmode ? theme.colors.outlineVariant : "white",
         },
       ]}
     >

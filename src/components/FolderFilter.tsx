@@ -130,7 +130,7 @@ function FolderFilter(props: Props) {
             onScroll={handleScroll}
             renderItem={({ item, index }) => (
               <>
-                <Divider style={{ marginRight: 4 }} />
+                <Divider />
                 <MenuItem
                   key={index}
                   leadingIcon={"folder"}
@@ -163,7 +163,7 @@ function FolderFilter(props: Props) {
                 >
                   {t("home:twofa")}
                 </MenuItem>
-                <Divider style={{ marginRight: 4 }} />
+                <Divider />
                 <MenuItem
                   leadingIcon={"credit-card-multiple"}
                   selected={props.selectedCard}
@@ -176,7 +176,7 @@ function FolderFilter(props: Props) {
                 >
                   {t("home:card")}
                 </MenuItem>
-                <Divider style={{ marginRight: 4 }} />
+                <Divider />
                 <MenuItem
                   leadingIcon={"star"}
                   selected={props.selectedFav}
@@ -215,7 +215,7 @@ function FolderFilter(props: Props) {
           />
           <View
             style={{
-              width: 6,
+              width: 1,
               height: "100%",
               alignItems: "center",
               justifyContent: "center",

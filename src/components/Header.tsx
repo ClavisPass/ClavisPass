@@ -13,7 +13,7 @@ type Props = {
 };
 
 function Header(props: Props) {
-  const { theme } = useTheme();
+  const { theme, darkmode } = useTheme();
   return (
     <View
       style={{
@@ -32,7 +32,7 @@ function Header(props: Props) {
         justifyContent: "center",
         borderWidth: StyleSheet.hairlineWidth,
         borderTopWidth: 0,
-        borderColor: theme.colors.outlineVariant,
+        borderColor: darkmode ? theme.colors.outlineVariant : "white",
       }}
     >
       <View

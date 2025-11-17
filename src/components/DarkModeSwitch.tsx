@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { useTheme } from "../contexts/ThemeProvider";
 import { useEffect, useState } from "react";
 import { RadioButton } from "react-native-paper";
@@ -25,7 +25,8 @@ function DarkModeSwitchPreview(props: Props) {
         gap: 4,
       }}
     >
-      <View
+      <Pressable
+        onPress={() => props.setChecked(props.value)}
         style={{
           height: 80,
           width: 120,
@@ -53,7 +54,7 @@ function DarkModeSwitchPreview(props: Props) {
             borderRadius: 10,
           }}
         ></View>
-      </View>
+      </Pressable>
       <View>
         <RadioButton
           value={props.value}
@@ -67,12 +68,22 @@ function DarkModeSwitchPreview(props: Props) {
 
 function DarkModeSwitch() {
   const { darkmode, setDarkmode } = useTheme();
-  const [checked, setChecked] = useState<CheckedType>(darkmode ? "dark" : "light");
+  const [checked, setChecked] = useState<CheckedType>(
+    darkmode ? "dark" : "light"
+  );
   useEffect(() => {
     setDarkmode(checked === "dark");
   }, [checked, darkmode]);
   return (
-    <View style={{ display: "flex", flexDirection: "row", gap: 6, marginTop: 10, marginBottom: 4 }}>
+    <View
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        gap: 6,
+        marginTop: 10,
+        marginBottom: 4,
+      }}
+    >
       <DarkModeSwitchPreview
         value="light"
         checked={checked}

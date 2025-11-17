@@ -31,7 +31,7 @@ type Props = {
 };
 
 function ContainerButton(props: Props) {
-  const { theme } = useTheme();
+  const { theme, darkmode } = useTheme();
   return (
     <View
       style={[
@@ -41,7 +41,7 @@ function ContainerButton(props: Props) {
           boxShadow: theme.colors?.shadow,
           flexGrow: props.flexGrow || 1,
           borderWidth: StyleSheet.hairlineWidth,
-          borderColor: theme.colors.outlineVariant,
+          borderColor: darkmode ? theme.colors.outlineVariant : "white",
         },
       ]}
     >

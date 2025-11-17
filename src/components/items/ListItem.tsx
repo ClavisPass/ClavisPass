@@ -43,7 +43,7 @@ type Props = {
 };
 
 function ListItem(props: Props) {
-  const { theme } = useTheme();
+  const { theme, darkmode } = useTheme();
 
   const [url, setUrl] = useState("");
   const [icon, setIcon] = useState("lock");
@@ -119,7 +119,7 @@ function ListItem(props: Props) {
           backgroundColor: theme.colors?.background,
           boxShadow: theme.colors?.shadow,
           borderWidth: StyleSheet.hairlineWidth,
-          borderColor: theme.colors.outlineVariant,
+          borderColor: darkmode ? theme.colors.outlineVariant : "white",
         },
       ]}
       onPointerEnter={() => Platform.OS === "web" && setHovered(true)}

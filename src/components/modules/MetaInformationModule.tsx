@@ -13,7 +13,7 @@ type MetaInformationModuleType = {
 };
 
 function MetaInformationModule(props: MetaInformationModuleType) {
-  const { theme } = useTheme();
+  const { theme, darkmode } = useTheme();
   const { t } = useTranslation();
 
   const [dateFormat, setDateFormat] = useState<string>("");
@@ -41,7 +41,7 @@ function MetaInformationModule(props: MetaInformationModuleType) {
         borderTopRightRadius: 12,
         width: "100%",
         borderWidth: StyleSheet.hairlineWidth,
-        borderColor: theme.colors.outlineVariant,
+        borderColor: darkmode ? theme.colors.outlineVariant : "white",
         borderBottomWidth: 0,
       }}
     >
