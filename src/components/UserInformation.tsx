@@ -8,6 +8,7 @@ import { useToken } from "../contexts/TokenProvider";
 import fetchUserInfo from "../api/fetchUserInfo/fetchUserInfo";
 import DropboxLoginButton from "./buttons/DropboxLoginButton";
 import UserInfoType from "../types/UserInfoType";
+import { useTheme } from "../contexts/ThemeProvider";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -18,6 +19,7 @@ type Props = {
 
 function UserInformation(props: Props) {
   const { token, removeToken, tokenType } = useToken();
+  const { darkmode } = useTheme();
   const [userInfo, setUserInfo] = useState<UserInfoType>(null);
   const [loading, setLoading] = useState(false);
 
@@ -45,7 +47,8 @@ function UserInformation(props: Props) {
       style={{
         height: token ? 56 : 44,
         width: "100%",
-      }}>
+      }}
+    >
       {token ? (
         <MotiView
           from={{ opacity: 0, translateY: -4 }}
@@ -98,9 +101,23 @@ function UserInformation(props: Props) {
                 </Chip>
               </MotiView>
             ) : (
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                <Skeleton show height={30} width={30} radius={50} colorMode="light" />
-                <Skeleton show height={20} width={100} radius={6} colorMode="light" />
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+              >
+                <Skeleton
+                  show
+                  height={30}
+                  width={30}
+                  radius={50}
+                  colorMode={darkmode ? "dark" : "light"}
+                />
+                <Skeleton
+                  show
+                  height={20}
+                  width={100}
+                  radius={6}
+                  colorMode={darkmode ? "dark" : "light"}
+                />
               </View>
             )}
           </View>

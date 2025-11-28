@@ -12,7 +12,12 @@ import AnimatedOpacityContainer from "./container/AnimatedOpacityContainer/Anima
 import { MenuItem } from "./items/MenuItem";
 import { useTheme } from "../contexts/ThemeProvider";
 import FolderType from "../types/FolderType";
-import { clamp } from "react-native-reanimated";
+import Animated, {
+  clamp,
+  FadeIn,
+  FadeOut,
+  LinearTransition,
+} from "react-native-reanimated";
 import { DraggableHandle } from "./DraggableHandle";
 import { get, set } from "../utils/store";
 import { useTranslation } from "react-i18next";
@@ -129,7 +134,7 @@ function FolderFilter(props: Props) {
             style={{ flexShrink: 1 }}
             onScroll={handleScroll}
             renderItem={({ item, index }) => (
-              <>
+              <Animated.View layout={LinearTransition.duration(120)}>
                 <Divider />
                 <MenuItem
                   key={index}
@@ -147,7 +152,7 @@ function FolderFilter(props: Props) {
                 >
                   {item.name}
                 </MenuItem>
-              </>
+              </Animated.View>
             )}
             ListHeaderComponent={
               <>
@@ -323,24 +328,26 @@ function FolderFilter(props: Props) {
                 </View>
               }
               renderItem={({ item, index }) => (
-                <Chip
-                  key={index}
-                  icon={"folder"}
-                  selected={props.selectedFolder == item ? true : false}
-                  showSelectedOverlay={true}
-                  onPress={() => {
-                    props.setSelected2FA(false);
-                    props.setSelectedCard(false);
-                    if (props.selectedFolder != item) {
-                      props.setSelectedFolder(item);
-                    } else {
-                      props.setSelectedFolder(null);
-                    }
-                  }}
-                  style={styles.chip}
-                >
-                  {item.name}
-                </Chip>
+                <Animated.View layout={LinearTransition.duration(120)}>
+                  <Chip
+                    key={index}
+                    icon={"folder"}
+                    selected={props.selectedFolder == item ? true : false}
+                    showSelectedOverlay={true}
+                    onPress={() => {
+                      props.setSelected2FA(false);
+                      props.setSelectedCard(false);
+                      if (props.selectedFolder != item) {
+                        props.setSelectedFolder(item);
+                      } else {
+                        props.setSelectedFolder(null);
+                      }
+                    }}
+                    style={styles.chip}
+                  >
+                    {item.name}
+                  </Chip>
+                </Animated.View>
               )}
               ListFooterComponent={
                 <View

@@ -81,6 +81,7 @@ function DarkModeSwitch() {
         flexDirection: "row",
         gap: 6,
         marginTop: 10,
+        marginLeft: 10,
         marginBottom: 4,
       }}
     >

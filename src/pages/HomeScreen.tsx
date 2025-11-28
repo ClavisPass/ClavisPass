@@ -529,7 +529,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                           }}
                           style={{
                             height: 40,
-                            width: 100,
+                            width: 130,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -547,7 +547,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                         onPress={refreshData}
                         style={{
                           height: 40,
-                          width: 100,
+                          width: 130,
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",

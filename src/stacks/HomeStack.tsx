@@ -5,8 +5,10 @@ import EditScreen from "../pages/EditScreen";
 import DigitalCardScanScreen from "../pages/DigitalCardScanScreen";
 import TotpScanScreen from "../pages/TotpScanScreen";
 import CardDetailsScreen from "../pages/CardDetailsScreen";
+import { useTheme } from "../contexts/ThemeProvider";
 
 function HomeStack() {
+  const { theme } = useTheme();
   return (
     <Stack.Navigator
       screenOptions={{
@@ -14,6 +16,9 @@ function HomeStack() {
         gestureDirection: "vertical",
         gestureEnabled: true,
         detachPreviousScreen: false,
+        cardStyle: {
+          backgroundColor: theme.colors.background,
+        },
       }}
     >
       <Stack.Screen

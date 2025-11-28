@@ -13,7 +13,6 @@ import {
 import { Chip, Divider, IconButton } from "react-native-paper";
 import WebSpecific from "./platformSpecific/WebSpecific";
 import { MenuItem } from "./items/MenuItem";
-import { useTheme } from "../contexts/ThemeProvider";
 import QuickSelectItem from "../types/QuickSelectItem";
 
 const styles = StyleSheet.create({

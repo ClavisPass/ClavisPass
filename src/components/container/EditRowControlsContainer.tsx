@@ -35,8 +35,8 @@ export function EditRowControlsContainer({
         {
           flexDirection: "row",
           flex: 1,
-          paddingLeft: 16,
-          paddingRight: 4,
+          //paddingLeft: 16,
+          //paddingRight: 4,
           borderRadius: 12,
           borderColor: darkmode ? theme.colors.outlineVariant : "white",
           borderWidth: StyleSheet.hairlineWidth,
@@ -63,11 +63,11 @@ export function EditRowControlsContainer({
       </View>
       <View style={[{ flex: 1 }, contentStyle]}>{children}</View>
       <IconButton
-        style={{ position: "absolute", right: 0, width: 20, height: 20 }}
+        style={{ position: "absolute", right: 0, width: 24, height: 24 }}
         selected
         mode="contained-tonal"
         icon="close"
-        size={8}
+        size={12}
         onPress={() => onDelete?.(id)}
         tabIndex={-1 as any}
       />

@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     borderRadius: 12,
     overflow: "hidden",
-    padding: 16,
+    //padding: 16,
   },
 });
 
@@ -31,17 +31,15 @@ export function SubItem(props: Props) {
           flexDirection: "row",
           gap: 4,
           alignItems: "center",
+          padding: 8,
+          paddingLeft: 8,
+          paddingRight: 8,
         }}
       >
         {props.icon && (
           <Icon color={theme.colors?.primary} source={props.icon} size={16} />
         )}
-        <Text
-          style={{ userSelect: "none", opacity: 0.7, }}
-          variant="titleMedium"
-        >
-          {props.title}
-        </Text>
+        <Text>{props.title}</Text>
       </View>
       <Divider style={{ marginBottom: 0 }} />
       {props.children}

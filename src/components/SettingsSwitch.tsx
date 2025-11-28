@@ -15,7 +15,8 @@ const SettingsSwitch = (props: Props) => {
     <View
       style={{
         height: 44,
-        minHeight: 24,
+        minHeight: 44,
+        maxHeight: 44,
         padding: 10,
         flex: 1,
         display: "flex",

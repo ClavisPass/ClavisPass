@@ -50,6 +50,7 @@ import { formatAbsoluteDate, formatAbsoluteTime } from "../utils/expiry";
 import { AppLanguage } from "../i18n/types";
 import { i18n } from "../i18n";
 import { useTranslation } from "react-i18next";
+import { Chip } from "react-native-paper";
 
 const styles = StyleSheet.create({
   surface: {
@@ -105,7 +106,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const fastAccessRef = useRef<View>(null);
   const backupRef = useRef<View>(null);
   const importRef = useRef<View>(null);
-  const linksRef = useRef<View>(null);
 
   const quickSelectItems: QuickSelectItem[] = useMemo(
     () => [
@@ -150,13 +150,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         icon: "import",
         ref: importRef,
         plattform: null,
-      },
-      {
-        title: t("settings:links"),
-        icon: "link-variant",
-        ref: linksRef,
-        plattform: null,
-      },
+      }
     ],
     [language]
   );
@@ -320,7 +314,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               <SettingsShortcutItem shortcut="ALT+W">
                 {t("settings:showHide")}
               </SettingsShortcutItem>
-              <SettingsDivider />
             </SettingsContainer>
           </WebSpecific>
           <SettingsContainer
@@ -382,7 +375,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 },
               ]}
             />
-            <SettingsDivider />
           </SettingsContainer>
           <SettingsContainer
             ref={quickSelectItems[3].ref}
@@ -404,7 +396,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 changeAuthentication(checked);
               }}
             />
-            <SettingsDivider />
           </SettingsContainer>
           <SettingsContainer
             ref={quickSelectItems[4].ref}
@@ -418,7 +409,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 changeFastAccessBehavior(checked);
               }}
             />
-            <SettingsDivider />
           </SettingsContainer>
           <SettingsContainer
             ref={quickSelectItems[5].ref}
@@ -428,7 +418,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             <BackupImportButton />
             <SettingsDivider />
             <BackupExportButton />
-            <SettingsDivider />
           </SettingsContainer>
           <SettingsContainer
             ref={quickSelectItems[6].ref}
@@ -446,43 +435,40 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               title={"Chrome"}
               icon={"google-chrome"}
             />
-            <SettingsDivider />
             {devMode && (
               <>
+                <SettingsDivider />
                 <Import
                   type={DocumentTypeEnum.PCLOUD}
                   title={"pCloud"}
                   icon={"circle-outline"}
                 />
-                <SettingsDivider />
               </>
             )}
           </SettingsContainer>
-          <SettingsContainer
-            ref={quickSelectItems[7].ref}
-            icon={quickSelectItems[7].icon}
-            title={quickSelectItems[7].title}
-          >
-            <SettingsItem
-              leadingIcon="web"
+          <Footer />
+          <View style={{display: "flex", flexDirection: "row", gap: 8, flexWrap: "wrap", margin: 8, marginTop: 0}}>
+            <Chip
+              icon={"web"}
+              showSelectedOverlay={true}
               onPress={() => {
                 openURL("https://clavispass.github.io/ClavisPass/");
               }}
+              style={{ borderRadius: 12 }}
             >
               {t("settings:website")}
-            </SettingsItem>
-            <SettingsDivider />
-            <SettingsItem
-              leadingIcon="github"
+            </Chip>
+            <Chip
+              icon={"github"}
+              showSelectedOverlay={true}
               onPress={() => {
                 openURL("https://github.com/ClavisPass/ClavisPass");
               }}
+              style={{ borderRadius: 12 }}
             >
               Github
-            </SettingsItem>
-            <SettingsDivider />
-          </SettingsContainer>
-          <Footer />
+            </Chip>
+          </View>
         </ScrollView>
       </View>
       <EditTokenModal

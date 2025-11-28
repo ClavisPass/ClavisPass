@@ -172,7 +172,7 @@ const CustomBottomTab = ({
           <BottomNavigation.Bar
             navigationState={{ index: state.index, routes }}
             onTabPress={({ route }) => route.onPress()}
-            shifting={false}
+            shifting={true}
             style={{
               backgroundColor: theme.colors.background,
             }}
@@ -194,6 +194,7 @@ const CustomBottomTab = ({
             animationEasing={Easing.bezier(0.2, 0.7, 0.3, 1)}
             activeColor={theme.colors.primary}
             inactiveColor={"#777"}
+            
           />
         </View>
       </View>

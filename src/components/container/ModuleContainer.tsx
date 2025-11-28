@@ -1,9 +1,10 @@
 import React, { ReactNode } from "react";
 import { View, StyleSheet, Pressable, Platform } from "react-native";
-import { Icon, Text } from "react-native-paper";
+import { Divider, Icon, Text } from "react-native-paper";
 import { useTheme } from "../../contexts/ThemeProvider";
 import FastAccessType from "../../types/FastAccessType";
 import { EditRowControlsContainer } from "./EditRowControlsContainer";
+import AnimatedPressable from "../AnimatedPressable";
 
 const moduleStyles = StyleSheet.create({
   container: {
@@ -12,7 +13,7 @@ const moduleStyles = StyleSheet.create({
     flex: 1,
   },
   inner: {
-    padding: 10,
+    //padding: 10,
     paddingTop: 0,
     marginLeft: 8,
     marginRight: 8,
@@ -61,6 +62,7 @@ export default function ModuleContainer({
           boxShadow: (theme.colors as any)?.shadow,
           ...(Platform.OS !== "web" ? { marginBottom: 8 } : {}),
           borderRadius: 12,
+          overflow: "hidden",
         },
       ]}
     >
@@ -71,51 +73,51 @@ export default function ModuleContainer({
             flexDirection: "row",
             alignItems: "center",
             gap: 4,
-            height: 28,
             width: "100%",
           }}
         >
-          <View
+          <AnimatedPressable
             style={{
+              padding: 8,
+              paddingLeft: 8,
+              paddingRight: 8,
               display: "flex",
               flexDirection: "row",
-              gap: 4,
+              justifyContent: "space-between",
               alignItems: "center",
-              marginLeft: 6,
-              marginTop: 8,
+              flex: 1,
+              overflow: "hidden",
             }}
+            onPress={titlePress}
           >
-            {icon ? (
-              <Icon source={icon} size={14} color={theme.colors?.primary} />
-            ) : null}
-
-            <Pressable
-              onPress={titlePress}
-              style={{ cursor: titlePress ? "pointer" : "auto" }}
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 4,
+                alignItems: "center",
+              }}
             >
-              <Text
-                variant="labelSmall"
-                style={{
-                  opacity: 0.7,
-                }}
-                accessibilityRole="header"
-              >
-                {title}
-              </Text>
-            </Pressable>
+              {icon ? (
+                <Icon source={icon} size={18} color={theme.colors?.primary} />
+              ) : null}
 
-            {id === fastAccess?.usernameId || id === fastAccess?.passwordId ? (
-              <Icon
-                source={"tooltip-account"}
-                size={14}
-                color={theme.colors?.primary}
-              />
-            ) : null}
-          </View>
+              <Text>{title}</Text>
 
+              {id === fastAccess?.usernameId ||
+              id === fastAccess?.passwordId ? (
+                <Icon
+                  source={"tooltip-account"}
+                  size={14}
+                  color={theme.colors?.primary}
+                />
+              ) : null}
+            </View>
+          </AnimatedPressable>
           {modal}
         </View>
-        {children}
+        <Divider />
+        <View style={{ flex: 1, padding: 8, paddingLeft: 20 }}>{children}</View>
       </View>
     </EditRowControlsContainer>
   );
