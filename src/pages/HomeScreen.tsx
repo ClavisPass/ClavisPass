@@ -118,11 +118,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   };
 
   const saveSelected2FAState = (twoFA: boolean) => {
+    setSearchQuery("");
     setSelected2FA(twoFA);
     store.set("TWOFA_FILTER", twoFA);
   };
 
   const saveSelectedCardState = (card: boolean) => {
+    setSearchQuery("");
     setSelectedCard(card);
     store.set("CARD_FILTER", card);
   };

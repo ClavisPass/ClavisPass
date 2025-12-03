@@ -175,12 +175,12 @@ function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
       icon={ModuleIconsEnum.TOTP}
       fastAccess={props.fastAccess}
     >
-      <View style={globalStyles.moduleView}>
+      <View style={[globalStyles.moduleView]}>
         {value !== "" ? (
           <Totp value={value} />
         ) : (
           <Button
-            style={{ borderRadius: 12 }}
+            style={{ borderRadius: 12, marginRight: 21 }}
             icon={"barcode-scan"}
             mode="contained-tonal"
             textColor={theme.colors.primary}

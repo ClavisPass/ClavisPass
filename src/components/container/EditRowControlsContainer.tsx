@@ -7,7 +7,7 @@ import {
   StyleProp,
   StyleSheet,
 } from "react-native";
-import { Icon, IconButton } from "react-native-paper";
+import { Divider, Icon, IconButton } from "react-native-paper";
 import { useTheme } from "../../contexts/ThemeProvider";
 
 export type EditRowControlsContainerProps = {
@@ -35,8 +35,6 @@ export function EditRowControlsContainer({
         {
           flexDirection: "row",
           flex: 1,
-          //paddingLeft: 16,
-          //paddingRight: 4,
           borderRadius: 12,
           borderColor: darkmode ? theme.colors.outlineVariant : "white",
           borderWidth: StyleSheet.hairlineWidth,
@@ -46,11 +44,10 @@ export function EditRowControlsContainer({
     >
       <View
         style={{
-          position: "absolute",
-          left: 2,
-          top: 0,
-          bottom: 0,
           justifyContent: "center",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
         }}
       >
         {Platform.OS === "web" ? (
@@ -60,17 +57,26 @@ export function EditRowControlsContainer({
             <Icon source="drag" size={20} />
           </Pressable>
         )}
+        <Divider
+          style={{
+            width: StyleSheet.hairlineWidth,
+            alignSelf: "stretch",
+            height: "100%",
+          }}
+        />
       </View>
       <View style={[{ flex: 1 }, contentStyle]}>{children}</View>
-      <IconButton
-        style={{ position: "absolute", right: 0, width: 24, height: 24 }}
-        selected
-        mode="contained-tonal"
-        icon="close"
-        size={12}
-        onPress={() => onDelete?.(id)}
-        tabIndex={-1 as any}
-      />
+      <View>
+        <IconButton
+          style={{ position: "absolute", right: 0, width: 24, height: 24 }}
+          selected
+          mode="contained-tonal"
+          icon="close"
+          size={12}
+          onPress={() => onDelete?.(id)}
+          tabIndex={-1 as any}
+        />
+      </View>
     </View>
   );
 }

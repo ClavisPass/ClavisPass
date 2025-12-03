@@ -177,7 +177,7 @@ const CustomBottomTab = ({
               backgroundColor: theme.colors.background,
             }}
             activeIndicatorStyle={{
-              backgroundColor: "rgba(0,0,0,0.06)",
+              backgroundColor: theme.colors.secondaryContainer,
               borderRadius: 12,
             }}
             renderLabel={({ route, focused }) => (

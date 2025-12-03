@@ -75,7 +75,6 @@ function DigitalCardModule(
   const [type, setType] = useState<DigitalCardType>(
     props.type as DigitalCardType
   );
-  const [editValue, setEditValue] = useState(false);
 
   useEffect(() => {
     if (didMount.current) {
@@ -100,7 +99,7 @@ function DigitalCardModule(
       icon={ModuleIconsEnum.DIGITAL_CARD}
       fastAccess={props.fastAccess}
     >
-      <View style={globalStyles.moduleView}>
+      <View style={[globalStyles.moduleView]}>
         <AnimatedPressable
           key={props.key}
           style={[{ borderRadius: 12 }]}
@@ -122,7 +121,7 @@ function DigitalCardModule(
               height: 112,
               borderRadius: 12,
               padding: 8,
-              backgroundColor: "white",
+              backgroundColor: value === "" ? theme.colors.background : "white",
             }}
           >
             {value !== "" ? (
@@ -133,7 +132,7 @@ function DigitalCardModule(
               )
             ) : (
               <Button
-                style={{ borderRadius: 12 }}
+                style={{ borderRadius: 12, marginRight: 21 }}
                 icon={"barcode-scan"}
                 mode="contained-tonal"
                 textColor={theme.colors.primary}

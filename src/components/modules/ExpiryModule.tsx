@@ -85,7 +85,7 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
       icon={ModuleIconsEnum.EXPIRY}
       fastAccess={props.fastAccess}
     >
-      <View style={globalStyles.moduleView}>
+      <View style={[globalStyles.moduleView]}>
         <View style={{ flex: 1 }}>
           {value ? (
             <>
@@ -119,7 +119,7 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
       {value ? null : (
         <View style={[globalStyles.moduleView, { justifyContent: "center" }]}>
           <Button
-            style={{ borderRadius: 12 }}
+            style={{ borderRadius: 12, marginRight: 21 }}
             mode="contained-tonal"
             onPress={() => setPickerVisible(true)}
             icon="calendar"

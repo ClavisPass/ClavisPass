@@ -57,6 +57,7 @@ function TaskModule(props: TaskModuleType & Props) {
               justifyContent: "flex-start",
               width: undefined,
               flex: 1,
+              marginRight: 21,
             },
           ]}
         >
@@ -64,7 +65,7 @@ function TaskModule(props: TaskModuleType & Props) {
             status={checked ? "checked" : "unchecked"}
             onPress={() => setChecked(!checked)}
           />
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 1, marginRight: 8 }}>
             <TextInput
               //placeholder="..."
               mode="outlined"

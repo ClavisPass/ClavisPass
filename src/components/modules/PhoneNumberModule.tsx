@@ -8,7 +8,7 @@ import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import { useTheme } from "../../contexts/ThemeProvider";
 import PhoneNumberModuleType from "../../types/modules/PhoneNumberModuleType";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
-import * as Linking from 'expo-linking';
+import * as Linking from "expo-linking";
 import { useTranslation } from "react-i18next";
 
 function PhoneNumberModule(props: PhoneNumberModuleType & Props) {
@@ -18,7 +18,7 @@ function PhoneNumberModule(props: PhoneNumberModuleType & Props) {
   const [value, setValue] = useState(props.value);
 
   const [formattedNumber, setFormattedNumber] = useState("");
-  const [isValid, setIsValid] = useState(false);
+  const [isValid, setIsValid] = useState(true);
 
   useEffect(() => {
     if (didMount.current) {
@@ -36,9 +36,11 @@ function PhoneNumberModule(props: PhoneNumberModuleType & Props) {
   const handleChange = (input: string) => {
     setValue(input);
 
-    // Versuche die Nummer zu parsen (Standardland: DE)
+    if (input === "") {
+      setIsValid(true);
+      return;
+    }
     const parsed = parsePhoneNumberFromString(input, "DE");
-
     if (parsed && parsed.isValid()) {
       setFormattedNumber(parsed.formatInternational());
       setIsValid(true);

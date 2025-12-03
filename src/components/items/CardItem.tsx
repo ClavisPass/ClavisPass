@@ -46,6 +46,10 @@ type Props = {
 function CardItem(props: Props) {
   const { theme, darkmode } = useTheme();
 
+  if(props.value === "") {
+    return null;
+  }
+
   return (
     <Animated.View
       entering={FadeInDown.delay(props.index * 50).duration(250)}

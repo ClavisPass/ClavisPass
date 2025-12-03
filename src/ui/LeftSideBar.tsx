@@ -137,7 +137,7 @@ export default function LeftSideTabBar({
           name === "AddTrigger"
             ? theme.colors.surface
             : isFocused
-              ? "rgba(0,0,0,0.06)"
+              ? theme.colors.secondaryContainer
               : "transparent";
 
         return (

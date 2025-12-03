@@ -117,7 +117,7 @@ export default function ModuleContainer({
           {modal}
         </View>
         <Divider />
-        <View style={{ flex: 1, padding: 8, paddingLeft: 20 }}>{children}</View>
+        <View style={{ flex: 1, padding: 8 }}>{children}</View>
       </View>
     </EditRowControlsContainer>
   );

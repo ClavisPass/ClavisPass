@@ -93,7 +93,7 @@ function URLModule(props: URLModuleType & Props) {
   };
 
   useEffect(() => {
-    setIsValid(validator.isURL(value));
+    setIsValid(validator.isURL(value) || value === "");
     setUrl(getFavIcon(value));
   }, [value, isValid]);
 

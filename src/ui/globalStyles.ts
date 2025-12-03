@@ -15,14 +15,13 @@ const globalStyles = (background: string, tertiary: string) => ({
     borderWidth: 2,
   },
   textInputStyle: { height: 40, lineHeight: 16, backgroundColor: tertiary, minWidth: 200, maxWidth: "100%" },
-  textInputNoteStyle: { lineHeight: 16, padding: 4, backgroundColor: tertiary, marginRight: 6, marginLeft: 6 },
+  textInputNoteStyle: { lineHeight: 16, padding: 4, backgroundColor: tertiary },
   moduleView: {
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    paddingLeft: 6
 
   },
   fab: {
