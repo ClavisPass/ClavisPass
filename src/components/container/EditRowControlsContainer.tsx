@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Divider, Icon, IconButton } from "react-native-paper";
 import { useTheme } from "../../contexts/ThemeProvider";
+import Animated, { FadeInDown, FadeOutUp, Layout } from "react-native-reanimated";
 
 export type EditRowControlsContainerProps = {
   id: string;
@@ -30,7 +31,9 @@ export function EditRowControlsContainer({
   const { theme, darkmode } = useTheme();
 
   return (
-    <View
+    <Animated.View
+      exiting={FadeOutUp.duration(150)}
+      entering={FadeInDown.delay(50).duration(250)}
       style={[
         {
           flexDirection: "row",
@@ -77,6 +80,6 @@ export function EditRowControlsContainer({
           tabIndex={-1 as any}
         />
       </View>
-    </View>
+    </Animated.View>
   );
 }
