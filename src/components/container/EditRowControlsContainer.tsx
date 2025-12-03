@@ -33,7 +33,7 @@ export function EditRowControlsContainer({
   return (
     <Animated.View
       exiting={FadeOutUp.duration(150)}
-      entering={FadeInDown.delay(50).duration(250)}
+      //entering={FadeInDown.delay(50).duration(250)}
       style={[
         {
           flexDirection: "row",
