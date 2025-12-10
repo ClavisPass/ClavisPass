@@ -4,10 +4,11 @@ import getColors from "../../ui/linearGradient";
 import QRCode from "react-qr-code";
 import Modal from "./Modal";
 import { Portal } from "react-native-paper";
-import { useToken } from "../../contexts/TokenProvider";
+import { useToken } from "../../contexts/CloudProvider"; // ggf. Pfad anpassen
 import { useEffect, useState } from "react";
 
 import { useTheme } from "../../contexts/ThemeProvider";
+import SessionQrPayload from "../../types/SessionQrPayload";
 
 type Props = {
   visible: boolean;
@@ -16,18 +17,34 @@ type Props = {
 
 function TokenQRCodeModal(props: Props) {
   const { theme } = useTheme();
-  const { refreshToken } = useToken();
+  const { provider, refreshToken } = useToken();
+
   const [value, setValue] = useState("");
   const hideModal = () => props.setVisible(false);
+
   useEffect(() => {
     if (refreshToken) {
-      hideModal();
-      setValue(refreshToken);
+      const payload: SessionQrPayload = {
+        kind: "clavispass:session",
+        version: 1,
+        provider,
+        refreshToken,
+      };
+      setValue(JSON.stringify(payload));
     } else {
-      hideModal();
       setValue("");
     }
-  }, [refreshToken]);
+  }, [provider, refreshToken]);
+
+  // Ob du automatisch schließen willst, wenn kein Token da ist,
+  // ist Geschmackssache. Ich würde das Schließen eher dem Aufrufer überlassen.
+  // Wenn du das Verhalten behalten willst:
+  useEffect(() => {
+    if (!refreshToken && props.visible) {
+      hideModal();
+    }
+  }, [refreshToken, props.visible]);
+
   return (
     <Portal>
       <Modal visible={props.visible} onDismiss={hideModal}>
@@ -52,7 +69,7 @@ function TokenQRCodeModal(props: Props) {
             <QRCode
               size={200}
               style={{ height: "auto", width: "auto" }}
-              value={value}
+              value={value || " "}
               viewBox="0 0 200 200"
             />
           </View>

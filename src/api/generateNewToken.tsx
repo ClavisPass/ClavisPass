@@ -1,4 +1,5 @@
 import { DROPBOX_CLIENT_ID } from "@env";
+import { logger } from "../utils/logger";
 
 async function generateNewToken(refreshToken: string) {
   const tokenEndpoint = "https://api.dropboxapi.com/oauth2/token";
@@ -25,11 +26,11 @@ async function generateNewToken(refreshToken: string) {
         scope: data.scope,
       };
     } else {
-      console.error("Error refreshing token:", data);
+      logger.error("Error refreshing token:", data);
       throw new Error(data.error_description || "Failed to refresh token");
     }
   } catch (error) {
-    console.error("Error during token refresh:", error);
+    logger.error("Error during token refresh:", error);
     throw error;
   }
 }

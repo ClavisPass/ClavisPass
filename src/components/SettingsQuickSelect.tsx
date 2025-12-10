@@ -14,6 +14,7 @@ import { Chip, Divider, IconButton } from "react-native-paper";
 import WebSpecific from "./platformSpecific/WebSpecific";
 import { MenuItem } from "./items/MenuItem";
 import QuickSelectItem from "../types/QuickSelectItem";
+import { logger } from "../utils/logger";
 
 const styles = StyleSheet.create({
   chip: {
@@ -64,7 +65,7 @@ function SettingsQuickSelect(props: Props) {
     const targetNode = findNodeHandle(ref.current);
 
     if (!scrollViewNode || !targetNode) {
-      console.warn("ScrollView oder Ziel-Element nicht gefunden");
+      logger.warn("ScrollView oder Ziel-Element nicht gefunden");
       return;
     }
 
@@ -72,7 +73,7 @@ function SettingsQuickSelect(props: Props) {
       targetNode,
       scrollViewNode,
       () => {
-        console.warn("Layout messen fehlgeschlagen");
+        logger.warn("Layout messen fehlgeschlagen");
       },
       (_x, y) => {
         props.scrollRef.current?.scrollTo({ y, animated: true });

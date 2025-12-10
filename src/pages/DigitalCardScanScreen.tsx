@@ -10,6 +10,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { RootStackParamList } from "../stacks/Stack";
 import DigitalCardType from "../types/DigitalCardType";
+import { logger } from "../utils/logger";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -113,12 +114,12 @@ const DigitalCardScanScreen: React.FC<DigitalCardScanScreenProps> = ({
       try {
         const mappedType = mapBarcodeType(res.type);
         if (!mappedType) {
-          console.log("Nicht unterstützter Barcode-Typ:", res.type);
+          logger.warn("Nicht unterstützter Barcode-Typ:", res.type);
           return;
         }
         setData(value, mappedType);
       } catch (e) {
-        console.error(e);
+        logger.error("Error handling scanned barcode:", e);
       } finally {
         navigation.goBack();
       }

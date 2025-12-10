@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import AnimatedContainer from "./container/AnimatedContainer";
-import CryptoType from "../types/CryptoType";
-import { loadBackup } from "../utils/Backup";
-import { Icon, Text } from "react-native-paper";
+import CryptoType, { CryptoTypeSchema } from "../types/CryptoType";
+import { ActivityIndicator, Icon, Text } from "react-native-paper";
 import { View } from "react-native";
 import PasswordTextbox from "./PasswordTextbox";
-import Logo from "../ui/Logo";
 import Button from "./buttons/Button";
 import { useTheme } from "../contexts/ThemeProvider";
 import { useData } from "../contexts/DataProvider";
@@ -13,49 +10,71 @@ import { useAuth } from "../contexts/AuthProvider";
 import { DataTypeSchema } from "../types/DataType";
 import { decrypt } from "../utils/CryptoLayer";
 import { formatDateTime } from "../utils/Timestamp";
+import { logger } from "../utils/logger";
+
+import * as DeviceStorageClient from "../api/DeviceStorageClient";
+import { useTranslation } from "react-i18next";
 
 function Backup() {
+  const { t } = useTranslation();
   const [parsedCryptoData, setParsedCryptoData] = useState<CryptoType | null>(
     null
   );
+  const [loading, setLoading] = useState<boolean>(true);
 
   const auth = useAuth();
   const { theme } = useTheme();
   const { setData, setLastUpdated } = useData();
 
-  const [loading, setLoading] = useState(true);
-
   const [capsLock, setCapsLock] = useState(false);
   const [error, setError] = useState(false);
-  const [autofocus, setAutofocus] = useState(false);
   const textInputRef = useRef<any>(null);
   const [value, setValue] = useState("");
 
   const fetchBackup = async () => {
-    const result = await loadBackup();
-    setParsedCryptoData(result);
+    try {
+      setLoading(true);
+      const result = await DeviceStorageClient.fetchFile();
+
+      if (!result) {
+        setParsedCryptoData(null);
+        return;
+      }
+
+      const parsed = CryptoTypeSchema.parse(JSON.parse(result));
+      setParsedCryptoData(parsed);
+    } catch (err) {
+      logger.error("[Backup] Error loading local backup:", err);
+      setParsedCryptoData(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchBackup();
   }, []);
 
-  const login = async (value: string, parsedCryptoData: CryptoType | null) => {
+  const login = async (
+    masterPassword: string,
+    cryptoData: CryptoType | null
+  ) => {
     try {
-      if (parsedCryptoData === null) {
+      if (!cryptoData) {
         return;
       }
-      const lastUpdated = parsedCryptoData.lastUpdated;
-      const decryptedData = decrypt(parsedCryptoData, value);
+
+      const lastUpdated = cryptoData.lastUpdated;
+      const decryptedData = decrypt(cryptoData, masterPassword);
       const jsonData = JSON.parse(decryptedData);
 
       const parsedData = DataTypeSchema.parse(jsonData);
       setData(parsedData);
       setLastUpdated(lastUpdated);
-      auth.login(value);
+      auth.login(masterPassword);
     } catch (error) {
-      console.error("Error getting Data:", error);
-      textInputRef.current.focus();
+      logger.error("[Backup] Error decrypting backup data:", error);
+      textInputRef.current?.focus?.();
       setValue("");
       setError(true);
       setTimeout(() => {
@@ -71,12 +90,16 @@ function Backup() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "space-between",
         backgroundColor: "transparent",
+        width: "100%",
       }}
     >
       <Icon source="cloud-off-outline" color={theme.colors.primary} size={30} />
-      {parsedCryptoData ? (
+
+      {loading ? (
+        <ActivityIndicator size={"large"} animating={true} />
+      ) : parsedCryptoData ? (
         <>
           <View
             style={{
@@ -89,7 +112,7 @@ function Backup() {
             }}
           >
             <Text>
-              {"Backup found from: " +
+              {t("login:backupTitle") +
                 formatDateTime(parsedCryptoData.lastUpdated)}
             </Text>
             <View style={{ width: "100%" }}>
@@ -97,27 +120,27 @@ function Backup() {
                 setCapsLock={setCapsLock}
                 textInputRef={textInputRef}
                 errorColor={error}
-                autofocus={autofocus}
+                autofocus
                 setValue={setValue}
                 value={value}
-                placeholder="Enter Password"
+                placeholder={t("login:masterPassword")}
                 onSubmitEditing={() => login(value, parsedCryptoData)}
               />
             </View>
             <Button
-              text={"Login"}
+              text={t("login:login")}
               onPress={() => login(value, parsedCryptoData)}
-            ></Button>
+            />
             {capsLock && (
               <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
-                Caps Lock is activated
+                {t("common:capsLockOn")}
               </Text>
             )}
           </View>
         </>
       ) : (
         <>
-          <Text>No local Backup found</Text>
+          <Text>{t("login:noBackupFound")}</Text>
         </>
       )}
     </View>

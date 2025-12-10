@@ -3,16 +3,9 @@ import Modal from "./Modal";
 import { useData } from "../../contexts/DataProvider";
 import { useEffect, useRef, useState } from "react";
 import PasswordTextbox from "../PasswordTextbox";
-import { ActivityIndicator, Text } from "react-native-paper";
+import { Text } from "react-native-paper";
 import Button from "../buttons/Button";
 import { useTheme } from "../../contexts/ThemeProvider";
-import fetchData from "../../api/fetchData/fetchData";
-import CryptoType, { CryptoTypeSchema } from "../../types/CryptoType";
-import { useToken } from "../../contexts/TokenProvider";
-import { decrypt, encrypt } from "../../utils/CryptoLayer";
-import DataType, { DataTypeSchema } from "../../types/DataType";
-import { compare, getDateTime } from "../../utils/Timestamp";
-import uploadData from "../../api/uploadData/uploadData";
 import { useAuth } from "../../contexts/AuthProvider";
 import { useTranslation } from "react-i18next";
 
@@ -21,15 +14,25 @@ type Props = {
   setVisible: (visible: boolean) => void;
 };
 
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "column",
+    height: 200,
+    width: 300,
+    cursor: "auto",
+    gap: 6,
+  },
+});
+
 function ChangeMasterPasswordModal(props: Props) {
   const data = useData();
   const auth = useAuth();
   const { theme } = useTheme();
   const { t } = useTranslation();
-
-  const [refreshing, setRefreshing] = useState(false);
-
-  const { token, tokenType } = useToken();
 
   const [passwordConfirmed, setPasswordConfirmed] = useState(false);
 
@@ -39,228 +42,182 @@ function ChangeMasterPasswordModal(props: Props) {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [serverHasNewerState, setServerHasNeverState] = useState(false);
-
-  const hideModal = () => props.setVisible(false);
-
-  const [parsedCryptoData, setParsedCryptoData] = useState<CryptoType | null>(
-    null
-  );
-
-  const [parsedData, setParsedData] = useState<DataType | null>(null);
-
-  const [loading, setLoading] = useState(true);
-
+  const [passwordNotEqual, setPasswordNotEqual] = useState(true);
   const [error, setError] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
   const textInputRef = useRef<any>(null);
   const textInput2Ref = useRef<any>(null);
   const textInput3Ref = useRef<any>(null);
 
-  const [passwordNotEqual, setPasswordNotEqual] = useState(true);
+  const hideModal = () => props.setVisible(false);
 
   const clear = () => {
     setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
+    setPasswordConfirmed(false);
+    setError(false);
+    setPasswordNotEqual(true);
   };
 
   useEffect(() => {
-    setPasswordConfirmed(false);
-    clear();
-    if (props.visible && token && tokenType) {
-      setLoading(true);
-      fetchData(token, tokenType, "clavispass.lock").then((response) => {
-        if (response === null) {
-          setLoading(false);
-        } else {
-          const parsedCryptoData = CryptoTypeSchema.parse(JSON.parse(response));
-          setParsedCryptoData(parsedCryptoData);
-          setServerHasNeverState(
-            compare(parsedCryptoData.lastUpdated, data.lastUpdated)
-          );
-          setLoading(false);
-        }
-      });
+    if (props.visible) {
+      clear();
+      setTimeout(() => {
+        textInputRef.current?.focus?.();
+      }, 50);
     }
   }, [props.visible]);
 
   useEffect(() => {
-    if (newPassword !== "" && confirmPassword !== "" && parsedData) {
+    if (newPassword !== "" && confirmPassword !== "") {
       setPasswordNotEqual(newPassword !== confirmPassword);
+    } else {
+      setPasswordNotEqual(true);
     }
-  }, [newPassword, confirmPassword, parsedData]);
+  }, [newPassword, confirmPassword]);
 
-  const login = async (value: string, parsedCryptoData: CryptoType | null) => {
-    try {
-      if (parsedCryptoData === null) {
-        return;
-      }
-      const lastUpdated = parsedCryptoData.lastUpdated;
-      const decryptedData = decrypt(parsedCryptoData, value);
-      const jsonData = JSON.parse(decryptedData);
-
-      setParsedData(DataTypeSchema.parse(jsonData));
-      setPasswordConfirmed(true);
-    } catch (error) {
-      console.error("Error getting Data:", error);
-      textInputRef.current.focus();
-      clear();
+  const verifyCurrentPassword = async () => {
+    if (!currentPassword) {
       setError(true);
-      setTimeout(() => {
-        setError(false);
-      }, 1000);
+      setTimeout(() => setError(false), 1000);
+      textInputRef.current?.focus?.();
+      return;
     }
+
+    if (currentPassword !== auth.master) {
+      setError(true);
+      setCurrentPassword("");
+      setTimeout(() => setError(false), 1000);
+      textInputRef.current?.focus?.();
+      return;
+    }
+
+    setPasswordConfirmed(true);
+    setTimeout(() => {
+      textInput2Ref.current?.focus?.();
+    }, 50);
   };
 
-  const uploadPassword = async () => {
-    const lastUpdated = getDateTime();
-    setRefreshing(true);
-    auth.login(newPassword);
-    data.setLastUpdated(lastUpdated);
-    uploadData(
-      token,
-      tokenType,
-      await encrypt(parsedData, newPassword, lastUpdated),
-      "clavispass.lock",
-      () => {
-        data.setData(parsedData);
-        setRefreshing(false);
-        props.setVisible(false);
-      }
-    );
+  const applyNewPassword = async () => {
+    if (passwordNotEqual || !newPassword || !confirmPassword) {
+      return;
+    }
+
+    setProcessing(true);
+    try {
+      auth.login(newPassword);
+      data.setShowSave(true);
+      hideModal();
+      // navigation.navigate("Home");
+    } finally {
+      setProcessing(false);
+      clear();
+    }
   };
 
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
       <View
-        style={{
-          padding: 16,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          height: 200,
-          width: 300,
-          cursor: "auto",
-          gap: 6,
-          borderRadius: 12,
-          borderWidth: StyleSheet.hairlineWidth,
-          borderColor: theme.colors.outlineVariant,
-        }}
+        style={[
+          styles.container,
+          {
+            borderRadius: 12,
+            borderWidth: StyleSheet.hairlineWidth,
+            borderColor: theme.colors.outlineVariant,
+          },
+        ]}
       >
-        {loading ? (
-          <ActivityIndicator size={"large"} animating={true} />
+        {!passwordConfirmed ? (
+          <>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+                flexGrow: 1,
+              }}
+            >
+              <Text
+                variant="headlineSmall"
+                style={{ userSelect: "none" as any }}
+              >
+                {t("common:verify")}
+              </Text>
+              <Text variant="bodyMedium" style={{ userSelect: "none" as any }}>
+                {t("login:enterMasterPassword")}
+              </Text>
+            </View>
+            <View style={{ width: "100%" }}>
+              <PasswordTextbox
+                setCapsLock={setCapsLock}
+                textInputRef={textInputRef}
+                errorColor={error}
+                autofocus
+                setValue={setCurrentPassword}
+                value={currentPassword}
+                placeholder={t("login:masterPassword")}
+                onSubmitEditing={verifyCurrentPassword}
+              />
+            </View>
+            <Button
+              text={t("login:login")}
+              onPress={verifyCurrentPassword}
+              loading={processing}
+            />
+          </>
         ) : (
           <>
-            {serverHasNewerState && passwordConfirmed ? (
-              <>
-                <Text style={{ color: theme.colors.error }}>
-                  Server has newer state
-                </Text>
-                <Button text={"Use Server State"} onPress={() => {}}></Button>
-                <Button
-                  color={theme.colors?.secondaryContainer}
-                  text={"Use Local State"}
-                  onPress={() => {}}
-                  white={false}
-                ></Button>
-              </>
-            ) : (
-              <>
-                {passwordConfirmed ? (
-                  <>
-                    <View
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 6,
-                        flexGrow: 1,
-                      }}
-                    >
-                      <Text
-                        variant="headlineSmall"
-                        style={{ userSelect: "none" }}
-                      >
-                        New Password
-                      </Text>
-                    </View>
-                    <View style={{ width: "100%" }}>
-                      <PasswordTextbox
-                        autofocus
-                        textInputRef={textInput2Ref}
-                        setValue={setNewPassword}
-                        value={newPassword}
-                        placeholder="New Password"
-                        onSubmitEditing={() => textInput3Ref.current.focus()}
-                      />
-                    </View>
-                    <View style={{ width: "100%" }}>
-                      <PasswordTextbox
-                        textInputRef={textInput3Ref}
-                        setValue={setConfirmPassword}
-                        value={confirmPassword}
-                        placeholder="Confirm Password"
-                        onSubmitEditing={
-                          passwordNotEqual ? undefined : uploadPassword
-                        }
-                      />
-                    </View>
-                    <Button
-                      disabled={passwordNotEqual}
-                      text={"Set Password"}
-                      onPress={uploadPassword}
-                      loading={refreshing}
-                    ></Button>
-                  </>
-                ) : (
-                  <>
-                    <View
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 6,
-                        flexGrow: 1,
-                      }}
-                    >
-                      <Text
-                        variant="headlineSmall"
-                        style={{ userSelect: "none" }}
-                      >
-                        Verify
-                      </Text>
-                      <Text variant="bodyMedium" style={{ userSelect: "none" }}>
-                        Enter your current Master Password to change it.
-                      </Text>
-                    </View>
-                    <View style={{ width: "100%" }}>
-                      <PasswordTextbox
-                        setCapsLock={setCapsLock}
-                        textInputRef={textInputRef}
-                        errorColor={error}
-                        autofocus
-                        setValue={setCurrentPassword}
-                        value={currentPassword}
-                        placeholder="Current Password"
-                        onSubmitEditing={() =>
-                          login(currentPassword, parsedCryptoData)
-                        }
-                      />
-                    </View>
-                    <Button
-                      text={"Login"}
-                      onPress={() => login(currentPassword, parsedCryptoData)}
-                    ></Button>
-                  </>
-                )}
-                {capsLock && (
-                  <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
-                    {t("common:capslockOn")}
-                  </Text>
-                )}
-              </>
-            )}
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+                flexGrow: 1,
+              }}
+            >
+              <Text
+                variant="headlineSmall"
+                style={{ userSelect: "none" as any }}
+              >
+                {t("login:newMasterPassword")}
+              </Text>
+            </View>
+            <View style={{ width: "100%" }}>
+              <PasswordTextbox
+                autofocus
+                textInputRef={textInput2Ref}
+                setValue={setNewPassword}
+                value={newPassword}
+                placeholder={t("login:newMasterPassword")}
+                onSubmitEditing={() => textInput3Ref.current?.focus?.()}
+              />
+            </View>
+            <View style={{ width: "100%" }}>
+              <PasswordTextbox
+                textInputRef={textInput3Ref}
+                setValue={setConfirmPassword}
+                value={confirmPassword}
+                placeholder={t("login:confirmMasterPassword")}
+                onSubmitEditing={
+                  passwordNotEqual ? undefined : applyNewPassword
+                }
+              />
+            </View>
+            <Button
+              disabled={passwordNotEqual}
+              text={t("login:setNewPassword")}
+              onPress={applyNewPassword}
+              loading={processing}
+            />
           </>
+        )}
+
+        {capsLock && (
+          <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
+            {t("common:capslockOn")}
+          </Text>
         )}
       </View>
     </Modal>

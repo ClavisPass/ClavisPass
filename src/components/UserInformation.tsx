@@ -1,55 +1,98 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import * as WebBrowser from "expo-web-browser";
 import { Chip, Text, Avatar } from "react-native-paper";
 import { Skeleton } from "moti/skeleton";
 import { View } from "react-native";
 import { MotiView } from "moti";
-import { useToken } from "../contexts/TokenProvider";
-import fetchUserInfo from "../api/fetchUserInfo/fetchUserInfo";
 import DropboxLoginButton from "./buttons/DropboxLoginButton";
 import UserInfoType from "../types/UserInfoType";
 import { useTheme } from "../contexts/ThemeProvider";
+import { useToken } from "../contexts/CloudProvider";
+import { logger } from "../utils/logger";
+import { fetchUserInfo } from "../api/CloudStorageClient";
+import GoogleDriveLoginButton from "./buttons/GoogleDriveLoginButton";
 
 WebBrowser.maybeCompleteAuthSession();
 
 type Props = {
-  changeEditTokenVisibility?: (value: boolean) => void;
-  setUserInfo?: (userInfo: UserInfoType) => void;
+  setUserInfo?: (userInfo: UserInfoType | null) => void;
 };
 
 function UserInformation(props: Props) {
-  const { token, removeToken, tokenType } = useToken();
   const { darkmode } = useTheme();
-  const [userInfo, setUserInfo] = useState<UserInfoType>(null);
+
+  const {
+    provider,
+    accessToken,
+    refreshToken,
+    ensureFreshAccessToken,
+    clearSession,
+  } = useToken();
+
+  const [userInfo, setUserInfoState] = useState<UserInfoType | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const fetch = (token: string) => {
-    setLoading(true);
-    fetchUserInfo(token, tokenType, setUserInfo, () => {
+  const hasCloudSession = useMemo(
+    () => provider !== "device" && !!refreshToken,
+    [provider, refreshToken]
+  );
+
+  const loadUserInfo = async () => {
+    if (!hasCloudSession) {
+      setUserInfoState(null);
+      props.setUserInfo?.(null);
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const token = accessToken ?? (await ensureFreshAccessToken());
+
+      if (!token) {
+        logger.warn("[UserInformation] No access token available.");
+        setLoading(false);
+        return;
+      }
+
+      await fetchUserInfo(
+        token,
+        provider,
+        (info) => {
+          setUserInfoState(info);
+          props.setUserInfo?.(info);
+        },
+        () => {
+          setLoading(false);
+        }
+      );
+    } catch (err) {
+      logger.error("[UserInformation] Failed to load user info:", err);
       setLoading(false);
-    });
+    }
   };
 
   useEffect(() => {
-    if (token) {
-      setLoading(true);
-      fetch(token);
-    }
-    setLoading(false);
-  }, [token]);
+    void loadUserInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasCloudSession, provider]);
 
-  useEffect(() => {
-    props.setUserInfo?.(userInfo);
-  }, [userInfo]);
+  const handleLogout = async () => {
+    try {
+      await clearSession();
+    } finally {
+      setUserInfoState(null);
+      props.setUserInfo?.(null);
+    }
+  };
 
   return (
     <View
       style={{
-        height: token ? 56 : 44,
         width: "100%",
       }}
     >
-      {token ? (
+      {hasCloudSession ? (
         <MotiView
           from={{ opacity: 0, translateY: -4 }}
           animate={{ opacity: 1, translateY: 0 }}
@@ -61,7 +104,7 @@ function UserInformation(props: Props) {
               flex: 1,
               display: "flex",
               padding: 10,
-              paddingLeft: 4,
+              paddingLeft: 8,
               minWidth: 140,
               minHeight: 54,
               height: 30,
@@ -70,39 +113,13 @@ function UserInformation(props: Props) {
               gap: 6,
             }}
           >
-            {userInfo ? (
-              <MotiView
-                from={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ type: "timing", duration: 300, delay: 100 }}
-                style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
-              >
-                {userInfo.avatar ? (
-                  <Avatar.Image size={30} source={{ uri: userInfo.avatar }} />
-                ) : (
-                  <Avatar.Text size={30} label={userInfo.username.charAt(0)} />
-                )}
-                <Text
-                  variant="bodyLarge"
-                  style={{ userSelect: "none" }}
-                  ellipsizeMode="tail"
-                  numberOfLines={1}
-                >
-                  {userInfo.username}
-                </Text>
-                <Chip
-                  onPress={() => {
-                    removeToken();
-                    setUserInfo(null);
-                  }}
-                  icon="logout"
-                >
-                  Logout
-                </Chip>
-              </MotiView>
-            ) : (
+            {loading || !userInfo ? (
               <View
-                style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 6,
+                }}
               >
                 <Skeleton
                   show
@@ -119,6 +136,30 @@ function UserInformation(props: Props) {
                   colorMode={darkmode ? "dark" : "light"}
                 />
               </View>
+            ) : (
+              <MotiView
+                from={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ type: "timing", duration: 300, delay: 100 }}
+                style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+              >
+                {userInfo.avatar ? (
+                  <Avatar.Image size={30} source={{ uri: userInfo.avatar }} />
+                ) : (
+                  <Avatar.Text size={30} label={userInfo.username.charAt(0)} />
+                )}
+                <Text
+                  variant="bodyLarge"
+                  style={{ userSelect: "none" as any }}
+                  ellipsizeMode="tail"
+                  numberOfLines={1}
+                >
+                  {userInfo.username}
+                </Text>
+                <Chip onPress={handleLogout} icon="logout">
+                  Logout
+                </Chip>
+              </MotiView>
             )}
           </View>
         </MotiView>
@@ -129,6 +170,7 @@ function UserInformation(props: Props) {
           transition={{ type: "timing", duration: 300 }}
         >
           <DropboxLoginButton />
+          <GoogleDriveLoginButton />
         </MotiView>
       )}
     </View>

@@ -8,6 +8,7 @@ import { check, Update as UpdateProp } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { useTheme } from "../contexts/ThemeProvider";
 import { Button, Icon, Text } from "react-native-paper";
+import { logger } from "../utils/logger";
 
 const UpdateManager = () => {
   const { theme } = useTheme();
@@ -64,14 +65,14 @@ const UpdateManager = () => {
       }
     } catch (error) {
       setUpdateMessage("Error while checking for updates");
-      console.log("error", error);
+      logger.error("Error while checking for updates:", error);
     }
   };
 
   const applyTauriUpdate = async () => {
     try {
       if (update) {
-        console.log(
+        logger.info(
           `found update ${update.version} from ${update.date} with notes ${update.body}`
         );
         let downloaded = 0;
@@ -79,26 +80,26 @@ const UpdateManager = () => {
           switch (event.event) {
             case "Started":
               setContentlength(event.data.contentLength);
-              console.log(
+              logger.info(
                 `started downloading ${event.data.contentLength} bytes`
               );
               break;
             case "Progress":
               downloaded += event.data.chunkLength;
               setDownloaded(downloaded);
-              console.log(`downloaded ${downloaded} from ${getContentLength}`);
+              logger.info(`downloaded ${downloaded} from ${getContentLength}`);
               break;
             case "Finished":
-              console.log("download finished");
+              logger.info("download finished");
               break;
           }
         });
 
-        console.log("update installed");
+        logger.info("update installed");
         await relaunch();
       }
     } catch (error) {
-      console.error(error);
+      logger.error("Error while applying update:", error);
       setUpdateMessage("Error while applying update");
     }
   };
@@ -139,7 +140,11 @@ const UpdateManager = () => {
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <Icon source={"tray-arrow-down"} size={24} color={theme.colors.primary} />
+          <Icon
+            source={"tray-arrow-down"}
+            size={24}
+            color={theme.colors.primary}
+          />
           <Text ellipsizeMode="clip" style={{ color: theme.colors.primary }}>
             {updateMessage}
           </Text>

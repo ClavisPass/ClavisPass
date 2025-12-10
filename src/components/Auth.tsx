@@ -13,17 +13,13 @@ import { View } from "react-native";
 
 type Props = {
   navigation: any;
-  changeEditTokenVisibility?: (value: boolean) => void;
   setUserInfo?: (userInfo: UserInfoType) => void;
 };
 
 function Auth(props: Props) {
   return (
-    <View style={{ height: 147 }}>
-      <UserInformation
-        setUserInfo={props.setUserInfo}
-        changeEditTokenVisibility={props.changeEditTokenVisibility}
-      />
+    <View>
+      <UserInformation setUserInfo={props.setUserInfo} />
       <Divider />
       <SettingsItem
         leadingIcon={"qrcode-scan"}

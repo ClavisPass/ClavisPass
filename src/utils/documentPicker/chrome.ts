@@ -4,11 +4,12 @@ import { getDateTime } from "../Timestamp";
 import createUniqueID from "../createUniqueID";
 import getModuleData from "../getModuleData";
 import ModulesEnum from "../../enums/ModulesEnum";
+import { logger } from "../logger";
 
 export default (fileData: string) => {
     const parsedData: any = Papa.parse(fileData);
     if (parsedData.errors.length > 0) {
-      console.error("Error parsing CSV:", parsedData.errors);
+      logger.error("Error parsing CSV:", parsedData.errors);
     } else {
       const data = parsedData.data;
       const dateTime = getDateTime();

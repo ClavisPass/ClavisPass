@@ -16,7 +16,6 @@ import Import, { DocumentTypeEnum } from "../utils/documentPicker/Import";
 import DarkModeSwitch from "../components/DarkModeSwitch";
 
 import Auth from "../components/Auth";
-import EditTokenModal from "../components/modals/EditTokenModal";
 import { useTheme } from "../contexts/ThemeProvider";
 import {
   authenticateUser,
@@ -150,7 +149,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         icon: "import",
         ref: importRef,
         plattform: null,
-      }
+      },
     ],
     [language]
   );
@@ -202,8 +201,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     }
     setFastAccess(auto);
   };
-
-  const [editTokenVisibility, setEditTokenVisibility] = useState(false);
 
   const changeAutoStart = async (startup: boolean) => {
     if (startup) {
@@ -278,7 +275,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           >
             <Auth
               navigation={navigation}
-              changeEditTokenVisibility={setEditTokenVisibility}
             />
           </SettingsContainer>
           <WebSpecific>
@@ -447,7 +443,16 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             )}
           </SettingsContainer>
           <Footer />
-          <View style={{display: "flex", flexDirection: "row", gap: 8, flexWrap: "wrap", margin: 8, marginTop: 0}}>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 8,
+              flexWrap: "wrap",
+              margin: 8,
+              marginTop: 0,
+            }}
+          >
             <Chip
               icon={"web"}
               showSelectedOverlay={true}
@@ -471,10 +476,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           </View>
         </ScrollView>
       </View>
-      <EditTokenModal
-        visible={editTokenVisibility}
-        setVisible={setEditTokenVisibility}
-      />
       <ChangeMasterPasswordModal
         visible={showChangeMasterPasswordModal}
         setVisible={setShowChangeMasterPasswordModal}

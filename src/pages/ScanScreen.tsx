@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import type { StackScreenProps } from "@react-navigation/stack";
 import Header from "../components/Header";
@@ -6,11 +6,14 @@ import AnimatedContainer from "../components/container/AnimatedContainer";
 import { useTheme } from "../contexts/ThemeProvider";
 import { Button, Icon, IconButton, Text } from "react-native-paper";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
-import { useToken } from "../contexts/TokenProvider";
-import isDropboxToken from "../utils/regex/isDropboxToken";
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { RootStackParamList } from "../stacks/Stack";
+import { logger } from "../utils/logger";
+import { useToken } from "../contexts/CloudProvider";
+import { refreshAccessToken as refreshCloudAccessToken } from "../api/CloudStorageClient";
+import isSessionQrPayload from "../utils/isSessionQrPayload";
+import SessionQrPayload from "../types/SessionQrPayload";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -58,43 +61,78 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
     darkmode,
     setHeaderSpacing,
   } = useTheme();
-  const { setRefreshToken, setTokenType, renewAccessToken } = useToken();
+
+  const { setSession } = useToken();
 
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
-
   const [trying, setTrying] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(40);
       setHeaderWhite(false);
-    }, [])
+    }, [setHeaderSpacing, setHeaderWhite])
   );
 
-  function isValidTokenFormat(token: string) {
-    setTrying(true);
-    if (!isDropboxToken(token)) {
-      console.log("Invalid Dropbox token format.");
-      return;
-    }
-    try {
-      renewAccessToken(token).then((data) => {
-        if (data) {
-          setTokenType("Dropbox");
-          setRefreshToken(token);
-          setTrying(false);
-          navigation.goBack();
-          return true;
+  const handleScannedValue = useCallback(
+    async (rawValue: string) => {
+      if (trying) return;
+      setTrying(true);
+
+      try {
+        let parsed: unknown;
+        try {
+          parsed = JSON.parse(rawValue);
+        } catch (e) {
+          logger.warn("Scanned QR is not valid JSON.");
+          return;
         }
-      });
-      setTrying(false);
-      return false;
-    } catch (error) {
-      setTrying(false);
-      return false;
-    }
-  }
+
+        if (!isSessionQrPayload(parsed)) {
+          logger.warn("Scanned QR is not a valid ClavisPass session payload.");
+          return;
+        }
+
+        const payload = parsed as SessionQrPayload;
+
+        // Optional: nur bestimmte Provider zulassen
+        if (payload.provider === "device") {
+          logger.warn(
+            "Session payload with provider 'device' is not supported for QR transfer."
+          );
+          return;
+        }
+
+        // Einmal Refresh auf dem Zielgerät, um ein frisches Access-Token zu holen
+        const result = await refreshCloudAccessToken({
+          provider: payload.provider,
+          refreshToken: payload.refreshToken,
+        });
+
+        if (!result || !result.accessToken) {
+          logger.warn(
+            "Cloud provider did not return a valid access token for scanned session."
+          );
+          return;
+        }
+
+        await setSession({
+          provider: payload.provider,
+          accessToken: result.accessToken,
+          refreshToken: payload.refreshToken,
+          expiresIn: result.expiresIn,
+        });
+
+        navigation.goBack();
+      } catch (error) {
+        logger.error("Error handling scanned session QR:", error);
+      } finally {
+        setTrying(false);
+      }
+    },
+    [trying, setSession, navigation]
+  );
 
   function toggleCameraFacing() {
     setFacing((current) => (current === "back" ? "front" : "back"));
@@ -107,11 +145,7 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
         translucent={true}
       />
-      <Header
-        onPress={() => {
-          navigation.goBack();
-        }}
-      ></Header>
+      <Header onPress={() => navigation.goBack()} />
       {!permission ? (
         <Text style={styles.message}>No Permission.</Text>
       ) : !permission.granted ? (
@@ -129,18 +163,18 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
         <CameraView
           style={styles.camera}
           facing={facing}
-          //mirror={false}
           barcodeScannerSettings={{
             barcodeTypes: ["qr"],
           }}
           onBarcodeScanned={(scanningResult) => {
             try {
               if (trying) return;
-              if (isValidTokenFormat(scanningResult.data)) {
-                setRefreshToken(scanningResult.data);
-              }
+              const value = scanningResult?.data;
+              if (!value) return;
+
+              void handleScannedValue(value);
             } catch (error) {
-              console.error(error);
+              logger.error("Error scanning barcode:", error);
             }
           }}
         >

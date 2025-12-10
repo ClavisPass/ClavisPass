@@ -7,9 +7,15 @@ import React, {
 } from "react";
 import * as Network from "expo-network";
 import { Platform } from "react-native";
+import { logger } from "../utils/logger";
+import { useToken } from "./CloudProvider";
 
 interface OnlineContextType {
-  isOnline: boolean;
+  /**
+   * Raw network status: true if the device has Internet access.
+   * (Independent of the selected provider.)
+   */
+  isCloudOnline: boolean;
 }
 
 export const OnlineContext = createContext<OnlineContextType | null>(null);
@@ -19,7 +25,7 @@ type Props = {
 };
 
 export const OnlineProvider = ({ children }: Props) => {
-  const [isOnline, setIsOnline] = useState(true);
+  const [isCloudOnline, setIsCloudOnline] = useState(true);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined;
@@ -27,20 +33,22 @@ export const OnlineProvider = ({ children }: Props) => {
     async function checkNetwork() {
       try {
         const state = await Network.getNetworkStateAsync();
-        setIsOnline(!!state.isConnected && state.isInternetReachable !== false);
+        setIsCloudOnline(
+          !!state.isConnected && state.isInternetReachable !== false
+        );
       } catch (error) {
-        console.warn("Network check failed", error);
-        setIsOnline(false);
+        logger.warn("Network check failed", error);
+        setIsCloudOnline(false);
       }
     }
 
     if (Platform.OS === "web") {
-      const handleOnline = () => setIsOnline(true);
-      const handleOffline = () => setIsOnline(false);
+      const handleOnline = () => setIsCloudOnline(true);
+      const handleOffline = () => setIsCloudOnline(false);
 
       window.addEventListener("online", handleOnline);
       window.addEventListener("offline", handleOffline);
-      setIsOnline(navigator.onLine);
+      setIsCloudOnline(navigator.onLine);
 
       return () => {
         window.removeEventListener("online", handleOnline);
@@ -57,12 +65,48 @@ export const OnlineProvider = ({ children }: Props) => {
   }, []);
 
   return (
-    <OnlineContext.Provider value={{ isOnline }}>
+    <OnlineContext.Provider value={{ isCloudOnline }}>
       {children}
     </OnlineContext.Provider>
   );
 };
 
-export const useOnline = () => {
-  return useContext(OnlineContext) as OnlineContextType;
+export interface UseOnlineResult {
+  /**
+   * Effective online status for the app:
+   *
+   * - If provider === "device": always true
+   * - Otherwise: equals isCloudOnline
+   */
+  isOnline: boolean;
+
+  /**
+   * Raw network status (is the Internet reachable?),
+   * independent of the selected provider.
+   */
+  isCloudOnline: boolean;
+}
+
+/**
+ * Hook for online status.
+ *
+ * - useOnline().isOnline:
+ *   - device → always true
+ *   - dropbox/googleDrive → depends on network availability
+ *
+ * - useOnline().isCloudOnline:
+ *   - raw network state (connectivity only)
+ */
+export const useOnline = (): UseOnlineResult => {
+  const ctx = useContext(OnlineContext);
+  if (!ctx) {
+    throw new Error("useOnline must be used within an OnlineProvider");
+  }
+
+  const { provider } = useToken();
+
+  const isCloudOnline = ctx.isCloudOnline;
+  const isOnline = provider === "device" ? true : isCloudOnline;
+
+  return { isOnline, isCloudOnline };
 };

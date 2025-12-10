@@ -3,10 +3,11 @@ import * as WebBrowser from "expo-web-browser";
 import { useEffect, useMemo, useRef, useCallback } from "react";
 import { Platform } from "react-native";
 import SettingsItem from "../items/SettingsItem";
-import { useToken } from "../../contexts/TokenProvider";
 import { DROPBOX_CLIENT_ID } from "@env";
 import { start, onUrl, cancel } from "@fabianlars/tauri-plugin-oauth";
 import * as Random from "expo-random";
+import { logger } from "../../utils/logger";
+import { useToken } from "../../contexts/CloudProvider";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -30,7 +31,7 @@ async function randState(len = 32) {
 }
 
 function DropboxLoginButton() {
-  const { setToken, setRefreshToken, saveRefreshToken } = useToken();
+  const { setSession } = useToken();
 
   // Flow-Refs
   const unsubscribeRef = useRef<null | (() => void)>(null);
@@ -57,21 +58,24 @@ function DropboxLoginButton() {
         });
         const data = await res.json();
         if (!res.ok) {
-          console.error("Token exchange failed:", data);
+          logger.error("Token exchange failed:", data);
           return;
         }
         if (data.access_token && data.refresh_token) {
-          setToken(data.access_token);
-          setRefreshToken(data.refresh_token);
-          saveRefreshToken(data.refresh_token);
+          await setSession({
+            provider: "dropbox",
+            accessToken: data.access_token,
+            refreshToken: data.refresh_token,
+            expiresIn: data.expires_in,
+          });
         } else {
-          console.error("Token response missing tokens:", data);
+          logger.error("Token response missing tokens:", data);
         }
       } catch (err) {
-        console.error("Token exchange error:", err);
+        logger.error("Token exchange error:", err);
       }
     },
-    [saveRefreshToken, setRefreshToken, setToken]
+    [setSession]
   );
 
   const MOBILE_REDIRECT_URI = useMemo(
@@ -131,9 +135,7 @@ function DropboxLoginButton() {
     );
 
     if (!prePopup) {
-      console.warn(
-        "Popup konnte nicht geöffnet werden (Popup-Blocker/Policy)."
-      );
+      logger.warn("Popup konnte nicht geöffnet werden (Popup-Blocker/Policy).");
       busyRef.current = false;
       return;
     }
@@ -168,7 +170,7 @@ function DropboxLoginButton() {
         const state = u.searchParams.get("state");
         if (!code) return;
         if (!state || state !== stateRef.current) {
-          console.warn("State mismatch (tauri). Ignoring callback.");
+          logger.warn("State mismatch (tauri). Ignoring callback.");
           return;
         }
 
@@ -192,7 +194,7 @@ function DropboxLoginButton() {
           try {
             await exchangeToken(code, redirectUri, codeVerifier);
           } catch (e) {
-            console.error("Token exchange (bg) failed:", e);
+            logger.error("Token exchange (bg) failed:", e);
           } finally {
             try {
               if (portRef.current != null) await cancel(portRef.current);
@@ -205,7 +207,7 @@ function DropboxLoginButton() {
 
       // 4) Timeout (2 min)
       timeoutRef.current = setTimeout(async () => {
-        console.warn("OAuth timeout – kein Redirect erhalten.");
+        logger.warn("OAuth timeout – kein Redirect erhalten.");
         try {
           if (portRef.current != null) await cancel(portRef.current);
         } catch {}
@@ -221,7 +223,7 @@ function DropboxLoginButton() {
         stateRef.current = null;
       }, 120_000);
 
-      console.log("Redirect URI: ", redirectUri);
+      logger.info("Redirect URI: ", redirectUri);
 
       // 5) Auth-URL
       const authUrl =
@@ -241,10 +243,10 @@ function DropboxLoginButton() {
       try {
         prePopup.location.href = authUrl;
       } catch (e) {
-        console.warn("Konnte Popup nicht navigieren:", e);
+        logger.warn("Konnte Popup nicht navigieren:", e);
       }
     } catch (err) {
-      console.error("OAuth flow failed (Tauri):", err);
+      logger.error("OAuth flow failed (Tauri):", err);
       // Cleanup
       try {
         if (portRef.current != null) await cancel(portRef.current);
@@ -301,7 +303,7 @@ function DropboxLoginButton() {
     } else if (isMobile) {
       promptAsync();
     } else {
-      console.error("Unsupported platform for this auth flow.");
+      logger.error("Unsupported platform for this auth flow.");
     }
   }, [handleTauriAuth, promptAsync]);
 

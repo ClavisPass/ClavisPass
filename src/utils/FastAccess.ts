@@ -5,6 +5,7 @@ import * as Notifications from "expo-notifications";
 import * as Clipboard from "expo-clipboard";
 import { currentMonitor, LogicalPosition } from "@tauri-apps/api/window";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { logger } from "./logger";
 
 let notificationListenerSet = false;
 
@@ -46,7 +47,7 @@ export async function openFastAccess(
       await positionPopupBottomRight();
       await win.show();
     } catch (err) {
-      console.error("Popup-Fenster konnte nicht erstellt/gezeigt werden:", err);
+      logger.error("Popup-Fenster konnte nicht erstellt/gezeigt werden:", err);
     }
     emit("show-popup", { title, username, password });
     return;
@@ -54,7 +55,7 @@ export async function openFastAccess(
 
   const { status } = await Notifications.requestPermissionsAsync();
   if (status !== "granted") {
-    console.warn("Permission denied");
+    logger.warn("Permission denied");
     return;
   }
 
@@ -118,7 +119,7 @@ export async function hideFastAccess() {
       let tauri = require("@tauri-apps/api/core");
       await tauri.invoke("plugin:window|hide", { label: "popup" });
     } catch (err) {
-      console.error("Fehler beim Verstecken des Fensters:", err);
+      logger.error("Fehler beim Verstecken des Fensters:", err);
     }
   } else {
     await Notifications.dismissAllNotificationsAsync();
@@ -128,13 +129,13 @@ export async function hideFastAccess() {
 export async function positionPopupBottomRight() {
   const win = await WebviewWindow.getByLabel("popup");
   if (!win) {
-    console.warn("Popup-Fenster nicht gefunden");
+    logger.warn("Popup-Fenster nicht gefunden");
     return;
   }
 
   const monitor = await currentMonitor();
   if (!monitor) {
-    console.warn("Kein Monitor gefunden");
+    logger.warn("Kein Monitor gefunden");
     return;
   }
 

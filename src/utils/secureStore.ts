@@ -21,9 +21,9 @@ export const saveData = async (key: string, value: string) => {
 
 export const getData = async (key: string) => {
   if (Platform.OS === "ios" || Platform.OS === "android") {
-    return await SecureStore.getItemAsync(key);
+    return await SecureStore.getItemAsync(key) as string;
   } else if (Platform.OS === "web") {
-    return await tauri.invoke('get_key', { key });
+    return await tauri.invoke('get_key', { key }) as string;
   }
 };
 

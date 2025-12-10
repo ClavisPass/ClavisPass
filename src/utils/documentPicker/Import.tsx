@@ -12,6 +12,7 @@ import { useTheme } from "../../contexts/ThemeProvider";
 import { View } from "react-native";
 import SettingsItem from "../../components/items/SettingsItem";
 import { useTranslation } from "react-i18next";
+import { logger } from "../logger";
 
 export enum DocumentTypeEnum {
   FIREFOX,
@@ -84,11 +85,11 @@ function Import(props: Props) {
             return;
           }
         } else {
-          console.error("Failed to read file data");
+          logger.error("Failed to read file data");
         }
       }
     } catch (error) {
-      console.error("Error picking document:", error);
+      logger.error("Error picking document:", error);
     }
   };
 

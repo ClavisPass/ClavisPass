@@ -66,21 +66,29 @@ function TypeWriterComponent(props: Props) {
         }}
         minDelay={20}
         typing={1}
-        onTypingEnd={() => setStartUsername(1)}
+        onTypingEnd={() => {
+          if (props.displayName == "") {
+            setStartExclamationMark(1);
+          } else {
+            setStartUsername(1);
+          }
+        }}
       >
         {randomGreeting}
       </TypeWriter>
-      <TypeWriter
-        style={[
-          { fontSize: 20, userSelect: "none" },
-          { color: theme.colors.primary, fontWeight: "bold" },
-        ]}
-        minDelay={20}
-        typing={startUsername}
-        onTypingEnd={() => setStartExclamationMark(1)}
-      >
-        {props.displayName}
-      </TypeWriter>
+      {props.displayName !== "" && (
+        <TypeWriter
+          style={[
+            { fontSize: 20, userSelect: "none" },
+            { color: theme.colors.primary, fontWeight: "bold" },
+          ]}
+          minDelay={20}
+          typing={startUsername}
+          onTypingEnd={() => setStartExclamationMark(1)}
+        >
+          {` ${props.displayName}`}
+        </TypeWriter>
+      )}
       <TypeWriter
         style={{
           fontSize: 20,

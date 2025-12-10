@@ -6,6 +6,7 @@ import { Platform } from "react-native";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import { useTranslation } from "react-i18next";
+import { logger } from "../../utils/logger";
 
 function BackupExportButton() {
   const data = useData();
@@ -36,13 +37,12 @@ function BackupExportButton() {
         });
 
         if (!filePath) {
-          console.log("Speichern abgebrochen.");
+          logger.warn("Speichern abgebrochen.");
           return;
         }
         const tauriFs = require("@tauri-apps/plugin-fs");
         await tauriFs.writeTextFile(filePath, contents);
-      }
-      else{
+      } else {
         const fileUri = FileSystem.cacheDirectory + fileName;
 
         await FileSystem.writeAsStringAsync(fileUri, contents, {
@@ -56,7 +56,7 @@ function BackupExportButton() {
         });
       }
     } catch (error) {
-      console.error("Fehler beim Erstellen des Backups:", error);
+      logger.error("Fehler beim Erstellen des Backups:", error);
     }
   };
 

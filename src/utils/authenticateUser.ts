@@ -1,6 +1,7 @@
 import { Platform } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
 import { getData, removeData, saveData } from "./secureStore";
+import { logger } from "./logger";
 
 const MASTER_KEY = "ClavisPass-Master";
 
@@ -44,7 +45,7 @@ export const isUsingAuthentication = async (): Promise<boolean> => {
     if(value !== null && value !== undefined && value !== "") return true;
     return false;
   } catch (error) {
-    console.error("Fehler beim Überprüfen der Authentifizierung:", error);
+    logger.error("Fehler beim Überprüfen der Authentifizierung:", error);
     return false;
   }
 };
@@ -53,7 +54,7 @@ export const removeAuthentication = async () => {
   try {
     await removeData(MASTER_KEY);
   } catch (error) {
-    console.error("Fehler beim Entfernen des Master Passwort:", error);
+    logger.error("Fehler beim Entfernen des Master Passwort:", error);
   }
 };
 
@@ -62,7 +63,7 @@ export const loadAuthentication = async () => {
     const value = await getData(MASTER_KEY);
     return value;
   } catch (error) {
-    console.error("Fehler beim Abrufen der Daten:", error);
+    logger.error("Fehler beim Abrufen der Daten:", error);
     return null;
   }
 };
@@ -72,6 +73,6 @@ export const saveAuthentication = async (master: string) => {
     .then(() => {
     })
     .catch((error) =>
-      console.error("Fehler beim Speichern des Master Passworts:", error)
+      logger.error("Fehler beim Speichern des Master Passworts:", error)
     );
 };

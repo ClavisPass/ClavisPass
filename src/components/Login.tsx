@@ -1,27 +1,32 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { View } from "react-native";
+import { ActivityIndicator, Text } from "react-native-paper";
+
 import { useAuth } from "../contexts/AuthProvider";
+import { useToken } from "../contexts/CloudProvider";
+import { useData } from "../contexts/DataProvider";
+import { useTheme } from "../contexts/ThemeProvider";
+
 import UserInfoType from "../types/UserInfoType";
 import Button from "./buttons/Button";
 import TypeWriterComponent from "./TypeWriter";
-import fetchData from "../api/fetchData/fetchData";
-import { useToken } from "../contexts/TokenProvider";
-import { ActivityIndicator } from "react-native-paper";
-import { View } from "react-native";
-import { useData } from "../contexts/DataProvider";
-import getEmptyData from "../utils/getEmptyData";
 import PasswordTextbox from "./PasswordTextbox";
+
 import CryptoType, { CryptoTypeSchema } from "../types/CryptoType";
 import { decrypt } from "../utils/CryptoLayer";
 import { DataTypeSchema } from "../types/DataType";
-import { useTheme } from "../contexts/ThemeProvider";
-import { Text } from "react-native-paper";
+import getEmptyData from "../utils/getEmptyData";
 
 import {
   authenticateUser,
   isUsingAuthentication,
   loadAuthentication,
 } from "../utils/authenticateUser";
+
 import Logo from "../ui/Logo";
+import { logger } from "../utils/logger";
+import { fetchRemoteVaultFile } from "../api/CloudStorageClient";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   userInfo: UserInfoType;
@@ -29,9 +34,10 @@ type Props = {
 
 function Login(props: Props) {
   const auth = useAuth();
-  const { token, tokenType } = useToken();
+  const { provider, accessToken, ensureFreshAccessToken } = useToken();
   const { theme } = useTheme();
   const { setData, setLastUpdated } = useData();
+  const { t } = useTranslation();
 
   const [parsedCryptoData, setParsedCryptoData] = useState<CryptoType | null>(
     null
@@ -41,77 +47,114 @@ function Login(props: Props) {
   const [showNewData, setShowNewData] = useState(false);
 
   const [capsLock, setCapsLock] = useState(false);
-
   const [error, setError] = useState(false);
-
   const [autofocus, setAutofocus] = useState(false);
 
   const textInputRef = useRef<any>(null);
-  const textInput2Ref = useRef<any>(null);
-  const textInput3Ref = useRef<any>(null);
+  const textInputNewRef = useRef<any>(null);
+  const textInputNewConfirmRef = useRef<any>(null);
 
-  const [value, setValue] = useState("");
-  const [value2, setValue2] = useState("");
+  const [masterPassword, setMasterPassword] = useState("");
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
 
   const [
     isUsingAuthenticationButtonVisible,
     setIsUsingAuthenticationButtonVisible,
   ] = useState(false);
 
-  const authenticate = () => {
-    isUsingAuthentication().then((isAuthenticated) => {
-      setIsUsingAuthenticationButtonVisible(isAuthenticated);
-      if (token && tokenType) {
-        setLoading(true);
-        fetchData(token, tokenType, "clavispass.lock").then((response) => {
-          if (response === null) {
-            setShowNewData(true);
-            setLoading(false);
-          } else {
-            const parsedCryptoData = CryptoTypeSchema.parse(
-              JSON.parse(response)
-            );
-            setParsedCryptoData(parsedCryptoData);
-            setLoading(false);
-            if (isAuthenticated) {
-              authenticateUser().then((auth) => {
-                if (auth) {
-                  loadAuthentication().then((data) => {
-                    login(data, parsedCryptoData);
-                  });
-                }
-              });
-            } else {
-              console.log("No authentication available, using password input.");
-              setAutofocus(true);
-            }
-          }
-        });
+  const authenticate = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      const hasAuthentication = await isUsingAuthentication();
+      setIsUsingAuthenticationButtonVisible(hasAuthentication);
+
+      if (!provider) {
+        logger.warn("[Login] No provider configured – treating as new vault.");
+        setShowNewData(true);
+        setLoading(false);
+        return;
       }
-    });
-  };
+
+      let tokenToUse: string | null = null;
+
+      if (provider !== "device") {
+        tokenToUse = accessToken ?? (await ensureFreshAccessToken());
+        if (!tokenToUse) {
+          logger.warn(
+            "[Login] No access token available – treating as new vault."
+          );
+          setShowNewData(true);
+          setLoading(false);
+          return;
+        }
+      }
+
+      const remoteContent = await fetchRemoteVaultFile({
+        provider,
+        accessToken: tokenToUse ?? "",
+        remotePath: "clavispass.lock",
+      });
+
+      if (!remoteContent) {
+        setShowNewData(true);
+        setLoading(false);
+        return;
+      }
+
+      const parsed = CryptoTypeSchema.parse(JSON.parse(remoteContent));
+      setParsedCryptoData(parsed);
+      setLoading(false);
+
+      if (hasAuthentication) {
+        const ok = await authenticateUser();
+        if (ok) {
+          const storedPassword = await loadAuthentication();
+          if (storedPassword) {
+            await loginWithMasterPassword(storedPassword, parsed);
+            return;
+          }
+        }
+        logger.info(
+          "[Login] Biometric auth failed or no stored password – using password input."
+        );
+      }
+
+      setAutofocus(true);
+      setTimeout(() => {
+        textInputRef.current?.focus?.();
+      }, 50);
+    } catch (err) {
+      logger.error("[Login] Error during authentication/bootstrap:", err);
+      setShowNewData(true);
+      setLoading(false);
+    }
+  }, [provider, accessToken, ensureFreshAccessToken]);
 
   useEffect(() => {
     authenticate();
-  }, [token, tokenType]);
+  }, [authenticate]);
 
-  const login = async (value: string, parsedCryptoData: CryptoType | null) => {
+  const loginWithMasterPassword = async (
+    masterPassword: string,
+    cryptoData: CryptoType | null
+  ) => {
     try {
-      if (parsedCryptoData === null) {
+      if (!cryptoData) {
         return;
       }
-      const lastUpdated = parsedCryptoData.lastUpdated;
-      const decryptedData = decrypt(parsedCryptoData, value);
+      const lastUpdated = cryptoData.lastUpdated;
+      const decryptedData = decrypt(cryptoData, masterPassword);
       const jsonData = JSON.parse(decryptedData);
 
       const parsedData = DataTypeSchema.parse(jsonData);
       setData(parsedData);
       setLastUpdated(lastUpdated);
-      auth.login(value);
+      auth.login(masterPassword);
     } catch (error) {
-      console.error("Error getting Data:", error);
-      textInputRef.current.focus();
-      setValue("");
+      logger.error("[Login] Error decrypting data:", error);
+      textInputRef.current?.focus?.();
+      setMasterPassword("");
       setError(true);
       setTimeout(() => {
         setError(false);
@@ -119,12 +162,24 @@ function Login(props: Props) {
     }
   };
 
+  const handlePasswordLogin = () => {
+    if (!parsedCryptoData) {
+      logger.warn("[Login] No crypto data available for password login.");
+      return;
+    }
+    void loginWithMasterPassword(masterPassword, parsedCryptoData);
+  };
+
   const newMasterPassword = () => {
-    if (value === value2 && value !== "" && value2 !== "") {
+    if (
+      masterPassword === newPasswordConfirm &&
+      masterPassword !== "" &&
+      newPasswordConfirm !== ""
+    ) {
       setData(getEmptyData());
-      auth.login(value);
+      auth.login(masterPassword);
     } else {
-      console.error("Wrong Password");
+      logger.error("[Login] Master password confirmation does not match.");
     }
   };
 
@@ -160,11 +215,8 @@ function Login(props: Props) {
               marginBottom: 0,
             }}
           >
-            <TypeWriterComponent
-              displayName={
-                props.userInfo?.username ? props.userInfo.username : ""
-              }
-            />
+            <TypeWriterComponent displayName={props.userInfo?.username ?? ""} />
+
             {showNewData ? (
               <>
                 <View
@@ -177,27 +229,27 @@ function Login(props: Props) {
                 >
                   <PasswordTextbox
                     autofocus
-                    textInputRef={textInput2Ref}
+                    textInputRef={textInputNewRef}
                     setCapsLock={setCapsLock}
-                    setValue={setValue}
-                    value={value}
-                    placeholder="New Password"
+                    setValue={setMasterPassword}
+                    value={masterPassword}
+                    placeholder={t("login:newMasterPassword")}
                     onSubmitEditing={() => {
-                      textInput3Ref.current.focus();
+                      textInputNewConfirmRef.current?.focus?.();
                     }}
                   />
                   <PasswordTextbox
-                    textInputRef={textInput3Ref}
+                    textInputRef={textInputNewConfirmRef}
                     setCapsLock={setCapsLock}
-                    setValue={setValue2}
-                    value={value2}
-                    placeholder="Confirm Password"
+                    setValue={setNewPasswordConfirm}
+                    value={newPasswordConfirm}
+                    placeholder={t("login:confirmMasterPassword")}
                   />
                 </View>
                 <Button
-                  text={"Set Password"}
+                  text={t("login:setNewPassword")}
                   onPress={newMasterPassword}
-                ></Button>
+                />
               </>
             ) : (
               <>
@@ -207,24 +259,23 @@ function Login(props: Props) {
                     textInputRef={textInputRef}
                     errorColor={error}
                     autofocus={autofocus}
-                    setValue={setValue}
-                    value={value}
-                    placeholder="Enter Password"
-                    onSubmitEditing={() => login(value, parsedCryptoData)}
+                    setValue={setMasterPassword}
+                    value={masterPassword}
+                    placeholder={t("login:masterPassword")}
+                    onSubmitEditing={handlePasswordLogin}
                   />
                 </View>
-                <Button
-                  text={"Login"}
-                  onPress={() => login(value, parsedCryptoData)}
-                ></Button>
+                <Button text={t("login:login")} onPress={handlePasswordLogin} />
               </>
             )}
+
             {capsLock && (
               <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
-                Caps Lock is activated
+                {t("common:capslockOn")}
               </Text>
             )}
           </View>
+
           <View
             style={{
               display: "flex",
@@ -240,7 +291,7 @@ function Login(props: Props) {
                 color="black"
                 icon="fingerprint"
                 onPress={authenticate}
-              ></Button>
+              />
             )}
           </View>
         </View>

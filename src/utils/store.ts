@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ModulesEnum from "../enums/ModulesEnum"; // <-- [NEW] für das Favorites-Array
+import { logger } from "./logger";
 
 type EnumDef<V extends readonly string[], D extends V[number]> = {
   readonly type: "enum";
@@ -183,7 +184,7 @@ export async function get<K extends DataKey>(
       }
     }
   } catch (e) {
-    console.error(`Failed to get ${String(key)}`, e);
+    logger.error(`Failed to get ${String(key)}`, e);
   }
   return schema.default as StoreValueMap[K];
 }
@@ -198,7 +199,7 @@ export async function set<K extends DataKey>(
       case "enum": {
         const v = value as unknown as string;
         if (!(schema.values as readonly string[]).includes(v)) {
-          console.warn(`Invalid value '${v}' for key '${String(key)}'`);
+          logger.warn(`Invalid value '${v}' for key '${String(key)}'`);
           return;
         }
         await AsyncStorage.setItem(key as string, v);
@@ -219,7 +220,7 @@ export async function set<K extends DataKey>(
         if (key === "FAVORITE_MODULES") {
           const norm = normalizeFavoriteModules(v);
           if (norm === null) {
-            console.warn(`Invalid JSON value for key '${String(key)}'`, v);
+            logger.warn(`Invalid JSON value for key '${String(key)}'`, v);
             return;
           }
           await AsyncStorage.setItem(key as string, JSON.stringify(norm));
@@ -227,7 +228,7 @@ export async function set<K extends DataKey>(
         }
 
         if (schema.validate && !schema.validate(v)) {
-          console.warn(`Invalid JSON value for key '${String(key)}'`, v);
+          logger.warn(`Invalid JSON value for key '${String(key)}'`, v);
           return;
         }
         await AsyncStorage.setItem(key as string, JSON.stringify(v));
@@ -235,6 +236,6 @@ export async function set<K extends DataKey>(
       }
     }
   } catch (e) {
-    console.error(`Failed to set ${String(key)}`, e);
+    logger.error(`Failed to set ${String(key)}`, e);
   }
 }

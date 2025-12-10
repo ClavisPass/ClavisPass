@@ -6,6 +6,7 @@ import { DataTypeSchema } from "../../types/DataType";
 
 import * as DocumentPicker from "expo-document-picker";
 import { useTranslation } from "react-i18next";
+import { logger } from "../../utils/logger";
 
 function BackupImportButton() {
   const data = useData();
@@ -32,7 +33,7 @@ function BackupImportButton() {
         data.setShowSave(true);
       }
     } catch (error) {
-      console.error("Fehler beim Importieren des Backups:", error);
+      logger.error("Fehler beim Importieren des Backups:", error);
     }
   };
 

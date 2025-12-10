@@ -25,6 +25,17 @@ export type TranslationSchema = {
     includeSymbols: string;
     use: string;
     reset: string;
+    verify: string;
+  };
+  login: {
+    masterPassword: string;
+    newMasterPassword: string;
+    confirmMasterPassword: string;
+    login: string;
+    setNewPassword: string;
+    noBackupFound: string;
+    backupTitle: string;
+    enterMasterPassword: string;
   };
   home: {
     search: string;
@@ -114,7 +125,7 @@ export type TranslationSchema = {
     url: string;
     username: string;
     wifi: string;
-    created: string; 
+    created: string;
     lastUpdated: string;
   };
   moduleTemplates: {

@@ -23,8 +23,8 @@ export const AuthProvider = ({ children }: Props) => {
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const login = (user: string) => {
-    setMaster(user);
+  const login = (master: string) => {
+    setMaster(master);
     const now = Date.now();
     setSessionStart(now);
     setSessionRemaining(SESSION_LIMIT / 1000);

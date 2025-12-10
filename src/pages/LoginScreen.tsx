@@ -1,93 +1,101 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, StyleSheet, ImageBackground } from "react-native";
 import Animated, { Easing, FadeIn, FadeOut } from "react-native-reanimated";
+import { StatusBar } from "expo-status-bar";
+import { BlurView } from "expo-blur";
+
 import ContentProtection from "../components/ContentProtection";
-import { useToken } from "../contexts/TokenProvider";
-import fetchUserInfo from "../api/fetchUserInfo/fetchUserInfo";
-import Auth from "../components/Auth";
-import UserInfoType from "../types/UserInfoType";
-import EditTokenModal from "../components/modals/EditTokenModal";
 import Login from "../components/Login";
-import generateNewToken from "../api/generateNewToken";
+import Backup from "../components/Backup";
+import AnimatedLogo from "../ui/AnimatedLogo";
+
+import UserInfoType from "../types/UserInfoType";
+
 import { useOnline } from "../contexts/OnlineProvider";
 import { useTheme } from "../contexts/ThemeProvider";
 import { useFocusEffect } from "@react-navigation/native";
-import { StatusBar } from "expo-status-bar";
-import { BlurView } from "expo-blur";
-import SettingsDivider from "../components/SettingsDivider";
-import Backup from "../components/Backup";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../stacks/Stack";
-import AnimatedLogo from "../ui/AnimatedLogo";
-
-const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    display: "flex",
-    flexDirection: "column",
-    margin: 6,
-  },
-});
+import { useToken } from "../contexts/CloudProvider";
+import { fetchUserInfo } from "../api/CloudStorageClient";
+import { logger } from "../utils/logger";
 
 type LoginScreenProps = StackScreenProps<RootStackParamList, "Login">;
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
-  const { setToken, setRefreshToken, loadRefreshToken, tokenType } = useToken();
   const { isOnline } = useOnline();
   const { headerWhite, setHeaderWhite, darkmode, theme, setHeaderSpacing } =
     useTheme();
 
-  const [userInfo, setUserInfo] = useState<UserInfoType>(null);
-  const [loading, setLoading] = useState(true);
-  const [editTokenVisibility, setEditTokenVisibility] = useState(false);
+  const { provider, accessToken, ensureFreshAccessToken, isInitializing } =
+    useToken();
+
+  const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
+  const [loadingUserInfo, setLoadingUserInfo] = useState(true);
 
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(0);
       setHeaderWhite(false);
-    }, [])
+    }, [setHeaderSpacing, setHeaderWhite])
   );
 
-  const login = async () => {
+  const loadUserInfo = useCallback(async () => {
     try {
-      const refreshToken = await loadRefreshToken();
-      if (!refreshToken) {
-        setLoading(false);
+      setLoadingUserInfo(true);
+
+      if (isInitializing) {
         return;
       }
 
-      const accessToken = await generateNewToken(refreshToken).then(
-        (data) => data.accessToken
+      if (!isOnline) {
+        setLoadingUserInfo(false);
+        return;
+      }
+
+      const currentProvider = provider ?? "device";
+
+      let tokenToUse = "";
+
+      if (currentProvider !== "device") {
+        const freshToken = accessToken ?? (await ensureFreshAccessToken());
+        if (!freshToken) {
+          logger.warn(
+            "[LoginScreen] No access token – treating userInfo as null."
+          );
+          setUserInfo(null);
+          setLoadingUserInfo(false);
+          return;
+        }
+        tokenToUse = freshToken;
+      }
+
+      await fetchUserInfo(
+        tokenToUse,
+        currentProvider,
+        (info) => {
+          setUserInfo(info);
+        },
+        () => {
+          setLoadingUserInfo(false);
+        }
       );
-      if (!accessToken) {
-        setLoading(false);
-        return;
-      }
-
-      setToken(accessToken);
-      setRefreshToken(refreshToken);
-
-      fetchUserInfo(accessToken, tokenType, setUserInfo, () => {
-        setLoading(false);
-      });
     } catch (error) {
-      console.log(error);
-      setLoading(false);
+      logger.error("[LoginScreen] Error during userInfo fetch:", error);
+      setUserInfo(null);
+      setLoadingUserInfo(false);
     }
-  };
+  }, [isInitializing, isOnline, provider, accessToken, ensureFreshAccessToken]);
 
   useEffect(() => {
-    login();
-  }, []);
+    loadUserInfo();
+  }, [loadUserInfo]);
 
-  // eindeutiger Key je nach State, damit FadeIn/FadeOut funktionieren
-  const currentKey = isOnline
-    ? loading
-      ? "loading"
-      : userInfo
-        ? "userInfo"
-        : "auth"
-    : "offline";
+  const currentKey = useMemo(() => {
+    if (!isOnline) return "offline";
+    if (isInitializing || loadingUserInfo) return "loading";
+    return "online";
+  }, [isOnline, isInitializing, loadingUserInfo]);
 
   return (
     <ImageBackground
@@ -121,7 +129,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           translucent={true}
         />
         <ContentProtection enabled={false} />
-
         <BlurView
           intensity={80}
           tint={darkmode ? "dark" : undefined}
@@ -150,27 +157,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             )}
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
           >
-            {isOnline ? (
-              loading ? (
-                <AnimatedLogo />
-              ) : userInfo ? (
-                <Login userInfo={userInfo} />
-              ) : (
-                <View style={styles.container}>
-                  <SettingsDivider />
-                  <Auth
-                    setUserInfo={setUserInfo}
-                    navigation={navigation}
-                    changeEditTokenVisibility={setEditTokenVisibility}
-                  />
-                  <EditTokenModal
-                    visible={editTokenVisibility}
-                    setVisible={setEditTokenVisibility}
-                  />
-                </View>
-              )
-            ) : (
+            {!isOnline ? (
               <Backup />
+            ) : isInitializing || loadingUserInfo ? (
+              <AnimatedLogo />
+            ) : (
+              <Login userInfo={userInfo} />
             )}
           </Animated.View>
         </BlurView>

@@ -11,7 +11,7 @@ import CustomTitlebar from "./src/components/CustomTitlebar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import GlobalShortcuts from "./src/components/shortcuts/GlobalShortcuts";
 import { ThemeProvider } from "./src/contexts/ThemeProvider";
-import { TokenProvider } from "./src/contexts/TokenProvider";
+import { CloudProvider } from "./src/contexts/CloudProvider";
 import theme from "./src/ui/theme";
 import { OnlineProvider } from "./src/contexts/OnlineProvider";
 import LoginStack from "./src/stacks/LoginStack";
@@ -22,8 +22,10 @@ import TabNavigator from "./src/ui/TabNavigatior";
 import { onOpenUrl, register } from "@tauri-apps/plugin-deep-link";
 import UpdateManager from "./src/components/UpdateManager";
 import * as store from "./src/utils/store";
-import { i18n, initI18n } from "./src/i18n";
+import { initI18n } from "./src/i18n";
 import { AppLanguage, toAppLanguage } from "./src/i18n/types";
+import { logger } from "./src/utils/logger";
+import GlobalErrorSnackbar from "./src/components/GlobalErrorSnackbar";
 
 const Tab = createBottomTabNavigator();
 
@@ -35,15 +37,15 @@ export function AppWithNavigation() {
   protocol();
   useEffect(() => {
     const cleanup = onOpenUrl((event) => {
-      console.log("Deep link received:", event);
+      logger.info("Deep link received:", event);
       try {
         const url = new URL(event as any);
         const code = url.searchParams.get("code");
         if (code) {
-          console.log("Received code:", code);
+          logger.info("Received code:", code);
         }
       } catch (err) {
-        console.error("Fehler beim Parsen der URL:", err);
+        logger.error("Fehler beim Parsen der URL:", err);
       }
     });
 
@@ -68,9 +70,10 @@ export function AppWithNavigation() {
         <ThemeProvider>
           <OnlineProvider>
             <AuthProvider>
-              <TokenProvider>
+              <CloudProvider>
                 <DataProvider>
                   <DevModeProvider>
+                    <GlobalErrorSnackbar />
                     <View
                       style={{
                         borderRadius: Platform.OS === "web" ? 6 : 0,
@@ -94,7 +97,7 @@ export function AppWithNavigation() {
                     </View>
                   </DevModeProvider>
                 </DataProvider>
-              </TokenProvider>
+              </CloudProvider>
             </AuthProvider>
           </OnlineProvider>
         </ThemeProvider>
@@ -133,7 +136,7 @@ export default function App() {
           setView("popup");
         }
       } catch (e) {
-        console.warn("Fehler beim Lesen des Fensters:", e);
+        logger.warn("Fehler beim Lesen des Fensters:", e);
         setView("main");
       }
     };

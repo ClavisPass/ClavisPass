@@ -3,15 +3,9 @@ import {
   View,
   Platform,
   useWindowDimensions,
-  Animated,
   InteractionManager,
 } from "react-native";
-import {
-  Searchbar,
-  IconButton,
-  ActivityIndicator,
-  Icon,
-} from "react-native-paper";
+import { Searchbar, IconButton } from "react-native-paper";
 
 import { Text } from "react-native-paper";
 
@@ -35,10 +29,7 @@ import FolderModal from "../components/modals/FolderModal";
 import { DataTypeSchema } from "../types/DataType";
 import SearchShortcut from "../components/shortcuts/SearchShortcut";
 import AddValueModal from "../components/modals/AddValueModal";
-import uploadData from "../api/uploadData/uploadData";
-import { useToken } from "../contexts/TokenProvider";
-import fetchData from "../api/fetchData/fetchData";
-import { decrypt, encrypt } from "../utils/CryptoLayer";
+import { decrypt } from "../utils/CryptoLayer";
 import { useAuth } from "../contexts/AuthProvider";
 import { CryptoTypeSchema } from "../types/CryptoType";
 import { useTheme } from "../contexts/ThemeProvider";
@@ -48,14 +39,10 @@ import {
   LexendExa_400Regular,
   LexendExa_700Bold,
 } from "@expo-google-fonts/lexend-exa";
-import { getDateTime } from "../utils/Timestamp";
 import LogoColored from "../ui/LogoColored";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../stacks/Stack";
-import { useOnline } from "../contexts/OnlineProvider";
-import { saveBackup } from "../utils/Backup";
 import FolderType from "../types/FolderType";
-import AnimatedPressable from "../components/AnimatedPressable";
 import { useTranslation } from "react-i18next";
 
 import * as store from "../utils/store";
@@ -63,18 +50,22 @@ import TotpItem from "../components/items/TotpItem";
 import ModulesEnum from "../enums/ModulesEnum";
 import CardItem from "../components/items/CardItem";
 import DigitalCardModuleType from "../types/modules/DigitalCardModuleType";
+import Sync from "../components/Sync";
+import { useToken } from "../contexts/CloudProvider";
+import { logger } from "../utils/logger";
+import { fetchRemoteVaultFile } from "../api/CloudStorageClient";
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const triggerAdd = route.params?.triggerAdd ?? false;
 
-  const { theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
+  const { headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
     useTheme();
   const { t } = useTranslation();
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const auth = useAuth();
-  const { isOnline } = useOnline();
+  const data = useData();
 
   const [fontsLoaded] = useFonts({
     LexendExa_400Regular,
@@ -93,12 +84,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [valueModalVisible, setValueModalVisible] = useState(false);
-
-  const data = useData();
-  const { token, tokenType } = useToken();
-
-  const slideAnim = useRef(new Animated.Value(0)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const { provider, accessToken, ensureFreshAccessToken } = useToken();
 
   useEffect(() => {
     store.get("FAVORITE_FILTER").then((stored) => {
@@ -148,33 +134,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   useEffect(() => {
     setHeaderWhite(true);
-    if (data.showSave) {
-      Animated.parallel([
-        Animated.timing(slideAnim, {
-          toValue: 48,
-          duration: 250,
-          useNativeDriver: false,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 250,
-          useNativeDriver: false,
-        }),
-      ]).start();
-    } else {
-      Animated.parallel([
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 250,
-          useNativeDriver: false,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: false,
-        }),
-      ]).start();
-    }
   }, [data.showSave]);
 
   const filteredValues = useMemo(() => {
@@ -229,32 +188,58 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   const refreshData = () => {
     const master = auth.master;
-    if (token && tokenType && master) {
-      data.setShowSave(true);
-      setRefreshing(true);
-      fetchData(token, tokenType, "clavispass.lock").then((response) => {
+
+    if (!master || !provider) {
+      setRefreshing(false);
+      return;
+    }
+
+    data.setShowSave(true);
+    setRefreshing(true);
+
+    (async () => {
+      try {
+        let tokenToUse: string | null = null;
+
+        if (provider !== "device") {
+          tokenToUse = accessToken ?? (await ensureFreshAccessToken());
+          if (!tokenToUse) {
+            logger.warn("[Home] No access token available for refreshData.");
+            setRefreshing(false);
+            return;
+          }
+        }
+
+        const response = await fetchRemoteVaultFile({
+          provider,
+          accessToken: tokenToUse ?? "",
+          remotePath: "clavispass.lock",
+        });
+
         if (response == null) {
           setRefreshing(false);
-        } else {
-          const parsedCryptoData = CryptoTypeSchema.parse(JSON.parse(response));
-          const decryptedData = decrypt(parsedCryptoData, master);
-          const jsonData = JSON.parse(decryptedData);
-
-          const parsedData = DataTypeSchema.parse(jsonData);
-          data.setData(parsedData);
-          data.setLastUpdated(parsedCryptoData.lastUpdated);
-          setRefreshing(false);
-          data.setShowSave(false);
-
-          setSelectedFolder(null);
-          saveSelectedFavState(false);
-          saveSelected2FAState(false);
-          saveSelectedCardState(false);
+          return;
         }
-      });
-    } else {
-      setRefreshing(false);
-    }
+
+        const parsedCryptoData = CryptoTypeSchema.parse(JSON.parse(response));
+        const decryptedData = decrypt(parsedCryptoData, master);
+        const jsonData = JSON.parse(decryptedData);
+
+        const parsedData = DataTypeSchema.parse(jsonData);
+        data.setData(parsedData);
+        data.setLastUpdated(parsedCryptoData.lastUpdated);
+        data.setShowSave(false);
+        setRefreshing(false);
+
+        setSelectedFolder(null);
+        saveSelectedFavState(false);
+        saveSelected2FAState(false);
+        saveSelectedCardState(false);
+      } catch (error) {
+        logger.error("[Home] Error during refreshData:", error);
+        setRefreshing(false);
+      }
+    })();
   };
 
   const searchRef = useRef<any>(null);
@@ -470,113 +455,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           />
         </View>
       </LinearGradient>
-      <Animated.View
-        style={{
-          height: slideAnim,
-          opacity: fadeAnim,
-          width: "100%",
-          padding: 0,
-          margin: 0,
-          overflow: "hidden",
-        }}
-      >
-        {data.showSave && (
-          <View
-            style={{
-              height: 48,
-              width: "100%",
-              padding: 4,
-              paddingLeft: 8,
-              paddingRight: 8,
-            }}
-          >
-            <View
-              style={{
-                backgroundColor: theme.colors.primary,
-                borderRadius: 8,
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "row",
-              }}
-            >
-              {refreshing ? (
-                <ActivityIndicator color="white" />
-              ) : (
-                <>
-                  {isOnline ? (
-                    <>
-                      <View style={{ backgroundColor: "#00000017" }}>
-                        <AnimatedPressable
-                          onPress={async () => {
-                            setRefreshing(true);
-                            const lastUpdated = getDateTime();
-                            const encryptedData = await encrypt(
-                              data.data,
-                              auth.master ? auth.master : "",
-                              lastUpdated
-                            );
-                            uploadData(
-                              token,
-                              tokenType,
-                              encryptedData,
-                              "clavispass.lock",
-                              () => {
-                                saveBackup(encryptedData);
-                                data.setShowSave(false);
-                                setRefreshing(false);
-                              }
-                            );
-                          }}
-                          style={{
-                            height: 40,
-                            width: 130,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Text
-                            variant="bodyLarge"
-                            style={{ color: "white", userSelect: "none" }}
-                          >
-                            {t("common:save")}
-                          </Text>
-                        </AnimatedPressable>
-                      </View>
-                      <AnimatedPressable
-                        onPress={refreshData}
-                        style={{
-                          height: 40,
-                          width: 130,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <Text
-                          variant="bodyLarge"
-                          style={{
-                            textDecorationLine: "underline",
-                            color: "white",
-                            userSelect: "none",
-                          }}
-                        >
-                          {t("common:reset")}
-                        </Text>
-                      </AnimatedPressable>
-                    </>
-                  ) : (
-                    <Icon source="cloud-off-outline" color="white" size={20} />
-                  )}
-                </>
-              )}
-            </View>
-          </View>
-        )}
-      </Animated.View>
+      <Sync
+        refreshData={refreshData}
+        refreshing={refreshing}
+        setRefreshing={setRefreshing}
+      />
       <View
         style={{
           flex: 1,
