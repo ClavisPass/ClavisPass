@@ -56,7 +56,7 @@ function TinyFilterChip({
 }) {
   return (
     <Chip
-      //icon={icon}
+      icon={() => null}
       selected={selected}
       showSelectedOverlay={true}
       onPress={onPress}

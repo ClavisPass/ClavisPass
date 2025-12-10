@@ -4,6 +4,7 @@ import {
   Platform,
   useWindowDimensions,
   InteractionManager,
+  RefreshControl,
 } from "react-native";
 import { Searchbar, IconButton } from "react-native-paper";
 

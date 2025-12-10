@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { View, StyleSheet, ImageBackground } from "react-native";
 import Animated, { Easing, FadeIn, FadeOut } from "react-native-reanimated";
 import { StatusBar } from "expo-status-bar";
@@ -19,6 +25,15 @@ import { RootStackParamList } from "../stacks/Stack";
 import { useToken } from "../contexts/CloudProvider";
 import { fetchUserInfo } from "../api/CloudStorageClient";
 import { logger } from "../utils/logger";
+
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetModalProvider,
+} from "@gorhom/bottom-sheet";
+import DropboxLoginButton from "../components/buttons/DropboxLoginButton";
+import GoogleDriveLoginButton from "../components/buttons/GoogleDriveLoginButton";
+import SettingsDivider from "../components/SettingsDivider";
 
 type LoginScreenProps = StackScreenProps<RootStackParamList, "Login">;
 
@@ -97,6 +112,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     return "online";
   }, [isOnline, isInitializing, loadingUserInfo]);
 
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+
   return (
     <ImageBackground
       source={
@@ -133,7 +154,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           intensity={80}
           tint={darkmode ? "dark" : undefined}
           style={{
-            height: "70%",
+            height: "90%",
+            maxHeight: 500,
             borderRadius: 12,
             padding: 20,
             overflow: "hidden",
@@ -162,9 +184,32 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             ) : isInitializing || loadingUserInfo ? (
               <AnimatedLogo />
             ) : (
-              <Login userInfo={userInfo} />
+              <Login
+                userInfo={userInfo}
+                handlePresentModalPress={handlePresentModalPress}
+              />
             )}
           </Animated.View>
+          <BottomSheetModalProvider>
+            <BottomSheetModal
+              ref={bottomSheetModalRef}
+              style={{
+                borderColor: theme.colors.outlineVariant,
+                borderTopWidth: StyleSheet.hairlineWidth,
+                borderRadius: 0,
+              }}
+              handleIndicatorStyle={{ backgroundColor: theme.colors.primary }}
+              snapPoints={["40%"]}
+            >
+              <BottomSheetView style={{ borderRadius: 0 }}>
+                <SettingsDivider />
+                <DropboxLoginButton />
+                <SettingsDivider />
+                <GoogleDriveLoginButton />
+                <SettingsDivider />
+              </BottomSheetView>
+            </BottomSheetModal>
+          </BottomSheetModalProvider>
         </BlurView>
       </View>
     </ImageBackground>

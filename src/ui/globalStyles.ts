@@ -1,4 +1,4 @@
-const globalStyles = (background: string, tertiary: string) => ({
+const globalStyles = (background: string, tertiary: string, secondaryContainer: string) => ({
   container: {
     flex: 1,
     backgroundColor: background,
@@ -31,10 +31,10 @@ const globalStyles = (background: string, tertiary: string) => ({
     bottom: 26,
   },
   folderContainer: {
-    backgroundColor: background,
+    backgroundColor: secondaryContainer,
     borderRadius: 12,
     borderWidth: 0,
-    borderColor: background,
+    //borderColor: background,
     display: "flex",
     flexDirection: "row",
     alignItems: "center",

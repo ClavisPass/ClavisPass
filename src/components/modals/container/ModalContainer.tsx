@@ -26,7 +26,7 @@ const ModalContainer = ({ visible, onDismiss, children }: Props) => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: theme.colors.elevation.level3,
+            backgroundColor: theme.colors.background,
           },
         ]}
       >

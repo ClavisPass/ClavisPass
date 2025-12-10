@@ -36,7 +36,7 @@ export const ThemeProvider = ({ children }: Props) => {
   const [headerWhite, setHeaderWhite] = useState(false);
   const [headerSpacing, setHeaderSpacing] = useState(0);
 
-  const globalStyles = styles(theme.colors.elevation.level2, theme.colors.tertiary);
+  const globalStyles = styles(theme.colors.elevation.level2, theme.colors.tertiary, theme.colors.secondaryContainer);
 
   useEffect(() => {
     (async () => {

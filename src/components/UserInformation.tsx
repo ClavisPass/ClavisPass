@@ -107,7 +107,7 @@ function UserInformation(props: Props) {
               paddingLeft: 8,
               minWidth: 140,
               minHeight: 54,
-              height: 30,
+              height: 54,
               flexDirection: "row",
               alignItems: "center",
               gap: 6,

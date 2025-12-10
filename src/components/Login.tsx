@@ -28,8 +28,11 @@ import { logger } from "../utils/logger";
 import { fetchRemoteVaultFile } from "../api/CloudStorageClient";
 import { useTranslation } from "react-i18next";
 
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+
 type Props = {
   userInfo: UserInfoType;
+  handlePresentModalPress: () => void;
 };
 
 function Login(props: Props) {
@@ -283,14 +286,22 @@ function Login(props: Props) {
               width: "100%",
               flexGrow: 1,
               justifyContent: "flex-end",
+              gap: 6,
             }}
           >
-            {isUsingAuthenticationButtonVisible && (
+            {isUsingAuthenticationButtonVisible && !showNewData && (
               <Button
                 maxWidth={"100%"}
                 color="black"
                 icon="fingerprint"
                 onPress={authenticate}
+              />
+            )}
+            {provider === "device" && (
+              <Button
+                onPress={props.handlePresentModalPress}
+                text="Cloud"
+                color="black"
               />
             )}
           </View>

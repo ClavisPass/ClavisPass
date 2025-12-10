@@ -70,7 +70,7 @@ function ModalContainerWeb(props: Props) {
       <View
         style={{
           overflow: "hidden",
-          backgroundColor: theme.colors?.elevation.level3,
+          backgroundColor: theme.colors?.background,
           borderRadius: 12,
           maxWidth: 400,
           boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
