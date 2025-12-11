@@ -10,6 +10,8 @@ import Animated, { Easing, FadeIn, FadeOut } from "react-native-reanimated";
 import { StatusBar } from "expo-status-bar";
 import { BlurView } from "expo-blur";
 
+import { Text } from "react-native-paper";
+
 import ContentProtection from "../components/ContentProtection";
 import Login from "../components/Login";
 import Backup from "../components/Backup";
@@ -42,8 +44,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { headerWhite, setHeaderWhite, darkmode, theme, setHeaderSpacing } =
     useTheme();
 
-  const { provider, accessToken, ensureFreshAccessToken, isInitializing } =
-    useToken();
+  const {
+    provider,
+    accessToken,
+    ensureFreshAccessToken,
+    isInitializing,
+    clearSession,
+  } = useToken();
 
   const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
   const [loadingUserInfo, setLoadingUserInfo] = useState(true);
@@ -118,6 +125,18 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     bottomSheetModalRef.current?.present();
   }, []);
 
+  const handleDismissModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.dismiss();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await clearSession();
+    } finally {
+      setUserInfo(null);
+    }
+  };
+
   return (
     <ImageBackground
       source={
@@ -184,33 +203,48 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             ) : isInitializing || loadingUserInfo ? (
               <AnimatedLogo />
             ) : (
-              <Login
-                userInfo={userInfo}
-                handlePresentModalPress={handlePresentModalPress}
-              />
+              <Login userInfo={userInfo} />
             )}
           </Animated.View>
-          <BottomSheetModalProvider>
-            <BottomSheetModal
-              ref={bottomSheetModalRef}
-              style={{
-                borderColor: theme.colors.outlineVariant,
-                borderTopWidth: StyleSheet.hairlineWidth,
-                borderRadius: 0,
-              }}
-              handleIndicatorStyle={{ backgroundColor: theme.colors.primary }}
-              snapPoints={["40%"]}
-            >
-              <BottomSheetView style={{ borderRadius: 0 }}>
-                <SettingsDivider />
-                <DropboxLoginButton />
-                <SettingsDivider />
-                <GoogleDriveLoginButton />
-                <SettingsDivider />
-              </BottomSheetView>
-            </BottomSheetModal>
-          </BottomSheetModalProvider>
         </BlurView>
+        {provider === "device" ? (
+          <Text
+            style={{ marginTop: 8, textDecorationLine: "underline" }}
+            onPress={handlePresentModalPress}
+          >
+            Use Cloud
+          </Text>
+        ) : (
+          <Text
+            style={{ marginTop: 8, textDecorationLine: "underline" }}
+            onPress={handleLogout}
+          >
+            Use Local Storage
+          </Text>
+        )}
+        <BottomSheetModalProvider>
+          <BottomSheetModal
+            ref={bottomSheetModalRef}
+            style={{
+              borderColor: theme.colors.outlineVariant,
+              borderTopWidth: StyleSheet.hairlineWidth,
+              borderRadius: 0,
+            }}
+            handleIndicatorStyle={{ backgroundColor: theme.colors.primary }}
+            backgroundStyle={{
+              backgroundColor: theme.colors.background,
+              borderRadius: 0,
+            }}
+          >
+            <BottomSheetView style={{ borderRadius: 0, paddingBottom: 60 }}>
+              <SettingsDivider />
+              <DropboxLoginButton callback={handleDismissModalPress} />
+              <SettingsDivider />
+              <GoogleDriveLoginButton callback={handleDismissModalPress} />
+              <SettingsDivider />
+            </BottomSheetView>
+          </BottomSheetModal>
+        </BottomSheetModalProvider>
       </View>
     </ImageBackground>
   );

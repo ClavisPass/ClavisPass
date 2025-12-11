@@ -31,7 +31,9 @@ async function randState(len = 32) {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-function GoogleDriveLoginButton() {
+type Props = { callback?: () => void };
+
+function GoogleDriveLoginButton(props: Props) {
   const { setSession } = useToken();
 
   // Flow-Refs
@@ -72,10 +74,7 @@ function GoogleDriveLoginButton() {
             expiresIn: data.expires_in,
           });
         } else {
-          logger.error(
-            "[GoogleDrive] Token response missing tokens:",
-            data
-          );
+          logger.error("[GoogleDrive] Token response missing tokens:", data);
         }
       } catch (err) {
         logger.error("[GoogleDrive] Token exchange error:", err);
@@ -99,7 +98,7 @@ function GoogleDriveLoginButton() {
       usePKCE: true,
       extraParams: {
         access_type: "offline", // wichtig für Refresh-Token
-        prompt: "consent",      // erzwingt Consent, damit offline-Zugriff gewährt wird
+        prompt: "consent", // erzwingt Consent, damit offline-Zugriff gewährt wird
       },
     },
     {
@@ -191,7 +190,9 @@ function GoogleDriveLoginButton() {
 
         if (!code) return;
         if (!state || state !== stateRef.current) {
-          logger.warn("[GoogleDrive] State mismatch (tauri). Ignoring callback.");
+          logger.warn(
+            "[GoogleDrive] State mismatch (tauri). Ignoring callback."
+          );
           return;
         }
 
@@ -250,8 +251,8 @@ function GoogleDriveLoginButton() {
           response_type: "code",
           redirect_uri: redirectUri,
           scope: SCOPES.join(" "),
-          access_type: "offline",       // Refresh-Token
-          prompt: "consent",            // expliziter Consent
+          access_type: "offline", // Refresh-Token
+          prompt: "consent", // expliziter Consent
           code_challenge: codeChallenge,
           code_challenge_method: method, // "S256"
           state: stateRef.current!,
@@ -321,6 +322,7 @@ function GoogleDriveLoginButton() {
     } else {
       logger.error("[GoogleDrive] Unsupported platform for this auth flow.");
     }
+    props.callback?.();
   }, [handleTauriAuth, promptAsync]);
 
   return (

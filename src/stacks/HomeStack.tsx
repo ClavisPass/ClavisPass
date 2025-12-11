@@ -14,7 +14,6 @@ function HomeStack() {
       screenOptions={{
         headerShown: true,
         gestureDirection: "vertical",
-        gestureEnabled: true,
         detachPreviousScreen: false,
         cardStyle: {
           backgroundColor: theme.colors.background,

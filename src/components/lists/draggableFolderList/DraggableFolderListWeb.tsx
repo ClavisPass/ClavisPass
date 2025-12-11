@@ -87,7 +87,7 @@ function DraggableFolderListWeb(props: Props) {
                     flexDirection: "row",
                     alignItems: "center",
                     gap: 4,
-                    marginRight: 30
+                    marginRight: 30,
                   }}
                   onPress={() => props.setSelectedFolder?.(null)}
                 >
@@ -135,50 +135,59 @@ function DraggableFolderListWeb(props: Props) {
                         marginBottom: 4,
                       }}
                     >
-                      <View style={globalStyles.folderContainer}>
-                        <Icon source="drag" size={20} />
+                      <View
+                        style={{
+                          width: "100%",
+                          backgroundColor: theme.colors.background,
+                          borderRadius: 12,
+                        }}
+                      >
+                        <View style={globalStyles.folderContainer}>
+                          <Icon source="drag" size={20} />
 
-                        <AnimatedPressable
-                          style={{
-                            borderRadius: 12,
-                            padding: 10,
-                            flex: 1,
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
-                            gap: 4,
-                          }}
-                          onPress={
-                            props.setSelectedFolder
-                              ? () => props.setSelectedFolder?.(item)
-                              : undefined
-                          }
-                        >
-                          <>
-                            <Icon
-                              source="folder"
-                              size={20}
-                              color={theme.colors.primary}
-                            />
-                            <Text
-                              style={{
-                                userSelect: "none",
-                                fontWeight: "bold",
-                                fontSize: 15,
-                              }}
-                              variant="bodyMedium"
-                            >
-                              {item.name}
-                            </Text>
-                          </>
-                        </AnimatedPressable>
+                          <AnimatedPressable
+                            style={{
+                              borderRadius: 12,
+                              padding: 10,
+                              flex: 1,
+                              display: "flex",
+                              flexDirection: "row",
+                              alignItems: "center",
+                              gap: 4,
+                              //backgroundColor: theme.colors.secondaryContainer,
+                            }}
+                            onPress={
+                              props.setSelectedFolder
+                                ? () => props.setSelectedFolder?.(item)
+                                : undefined
+                            }
+                          >
+                            <>
+                              <Icon
+                                source="folder"
+                                size={20}
+                                color={theme.colors.primary}
+                              />
+                              <Text
+                                style={{
+                                  userSelect: "none",
+                                  fontWeight: "bold",
+                                  fontSize: 15,
+                                }}
+                                variant="bodyMedium"
+                              >
+                                {item.name}
+                              </Text>
+                            </>
+                          </AnimatedPressable>
 
-                        <IconButton
-                          icon="close"
-                          size={14}
-                          style={{ margin: 0 }}
-                          onPress={() => props.deleteFolder(item)}
-                        />
+                          <IconButton
+                            icon="close"
+                            size={14}
+                            style={{ margin: 0 }}
+                            onPress={() => props.deleteFolder(item)}
+                          />
+                        </View>
                       </View>
                     </div>
                   );

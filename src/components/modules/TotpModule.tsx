@@ -181,7 +181,7 @@ function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
         ) : (
           <Button
             style={{ borderRadius: 12, marginRight: 21 }}
-            icon={"barcode-scan"}
+            icon={"qrcode-scan"}
             mode="contained-tonal"
             textColor={theme.colors.primary}
             onPress={() => {

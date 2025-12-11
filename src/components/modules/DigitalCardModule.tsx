@@ -122,6 +122,7 @@ function DigitalCardModule(
               borderRadius: 12,
               padding: 8,
               backgroundColor: value === "" ? theme.colors.background : "white",
+              marginRight: 21,
             }}
           >
             {value !== "" ? (
@@ -132,7 +133,7 @@ function DigitalCardModule(
               )
             ) : (
               <Button
-                style={{ borderRadius: 12, marginRight: 21 }}
+                style={{ borderRadius: 12 }}
                 icon={"barcode-scan"}
                 mode="contained-tonal"
                 textColor={theme.colors.primary}

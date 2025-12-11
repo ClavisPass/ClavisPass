@@ -8,7 +8,6 @@ function SettingsStack() {
     <Stack.Navigator
       screenOptions={{
         headerShown: true,
-        gestureEnabled: true,
         gestureDirection: "vertical",
       }}
     >

@@ -11,6 +11,7 @@ import { useToken } from "../contexts/CloudProvider";
 import { logger } from "../utils/logger";
 import { fetchUserInfo } from "../api/CloudStorageClient";
 import GoogleDriveLoginButton from "./buttons/GoogleDriveLoginButton";
+import SettingsDivider from "./SettingsDivider";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -170,6 +171,7 @@ function UserInformation(props: Props) {
           transition={{ type: "timing", duration: 300 }}
         >
           <DropboxLoginButton />
+          <SettingsDivider />
           <GoogleDriveLoginButton />
         </MotiView>
       )}

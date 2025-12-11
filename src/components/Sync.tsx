@@ -156,7 +156,6 @@ const Sync = (props: Props) => {
                       <Text
                         variant="bodyLarge"
                         style={{
-                          textDecorationLine: "underline",
                           color: "white",
                           userSelect: "none",
                         }}

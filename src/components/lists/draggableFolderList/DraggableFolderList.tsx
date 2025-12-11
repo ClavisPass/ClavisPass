@@ -25,50 +25,59 @@ function DraggableFolderList(props: Props) {
   const renderItem = useCallback(
     ({ item, drag, isActive }: RenderItemParams<FolderType>) => {
       return (
-        <View style={[globalStyles.folderContainer, { marginBottom: 4 }]}>
-          <Pressable onPressIn={drag}>
-            <Icon source="drag" size={20} />
-          </Pressable>
-          <AnimatedPressable
-            style={{
-              borderRadius: 12,
-              padding: 10,
-              flex: 1,
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 4,
-            }}
-            onPress={
-              props.setSelectedFolder
-                ? () => {
-                    props.setSelectedFolder?.(item);
-                  }
-                : undefined
-            }
-          >
-            <>
-              <Icon source="folder" color={theme.colors.primary} size={20} />
-              <Text
-                style={{
-                  userSelect: "none",
-                  fontWeight: "bold",
-                  fontSize: 15,
-                }}
-                variant="bodyMedium"
-              >
-                {item.name}
-              </Text>
-            </>
-          </AnimatedPressable>
-          <IconButton
-            icon="close"
-            size={14}
-            style={{ margin: 0 }}
-            onPress={() => {
-              props.deleteFolder(item);
-            }}
-          />
+        <View
+          style={{
+            width: "100%",
+            backgroundColor: theme.colors.background,
+            borderRadius: 12,
+            marginBottom: 4,
+          }}
+        >
+          <View style={[globalStyles.folderContainer]}>
+            <Pressable onPressIn={drag}>
+              <Icon source="drag" size={20} />
+            </Pressable>
+            <AnimatedPressable
+              style={{
+                borderRadius: 12,
+                padding: 10,
+                flex: 1,
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 4,
+              }}
+              onPress={
+                props.setSelectedFolder
+                  ? () => {
+                      props.setSelectedFolder?.(item);
+                    }
+                  : undefined
+              }
+            >
+              <>
+                <Icon source="folder" color={theme.colors.primary} size={20} />
+                <Text
+                  style={{
+                    userSelect: "none",
+                    fontWeight: "bold",
+                    fontSize: 15,
+                  }}
+                  variant="bodyMedium"
+                >
+                  {item.name}
+                </Text>
+              </>
+            </AnimatedPressable>
+            <IconButton
+              icon="close"
+              size={14}
+              style={{ margin: 0 }}
+              onPress={() => {
+                props.deleteFolder(item);
+              }}
+            />
+          </View>
         </View>
       );
     },
@@ -78,37 +87,46 @@ function DraggableFolderList(props: Props) {
   return (
     <View style={{ flex: 1, width: "100%" }}>
       {props.setSelectedFolder && (
-        <View style={[globalStyles.folderContainer, { marginBottom: 4 }]}>
-          <Icon source="minus" size={20} />
+        <View
+          style={{
+            width: "100%",
+            backgroundColor: theme.colors.background,
+            borderRadius: 12,
+            marginBottom: 4,
+          }}
+        >
+          <View style={[globalStyles.folderContainer]}>
+            <Icon source="minus" size={20} />
 
-          <AnimatedPressable
-            style={{
-              borderRadius: 12,
-              padding: 10,
-              flex: 1,
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 4,
-              marginRight: 30,
-              overflow: "hidden",
-            }}
-            onPress={() => props.setSelectedFolder?.(null)}
-          >
-            <>
-              <Icon source="folder" size={20} color={theme.colors.primary} />
-              <Text
-                style={{
-                  userSelect: "none",
-                  fontWeight: "bold",
-                  fontSize: 15,
-                }}
-                variant="bodyMedium"
-              >
-                {t("common:none")}
-              </Text>
-            </>
-          </AnimatedPressable>
+            <AnimatedPressable
+              style={{
+                borderRadius: 12,
+                padding: 10,
+                flex: 1,
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 4,
+                marginRight: 30,
+                overflow: "hidden",
+              }}
+              onPress={() => props.setSelectedFolder?.(null)}
+            >
+              <>
+                <Icon source="folder" size={20} color={theme.colors.primary} />
+                <Text
+                  style={{
+                    userSelect: "none",
+                    fontWeight: "bold",
+                    fontSize: 15,
+                  }}
+                  variant="bodyMedium"
+                >
+                  {t("common:none")}
+                </Text>
+              </>
+            </AnimatedPressable>
+          </View>
         </View>
       )}
       <DraggableFlatList

@@ -30,7 +30,9 @@ async function randState(len = 32) {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-function DropboxLoginButton() {
+type Props = { callback?: () => void };
+
+function DropboxLoginButton(props: Props) {
   const { setSession } = useToken();
 
   // Flow-Refs
@@ -305,6 +307,7 @@ function DropboxLoginButton() {
     } else {
       logger.error("Unsupported platform for this auth flow.");
     }
+    props.callback?.();
   }, [handleTauriAuth, promptAsync]);
 
   return (

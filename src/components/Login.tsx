@@ -28,11 +28,8 @@ import { logger } from "../utils/logger";
 import { fetchRemoteVaultFile } from "../api/CloudStorageClient";
 import { useTranslation } from "react-i18next";
 
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-
 type Props = {
   userInfo: UserInfoType;
-  handlePresentModalPress: () => void;
 };
 
 function Login(props: Props) {
@@ -295,13 +292,6 @@ function Login(props: Props) {
                 color="black"
                 icon="fingerprint"
                 onPress={authenticate}
-              />
-            )}
-            {provider === "device" && (
-              <Button
-                onPress={props.handlePresentModalPress}
-                text="Cloud"
-                color="black"
               />
             )}
           </View>
