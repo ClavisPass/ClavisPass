@@ -75,7 +75,6 @@ function CopyToClipboard({ value, disabled, margin }: Props) {
         disabled={disabled}
         style={{ margin: margin ?? 6 }}
       />
-      {/* SnackBar nutzt du aktuell nicht; falls du eine hast, hier rendern. */}
     </View>
   );
 }

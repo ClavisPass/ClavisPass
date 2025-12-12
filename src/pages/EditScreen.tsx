@@ -76,6 +76,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   const [favIcon, setFavIcon] = useState("star-outline");
 
+  const didValidateFolderRef = useRef(false);
+
   const [fastAccessObject, setFastAccessObject] =
     useState<FastAccessType | null>(
       extractFastAccessObject(value.modules, value.title)
@@ -131,6 +133,24 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     }
   }, [routeFavorite, routeFolder]);
 
+  useEffect(() => {
+    if (didValidateFolderRef.current) return;
+
+    const folders = data.data?.folder;
+    if (!folders) return;
+
+    didValidateFolderRef.current = true;
+
+    setValue((prev) => {
+      if (!prev.folder) return prev;
+
+      const exists = folders.some((f) => f.id === prev.folder!.id);
+      if (exists) return prev;
+
+      return { ...prev, folder: null };
+    });
+  }, [data.data?.folder]);
+
   const showFastAccess = () => {
     if (
       fastAccessObject === null ||
@@ -161,6 +181,12 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       win.minimize();
     }
     showFastAccess();
+  };
+
+  const folderExists = (folder: FolderType | null | undefined) => {
+    if (!folder) return true;
+    const folders = data.data?.folder ?? [];
+    return folders.some((f) => f.id === folder.id);
   };
 
   const saveValue = () => {
