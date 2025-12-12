@@ -129,6 +129,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     bottomSheetModalRef.current?.dismiss();
   }, []);
 
+  useEffect(() => {
+    handleDismissModalPress();
+  }, [provider]);
+
   const handleLogout = async () => {
     try {
       await clearSession();
@@ -169,11 +173,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           translucent={true}
         />
         <ContentProtection enabled={false} />
+        <View style={{ height: 17 }}></View>
         <BlurView
           intensity={80}
           tint={darkmode ? "dark" : undefined}
           style={{
-            height: "90%",
+            height: "80%",
             maxHeight: 500,
             borderRadius: 12,
             padding: 20,
@@ -238,9 +243,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           >
             <BottomSheetView style={{ borderRadius: 0, paddingBottom: 60 }}>
               <SettingsDivider />
-              <DropboxLoginButton callback={handleDismissModalPress} />
+              <DropboxLoginButton />
               <SettingsDivider />
-              <GoogleDriveLoginButton callback={handleDismissModalPress} />
+              <GoogleDriveLoginButton />
               <SettingsDivider />
             </BottomSheetView>
           </BottomSheetModal>

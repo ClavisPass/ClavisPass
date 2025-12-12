@@ -95,54 +95,75 @@ function Backup() {
         width: "100%",
       }}
     >
-      <Icon source="cloud-off-outline" color={theme.colors.primary} size={30} />
+      <View
+        style={{
+          flexGrow: 1,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Icon
+          source="cloud-off-outline"
+          color={theme.colors.primary}
+          size={50}
+        />
+      </View>
 
       {loading ? (
         <ActivityIndicator size={"large"} animating={true} />
       ) : parsedCryptoData ? (
-        <>
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              width: "100%",
-            }}
-          >
-            <Text>
-              {t("login:backupTitle") +
-                formatDateTime(parsedCryptoData.lastUpdated)}
-            </Text>
-            <View style={{ width: "100%" }}>
-              <PasswordTextbox
-                setCapsLock={setCapsLock}
-                textInputRef={textInputRef}
-                errorColor={error}
-                autofocus
-                setValue={setValue}
-                value={value}
-                placeholder={t("login:masterPassword")}
-                onSubmitEditing={() => login(value, parsedCryptoData)}
-              />
-            </View>
-            <Button
-              text={t("login:login")}
-              onPress={() => login(value, parsedCryptoData)}
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            width: "100%",
+          }}
+        >
+          <Text variant="bodyLarge">{t("login:backupTitle")}</Text>
+          <Text variant="bodyLarge" style={{ color: theme.colors.primary }}>
+            {formatDateTime(parsedCryptoData.lastUpdated)}
+          </Text>
+          <View style={{ width: "100%" }}>
+            <PasswordTextbox
+              setCapsLock={setCapsLock}
+              textInputRef={textInputRef}
+              errorColor={error}
+              autofocus
+              setValue={setValue}
+              value={value}
+              placeholder={t("login:masterPassword")}
+              onSubmitEditing={() => login(value, parsedCryptoData)}
             />
-            {capsLock && (
-              <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
-                {t("common:capsLockOn")}
-              </Text>
-            )}
           </View>
-        </>
+          <Button
+            text={t("login:login")}
+            onPress={() => login(value, parsedCryptoData)}
+          />
+          {capsLock && (
+            <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
+              {t("common:capsLockOn")}
+            </Text>
+          )}
+        </View>
       ) : (
         <>
           <Text>{t("login:noBackupFound")}</Text>
         </>
       )}
+      <View
+        style={{
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+          flexGrow: 1,
+          justifyContent: "flex-end",
+          gap: 6,
+        }}
+      ></View>
     </View>
   );
 }

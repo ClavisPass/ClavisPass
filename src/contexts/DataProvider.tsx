@@ -6,6 +6,7 @@ import React, {
   useEffect,
 } from "react";
 import DataType from "../types/DataType";
+import { useToken } from "./CloudProvider";
 
 export interface DataContextType {
   data: DataType;
@@ -36,7 +37,17 @@ export const DataProvider = ({ children }: Props) => {
   }, [data]);
 
   return (
-    <DataContext.Provider value={{ data, setData, backup, showSave, setShowSave, lastUpdated, setLastUpdated }}>
+    <DataContext.Provider
+      value={{
+        data,
+        setData,
+        backup,
+        showSave,
+        setShowSave,
+        lastUpdated,
+        setLastUpdated,
+      }}
+    >
       {children}
     </DataContext.Provider>
   );

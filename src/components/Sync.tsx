@@ -61,10 +61,6 @@ const Sync = (props: Props) => {
   }, [data.showSave]);
 
   const save = async () => {
-    if (accessToken === null) {
-      logger.error("Cannot save: No access token.");
-      return;
-    }
     props.setRefreshing(true);
     const lastUpdated = getDateTime();
     const encryptedData = await encrypt(
@@ -75,7 +71,7 @@ const Sync = (props: Props) => {
 
     uploadRemoteVaultFile({
       provider,
-      accessToken,
+      accessToken: accessToken ?? "",
       remotePath: "clavispass.lock",
       content: encryptedData,
       onCompleted: () => {
@@ -160,7 +156,7 @@ const Sync = (props: Props) => {
                           userSelect: "none",
                         }}
                       >
-                        {t("common:reset")}
+                        {t("common:reload")}
                       </Text>
                     </AnimatedPressable>
                   </>

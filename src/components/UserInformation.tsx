@@ -12,6 +12,7 @@ import { logger } from "../utils/logger";
 import { fetchUserInfo } from "../api/CloudStorageClient";
 import GoogleDriveLoginButton from "./buttons/GoogleDriveLoginButton";
 import SettingsDivider from "./SettingsDivider";
+import { useOnline } from "../contexts/OnlineProvider";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -21,6 +22,7 @@ type Props = {
 
 function UserInformation(props: Props) {
   const { darkmode } = useTheme();
+  const { isOnline } = useOnline();
 
   const {
     provider,
@@ -76,7 +78,7 @@ function UserInformation(props: Props) {
   useEffect(() => {
     void loadUserInfo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasCloudSession, provider]);
+  }, [hasCloudSession, provider, isOnline]);
 
   const handleLogout = async () => {
     try {
@@ -108,10 +110,10 @@ function UserInformation(props: Props) {
               paddingLeft: 8,
               minWidth: 140,
               minHeight: 54,
-              height: 54,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 6,
+              height: 92,
+              flexDirection: "column",
+              //alignItems: "center",
+              gap: 8,
             }}
           >
             {loading || !userInfo ? (
@@ -157,11 +159,11 @@ function UserInformation(props: Props) {
                 >
                   {userInfo.username}
                 </Text>
-                <Chip onPress={handleLogout} icon="logout">
-                  Logout
-                </Chip>
               </MotiView>
             )}
+            <Chip style={{ width: 100 }} onPress={handleLogout} icon="logout">
+              Logout
+            </Chip>
           </View>
         </MotiView>
       ) : (

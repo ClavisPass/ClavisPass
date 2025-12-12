@@ -8,6 +8,8 @@ import { start, onUrl, cancel } from "@fabianlars/tauri-plugin-oauth";
 import * as Random from "expo-random";
 import { logger } from "../../utils/logger";
 import { useToken } from "../../contexts/CloudProvider";
+import { useData } from "../../contexts/DataProvider";
+import { G } from "react-native-svg";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -31,10 +33,9 @@ async function randState(len = 32) {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-type Props = { callback?: () => void };
-
-function GoogleDriveLoginButton(props: Props) {
+function GoogleDriveLoginButton() {
   const { setSession } = useToken();
+  const { setShowSave } = useData();
 
   // Flow-Refs
   const unsubscribeRef = useRef<null | (() => void)>(null);
@@ -73,6 +74,7 @@ function GoogleDriveLoginButton(props: Props) {
             refreshToken: data.refresh_token,
             expiresIn: data.expires_in,
           });
+          setShowSave(true);
         } else {
           logger.error("[GoogleDrive] Token response missing tokens:", data);
         }
@@ -242,6 +244,7 @@ function GoogleDriveLoginButton(props: Props) {
       }, 120_000);
 
       logger.info("[GoogleDrive] Redirect URI: ", redirectUri);
+      logger.info("[GoogleDrive] ClientID: ", GOOGLE_CLIENT_ID);
 
       // 5) Auth-URL
       const authUrl =
@@ -322,8 +325,11 @@ function GoogleDriveLoginButton(props: Props) {
     } else {
       logger.error("[GoogleDrive] Unsupported platform for this auth flow.");
     }
-    props.callback?.();
   }, [handleTauriAuth, promptAsync]);
+
+  if (Platform.OS !== "web") {
+    return null;
+  }
 
   return (
     <SettingsItem leadingIcon="google-drive" onPress={handleAuth}>

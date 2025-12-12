@@ -36,7 +36,7 @@ function Login(props: Props) {
   const auth = useAuth();
   const { provider, accessToken, ensureFreshAccessToken } = useToken();
   const { theme } = useTheme();
-  const { setData, setLastUpdated } = useData();
+  const { setData, setLastUpdated, setShowSave } = useData();
   const { t } = useTranslation();
 
   const [parsedCryptoData, setParsedCryptoData] = useState<CryptoType | null>(
@@ -150,6 +150,7 @@ function Login(props: Props) {
       const parsedData = DataTypeSchema.parse(jsonData);
       setData(parsedData);
       setLastUpdated(lastUpdated);
+      setShowSave(false);
       auth.login(masterPassword);
     } catch (error) {
       logger.error("[Login] Error decrypting data:", error);

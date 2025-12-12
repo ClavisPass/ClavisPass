@@ -29,6 +29,7 @@ const de: TranslationSchema = {
     use: "Anwenden",
     reset: "Zurücksetzen",
     verify: "Verifizieren",
+    reload: "Neu laden",
   },
   login: {
     masterPassword: "Master Passwort",

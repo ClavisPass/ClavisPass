@@ -26,6 +26,7 @@ export type TranslationSchema = {
     use: string;
     reset: string;
     verify: string;
+    reload: string;
   };
   login: {
     masterPassword: string;

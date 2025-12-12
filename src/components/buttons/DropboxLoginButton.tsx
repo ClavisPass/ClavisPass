@@ -8,6 +8,7 @@ import { start, onUrl, cancel } from "@fabianlars/tauri-plugin-oauth";
 import * as Random from "expo-random";
 import { logger } from "../../utils/logger";
 import { useToken } from "../../contexts/CloudProvider";
+import { useData } from "../../contexts/DataProvider";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -30,10 +31,9 @@ async function randState(len = 32) {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-type Props = { callback?: () => void };
-
-function DropboxLoginButton(props: Props) {
+function DropboxLoginButton() {
   const { setSession } = useToken();
+  const { setShowSave } = useData();
 
   // Flow-Refs
   const unsubscribeRef = useRef<null | (() => void)>(null);
@@ -70,6 +70,7 @@ function DropboxLoginButton(props: Props) {
             refreshToken: data.refresh_token,
             expiresIn: data.expires_in,
           });
+          setShowSave(true);
         } else {
           logger.error("Token response missing tokens:", data);
         }
@@ -307,7 +308,6 @@ function DropboxLoginButton(props: Props) {
     } else {
       logger.error("Unsupported platform for this auth flow.");
     }
-    props.callback?.();
   }, [handleTauriAuth, promptAsync]);
 
   return (

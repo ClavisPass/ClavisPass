@@ -29,6 +29,7 @@ const en: TranslationSchema = {
     use: "Use",
     reset: "Reset",
     verify: "Verify",
+    reload: "Reload",
   },
   login: {
     masterPassword: "Master Password",
