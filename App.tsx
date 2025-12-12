@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import "react-native-gesture-handler";
 import { AuthProvider } from "./src/contexts/AuthProvider";
 import { DataProvider } from "./src/contexts/DataProvider";
 import ProtectedRoute from "./src/utils/ProtectedRoute";
-import { Platform, View, Text } from "react-native";
+import { Platform, View } from "react-native";
 import CustomTitlebar from "./src/components/CustomTitlebar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import GlobalShortcuts from "./src/components/shortcuts/GlobalShortcuts";
@@ -21,11 +20,10 @@ import { AutocompleteDropdownContextProvider } from "react-native-autocomplete-d
 import TabNavigator from "./src/ui/TabNavigatior";
 import { onOpenUrl, register } from "@tauri-apps/plugin-deep-link";
 import UpdateManager from "./src/components/UpdateManager";
-import * as store from "./src/utils/store";
-import { initI18n } from "./src/i18n";
-import { AppLanguage, toAppLanguage } from "./src/i18n/types";
 import { logger } from "./src/utils/logger";
 import GlobalErrorSnackbar from "./src/components/GlobalErrorSnackbar";
+import { SettingsProvider } from "./src/contexts/SettingsProvider";
+import I18nBridge from "./src/components/I18nBridge";
 
 const Tab = createBottomTabNavigator();
 
@@ -35,6 +33,7 @@ const protocol = async () => {
 
 export function AppWithNavigation() {
   protocol();
+
   useEffect(() => {
     const cleanup = onOpenUrl((event) => {
       logger.info("Deep link received:", event);
@@ -54,53 +53,47 @@ export function AppWithNavigation() {
     };
   }, []);
 
-  useEffect(() => {
-    store.get("LANGUAGE").then((stored) => {
-      const lang = toAppLanguage(stored);
-      initLanguage(lang);
-    });
-  }, []);
-
-  const initLanguage = async (lang: AppLanguage) => {
-    await initI18n(lang);
-  };
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AutocompleteDropdownContextProvider>
-        <ThemeProvider>
-          <OnlineProvider>
-            <AuthProvider>
-              <CloudProvider>
-                <DataProvider>
-                  <DevModeProvider>
-                    <GlobalErrorSnackbar />
-                    <View
-                      style={{
-                        borderRadius: Platform.OS === "web" ? 6 : 0,
-                        borderColor:
-                          Platform.OS === "web"
-                            ? theme.colors.primary
-                            : undefined,
-                        borderWidth: Platform.OS === "web" ? 1 : 0,
-                        overflow: "hidden",
-                        flex: 1,
-                      }}
-                    >
-                      <GlobalShortcuts />
-                      <CustomTitlebar />
-                      <NavigationContainer>
-                        <ProtectedRoute loginScreen={<LoginStack />}>
-                          <TabNavigator />
-                          <UpdateManager />
-                        </ProtectedRoute>
-                      </NavigationContainer>
-                    </View>
-                  </DevModeProvider>
-                </DataProvider>
-              </CloudProvider>
-            </AuthProvider>
-          </OnlineProvider>
-        </ThemeProvider>
+        <SettingsProvider>
+          <ThemeProvider>
+            <I18nBridge />
+            <OnlineProvider>
+              <AuthProvider>
+                <CloudProvider>
+                  <DataProvider>
+                    <DevModeProvider>
+                      <GlobalErrorSnackbar />
+                      <View
+                        style={{
+                          borderRadius: Platform.OS === "web" ? 6 : 0,
+                          borderColor:
+                            Platform.OS === "web"
+                              ? theme.colors.primary
+                              : undefined,
+                          borderWidth: Platform.OS === "web" ? 1 : 0,
+                          overflow: "hidden",
+                          flex: 1,
+                        }}
+                      >
+                        <GlobalShortcuts />
+                        <CustomTitlebar />
+
+                        <NavigationContainer>
+                          <ProtectedRoute loginScreen={<LoginStack />}>
+                            <TabNavigator />
+                            <UpdateManager />
+                          </ProtectedRoute>
+                        </NavigationContainer>
+                      </View>
+                    </DevModeProvider>
+                  </DataProvider>
+                </CloudProvider>
+              </AuthProvider>
+            </OnlineProvider>
+          </ThemeProvider>
+        </SettingsProvider>
       </AutocompleteDropdownContextProvider>
     </GestureHandlerRootView>
   );
@@ -123,18 +116,13 @@ export default function App() {
   useEffect(() => {
     const detectWindow = async () => {
       if (Platform.OS !== "web" || !getCurrentWindowSafe) {
-        // Native Plattformen -> Immer Main
         setView("main");
         return;
       }
 
       try {
         const { label } = await getCurrentWindowSafe();
-        if (label === "main") {
-          setView("main");
-        } else {
-          setView("popup");
-        }
+        setView(label === "main" ? "main" : "popup");
       } catch (e) {
         logger.warn("Fehler beim Lesen des Fensters:", e);
         setView("main");
@@ -146,11 +134,16 @@ export default function App() {
 
   if (view === null) return <></>;
 
-  if (view === "popup")
+  if (view === "popup") {
     return (
-      <ThemeProvider>
-        <FastAccessScreen />
-      </ThemeProvider>
+      <SettingsProvider>
+        <ThemeProvider>
+          <I18nBridge />
+          <FastAccessScreen />
+        </ThemeProvider>
+      </SettingsProvider>
     );
+  }
+
   return <AppWithNavigation />;
 }

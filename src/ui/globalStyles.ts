@@ -1,4 +1,20 @@
-const globalStyles = (background: string, tertiary: string, secondaryContainer: string) => ({
+import type { ViewStyle, TextStyle } from "react-native";
+
+export type GlobalStyles = {
+  container: ViewStyle;
+  outlineStyle: ViewStyle;
+  textInputStyle: TextStyle;
+  textInputNoteStyle: TextStyle;
+  moduleView: ViewStyle;
+  fab: ViewStyle;
+  folderContainer: ViewStyle;
+};
+
+const globalStyles = (
+  background: string,
+  tertiary: string,
+  secondaryContainer: string
+): GlobalStyles => ({
   container: {
     flex: 1,
     backgroundColor: background,
@@ -14,15 +30,24 @@ const globalStyles = (background: string, tertiary: string, secondaryContainer: 
     borderColor: tertiary,
     borderWidth: 2,
   },
-  textInputStyle: { height: 40, lineHeight: 16, backgroundColor: tertiary, minWidth: 200, maxWidth: "100%" },
-  textInputNoteStyle: { lineHeight: 16, padding: 4, backgroundColor: tertiary },
+  textInputStyle: {
+    height: 40,
+    lineHeight: 16,
+    backgroundColor: tertiary,
+    minWidth: 200,
+    maxWidth: "100%",
+  },
+  textInputNoteStyle: {
+    lineHeight: 16,
+    padding: 4,
+    backgroundColor: tertiary,
+  },
   moduleView: {
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-
   },
   fab: {
     position: "absolute",
@@ -34,7 +59,6 @@ const globalStyles = (background: string, tertiary: string, secondaryContainer: 
     backgroundColor: secondaryContainer,
     borderRadius: 12,
     borderWidth: 0,
-    //borderColor: background,
     display: "flex",
     flexDirection: "row",
     alignItems: "center",

@@ -70,15 +70,6 @@ export const uploadRemoteVaultFile = async (
 ): Promise<void> => {
   const { provider, accessToken, remotePath, content, onCompleted } = params;
 
-  try {
-    await DeviceStorageClient.uploadFile(content);
-  } catch (error) {
-    logger.error(
-      "[CloudStorage] Fehler beim lokalen Speichern über DeviceStorageClient:",
-      error
-    );
-  }
-
   switch (provider) {
     case "dropbox":
       return DropboxClient.uploadFile(
@@ -96,7 +87,7 @@ export const uploadRemoteVaultFile = async (
         onCompleted
       );
     case "device":
-      break;
+      return DeviceStorageClient.uploadFile(content, onCompleted);
     default: {
       const _exhaustiveCheck: never = provider;
       logger.error("[CloudStorage] Unsupported provider for upload:", provider);

@@ -5,6 +5,7 @@ import CryptoType from "../types/CryptoType";
 import { logger } from "../utils/logger";
 import UserInfoType from "../types/UserInfoType";
 import { triggerGlobalError } from "../events/errorBus";
+import * as DeviceStorageClient from "./DeviceStorageClient";
 
 export const fetchUserInfo = async (
   token: string,
@@ -100,6 +101,12 @@ export const uploadFile = async (
   filePath: string,
   onCompleted?: () => void
 ): Promise<void> => {
+  try {
+    await DeviceStorageClient.uploadFile(content);
+  } catch (error) {
+    logger.error("[Dropbox] DeviceStorage save failed (continuing):", error);
+  }
+
   const uploadEndpoint = "https://content.dropboxapi.com/2/files/upload";
 
   const normalizedPath = filePath.startsWith("/") ? filePath : `/${filePath}`;

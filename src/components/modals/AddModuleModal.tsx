@@ -1,10 +1,4 @@
-import React, {
-  useMemo,
-  useState,
-  useCallback,
-  useEffect,
-  useRef,
-} from "react";
+import React, { useMemo, useState, useCallback, useRef } from "react";
 import {
   useWindowDimensions,
   View,
@@ -18,9 +12,9 @@ import ModulesEnum from "../../enums/ModulesEnum";
 import ModuleIconsEnum from "../../enums/ModuleIconsEnum";
 import AnimatedPressable from "../AnimatedPressable";
 
-import * as store from "../../utils/store";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../contexts/ThemeProvider";
+import { useSetting } from "../../contexts/SettingsProvider";
 
 type ModuleCategory = "Common" | "Security" | "vCard" | "Utility";
 
@@ -37,9 +31,9 @@ type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
 
-  favorites?: ModulesEnum[]; // controlled optional
+  favorites?: ModulesEnum[];
   recent?: ModulesEnum[];
-  onToggleFavorite?: (module: ModulesEnum, isFavorite: boolean) => void; // controlled handler optional
+  onToggleFavorite?: (module: ModulesEnum, isFavorite: boolean) => void;
   onSelect?: (module: ModulesEnum) => void;
 };
 
@@ -151,8 +145,13 @@ export default function AddModuleModalCompactFav(props: Props) {
   const hideModal = () => props.setVisible(false);
 
   const [query, setQuery] = useState("");
-  const [localFavs, setLocalFavs] = useState<ModulesEnum[]>([]);
-  const favs = props.favorites ?? localFavs;
+
+  // Settings-backed favorites (uncontrolled)
+  const { value: storedFavs, setValue: setStoredFavs } =
+    useSetting("FAVORITE_MODULES");
+
+  // Controlled overrides stored
+  const favs = props.favorites ?? storedFavs;
 
   const ScrollViewRef: any = useRef<ScrollView>(null);
   const [currentOffset, setCurrentOffset] = useState(0);
@@ -262,23 +261,6 @@ export default function AddModuleModalCompactFav(props: Props) {
     });
   };
 
-  // [NEW] Beim Mount Favoriten aus dem Store laden (nur wenn uncontrolled)
-  useEffect(() => {
-    if (props.favorites) return; // controlled → Quelle ist Parent
-    (async () => {
-      const stored = await store.get("FAVORITE_MODULES");
-      setLocalFavs(Array.isArray(stored) ? stored : []);
-    })();
-  }, [props.favorites]);
-
-  // [NEW] Wenn controlled und sich favorites-Prop ändert, Store spiegeln
-  useEffect(() => {
-    if (!props.favorites) return;
-    // Deduplizieren & speichern
-    const uniq = Array.from(new Set(props.favorites));
-    store.set("FAVORITE_MODULES", uniq).catch(() => {});
-  }, [props.favorites]);
-
   const categories: ModuleCategory[] = [
     "Common",
     "Security",
@@ -307,7 +289,7 @@ export default function AddModuleModalCompactFav(props: Props) {
       });
     }
     return list;
-  }, [activeCats, normalizedQuery]);
+  }, [activeCats, normalizedQuery, MODULES]);
 
   const sections = useMemo(() => {
     const byId = new Map(filtered.map((m) => [m.id, m]));
@@ -317,10 +299,12 @@ export default function AddModuleModalCompactFav(props: Props) {
     const recentItems = (props.recent ?? [])
       .map((id) => byId.get(id))
       .filter(Boolean) as ModuleMeta[];
+
     const taken = new Set([
       ...favItems.map((m) => m.id),
       ...recentItems.map((m) => m.id),
     ]);
+
     const allItems = filtered.filter((m) => !taken.has(m.id));
 
     const s: Array<{ title: string; data: ModuleMeta[] }> = [];
@@ -342,41 +326,26 @@ export default function AddModuleModalCompactFav(props: Props) {
 
   const isFavorite = (id: ModulesEnum) => favs.includes(id);
 
-  const persistFavs = useCallback(async (arr: ModulesEnum[]) => {
-    const uniq = Array.from(new Set(arr));
-    try {
-      await store.set("FAVORITE_MODULES", uniq);
-    } catch {
-      // optional: loggen
-    }
-  }, []);
-
   const toggleFavorite = (id: ModulesEnum) => {
     const nowFav = !isFavorite(id);
 
-    // Falls Parent Interesse hat, zuerst informieren (controlled hook-in)
-    if (props.onToggleFavorite) props.onToggleFavorite(id, nowFav);
-
-    // Unabhängig davon: wenn uncontrolled → lokalen State + Store updaten
-    if (!props.favorites) {
-      setLocalFavs((prev) => {
-        const set = new Set(prev);
-        nowFav ? set.add(id) : set.delete(id);
-        const arr = Array.from(set);
-        persistFavs(arr); // [NEW]
-        return arr;
-      });
-    } else {
-      // controlled: optional Store spiegeln, wenn Parent keinen Handler liefert
-      if (!props.onToggleFavorite) {
-        const base = new Set(props.favorites);
-        nowFav ? base.add(id) : base.delete(id);
-        persistFavs(Array.from(base)); // [NEW]
-      }
+    if (props.onToggleFavorite) {
+      props.onToggleFavorite(id, nowFav);
+      return;
     }
+
+    if (!props.favorites) {
+      const next = new Set(storedFavs);
+      nowFav ? next.add(id) : next.delete(id);
+      setStoredFavs(Array.from(next));
+      return;
+    }
+
+    const base = new Set(props.favorites);
+    nowFav ? base.add(id) : base.delete(id);
+    setStoredFavs(Array.from(base));
   };
 
-  const { height: _h, width: _w } = useWindowDimensions();
   const containerWidth = Math.min(400, winW - 32);
   const containerMaxHeight = Math.max(360, Math.min(640, winH - 160));
   const columns = 2;

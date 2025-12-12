@@ -14,8 +14,8 @@ import { useTheme } from "../../contexts/ThemeProvider";
 import ExpiryPickerModal from "../modals/ExpiryPickerModal";
 import ExpiryModuleType from "../../types/modules/ExpiryModuleType";
 
-import * as store from "../../utils/store";
 import { useTranslation } from "react-i18next";
+import { useSetting } from "../../contexts/SettingsProvider";
 
 function ExpiryModule(props: ExpiryModuleType & Props) {
   const didMount = useRef(false);
@@ -28,8 +28,8 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
   const [tick, setTick] = useState(0);
   const [pickerVisible, setPickerVisible] = useState(false);
 
-  const [dateFormat, setDateFormat] = useState<string>("");
-  const [timeFormat, setTimeFormat] = useState<string>("");
+  const { value: dateFormat } = useSetting("DATE_FORMAT");
+  const { value: timeFormat } = useSetting("TIME_FORMAT");
 
   useEffect(() => {
     if (didMount.current) {
@@ -66,15 +66,6 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
     statusInfo.status === "active" || statusInfo.status === "dueSoon"
       ? 1 - Math.min(1, Math.max(0, statusInfo.remainingMs / warnBeforeMs))
       : 1;
-
-  useEffect(() => {
-    store.get("DATE_FORMAT").then((stored) => {
-      setDateFormat(stored);
-    });
-    store.get("TIME_FORMAT").then((stored) => {
-      setTimeFormat(stored);
-    });
-  }, []);
 
   return (
     <ModuleContainer

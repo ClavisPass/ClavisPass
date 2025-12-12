@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import ModulesEnum from "../enums/ModulesEnum"; // <-- [NEW] für das Favorites-Array
+import ModulesEnum from "../enums/ModulesEnum";
 import { logger } from "./logger";
 
 type EnumDef<V extends readonly string[], D extends V[number]> = {
@@ -111,6 +111,10 @@ export const storeSchema = {
     values: ["en-US", "de-DE"] as const,
     default: "en-US",
   },
+  COPY_DURATION: {
+    type: "number",
+    default: 20,
+  },
 } as const satisfies Record<
   string,
   | EnumDef<readonly string[], string>
@@ -119,10 +123,10 @@ export const storeSchema = {
   | JsonDef<any>
 >;
 
-type StoreSchema = typeof storeSchema;
+export type StoreSchema = typeof storeSchema;
 export type DataKey = keyof StoreSchema;
 
-type StoreValueMap = {
+export type StoreValueMap = {
   [K in DataKey]: StoreSchema[K] extends EnumDef<infer V, any>
     ? V[number]
     : StoreSchema[K] extends NumberDef<any>

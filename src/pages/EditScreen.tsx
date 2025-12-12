@@ -38,10 +38,10 @@ import useAppLifecycle from "../hooks/useAppLifecycle";
 import { openFastAccess, hideFastAccess } from "../utils/FastAccess";
 import extractFastAccessObject from "../utils/extractFastAccessObject";
 import FastAccessType from "../types/FastAccessType";
-import * as store from "../utils/store";
 import FolderType from "../types/FolderType";
 import MetaInformationModule from "../components/modules/MetaInformationModule";
 import { useTranslation } from "react-i18next";
+import { useSetting } from "../contexts/SettingsProvider";
 
 type EditScreenProps = StackScreenProps<RootStackParamList, "Edit">;
 
@@ -61,7 +61,10 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     setHeaderSpacing,
   } = useTheme();
   const { t } = useTranslation();
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
+
+  const { value: fastAccessBehavior } = useSetting("FAST_ACCESS");
+
   const [value, setValue] = useState<ValuesType>({ ...routeValue });
 
   const [addModuleModalVisible, setAddModuleModalVisible] = useState(false);
@@ -95,8 +98,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   useAppLifecycle({
     onBackground: async () => {
-      const stored = await store.get("FAST_ACCESS");
-      if (stored === "auto") {
+      if (fastAccessBehavior === "auto") {
         showFastAccess();
       }
     },
@@ -353,10 +355,12 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             />
           </SquaredContainerButton>
         )}
-        <SquaredContainerButton
-          onPress={() => setDeleteModalVisible(true)}
-        >
-          <Icon source="trash-can-outline" size={20} color={theme.colors?.error} />
+        <SquaredContainerButton onPress={() => setDeleteModalVisible(true)}>
+          <Icon
+            source="trash-can-outline"
+            size={20}
+            color={theme.colors?.error}
+          />
         </SquaredContainerButton>
       </View>
       {Platform.OS === "web" ? (

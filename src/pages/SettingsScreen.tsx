@@ -30,7 +30,6 @@ import SettingsContainer from "../components/container/SettingsContainer";
 import SettingsItem from "../components/items/SettingsItem";
 import SettingsSwitch from "../components/SettingsSwitch";
 import Footer from "../components/Footer";
-import * as store from "../utils/store";
 
 import { open } from "@tauri-apps/plugin-shell";
 
@@ -50,6 +49,7 @@ import { AppLanguage } from "../i18n/types";
 import { i18n } from "../i18n";
 import { useTranslation } from "react-i18next";
 import { Chip } from "react-native-paper";
+import { useSetting } from "../contexts/SettingsProvider";
 
 const styles = StyleSheet.create({
   surface: {
@@ -85,13 +85,24 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const [startup, setStartup] = React.useState(false);
   const { width } = useWindowDimensions();
   const [useAuthentication, setUseAuthentication] = React.useState(false);
-  const [closeBehavior, setCloseBehavior] = React.useState(false);
-  const [hideOnStartup, setHideOnStartup] = React.useState(false);
-  const [fastAccess, setFastAccess] = React.useState(false);
 
-  const [language, setLanguage] = useState<string>("");
-  const [dateFormat, setDateFormat] = useState<string>("");
-  const [timeFormat, setTimeFormat] = useState<string>("");
+  const { value: closeBehaviorValue, setValue: setCloseBehaviorValue } =
+    useSetting("CLOSE_BEHAVIOR");
+  const { value: startBehaviorValue, setValue: setStartBehaviorValue } =
+    useSetting("START_BEHAVIOR");
+  const { value: fastAccessValue, setValue: setFastAccessValue } =
+    useSetting("FAST_ACCESS");
+
+  const { value: language, setValue: setLanguageSetting } =
+    useSetting("LANGUAGE");
+  const { value: dateFormat, setValue: setDateFormatSetting } =
+    useSetting("DATE_FORMAT");
+  const { value: timeFormat, setValue: setTimeFormatSetting } =
+    useSetting("TIME_FORMAT");
+
+  const closeBehavior = closeBehaviorValue === "hide";
+  const hideOnStartup = startBehaviorValue === "hidden";
+  const fastAccess = fastAccessValue === "auto";
 
   const [showChangeMasterPasswordModal, setShowChangeMasterPasswordModal] =
     useState(false);
@@ -151,14 +162,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         plattform: null,
       },
     ],
-    [language]
+    [t, language]
   );
 
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(0);
       setHeaderWhite(false);
-    }, [])
+    }, [setHeaderSpacing, setHeaderWhite])
   );
 
   const changeAuthentication = async (authentication: boolean) => {
@@ -176,30 +187,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   };
 
   const changeCloseBehavior = async (hide: boolean) => {
-    if (hide) {
-      store.set("CLOSE_BEHAVIOR", "hide");
-    } else {
-      store.set("CLOSE_BEHAVIOR", "exit");
-    }
-    setCloseBehavior(hide);
+    await setCloseBehaviorValue(hide ? "hide" : "exit");
   };
 
   const changeStartBehavior = async (hidden: boolean) => {
-    if (hidden) {
-      store.set("START_BEHAVIOR", "hidden");
-    } else {
-      store.set("START_BEHAVIOR", "shown");
-    }
-    setHideOnStartup(hidden);
+    await setStartBehaviorValue(hidden ? "hidden" : "shown");
   };
 
   const changeFastAccessBehavior = async (auto: boolean) => {
-    if (auto) {
-      store.set("FAST_ACCESS", "auto");
-    } else {
-      store.set("FAST_ACCESS", "disabled");
-    }
-    setFastAccess(auto);
+    await setFastAccessValue(auto ? "auto" : "disabled");
   };
 
   const changeAutoStart = async (startup: boolean) => {
@@ -221,24 +217,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     getAutoStart();
     isUsingAuthentication().then((isAuthenticated) => {
       setUseAuthentication(isAuthenticated);
-    });
-    store.get("CLOSE_BEHAVIOR").then((stored) => {
-      setCloseBehavior(stored === "hide");
-    });
-    store.get("START_BEHAVIOR").then((stored) => {
-      setHideOnStartup(stored === "hidden");
-    });
-    store.get("FAST_ACCESS").then((stored) => {
-      setFastAccess(stored === "auto");
-    });
-    store.get("LANGUAGE").then((stored) => {
-      setLanguage(stored);
-    });
-    store.get("DATE_FORMAT").then((stored) => {
-      setDateFormat(stored);
-    });
-    store.get("TIME_FORMAT").then((stored) => {
-      setTimeFormat(stored);
     });
   }, []);
 
@@ -273,10 +251,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             icon={quickSelectItems[0].icon}
             title={quickSelectItems[0].title}
           >
-            <Auth
-              navigation={navigation}
-            />
+            <Auth navigation={navigation} />
           </SettingsContainer>
+
           <WebSpecific>
             <SettingsContainer
               ref={quickSelectItems[1].ref}
@@ -312,6 +289,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               </SettingsShortcutItem>
             </SettingsContainer>
           </WebSpecific>
+
           <SettingsContainer
             ref={quickSelectItems[2].ref}
             icon={quickSelectItems[2].icon}
@@ -319,12 +297,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           >
             <DarkModeSwitch />
             <SettingsDivider />
+
             <SettingsDropdownItem
               value={language}
-              setValue={(language) => {
-                setLanguage(language);
-                i18n.changeLanguage(language);
-                store.set("LANGUAGE", language as AppLanguage);
+              setValue={(lang) => {
+                i18n.changeLanguage(lang);
+                setLanguageSetting(lang as AppLanguage);
               }}
               label={t("settings:language")}
               options={[
@@ -332,12 +310,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 { label: "Deutsch", value: "de" },
               ]}
             />
+
             <SettingsDivider />
+
             <SettingsDropdownItem
               value={dateFormat}
-              setValue={(dateFormat) => {
-                setDateFormat(dateFormat);
-                store.set("DATE_FORMAT", dateFormat as "de-DE" | "en-US");
+              setValue={(df) => {
+                setDateFormatSetting(df as "de-DE" | "en-US");
               }}
               label={t("settings:dateFormat")}
               dropdownMaxWidth={120}
@@ -352,12 +331,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 },
               ]}
             />
+
             <SettingsDivider />
+
             <SettingsDropdownItem
               value={timeFormat}
-              setValue={(timeFormat) => {
-                setTimeFormat(timeFormat);
-                store.set("TIME_FORMAT", timeFormat as "de-DE" | "en-US");
+              setValue={(tf) => {
+                setTimeFormatSetting(tf as "de-DE" | "en-US");
               }}
               label={t("settings:timeFormat")}
               options={[
@@ -372,6 +352,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               ]}
             />
           </SettingsContainer>
+
           <SettingsContainer
             ref={quickSelectItems[3].ref}
             icon={quickSelectItems[3].icon}
@@ -393,6 +374,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               }}
             />
           </SettingsContainer>
+
           <SettingsContainer
             ref={quickSelectItems[4].ref}
             icon={quickSelectItems[4].icon}
@@ -406,6 +388,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               }}
             />
           </SettingsContainer>
+
           <SettingsContainer
             ref={quickSelectItems[5].ref}
             icon={quickSelectItems[5].icon}
@@ -415,6 +398,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             <SettingsDivider />
             <BackupExportButton />
           </SettingsContainer>
+
           <SettingsContainer
             ref={quickSelectItems[6].ref}
             icon={quickSelectItems[6].icon}
@@ -442,7 +426,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               </>
             )}
           </SettingsContainer>
+
           <Footer />
+
           <View
             style={{
               display: "flex",
@@ -476,6 +462,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           </View>
         </ScrollView>
       </View>
+
       <ChangeMasterPasswordModal
         visible={showChangeMasterPasswordModal}
         setVisible={setShowChangeMasterPasswordModal}

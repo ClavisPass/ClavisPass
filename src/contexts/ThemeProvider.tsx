@@ -1,22 +1,16 @@
-import React, {
-  createContext,
-  useState,
-  useContext,
-  ReactNode,
-  useEffect,
-} from "react";
-import { PaperProvider } from "react-native-paper";
+import React, { createContext, useState, useContext, ReactNode } from "react";
+import { MD3Theme, PaperProvider } from "react-native-paper";
 import lightTheme from "../ui/theme";
 import darkTheme from "../ui/theme-darkmode";
-import styles from "../ui/globalStyles";
+import styles, { GlobalStyles } from "../ui/globalStyles";
 
-import * as store from "../utils/store";
+import { useSetting } from "./SettingsProvider";
 
 interface ThemeContextType {
   darkmode: boolean;
   setDarkmode: (darkmode: boolean) => void;
-  theme: any;
-  globalStyles: any;
+  theme: MD3Theme;
+  globalStyles: GlobalStyles;
   headerWhite: boolean;
   setHeaderWhite: (headerWhite: boolean) => void;
   headerSpacing: number;
@@ -30,39 +24,39 @@ type Props = {
 };
 
 export const ThemeProvider = ({ children }: Props) => {
-  const [darkmode, setDarkmodeState] = useState(false);
-  const [theme, setTheme] = useState(lightTheme);
-  const [isReady, setIsReady] = useState(false);
+  const { value: themePref, setValue: setThemePref, isReady } =
+    useSetting("THEME_PREFERENCE");
+
   const [headerWhite, setHeaderWhite] = useState(false);
   const [headerSpacing, setHeaderSpacing] = useState(0);
 
-  const globalStyles = styles(theme.colors.elevation.level2, theme.colors.tertiary, theme.colors.secondaryContainer);
+  const darkmode = themePref === "dark";
+  const theme = darkmode ? darkTheme : lightTheme;
 
-  useEffect(() => {
-    (async () => {
-      const stored = await store.get("THEME_PREFERENCE");
-      if (stored === "dark") {
-        setDarkmodeState(true);
-        setTheme(darkTheme);
-      } else {
-        setDarkmodeState(false);
-        setTheme(lightTheme);
-      }
-      setIsReady(true);
-    })();
-  }, []);
+  const globalStyles = styles(
+    theme.colors.elevation.level2,
+    theme.colors.tertiary,
+    theme.colors.secondaryContainer
+  );
 
   const setDarkmode = (value: boolean) => {
-    setDarkmodeState(value);
-    store.set("THEME_PREFERENCE", value ? "dark" : "light");
-    setTheme(value ? darkTheme : lightTheme);
+    setThemePref(value ? "dark" : "light");
   };
 
   if (!isReady) return null;
 
   return (
     <ThemeContext.Provider
-      value={{ darkmode, setDarkmode, theme, globalStyles, headerWhite, setHeaderWhite, headerSpacing, setHeaderSpacing }}
+      value={{
+        darkmode,
+        setDarkmode,
+        theme,
+        globalStyles,
+        headerWhite,
+        setHeaderWhite,
+        headerSpacing,
+        setHeaderSpacing,
+      }}
     >
       <PaperProvider theme={theme}>{children}</PaperProvider>
     </ThemeContext.Provider>
@@ -70,5 +64,7 @@ export const ThemeProvider = ({ children }: Props) => {
 };
 
 export const useTheme = () => {
-  return useContext(ThemeContext) as ThemeContextType;
+  const ctx = useContext(ThemeContext);
+  if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
+  return ctx;
 };

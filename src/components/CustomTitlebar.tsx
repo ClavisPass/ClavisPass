@@ -7,9 +7,9 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useAuth } from "../contexts/AuthProvider";
 import { exit } from "@tauri-apps/plugin-process";
 import { useTheme } from "../contexts/ThemeProvider";
-import * as store from "../utils/store";
 import showMainWindow from "../utils/showMainWindow";
 import AnimatedPressable from "./AnimatedPressable";
+import { useSetting } from "../contexts/SettingsProvider";
 
 export const TITLEBAR_HEIGHT = Platform.OS === "web" ? 40 : 0;
 
@@ -48,11 +48,13 @@ export function TitlebarHeight(props: Props) {
 function CustomTitlebar() {
   const auth = useAuth();
   const { headerWhite, headerSpacing } = useTheme();
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
+
+  const { value: closeBehavior } = useSetting("CLOSE_BEHAVIOR");
+  const { value: startBehavior } = useSetting("START_BEHAVIOR");
 
   useEffect(() => {
     if (Platform.OS === "web") {
-      showMainWindow();
       if (document) {
         document
           .getElementById("titlebar")
@@ -67,6 +69,12 @@ function CustomTitlebar() {
     }
   }, []);
 
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      showMainWindow(startBehavior);
+    }
+  }, [startBehavior]);
+
   const minimizeWindow = () => {
     const appWindow = getCurrentWindow();
     if (appWindow) {
@@ -75,16 +83,16 @@ function CustomTitlebar() {
   };
 
   const closeWindow = async () => {
-    const stored = await store.get("CLOSE_BEHAVIOR");
     const appWindow = getCurrentWindow();
-    if (appWindow) {
-      if (stored === "exit") {
-        await exit(0);
-      } else {
-        auth.logout();
-        appWindow.hide();
-      }
+    if (!appWindow) return;
+
+    if (closeBehavior === "exit") {
+      await exit(0);
+      return;
     }
+
+    auth.logout();
+    appWindow.hide();
   };
 
   return (

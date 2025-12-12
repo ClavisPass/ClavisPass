@@ -1,10 +1,11 @@
 import RemoteFileContent from "../types/api/cloudStorage/RemoteFileContent";
 import TokenRefreshResult from "../types/api/oauth/TokenRefreshResult";
-import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "@env";
+import { GOOGLE_CLIENT_ID } from "@env";
 import CryptoType from "../types/CryptoType";
 import { logger } from "../utils/logger";
 import UserInfoType from "../types/UserInfoType";
 import { triggerGlobalError } from "../events/errorBus";
+import * as DeviceStorageClient from "./DeviceStorageClient";
 
 export const fetchUserInfo = async (
   token: string,
@@ -104,6 +105,15 @@ export const uploadFile = async (
   fileId: string,
   onCompleted?: () => void
 ): Promise<void> => {
+  try {
+    await DeviceStorageClient.uploadFile(content);
+  } catch (error) {
+    logger.error(
+      "[GoogleDrive] DeviceStorage save failed (continuing):",
+      error
+    );
+  }
+
   const uploadEndpoint = `https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(
     fileId
   )}?uploadType=media`;
@@ -156,7 +166,7 @@ export const refreshAccessToken = async (
         grant_type: "refresh_token",
         refresh_token: refreshToken,
         client_id: GOOGLE_CLIENT_ID,
-        client_secret: GOOGLE_CLIENT_SECRET,
+        //client_secret: GOOGLE_CLIENT_SECRET,
       }).toString(),
     });
 

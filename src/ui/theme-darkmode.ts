@@ -1,10 +1,9 @@
-import { MD3DarkTheme as DefaultTheme, shadow } from "react-native-paper";
+import { MD3DarkTheme as DefaultTheme, MD3Theme } from "react-native-paper";
 
-const theme = {
+const theme: MD3Theme = {
   ...DefaultTheme,
   dark: true,
   roundness: 4,
-  // Specify custom property in nested object
   colors: {
     ...DefaultTheme.colors,
     primary: "#787FF6",
@@ -12,7 +11,6 @@ const theme = {
     secondary: "#69C4FF",
     secondaryContainer: "rgba(120, 126, 245, 0.09)",
     background: "#1b1b1bff",
-    //shadowColor: "grey",
     elevation: {
       level0: "transparent",
       level1: "rgb(39, 35, 41)",

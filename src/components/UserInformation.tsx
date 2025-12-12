@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import * as WebBrowser from "expo-web-browser";
-import { Chip, Text, Avatar } from "react-native-paper";
+import { Chip, Text, Avatar, Icon } from "react-native-paper";
 import { Skeleton } from "moti/skeleton";
 import { View } from "react-native";
 import { MotiView } from "moti";
@@ -23,7 +23,7 @@ type Props = {
 function UserInformation(props: Props) {
   const { darkmode } = useTheme();
   const { isOnline } = useOnline();
-
+  const { theme } = useTheme();
   const {
     provider,
     accessToken,
@@ -111,7 +111,7 @@ function UserInformation(props: Props) {
               minWidth: 140,
               minHeight: 54,
               height: 92,
-              flexDirection: "column",
+              //flexDirection: "row",
               //alignItems: "center",
               gap: 8,
             }}
@@ -161,9 +161,31 @@ function UserInformation(props: Props) {
                 </Text>
               </MotiView>
             )}
-            <Chip style={{ width: 100 }} onPress={handleLogout} icon="logout">
-              Logout
-            </Chip>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              {provider === "dropbox" ? (
+                <Icon
+                  source={"dropbox"}
+                  size={24}
+                  color={theme.colors.primary}
+                />
+              ) : null}
+              {provider === "googleDrive" ? (
+                <Icon
+                  source={"google-drive"}
+                  size={24}
+                  color={theme.colors.primary}
+                />
+              ) : null}
+              <Chip style={{ width: 100 }} onPress={handleLogout} icon="logout">
+                Logout
+              </Chip>
+            </View>
           </View>
         </MotiView>
       ) : (

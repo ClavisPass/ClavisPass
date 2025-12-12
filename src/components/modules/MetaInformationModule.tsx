@@ -3,9 +3,9 @@ import { View, StyleSheet } from "react-native";
 import { useTheme } from "../../contexts/ThemeProvider";
 import { MenuItem } from "../items/MenuItem";
 
-import * as store from "../../utils/store";
 import { formatAbsoluteLocal } from "../../utils/expiry";
 import { useTranslation } from "react-i18next";
+import { useSetting } from "../../contexts/SettingsProvider";
 
 type MetaInformationModuleType = {
   lastUpdated: string;
@@ -16,17 +16,8 @@ function MetaInformationModule(props: MetaInformationModuleType) {
   const { theme, darkmode } = useTheme();
   const { t } = useTranslation();
 
-  const [dateFormat, setDateFormat] = useState<string>("");
-  const [timeFormat, setTimeFormat] = useState<string>("");
-
-  useEffect(() => {
-    store.get("DATE_FORMAT").then((stored) => {
-      setDateFormat(stored);
-    });
-    store.get("TIME_FORMAT").then((stored) => {
-      setTimeFormat(stored);
-    });
-  }, []);
+  const { value: dateFormat } = useSetting("DATE_FORMAT");
+  const { value: timeFormat } = useSetting("TIME_FORMAT");
 
   return (
     <View

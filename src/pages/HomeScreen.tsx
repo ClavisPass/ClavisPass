@@ -46,7 +46,6 @@ import { RootStackParamList } from "../stacks/Stack";
 import FolderType from "../types/FolderType";
 import { useTranslation } from "react-i18next";
 
-import * as store from "../utils/store";
 import TotpItem from "../components/items/TotpItem";
 import ModulesEnum from "../enums/ModulesEnum";
 import CardItem from "../components/items/CardItem";
@@ -55,6 +54,7 @@ import Sync from "../components/Sync";
 import { useToken } from "../contexts/CloudProvider";
 import { logger } from "../utils/logger";
 import { fetchRemoteVaultFile } from "../api/CloudStorageClient";
+import { useSetting } from "../contexts/SettingsProvider";
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
 
@@ -75,9 +75,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
-  const [selectedFav, setSelectedFav] = useState(false);
-  const [selected2FA, setSelected2FA] = useState(false);
-  const [selectedCard, setSelectedCard] = useState(false);
+  const { value: selectedFav, setValue: setSelectedFav } =
+    useSetting("FAVORITE_FILTER");
+  const { value: selected2FA, setValue: setSelected2FA } =
+    useSetting("TWOFA_FILTER");
+  const { value: selectedCard, setValue: setSelectedCard } =
+    useSetting("CARD_FILTER");
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -87,33 +90,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const [valueModalVisible, setValueModalVisible] = useState(false);
   const { provider, accessToken, ensureFreshAccessToken } = useToken();
 
-  useEffect(() => {
-    store.get("FAVORITE_FILTER").then((stored) => {
-      setSelectedFav(stored);
-    });
-    store.get("TWOFA_FILTER").then((stored) => {
-      setSelected2FA(stored);
-    });
-    store.get("CARD_FILTER").then((stored) => {
-      setSelectedCard(stored);
-    });
-  }, []);
-
   const saveSelectedFavState = (fav: boolean) => {
     setSelectedFav(fav);
-    store.set("FAVORITE_FILTER", fav);
   };
 
   const saveSelected2FAState = (twoFA: boolean) => {
     setSearchQuery("");
     setSelected2FA(twoFA);
-    store.set("TWOFA_FILTER", twoFA);
   };
 
   const saveSelectedCardState = (card: boolean) => {
     setSearchQuery("");
     setSelectedCard(card);
-    store.set("CARD_FILTER", card);
   };
 
   useEffect(() => {
