@@ -24,6 +24,7 @@ import { logger } from "./src/utils/logger";
 import GlobalErrorSnackbar from "./src/components/GlobalErrorSnackbar";
 import { SettingsProvider } from "./src/contexts/SettingsProvider";
 import I18nBridge from "./src/components/I18nBridge";
+import DropdownLayer from "./src/components/web/DropdownLayer";
 
 const Tab = createBottomTabNavigator();
 
@@ -58,6 +59,7 @@ export function AppWithNavigation() {
       <AutocompleteDropdownContextProvider>
         <SettingsProvider>
           <ThemeProvider>
+            <DropdownLayer />
             <I18nBridge />
             <OnlineProvider>
               <AuthProvider>

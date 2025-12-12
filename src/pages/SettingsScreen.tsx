@@ -50,6 +50,7 @@ import { i18n } from "../i18n";
 import { useTranslation } from "react-i18next";
 import { Chip } from "react-native-paper";
 import { useSetting } from "../contexts/SettingsProvider";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 const styles = StyleSheet.create({
   surface: {
@@ -230,243 +231,257 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 
   return (
     <AnimatedContainer useFocusEffect={useFocusEffect}>
-      <StatusBar
-        animated={true}
-        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
-        translucent={true}
-      />
-      <Header title={t("bar:Settings")} />
-      <View
-        style={{
-          flex: 1,
-          width: "100%",
-          padding: 0,
-          flexDirection: width > 600 ? "row" : "column",
-        }}
-      >
-        <SettingsQuickSelect scrollRef={scrollRef} items={quickSelectItems} />
-        <ScrollView ref={scrollRef} style={styles.scrollView}>
-          <SettingsContainer
-            ref={quickSelectItems[0].ref}
-            icon={quickSelectItems[0].icon}
-            title={quickSelectItems[0].title}
-          >
-            <Auth navigation={navigation} />
-          </SettingsContainer>
-
-          <WebSpecific>
+      <BottomSheetModalProvider>
+        <StatusBar
+          animated={true}
+          style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+          translucent={true}
+        />
+        <Header title={t("bar:Settings")} />
+        <View
+          style={{
+            flex: 1,
+            width: "100%",
+            padding: 0,
+            flexDirection: width > 600 ? "row" : "column",
+          }}
+        >
+          <SettingsQuickSelect scrollRef={scrollRef} items={quickSelectItems} />
+          <ScrollView ref={scrollRef} style={styles.scrollView}>
             <SettingsContainer
-              ref={quickSelectItems[1].ref}
-              icon={quickSelectItems[1].icon}
-              title={quickSelectItems[1].title}
+              ref={quickSelectItems[0].ref}
+              icon={quickSelectItems[0].icon}
+              title={quickSelectItems[0].title}
             >
-              <SettingsSwitch
-                label={t("settings:autostart")}
-                value={startup}
-                onValueChange={(checked) => {
-                  changeAutoStart(checked);
-                }}
-              />
-              <SettingsDivider />
-              <SettingsSwitch
-                label={t("settings:startMinimized")}
-                value={hideOnStartup}
-                onValueChange={(checked) => {
-                  changeStartBehavior(checked);
-                }}
-              />
-              <SettingsDivider />
-              <SettingsSwitch
-                label={t("settings:minimizeToTray")}
-                value={closeBehavior}
-                onValueChange={(checked) => {
-                  changeCloseBehavior(checked);
-                }}
-              />
-              <SettingsDivider />
-              <SettingsShortcutItem shortcut="ALT+W">
-                {t("settings:showHide")}
-              </SettingsShortcutItem>
+              <Auth navigation={navigation} />
             </SettingsContainer>
-          </WebSpecific>
 
-          <SettingsContainer
-            ref={quickSelectItems[2].ref}
-            icon={quickSelectItems[2].icon}
-            title={quickSelectItems[2].title}
-          >
-            <DarkModeSwitch />
-            <SettingsDivider />
-
-            <SettingsDropdownItem
-              value={language}
-              setValue={(lang) => {
-                i18n.changeLanguage(lang);
-                setLanguageSetting(lang as AppLanguage);
-              }}
-              label={t("settings:language")}
-              options={[
-                { label: "English", value: "en" },
-                { label: "Deutsch", value: "de" },
-              ]}
-            />
-
-            <SettingsDivider />
-
-            <SettingsDropdownItem
-              value={dateFormat}
-              setValue={(df) => {
-                setDateFormatSetting(df as "de-DE" | "en-US");
-              }}
-              label={t("settings:dateFormat")}
-              dropdownMaxWidth={120}
-              options={[
-                {
-                  label: formatAbsoluteDate(new Date().toISOString(), "de-DE"),
-                  value: "de-DE",
-                },
-                {
-                  label: formatAbsoluteDate(new Date().toISOString(), "en-US"),
-                  value: "en-US",
-                },
-              ]}
-            />
-
-            <SettingsDivider />
-
-            <SettingsDropdownItem
-              value={timeFormat}
-              setValue={(tf) => {
-                setTimeFormatSetting(tf as "de-DE" | "en-US");
-              }}
-              label={t("settings:timeFormat")}
-              options={[
-                {
-                  label: formatAbsoluteTime(new Date().toISOString(), "de-DE"),
-                  value: "de-DE",
-                },
-                {
-                  label: formatAbsoluteTime(new Date().toISOString(), "en-US"),
-                  value: "en-US",
-                },
-              ]}
-            />
-          </SettingsContainer>
-
-          <SettingsContainer
-            ref={quickSelectItems[3].ref}
-            icon={quickSelectItems[3].icon}
-            title={quickSelectItems[3].title}
-          >
-            <SettingsItem
-              onPress={() => {
-                setShowChangeMasterPasswordModal(true);
-              }}
-            >
-              {t("settings:changeMasterPassword")}
-            </SettingsItem>
-            <SettingsDivider />
-            <SettingsSwitch
-              label={t("settings:useSystemAuth")}
-              value={useAuthentication}
-              onValueChange={(checked) => {
-                changeAuthentication(checked);
-              }}
-            />
-          </SettingsContainer>
-
-          <SettingsContainer
-            ref={quickSelectItems[4].ref}
-            icon={quickSelectItems[4].icon}
-            title={quickSelectItems[4].title}
-          >
-            <SettingsSwitch
-              label={t("settings:autoOpenFastAccess")}
-              value={fastAccess}
-              onValueChange={(checked) => {
-                changeFastAccessBehavior(checked);
-              }}
-            />
-          </SettingsContainer>
-
-          <SettingsContainer
-            ref={quickSelectItems[5].ref}
-            icon={quickSelectItems[5].icon}
-            title={quickSelectItems[5].title}
-          >
-            <BackupImportButton />
-            <SettingsDivider />
-            <BackupExportButton />
-          </SettingsContainer>
-
-          <SettingsContainer
-            ref={quickSelectItems[6].ref}
-            icon={quickSelectItems[6].icon}
-            title={quickSelectItems[6].title}
-          >
-            <Import
-              type={DocumentTypeEnum.FIREFOX}
-              title={"Firefox"}
-              icon={"firefox"}
-            />
-            <SettingsDivider />
-            <Import
-              type={DocumentTypeEnum.CHROME}
-              title={"Chrome"}
-              icon={"google-chrome"}
-            />
-            {devMode && (
-              <>
-                <SettingsDivider />
-                <Import
-                  type={DocumentTypeEnum.PCLOUD}
-                  title={"pCloud"}
-                  icon={"circle-outline"}
+            <WebSpecific>
+              <SettingsContainer
+                ref={quickSelectItems[1].ref}
+                icon={quickSelectItems[1].icon}
+                title={quickSelectItems[1].title}
+              >
+                <SettingsSwitch
+                  label={t("settings:autostart")}
+                  value={startup}
+                  onValueChange={(checked) => {
+                    changeAutoStart(checked);
+                  }}
                 />
-              </>
-            )}
-          </SettingsContainer>
+                <SettingsDivider />
+                <SettingsSwitch
+                  label={t("settings:startMinimized")}
+                  value={hideOnStartup}
+                  onValueChange={(checked) => {
+                    changeStartBehavior(checked);
+                  }}
+                />
+                <SettingsDivider />
+                <SettingsSwitch
+                  label={t("settings:minimizeToTray")}
+                  value={closeBehavior}
+                  onValueChange={(checked) => {
+                    changeCloseBehavior(checked);
+                  }}
+                />
+                <SettingsDivider />
+                <SettingsShortcutItem shortcut="ALT+W">
+                  {t("settings:showHide")}
+                </SettingsShortcutItem>
+              </SettingsContainer>
+            </WebSpecific>
 
-          <Footer />
-
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              gap: 8,
-              flexWrap: "wrap",
-              margin: 8,
-              marginTop: 0,
-            }}
-          >
-            <Chip
-              icon={"web"}
-              showSelectedOverlay={true}
-              onPress={() => {
-                openURL("https://clavispass.github.io/ClavisPass/");
-              }}
-              style={{ borderRadius: 12 }}
+            <SettingsContainer
+              ref={quickSelectItems[2].ref}
+              icon={quickSelectItems[2].icon}
+              title={quickSelectItems[2].title}
             >
-              {t("settings:website")}
-            </Chip>
-            <Chip
-              icon={"github"}
-              showSelectedOverlay={true}
-              onPress={() => {
-                openURL("https://github.com/ClavisPass/ClavisPass");
-              }}
-              style={{ borderRadius: 12 }}
-            >
-              Github
-            </Chip>
-          </View>
-        </ScrollView>
-      </View>
+              <DarkModeSwitch />
+              <SettingsDivider />
 
-      <ChangeMasterPasswordModal
-        visible={showChangeMasterPasswordModal}
-        setVisible={setShowChangeMasterPasswordModal}
-      />
+              <SettingsDropdownItem
+                value={language}
+                setValue={(lang) => {
+                  i18n.changeLanguage(lang);
+                  setLanguageSetting(lang as AppLanguage);
+                }}
+                label={t("settings:language")}
+                options={[
+                  { label: "English", value: "en" },
+                  { label: "Deutsch", value: "de" },
+                ]}
+              />
+
+              <SettingsDivider />
+
+              <SettingsDropdownItem
+                value={dateFormat}
+                setValue={(df) => {
+                  setDateFormatSetting(df as "de-DE" | "en-US");
+                }}
+                label={t("settings:dateFormat")}
+                dropdownMaxWidth={120}
+                options={[
+                  {
+                    label: formatAbsoluteDate(
+                      new Date().toISOString(),
+                      "de-DE"
+                    ),
+                    value: "de-DE",
+                  },
+                  {
+                    label: formatAbsoluteDate(
+                      new Date().toISOString(),
+                      "en-US"
+                    ),
+                    value: "en-US",
+                  },
+                ]}
+              />
+
+              <SettingsDivider />
+
+              <SettingsDropdownItem
+                value={timeFormat}
+                setValue={(tf) => {
+                  setTimeFormatSetting(tf as "de-DE" | "en-US");
+                }}
+                label={t("settings:timeFormat")}
+                options={[
+                  {
+                    label: formatAbsoluteTime(
+                      new Date().toISOString(),
+                      "de-DE"
+                    ),
+                    value: "de-DE",
+                  },
+                  {
+                    label: formatAbsoluteTime(
+                      new Date().toISOString(),
+                      "en-US"
+                    ),
+                    value: "en-US",
+                  },
+                ]}
+              />
+            </SettingsContainer>
+
+            <SettingsContainer
+              ref={quickSelectItems[3].ref}
+              icon={quickSelectItems[3].icon}
+              title={quickSelectItems[3].title}
+            >
+              <SettingsItem
+                onPress={() => {
+                  setShowChangeMasterPasswordModal(true);
+                }}
+              >
+                {t("settings:changeMasterPassword")}
+              </SettingsItem>
+              <SettingsDivider />
+              <SettingsSwitch
+                label={t("settings:useSystemAuth")}
+                value={useAuthentication}
+                onValueChange={(checked) => {
+                  changeAuthentication(checked);
+                }}
+              />
+            </SettingsContainer>
+
+            <SettingsContainer
+              ref={quickSelectItems[4].ref}
+              icon={quickSelectItems[4].icon}
+              title={quickSelectItems[4].title}
+            >
+              <SettingsSwitch
+                label={t("settings:autoOpenFastAccess")}
+                value={fastAccess}
+                onValueChange={(checked) => {
+                  changeFastAccessBehavior(checked);
+                }}
+              />
+            </SettingsContainer>
+
+            <SettingsContainer
+              ref={quickSelectItems[5].ref}
+              icon={quickSelectItems[5].icon}
+              title={quickSelectItems[5].title}
+            >
+              <BackupImportButton />
+              <SettingsDivider />
+              <BackupExportButton />
+            </SettingsContainer>
+
+            <SettingsContainer
+              ref={quickSelectItems[6].ref}
+              icon={quickSelectItems[6].icon}
+              title={quickSelectItems[6].title}
+            >
+              <Import
+                type={DocumentTypeEnum.FIREFOX}
+                title={"Firefox"}
+                icon={"firefox"}
+              />
+              <SettingsDivider />
+              <Import
+                type={DocumentTypeEnum.CHROME}
+                title={"Chrome"}
+                icon={"google-chrome"}
+              />
+              {devMode && (
+                <>
+                  <SettingsDivider />
+                  <Import
+                    type={DocumentTypeEnum.PCLOUD}
+                    title={"pCloud"}
+                    icon={"circle-outline"}
+                  />
+                </>
+              )}
+            </SettingsContainer>
+
+            <Footer />
+
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 8,
+                flexWrap: "wrap",
+                margin: 8,
+                marginTop: 0,
+              }}
+            >
+              <Chip
+                icon={"web"}
+                showSelectedOverlay={true}
+                onPress={() => {
+                  openURL("https://clavispass.github.io/ClavisPass/");
+                }}
+                style={{ borderRadius: 12 }}
+              >
+                {t("settings:website")}
+              </Chip>
+              <Chip
+                icon={"github"}
+                showSelectedOverlay={true}
+                onPress={() => {
+                  openURL("https://github.com/ClavisPass/ClavisPass");
+                }}
+                style={{ borderRadius: 12 }}
+              >
+                Github
+              </Chip>
+            </View>
+          </ScrollView>
+        </View>
+
+        <ChangeMasterPasswordModal
+          visible={showChangeMasterPasswordModal}
+          setVisible={setShowChangeMasterPasswordModal}
+        />
+      </BottomSheetModalProvider>
     </AnimatedContainer>
   );
 };

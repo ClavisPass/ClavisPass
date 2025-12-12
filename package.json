@@ -28,6 +28,8 @@
     "@gorhom/bottom-sheet": "^5.2.8",
     "@hello-pangea/dnd": "^18.0.1",
     "@kichiyaki/react-native-barcode-generator": "^0.6.7",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-popover": "^1.1.15",
     "@react-native-assets/slider": "^11.0.8",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-picker/picker": "2.11.1",

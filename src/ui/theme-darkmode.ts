@@ -10,12 +10,12 @@ const theme: MD3Theme = {
     primaryContainer: "rgba(120, 126, 245, 1)",
     secondary: "#69C4FF",
     secondaryContainer: "rgba(120, 126, 245, 0.09)",
-    background: "#1b1b1bff",
+    background: "#1A1A1A",
     elevation: {
       level0: "transparent",
       level1: "rgb(39, 35, 41)",
-      level2: "#000000", //rgb(44, 40, 48)
-      level3: "#2c2c2c",
+      level2: "#0D0D0D", //rgb(44, 40, 48)
+      level3: "#262626",
       level4: "rgb(52, 46, 57)",
       level5: "rgb(56, 49, 62)",
     },
