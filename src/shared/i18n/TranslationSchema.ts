@@ -73,6 +73,10 @@ export type TranslationSchema = {
     exportBackup: string;
     importPasswords: string;
     website: string;
+    minutes: string;
+    seconds: string;
+    copyDuration: string;
+    copyDurationOff: string;
   };
   analysis: {
     averageEntropy: string;

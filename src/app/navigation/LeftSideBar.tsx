@@ -12,6 +12,13 @@ import { useTranslation } from "react-i18next";
 const SIDEBAR_WIDTH = 88;
 export const sidebarWidth = SIDEBAR_WIDTH;
 
+function getActiveRouteName(state: any): string | undefined {
+  if (!state) return undefined;
+  const route = state.routes?.[state.index ?? 0];
+  if (!route) return undefined;
+  return route.state ? getActiveRouteName(route.state) : route.name;
+}
+
 export default function LeftSideTabBar({
   state,
   descriptors,
@@ -23,11 +30,19 @@ export default function LeftSideTabBar({
   const { t } = useTranslation();
 
   const handleLogout = () => auth.logout();
-  const goAdd = () =>
+
+  const activeRouteName = getActiveRouteName(state as any);
+  const isInEditScreen =
+    activeRouteName === "Edit" || activeRouteName === "EditScreen";
+  const isAddDisabled = isInEditScreen;
+
+  const goAdd = () => {
+    if (isAddDisabled) return;
     navigation.navigate("HomeStack", {
       screen: "Home",
       params: { triggerAdd: Date.now() },
     });
+  };
 
   const orderedRoutes = React.useMemo(() => {
     const r = [...state.routes];
@@ -119,6 +134,7 @@ export default function LeftSideTabBar({
             return;
           }
           if (name === "AddTrigger") {
+            if (isAddDisabled) return;
             goAdd();
             return;
           }
@@ -148,7 +164,9 @@ export default function LeftSideTabBar({
               styles.item,
               { backgroundColor: bgActive, opacity: isOnline ? 1 : 0.85 },
               isAction && styles.itemAction,
+              name === "AddTrigger" && isAddDisabled && { opacity: 0.45 },
             ]}
+            disabled={(name === "AddTrigger" && isAddDisabled) || false}
           >
             <View style={styles.itemInner}>
               {iconEl}

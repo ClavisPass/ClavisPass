@@ -106,6 +106,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const { value: timeFormat, setValue: setTimeFormatSetting } =
     useSetting("TIME_FORMAT");
 
+  const { value: copyDurationSeconds, setValue: setCopyDurationSeconds } =
+    useSetting("COPY_DURATION");
+
   const closeBehavior = closeBehaviorValue === "hide";
   const hideOnStartup = startBehaviorValue === "hidden";
   const fastAccess = fastAccessValue === "auto";
@@ -405,6 +408,42 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 onValueChange={(checked) => {
                   changeFastAccessBehavior(checked);
                 }}
+              />
+              <SettingsDivider />
+              <SettingsDropdownItem
+                value={String(copyDurationSeconds ?? 0)}
+                setValue={(v) => setCopyDurationSeconds(Number(v))}
+                label={t("settings:copyDuration")}
+                leadingIcon="content-copy"
+                dropdownMaxWidth={260}
+                dropdownMinWidth={200}
+                options={[
+                  { label: t("settings:copyDurationOff"), value: "0" },
+                  {
+                    label: t("settings:seconds", { count: 5 }),
+                    value: "5",
+                  },
+                  {
+                    label: t("settings:seconds", { count: 10 }),
+                    value: "10",
+                  },
+                  {
+                    label: t("settings:seconds", { count: 15 }),
+                    value: "15",
+                  },
+                  {
+                    label: t("settings:seconds", { count: 20 }),
+                    value: "20",
+                  },
+                  {
+                    label: t("settings:seconds", { count: 30 }),
+                    value: "30",
+                  },
+                  {
+                    label: t("settings:minutes", { count: 1 }),
+                    value: "60",
+                  },
+                ]}
               />
             </SettingsContainer>
 

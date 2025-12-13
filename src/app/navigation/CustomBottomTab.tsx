@@ -8,6 +8,13 @@ import { useAuth } from "../providers/AuthProvider";
 import { useOnline } from "../providers/OnlineProvider";
 import { useTranslation } from "react-i18next";
 
+function getActiveRouteName(state: any): string | undefined {
+  if (!state) return undefined;
+  const route = state.routes?.[state.index ?? 0];
+  if (!route) return undefined;
+  return route.state ? getActiveRouteName(route.state) : route.name;
+}
+
 const CustomBottomTab = ({
   state,
   descriptors,
@@ -22,10 +29,16 @@ const CustomBottomTab = ({
     auth.logout();
   };
 
+  const activeRouteName = getActiveRouteName(state as any); // ✅ CHANGED
+  const isInEditScreen =
+    activeRouteName === "Edit" || activeRouteName === "EditScreen";
+
   const routes = state.routes.map((route, idx) => {
     const isAdd = route.name === "AddTrigger";
     const isLogout = route.name === "Logout";
     const isFocused = state.index === idx;
+
+    const isAddDisabled = isInEditScreen;
 
     const label = isAdd
       ? ""
@@ -53,6 +66,7 @@ const CustomBottomTab = ({
         if (isLogout) {
           handleLogout();
         } else if (isAdd) {
+          if (isAddDisabled) return;
           navigation.navigate("HomeStack", {
             screen: "Home",
             params: { triggerAdd: Date.now() },
@@ -141,12 +155,14 @@ const CustomBottomTab = ({
           mode="contained-tonal"
           selected={true}
           iconColor={theme.colors.primary}
-          onPress={() =>
+          disabled={isInEditScreen}
+          onPress={() => {
+            if (isInEditScreen) return;
             navigation.navigate("HomeStack", {
               screen: "Home",
               params: { triggerAdd: Date.now() },
-            })
-          }
+            });
+          }}
         />
       </View>
 
@@ -194,7 +210,6 @@ const CustomBottomTab = ({
             animationEasing={Easing.bezier(0.2, 0.7, 0.3, 1)}
             activeColor={theme.colors.primary}
             inactiveColor={"#777"}
-            
           />
         </View>
       </View>

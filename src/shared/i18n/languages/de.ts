@@ -77,6 +77,10 @@ const de: TranslationSchema = {
     exportBackup: "Exportieren",
     importPasswords: "{{title}} Passwörter",
     website: "Webseite",
+    minutes: "{{count}} Minuten",
+    seconds: "{{count}} Sekunden",
+    copyDuration: "Kopierdauer",
+    copyDurationOff: "Aus",
   },
   analysis: {
     averageEntropy: "Ø Entropie",
