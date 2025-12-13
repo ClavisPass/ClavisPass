@@ -1,30 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
 import "react-native-gesture-handler";
-import { AuthProvider } from "./src/contexts/AuthProvider";
-import { DataProvider } from "./src/contexts/DataProvider";
-import ProtectedRoute from "./src/utils/ProtectedRoute";
+import { AuthProvider } from "./src/app/providers/AuthProvider";
+import { DataProvider } from "./src/app/providers/DataProvider";
 import { Platform, View } from "react-native";
-import CustomTitlebar from "./src/components/CustomTitlebar";
+import CustomTitlebar from "./src/shared/components/CustomTitlebar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import GlobalShortcuts from "./src/components/shortcuts/GlobalShortcuts";
-import { ThemeProvider } from "./src/contexts/ThemeProvider";
-import { CloudProvider } from "./src/contexts/CloudProvider";
-import theme from "./src/ui/theme";
-import { OnlineProvider } from "./src/contexts/OnlineProvider";
-import LoginStack from "./src/stacks/LoginStack";
-import FastAccessScreen from "./src/pages/FastAccessScreen";
-import { DevModeProvider } from "./src/contexts/DevModeProvider";
+import GlobalShortcuts from "./src/shared/components/shortcuts/GlobalShortcuts";
+import { ThemeProvider } from "./src/app/providers/ThemeProvider";
+import { CloudProvider } from "./src/app/providers/CloudProvider";
+import theme from "./src/shared/ui/theme";
+import { OnlineProvider } from "./src/app/providers/OnlineProvider";
+import FastAccessScreen from "./src/screens/FastAccessScreen";
+import { DevModeProvider } from "./src/app/providers/DevModeProvider";
 import { AutocompleteDropdownContextProvider } from "react-native-autocomplete-dropdown";
-import TabNavigator from "./src/ui/TabNavigatior";
 import { onOpenUrl, register } from "@tauri-apps/plugin-deep-link";
-import UpdateManager from "./src/components/UpdateManager";
-import { logger } from "./src/utils/logger";
-import GlobalErrorSnackbar from "./src/components/GlobalErrorSnackbar";
-import { SettingsProvider } from "./src/contexts/SettingsProvider";
-import I18nBridge from "./src/components/I18nBridge";
-import DropdownLayer from "./src/components/web/DropdownLayer";
+import { logger } from "./src/infrastructure/logging/logger";
+import GlobalErrorSnackbar from "./src/shared/components/GlobalErrorSnackbar";
+import { SettingsProvider } from "./src/app/providers/SettingsProvider";
+import I18nBridge from "./src/shared/components/I18nBridge";
+import DropdownLayer from "./src/shared/components/web/DropdownLayer";
+import NavigationContainer from "./src/app/navigation/NavigationContainer";
 
 const Tab = createBottomTabNavigator();
 
@@ -81,13 +77,7 @@ export function AppWithNavigation() {
                       >
                         <GlobalShortcuts />
                         <CustomTitlebar />
-
-                        <NavigationContainer>
-                          <ProtectedRoute loginScreen={<LoginStack />}>
-                            <TabNavigator />
-                            <UpdateManager />
-                          </ProtectedRoute>
-                        </NavigationContainer>
+                        <NavigationContainer />
                       </View>
                     </DevModeProvider>
                   </DataProvider>
