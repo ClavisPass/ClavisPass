@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Platform, View, StyleSheet } from "react-native";
 import { IconButton, TextInput } from "react-native-paper";
-import DraggableFolderList from "../../../features/vault/components/lists/DraggableFolderList";
-import { useTheme } from "../../../app/providers/ThemeProvider";
-import changeFolder from "../../../features/vault/utils/changeFolder";
-import { useData } from "../../../app/providers/DataProvider";
-import FolderType from "../../../features/vault/model/FolderType";
-import createUniqueID from "../../utils/createUniqueID";
+import DraggableFolderList from "../lists/DraggableFolderList";
+import { useTheme } from "../../../../app/providers/ThemeProvider";
+import changeFolder from "../../utils/changeFolder";
+import { useData } from "../../../../app/providers/DataProvider";
+import FolderType from "../../model/FolderType";
+import createUniqueID from "../../../../shared/utils/createUniqueID";
 import { useTranslation } from "react-i18next";
-import DraggableFolderListWeb from "../../../features/vault/components/lists/DraggableFolderListWeb";
-import Modal from "./Modal";
+import DraggableFolderListWeb from "../lists/DraggableFolderListWeb";
+import Modal from "../../../../shared/components/modals/Modal";
 
 type Props = {
   visible: boolean;

@@ -1,4 +1,4 @@
-import TokenQRCodeModal from "../modals/TokenQRCodeModal";
+import TokenQRCodeModal from "../../../features/settings/components/modals/TokenQRCodeModal";
 import { useState } from "react";
 import SettingsItem from "../../../features/vault/components/items/SettingsItem";
 import { useToken } from "../../../app/providers/CloudProvider";

@@ -31,7 +31,7 @@ import getPasswordStrengthIcon from "../features/analysis/utils/getPasswordStren
 import Header from "../shared/components/Header";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../shared/ui/linearGradient";
-import FilterAnalysisModal from "../shared/components/modals/FilterAnalysisModal";
+import FilterAnalysisModal from "../features/analysis/components/modals/FilterAnalysisModal";
 import { StackScreenProps } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import AnimatedPressable from "../shared/components/AnimatedPressable";

@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { Button, Portal, Text } from "react-native-paper";
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
-import { toIsoUtcFromLocal } from "../../../features/vault/utils/expiry";
-import Modal from "./Modal";
+import { toIsoUtcFromLocal } from "../../utils/expiry";
+import Modal from "../../../../shared/components/modals/Modal";
 
-import { useTheme } from "../../../app/providers/ThemeProvider";
+import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { useTranslation } from "react-i18next";
 
 type Props = {

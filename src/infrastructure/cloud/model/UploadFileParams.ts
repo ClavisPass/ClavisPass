@@ -1,5 +1,5 @@
-import CryptoType from "../../CryptoType";
-import Provider from "../Provider";
+import CryptoType from "../../crypto/CryptoType";
+import Provider from "./Provider";
 
 export interface UploadFileParams {
   provider: Provider;

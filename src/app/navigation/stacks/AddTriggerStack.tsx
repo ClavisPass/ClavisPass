@@ -1,5 +1,5 @@
 import Stack from "./Stack";
-import transitionSpecConfig from "../../configs/TransitionSpecConfig";
+import transitionSpecConfig from "../../config/TransitionSpecConfig";
 import AddTriggerScreen from "../../../screens/AddTriggerScreen";
 
 function AddTriggerStack() {

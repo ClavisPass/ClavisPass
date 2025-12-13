@@ -21,11 +21,11 @@ import {
   authenticateUser,
   isUsingAuthentication,
   loadAuthentication,
-} from "../../../shared/utils/authenticateUser";
+} from "../utils/authenticateUser";
 
 import Logo from "../../../shared/ui/Logo";
 import { logger } from "../../../infrastructure/logging/logger";
-import { fetchRemoteVaultFile } from "../../../infrastructure/clients/CloudStorageClient";
+import { fetchRemoteVaultFile } from "../../../infrastructure/cloud/clients/CloudStorageClient";
 import { useTranslation } from "react-i18next";
 
 type Props = {

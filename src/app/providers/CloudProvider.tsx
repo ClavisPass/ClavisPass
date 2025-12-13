@@ -8,8 +8,8 @@ import React, {
 } from "react";
 
 import { getData, saveData, removeData } from "../../infrastructure/storage/secureStore";
-import { refreshAccessToken } from "../../infrastructure/clients/CloudStorageClient";
-import Provider from "../../infrastructure/clients/Provider";
+import { refreshAccessToken } from "../../infrastructure/cloud/clients/CloudStorageClient";
+import Provider from "../../infrastructure/cloud/model/Provider";
 import { logger } from "../../infrastructure/logging/logger";
 
 type StoredAuth = {

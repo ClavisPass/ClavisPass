@@ -1,16 +1,16 @@
-import FetchFileParams from "./cloudStorage/FetchFileParams";
-import RemoteFileContent from "./cloudStorage/RemoteFileContent";
-import { UploadFileParams } from "./cloudStorage/UploadFileParams";
-import TokenRefreshParams from "./oauth/TokenRefreshParams";
-import TokenRefreshResult from "./oauth/TokenRefreshResult";
+import FetchFileParams from "../model/FetchFileParams";
+import RemoteFileContent from "../model/RemoteFileContent";
+import { UploadFileParams } from "../model/UploadFileParams";
+import TokenRefreshParams from "../model/oauth/TokenRefreshParams";
+import TokenRefreshResult from "../model/oauth/TokenRefreshResult";
 import * as DropboxClient from "./DropboxClient";
 import * as GoogleDriveClient from "./GoogleDriveClient";
 import * as DeviceStorageClient from "./DeviceStorageClient";
 
-import { logger } from "../logging/logger";
-import Provider from "./Provider";
-import UserInfoType from "../../features/sync/model/UserInfoType";
-import { triggerGlobalError } from "../events/errorBus";
+import { logger } from "../../logging/logger";
+import Provider from "../model/Provider";
+import UserInfoType from "../../../features/sync/model/UserInfoType";
+import { triggerGlobalError } from "../../events/errorBus";
 
 export const fetchUserInfo = async (
   token: string,

@@ -7,14 +7,14 @@ import {
   StyleSheet,
 } from "react-native";
 import { Searchbar, Text, Icon, IconButton, Chip } from "react-native-paper";
-import Modal from "./Modal";
-import ModulesEnum from "../../../features/vault/model/ModulesEnum";
-import ModuleIconsEnum from "../../../features/vault/model/ModuleIconsEnum";
-import AnimatedPressable from "../AnimatedPressable";
+import Modal from "../../../../shared/components/modals/Modal";
+import ModulesEnum from "../../model/ModulesEnum";
+import ModuleIconsEnum from "../../model/ModuleIconsEnum";
+import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 
 import { useTranslation } from "react-i18next";
-import { useTheme } from "../../../app/providers/ThemeProvider";
-import { useSetting } from "../../../app/providers/SettingsProvider";
+import { useTheme } from "../../../../app/providers/ThemeProvider";
+import { useSetting } from "../../../../app/providers/SettingsProvider";
 
 type ModuleCategory = "Common" | "Security" | "vCard" | "Utility";
 

@@ -8,15 +8,15 @@ import {
   Text,
   TextInput,
 } from "react-native-paper";
-import getColors from "../../ui/linearGradient";
+import getColors from "../../../../shared/ui/linearGradient";
 import { LinearGradient } from "expo-linear-gradient";
 import { Slider } from "@react-native-assets/slider";
 
-import generatePassword from "../../../features/vault/utils/generatePassword";
-import CopyToClipboard from "../buttons/CopyToClipboard";
-import Modal from "./Modal";
-import { useTheme } from "../../../app/providers/ThemeProvider";
-import Button from "../buttons/Button";
+import generatePassword from "../../utils/generatePassword";
+import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
+import Modal from "../../../../shared/components/modals/Modal";
+import { useTheme } from "../../../../app/providers/ThemeProvider";
+import Button from "../../../../shared/components/buttons/Button";
 import { useTranslation } from "react-i18next";
 
 const styles = StyleSheet.create({

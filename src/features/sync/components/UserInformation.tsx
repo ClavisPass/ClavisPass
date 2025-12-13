@@ -9,7 +9,7 @@ import UserInfoType from "../model/UserInfoType";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import { useToken } from "../../../app/providers/CloudProvider";
 import { logger } from "../../../infrastructure/logging/logger";
-import { fetchUserInfo } from "../../../infrastructure/clients/CloudStorageClient";
+import { fetchUserInfo } from "../../../infrastructure/cloud/clients/CloudStorageClient";
 import GoogleDriveLoginButton from "./GoogleDriveLoginButton";
 import SettingsDivider from "../../settings/components/SettingsDivider";
 import { useOnline } from "../../../app/providers/OnlineProvider";

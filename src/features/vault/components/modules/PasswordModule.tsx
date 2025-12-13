@@ -8,7 +8,7 @@ import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
 
 import passwordEntropy from "../../../analysis/utils/Entropy";
-import PasswordGeneratorModal from "../../../../shared/components/modals/PasswordGeneratorModal";
+import PasswordGeneratorModal from "../modals/PasswordGeneratorModal";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
 import * as Progress from "react-native-progress";
 import ModuleIconsEnum from "../../model/ModuleIconsEnum";

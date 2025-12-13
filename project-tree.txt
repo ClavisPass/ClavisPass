@@ -43,159 +43,148 @@
 Ôö£ÔöÇÔöÇ project-tree.txt
 Ôö£ÔöÇÔöÇ release.js
 Ôö£ÔöÇÔöÇ src
-Ôöé   Ôö£ÔöÇÔöÇ api
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ CloudStorageClient.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DeviceStorageClient.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DropboxClient.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ GoogleDriveClient.ts
-Ôöé   Ôöé   ÔööÔöÇÔöÇ generateNewToken.tsx
-Ôöé   Ôö£ÔöÇÔöÇ components
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AnalysisEntry.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AnalysisEntryGradient.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AnimatedPressable.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Auth.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Autocomplete.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Backup.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Blur.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ CircularProgressBar.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ContentProtection.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ CustomTitlebar.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DarkModeSwitch.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Divider.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DraggableHandle.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ FolderFilter.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Footer.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ GlobalErrorSnackbar.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Header.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ I18nBridge.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Login.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ PasswordTextbox.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Pattern.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ QuickSelect.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ SettingsDivider.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ SettingsQuickSelect.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ SettingsSwitch.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Sync.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ TypeWriter.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ UpdateManager.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ UserInformation.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ buttons
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ BackupExportButton.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ BackupImportButton.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Button.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ContainerButton.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ CopyToClipboard.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DropboxLoginButton.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ GoogleDriveLoginButton.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ShowQRCodeButton.tsx
-Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ SquaredContainerButton.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ container
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AnimatedContainer.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AnimatedOpacityContainer
-Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AnimatedOpacityContainer
-Ôöé   Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ AnimatedOpacityContainer.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ EditRowControlsContainer.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ModuleContainer.tsx
-Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ SettingsContainer.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ items
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ CardItem.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ CategoryItem.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ListItem.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ MenuItem.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ SettingsDropdownItem.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ SettingsItem.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ SettingsShortcutItem.tsx
-Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ TotpItem.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ lists
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ draggableFolderList
-Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DraggableFolderList.tsx
-Ôöé   Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ DraggableFolderListWeb.tsx
-Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ draggableModulesList
-Ôöé   Ôöé   Ôöé       Ôö£ÔöÇÔöÇ DraggableModulesList.tsx
-Ôöé   Ôöé   Ôöé       ÔööÔöÇÔöÇ DraggableModulesListWeb.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ menus
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ HomeFilterMenu.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Menu.tsx
-Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ container
-Ôöé   Ôöé   Ôöé       Ôö£ÔöÇÔöÇ MenuContainer.tsx
-Ôöé   Ôöé   Ôöé       ÔööÔöÇÔöÇ MenuContainerWeb.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ modals
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AddModuleModal.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AddValueModal.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ChangeMasterPasswordModal.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DeleteModal.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DiscardChangesModal.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ EditCustomFieldModal.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ExpiryPickerModal.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ FilterAnalysisModal.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ FolderModal.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Modal.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ PasswordGeneratorModal.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ TokenQRCodeModal.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ WifiQRCodeModal.tsx
-Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ container
-Ôöé   Ôöé   Ôöé       Ôö£ÔöÇÔöÇ ModalContainer.tsx
-Ôöé   Ôöé   Ôöé       ÔööÔöÇÔöÇ ModalContainerWeb.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ modules
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ CustomFieldModule.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ EmailModule.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ExpiryModule.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ KeyModule.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ MetaInformationModule.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ NoteModule.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ PasswordModule.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ PhoneNumberModule.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ TaskModule.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ TitleModule.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ TotpModule.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ URLModule.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ UnknownModule.tsx
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ UsernameModule.tsx
-Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ WifiModule.tsx
+Ôöé   Ôö£ÔöÇÔöÇ app
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ configs
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ TransitionSpecConfig.ts
 Ôöé   Ôöé   Ôö£ÔöÇÔöÇ navigation
 Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ CustomBottomTab.tsx
 Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ LeftSideBar.tsx
 Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ NavigationContainer.tsx
-Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ TabNavigatior.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ platformSpecific
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ProtectedRoute.tsx
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ TabNavigator.tsx
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ stacks
+Ôöé   Ôöé   Ôöé       Ôö£ÔöÇÔöÇ AddTriggerStack.tsx
+Ôöé   Ôöé   Ôöé       Ôö£ÔöÇÔöÇ AnalysisStack.tsx
+Ôöé   Ôöé   Ôöé       Ôö£ÔöÇÔöÇ HomeStack.tsx
+Ôöé   Ôöé   Ôöé       Ôö£ÔöÇÔöÇ LoginStack.tsx
+Ôöé   Ôöé   Ôöé       Ôö£ÔöÇÔöÇ LogoutStack.tsx
+Ôöé   Ôöé   Ôöé       Ôö£ÔöÇÔöÇ SettingsStack.tsx
+Ôöé   Ôöé   Ôöé       ÔööÔöÇÔöÇ Stack.tsx
+Ôöé   Ôöé   ÔööÔöÇÔöÇ providers
+Ôöé   Ôöé       Ôö£ÔöÇÔöÇ AuthProvider.tsx
+Ôöé   Ôöé       Ôö£ÔöÇÔöÇ CloudProvider.tsx
+Ôöé   Ôöé       Ôö£ÔöÇÔöÇ DataProvider.tsx
+Ôöé   Ôöé       Ôö£ÔöÇÔöÇ DevModeProvider.tsx
+Ôöé   Ôöé       Ôö£ÔöÇÔöÇ OnlineProvider.tsx
+Ôöé   Ôöé       Ôö£ÔöÇÔöÇ SettingsProvider.tsx
+Ôöé   Ôöé       ÔööÔöÇÔöÇ ThemeProvider.tsx
+Ôöé   Ôö£ÔöÇÔöÇ features
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ analysis
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ components
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AnalysisEntry.tsx
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AnalysisEntryGradient.tsx
+Ôöé   Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ Pattern.tsx
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ model
+Ôöé   Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ PasswordStrengthLevel.ts
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ utils
+Ôöé   Ôöé   Ôöé       Ôö£ÔöÇÔöÇ Entropy.ts
+Ôöé   Ôöé   Ôöé       Ôö£ÔöÇÔöÇ getPasswordStrengthColor.ts
+Ôöé   Ôöé   Ôöé       ÔööÔöÇÔöÇ getPasswordStrengthIcon.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ auth
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ components
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Auth.tsx
+Ôöé   Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ Login.tsx
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ model
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ fastaccess
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ components
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ model
+Ôöé   Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ FastAccessType.ts
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ utils
+Ôöé   Ôöé   Ôöé       Ôö£ÔöÇÔöÇ FastAccess.ts
+Ôöé   Ôöé   Ôöé       ÔööÔöÇÔöÇ extractFastAccessObject.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ settings
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ components
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ BackupExportButton.tsx
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ BackupImportButton.tsx
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DarkModeSwitch.tsx
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Footer.tsx
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ SettingsContainer.tsx
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ SettingsDivider.tsx
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ SettingsQuickSelect.tsx
+Ôöé   Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ SettingsSwitch.tsx
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ model
+Ôöé   Ôöé   Ôöé       Ôö£ÔöÇÔöÇ QuickSelectItem.ts
+Ôöé   Ôöé   Ôöé       ÔööÔöÇÔöÇ documentPicker
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ sync
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ components
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Backup.tsx
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DropboxLoginButton.tsx
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ GoogleDriveLoginButton.tsx
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Sync.tsx
+Ôöé   Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ UserInformation.tsx
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ model
+Ôöé   Ôöé   Ôöé       ÔööÔöÇÔöÇ UserInfoType.ts
+Ôöé   Ôöé   ÔööÔöÇÔöÇ vault
+Ôöé   Ôöé       Ôö£ÔöÇÔöÇ components
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ EditRowControlsContainer.tsx
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ FolderFilter.tsx
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ ModuleContainer.tsx
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ QuickSelect.tsx
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ items
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ lists
+Ôöé   Ôöé       Ôöé   ÔööÔöÇÔöÇ modules
+Ôöé   Ôöé       Ôö£ÔöÇÔöÇ model
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ DataType.ts
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ ExpiryStatus.ts
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ FolderType.ts
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ ModuleIconsEnum.ts
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ ModuleProps.ts
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ ModulesEnum.ts
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ ModulesType.ts
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ TemplateEnum.ts
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ ValueIconsEnum.ts
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ ValuesType.ts
+Ôöé   Ôöé       Ôöé   Ôö£ÔöÇÔöÇ WifiTypeEnum.ts
+Ôöé   Ôöé       Ôöé   ÔööÔöÇÔöÇ modules
+Ôöé   Ôöé       ÔööÔöÇÔöÇ utils
+Ôöé   Ôöé           Ôö£ÔöÇÔöÇ changeFolder.ts
+Ôöé   Ôöé           Ôö£ÔöÇÔöÇ expiry.ts
+Ôöé   Ôöé           Ôö£ÔöÇÔöÇ generatePassword.ts
+Ôöé   Ôöé           Ôö£ÔöÇÔöÇ getEmptyData.ts
+Ôöé   Ôöé           Ôö£ÔöÇÔöÇ getModule.tsx
+Ôöé   Ôöé           Ôö£ÔöÇÔöÇ getModuleData.ts
+Ôöé   Ôöé           Ôö£ÔöÇÔöÇ getModuleNameByEnum.ts
+Ôöé   Ôöé           Ôö£ÔöÇÔöÇ getTemplate.ts
+Ôöé   Ôöé           Ôö£ÔöÇÔöÇ getTestData.ts
+Ôöé   Ôöé           Ôö£ÔöÇÔöÇ pkce.web.ts
+Ôöé   Ôöé           Ôö£ÔöÇÔöÇ predictNextModule.ts
+Ôöé   Ôöé           Ôö£ÔöÇÔöÇ regex
+Ôöé   Ôöé           ÔööÔöÇÔöÇ totp.ts
+Ôöé   Ôö£ÔöÇÔöÇ infrastructure
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ clients
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ CloudStorageClient.ts
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DeviceStorageClient.ts
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DropboxClient.ts
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ GoogleDriveClient.ts
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Provider.ts
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ SessionQrPayload.ts
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ cloudStorage
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ FetchFileParams.ts
+Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ RemoteFileContent.ts
+Ôöé   Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ UploadFileParams.ts
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ oauth
+Ôöé   Ôöé   Ôöé       Ôö£ÔöÇÔöÇ TokenRefreshParams.ts
+Ôöé   Ôöé   Ôöé       ÔööÔöÇÔöÇ TokenRefreshResult.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ clipboard
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ clipboardClearScheduler.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ crypto
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ CryptoLayer.ts
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ CryptoType.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ events
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ GlobalErrorPayload.ts
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ errorBus.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ logging
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ logger.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ platform
 Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AndroidSpecific.tsx
 Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ IosSpecific.tsx
-Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ WebSpecific.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ shortcuts
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ GlobalShortcuts.tsx
-Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ SearchShortcut.tsx
-Ôöé   Ôöé   ÔööÔöÇÔöÇ web
-Ôöé   Ôöé       Ôö£ÔöÇÔöÇ DropdownLayer.tsx
-Ôöé   Ôöé       ÔööÔöÇÔöÇ DropdownLayer.web.tsx
-Ôöé   Ôö£ÔöÇÔöÇ configs
-Ôöé   Ôöé   ÔööÔöÇÔöÇ TransitionSpecConfig.ts
-Ôöé   Ôö£ÔöÇÔöÇ contexts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AuthProvider.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ CloudProvider.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DataProvider.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DevModeProvider.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ OnlineProvider.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ SettingsProvider.tsx
-Ôöé   Ôöé   ÔööÔöÇÔöÇ ThemeProvider.tsx
-Ôöé   Ôö£ÔöÇÔöÇ enums
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ModuleIconsEnum.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ModulesEnum.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ PasswordStrengthLevel.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ TemplateEnum.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ValueIconsEnum.ts
-Ôöé   Ôöé   ÔööÔöÇÔöÇ WifiTypeEnum.ts
-Ôöé   Ôö£ÔöÇÔöÇ events
-Ôöé   Ôöé   ÔööÔöÇÔöÇ errorBus.ts
-Ôöé   Ôö£ÔöÇÔöÇ hooks
-Ôöé   Ôöé   ÔööÔöÇÔöÇ useAppLifecycle.ts
-Ôöé   Ôö£ÔöÇÔöÇ i18n
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ TranslationSchema.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ index.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ languages
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ de.ts
-Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ en.ts
-Ôöé   Ôöé   ÔööÔöÇÔöÇ types.ts
-Ôöé   Ôö£ÔöÇÔöÇ pages
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ WebSpecific.tsx
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ isTauri.ts
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ showMainWindow.ts
+Ôöé   Ôöé   ÔööÔöÇÔöÇ storage
+Ôöé   Ôöé       Ôö£ÔöÇÔöÇ secureStore.ts
+Ôöé   Ôöé       ÔööÔöÇÔöÇ store.ts
+Ôöé   Ôö£ÔöÇÔöÇ screens
 Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AddTriggerScreen.tsx
 Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AnalysisDetailScreen.tsx
 Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AnalysisScreen.tsx
@@ -208,100 +197,81 @@
 Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ScanScreen.tsx
 Ôöé   Ôöé   Ôö£ÔöÇÔöÇ SettingsScreen.tsx
 Ôöé   Ôöé   ÔööÔöÇÔöÇ TotpScanScreen.tsx
-Ôöé   Ôö£ÔöÇÔöÇ stacks
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AddTriggerStack.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AnalysisStack.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ HomeStack.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ LoginStack.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ LogoutStack.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ SettingsStack.tsx
-Ôöé   Ôöé   ÔööÔöÇÔöÇ Stack.tsx
-Ôöé   Ôö£ÔöÇÔöÇ types
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ CryptoType.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DataType.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ExpiryStatus.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ FastAccessType.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ FolderType.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ GlobalErrorPayload.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ModuleProps.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ModulesType.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ QuickSelectItem.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ SessionQrPayload.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ UserInfoType.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ValuesType.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ api
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Provider.ts
-Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ cloudStorage
-Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ FetchFileParams.ts
-Ôöé   Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ RemoteFileContent.ts
-Ôöé   Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ UploadFileParams.ts
-Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ oauth
-Ôöé   Ôöé   Ôöé       Ôö£ÔöÇÔöÇ TokenRefreshParams.ts
-Ôöé   Ôöé   Ôöé       ÔööÔöÇÔöÇ TokenRefreshResult.ts
-Ôöé   Ôöé   ÔööÔöÇÔöÇ modules
-Ôöé   Ôöé       Ôö£ÔöÇÔöÇ CustomFieldModuleType.ts
-Ôöé   Ôöé       Ôö£ÔöÇÔöÇ EmailModuleType.ts
-Ôöé   Ôöé       Ôö£ÔöÇÔöÇ ExpiryModuleType.ts
-Ôöé   Ôöé       Ôö£ÔöÇÔöÇ KeyModuleType.ts
-Ôöé   Ôöé       Ôö£ÔöÇÔöÇ NoteModuleType.ts
-Ôöé   Ôöé       Ôö£ÔöÇÔöÇ PasswordModuleType.ts
-Ôöé   Ôöé       Ôö£ÔöÇÔöÇ PhoneNumberModuleType.ts
-Ôöé   Ôöé       Ôö£ÔöÇÔöÇ TaskModuleType.ts
-Ôöé   Ôöé       Ôö£ÔöÇÔöÇ TitleModuleType.ts
-Ôöé   Ôöé       Ôö£ÔöÇÔöÇ TotpModuleType.ts
-Ôöé   Ôöé       Ôö£ÔöÇÔöÇ URLModuleType.ts
-Ôöé   Ôöé       Ôö£ÔöÇÔöÇ UnknownModuleType.ts
-Ôöé   Ôöé       Ôö£ÔöÇÔöÇ UsernameModuleType.ts
-Ôöé   Ôöé       ÔööÔöÇÔöÇ WifiModuleType.ts
-Ôöé   Ôö£ÔöÇÔöÇ ui
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AddTabButton.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AnimatedLogo.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Blob1.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Blob2.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Logo.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ LogoColored.tsx
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ globalStyles.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ linearGradient.ts
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ theme-darkmode.ts
-Ôöé   Ôöé   ÔööÔöÇÔöÇ theme.ts
-Ôöé   ÔööÔöÇÔöÇ utils
-Ôöé       Ôö£ÔöÇÔöÇ CryptoJS.ts
-Ôöé       Ôö£ÔöÇÔöÇ CryptoLayer.ts
-Ôöé       Ôö£ÔöÇÔöÇ Entropy.ts
-Ôöé       Ôö£ÔöÇÔöÇ FastAccess.ts
-Ôöé       Ôö£ÔöÇÔöÇ ProtectedRoute.tsx
-Ôöé       Ôö£ÔöÇÔöÇ Timestamp.ts
-Ôöé       Ôö£ÔöÇÔöÇ authenticateUser.ts
-Ôöé       Ôö£ÔöÇÔöÇ changeFolder.ts
-Ôöé       Ôö£ÔöÇÔöÇ clipboardClearScheduler.ts
-Ôöé       Ôö£ÔöÇÔöÇ createUniqueID.ts
-Ôöé       Ôö£ÔöÇÔöÇ documentPicker
-Ôöé       Ôöé   Ôö£ÔöÇÔöÇ Import.tsx
-Ôöé       Ôöé   Ôö£ÔöÇÔöÇ chrome.ts
-Ôöé       Ôöé   Ôö£ÔöÇÔöÇ firefox.ts
-Ôöé       Ôöé   ÔööÔöÇÔöÇ pcloud.ts
-Ôöé       Ôö£ÔöÇÔöÇ expiry.ts
-Ôöé       Ôö£ÔöÇÔöÇ extractFastAccessObject.ts
-Ôöé       Ôö£ÔöÇÔöÇ generatePassword.ts
-Ôöé       Ôö£ÔöÇÔöÇ getEmptyData.ts
-Ôöé       Ôö£ÔöÇÔöÇ getModule.tsx
-Ôöé       Ôö£ÔöÇÔöÇ getModuleData.ts
-Ôöé       Ôö£ÔöÇÔöÇ getModuleNameByEnum.ts
-Ôöé       Ôö£ÔöÇÔöÇ getPasswordStrengthColor.ts
-Ôöé       Ôö£ÔöÇÔöÇ getPasswordStrengthIcon.ts
-Ôöé       Ôö£ÔöÇÔöÇ getTemplate.ts
-Ôöé       Ôö£ÔöÇÔöÇ getTestData.ts
-Ôöé       Ôö£ÔöÇÔöÇ isSessionQrPayload.ts
-Ôöé       Ôö£ÔöÇÔöÇ isTauri.ts
-Ôöé       Ôö£ÔöÇÔöÇ logger.ts
-Ôöé       Ôö£ÔöÇÔöÇ pkce.web.ts
-Ôöé       Ôö£ÔöÇÔöÇ predictNextModule.ts
-Ôöé       Ôö£ÔöÇÔöÇ regex
-Ôöé       Ôöé   Ôö£ÔöÇÔöÇ identifyKeyType.ts
-Ôöé       Ôöé   Ôö£ÔöÇÔöÇ isDropboxToken.ts
-Ôöé       Ôöé   Ôö£ÔöÇÔöÇ isGoogleDriveToken.ts
-Ôöé       Ôöé   ÔööÔöÇÔöÇ validateEmail.ts
-Ôöé       Ôö£ÔöÇÔöÇ secureStore.ts
-Ôöé       Ôö£ÔöÇÔöÇ showMainWindow.ts
-Ôöé       Ôö£ÔöÇÔöÇ store.ts
-Ôöé       ÔööÔöÇÔöÇ totp.ts
+Ôöé   ÔööÔöÇÔöÇ shared
+Ôöé       Ôö£ÔöÇÔöÇ components
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ AnimatedPressable.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ Autocomplete.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ Blur.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ CircularProgressBar.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ ContentProtection.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ CustomTitlebar.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ Divider.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ DraggableHandle.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ GlobalErrorSnackbar.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ Header.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ I18nBridge.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ PasswordTextbox.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ TypeWriter.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ UpdateManager.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ buttons
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Button.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ContainerButton.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ CopyToClipboard.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ShowQRCodeButton.tsx
+Ôöé       Ôöé   Ôöé   ÔööÔöÇÔöÇ SquaredContainerButton.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ container
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AnimatedContainer.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AnimatedOpacityContainer
+Ôöé       Ôöé   Ôöé   ÔööÔöÇÔöÇ AnimatedOpacityContainer.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ menus
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ HomeFilterMenu.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Menu.tsx
+Ôöé       Ôöé   Ôöé   ÔööÔöÇÔöÇ container
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ modals
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AddModuleModal.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AddValueModal.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ChangeMasterPasswordModal.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DeleteModal.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ DiscardChangesModal.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ EditCustomFieldModal.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ExpiryPickerModal.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ FilterAnalysisModal.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ FolderModal.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Modal.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ PasswordGeneratorModal.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ TokenQRCodeModal.tsx
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ WifiQRCodeModal.tsx
+Ôöé       Ôöé   Ôöé   ÔööÔöÇÔöÇ container
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ shortcuts
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ GlobalShortcuts.tsx
+Ôöé       Ôöé   Ôöé   ÔööÔöÇÔöÇ SearchShortcut.tsx
+Ôöé       Ôöé   ÔööÔöÇÔöÇ web
+Ôöé       Ôöé       Ôö£ÔöÇÔöÇ DropdownLayer.tsx
+Ôöé       Ôöé       ÔööÔöÇÔöÇ DropdownLayer.web.tsx
+Ôöé       Ôö£ÔöÇÔöÇ hooks
+Ôöé       Ôöé   ÔööÔöÇÔöÇ useAppLifecycle.ts
+Ôöé       Ôö£ÔöÇÔöÇ i18n
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ TranslationSchema.ts
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ index.ts
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ languages
+Ôöé       Ôöé   Ôöé   Ôö£ÔöÇÔöÇ de.ts
+Ôöé       Ôöé   Ôöé   ÔööÔöÇÔöÇ en.ts
+Ôöé       Ôöé   ÔööÔöÇÔöÇ types.ts
+Ôöé       Ôö£ÔöÇÔöÇ ui
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ AddTabButton.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ AnimatedLogo.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ Blob1.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ Blob2.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ Logo.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ LogoColored.tsx
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ globalStyles.ts
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ linearGradient.ts
+Ôöé       Ôöé   Ôö£ÔöÇÔöÇ theme-darkmode.ts
+Ôöé       Ôöé   ÔööÔöÇÔöÇ theme.ts
+Ôöé       ÔööÔöÇÔöÇ utils
+Ôöé           Ôö£ÔöÇÔöÇ Timestamp.ts
+Ôöé           Ôö£ÔöÇÔöÇ authenticateUser.ts
+Ôöé           Ôö£ÔöÇÔöÇ createUniqueID.ts
+Ôöé           ÔööÔöÇÔöÇ isSessionQrPayload.ts
+Ôö£ÔöÇÔöÇ tsconfig.json
+ÔööÔöÇÔöÇ version.json

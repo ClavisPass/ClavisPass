@@ -6,7 +6,7 @@ import WifiModuleType from "../../model/modules/WifiModuleType";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
-import WifiQRCodeModal from "../../../../shared/components/modals/WifiQRCodeModal";
+import WifiQRCodeModal from "../modals/WifiQRCodeModal";
 import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { Dropdown, DropdownInputProps } from "react-native-paper-dropdown";

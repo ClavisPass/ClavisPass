@@ -1,6 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import LoginStack from "./stacks/LoginStack";
-import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRoute from "../auth/ProtectedRoute";
 import TabNavigator from "./TabNavigator";
 import UpdateManager from "../../shared/components/UpdateManager";
 import { useTheme } from "../providers/ThemeProvider";

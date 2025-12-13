@@ -11,9 +11,9 @@ import { StatusBar } from "expo-status-bar";
 import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import { logger } from "../infrastructure/logging/logger";
 import { useToken } from "../app/providers/CloudProvider";
-import { refreshAccessToken as refreshCloudAccessToken } from "../infrastructure/clients/CloudStorageClient";
+import { refreshAccessToken as refreshCloudAccessToken } from "../infrastructure/cloud/clients/CloudStorageClient";
 import isSessionQrPayload from "../shared/utils/isSessionQrPayload";
-import SessionQrPayload from "../infrastructure/clients/SessionQrPayload";
+import SessionQrPayload from "../infrastructure/cloud/model/SessionQrPayload";
 
 const styles = StyleSheet.create({
   scrollView: {

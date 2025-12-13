@@ -1,13 +1,13 @@
 import React from "react";
 import { Divider, IconButton } from "react-native-paper";
-import DataType from "../../../features/vault/model/DataType";
+import DataType from "../../model/DataType";
 import { View } from "react-native";
-import Menu from "./Menu";
-import { useData } from "../../../app/providers/DataProvider";
-import { MenuItem } from "../../../features/vault/components/items/MenuItem";
-import { useOnline } from "../../../app/providers/OnlineProvider";
+import Menu from "../../../../shared/components/menus/Menu";
+import { useData } from "../../../../app/providers/DataProvider";
+import { MenuItem } from "../items/MenuItem";
+import { useOnline } from "../../../../app/providers/OnlineProvider";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "../../../app/providers/ThemeProvider";
+import { useTheme } from "../../../../app/providers/ThemeProvider";
 
 type Props = {
   visible: boolean;

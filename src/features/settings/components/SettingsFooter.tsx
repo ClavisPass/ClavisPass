@@ -8,7 +8,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useRef } from "react";
 import { useDevMode } from "../../../app/providers/DevModeProvider";
 
-function Footer() {
+function SettingsFooter() {
   const { theme } = useTheme();
   const { setDevMode } = useDevMode();
   const appName =
@@ -86,4 +86,4 @@ function Footer() {
   );
 }
 
-export default Footer;
+export default SettingsFooter;

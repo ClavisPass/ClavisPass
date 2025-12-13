@@ -1,7 +1,7 @@
 import { Platform } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
-import { getData, removeData, saveData } from "../../infrastructure/storage/secureStore";
-import { logger } from "../../infrastructure/logging/logger";
+import { getData, removeData, saveData } from "../../../infrastructure/storage/secureStore";
+import { logger } from "../../../infrastructure/logging/logger";
 
 const MASTER_KEY = "ClavisPass-Master";
 

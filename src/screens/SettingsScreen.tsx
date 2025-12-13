@@ -12,7 +12,9 @@ import { useFocusEffect } from "@react-navigation/native";
 import WebSpecific from "../infrastructure/platform/WebSpecific";
 
 import { enable, isEnabled, disable } from "@tauri-apps/plugin-autostart";
-import Import, { DocumentTypeEnum } from "../features/settings/model/documentPicker/Import";
+import Import, {
+  DocumentTypeEnum,
+} from "../features/settings/model/documentPicker/Import";
 import DarkModeSwitch from "../features/settings/components/DarkModeSwitch";
 
 import Auth from "../features/auth/components/Auth";
@@ -22,14 +24,14 @@ import {
   isUsingAuthentication,
   removeAuthentication,
   saveAuthentication,
-} from "../shared/utils/authenticateUser";
+} from "../features/auth/utils/authenticateUser";
 import { useAuth } from "../app/providers/AuthProvider";
-import ChangeMasterPasswordModal from "../shared/components/modals/ChangeMasterPasswordModal";
+import ChangeMasterPasswordModal from "../features/settings/components/modals/ChangeMasterPasswordModal";
 import SettingsDivider from "../features/settings/components/SettingsDivider";
 import SettingsContainer from "../features/settings/components/SettingsContainer";
 import SettingsItem from "../features/vault/components/items/SettingsItem";
 import SettingsSwitch from "../features/settings/components/SettingsSwitch";
-import Footer from "../features/settings/components/Footer";
+import SettingsFooter from "../features/settings/components/SettingsFooter";
 
 import { open } from "@tauri-apps/plugin-shell";
 
@@ -38,19 +40,22 @@ import Header from "../shared/components/Header";
 import SettingsQuickSelect from "../features/settings/components/SettingsQuickSelect";
 import QuickSelectItem from "../features/settings/model/QuickSelectItem";
 import SettingsShortcutItem from "../features/vault/components/items/SettingsShortcutItem";
-import BackupImportButton from "../features/settings/components/BackupImportButton";
-import BackupExportButton from "../features/settings/components/BackupExportButton";
 import { useDevMode } from "../app/providers/DevModeProvider";
 import { StackScreenProps } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import SettingsDropdownItem from "../features/vault/components/items/SettingsDropdownItem";
-import { formatAbsoluteDate, formatAbsoluteTime } from "../features/vault/utils/expiry";
+import {
+  formatAbsoluteDate,
+  formatAbsoluteTime,
+} from "../features/vault/utils/expiry";
 import { AppLanguage } from "../shared/i18n/types";
 import { i18n } from "../shared/i18n";
 import { useTranslation } from "react-i18next";
 import { Chip } from "react-native-paper";
 import { useSetting } from "../app/providers/SettingsProvider";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import BackupImportButton from "../features/settings/components/buttons/BackupImportButton";
+import BackupExportButton from "../features/settings/components/buttons/BackupExportButton";
 
 const styles = StyleSheet.create({
   surface: {
@@ -441,7 +446,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               )}
             </SettingsContainer>
 
-            <Footer />
+            <SettingsFooter />
 
             <View
               style={{

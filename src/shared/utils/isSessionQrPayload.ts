@@ -1,4 +1,4 @@
-import SessionQrPayload from "../../infrastructure/clients/SessionQrPayload";
+import SessionQrPayload from "../../infrastructure/cloud/model/SessionQrPayload";
 
 function isSessionQrPayload(value: unknown): value is SessionQrPayload {
   if (!value || typeof value !== "object") return false;

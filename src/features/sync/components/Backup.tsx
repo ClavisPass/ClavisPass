@@ -11,7 +11,7 @@ import { DataTypeSchema } from "../../vault/model/DataType";
 import { decrypt } from "../../../infrastructure/crypto/CryptoLayer";
 import { logger } from "../../../infrastructure/logging/logger";
 
-import * as DeviceStorageClient from "../../../infrastructure/clients/DeviceStorageClient";
+import * as DeviceStorageClient from "../../../infrastructure/cloud/clients/DeviceStorageClient";
 import { useTranslation } from "react-i18next";
 import { formatAbsoluteLocal } from "../../vault/utils/expiry";
 import { useSetting } from "../../../app/providers/SettingsProvider";

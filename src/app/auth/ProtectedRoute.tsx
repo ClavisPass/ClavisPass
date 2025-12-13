@@ -16,7 +16,6 @@ const ProtectedRoute = ({ children, loginScreen }: Props) => {
 
   return (
     <Animated.View
-      //key={isAuthed ? "authed" : "login"}
       entering={FadeIn.duration(150)}
       exiting={FadeOut.duration(150)}
       style={[styles.container, { backgroundColor: theme.colors.background }]}

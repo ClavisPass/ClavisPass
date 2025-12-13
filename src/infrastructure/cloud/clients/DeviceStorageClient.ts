@@ -1,9 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import RemoteFileContent from "./cloudStorage/RemoteFileContent";
-import CryptoType from "../crypto/CryptoType";
-import { logger } from "../logging/logger";
-import { triggerGlobalError } from "../events/errorBus";
-import UserInfoType from "../../features/sync/model/UserInfoType";
+import RemoteFileContent from "../model/RemoteFileContent";
+import CryptoType from "../../crypto/CryptoType";
+import { logger } from "../../logging/logger";
+import { triggerGlobalError } from "../../events/errorBus";
+import UserInfoType from "../../../features/sync/model/UserInfoType";
 
 const LOCAL_SYNC_KEY = "LOCAL_SYNC";
 

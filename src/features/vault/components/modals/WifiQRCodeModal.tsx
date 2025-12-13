@@ -1,50 +1,37 @@
+import { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import getColors from "../../ui/linearGradient";
+import getColors from "../../../../shared/ui/linearGradient";
 import QRCode from "react-qr-code";
-import Modal from "./Modal";
+import Modal from "../../../../shared/components/modals/Modal";
 import { Portal } from "react-native-paper";
-import { useToken } from "../../../app/providers/CloudProvider"; // ggf. Pfad anpassen
-import { useEffect, useState } from "react";
 
-import { useTheme } from "../../../app/providers/ThemeProvider";
-import SessionQrPayload from "../../../infrastructure/clients/SessionQrPayload";
+import { useTheme } from "../../../../app/providers/ThemeProvider";
 
 type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
+  wifitype: string;
+  wifiname: string;
+  wifipassword: string;
 };
 
-function TokenQRCodeModal(props: Props) {
+function WifiQRCodeModal(props: Props) {
   const { theme } = useTheme();
-  const { provider, refreshToken } = useToken();
-
   const [value, setValue] = useState("");
   const hideModal = () => props.setVisible(false);
 
   useEffect(() => {
-    if (refreshToken) {
-      const payload: SessionQrPayload = {
-        kind: "clavispass:session",
-        version: 1,
-        provider,
-        refreshToken,
-      };
-      setValue(JSON.stringify(payload));
-    } else {
-      setValue("");
-    }
-  }, [provider, refreshToken]);
-
-  // Ob du automatisch schließen willst, wenn kein Token da ist,
-  // ist Geschmackssache. Ich würde das Schließen eher dem Aufrufer überlassen.
-  // Wenn du das Verhalten behalten willst:
-  useEffect(() => {
-    if (!refreshToken && props.visible) {
-      hideModal();
-    }
-  }, [refreshToken, props.visible]);
-
+    const wifiString =
+      "WIFI:S:" +
+      props.wifiname +
+      ";T:" +
+      props.wifitype +
+      ";P:" +
+      props.wifipassword +
+      ";;";
+    setValue(wifiString);
+  }, [props.wifitype, props.wifiname, props.wifipassword]);
   return (
     <Portal>
       <Modal visible={props.visible} onDismiss={hideModal}>
@@ -69,7 +56,7 @@ function TokenQRCodeModal(props: Props) {
             <QRCode
               size={200}
               style={{ height: "auto", width: "auto" }}
-              value={value || " "}
+              value={value}
               viewBox="0 0 200 200"
             />
           </View>
@@ -79,4 +66,4 @@ function TokenQRCodeModal(props: Props) {
   );
 }
 
-export default TokenQRCodeModal;
+export default WifiQRCodeModal;

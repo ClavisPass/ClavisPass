@@ -1,12 +1,12 @@
-import Modal from "./Modal";
+import Modal from "../../../../shared/components/modals/Modal";
 import { View, StyleSheet } from "react-native";
-import ValueIconsEnum from "../../../features/vault/model/ValueIconsEnum";
-import TemplateEnum from "../../../features/vault/model/TemplateEnum";
-import getTemplate from "../../../features/vault/utils/getTemplate";
-import CategoryItem from "../../../features/vault/components/items/CategoryItem";
-import FolderType from "../../../features/vault/model/FolderType";
+import ValueIconsEnum from "../../model/ValueIconsEnum";
+import TemplateEnum from "../../model/TemplateEnum";
+import getTemplate from "../../utils/getTemplate";
+import CategoryItem from "../items/CategoryItem";
+import FolderType from "../../model/FolderType";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "../../../app/providers/ThemeProvider";
+import { useTheme } from "../../../../app/providers/ThemeProvider";
 
 type Props = {
   visible: boolean;

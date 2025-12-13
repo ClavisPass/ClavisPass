@@ -1,11 +1,11 @@
-import Modal from "./Modal";
+import Modal from "../../../../shared/components/modals/Modal";
 import { View, StyleSheet } from "react-native";
-import Divider from "../Divider";
-import SettingsSwitch from "../../../features/settings/components/SettingsSwitch";
-import getPasswordStrengthIcon from "../../../features/analysis/utils/getPasswordStrengthIcon";
-import PasswordStrengthLevel from "../../../features/analysis/model/PasswordStrengthLevel";
+import Divider from "../../../../shared/components/Divider";
+import SettingsSwitch from "../../../settings/components/SettingsSwitch";
+import getPasswordStrengthIcon from "../../utils/getPasswordStrengthIcon";
+import PasswordStrengthLevel from "../../model/PasswordStrengthLevel";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "../../../app/providers/ThemeProvider";
+import { useTheme } from "../../../../app/providers/ThemeProvider";
 
 type Props = {
   visible: boolean;

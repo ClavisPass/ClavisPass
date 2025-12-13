@@ -1,12 +1,12 @@
 import { View, StyleSheet } from "react-native";
-import Modal from "./Modal";
-import { useData } from "../../../app/providers/DataProvider";
+import Modal from "../../../../shared/components/modals/Modal";
+import { useData } from "../../../../app/providers/DataProvider";
 import { useEffect, useRef, useState } from "react";
-import PasswordTextbox from "../PasswordTextbox";
+import PasswordTextbox from "../../../../shared/components/PasswordTextbox";
 import { Text } from "react-native-paper";
-import Button from "../buttons/Button";
-import { useTheme } from "../../../app/providers/ThemeProvider";
-import { useAuth } from "../../../app/providers/AuthProvider";
+import Button from "../../../../shared/components/buttons/Button";
+import { useTheme } from "../../../../app/providers/ThemeProvider";
+import { useAuth } from "../../../../app/providers/AuthProvider";
 import { useTranslation } from "react-i18next";
 
 type Props = {

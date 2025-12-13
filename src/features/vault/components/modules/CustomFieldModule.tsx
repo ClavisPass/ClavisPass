@@ -5,7 +5,7 @@ import { TextInput } from "react-native-paper";
 
 import CustomFieldModuleType from "../../model/modules/CustomFieldModuleType";
 import Props from "../../model/ModuleProps";
-import EditCustomFieldModal from "../../../../shared/components/modals/EditCustomFieldModal";
+import EditCustomFieldModal from "../modals/EditCustomFieldModal";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
 import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import { useTheme } from "../../../../app/providers/ThemeProvider";

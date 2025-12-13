@@ -1,4 +1,4 @@
-import Provider from "../Provider";
+import Provider from "../../model/Provider";
 
 interface TokenRefreshParams {
   provider: Provider;

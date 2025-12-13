@@ -1,5 +1,5 @@
 import Stack from "./Stack";
-import transitionSpecConfig from "../../configs/TransitionSpecConfig";
+import transitionSpecConfig from "../../config/TransitionSpecConfig";
 import LoginScreen from "../../../screens/LoginScreen";
 import ScanScreen from "../../../screens/ScanScreen";
 

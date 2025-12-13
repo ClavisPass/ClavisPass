@@ -11,7 +11,7 @@ import {
   formatAbsoluteLocal,
 } from "../../utils/expiry";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
-import ExpiryPickerModal from "../../../../shared/components/modals/ExpiryPickerModal";
+import ExpiryPickerModal from "../modals/ExpiryPickerModal";
 import ExpiryModuleType from "../../model/modules/ExpiryModuleType";
 
 import { useTranslation } from "react-i18next";

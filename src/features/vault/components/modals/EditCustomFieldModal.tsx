@@ -1,8 +1,8 @@
 import { View, StyleSheet } from "react-native";
 import { TextInput } from "react-native-paper";
-import Modal from "./Modal";
+import Modal from "../../../../shared/components/modals/Modal";
 import { useEffect, useRef } from "react";
-import { useTheme } from "../../../app/providers/ThemeProvider";
+import { useTheme } from "../../../../app/providers/ThemeProvider";
 
 type Props = {
   visible: boolean;

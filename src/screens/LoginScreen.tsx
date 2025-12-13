@@ -25,7 +25,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import { useToken } from "../app/providers/CloudProvider";
-import { fetchUserInfo } from "../infrastructure/clients/CloudStorageClient";
+import { fetchUserInfo } from "../infrastructure/cloud/clients/CloudStorageClient";
 import { logger } from "../infrastructure/logging/logger";
 
 import {

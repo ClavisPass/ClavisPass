@@ -1,7 +1,7 @@
-import Modal from "./Modal";
+import Modal from "../../../../shared/components/modals/Modal";
 import { View, StyleSheet } from "react-native";
 import { Button, Text } from "react-native-paper";
-import { useTheme } from "../../../app/providers/ThemeProvider";
+import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { useTranslation } from "react-i18next";
 
 type Props = {

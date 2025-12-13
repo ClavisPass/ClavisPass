@@ -1,10 +1,10 @@
 import RemoteFileContent from "../../types/api/cloudStorage/RemoteFileContent";
 import TokenRefreshResult from "../../types/api/oauth/TokenRefreshResult";
 import { GOOGLE_CLIENT_ID } from "@env";
-import CryptoType from "../crypto/CryptoType";
-import { logger } from "../logging/logger";
-import UserInfoType from "../../features/sync/model/UserInfoType";
-import { triggerGlobalError } from "../events/errorBus";
+import CryptoType from "../../crypto/CryptoType";
+import { logger } from "../../logging/logger";
+import UserInfoType from "../../../features/sync/model/UserInfoType";
+import { triggerGlobalError } from "../../events/errorBus";
 import * as DeviceStorageClient from "./DeviceStorageClient";
 
 export const fetchUserInfo = async (
