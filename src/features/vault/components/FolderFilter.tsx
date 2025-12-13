@@ -9,7 +9,7 @@ import {
 import { Chip, Divider, IconButton } from "react-native-paper";
 import WebSpecific from "../../../infrastructure/platform/WebSpecific";
 import AnimatedOpacityContainer from "../../../shared/components/container/AnimatedOpacityContainer";
-import { MenuItem } from "./items/MenuItem";
+import { MenuItem } from "../../../shared/components/menus/MenuItem";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import FolderType from "../model/FolderType";
 import Animated, {

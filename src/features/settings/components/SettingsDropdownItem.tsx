@@ -2,10 +2,10 @@ import React, { useMemo, useRef, useState, useCallback, useEffect } from "react"
 import { View, Platform, useWindowDimensions, StyleSheet } from "react-native";
 import { Divider, Text } from "react-native-paper";
 import type { Option as DropdownOption } from "react-native-paper-dropdown";
-import { useTheme } from "../../../../app/providers/ThemeProvider";
-import { MenuItem } from "./MenuItem";
-import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
-import SettingsDivider from "../../../settings/components/SettingsDivider";
+import { useTheme } from "../../../app/providers/ThemeProvider";
+import { MenuItem } from "../../../shared/components/menus/MenuItem";
+import AnimatedPressable from "../../../shared/components/AnimatedPressable";
+import SettingsDivider from "./SettingsDivider";
 
 // Native (iOS/Android)
 import {

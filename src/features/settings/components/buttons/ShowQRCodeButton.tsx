@@ -1,7 +1,7 @@
-import TokenQRCodeModal from "../../../features/settings/components/modals/TokenQRCodeModal";
+import TokenQRCodeModal from "../modals/TokenQRCodeModal";
 import { useState } from "react";
-import SettingsItem from "../../../features/vault/components/items/SettingsItem";
-import { useToken } from "../../../app/providers/CloudProvider";
+import SettingsItem from "../SettingsItem";
+import { useToken } from "../../../../app/providers/CloudProvider";
 
 function ShowQRCodeButton() {
   const { refreshToken } = useToken();

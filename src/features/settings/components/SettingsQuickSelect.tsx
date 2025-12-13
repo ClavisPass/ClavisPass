@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { Chip, Divider, IconButton } from "react-native-paper";
 import WebSpecific from "../../../infrastructure/platform/WebSpecific";
-import { MenuItem } from "../../vault/components/items/MenuItem";
+import { MenuItem } from "../../../shared/components/menus/MenuItem";
 import QuickSelectItem from "../model/QuickSelectItem";
 import { logger } from "../../../infrastructure/logging/logger";
 

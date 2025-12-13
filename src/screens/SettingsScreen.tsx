@@ -29,7 +29,7 @@ import { useAuth } from "../app/providers/AuthProvider";
 import ChangeMasterPasswordModal from "../features/settings/components/modals/ChangeMasterPasswordModal";
 import SettingsDivider from "../features/settings/components/SettingsDivider";
 import SettingsContainer from "../features/settings/components/SettingsContainer";
-import SettingsItem from "../features/vault/components/items/SettingsItem";
+import SettingsItem from "../features/settings/components/SettingsItem";
 import SettingsSwitch from "../features/settings/components/SettingsSwitch";
 import SettingsFooter from "../features/settings/components/SettingsFooter";
 
@@ -39,11 +39,11 @@ import * as Linking from "expo-linking";
 import Header from "../shared/components/Header";
 import SettingsQuickSelect from "../features/settings/components/SettingsQuickSelect";
 import QuickSelectItem from "../features/settings/model/QuickSelectItem";
-import SettingsShortcutItem from "../features/vault/components/items/SettingsShortcutItem";
+import SettingsShortcutItem from "../features/settings/components/SettingsShortcutItem";
 import { useDevMode } from "../app/providers/DevModeProvider";
 import { StackScreenProps } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../app/navigation/stacks/Stack";
-import SettingsDropdownItem from "../features/vault/components/items/SettingsDropdownItem";
+import SettingsDropdownItem from "../features/settings/components/SettingsDropdownItem";
 import {
   formatAbsoluteDate,
   formatAbsoluteTime,

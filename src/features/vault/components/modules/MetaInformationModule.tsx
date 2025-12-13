@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
-import { MenuItem } from "../items/MenuItem";
+import { MenuItem } from "../../../../shared/components/menus/MenuItem";
 
 import { formatAbsoluteLocal } from "../../utils/expiry";
 import { useTranslation } from "react-i18next";

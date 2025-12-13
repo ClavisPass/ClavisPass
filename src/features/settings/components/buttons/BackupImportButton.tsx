@@ -1,5 +1,3 @@
-
-
 import * as DocumentPicker from "expo-document-picker";
 import { useTranslation } from "react-i18next";
 import { useData } from "../../../../app/providers/DataProvider";
@@ -7,7 +5,7 @@ import { CryptoTypeSchema } from "../../../../infrastructure/crypto/CryptoType";
 import { DataTypeSchema } from "../../../vault/model/DataType";
 import { decrypt } from "../../../../infrastructure/crypto/CryptoLayer";
 import { logger } from "../../../../infrastructure/logging/logger";
-import SettingsItem from "../../../vault/components/items/SettingsItem";
+import SettingsItem from "../SettingsItem";
 
 function BackupImportButton() {
   const data = useData();

@@ -4,10 +4,10 @@ import { Divider } from "react-native-paper";
 
 import { Button } from "react-native-paper";
 
-import ShowQRCodeButton from "../../../shared/components/buttons/ShowQRCodeButton";
+import ShowQRCodeButton from "../../settings/components/buttons/ShowQRCodeButton";
 import UserInformation from "../../sync/components/UserInformation";
 import UserInfoType from "../../sync/model/UserInfoType";
-import SettingsItem from "../../vault/components/items/SettingsItem";
+import SettingsItem from "../../settings/components/SettingsItem";
 import SettingsDivider from "../../settings/components/SettingsDivider";
 import { View } from "react-native";
 

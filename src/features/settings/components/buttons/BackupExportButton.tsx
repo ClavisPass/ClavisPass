@@ -1,12 +1,11 @@
-import SettingsItem from "../../vault/components/items/SettingsItem";
-import { encrypt } from "../../../infrastructure/crypto/CryptoLayer";
-import { useData } from "../../../app/providers/DataProvider";
 import { Platform } from "react-native";
-
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import { useTranslation } from "react-i18next";
-import { logger } from "../../../infrastructure/logging/logger";
+import { useData } from "../../../../app/providers/DataProvider";
+import { encrypt } from "../../../../infrastructure/crypto/CryptoLayer";
+import { logger } from "../../../../infrastructure/logging/logger";
+import SettingsItem from "../SettingsItem";
 
 function BackupExportButton() {
   const data = useData();

@@ -10,7 +10,7 @@ import importpCloud from "./pcloud";
 import Modal from "../../../../shared/components/modals/Modal";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { View } from "react-native";
-import SettingsItem from "../../../vault/components/items/SettingsItem";
+import SettingsItem from "../../components/SettingsItem";
 import { useTranslation } from "react-i18next";
 import { logger } from "../../../../infrastructure/logging/logger";
 

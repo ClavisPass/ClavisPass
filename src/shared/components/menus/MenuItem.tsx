@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 import { View } from "react-native";
 import { Text, Icon } from "react-native-paper";
-import { useTheme } from "../../../../app/providers/ThemeProvider";
-import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
+import { useTheme } from "../../../app/providers/ThemeProvider";
+import AnimatedPressable from "../AnimatedPressable";
 
 type Props = {
   children: ReactNode;

@@ -4,7 +4,7 @@ import DataType from "../../model/DataType";
 import { View } from "react-native";
 import Menu from "../../../../shared/components/menus/Menu";
 import { useData } from "../../../../app/providers/DataProvider";
-import { MenuItem } from "../items/MenuItem";
+import { MenuItem } from "../../../../shared/components/menus/MenuItem";
 import { useOnline } from "../../../../app/providers/OnlineProvider";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../../../app/providers/ThemeProvider";

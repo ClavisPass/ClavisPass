@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { View } from "react-native";
 import { Icon, Text } from "react-native-paper";
-import { useTheme } from "../../../../app/providers/ThemeProvider";
+import { useTheme } from "../../../app/providers/ThemeProvider";
 
 type Props = {
   children: ReactNode;

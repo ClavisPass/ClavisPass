@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { View } from "react-native";
-import { MenuItem } from "./MenuItem";
+import { MenuItem } from "../../../shared/components/menus/MenuItem";
 
 type Props = {
   children: ReactNode;

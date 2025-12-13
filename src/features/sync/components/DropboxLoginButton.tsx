@@ -2,7 +2,7 @@ import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect, useMemo, useRef, useCallback } from "react";
 import { Platform } from "react-native";
-import SettingsItem from "../../vault/components/items/SettingsItem";
+import SettingsItem from "../../settings/components/SettingsItem";
 import { DROPBOX_CLIENT_ID } from "@env";
 import { start, onUrl, cancel } from "@fabianlars/tauri-plugin-oauth";
 import * as Random from "expo-random";
