@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import type { StackScreenProps } from "@react-navigation/stack";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Header from "../shared/components/Header";
-import { TitlebarHeight } from "../shared/components/CustomTitlebar";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import { useTheme } from "../app/providers/ThemeProvider";
 import { Divider, Icon, Text, TextInput } from "react-native-paper";
@@ -18,7 +17,7 @@ import getPasswordStrengthIcon from "../features/analysis/utils/getPasswordStren
 import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import { useTranslation } from "react-i18next";
 
-type AnalysisDetailScreenProps = StackScreenProps<
+type AnalysisDetailScreenProps = NativeStackScreenProps<
   RootStackParamList,
   "AnalysisDetail"
 >;
@@ -186,7 +185,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
   }, [secureTextEntry]);
 
   return (
-    <AnimatedContainer style={globalStyles.container} trigger={edit}>
+    <AnimatedContainer style={globalStyles.container}>
       <StatusBar
         animated={true}
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}

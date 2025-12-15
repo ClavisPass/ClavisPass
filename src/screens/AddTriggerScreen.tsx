@@ -1,8 +1,11 @@
 import React from "react";
-import { StackScreenProps } from "@react-navigation/stack/lib/typescript/src/types";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../app/navigation/stacks/Stack";
 
-type AddTriggerScreenProps = StackScreenProps<RootStackParamList, "AddTrigger">;
+type AddTriggerScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  "AddTrigger"
+>;
 
 const AddTriggerScreen: React.FC<AddTriggerScreenProps> = ({}) => {
   return <></>;

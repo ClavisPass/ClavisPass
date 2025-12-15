@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
-import type { StackScreenProps } from "@react-navigation/stack";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Header from "../shared/components/Header";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import { useTheme } from "../app/providers/ThemeProvider";
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   },
 });
 
-type ScanScreenProps = StackScreenProps<RootStackParamList, "Scan">;
+type ScanScreenProps = NativeStackScreenProps<RootStackParamList, "Scan">;
 
 const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
   const {

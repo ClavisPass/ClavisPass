@@ -1,30 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Platform, View, InteractionManager } from "react-native";
+import React from "react";
+import { View, InteractionManager } from "react-native";
 
-import type { StackScreenProps } from "@react-navigation/stack";
-import { Icon, Text } from "react-native-paper";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Header from "../shared/components/Header";
-import AddModuleModal from "../features/vault/components/modals/AddModuleModal";
-import { useData } from "../app/providers/DataProvider";
-import TitleModule from "../features/vault/components/modules/TitleModule";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
-import DraggableModulesListWeb from "../features/vault/components/lists/draggableModulesList/DraggableModulesListWeb";
-import DraggableModulesList from "../features/vault/components/lists/draggableModulesList/DraggableModulesList";
-import FolderModal from "../features/vault/components/modals/FolderModal";
 import { useTheme } from "../app/providers/ThemeProvider";
-import DiscardChangesModal from "../features/vault/components/modals/DiscardChangesModal";
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import ContainerButton from "../shared/components/buttons/ContainerButton";
-import SquaredContainerButton from "../shared/components/buttons/SquaredContainerButton";
-import DeleteModal from "../features/vault/components/modals/DeleteModal";
-import Button from "../shared/components/buttons/Button";
 import { RootStackParamList } from "../app/navigation/stacks/Stack";
-import MetaInformationModule from "../features/vault/components/modules/MetaInformationModule";
 import QRCode from "react-qr-code";
 import Barcode from "@kichiyaki/react-native-barcode-generator";
 
-type CardDetailsScreenProps = StackScreenProps<
+type CardDetailsScreenProps = NativeStackScreenProps<
   RootStackParamList,
   "CardDetails"
 >;

@@ -32,11 +32,11 @@ import Header from "../shared/components/Header";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../shared/ui/linearGradient";
 import FilterAnalysisModal from "../features/analysis/components/modals/FilterAnalysisModal";
-import { StackScreenProps } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
 import { useTranslation } from "react-i18next";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 export type CachedPasswordsType = {
   title: string;
@@ -47,7 +47,10 @@ export type CachedPasswordsType = {
   passwordStrengthLevel: PasswordStrengthLevel;
 };
 
-type AnalysisScreenProps = StackScreenProps<RootStackParamList, "Analysis">;
+type AnalysisScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  "Analysis"
+>;
 
 type CacheResult = {
   list: CachedPasswordsType[];
@@ -195,7 +198,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   const weakCount = cache?.counts.weak ?? 0;
 
   return (
-    <AnimatedContainer useFocusEffect={useFocusEffect}>
+    <AnimatedContainer>
       <StatusBar
         animated
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}

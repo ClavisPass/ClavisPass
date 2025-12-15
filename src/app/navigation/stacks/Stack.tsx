@@ -1,4 +1,4 @@
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ValuesType from "../../../features/vault/model/ValuesType";
 import { CachedPasswordsType } from "../../../screens/AnalysisScreen";
 import FolderType from "../../../features/vault/model/FolderType";
@@ -35,6 +35,6 @@ export type RootStackParamList = {
   };
 };
 
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default Stack;

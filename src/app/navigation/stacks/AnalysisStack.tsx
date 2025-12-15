@@ -1,5 +1,4 @@
 import Stack from "./Stack";
-import transitionSpecConfig from "../../config/TransitionSpecConfig";
 import AnalysisScreen from "../../../screens/AnalysisScreen";
 import AnalysisDetailScreen from "../../../screens/AnalysisDetailScreen";
 
@@ -7,33 +6,12 @@ function AnalysisStack() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerShown: true,
-        gestureDirection: "vertical",
+        headerShown: false,
+        animation: "fade",
       }}
     >
-      <Stack.Screen
-        name="Analysis"
-        component={AnalysisScreen}
-        options={{
-          headerShown: false,
-          transitionSpec: {
-            open: transitionSpecConfig,
-            close: transitionSpecConfig,
-          },
-          detachPreviousScreen: false,
-        }}
-      />
-      <Stack.Screen
-        name="AnalysisDetail"
-        component={AnalysisDetailScreen}
-        options={{
-          headerShown: false,
-          transitionSpec: {
-            open: transitionSpecConfig,
-            close: transitionSpecConfig,
-          },
-        }}
-      />
+      <Stack.Screen name="Analysis" component={AnalysisScreen} />
+      <Stack.Screen name="AnalysisDetail" component={AnalysisDetailScreen} />
     </Stack.Navigator>
   );
 }

@@ -1,28 +1,15 @@
 import Stack from "./Stack";
-import transitionSpecConfig from "../../config/TransitionSpecConfig";
 import LogoutScreen from "../../../screens/LogoutScreen";
 
 function LogoutStack() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerShown: true,
-        gestureEnabled: true,
-        gestureDirection: "vertical",
+        headerShown: false,
+        animation: "fade",
       }}
     >
-      <Stack.Screen
-        name="Logout"
-        component={LogoutScreen}
-        options={{
-          headerShown: false,
-          transitionSpec: {
-            open: transitionSpecConfig,
-            close: transitionSpecConfig,
-          },
-          detachPreviousScreen: false,
-        }}
-      />
+      <Stack.Screen name="Logout" component={LogoutScreen} />
     </Stack.Navigator>
   );
 }

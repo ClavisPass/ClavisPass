@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
-import type { StackScreenProps } from "@react-navigation/stack";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Header from "../shared/components/Header";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import { useTheme } from "../app/providers/ThemeProvider";
@@ -60,7 +60,7 @@ export const BARCODE_TYPE_MAP: Record<string, DigitalCardType | undefined> = {
   upc_e: "UPCE",
 };
 
-type DigitalCardScanScreenProps = StackScreenProps<
+type DigitalCardScanScreenProps = NativeStackScreenProps<
   RootStackParamList,
   "DigitalCardScan"
 >;

@@ -4,7 +4,6 @@ import {
   Platform,
   useWindowDimensions,
   InteractionManager,
-  RefreshControl,
 } from "react-native";
 import { Searchbar, IconButton } from "react-native-paper";
 
@@ -41,7 +40,7 @@ import {
   LexendExa_700Bold,
 } from "@expo-google-fonts/lexend-exa";
 import LogoColored from "../shared/ui/LogoColored";
-import { StackScreenProps } from "@react-navigation/stack";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import FolderType from "../features/vault/model/FolderType";
 import { useTranslation } from "react-i18next";
@@ -56,7 +55,7 @@ import { fetchRemoteVaultFile } from "../infrastructure/cloud/clients/CloudStora
 import { useSetting } from "../app/providers/SettingsProvider";
 import Sync from "../features/sync/components/Sync";
 
-type HomeScreenProps = StackScreenProps<RootStackParamList, "Home">;
+type HomeScreenProps = NativeStackScreenProps<RootStackParamList, "Home">;
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const triggerAdd = route.params?.triggerAdd ?? false;
@@ -342,164 +341,163 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   }
 
   return (
-    <AnimatedContainer
-      style={{ display: "flex", justifyContent: "center" }}
-      useFocusEffect={useFocusEffect}
-    >
-      <StatusBar
-        animated={true}
-        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
-        translucent={true}
-      />
-      <ContentProtection enabled={true} />
-      <WebSpecific>
-        <SearchShortcut searchRef={searchRef} />
-      </WebSpecific>
-      <LinearGradient
-        colors={getColors()}
-        dither={true}
-        style={{
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: 10,
-          marginBottom: 4,
-          paddingTop: Constants.statusBarHeight,
-          borderBottomLeftRadius: 12,
-          borderBottomRightRadius: 12,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.4,
-          shadowRadius: 6,
-          elevation: 5,
-        }}
-        end={{ x: 0.1, y: 0.2 }}
-      >
-        <View
+    <AnimatedContainer style={{ display: "flex", justifyContent: "center" }}>
+      <View style={{ flex: 1 }}>
+        <StatusBar
+          animated={true}
+          style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+          translucent={true}
+        />
+        <ContentProtection enabled={true} />
+        <WebSpecific>
+          <SearchShortcut searchRef={searchRef} />
+        </WebSpecific>
+        <LinearGradient
+          colors={getColors()}
+          dither={true}
           style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginTop: 12,
-            marginBottom: 8,
-            marginLeft: 4,
             width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            padding: 10,
+            marginBottom: 4,
+            paddingTop: Constants.statusBarHeight,
+            borderBottomLeftRadius: 12,
+            borderBottomRightRadius: 12,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 0.4,
+            shadowRadius: 6,
+            elevation: 5,
           }}
+          end={{ x: 0.1, y: 0.2 }}
         >
           <View
             style={{
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
-              gap: 8,
+              justifyContent: "space-between",
+              marginTop: 12,
+              marginBottom: 8,
+              marginLeft: 4,
+              width: "100%",
             }}
           >
-            <LogoColored width={20} height={20} />
-            <Text
+            <View
               style={{
-                fontFamily: "LexendExa_400Regular",
-                fontSize: 16,
-                color: "white",
-                userSelect: "none",
-                width: 110,
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
               }}
             >
-              ClavisPass
-            </Text>
+              <LogoColored width={20} height={20} />
+              <Text
+                style={{
+                  fontFamily: "LexendExa_400Regular",
+                  fontSize: 16,
+                  color: "white",
+                  userSelect: "none",
+                  width: 110,
+                }}
+              >
+                ClavisPass
+              </Text>
+            </View>
           </View>
-        </View>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Searchbar
+              ref={searchRef}
+              inputStyle={{ height: 40, minHeight: 40, color: "white" }}
+              style={{
+                height: 40,
+                flex: 1,
+                borderRadius: 10,
+                backgroundColor: "rgba(217, 217, 217, 0.21)",
+              }}
+              placeholder={t("home:search")}
+              onChangeText={setSearchQuery}
+              value={searchQuery}
+              loading={false}
+              iconColor={"#ffffff80"}
+              placeholderTextColor={"#ffffff80"}
+            />
+            <IconButton
+              icon="sort-variant"
+              size={25}
+              onPress={() => {
+                setShowMenu(true);
+              }}
+              iconColor="white"
+              style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
+            />
+          </View>
+        </LinearGradient>
+        <Sync
+          refreshData={refreshData}
+          refreshing={refreshing}
+          setRefreshing={setRefreshing}
+        />
         <View
           style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
+            flex: 1,
+            width: "100%",
+            padding: 4,
+            paddingRight: 0,
+            paddingLeft: width > 600 ? 0 : 4,
+            flexDirection: width > 600 ? "row-reverse" : "column",
           }}
         >
-          <Searchbar
-            ref={searchRef}
-            inputStyle={{ height: 40, minHeight: 40, color: "white" }}
-            style={{
-              height: 40,
-              flex: 1,
-              borderRadius: 10,
-              backgroundColor: "rgba(217, 217, 217, 0.21)",
-            }}
-            placeholder={t("home:search")}
-            onChangeText={setSearchQuery}
-            value={searchQuery}
-            loading={false}
-            iconColor={"#ffffff80"}
-            placeholderTextColor={"#ffffff80"}
-          />
-          <IconButton
-            icon="sort-variant"
-            size={25}
-            onPress={() => {
-              setShowMenu(true);
-            }}
-            iconColor="white"
-            style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
+          {renderFlashList()}
+          <FolderFilter
+            folder={data.data?.folder}
+            selectedFav={selectedFav}
+            setSelectedFav={saveSelectedFavState}
+            selectedFolder={selectedFolder}
+            setSelectedFolder={setSelectedFolder}
+            setFolderModalVisible={setFolderModalVisible}
+            selected2FA={selected2FA}
+            setSelected2FA={saveSelected2FAState}
+            selectedCard={selectedCard}
+            setSelectedCard={saveSelectedCardState}
           />
         </View>
-      </LinearGradient>
-      <Sync
-        refreshData={refreshData}
-        refreshing={refreshing}
-        setRefreshing={setRefreshing}
-      />
-      <View
-        style={{
-          flex: 1,
-          width: "100%",
-          padding: 4,
-          paddingRight: 0,
-          paddingLeft: width > 600 ? 0 : 4,
-          flexDirection: width > 600 ? "row-reverse" : "column",
-        }}
-      >
-        {renderFlashList()}
-        <FolderFilter
-          folder={data.data?.folder}
-          selectedFav={selectedFav}
-          setSelectedFav={saveSelectedFavState}
-          selectedFolder={selectedFolder}
-          setSelectedFolder={setSelectedFolder}
-          setFolderModalVisible={setFolderModalVisible}
-          selected2FA={selected2FA}
-          setSelected2FA={saveSelected2FAState}
-          selectedCard={selectedCard}
-          setSelectedCard={saveSelectedCardState}
+
+        <HomeFilterMenu
+          visible={showMenu}
+          setVisible={setShowMenu}
+          data={data.data}
+          setData={data.setData}
+          positionY={
+            Constants.statusBarHeight +
+            TITLEBAR_HEIGHT +
+            (Platform.OS === "web" ? 48 : 90)
+          }
+          openEditFolder={() => setFolderModalVisible(true)}
+          refreshData={refreshData}
+        />
+
+        <FolderModal
+          visible={folderModalVisible}
+          setVisible={setFolderModalVisible}
+          folder={data?.data ? data.data.folder : []}
+        />
+        <AddValueModal
+          visible={valueModalVisible}
+          setVisible={setValueModalVisible}
+          navigation={navigation}
+          favorite={selectedFav}
+          folder={selectedFolder}
         />
       </View>
-
-      <HomeFilterMenu
-        visible={showMenu}
-        setVisible={setShowMenu}
-        data={data.data}
-        setData={data.setData}
-        positionY={
-          Constants.statusBarHeight +
-          TITLEBAR_HEIGHT +
-          (Platform.OS === "web" ? 48 : 90)
-        }
-        openEditFolder={() => setFolderModalVisible(true)}
-        refreshData={refreshData}
-      />
-
-      <FolderModal
-        visible={folderModalVisible}
-        setVisible={setFolderModalVisible}
-        folder={data?.data ? data.data.folder : []}
-      />
-      <AddValueModal
-        visible={valueModalVisible}
-        setVisible={setValueModalVisible}
-        navigation={navigation}
-        favorite={selectedFav}
-        folder={selectedFolder}
-      />
     </AnimatedContainer>
   );
 };

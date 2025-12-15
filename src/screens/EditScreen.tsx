@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Platform,
   View,
-  Animated,
   InteractionManager,
   useWindowDimensions,
 } from "react-native";
@@ -10,7 +9,8 @@ import ModulesType, { ModuleType } from "../features/vault/model/ModulesType";
 
 import ModulesEnum from "../features/vault/model/ModulesEnum";
 
-import type { StackScreenProps } from "@react-navigation/stack";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+
 import { Icon, Text } from "react-native-paper";
 import Header from "../shared/components/Header";
 import ValuesType from "../features/vault/model/ValuesType";
@@ -33,7 +33,10 @@ import Button from "../shared/components/buttons/Button";
 import { RootStackParamList } from "../app/navigation/stacks/Stack";
 
 import useAppLifecycle from "../shared/hooks/useAppLifecycle";
-import { openFastAccess, hideFastAccess } from "../features/fastaccess/utils/FastAccess";
+import {
+  openFastAccess,
+  hideFastAccess,
+} from "../features/fastaccess/utils/FastAccess";
 import extractFastAccessObject from "../features/fastaccess/utils/extractFastAccessObject";
 import FastAccessType from "../features/fastaccess/model/FastAccessType";
 import FolderType from "../features/vault/model/FolderType";
@@ -43,7 +46,7 @@ import { useSetting } from "../app/providers/SettingsProvider";
 import DraggableModulesListWeb from "../features/vault/components/lists/DraggableModulesListWeb";
 import DraggableModulesList from "../features/vault/components/lists/DraggableModulesList";
 
-type EditScreenProps = StackScreenProps<RootStackParamList, "Edit">;
+type EditScreenProps = NativeStackScreenProps<RootStackParamList, "Edit">;
 
 const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const {

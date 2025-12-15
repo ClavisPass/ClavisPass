@@ -41,7 +41,6 @@ import SettingsQuickSelect from "../features/settings/components/SettingsQuickSe
 import QuickSelectItem from "../features/settings/model/QuickSelectItem";
 import SettingsShortcutItem from "../features/settings/components/SettingsShortcutItem";
 import { useDevMode } from "../app/providers/DevModeProvider";
-import { StackScreenProps } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import SettingsDropdownItem from "../features/settings/components/SettingsDropdownItem";
 import {
@@ -56,6 +55,7 @@ import { useSetting } from "../app/providers/SettingsProvider";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import BackupImportButton from "../features/settings/components/buttons/BackupImportButton";
 import BackupExportButton from "../features/settings/components/buttons/BackupExportButton";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 const styles = StyleSheet.create({
   surface: {
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   },
 });
 
-type SettingsScreenProps = StackScreenProps<RootStackParamList, "Settings">;
+type SettingsScreenProps = NativeStackScreenProps<RootStackParamList, "Settings">;
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const { headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
@@ -238,7 +238,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   };
 
   return (
-    <AnimatedContainer useFocusEffect={useFocusEffect}>
+    <AnimatedContainer>
       <BottomSheetModalProvider>
         <StatusBar
           animated={true}

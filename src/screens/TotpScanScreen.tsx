@@ -1,12 +1,11 @@
-// screens/TotpScanScreen.tsx
 import React, { useCallback, useRef, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
-import type { StackScreenProps } from "@react-navigation/stack";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+
 import { StatusBar } from "expo-status-bar";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
-import * as Clipboard from "expo-clipboard";
 import { useFocusEffect } from "@react-navigation/native";
-import { Button, Icon, IconButton, Text, TextInput } from "react-native-paper";
+import { Button, Icon, IconButton, Text } from "react-native-paper";
 
 import Header from "../shared/components/Header";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
@@ -41,7 +40,10 @@ const styles = StyleSheet.create({
   },
 });
 
-type TotpScanScreenProps = StackScreenProps<RootStackParamList, "TotpScan">;
+type TotpScanScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  "TotpScan"
+>;
 
 function isValidOtpauth(uri?: string) {
   if (!uri || !uri.startsWith("otpauth://")) return false;
@@ -56,9 +58,18 @@ function isValidOtpauth(uri?: string) {
   }
 }
 
-const TotpScanScreen: React.FC<TotpScanScreenProps> = ({ route, navigation }) => {
+const TotpScanScreen: React.FC<TotpScanScreenProps> = ({
+  route,
+  navigation,
+}) => {
   const { setOtpauth } = route.params;
-  const { globalStyles, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } = useTheme();
+  const {
+    globalStyles,
+    headerWhite,
+    setHeaderWhite,
+    darkmode,
+    setHeaderSpacing,
+  } = useTheme();
 
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
@@ -114,7 +125,9 @@ const TotpScanScreen: React.FC<TotpScanScreenProps> = ({ route, navigation }) =>
         <Text style={styles.message}>No Permission.</Text>
       ) : !permission.granted ? (
         <View style={styles.container}>
-          <Text style={styles.message}>We need your permission to show the camera.</Text>
+          <Text style={styles.message}>
+            We need your permission to show the camera.
+          </Text>
           <View>
             <Button style={{ borderRadius: 12 }} onPress={requestPermission}>
               Grant Permission

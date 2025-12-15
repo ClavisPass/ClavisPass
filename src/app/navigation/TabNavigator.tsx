@@ -13,11 +13,14 @@ import LeftSideTabBar from "./LeftSideBar";
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   return (
     <Tab.Navigator
-      screenOptions={{ headerShown: false }}
-      sceneContainerStyle={width > 600 ? { marginLeft: 88 } : undefined}
+      screenOptions={{
+        headerShown: false,
+        animation: "fade",
+        sceneStyle: width > 600 ? { marginLeft: 88 } : undefined,
+      }}
       tabBar={(props) =>
         width > 600 ? (
           <LeftSideTabBar {...props} />
@@ -26,6 +29,7 @@ export default function TabNavigator() {
         )
       }
       initialRouteName="HomeStack"
+      detachInactiveScreens={false}
     >
       <Tab.Screen
         name="HomeStack"
