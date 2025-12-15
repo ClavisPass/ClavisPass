@@ -1,0 +1,58 @@
+name: Android Dev Client Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: "Optional build note"
+        required: false
+        default: "Manual dev client build"
+
+jobs:
+  build-android-dev-client:
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install EAS CLI
+        run: npm install -g eas-cli@latest
+
+      - name: Verify EAS authentication
+        run: eas whoami
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build Android Dev Client (EAS)
+        id: eas_build
+        run: |
+          eas build --platform android --profile development --non-interactive --wait --json > build-info.json
+          cat build-info.json
+
+      - name: Extract APK URL
+        run: |
+          APK_URL=$(jq -r '.[0].artifacts.buildUrl' build-info.json)
+          echo "APK_URL=$APK_URL" >> $GITHUB_ENV
+          echo "Discovered APK URL: $APK_URL"
+
+      - name: Download APK
+        run: |
+          curl -L -o ClavisPass_devclient_android.apk "$APK_URL"
+          ls -l ClavisPass_devclient_android.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-dev-client
+          path: ClavisPass_devclient_android.apk

@@ -38,8 +38,7 @@
       "package": "com.clavispass.app",
       "permissions": [
         "android.permission.CAMERA"
-      ],
-      "runtimeVersion": "1.0.0"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
