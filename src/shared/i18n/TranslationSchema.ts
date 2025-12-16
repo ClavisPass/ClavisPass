@@ -79,20 +79,36 @@ export type TranslationSchema = {
     copyDurationOff: string;
   };
   analysis: {
-    averageEntropy: string;
+    topFindings: string;
+    noFindings: string;
+    strengthDistribution: string;
     strong: string;
     medium: string;
     weak: string;
+    finding: {
+      reused: string;
+      weak: string;
+      short: string;
+      variants: string;
+      sequential: string;
+    };
+    badge: {
+      reused: string;
+      variant: string;
+    };
   };
   analysisDetail: {
+    title: string;
+    yourPassword: string;
+    statistics: string;
     entropy: string;
     letters: string;
     digits: string;
     characters: string;
-    yourPassword: string;
-    statistics: string;
     pattern: string;
-    repeatedSequences: string;
+    repeatedChars: string;
+    sequentialPatterns: string;
+    revealHint: string;
   };
   greetings: {
     1: string;

@@ -11,134 +11,169 @@ import {
   useWindowDimensions,
   View,
   StyleSheet,
+  ViewStyle,
+  StyleProp,
 } from "react-native";
-import { Icon, IconButton, Searchbar, Text } from "react-native-paper";
+import {
+  Chip,
+  Divider,
+  Icon,
+  IconButton,
+  Searchbar,
+  Text,
+} from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import { useFocusEffect } from "@react-navigation/native";
 import { FlashList } from "@shopify/flash-list";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+
 import { useData } from "../app/providers/DataProvider";
 import { ValuesListType } from "../features/vault/model/ValuesType";
-import ModulesEnum from "../features/vault/model/ModulesEnum";
-import WifiModuleType from "../features/vault/model/modules/WifiModuleType";
 import { useTheme } from "../app/providers/ThemeProvider";
-import passwordEntropy from "../features/analysis/utils/Entropy";
-import AnalysisEntry from "../features/analysis/components/AnalysisEntry";
-import AnalysisEntryGradient from "../features/analysis/components/AnalysisEntryGradient";
-import PasswordStrengthLevel from "../features/analysis/model/PasswordStrengthLevel";
-import getPasswordStrengthColor from "../features/analysis/utils/getPasswordStrengthColor";
-import getPasswordStrengthIcon from "../features/analysis/utils/getPasswordStrengthIcon";
 import Header from "../shared/components/Header";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../shared/ui/linearGradient";
 import FilterAnalysisModal from "../features/analysis/components/modals/FilterAnalysisModal";
-import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
 import { useTranslation } from "react-i18next";
-import Animated, { FadeInDown } from "react-native-reanimated";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-export type CachedPasswordsType = {
-  title: string;
-  normalizedTitle: string;
-  password: string;
-  entropy: number;
-  type: ModulesEnum;
-  passwordStrengthLevel: PasswordStrengthLevel;
-};
+import getPasswordStrengthColor from "../features/analysis/utils/getPasswordStrengthColor";
+import getPasswordStrengthIcon from "../features/analysis/utils/getPasswordStrengthIcon";
+
+import {
+  buildAnalysisCache,
+  normalize,
+  deriveAnalysisPepperFromMaster,
+} from "../features/analysis/utils/analysisEngine";
+
+import { RootStackParamList } from "../app/navigation/stacks/Stack";
+import { useAuth } from "../app/providers/AuthProvider";
+import CacheResult from "../features/analysis/model/CacheResult";
+import PasswordStrengthLevel from "../features/analysis/model/PasswordStrengthLevel";
 
 type AnalysisScreenProps = NativeStackScreenProps<
   RootStackParamList,
   "Analysis"
 >;
 
-type CacheResult = {
-  list: CachedPasswordsType[];
-  counts: { weak: number; medium: number; strong: number };
-  avgEntropy: number;
-  avgEntropyPct: number;
+type FindingKey = string;
+
+type StrengthSelection = {
+  strong: boolean;
+  medium: boolean;
+  weak: boolean;
 };
 
-const normalize = (t: string) =>
-  t
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "");
-
-function buildCache(values: ValuesListType): CacheResult {
-  const out: CachedPasswordsType[] = [];
-  let weak = 0,
-    medium = 0,
-    strong = 0,
-    entropySum = 0;
-
-  for (const item of values) {
-    const normalizedItemTitle = normalize(item.title);
-
-    for (const mod of item.modules) {
-      const isPwd = mod.module === ModulesEnum.PASSWORD;
-      const isWifi = mod.module === ModulesEnum.WIFI;
-      if (!isPwd && !isWifi) continue;
-
-      const pwd = isPwd ? String(mod.value) : (mod as WifiModuleType).value;
-      const title = isPwd
-        ? item.title
-        : ((mod as WifiModuleType).wifiName ?? item.title);
-      const normalizedTitle = isPwd ? normalizedItemTitle : normalize(title);
-
-      const entropy = passwordEntropy(pwd);
-      entropySum += entropy;
-      const p = entropy / 200;
-
-      let level: PasswordStrengthLevel;
-      if (p < 0.4) {
-        level = PasswordStrengthLevel.WEAK;
-        weak++;
-      } else if (p < 0.55) {
-        level = PasswordStrengthLevel.MEDIUM;
-        medium++;
-      } else {
-        level = PasswordStrengthLevel.STRONG;
-        strong++;
-      }
-
-      out.push({
-        title,
-        normalizedTitle,
-        password: pwd,
-        entropy,
-        type: isPwd ? ModulesEnum.PASSWORD : ModulesEnum.WIFI,
-        passwordStrengthLevel: level,
-      });
-    }
+const normalizeStrengthSelection = (
+  s: StrengthSelection
+): StrengthSelection => {
+  if (s.strong && s.medium && s.weak) {
+    return { strong: false, medium: false, weak: false };
   }
+  return s;
+};
 
-  const avg = out.length ? entropySum / out.length : 0;
-  return {
-    list: out,
-    counts: { weak, medium, strong },
-    avgEntropy: Math.floor(avg),
-    avgEntropyPct: (avg / 200) * 100,
-  };
-}
+const isNoStrengthFilter = (s: StrengthSelection) => {
+  const allOff = !s.strong && !s.medium && !s.weak;
+  const allOn = s.strong && s.medium && s.weak;
+  return allOff || allOn;
+};
+
+const truthy = (v: any) => v === true;
 
 const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   const data = useData();
+  const { master } = useAuth();
+
   const { theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
     useTheme();
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
-
-  const [filterModalVisible, setFilterModalVisible] = useState(false);
-
+  
   const [cache, setCache] = useState<CacheResult | null>(null);
 
-  const [showStrong, setShowStrong] = useState(true);
-  const [showMedium, setShowMedium] = useState(true);
-  const [showWeak, setShowWeak] = useState(true);
+  const [strengthSel, setStrengthSel] = useState<StrengthSelection>({
+    strong: false,
+    medium: false,
+    weak: false,
+  });
+
+  const [activeFindingKey, setActiveFindingKey] = useState<FindingKey | null>(
+    null
+  );
 
   const [searchQuery, setSearchQuery] = useState("");
   const deferredQuery = useDeferredValue(searchQuery.trim());
+
+  const [maxFindingWidth, setMaxFindingWidth] = useState<number | null>(null);
+
+  const cardStyle: ViewStyle = {
+    backgroundColor: theme.colors.background,
+    borderRadius: 12,
+    padding: 12,
+    boxShadow: theme.colors.shadow as any,
+    flex: 1,
+    minWidth: 0,
+  };
+
+  const isSelected = (key: keyof StrengthSelection) => strengthSel[key];
+
+  const strengthCardStyle = (selected: boolean): StyleProp<ViewStyle> => [
+    cardStyle,
+    selected
+      ? {
+          backgroundColor:
+            theme.colors.surfaceVariant ?? theme.colors.background,
+          opacity: 0.9,
+        }
+      : undefined,
+  ];
+
+  // ✅ NEU: Finding selection style wie bei Strength (Background/Opacity)
+  const findingCardStyle = (
+    selected: boolean,
+    extra?: StyleProp<ViewStyle>
+  ): StyleProp<ViewStyle> => [
+    {
+      backgroundColor: theme.colors.background,
+      borderRadius: 12,
+      padding: 12,
+      boxShadow: theme.colors.shadow as any,
+    },
+    selected
+      ? {
+          backgroundColor:
+            theme.colors.surfaceVariant ?? theme.colors.background,
+          opacity: 0.9,
+        }
+      : undefined,
+    // optional: neutraler Rahmen (nicht als Selection-Indikator)
+    {
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: darkmode ? theme.colors.outlineVariant : "white",
+    },
+    extra,
+  ];
+
+  const toggleFinding = (key: FindingKey) => {
+    setActiveFindingKey((prev) => (prev === key ? null : key));
+  };
+
+  const toggleStrength = (key: keyof StrengthSelection) => {
+    setStrengthSel((prev) =>
+      normalizeStrengthSelection({ ...prev, [key]: !prev[key] })
+    );
+  };
+
+  const setExclusiveStrength = (key: keyof StrengthSelection) => {
+    setStrengthSel({ strong: false, medium: false, weak: false, [key]: true });
+  };
+
+  const setStrengthFromModal = (key: keyof StrengthSelection, v: boolean) => {
+    setStrengthSel((prev) => normalizeStrengthSelection({ ...prev, [key]: v }));
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -148,41 +183,134 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   );
 
   useEffect(() => {
-    if (!data?.data?.values) return;
+    const values = data?.data?.values as ValuesListType | undefined;
+    if (!values || !master) {
+      setCache(null);
+      return;
+    }
+
     let cancelled = false;
 
     InteractionManager.runAfterInteractions(() => {
       if (cancelled) return;
-      if (data?.data?.values) {
-        const result = buildCache(data.data.values as ValuesListType);
+
+      (async () => {
+        const pepper = await deriveAnalysisPepperFromMaster(master);
+        const result = await buildAnalysisCache(values, pepper);
         startTransition(() => {
           if (!cancelled) setCache(result);
         });
-      }
+      })();
     });
 
     return () => {
       cancelled = true;
     };
-  }, [data?.data?.values]);
+  }, [data?.data?.values, master]);
+
+  useEffect(() => {
+    setMaxFindingWidth(null);
+  }, [cache?.findings?.length]);
 
   const filteredValues = useMemo(() => {
     if (!cache) return [];
     const q = deferredQuery ? normalize(deferredQuery) : "";
 
-    const matchesStrength = (lvl: PasswordStrengthLevel) =>
-      (lvl === PasswordStrengthLevel.STRONG && showStrong) ||
-      (lvl === PasswordStrengthLevel.MEDIUM && showMedium) ||
-      (lvl === PasswordStrengthLevel.WEAK && showWeak);
+    const matchesStrength = (lvl: PasswordStrengthLevel) => {
+      if (isNoStrengthFilter(strengthSel)) return true;
+      return (
+        (lvl === PasswordStrengthLevel.STRONG && strengthSel.strong) ||
+        (lvl === PasswordStrengthLevel.MEDIUM && strengthSel.medium) ||
+        (lvl === PasswordStrengthLevel.WEAK && strengthSel.weak)
+      );
+    };
 
-    // Relevanz-basiertes Filtern/Sortieren
-    const mapped = cache.list.map((it) => {
-      if (!matchesStrength(it.passwordStrengthLevel))
-        return { it, rel: Infinity };
+    const matchesFinding = (it: any) => {
+      if (!activeFindingKey) return true;
+
+      const key = String(activeFindingKey).toLowerCase();
+      const flags = it?.flags ?? {};
+
+      if (key === "reused" || key.includes("reuse")) {
+        return (flags?.reuseGroupSize ?? 0) >= 2;
+      }
+      if (key === "variants" || key.includes("variant")) {
+        return (flags?.variantGroupSize ?? 0) >= 2;
+      }
+
+      if (key === "weak" || key.includes("weak")) {
+        return it.strength === PasswordStrengthLevel.WEAK;
+      }
+      if (key === "medium" || key.includes("medium")) {
+        return it.strength === PasswordStrengthLevel.MEDIUM;
+      }
+      if (key === "strong" || key.includes("strong")) {
+        return it.strength === PasswordStrengthLevel.STRONG;
+      }
+
+      if (
+        key === "short" ||
+        key.includes("short") ||
+        key.includes("too_short")
+      ) {
+        if (
+          truthy(flags?.short) ||
+          truthy(flags?.isShort) ||
+          truthy(flags?.tooShort)
+        )
+          return true;
+
+        const len =
+          (typeof flags?.length === "number" ? flags.length : undefined) ??
+          (typeof it?.passwordLength === "number"
+            ? it.passwordLength
+            : undefined) ??
+          (typeof it?.stats?.length === "number" ? it.stats.length : undefined);
+
+        if (typeof len === "number") return len < 12;
+
+        return false;
+      }
+
+      if (key === "sequential" || key.includes("sequen")) {
+        if (
+          truthy(flags?.sequential) ||
+          truthy(flags?.hasSequential) ||
+          truthy(flags?.isSequential)
+        )
+          return true;
+
+        const seqCount =
+          (typeof flags?.sequentialCount === "number"
+            ? flags.sequentialCount
+            : 0) ?? 0;
+
+        const triples = Array.isArray(flags?.sequentialTriples)
+          ? flags.sequentialTriples
+          : null;
+
+        if (seqCount > 0) return true;
+        if (triples && triples.length > 0) return true;
+
+        const altTriples = Array.isArray(it?.sequentialTriples)
+          ? it.sequentialTriples
+          : null;
+        if (altTriples && altTriples.length > 0) return true;
+
+        return false;
+      }
+
+      return true;
+    };
+
+    const mapped = cache.list.map((it: any) => {
+      if (!matchesStrength(it.strength)) return { it, rel: Infinity };
+      if (!matchesFinding(it)) return { it, rel: Infinity };
+
       if (!q) return { it, rel: 0 };
-      const t = it.normalizedTitle;
-      if (t.startsWith(q)) return { it, rel: 0 };
-      const idx = t.indexOf(q);
+      const tt = it.normalizedTitle;
+      if (tt.startsWith(q)) return { it, rel: 0 };
+      const idx = tt.indexOf(q);
       return { it, rel: idx === -1 ? Infinity : idx + 1 };
     });
 
@@ -190,12 +318,17 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
       .filter((x) => x.rel !== Infinity)
       .sort((a, b) => a.rel - b.rel)
       .map((x) => x.it);
-  }, [cache, deferredQuery, showStrong, showMedium, showWeak]);
+  }, [cache, deferredQuery, strengthSel, activeFindingKey]);
 
-  const total = cache?.list.length ?? 0;
-  const strongCount = cache?.counts.strong ?? 0;
-  const mediumCount = cache?.counts.medium ?? 0;
-  const weakCount = cache?.counts.weak ?? 0;
+  const counts = cache?.counts ?? {
+    weak: 0,
+    medium: 0,
+    strong: 0,
+    reused: 0,
+    variants: 0,
+    short: 0,
+    sequential: 0,
+  };
 
   return (
     <AnimatedContainer>
@@ -205,71 +338,133 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
         translucent
       />
       <Header title={t("bar:Analysis")} />
+
       <View
         style={{
           flex: 1,
-          display: "flex",
-          flexDirection: width > 600 ? "row-reverse" : "column",
+          flexDirection: width > 600 ? "row" : "column",
           width: "100%",
+          alignItems: "stretch",
         }}
       >
-        <ScrollView
-          showsHorizontalScrollIndicator={false}
-          style={{
-            maxWidth: width > 600 ? 180 : undefined,
-            margin: 8,
-            marginLeft: width > 600 ? 0 : 8,
-            marginTop: 0,
-            display: "flex",
-            flexDirection: "column",
-            gap: 8,
-            flexGrow: 0,
-          }}
-        >
-          <View
-            style={{
-              display: "flex",
-              flexDirection: width > 600 ? "column" : "row",
-              justifyContent: "space-evenly",
-              height: width > 600 ? undefined : 80,
-              gap: 8,
-              marginBottom: 8,
-            }}
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text
+            variant="labelSmall"
+            style={{ opacity: 0.7, marginLeft: 14, userSelect: "none" }}
           >
-            <AnalysisEntryGradient
-              name={t("analysis:averageEntropy")}
-              number={cache?.avgEntropy ?? 0}
-              percentage={cache?.avgEntropyPct ?? 0}
-            />
-            <AnalysisEntry
-              name={t("analysis:strong")}
-              number={strongCount}
-              percentage={total ? (strongCount / total) * 100 : 0}
-            />
+            {t("analysis:strengthDistribution", {
+              defaultValue: "Strength distribution",
+            })}
+          </Text>
+
+          <View style={{ flexDirection: "row", margin: 8, gap: 8 }}>
+            <AnimatedPressable
+              onPress={() => startTransition(() => toggleStrength("strong"))}
+              style={strengthCardStyle(isSelected("strong"))}
+            >
+              <View>
+                <Text style={{ fontWeight: "700", userSelect: "none" }}>
+                  {counts.strong}
+                </Text>
+                <Text style={{ opacity: 0.8, userSelect: "none" }}>
+                  {t("analysis:strong")}
+                </Text>
+              </View>
+            </AnimatedPressable>
+
+            <AnimatedPressable
+              onPress={() => startTransition(() => toggleStrength("medium"))}
+              style={strengthCardStyle(isSelected("medium"))}
+            >
+              <View>
+                <Text style={{ fontWeight: "700", userSelect: "none" }}>
+                  {counts.medium}
+                </Text>
+                <Text style={{ opacity: 0.8, userSelect: "none" }}>
+                  {t("analysis:medium")}
+                </Text>
+              </View>
+            </AnimatedPressable>
+
+            <AnimatedPressable
+              onPress={() => startTransition(() => toggleStrength("weak"))}
+              style={strengthCardStyle(isSelected("weak"))}
+            >
+              <View>
+                <Text style={{ fontWeight: "700", userSelect: "none" }}>
+                  {counts.weak}
+                </Text>
+                <Text style={{ opacity: 0.8, userSelect: "none" }}>
+                  {t("analysis:weak")}
+                </Text>
+              </View>
+            </AnimatedPressable>
           </View>
-          <View
-            style={{
-              width: "100%",
-              display: "flex",
-              flexDirection: width > 600 ? "column" : "row",
-              justifyContent: "space-evenly",
-              height: width > 600 ? undefined : 80,
-              gap: 8,
-            }}
-          >
-            <AnalysisEntry
-              name={t("analysis:medium")}
-              number={mediumCount}
-              percentage={total ? (mediumCount / total) * 100 : 0}
-            />
-            <AnalysisEntry
-              name={t("analysis:weak")}
-              number={weakCount}
-              percentage={total ? (weakCount / total) * 100 : 0}
-            />
-          </View>
-        </ScrollView>
-        <View style={{ flex: 1, padding: 0 }}>
+
+          {width <= 600 ? (
+            <>
+              <Text
+                variant="labelSmall"
+                style={{ opacity: 0.7, marginLeft: 14, userSelect: "none" }}
+              >
+                {t("analysis:topFindings", { defaultValue: "Top findings" })}
+              </Text>
+
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={{
+                  alignSelf: "flex-start",
+                  flexGrow: 0,
+                  flexShrink: 0,
+                }}
+                contentContainerStyle={{
+                  padding: 8,
+                  flexDirection: "row",
+                  alignItems: "flex-start",
+                }}
+              >
+                {(cache?.findings?.length ?? 0) > 0 ? (
+                  cache!.findings.slice(0, 5).map((f: any, index: number) => (
+                    <AnimatedPressable
+                      key={f.key}
+                      onPress={() =>
+                        startTransition(() => toggleFinding(f.key))
+                      }
+                      style={findingCardStyle(activeFindingKey === f.key, {
+                        marginRight: index === 4 ? 0 : 8,
+                        minWidth: 160,
+                        alignSelf: "flex-start",
+                      })}
+                    >
+                      <View>
+                        <Text style={{ fontWeight: "700", userSelect: "none" }}>
+                          {f.count}
+                        </Text>
+                        <Text
+                          style={{ opacity: 0.8, userSelect: "none" }}
+                          numberOfLines={2}
+                        >
+                          {t(`analysis:finding.${f.key}`, {
+                            defaultValue: f.key,
+                          })}
+                        </Text>
+                      </View>
+                    </AnimatedPressable>
+                  ))
+                ) : (
+                  <View style={{ padding: 12, opacity: 0.7 }}>
+                    <Text>
+                      {t("analysis:noFindings", {
+                        defaultValue: "No findings.",
+                      })}
+                    </Text>
+                  </View>
+                )}
+              </ScrollView>
+            </>
+          ) : null}
+
           <LinearGradient
             colors={getColors()}
             dither
@@ -284,7 +479,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
               shadowRadius: 6,
               elevation: 5,
               margin: 8,
-              marginTop: 0,
+              marginTop: width > 600 ? 8 : 0,
               alignItems: "center",
             }}
             end={{ x: 0.1, y: 0.2 }}
@@ -297,104 +492,217 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                 borderRadius: 10,
                 backgroundColor: "rgba(217, 217, 217, 0.21)",
               }}
-              placeholder="Search"
-              onChangeText={(t) => startTransition(() => setSearchQuery(t))}
+              placeholder={t("common:search", { defaultValue: "Search" })}
+              onChangeText={(txt) => startTransition(() => setSearchQuery(txt))}
               value={searchQuery}
               iconColor={"#ffffff80"}
               placeholderTextColor={"#ffffff80"}
             />
-            <IconButton
-              icon="filter-variant"
-              size={25}
-              onPress={() => setFilterModalVisible(true)}
-              iconColor="white"
-              style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
-            />
           </LinearGradient>
-          <FlashList
-            data={filteredValues}
-            keyExtractor={(item, idx) => `${item.title}:${idx}:${item.type}`}
-            removeClippedSubviews
-            renderItem={({ item, index }) => (
-              <Animated.View
-                entering={FadeInDown.delay(index * 50).duration(250)}
-                style={{
-                  borderRadius: 12,
-                  margin: 8,
-                  marginBottom: 4,
-                  marginTop: 0,
-                  overflow: "hidden",
-                  backgroundColor: theme.colors?.background,
-                  boxShadow: theme.colors?.shadow,
-                  height: 40,
-                  borderColor: darkmode ? theme.colors.outlineVariant : "white",
-                  borderWidth: StyleSheet.hairlineWidth,
-                }}
-              >
-                <AnimatedPressable
-                  onPress={() => {
-                    navigation.navigate("AnalysisDetail", { value: item });
+
+          {activeFindingKey ? (
+            <View
+              style={{ marginHorizontal: 8, marginTop: -4, marginBottom: 4 }}
+            >
+              <Text style={{ opacity: 0.7 }}>
+                {t("analysis:activeFilter", { defaultValue: "Active filter:" })}{" "}
+                {t(`analysis:finding.${activeFindingKey}`, {
+                  defaultValue: activeFindingKey,
+                })}{" "}
+                <Text
+                  style={{ color: theme.colors.primary }}
+                  onPress={() => setActiveFindingKey(null)}
+                >
+                  {t("common:clear", { defaultValue: "Clear" })}
+                </Text>
+              </Text>
+            </View>
+          ) : null}
+
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <FlashList
+              data={filteredValues}
+              keyExtractor={(item: any) =>
+                `${item.ref.valueId}:${item.ref.moduleId}:${item.ref.type}`
+              }
+              removeClippedSubviews
+              renderItem={({ item, index }: any) => (
+                <Animated.View
+                  entering={FadeInDown.delay(index * 50).duration(250)}
+                  style={{
+                    borderRadius: 12,
+                    margin: 8,
+                    marginBottom: 4,
+                    marginTop: 0,
+                    overflow: "hidden",
+                    backgroundColor: theme.colors?.background,
+                    boxShadow: theme.colors?.shadow,
+                    height: 44,
+                    borderColor: darkmode
+                      ? theme.colors.outlineVariant
+                      : "white",
+                    borderWidth: StyleSheet.hairlineWidth,
                   }}
                 >
-                  <View
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      flexDirection: "row",
-                      gap: 4,
-                      padding: 10,
-                      justifyContent: "space-between",
-                    }}
+                  <AnimatedPressable
+                    onPress={() =>
+                      navigation.navigate("AnalysisDetail", { ref: item.ref })
+                    }
                   >
                     <View
-                      style={{ display: "flex", flexDirection: "row", gap: 6 }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "row",
+                        paddingHorizontal: 10,
+                        height: 44,
+                        justifyContent: "space-between",
+                      }}
                     >
-                      <Text
+                      <View
                         style={{
-                          color: theme.colors.primary,
-                          userSelect: "none",
+                          display: "flex",
+                          flexDirection: "row",
+                          gap: 6,
+                          flex: 1,
+                          alignItems: "center",
+                          minWidth: 0,
                         }}
                       >
-                        {index + 1}.
-                      </Text>
-                      <Text style={{ userSelect: "none" }}>{item.title}</Text>
-                    </View>
-                    <Icon
-                      source={getPasswordStrengthIcon(
-                        item.passwordStrengthLevel
-                      )}
-                      size={20}
-                      color={getPasswordStrengthColor(
-                        item.passwordStrengthLevel
-                      )}
-                    />
-                  </View>
-                </AnimatedPressable>
-              </Animated.View>
-            )}
-            ListEmptyComponent={
-              <>
-                {cache ? (
-                  <View style={{ alignItems: "center", marginTop: 32 }}>
-                    <Text style={{ opacity: 0.6 }}>No results</Text>
-                  </View>
-                ) : null}
-              </>
-            }
-          />
-        </View>
-      </View>
+                        <Text
+                          style={{
+                            color: theme.colors.primary,
+                            userSelect: "none",
+                          }}
+                        >
+                          {index + 1}.
+                        </Text>
+                        <Text
+                          style={{ userSelect: "none", flex: 1 }}
+                          numberOfLines={1}
+                        >
+                          {item.title}
+                        </Text>
 
-      <FilterAnalysisModal
-        visible={filterModalVisible}
-        setVisible={setFilterModalVisible}
-        strong={showStrong}
-        setStrong={(v) => startTransition(() => setShowStrong(v))}
-        medium={showMedium}
-        setMedium={(v) => startTransition(() => setShowMedium(v))}
-        weak={showWeak}
-        setWeak={(v) => startTransition(() => setShowWeak(v))}
-      />
+                        {(item.flags?.variantGroupSize ?? 0) >= 2 ? (
+                          <Chip style={{ borderRadius: 12 }}>
+                            {t("analysis:badge.variant", {
+                              defaultValue: "Variant",
+                            })}
+                          </Chip>
+                        ) : null}
+                        {(item.flags?.reuseGroupSize ?? 0) >= 2 ? (
+                          <Chip style={{ borderRadius: 12 }}>
+                            {t("analysis:badge.reused", {
+                              defaultValue: "Reused",
+                            })}
+                          </Chip>
+                        ) : null}
+                      </View>
+                      <Divider
+                        style={{
+                          height: 24,
+                          width: StyleSheet.hairlineWidth,
+                          marginHorizontal: 6,
+                        }}
+                      />
+                      <Icon
+                        source={getPasswordStrengthIcon(item.strength as any)}
+                        size={20}
+                        color={getPasswordStrengthColor(item.strength as any)}
+                      />
+                    </View>
+                  </AnimatedPressable>
+                </Animated.View>
+              )}
+              ListEmptyComponent={
+                cache ? (
+                  <View style={{ alignItems: "center", marginTop: 32 }}>
+                    <Text style={{ opacity: 0.6 }}>
+                      {t("common:noResults", { defaultValue: "No results" })}
+                    </Text>
+                  </View>
+                ) : null
+              }
+            />
+          </View>
+        </View>
+
+        {width > 600 ? (
+          <View
+            style={{
+              width: StyleSheet.hairlineWidth,
+              alignSelf: "stretch",
+              backgroundColor: theme.colors.outlineVariant,
+              flexShrink: 0,
+            }}
+          />
+        ) : null}
+
+        {width > 600 ? (
+          <View>
+            <Text
+              variant="labelSmall"
+              style={{ opacity: 0.7, marginLeft: 6, userSelect: "none" }}
+            >
+              {t("analysis:topFindings", { defaultValue: "Top findings" })}
+            </Text>
+
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{
+                padding: 8,
+                paddingTop: 8,
+                gap: 8,
+                alignSelf: "flex-start",
+              }}
+              style={{
+                alignSelf: "flex-start",
+                flexShrink: 0,
+              }}
+            >
+              {(cache?.findings?.length ?? 0) > 0 ? (
+                cache!.findings.slice(0, 8).map((f: any) => (
+                  <AnimatedPressable
+                    key={f.key}
+                    onPress={() => startTransition(() => toggleFinding(f.key))}
+                    onLayout={(e) => {
+                      if (maxFindingWidth != null) return;
+                      const w = e.nativeEvent.layout.width;
+                      setMaxFindingWidth((prev) =>
+                        prev == null ? w : Math.max(prev, w)
+                      );
+                    }}
+                    style={findingCardStyle(activeFindingKey === f.key, [
+                      maxFindingWidth != null ? { width: maxFindingWidth } : null,
+                      { alignSelf: "flex-start" },
+                    ])}
+                  >
+                    <View>
+                      <Text style={{ fontWeight: "700", userSelect: "none" }}>
+                        {f.count}
+                      </Text>
+                      <Text style={{ opacity: 0.8, userSelect: "none" }}>
+                        {t(`analysis:finding.${f.key}`, {
+                          defaultValue: f.key,
+                        })}
+                      </Text>
+                    </View>
+                  </AnimatedPressable>
+                ))
+              ) : (
+                <View
+                  style={{ padding: 12, opacity: 0.7, alignSelf: "flex-start" }}
+                >
+                  <Text>
+                    {t("analysis:noFindings", { defaultValue: "No findings." })}
+                  </Text>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+        ) : null}
+      </View>
     </AnimatedContainer>
   );
 };

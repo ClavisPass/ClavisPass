@@ -1,37 +1,43 @@
 import React from "react";
 import { TouchableRipple } from "react-native-paper";
-import { StyleProp, ViewStyle, GestureResponderEvent } from "react-native";
+import type { ComponentProps } from "react";
+import type { StyleProp, ViewStyle } from "react-native";
 
-type ButtonWrapperProps = {
-  children: React.ReactNode;
-  onPress?: (event: GestureResponderEvent) => void;
+type TouchableRippleProps = ComponentProps<typeof TouchableRipple>;
+
+export type AnimatedPressableProps = Omit<
+  TouchableRippleProps,
+  "style" | "children"
+> & {
   style?: StyleProp<ViewStyle>;
-  onPressIn?: (event: GestureResponderEvent) => void;
-  onPressOut?: (event: GestureResponderEvent) => void;
-  disabled?: boolean;
+  children?: React.ReactNode; // erlaubt mehrere Kinder, Fragments, Arrays, etc.
 };
 
-export const AnimatedPressable: React.FC<ButtonWrapperProps> = ({
-  children,
-  onPress,
-  style,
-  onPressIn,
-  onPressOut,
-  disabled,
-}) => {
-  return (
-    <TouchableRipple
-      rippleColor="rgba(0, 0, 0, .32)"
-      style={style}
-      borderless
-      onPress={onPress}
-      onPressIn={onPressIn}
-      onPressOut={onPressOut}
-      disabled={disabled}
-    >
-      {children}
-    </TouchableRipple>
-  );
-};
+const AnimatedPressable = React.forwardRef<any, AnimatedPressableProps>(
+  (
+    {
+      children,
+      style,
+      rippleColor = "rgba(0, 0, 0, .32)",
+      borderless = true,
+      ...rest
+    },
+    ref
+  ) => {
+    return (
+      <TouchableRipple
+        ref={ref}
+        style={style}
+        rippleColor={rippleColor}
+        borderless={borderless}
+        {...rest}
+      >
+        {children}
+      </TouchableRipple>
+    );
+  }
+);
+
+AnimatedPressable.displayName = "AnimatedPressable";
 
 export default AnimatedPressable;

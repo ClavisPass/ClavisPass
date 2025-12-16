@@ -83,20 +83,38 @@ const de: TranslationSchema = {
     copyDurationOff: "Aus",
   },
   analysis: {
-    averageEntropy: "Ø Entropie",
+    topFindings: "Wichtigste Findings",
+    noFindings: "Keine Auffälligkeiten.",
+    strengthDistribution: "Stärkeverteilung",
     strong: "Stark",
     medium: "Mittel",
     weak: "Schwach",
+
+    finding: {
+      reused: "Wiederverwendete Passwörter",
+      weak: "Schwache Passwörter",
+      short: "Zu kurz",
+      variants: "Passwort-Varianten",
+      sequential: "Sequentielle Muster",
+    },
+
+    badge: {
+      reused: "Reuse",
+      variant: "Variante",
+    },
   },
   analysisDetail: {
+    title: "Analyse",
+    yourPassword: "Dein Passwort",
+    statistics: "Statistiken",
     entropy: "Entropie",
     letters: "Buchstaben",
     digits: "Ziffern",
-    characters: "Zeichen",
-    yourPassword: "Ihr Passwort",
-    statistics: "Statistiken",
+    characters: "Sonderzeichen",
     pattern: "Muster",
-    repeatedSequences: "Wiederholte Sequenzen",
+    repeatedChars: "Wiederholte Zeichen",
+    sequentialPatterns: "Sequentielle Muster",
+    revealHint: "Zum Anzeigen der Detailanalyse Passwort einblenden.",
   },
   greetings: {
     1: "Hi",

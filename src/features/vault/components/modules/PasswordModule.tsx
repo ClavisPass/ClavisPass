@@ -1,22 +1,26 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
-
 import { IconButton } from "react-native-paper";
+import * as Progress from "react-native-progress";
+import { useTranslation } from "react-i18next";
 
 import PasswordModuleType from "../../model/modules/PasswordModuleType";
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
 
-import passwordEntropy from "../../../analysis/utils/Entropy";
-import PasswordGeneratorModal from "../modals/PasswordGeneratorModal";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
-import * as Progress from "react-native-progress";
 import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import PasswordTextbox from "../../../../shared/components/PasswordTextbox";
+import PasswordGeneratorModal from "../modals/PasswordGeneratorModal";
+
 import PasswordStrengthLevel from "../../../analysis/model/PasswordStrengthLevel";
 import getPasswordStrengthColor from "../../../analysis/utils/getPasswordStrengthColor";
-import { useTranslation } from "react-i18next";
+import {
+  computeEntropyBitsForUi,
+  entropyToProgress,
+  entropyToStrength,
+} from "../../utils/entropyUi";
 
 function PasswordModule(props: PasswordModuleType & Props) {
   const didMount = useRef(false);
@@ -32,22 +36,12 @@ function PasswordModule(props: PasswordModuleType & Props) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const percentage = passwordEntropy(value) / 200;
-    setProgressbarColor(getPasswordStrengthColor(PasswordStrengthLevel.STRONG));
-    if (percentage < 0.55) {
-      setProgressbarColor(
-        getPasswordStrengthColor(PasswordStrengthLevel.MEDIUM)
-      );
-    }
-    if (percentage < 0.4) {
-      setProgressbarColor(getPasswordStrengthColor(PasswordStrengthLevel.WEAK));
-    }
+    const entropyBits = computeEntropyBitsForUi(value);
+    const strength = entropyToStrength(entropyBits);
+    const progress = entropyToProgress(entropyBits);
 
-    if (percentage > 1) {
-      setEntropyPercentage(1);
-    } else {
-      setEntropyPercentage(percentage);
-    }
+    setProgressbarColor(getPasswordStrengthColor(strength));
+    setEntropyPercentage(progress);
   }, [value]);
 
   useEffect(() => {
@@ -78,6 +72,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
         </View>
         <CopyToClipboard value={value} />
       </View>
+
       <View style={globalStyles.moduleView}>
         <View style={{ flexGrow: 1, padding: 6 }}>
           <Progress.Bar
@@ -89,15 +84,15 @@ function PasswordModule(props: PasswordModuleType & Props) {
             height={4}
           />
         </View>
+
         <IconButton
           style={{ margin: 0, marginLeft: 8, marginRight: 8 }}
           iconColor={theme.colors.primary}
           icon="lock-check-outline"
           size={16}
-          onPress={() => {
-            setVisible(true);
-          }}
+          onPress={() => setVisible(true)}
         />
+
         <PasswordGeneratorModal
           visible={visible}
           setVisible={setVisible}

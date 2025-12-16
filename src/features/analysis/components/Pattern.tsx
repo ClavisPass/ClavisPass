@@ -9,7 +9,7 @@ type Props = {
 };
 
 function Pattern(props: Props) {
-  const { theme } = useTheme();
+  const { theme, darkmode } = useTheme();
   const [arrayPattern, setArrayPattern] = useState<string[]>([]);
   useEffect(() => {
     if (props.pattern) {
@@ -26,7 +26,7 @@ function Pattern(props: Props) {
         justifyContent: "space-around",
         boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
         borderWidth: StyleSheet.hairlineWidth,
-        borderColor: theme.colors.outlineVariant,
+        borderColor: darkmode ? theme.colors.outlineVariant : "white",
       }}
     >
       <ScrollView
@@ -36,9 +36,9 @@ function Pattern(props: Props) {
           flexDirection: "row",
           gap: 2,
           width: "100%",
-          //justifyContent: "center",
           overflow: "hidden",
         }}
+        showsHorizontalScrollIndicator={false}
       >
         {arrayPattern.map((char, index) => {
           return (

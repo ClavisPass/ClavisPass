@@ -1,8 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ValuesType from "../../../features/vault/model/ValuesType";
-import { CachedPasswordsType } from "../../../screens/AnalysisScreen";
 import FolderType from "../../../features/vault/model/FolderType";
 import DigitalCardType from "../../../features/vault/model/DigitalCardType";
+import AnalysisRef from "../../../features/analysis/model/AnalysisRef";
 
 export type RootStackParamList = {
   Home: {
@@ -14,9 +14,7 @@ export type RootStackParamList = {
     folder?: FolderType | null;
   };
   Analysis: undefined;
-  AnalysisDetail: {
-    value: CachedPasswordsType;
-  };
+  AnalysisDetail: { ref: AnalysisRef };
   Settings: undefined;
   Login: undefined;
   Scan: undefined;

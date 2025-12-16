@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Header from "../shared/components/Header";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import { useTheme } from "../app/providers/ThemeProvider";
-import { Divider, Icon, Text, TextInput } from "react-native-paper";
+import { Chip, Divider, Icon, Text, TextInput } from "react-native-paper";
 import ModulesEnum from "../features/vault/model/ModulesEnum";
 import ModuleIconsEnum from "../features/vault/model/ModuleIconsEnum";
-import { ScrollView, View } from "react-native";
+import WifiModuleType from "../features/vault/model/modules/WifiModuleType";
+import { ValuesListType } from "../features/vault/model/ValuesType";
+import { ScrollView, View, StyleSheet } from "react-native";
 import AnalysisEntry from "../features/analysis/components/AnalysisEntry";
 import AnalysisEntryGradient from "../features/analysis/components/AnalysisEntryGradient";
 import Pattern from "../features/analysis/components/Pattern";
@@ -16,6 +18,21 @@ import getPasswordStrengthColor from "../features/analysis/utils/getPasswordStre
 import getPasswordStrengthIcon from "../features/analysis/utils/getPasswordStrengthIcon";
 import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import { useTranslation } from "react-i18next";
+import { useData } from "../app/providers/DataProvider";
+import { useAuth } from "../app/providers/AuthProvider";
+
+import passwordEntropy from "../features/analysis/utils/Entropy";
+import AnalysisRef from "../features/analysis/model/AnalysisRef";
+import PasswordStrengthLevel from "../features/analysis/model/PasswordStrengthLevel";
+
+import {
+  canonicalizeForVariants,
+  deriveAnalysisPepperFromMaster,
+  fingerprintPassword,
+  findSequentialTriples,
+  hasRepeatedChars,
+  strengthFromEntropyBits,
+} from "../features/analysis/utils/analysisEngine";
 
 type AnalysisDetailScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -31,17 +48,109 @@ type CharacterAnalysis = {
   specialCharactersPercent: number;
 } | null;
 
-type PasswordAnalysis = {
+type DetailComputed = {
+  entropyBits: number;
+  strength: PasswordStrengthLevel;
   pattern: string;
-  repeatedSequences: string[];
-  sequentialPatterns: string[];
-} | null;
+  sequential: string[];
+  repeated: boolean;
+  charAnalysis: CharacterAnalysis;
+  length: number;
+
+  reuseCount: number; // wie oft exakt wiederverwendet (inkl. dieses)
+  variantCount: number; // wie viele Varianten (inkl. dieses)
+};
+
+function analyzeCharacterComposition(input: string): CharacterAnalysis {
+  let letters = 0,
+    digits = 0,
+    specialCharacters = 0;
+
+  for (const char of input) {
+    if (/[a-zA-Z]/.test(char)) letters++;
+    else if (/[0-9]/.test(char)) digits++;
+    else specialCharacters++;
+  }
+
+  const total = input.length || 1;
+  return {
+    letters,
+    lettersPercent: (letters / total) * 100,
+    digits,
+    digitsPercent: (digits / total) * 100,
+    specialCharacters,
+    specialCharactersPercent: (specialCharacters / total) * 100,
+  };
+}
+
+function classifyPattern(password: string): string {
+  const regexMap: { [key: string]: RegExp } = {
+    a: /[a-z]/,
+    A: /[A-Z]/,
+    1: /[0-9]/,
+    "!": /[^a-zA-Z0-9]/,
+  };
+
+  let pattern = "";
+  for (const char of password) {
+    for (const [key, regex] of Object.entries(regexMap)) {
+      if (regex.test(char)) {
+        pattern += key;
+        break;
+      }
+    }
+  }
+  return pattern;
+}
+
+function resolveById(
+  values: ValuesListType,
+  ref: AnalysisRef
+): { title: string; password: string; typeIcon: any } | null {
+  const value = values.find((v) => v.id === ref.valueId);
+  if (!value) return null;
+
+  const mod = value.modules.find((m: any) => m.id === ref.moduleId);
+  if (!mod) return null;
+
+  if (ref.type === ModulesEnum.PASSWORD) {
+    return {
+      title: value.title,
+      password: String((mod as any).value),
+      typeIcon: ModuleIconsEnum.PASSWORD,
+    };
+  }
+
+  if (ref.type === ModulesEnum.WIFI) {
+    const wifi = mod as WifiModuleType;
+    return {
+      title: wifi.wifiName ?? value.title,
+      password: wifi.value,
+      typeIcon: ModuleIconsEnum.WIFI,
+    };
+  }
+
+  return null;
+}
+
+function Badge({ text }: { text: string }) {
+  return (
+    <Chip style={{ borderRadius: 12 }}>
+      {text}
+    </Chip>
+  );
+}
 
 const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
   route,
   navigation,
 }) => {
-  const { value: routeValue } = route.params!;
+  const { ref } = route.params;
+  const data = useData();
+  const values = data?.data?.values as ValuesListType | undefined;
+
+  const { master } = useAuth();
+
   const {
     globalStyles,
     theme,
@@ -52,235 +161,270 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
   } = useTheme();
   const { t } = useTranslation();
 
-  const [characterAnalysis, setCharacterAnalysis] =
-    useState<CharacterAnalysis>(null);
-
-  const [passwordAnalysis, setPasswordAnalysis] =
-    useState<PasswordAnalysis>(null);
+  const resolved = useMemo(() => {
+    if (!values) return null;
+    return resolveById(values, ref);
+  }, [values, ref]);
 
   const [secureTextEntry, setSecureTextEntry] = useState(true);
-
-  const [eyeIcon, setEyeIcon] = useState("eye");
-
-  const [edit, setEdit] = useState(false);
+  const [passwordPlain, setPasswordPlain] = useState<string | null>(null);
+  const [computed, setComputed] = useState<DetailComputed | null>(null);
 
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(40);
       setHeaderWhite(false);
-    }, [])
+
+      return () => {
+        setSecureTextEntry(true);
+        setPasswordPlain(null);
+        setComputed(null);
+      };
+    }, [setHeaderSpacing, setHeaderWhite])
   );
 
-  const goBack = () => {
-    navigation.goBack();
-  };
+  useEffect(() => {
+    let cancelled = false;
 
-  function analyzeCharacterComposition(input: string): CharacterAnalysis {
-    // Initialisieren der Zähler
-    let letters = 0;
-    let digits = 0;
-    let specialCharacters = 0;
-
-    // Durch den String iterieren
-    for (const char of input) {
-      if (/[a-zA-Z]/.test(char)) {
-        letters++;
-      } else if (/[0-9]/.test(char)) {
-        digits++;
-      } else {
-        specialCharacters++;
+    (async () => {
+      if (!resolved || !values || !master) {
+        setComputed(null);
+        return;
       }
-    }
 
-    // Gesamtlänge für die Berechnung der Anteile
-    const total = input.length || 1; // Vermeidung einer Division durch 0
+      const pw = resolved.password;
 
-    return {
-      letters: letters,
-      lettersPercent: (letters / total) * 100,
-      digits: digits,
-      digitsPercent: (digits / total) * 100,
-      specialCharacters: specialCharacters,
-      specialCharactersPercent: (specialCharacters / total) * 100,
-    };
-  }
+      const entropyBits = passwordEntropy(pw);
+      const strength = strengthFromEntropyBits(
+        entropyBits
+      ) as PasswordStrengthLevel;
+      const pattern = classifyPattern(pw);
+      const sequential = findSequentialTriples(pw);
+      const repeated = hasRepeatedChars(pw);
+      const charAnalysis = analyzeCharacterComposition(pw);
+      const length = pw.length;
 
-  function analyzePassword(password: string): PasswordAnalysis {
-    // Initialisiere Variablen
-    let pattern = "";
-    const repeatedSequences: string[] = [];
-    const sequentialPatterns: string[] = [];
+      const pepper = await deriveAnalysisPepperFromMaster(master);
+      const fp = await fingerprintPassword(pepper, pw);
+      const canonical = canonicalizeForVariants(pw);
 
-    // Regex für die Klassifikation
-    const regexMap: { [key: string]: RegExp } = {
-      a: /[a-z]/,
-      A: /[A-Z]/,
-      1: /[0-9]/,
-      "!": /[^a-zA-Z0-9]/,
-    };
+      let reuseCount = 0;
+      let variantCount = 0;
 
-    // Erzeuge das Pattern
-    for (const char of password) {
-      for (const [key, regex] of Object.entries(regexMap)) {
-        if (regex.test(char)) {
-          pattern += key;
-          break;
+      for (const v of values) {
+        for (const m of v.modules) {
+          const isPwd = m.module === ModulesEnum.PASSWORD;
+          const isWifi = m.module === ModulesEnum.WIFI;
+          if (!isPwd && !isWifi) continue;
+
+          const otherPw = isPwd
+            ? String((m as any).value)
+            : (m as WifiModuleType).value;
+
+          const otherFp = await fingerprintPassword(pepper, otherPw);
+          if (otherFp === fp) reuseCount++;
+
+          const otherCanonical = canonicalizeForVariants(otherPw);
+          if (
+            canonical &&
+            canonical.length >= 4 &&
+            otherCanonical === canonical
+          )
+            variantCount++;
         }
       }
-    }
 
-    // Finde wiederholte Sequenzen (z. B. "aaa", "111")
-    const repeatedMatch = pattern.match(/(.)\1{2,}/g); // Mindestens 3 gleiche Zeichen
-    if (repeatedMatch) {
-      repeatedSequences.push(...repeatedMatch);
-    }
+      if (cancelled) return;
 
-    // Finde sequentielle Muster (z. B. "123", "abc")
-    for (let i = 0; i < password.length - 2; i++) {
-      const currentChar = password[i];
-      const nextChar = password[i + 1];
-      const nextNextChar = password[i + 2];
+      setComputed({
+        entropyBits,
+        strength,
+        pattern,
+        sequential,
+        repeated,
+        charAnalysis,
+        length,
+        reuseCount,
+        variantCount,
+      });
+    })();
 
-      // Prüfe auf numerische oder alphabetische Sequenzen
-      if (
-        (/\d/.test(currentChar) &&
-          +nextChar === +currentChar + 1 &&
-          +nextNextChar === +currentChar + 2) || // Numerische Sequenz
-        (/[a-zA-Z]/.test(currentChar) &&
-          nextChar.charCodeAt(0) === currentChar.charCodeAt(0) + 1 &&
-          nextNextChar.charCodeAt(0) === currentChar.charCodeAt(0) + 2) // Alphabetische Sequenz
-      ) {
-        sequentialPatterns.push(password.slice(i, i + 3));
-      }
-    }
-
-    return {
-      pattern,
-      repeatedSequences,
-      sequentialPatterns,
+    return () => {
+      cancelled = true;
     };
-  }
+  }, [resolved, values, master]);
 
-  const getTypeIcon = () => {
-    if (routeValue.type === ModulesEnum.PASSWORD) {
-      return ModuleIconsEnum.PASSWORD;
+  const onToggleEye = () => {
+    if (!resolved) return;
+
+    if (secureTextEntry) {
+      setPasswordPlain(resolved.password);
+      setSecureTextEntry(false);
+    } else {
+      setSecureTextEntry(true);
+      setPasswordPlain(null);
     }
-    if (routeValue.type === ModulesEnum.WIFI) {
-      return ModuleIconsEnum.WIFI;
-    }
-    return "";
   };
 
-  useEffect(() => {
-    setCharacterAnalysis(analyzeCharacterComposition(routeValue.password));
-    setPasswordAnalysis(analyzePassword(routeValue.password));
-  }, [routeValue]);
+  const shownPassword = secureTextEntry ? "••••••••••••" : (passwordPlain ?? "");
 
-  useEffect(() => {
-    if (secureTextEntry) {
-      setEyeIcon("eye");
-    } else {
-      setEyeIcon("eye-off");
-    }
-  }, [secureTextEntry]);
+  const strength = computed?.strength ?? null;
+
+  const showReused = (computed?.reuseCount ?? 0) >= 2;
+  const showVariant = (computed?.variantCount ?? 0) >= 2;
+  const showShort = (computed?.length ?? 0) > 0 && (computed?.length ?? 0) < 12;
+  const showSequential = (computed?.sequential?.length ?? 0) > 0;
+  const showRepeated = computed?.repeated ?? false;
+
+  const reuseOthers = Math.max(0, (computed?.reuseCount ?? 0) - 1);
+  const variantOthers = Math.max(0, (computed?.variantCount ?? 0) - 1);
 
   return (
     <AnimatedContainer style={globalStyles.container}>
       <StatusBar
-        animated={true}
+        animated
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
-        translucent={true}
+        translucent
       />
+
       <Header
-        onPress={goBack}
-        //leftNode={<Text>{routeValue.title}</Text>}
-        title={routeValue.title}
-      ></Header>
-      <ScrollView
-        style={{
-          width: "100%",
-          display: "flex",
-          gap: 6,
-          padding: 6,
-        }}
-      >
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-          }}
-        >
-          <Text
-            variant="labelSmall"
-            style={{
-              opacity: 0.7,
-              userSelect: "none",
-              marginLeft: 6,
-            }}
-            accessibilityRole="header"
-          >
-            {t("analysisDetail:yourPassword")}
-          </Text>
+        onPress={() => navigation.goBack()}
+        title={
+          resolved?.title ??
+          t("analysisDetail:title", { defaultValue: "Analysis" })
+        }
+      />
+
+      <ScrollView style={{ width: "100%", padding: 6 }}>
+        <View style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {/* 1) Password field */}
+          <View>
+            <Text
+              variant="labelSmall"
+              style={{ opacity: 0.7, userSelect: "none", marginLeft: 6 }}
+            >
+              {t("analysisDetail:yourPassword")}
+            </Text>
+
+            <View
+              style={{
+                height: 40,
+                flexDirection: "row",
+                gap: 6,
+                alignItems: "center",
+              }}
+            >
+              <Icon
+                source={resolved?.typeIcon ?? ""}
+                color={theme.colors?.primary}
+                size={24}
+              />
+
+              <TextInput
+                outlineStyle={[
+                  globalStyles.outlineStyle,
+                  {
+                    borderColor: theme.colors.primary,
+                    borderWidth: 2,
+                    flexGrow: 1,
+                  },
+                ]}
+                style={[
+                  globalStyles.textInputStyle,
+                  { userSelect: "none", flexGrow: 1 },
+                ]}
+                value={shownPassword}
+                mode="outlined"
+                secureTextEntry={secureTextEntry}
+                readOnly
+                right={
+                  <TextInput.Icon
+                    animated
+                    icon={secureTextEntry ? "eye" : "eye-off"}
+                    color={theme.colors.primary}
+                    onPress={onToggleEye}
+                  />
+                }
+              />
+            </View>
+          </View>
+
+          {/* 2) Findings badges directly under password */}
           <View
             style={{
-              height: 40,
-              margin: 0,
-              marginBottom: 0,
-              marginTop: 0,
-              display: "flex",
               flexDirection: "row",
-              flexGrow: 1,
-              gap: 6,
-              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 8,
+              paddingHorizontal: 6,
+              marginTop: -2,
             }}
           >
-            <Icon
-              source={getTypeIcon()}
-              color={theme.colors?.primary}
-              size={24}
-            />
-            <TextInput
-              outlineStyle={[
-                globalStyles.outlineStyle,
-                {
-                  borderColor: theme.colors.primary,
-                  borderWidth: 2,
-                  flexGrow: 1,
-                },
-              ]}
-              style={[
-                globalStyles.textInputStyle,
-                { userSelect: "none", flexGrow: 1 },
-              ]}
-              value={routeValue.password}
-              mode="outlined"
-              secureTextEntry={secureTextEntry}
-              readOnly={true}
-              right={
-                <TextInput.Icon
-                  animated
-                  icon={eyeIcon}
-                  color={theme.colors.primary}
-                  onPress={() => setSecureTextEntry(!secureTextEntry)}
-                />
-              }
-            />
+            {showReused ? (
+              <Badge
+                text={t("analysisDetail:badge.reused", {
+                  defaultValue: `Reused (${computed?.reuseCount})`,
+                })}
+              />
+            ) : null}
+            {showVariant ? (
+              <Badge
+                text={t("analysisDetail:badge.variant", {
+                  defaultValue: `Variant (${computed?.variantCount})`,
+                })}
+              />
+            ) : null}
+            {showShort ? (
+              <Badge
+                text={t("analysisDetail:badge.short", {
+                  defaultValue: "Too short",
+                })}
+              />
+            ) : null}
+            {showSequential ? (
+              <Badge
+                text={t("analysisDetail:badge.sequential", {
+                  defaultValue: "Sequential",
+                })}
+              />
+            ) : null}
+            {showRepeated ? (
+              <Badge
+                text={t("analysisDetail:badge.repeated", {
+                  defaultValue: "Repeated",
+                })}
+              />
+            ) : null}
           </View>
+
+          {/* 3) Reused/Variant explanation lines (replace the old sentence) */}
+          {(showReused || showVariant) && computed ? (
+            <View style={{ paddingHorizontal: 10, marginTop: -2 }}>
+              {showReused ? (
+                <Text variant="labelSmall" style={{ opacity: 0.75 }}>
+                  • Reused counts exact matches including this entry — that
+                  equals {reuseOthers} other entries.
+                </Text>
+              ) : null}
+              {showVariant ? (
+                <Text variant="labelSmall" style={{ opacity: 0.75 }}>
+                  • Variant counts the same base password (canonical form)
+                  including this entry — that equals {variantOthers} other
+                  entries.
+                </Text>
+              ) : null}
+            </View>
+          ) : null}
+
+          {/* 4) Stats (same 6-pack layout as before) */}
           <Text
             variant="labelSmall"
-            style={{
-              opacity: 0.7,
-              userSelect: "none",
-              marginLeft: 6,
-            }}
-            accessibilityRole="header"
+            style={{ opacity: 0.7, userSelect: "none", marginLeft: 6 }}
           >
             {t("analysisDetail:statistics")}
           </Text>
+
           <View
             style={{
-              display: "flex",
               flexDirection: "row",
               justifyContent: "space-evenly",
               height: 80,
@@ -289,27 +433,23 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
           >
             <AnalysisEntryGradient
               name={t("analysisDetail:entropy")}
-              number={routeValue.entropy}
-              percentage={(routeValue.entropy / 200) * 100}
-              fixed={true}
+              number={Math.floor(computed?.entropyBits ?? 0)}
+              percentage={Math.min(
+                100,
+                ((computed?.entropyBits ?? 0) / 80) * 100
+              )}
+              fixed
             />
             <AnalysisEntry
-              name={t("analysisDetail:letters")}
-              number={
-                characterAnalysis?.letters ? characterAnalysis?.letters : 0
-              }
-              percentage={
-                characterAnalysis?.lettersPercent
-                  ? characterAnalysis?.lettersPercent
-                  : 0
-              }
-              fixed={true}
+              name={t("analysisDetail:length", { defaultValue: "Length" })}
+              number={computed?.length ?? 0}
+              percentage={Math.min(100, ((computed?.length ?? 0) / 20) * 100)}
+              fixed
             />
           </View>
+
           <View
             style={{
-              width: "100%",
-              display: "flex",
               flexDirection: "row",
               justifyContent: "space-evenly",
               height: 80,
@@ -317,106 +457,166 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             }}
           >
             <AnalysisEntry
-              name={t("analysisDetail:digits")}
-              number={characterAnalysis?.digits ? characterAnalysis?.digits : 0}
-              percentage={
-                characterAnalysis?.digitsPercent
-                  ? characterAnalysis?.digitsPercent
-                  : 0
-              }
-              fixed={true}
+              name={t("analysisDetail:letters")}
+              number={computed?.charAnalysis?.letters ?? 0}
+              percentage={computed?.charAnalysis?.lettersPercent ?? 0}
+              fixed
             />
             <AnalysisEntry
-              name={t("analysisDetail:characters")}
-              number={
-                characterAnalysis?.specialCharacters
-                  ? characterAnalysis?.specialCharacters
-                  : 0
-              }
-              percentage={
-                characterAnalysis?.specialCharactersPercent
-                  ? characterAnalysis?.specialCharactersPercent
-                  : 0
-              }
-              fixed={true}
+              name={t("analysisDetail:digits")}
+              number={computed?.charAnalysis?.digits ?? 0}
+              percentage={computed?.charAnalysis?.digitsPercent ?? 0}
+              fixed
             />
           </View>
-          {passwordAnalysis?.pattern &&
-            passwordAnalysis?.pattern.length !== 0 && (
-              <>
-                <Text
-                  variant="labelSmall"
-                  style={{
-                    opacity: 0.7,
-                    userSelect: "none",
-                    marginLeft: 6,
-                  }}
-                  accessibilityRole="header"
-                >
-                  {t("analysisDetail:pattern")}
-                </Text>
-                <Pattern pattern={passwordAnalysis?.pattern} />
-              </>
-            )}
 
-          {passwordAnalysis?.repeatedSequences &&
-            passwordAnalysis?.repeatedSequences.length !== 0 && (
-              <>
-                <Text
-                  variant="labelSmall"
-                  style={{
-                    opacity: 0.7,
-                    userSelect: "none",
-                    marginLeft: 6,
-                  }}
-                  accessibilityRole="header"
-                >
-                  {t("analysisDetail:repeatedSequences")}
-                </Text>
-                {passwordAnalysis?.repeatedSequences.map((sequence, index) => {
-                  return <Pattern pattern={sequence} key={index} />;
-                })}
-              </>
-            )}
-          {passwordAnalysis?.sequentialPatterns &&
-            passwordAnalysis?.sequentialPatterns.length !== 0 && (
-              <>
-                <Text
-                  variant="titleSmall"
-                  style={{ marginLeft: 6, userSelect: "none" }}
-                >
-                  Sequencial Patterns
-                </Text>
-                {passwordAnalysis?.sequentialPatterns.map((pattern, index) => {
-                  return <Pattern pattern={pattern} key={index} />;
-                })}
-              </>
-            )}
-          <Divider />
           <View
             style={{
-              padding: 6,
-              backgroundColor: getPasswordStrengthColor(
-                routeValue.passwordStrengthLevel
-              ),
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
               flexDirection: "row",
-              borderRadius: 10,
+              justifyContent: "space-evenly",
+              height: 80,
               gap: 6,
-              boxShadow: theme.colors.shadow,
             }}
           >
-            <Icon
-              source={getPasswordStrengthIcon(routeValue.passwordStrengthLevel)}
-              size={18}
-              color={"white"}
+            <AnalysisEntry
+              name={t("analysisDetail:characters")}
+              number={computed?.charAnalysis?.specialCharacters ?? 0}
+              percentage={computed?.charAnalysis?.specialCharactersPercent ?? 0}
+              fixed
             />
-            <Text style={{ color: "white", userSelect: "none" }}>
-              {t(`analysis:${routeValue.passwordStrengthLevel.toLowerCase()}`)}
+            <AnalysisEntry
+              name={t("analysisDetail:reuse", { defaultValue: "Reuse" })}
+              number={Math.max(0, (computed?.reuseCount ?? 0) - 1)}
+              percentage={Math.min(
+                100,
+                Math.max(0, (computed?.reuseCount ?? 0) - 1) * 25
+              )}
+              fixed
+            />
+          </View>
+
+          {/* 5) Note block alone (between stats and "what this means") */}
+          <View
+            style={{
+              marginHorizontal: 6,
+              padding: 10,
+              borderRadius: 12,
+              backgroundColor: theme.colors.background,
+              borderWidth: StyleSheet.hairlineWidth,
+              borderColor: darkmode ? theme.colors.outlineVariant : "white",
+            }}
+          >
+            <Text style={{ opacity: 0.8 }}>
+              Note: The “%” bars in these tiles are scale indicators to compare
+              values at a glance. They are not “percent of all passwords”.
             </Text>
           </View>
+
+          {/* 6) What these findings mean (6 bullets for the 6 stats) */}
+          <View
+            style={{
+              marginHorizontal: 6,
+              padding: 10,
+              borderRadius: 12,
+              backgroundColor: theme.colors.background,
+              borderWidth: StyleSheet.hairlineWidth,
+              borderColor: darkmode ? theme.colors.outlineVariant : "white",
+            }}
+          >
+            <Text style={{ fontWeight: "700", marginBottom: 6 }}>
+              What these values mean
+            </Text>
+
+            <Text style={{ opacity: 0.8 }}>
+              • <Text style={{ fontWeight: "700" }}>Entropy:</Text> Estimated
+              unpredictability. Higher is better.
+            </Text>
+
+            <Text style={{ opacity: 0.8, marginTop: 6 }}>
+              • <Text style={{ fontWeight: "700" }}>Length:</Text> Number of
+              characters. Aim for 12+ where possible.
+            </Text>
+
+            <Text style={{ opacity: 0.8, marginTop: 6 }}>
+              • <Text style={{ fontWeight: "700" }}>Letters:</Text> Count and
+              share of a–z/A–Z characters.
+            </Text>
+
+            <Text style={{ opacity: 0.8, marginTop: 6 }}>
+              • <Text style={{ fontWeight: "700" }}>Digits:</Text> Count and
+              share of 0–9 characters.
+            </Text>
+
+            <Text style={{ opacity: 0.8, marginTop: 6 }}>
+              • <Text style={{ fontWeight: "700" }}>Special characters:</Text>{" "}
+              Count and share of symbols (e.g., ! ? # $).
+            </Text>
+
+            <Text style={{ opacity: 0.8, marginTop: 6 }}>
+              • <Text style={{ fontWeight: "700" }}>Reuse:</Text> Exact matches
+              found in other entries. Your value shows {Math.max(
+                0,
+                (computed?.reuseCount ?? 0) - 1
+              )}{" "}
+              other entries.
+            </Text>
+          </View>
+
+          {/* Pattern + heuristics */}
+          {computed?.pattern ? (
+            <>
+              <Text
+                variant="labelSmall"
+                style={{ opacity: 0.7, userSelect: "none", marginLeft: 6 }}
+              >
+                {t("analysisDetail:pattern")}
+              </Text>
+              <Pattern pattern={computed.pattern} />
+            </>
+          ) : null}
+
+          {computed?.sequential && computed.sequential.length > 0 ? (
+            <>
+              <Text
+                variant="labelSmall"
+                style={{ opacity: 0.7, userSelect: "none", marginLeft: 6 }}
+              >
+                {t("analysisDetail:sequentialPatterns", {
+                  defaultValue: "Sequential patterns",
+                })}
+              </Text>
+              {computed.sequential.map((p, idx) => (
+                <Pattern pattern={p} key={idx} />
+              ))}
+            </>
+          ) : null}
+
+          <Divider />
+
+          {strength ? (
+            <View
+              style={{
+                padding: 6,
+                backgroundColor: getPasswordStrengthColor(strength as any),
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "row",
+                borderRadius: 10,
+                gap: 6,
+                boxShadow: theme.colors.shadow,
+              }}
+            >
+              <Icon
+                source={getPasswordStrengthIcon(strength as any)}
+                size={18}
+                color={"white"}
+              />
+              <Text style={{ color: "white", userSelect: "none" }}>
+                {t(`analysis:${String(strength).toLowerCase()}`)}
+              </Text>
+            </View>
+          ) : null}
         </View>
       </ScrollView>
     </AnimatedContainer>
