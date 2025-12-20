@@ -56,7 +56,7 @@ function Header(props: Props) {
         >
           {props.onPress ? (
             <IconButton
-              icon={"chevron-down"}
+              icon={"chevron-left"}
               iconColor={theme.colors?.primary}
               size={20}
               onPress={props.onPress}

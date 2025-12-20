@@ -30,6 +30,8 @@ const getModuleNameByEnum = (moduleEnum: ModulesEnum, t: any): string => {
       return t("modules:totp");
     case ModulesEnum.EXPIRY:
       return t("modules:expiry");
+    case ModulesEnum.RECOVERY_CODES:
+      return t("modules:recoveryCodes");
     case ModulesEnum.UNKNOWN:
       return t("modules:unknown");
     default:

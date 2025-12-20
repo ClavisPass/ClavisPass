@@ -12,7 +12,6 @@ import {
 
 import { View } from "react-native";
 import { Chip, IconButton } from "react-native-paper";
-import { StackNavigationProp } from "@react-navigation/stack/lib/typescript/src/types";
 import { useTranslation } from "react-i18next";
 import ModulesEnum from "../../model/ModulesEnum";
 import ModulesType, { ModuleType } from "../../model/ModulesType";
@@ -23,6 +22,7 @@ import { useTheme } from "../../../../app/providers/ThemeProvider";
 import predictNextModule from "../../utils/predictNextModule";
 import getModule from "../../utils/getModule";
 import getModuleNameByEnum from "../../utils/getModuleNameByEnum";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type Props = {
   value: ValuesType;
@@ -34,7 +34,7 @@ type Props = {
   setDiscardoChanges: () => void;
   showAddModuleModal: () => void;
   fastAccess: FastAccessType | null;
-  navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>;
+  navigation: NativeStackNavigationProp<RootStackParamList, "Edit", undefined>;
 };
 
 const reorder = (list: any, startIndex: number, endIndex: number) => {

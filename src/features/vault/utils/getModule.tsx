@@ -22,7 +22,6 @@ import DigitalCardModuleType from "../model/modules/DigitalCardModuleType";
 import DigitalCardModule from "../components/modules/DigitalCardModule";
 import TaskModule from "../components/modules/TaskModule";
 import TaskModuleType from "../model/modules/TaskModuleType";
-import { StackNavigationProp } from "@react-navigation/stack/lib/typescript/src/types";
 import { RootStackParamList } from "../../../app/navigation/stacks/Stack";
 import UnknownModule from "../components/modules/UnknownModule";
 import createUniqueID from "../../../shared/utils/createUniqueID";
@@ -32,6 +31,9 @@ import TotpModule from "../components/modules/TotpModule";
 import TotpModuleType from "../model/modules/TotpModuleType";
 import ExpiryModuleType from "../model/modules/ExpiryModuleType";
 import ExpiryModule from "../components/modules/ExpiryModule";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import RecoveryCodesModule from "../components/modules/RecoveryCodesModule";
+import RecoveryCodesModuleType from "../model/modules/RecoveryCodesModuleType";
 
 function getModule(
   module: ModuleType,
@@ -39,7 +41,7 @@ function getModule(
   deleteModule: (id: string) => void,
   changeModule: (module: ModuleType) => void,
   fastAccess: FastAccessType | null,
-  navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>,
+  navigation: NativeStackNavigationProp<RootStackParamList, "Edit", undefined>,
   title: string
 ): ReactNode {
   if (module.module === ModulesEnum.CUSTOM_FIELD) {
@@ -230,6 +232,21 @@ function getModule(
         deleteModule={deleteModule}
         changeModule={changeModule}
         fastAccess={fastAccess}
+      />
+    );
+  }
+  if (module.module === ModulesEnum.RECOVERY_CODES) {
+    const moduleObject = module as RecoveryCodesModuleType;
+    return (
+      <RecoveryCodesModule
+        id={moduleObject.id}
+        module={moduleObject.module}
+        warnBeforeMs={moduleObject.warnBeforeMs}
+        onDragStart={onDragStart}
+        deleteModule={deleteModule}
+        changeModule={changeModule}
+        fastAccess={fastAccess}
+        codes={moduleObject.codes}
       />
     );
   }

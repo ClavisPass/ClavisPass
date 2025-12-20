@@ -13,6 +13,7 @@ enum ModuleIconsEnum {
   UNKNOWN = "help-circle-outline",
   TOTP = "two-factor-authentication",
   EXPIRY = "calendar",
+  RECOVERY_CODES = "keys",
 }
 
 export default ModuleIconsEnum;

@@ -4,7 +4,6 @@ import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
 import { Chip, IconButton } from "react-native-paper";
-import { StackNavigationProp } from "@react-navigation/stack/lib/typescript/src/types";
 
 import { InteractionManager } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -17,6 +16,7 @@ import { useTheme } from "../../../../app/providers/ThemeProvider";
 import predictNextModule from "../../utils/predictNextModule";
 import getModule from "../../utils/getModule";
 import getModuleNameByEnum from "../../utils/getModuleNameByEnum";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type Props = {
   value: ValuesType;
@@ -28,7 +28,7 @@ type Props = {
   setDiscardoChanges: () => void;
   showAddModuleModal: () => void;
   fastAccess: FastAccessType | null;
-  navigation: StackNavigationProp<RootStackParamList, "Edit", undefined>;
+  navigation: NativeStackNavigationProp<RootStackParamList, "Edit", undefined>;
 };
 
 function DraggableModulesList(props: Props) {

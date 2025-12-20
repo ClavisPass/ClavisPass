@@ -101,7 +101,7 @@ function EmailModule(props: EmailModuleType & Props) {
 
   const containerStyle = StyleSheet.flatten([
     globalStyles.moduleView,
-    { position: "relative", overflow: "visible" as ViewStyle["overflow"] },
+    { position: "relative" as const, overflow: "visible" as ViewStyle["overflow"] },
   ]);
 
   const leftColumnStyle = StyleSheet.flatten([

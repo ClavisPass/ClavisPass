@@ -10,6 +10,9 @@ function predictNextModule(modules: ModulesType) {
   if (moduleValue === ModulesEnum.TASK) {
     return ModulesEnum.TASK;
   }
+  if (moduleValue === ModulesEnum.TOTP) {
+    return ModulesEnum.RECOVERY_CODES;
+  }
   if (moduleValue === ModulesEnum.USERNAME) {
     const secondLastModule = modules[modules.length - 2];
     const moduleValue = secondLastModule?.module;

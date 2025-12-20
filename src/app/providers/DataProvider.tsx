@@ -6,7 +6,6 @@ import React, {
   useEffect,
 } from "react";
 import DataType from "../../features/vault/model/DataType";
-import { useToken } from "./CloudProvider";
 
 export interface DataContextType {
   data: DataType;

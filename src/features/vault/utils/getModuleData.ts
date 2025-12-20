@@ -15,6 +15,7 @@ import URLModuleType from "../model/modules/URLModuleType";
 import UsernameModuleType from "../model/modules/UsernameModuleType";
 import WifiModuleType from "../model/modules/WifiModuleType";
 import createUniqueID from "../../../shared/utils/createUniqueID";
+import RecoveryCodesModuleType from "../model/modules/RecoveryCodesModuleType";
 
 function getModuleData(module: ModulesEnum) {
   const id = createUniqueID();
@@ -132,6 +133,14 @@ function getModuleData(module: ModulesEnum) {
       id: id,
       module: module,
       value: "",
+    };
+    return moduleData as ModuleType;
+  }
+  if (module === ModulesEnum.RECOVERY_CODES) {
+    const moduleData: RecoveryCodesModuleType = {
+      id: id,
+      module: module,
+      codes: [],
     };
     return moduleData as ModuleType;
   }

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import ModulesEnum from "../ModulesEnum";
 
-const regex = new RegExp(ModulesEnum.PASSWORD);
+const regex = new RegExp(ModulesEnum.TOTP);
 
 export const TotpModuleTypeSchema = z.object({
   id: z.string(),

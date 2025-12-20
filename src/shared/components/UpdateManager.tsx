@@ -156,7 +156,7 @@ const UpdateManager = () => {
             borderRadius: 12,
             borderBottomRightRadius: 0,
             borderTopRightRadius: 0,
-            paddingHorizontal: 18,
+            width: 110
           }}
           onPress={applyUpdate}
         >

@@ -235,6 +235,13 @@ export default function AddModuleModalCompactFav(props: Props) {
       keywords: ["2fa", "otp", "totp", "mfa"],
     },
     {
+      id: ModulesEnum.RECOVERY_CODES,
+      label: t("modules:recoveryCodes"),
+      icon: ModuleIconsEnum.RECOVERY_CODES,
+      category: "Security",
+      keywords: ["2fa", "otp", "totp", "mfa", "recovery", "codes"],
+    },
+    {
       id: ModulesEnum.NOTE,
       label: t("modules:note"),
       icon: ModuleIconsEnum.NOTE,

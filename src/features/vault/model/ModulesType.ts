@@ -14,6 +14,7 @@ import { UnknownModuleTypeSchema } from "./modules/UnknownModuleType";
 import { PhoneNumberModuleTypeSchema } from "./modules/PhoneNumberModuleType";
 import { TotpModuleTypeSchema } from "./modules/TotpModuleType";
 import { ExpiryModuleTypeSchema } from "./modules/ExpiryModuleType";
+import { RecoveryCodesModuleTypeSchema } from "./modules/RecoveryCodesModuleType";
 
 export const ModuleTypeSchema = CustomFieldModuleTypeSchema.or(
   EmnailModuleTypeSchema
@@ -30,6 +31,7 @@ export const ModuleTypeSchema = CustomFieldModuleTypeSchema.or(
   .or(PhoneNumberModuleTypeSchema)
   .or(TotpModuleTypeSchema)
   .or(ExpiryModuleTypeSchema)
+  .or(RecoveryCodesModuleTypeSchema)
   .or(UnknownModuleTypeSchema);
 
 export type ModuleType = z.infer<typeof ModuleTypeSchema>;
