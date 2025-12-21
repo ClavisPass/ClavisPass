@@ -13,17 +13,17 @@ import {
 import { View } from "react-native";
 import { Icon, IconButton, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
-import { DataContextType } from "../../../../app/providers/DataProvider";
 import FolderType from "../../model/FolderType";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
-import changeFolder from "../../utils/changeFolder";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
+import { useVault } from "../../../../app/providers/VaultProvider";
+
 
 type Props = {
-  data: DataContextType;
   folder: FolderType[];
   setSelectedFolder?: (folder: FolderType | null) => void;
   deleteFolder: (folder: FolderType) => void;
+  draggableDisabled?: boolean;
 };
 
 const reorder = (list: FolderType[], startIndex: number, endIndex: number) => {
@@ -50,8 +50,16 @@ const getListStyle = (isDraggingOver: boolean) => ({
 function DraggableFolderListWeb(props: Props) {
   const { globalStyles, theme } = useTheme();
   const { t } = useTranslation();
+  const vault = useVault();
+
+  const persistFolderOrder = (nextFolders: FolderType[]) => {
+    vault.update((draft) => {
+      draft.folder = nextFolders;
+    });
+  };
 
   const onDragEnd = (result: DropResult) => {
+    if (props.draggableDisabled) return;
     if (!result.destination) return;
 
     const reordered = reorder(
@@ -60,13 +68,15 @@ function DraggableFolderListWeb(props: Props) {
       result.destination.index
     );
 
-    changeFolder(reordered, props.data);
-    props.data.setShowSave(true);
+    persistFolderOrder(reordered);
   };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="droppable">
+      <Droppable
+        droppableId="droppable"
+        isDropDisabled={!!props.draggableDisabled}
+      >
         {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
           <div
             {...provided.droppableProps}
@@ -110,89 +120,89 @@ function DraggableFolderListWeb(props: Props) {
                 </AnimatedPressable>
               </View>
             )}
+
             {props.folder.map((item: FolderType, index: number) => (
               <Draggable
                 key={item.id + "-" + index}
                 draggableId={item.id + "-" + index}
                 index={index}
+                isDragDisabled={!!props.draggableDisabled}
               >
                 {(
                   provided: DraggableProvided,
                   snapshot: DraggableStateSnapshot
-                ) => {
-                  const isLast = index === props.folder.length - 1;
-                  return (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
+                ) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    style={{
+                      ...getItemStyle(
+                        snapshot.isDragging,
+                        provided.draggableProps.style
+                      ),
+                      marginBottom: 4,
+                      opacity: props.draggableDisabled ? 0.8 : 1,
+                    }}
+                  >
+                    <View
                       style={{
-                        ...getItemStyle(
-                          snapshot.isDragging,
-                          provided.draggableProps.style
-                        ),
-                        marginBottom: 4,
+                        width: "100%",
+                        backgroundColor: theme.colors.background,
+                        borderRadius: 12,
                       }}
                     >
-                      <View
-                        style={{
-                          width: "100%",
-                          backgroundColor: theme.colors.background,
-                          borderRadius: 12,
-                        }}
-                      >
-                        <View style={globalStyles.folderContainer}>
-                          <Icon source="drag" size={20} />
+                      <View style={globalStyles.folderContainer}>
+                        <Icon source="drag" size={20} />
 
-                          <AnimatedPressable
-                            style={{
-                              borderRadius: 12,
-                              padding: 10,
-                              flex: 1,
-                              display: "flex",
-                              flexDirection: "row",
-                              alignItems: "center",
-                              gap: 4,
-                              //backgroundColor: theme.colors.secondaryContainer,
-                            }}
-                            onPress={
-                              props.setSelectedFolder
-                                ? () => props.setSelectedFolder?.(item)
-                                : undefined
-                            }
-                          >
-                            <>
-                              <Icon
-                                source="folder"
-                                size={20}
-                                color={theme.colors.primary}
-                              />
-                              <Text
-                                style={{
-                                  userSelect: "none",
-                                  fontWeight: "bold",
-                                  fontSize: 15,
-                                }}
-                                variant="bodyMedium"
-                              >
-                                {item.name}
-                              </Text>
-                            </>
-                          </AnimatedPressable>
+                        <AnimatedPressable
+                          style={{
+                            borderRadius: 12,
+                            padding: 10,
+                            flex: 1,
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            gap: 4,
+                          }}
+                          onPress={
+                            props.setSelectedFolder
+                              ? () => props.setSelectedFolder?.(item)
+                              : undefined
+                          }
+                        >
+                          <>
+                            <Icon
+                              source="folder"
+                              size={20}
+                              color={theme.colors.primary}
+                            />
+                            <Text
+                              style={{
+                                userSelect: "none",
+                                fontWeight: "bold",
+                                fontSize: 15,
+                              }}
+                              variant="bodyMedium"
+                            >
+                              {item.name}
+                            </Text>
+                          </>
+                        </AnimatedPressable>
 
-                          <IconButton
-                            icon="close"
-                            size={14}
-                            style={{ margin: 0 }}
-                            onPress={() => props.deleteFolder(item)}
-                          />
-                        </View>
+                        <IconButton
+                          icon="close"
+                          size={14}
+                          style={{ margin: 0 }}
+                          onPress={() => props.deleteFolder(item)}
+                        />
                       </View>
-                    </div>
-                  );
-                }}
+                    </View>
+                  </div>
+                )}
               </Draggable>
             ))}
+
             {provided.placeholder}
           </div>
         )}

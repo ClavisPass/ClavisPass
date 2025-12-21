@@ -2,7 +2,7 @@ import { z } from "zod";
 import { ValuesListTypeSchema } from "./ValuesType";
 import { FolderSchema } from "./FolderType";
 
-export const DataTypeSchema = z
+export const VaultDataTypeSchema = z
   .object({
     version: z.string(),
     folder: z.array(FolderSchema).default([]),
@@ -11,6 +11,6 @@ export const DataTypeSchema = z
   .passthrough()
   .nullable();
 
-type DataType = z.infer<typeof DataTypeSchema>;
+type VaultDataType = z.infer<typeof VaultDataTypeSchema>;
 
-export default DataType;
+export default VaultDataType;

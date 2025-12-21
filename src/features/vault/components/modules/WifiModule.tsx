@@ -7,10 +7,11 @@ import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboa
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
 import WifiQRCodeModal from "../modals/WifiQRCodeModal";
-import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { Dropdown, DropdownInputProps } from "react-native-paper-dropdown";
 import { useTranslation } from "react-i18next";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
+import ModulesEnum from "../../model/ModulesEnum";
 
 function WifiModule(props: WifiModuleType & Props) {
   const didMount = useRef(false);
@@ -78,7 +79,7 @@ function WifiModule(props: WifiModuleType & Props) {
       title={t("modules:wifi")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      icon={ModuleIconsEnum.WIFI}
+      icon={MODULE_ICON[ModulesEnum.WIFI]}
       fastAccess={props.fastAccess}
     >
       <View style={{ display: "flex", flexDirection: "column", gap: 6 }}>

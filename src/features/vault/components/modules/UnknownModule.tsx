@@ -5,9 +5,10 @@ import { Text } from "react-native-paper";
 
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
-import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { useTranslation } from "react-i18next";
+import ModulesEnum from "../../model/ModulesEnum";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 
 function UnknownModule(props: { module: any; id: string } & Props) {
   const { globalStyles } = useTheme();
@@ -18,7 +19,7 @@ function UnknownModule(props: { module: any; id: string } & Props) {
       title={t("modules:unknownModule")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      icon={ModuleIconsEnum.UNKNOWN}
+      icon={MODULE_ICON[ModulesEnum.UNKNOWN]}
       fastAccess={props.fastAccess}
     >
       <View style={[globalStyles.moduleView, {display: 'flex', flexDirection: 'column', gap: 4}]}>

@@ -7,9 +7,10 @@ import CustomFieldModuleType from "../../model/modules/CustomFieldModuleType";
 import Props from "../../model/ModuleProps";
 import EditCustomFieldModal from "../modals/EditCustomFieldModal";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
-import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import ModuleContainer from "../ModuleContainer";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
+import ModulesEnum from "../../model/ModulesEnum";
 
 function CustomFieldModule(props: CustomFieldModuleType & Props) {
   const didMount = useRef(false);
@@ -37,7 +38,7 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
       title={props.title}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      icon={ModuleIconsEnum.CUSTOM_FIELD}
+      icon={MODULE_ICON[ModulesEnum.CUSTOM_FIELD]}
       titlePress={() => {
         setVisible(true);
       }}

@@ -62,17 +62,11 @@ function DraggableModulesListWeb(props: Props) {
     null
   );
 
-  // ⬇️ Refs für Scrollen
   const listRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const scrollToBottom = () => {
-    // Methode 1: Sentinel
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-    // (Optional) Methode 2: direkt scrollen
-    // if (listRef.current) {
-    //   listRef.current.scroll({ top: listRef.current.scrollHeight, behavior: "smooth" });
-    // }
   };
 
   const onDragEnd = (result: DropResult) => {
@@ -84,20 +78,16 @@ function DraggableModulesListWeb(props: Props) {
     );
     props.changeModules(reordered);
     props.setDiscardoChanges();
-    // (typisch: nach Reorder nicht auto scrollen)
   };
 
-  // 🧠 Vorhersage aktualisieren
   useEffect(() => {
     setModulePrediction(predictNextModule(props.value.modules));
   }, [props.value.modules]);
 
-  // ✅ Auto-Scroll wenn Anzahl der Module steigt (neues Element unten)
   const modulesLength = props.value.modules.length;
   const prevLenRef = useRef(modulesLength);
   useEffect(() => {
     if (modulesLength > prevLenRef.current) {
-      // neues Item hinzugekommen -> nach unten
       scrollToBottom();
     }
     prevLenRef.current = modulesLength;
@@ -109,7 +99,6 @@ function DraggableModulesListWeb(props: Props) {
         {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
           <div
             {...provided.droppableProps}
-            // ⬇️ beide Refs kombinieren (Pangea braucht seinen innerRef)
             ref={(el) => {
               provided.innerRef(el);
               listRef.current = el;

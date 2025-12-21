@@ -11,7 +11,6 @@ import { DropdownInputProps } from "react-native-paper-dropdown";
 
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
-import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import DigitalCardModuleType from "../../model/modules/DigitalCardModuleType";
 import DigitalCardType, {
@@ -23,6 +22,8 @@ import { RootStackParamList } from "../../../../app/navigation/stacks/Stack";
 import { useTranslation } from "react-i18next";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import ModulesEnum from "../../model/ModulesEnum";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 
 type DigitalCardModuleProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Edit", undefined>;
@@ -96,7 +97,7 @@ function DigitalCardModule(
       title={t("modules:digitalCard")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      icon={ModuleIconsEnum.DIGITAL_CARD}
+      icon={MODULE_ICON[ModulesEnum.DIGITAL_CARD]}
       fastAccess={props.fastAccess}
     >
       <View style={[globalStyles.moduleView]}>

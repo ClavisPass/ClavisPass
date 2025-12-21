@@ -1,13 +1,20 @@
 import { View, StyleSheet } from "react-native";
-import Modal from "../../../../shared/components/modals/Modal";
-import { useData } from "../../../../app/providers/DataProvider";
 import { useEffect, useRef, useState } from "react";
-import PasswordTextbox from "../../../../shared/components/PasswordTextbox";
 import { Text } from "react-native-paper";
+import { useTranslation } from "react-i18next";
+
+import Modal from "../../../../shared/components/modals/Modal";
+import PasswordTextbox from "../../../../shared/components/PasswordTextbox";
 import Button from "../../../../shared/components/buttons/Button";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { useAuth } from "../../../../app/providers/AuthProvider";
-import { useTranslation } from "react-i18next";
+import { useToken } from "../../../../app/providers/CloudProvider";
+
+import { logger } from "../../../../infrastructure/logging/logger";
+import { encrypt } from "../../../../infrastructure/crypto/CryptoLayer";
+import { uploadRemoteVaultFile } from "../../../../infrastructure/cloud/clients/CloudStorageClient";
+import { getDateTime } from "../../../../shared/utils/Timestamp";
+import { useVault } from "../../../../app/providers/VaultProvider";
 
 type Props = {
   visible: boolean;
@@ -29,13 +36,14 @@ const styles = StyleSheet.create({
 });
 
 function ChangeMasterPasswordModal(props: Props) {
-  const data = useData();
   const auth = useAuth();
+  const vault = useVault();
+  const { provider, accessToken, ensureFreshAccessToken } = useToken();
+
   const { theme } = useTheme();
   const { t } = useTranslation();
 
   const [passwordConfirmed, setPasswordConfirmed] = useState(false);
-
   const [capsLock, setCapsLock] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState("");
@@ -78,18 +86,21 @@ function ChangeMasterPasswordModal(props: Props) {
     }
   }, [newPassword, confirmPassword]);
 
+  const flashError = () => {
+    setError(true);
+    setTimeout(() => setError(false), 1000);
+  };
+
   const verifyCurrentPassword = async () => {
     if (!currentPassword) {
-      setError(true);
-      setTimeout(() => setError(false), 1000);
+      flashError();
       textInputRef.current?.focus?.();
       return;
     }
 
     if (currentPassword !== auth.master) {
-      setError(true);
+      flashError();
       setCurrentPassword("");
-      setTimeout(() => setError(false), 1000);
       textInputRef.current?.focus?.();
       return;
     }
@@ -101,16 +112,49 @@ function ChangeMasterPasswordModal(props: Props) {
   };
 
   const applyNewPassword = async () => {
-    if (passwordNotEqual || !newPassword || !confirmPassword) {
-      return;
-    }
+    if (passwordNotEqual || !newPassword || !confirmPassword) return;
 
     setProcessing(true);
     try {
+      // 1) Klartext-Vault exportieren (kurzzeitig)
+      const data = vault.exportFullData();
+
+      // 2) Neu verschlüsseln mit neuem Master-Passwort
+      const lastUpdated = getDateTime();
+      const crypto = await encrypt(data, newPassword, lastUpdated);
+      const content = JSON.stringify(crypto);
+
+      // 3) Persistieren (device oder remote provider)
+      if (!provider) {
+        // Falls "kein Provider" bei dir wirklich existiert, musst du hier deinen lokalen Save-Path aufrufen.
+        // In deinem Setup sieht es eher so aus, dass immer provider gesetzt ist (mindestens "device").
+        logger.warn("[ChangeMasterPassword] No provider configured; cannot persist.");
+        throw new Error("No provider configured");
+      }
+
+      let tokenToUse: string | null = null;
+
+      if (provider !== "device") {
+        tokenToUse = accessToken ?? (await ensureFreshAccessToken());
+        if (!tokenToUse) throw new Error("No access token available");
+      }
+
+      await uploadRemoteVaultFile({
+        provider,
+        accessToken: tokenToUse ?? "",
+        remotePath: "clavispass.lock",
+        content,
+        onCompleted: undefined,
+      } as any);
+
+      // 4) Session aktualisieren: auth master wechseln, dirty reset
       auth.login(newPassword);
-      data.setShowSave(true);
+      vault.markSaved();
+
       hideModal();
-      // navigation.navigate("Home");
+    } catch (e) {
+      logger.error("[ChangeMasterPassword] Failed to change master password:", e);
+      flashError();
     } finally {
       setProcessing(false);
       clear();
@@ -131,24 +175,15 @@ function ChangeMasterPasswordModal(props: Props) {
       >
         {!passwordConfirmed ? (
           <>
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 6,
-                flexGrow: 1,
-              }}
-            >
-              <Text
-                variant="headlineSmall"
-                style={{ userSelect: "none" as any }}
-              >
+            <View style={{ display: "flex", flexDirection: "column", gap: 6, flexGrow: 1 }}>
+              <Text variant="headlineSmall" style={{ userSelect: "none" as any }}>
                 {t("common:verify")}
               </Text>
               <Text variant="bodyMedium" style={{ userSelect: "none" as any }}>
                 {t("login:enterMasterPassword")}
               </Text>
             </View>
+
             <View style={{ width: "100%" }}>
               <PasswordTextbox
                 setCapsLock={setCapsLock}
@@ -161,6 +196,7 @@ function ChangeMasterPasswordModal(props: Props) {
                 onSubmitEditing={verifyCurrentPassword}
               />
             </View>
+
             <Button
               text={t("login:login")}
               onPress={verifyCurrentPassword}
@@ -169,21 +205,12 @@ function ChangeMasterPasswordModal(props: Props) {
           </>
         ) : (
           <>
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 6,
-                flexGrow: 1,
-              }}
-            >
-              <Text
-                variant="headlineSmall"
-                style={{ userSelect: "none" as any }}
-              >
+            <View style={{ display: "flex", flexDirection: "column", gap: 6, flexGrow: 1 }}>
+              <Text variant="headlineSmall" style={{ userSelect: "none" as any }}>
                 {t("login:newMasterPassword")}
               </Text>
             </View>
+
             <View style={{ width: "100%" }}>
               <PasswordTextbox
                 autofocus
@@ -194,17 +221,17 @@ function ChangeMasterPasswordModal(props: Props) {
                 onSubmitEditing={() => textInput3Ref.current?.focus?.()}
               />
             </View>
+
             <View style={{ width: "100%" }}>
               <PasswordTextbox
                 textInputRef={textInput3Ref}
                 setValue={setConfirmPassword}
                 value={confirmPassword}
                 placeholder={t("login:confirmMasterPassword")}
-                onSubmitEditing={
-                  passwordNotEqual ? undefined : applyNewPassword
-                }
+                onSubmitEditing={passwordNotEqual ? undefined : applyNewPassword}
               />
             </View>
+
             <Button
               disabled={passwordNotEqual}
               text={t("login:setNewPassword")}

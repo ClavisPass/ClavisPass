@@ -29,7 +29,7 @@ const CustomBottomTab = ({
     auth.logout();
   };
 
-  const activeRouteName = getActiveRouteName(state as any); // ✅ CHANGED
+  const activeRouteName = getActiveRouteName(state as any);
   const isInEditScreen =
     activeRouteName === "Edit" || activeRouteName === "EditScreen";
 

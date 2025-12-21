@@ -17,8 +17,6 @@ import ValuesType from "../features/vault/model/ValuesType";
 import getModuleData from "../features/vault/utils/getModuleData";
 import AddModuleModal from "../features/vault/components/modals/AddModuleModal";
 import { getDateTime } from "../shared/utils/Timestamp";
-import { useData } from "../app/providers/DataProvider";
-import DataType from "../features/vault/model/DataType";
 import TitleModule from "../features/vault/components/modules/TitleModule";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import FolderModal from "../features/vault/components/modals/FolderModal";
@@ -45,6 +43,7 @@ import { useTranslation } from "react-i18next";
 import { useSetting } from "../app/providers/SettingsProvider";
 import DraggableModulesListWeb from "../features/vault/components/lists/DraggableModulesListWeb";
 import DraggableModulesList from "../features/vault/components/lists/DraggableModulesList";
+import { useVault } from "../app/providers/VaultProvider";
 
 type EditScreenProps = NativeStackScreenProps<RootStackParamList, "Edit">;
 
@@ -54,7 +53,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     favorite: routeFavorite,
     folder: routeFolder,
   } = route.params!;
-  const data = useData();
+  const vault = useVault();
+
   const {
     globalStyles,
     theme,
@@ -139,7 +139,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   useEffect(() => {
     if (didValidateFolderRef.current) return;
 
-    const folders = data.data?.folder;
+    const folders = vault.folders;
     if (!folders) return;
 
     didValidateFolderRef.current = true;
@@ -152,7 +152,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
       return { ...prev, folder: null };
     });
-  }, [data.data?.folder]);
+  }, [vault.folders]);
 
   const showFastAccess = () => {
     if (
@@ -188,26 +188,17 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   const folderExists = (folder: FolderType | null | undefined) => {
     if (!folder) return true;
-    const folders = data.data?.folder ?? [];
+    const folders = vault.folders ?? [];
     return folders.some((f) => f.id === folder.id);
   };
 
   const saveValue = () => {
-    let newData = { ...data.data } as DataType;
-    let valueToChange: any = newData?.values.find(
-      (x: ValuesType) => x.id === routeValue.id
-    );
-    if (valueToChange) {
-      valueToChange.title = value.title;
-      valueToChange.fav = value.fav;
-      valueToChange.folder = value.folder;
-      valueToChange.modules = value.modules;
-      valueToChange.lastUpdated = getDateTime();
-    } else {
-      if (newData) newData.values = [...newData.values, value];
-    }
-    data.setData(newData);
-    data.setShowSave(true);
+    const updated: ValuesType = {
+      ...value,
+      lastUpdated: getDateTime(),
+    };
+
+    vault.upsertEntry(updated);
     goBack();
   };
 
@@ -278,16 +269,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   };
 
   const deleteValue = (id: string) => {
-    let newData = { ...data.data } as DataType;
-    let valueToChange: any = newData?.values?.filter(
-      (item: ValuesType) => item.id !== id
-    );
-    if (newData) {
-      newData.values = valueToChange;
-      data.setData(newData);
-    }
+    vault.deleteEntry(id);
     setDeleteModalVisible(false);
-    data.setShowSave(true);
     goBack();
   };
 
@@ -443,7 +426,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       <FolderModal
         visible={folderModalVisible}
         setVisible={setFolderModalVisible}
-        folder={data?.data ? data.data.folder : []}
+        folder={vault.folders ?? []}
         setSelectedFolder={changeSelectedFolder}
       />
       <DiscardChangesModal

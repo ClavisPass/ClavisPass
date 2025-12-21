@@ -17,133 +17,133 @@ import WifiModuleType from "../model/modules/WifiModuleType";
 import createUniqueID from "../../../shared/utils/createUniqueID";
 import RecoveryCodesModuleType from "../model/modules/RecoveryCodesModuleType";
 
-function getModuleData(module: ModulesEnum) {
-  const id = createUniqueID();
-  if (module === ModulesEnum.CUSTOM_FIELD) {
-    const moduleData: CustomFieldModuleType = {
-      id: id,
-      module: module,
+type AddableModules = Exclude<ModulesEnum, ModulesEnum.UNKNOWN>;
+
+type ModuleFactory = (id: string) => ModuleType;
+
+const MODULE_DEFAULTS = {
+  [ModulesEnum.CUSTOM_FIELD]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.CUSTOM_FIELD,
       title: "Custom",
       value: "",
-    };
-    return moduleData as ModuleType;
-  }
-  if (module === ModulesEnum.E_MAIL) {
-    const moduleData: EmailModuleType = {
-      id: id,
-      module: module,
+    } satisfies CustomFieldModuleType),
+
+  [ModulesEnum.E_MAIL]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.E_MAIL,
       value: "",
-    };
-    return moduleData as ModuleType;
-  }
-  if (module === ModulesEnum.KEY) {
-    const moduleData: KeyModuleType = {
-      id: id,
-      module: module,
+    } satisfies EmailModuleType),
+
+  [ModulesEnum.KEY]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.KEY,
       value: "",
-    };
-    return moduleData as ModuleType;
-  }
-  if (module === ModulesEnum.NOTE) {
-    const moduleData: NoteModuleType = {
-      id: id,
-      module: module,
+    } satisfies KeyModuleType),
+
+  [ModulesEnum.NOTE]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.NOTE,
       value: "",
-    };
-    return moduleData as ModuleType;
-  }
-  if (module === ModulesEnum.PASSWORD) {
-    const moduleData: PasswordModuleType = {
-      id: id,
-      module: module,
+    } satisfies NoteModuleType),
+
+  [ModulesEnum.PASSWORD]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.PASSWORD,
       value: "",
-    };
-    return moduleData as ModuleType;
-  }
-  if (module === ModulesEnum.TITLE) {
-    const moduleData: TitleModuleType = {
-      id: id,
-      module: module,
+    } satisfies PasswordModuleType),
+
+  [ModulesEnum.TITLE]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.TITLE,
       value: "",
-    };
-    return moduleData as ModuleType;
-  }
-  if (module === ModulesEnum.URL) {
-    const moduleData: URLModuleType = {
-      id: id,
-      module: module,
+    } satisfies TitleModuleType),
+
+  [ModulesEnum.URL]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.URL,
       value: "",
-    };
-    return moduleData as ModuleType;
-  }
-  if (module === ModulesEnum.USERNAME) {
-    const moduleData: UsernameModuleType = {
-      id: id,
-      module: module,
+    } satisfies URLModuleType),
+
+  [ModulesEnum.USERNAME]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.USERNAME,
       value: "",
-    };
-    return moduleData as ModuleType;
-  }
-  if (module === ModulesEnum.WIFI) {
-    const moduleData: WifiModuleType = {
-      id: id,
-      module: module,
+    } satisfies UsernameModuleType),
+
+  [ModulesEnum.WIFI]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.WIFI,
       value: "",
       wifiName: "",
       wifiType: "WPA",
-    };
-    return moduleData as ModuleType;
-  }
-  if (module === ModulesEnum.DIGITAL_CARD) {
-    const moduleData: DigitalCardModuleType = {
-      id: id,
-      module: module,
+    } satisfies WifiModuleType),
+
+  [ModulesEnum.DIGITAL_CARD]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.DIGITAL_CARD,
       value: "",
       type: "QR-Code",
-    };
-    return moduleData as ModuleType;
-  }
-  if (module === ModulesEnum.TASK) {
-    const moduleData: TaskModuleType = {
-      id: id,
-      module: module,
+    } satisfies DigitalCardModuleType),
+
+  [ModulesEnum.TASK]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.TASK,
       value: "",
       completed: false,
-    };
-    return moduleData as ModuleType;
-  }
-  if (module === ModulesEnum.PHONE_NUMBER) {
-    const moduleData: PhoneNumberModuleType = {
-      id: id,
-      module: module,
+    } satisfies TaskModuleType),
+
+  [ModulesEnum.PHONE_NUMBER]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.PHONE_NUMBER,
       value: "",
-    };
-    return moduleData as ModuleType;
-  }
-  if (module === ModulesEnum.TOTP) {
-    const moduleData: TotpModuleType = {
-      id: id,
-      module: module,
+    } satisfies PhoneNumberModuleType),
+
+  [ModulesEnum.TOTP]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.TOTP,
       value: "",
-    };
-    return moduleData as ModuleType;
-  }
-  if (module === ModulesEnum.EXPIRY) {
-    const moduleData: ExpiryModuleType = {
-      id: id,
-      module: module,
+    } satisfies TotpModuleType),
+
+  [ModulesEnum.EXPIRY]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.EXPIRY,
       value: "",
-    };
-    return moduleData as ModuleType;
-  }
-  if (module === ModulesEnum.RECOVERY_CODES) {
-    const moduleData: RecoveryCodesModuleType = {
-      id: id,
-      module: module,
+    } satisfies ExpiryModuleType),
+
+  [ModulesEnum.RECOVERY_CODES]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.RECOVERY_CODES,
       codes: [],
-    };
-    return moduleData as ModuleType;
-  }
+    } satisfies RecoveryCodesModuleType),
+} satisfies Record<AddableModules, ModuleFactory>;
+
+function getModuleData(module: ModulesEnum): ModuleType {
+  const id = createUniqueID();
+
+  const factory = MODULE_DEFAULTS[module as AddableModules];
+  if (factory) return factory(id);
+
+  return {
+    id,
+    module: ModulesEnum.UNKNOWN,
+    value: "",
+  } as ModuleType;
 }
 
 export default getModuleData;

@@ -11,7 +11,6 @@ import { Text } from "react-native-paper";
 
 import { FlashList } from "@shopify/flash-list";
 
-import { useData } from "../app/providers/DataProvider";
 import { LinearGradient } from "expo-linear-gradient";
 import ListItem from "../features/vault/components/items/ListItem";
 import { StatusBar } from "expo-status-bar";
@@ -26,7 +25,7 @@ import ContentProtection from "../shared/components/ContentProtection";
 import { useFocusEffect } from "@react-navigation/native";
 import { TITLEBAR_HEIGHT } from "../shared/components/CustomTitlebar";
 import FolderModal from "../features/vault/components/modals/FolderModal";
-import { DataTypeSchema } from "../features/vault/model/DataType";
+import { VaultDataTypeSchema } from "../features/vault/model/VaultDataType";
 import SearchShortcut from "../shared/components/shortcuts/SearchShortcut";
 import AddValueModal from "../features/vault/components/modals/AddValueModal";
 import { decrypt } from "../infrastructure/crypto/CryptoLayer";
@@ -54,6 +53,7 @@ import { logger } from "../infrastructure/logging/logger";
 import { fetchRemoteVaultFile } from "../infrastructure/cloud/clients/CloudStorageClient";
 import { useSetting } from "../app/providers/SettingsProvider";
 import Sync from "../features/sync/components/Sync";
+import { useVault } from "../app/providers/VaultProvider";
 
 type HomeScreenProps = NativeStackScreenProps<RootStackParamList, "Home">;
 
@@ -65,7 +65,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const auth = useAuth();
-  const data = useData();
+  const vault = useVault();
 
   const [fontsLoaded] = useFonts({
     LexendExa_400Regular,
@@ -122,10 +122,19 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   useEffect(() => {
     setHeaderWhite(true);
-  }, [data.showSave]);
+  }, [vault.dirty]);
+
+  const vaultData = useMemo(() => {
+    try {
+      if (!vault.isUnlocked) return null;
+      return vault.exportFullData();
+    } catch {
+      return null;
+    }
+  }, [vault.isUnlocked, vault.entries, vault.folders, vault.dirty]);
 
   const filteredValues = useMemo(() => {
-    const values = data.data?.values ?? [];
+    const values = vaultData?.values ?? [];
 
     const normalizeText = (text: string) =>
       text
@@ -136,8 +145,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     const normalizedQuery = normalizeText(searchQuery.trim());
     const hasQuery = normalizedQuery.length > 0;
 
-    // 1) Wenn es eine Query gibt: NICHT nach fav/folder filtern (alles durchsuchen)
-    // 2) Wenn es KEINE Query gibt: normal nach fav/folder filtern
     const prefiltered = values.filter((item) => {
       if (hasQuery) return true;
 
@@ -172,7 +179,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       : withRelevance;
 
     return result;
-  }, [data.data, searchQuery, selectedFolder, selectedFav]);
+  }, [vaultData, searchQuery, selectedFolder, selectedFav]);
 
   const refreshData = () => {
     const master = auth.master;
@@ -182,7 +189,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       return;
     }
 
-    data.setShowSave(true);
     setRefreshing(true);
 
     (async () => {
@@ -213,10 +219,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         const decryptedData = decrypt(parsedCryptoData, master);
         const jsonData = JSON.parse(decryptedData);
 
-        const parsedData = DataTypeSchema.parse(jsonData);
-        data.setData(parsedData);
-        data.setLastUpdated(parsedCryptoData.lastUpdated);
-        data.setShowSave(false);
+        const parsedData = VaultDataTypeSchema.parse(jsonData);
+        if (!parsedData) {
+          setRefreshing(false);
+          return;
+        }
+
+        vault.unlockWithDecryptedVault(parsedData);
+        vault.markSaved();
+
         setRefreshing(false);
 
         setSelectedFolder(null);
@@ -234,9 +245,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   function renderFlashList() {
     if (selectedCard && searchQuery === "") {
-      let cardEntries = [];
-      if (data.data?.values) {
-        for (const item of data.data.values) {
+      let cardEntries: any[] = [];
+      if (vaultData?.values) {
+        for (const item of vaultData.values) {
           for (const mod of item.modules) {
             const isCard = mod.module === ModulesEnum.DIGITAL_CARD;
             const moduleType = mod as DigitalCardModuleType;
@@ -282,9 +293,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       );
     }
     if (selected2FA && searchQuery === "") {
-      let totpEntries = [];
-      if (data.data?.values) {
-        for (const item of data.data.values) {
+      let totpEntries: any[] = [];
+      if (vaultData?.values) {
+        for (const item of vaultData.values) {
           for (const mod of item.modules) {
             const isTOTP = mod.module === ModulesEnum.TOTP;
             if (!isTOTP) continue;
@@ -458,7 +469,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         >
           {renderFlashList()}
           <FolderFilter
-            folder={data.data?.folder}
+            folder={vaultData?.folder}
             selectedFav={selectedFav}
             setSelectedFav={saveSelectedFavState}
             selectedFolder={selectedFolder}
@@ -474,8 +485,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         <HomeFilterMenu
           visible={showMenu}
           setVisible={setShowMenu}
-          data={data.data}
-          setData={data.setData}
           positionY={
             Constants.statusBarHeight +
             TITLEBAR_HEIGHT +
@@ -488,7 +497,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         <FolderModal
           visible={folderModalVisible}
           setVisible={setFolderModalVisible}
-          folder={data?.data ? data.data.folder : []}
+          folder={vaultData?.folder ?? []}
         />
         <AddValueModal
           visible={valueModalVisible}

@@ -67,7 +67,6 @@ function TaskModule(props: TaskModuleType & Props) {
           />
           <View style={{ flex: 1, marginRight: 8 }}>
             <TextInput
-              //placeholder="..."
               mode="outlined"
               multiline
               scrollEnabled={false}

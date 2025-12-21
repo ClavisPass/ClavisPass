@@ -85,7 +85,6 @@ function DraggableModulesList(props: Props) {
     setModulePrediction(predictNextModule(props.value.modules));
   }, [props.value.modules]);
 
-  // ✅ Auto-Scroll wenn Anzahl der Module steigt (neues Modul hinzugefügt)
   const prevLenRef = useRef(props.value.modules.length);
   useEffect(() => {
     const curr = props.value.modules.length;

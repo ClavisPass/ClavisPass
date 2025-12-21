@@ -2,18 +2,35 @@ import { Platform } from "react-native";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import { useTranslation } from "react-i18next";
-import { useData } from "../../../../app/providers/DataProvider";
+
 import { encrypt } from "../../../../infrastructure/crypto/CryptoLayer";
 import { logger } from "../../../../infrastructure/logging/logger";
 import SettingsItem from "../SettingsItem";
 
+import { useAuth } from "../../../../app/providers/AuthProvider";
+import { useVault } from "../../../../app/providers/VaultProvider";
+
 function BackupExportButton() {
-  const data = useData();
   const { t } = useTranslation();
+  const auth = useAuth();
+  const vault = useVault();
 
   const exportBackup = async () => {
     try {
-      const backupData = await encrypt(data.data, "test");
+      if (!vault.isUnlocked) {
+        logger.warn("[BackupExport] Vault is locked – cannot export backup.");
+        return;
+      }
+
+      const master = auth.master;
+      if (!master) {
+        logger.warn("[BackupExport] No master password in session.");
+        return;
+      }
+
+      const fullData = vault.exportFullData();
+      const backupData = await encrypt(fullData, master);
+
       const contents = JSON.stringify(backupData);
       const timestamp = new Date()
         .toISOString()
@@ -36,9 +53,10 @@ function BackupExportButton() {
         });
 
         if (!filePath) {
-          logger.warn("Speichern abgebrochen.");
+          logger.warn("[BackupExport] Save canceled.");
           return;
         }
+
         const tauriFs = require("@tauri-apps/plugin-fs");
         await tauriFs.writeTextFile(filePath, contents);
       } else {
@@ -55,7 +73,7 @@ function BackupExportButton() {
         });
       }
     } catch (error) {
-      logger.error("Fehler beim Erstellen des Backups:", error);
+      logger.error("[BackupExport] Fehler beim Erstellen des Backups:", error);
     }
   };
 

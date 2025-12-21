@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
+import { useTranslation } from "react-i18next";
 
 import { useAuth } from "../../../app/providers/AuthProvider";
 import { useToken } from "../../../app/providers/CloudProvider";
-import { useData } from "../../../app/providers/DataProvider";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 
 import UserInfoType from "../../sync/model/UserInfoType";
@@ -12,9 +12,11 @@ import Button from "../../../shared/components/buttons/Button";
 import TypeWriterComponent from "../../../shared/components/TypeWriter";
 import PasswordTextbox from "../../../shared/components/PasswordTextbox";
 
-import CryptoType, { CryptoTypeSchema } from "../../../infrastructure/crypto/CryptoType";
+import CryptoType, {
+  CryptoTypeSchema,
+} from "../../../infrastructure/crypto/CryptoType";
 import { decrypt } from "../../../infrastructure/crypto/CryptoLayer";
-import { DataTypeSchema } from "../../vault/model/DataType";
+import { VaultDataTypeSchema } from "../../vault/model/VaultDataType";
 import getEmptyData from "../../vault/utils/getEmptyData";
 
 import {
@@ -26,7 +28,7 @@ import {
 import Logo from "../../../shared/ui/Logo";
 import { logger } from "../../../infrastructure/logging/logger";
 import { fetchRemoteVaultFile } from "../../../infrastructure/cloud/clients/CloudStorageClient";
-import { useTranslation } from "react-i18next";
+import { useVault } from "../../../app/providers/VaultProvider";
 
 type Props = {
   userInfo: UserInfoType;
@@ -34,9 +36,10 @@ type Props = {
 
 function Login(props: Props) {
   const auth = useAuth();
+  const vault = useVault();
+
   const { provider, accessToken, ensureFreshAccessToken } = useToken();
   const { theme } = useTheme();
-  const { setData, setLastUpdated, setShowSave } = useData();
   const { t } = useTranslation();
 
   const [parsedCryptoData, setParsedCryptoData] = useState<CryptoType | null>(
@@ -61,6 +64,29 @@ function Login(props: Props) {
     isUsingAuthenticationButtonVisible,
     setIsUsingAuthenticationButtonVisible,
   ] = useState(false);
+
+  const loginWithMasterPassword = async (
+    masterPassword: string,
+    cryptoData: CryptoType | null
+  ) => {
+    try {
+      if (!cryptoData) return;
+
+      const decryptedData = decrypt(cryptoData, masterPassword);
+      const jsonData = JSON.parse(decryptedData);
+
+      const parsed = VaultDataTypeSchema.parse(jsonData);
+      const parsedData = parsed ?? getEmptyData();
+      vault.unlockWithDecryptedVault(parsedData);
+      auth.login(masterPassword);
+    } catch (err) {
+      logger.error("[Login] Error decrypting data:", err);
+      textInputRef.current?.focus?.();
+      setMasterPassword("");
+      setError(true);
+      setTimeout(() => setError(false), 1000);
+    }
+  };
 
   const authenticate = useCallback(async () => {
     try {
@@ -135,34 +161,6 @@ function Login(props: Props) {
     authenticate();
   }, [authenticate]);
 
-  const loginWithMasterPassword = async (
-    masterPassword: string,
-    cryptoData: CryptoType | null
-  ) => {
-    try {
-      if (!cryptoData) {
-        return;
-      }
-      const lastUpdated = cryptoData.lastUpdated;
-      const decryptedData = decrypt(cryptoData, masterPassword);
-      const jsonData = JSON.parse(decryptedData);
-
-      const parsedData = DataTypeSchema.parse(jsonData);
-      setData(parsedData);
-      setLastUpdated(lastUpdated);
-      setShowSave(false);
-      auth.login(masterPassword);
-    } catch (error) {
-      logger.error("[Login] Error decrypting data:", error);
-      textInputRef.current?.focus?.();
-      setMasterPassword("");
-      setError(true);
-      setTimeout(() => {
-        setError(false);
-      }, 1000);
-    }
-  };
-
   const handlePasswordLogin = () => {
     if (!parsedCryptoData) {
       logger.warn("[Login] No crypto data available for password login.");
@@ -177,7 +175,8 @@ function Login(props: Props) {
       masterPassword !== "" &&
       newPasswordConfirm !== ""
     ) {
-      setData(getEmptyData());
+      const empty = getEmptyData();
+      vault.unlockWithDecryptedVault(empty);
       auth.login(masterPassword);
     } else {
       logger.error("[Login] Master password confirmation does not match.");
@@ -205,6 +204,7 @@ function Login(props: Props) {
             height={50}
             style={{ alignSelf: "center", flexGrow: 1 }}
           />
+
           <View
             style={{
               display: "flex",

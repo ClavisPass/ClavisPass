@@ -14,14 +14,7 @@ import {
   ViewStyle,
   StyleProp,
 } from "react-native";
-import {
-  Chip,
-  Divider,
-  Icon,
-  IconButton,
-  Searchbar,
-  Text,
-} from "react-native-paper";
+import { Chip, Divider, Icon, Searchbar, Text } from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import { useFocusEffect } from "@react-navigation/native";
@@ -29,13 +22,10 @@ import { FlashList } from "@shopify/flash-list";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import { useData } from "../app/providers/DataProvider";
-import { ValuesListType } from "../features/vault/model/ValuesType";
 import { useTheme } from "../app/providers/ThemeProvider";
 import Header from "../shared/components/Header";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../shared/ui/linearGradient";
-import FilterAnalysisModal from "../features/analysis/components/modals/FilterAnalysisModal";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
 import { useTranslation } from "react-i18next";
 
@@ -52,6 +42,8 @@ import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import { useAuth } from "../app/providers/AuthProvider";
 import CacheResult from "../features/analysis/model/CacheResult";
 import PasswordStrengthLevel from "../features/analysis/model/PasswordStrengthLevel";
+import { useVault } from "../app/providers/VaultProvider";
+
 
 type AnalysisScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -84,14 +76,14 @@ const isNoStrengthFilter = (s: StrengthSelection) => {
 const truthy = (v: any) => v === true;
 
 const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
-  const data = useData();
+  const vault = useVault();
   const { master } = useAuth();
 
   const { theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
     useTheme();
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
-  
+
   const [cache, setCache] = useState<CacheResult | null>(null);
 
   const [strengthSel, setStrengthSel] = useState<StrengthSelection>({
@@ -131,7 +123,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
       : undefined,
   ];
 
-  // ✅ NEU: Finding selection style wie bei Strength (Background/Opacity)
   const findingCardStyle = (
     selected: boolean,
     extra?: StyleProp<ViewStyle>
@@ -149,7 +140,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
           opacity: 0.9,
         }
       : undefined,
-    // optional: neutraler Rahmen (nicht als Selection-Indikator)
     {
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: darkmode ? theme.colors.outlineVariant : "white",
@@ -167,14 +157,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
     );
   };
 
-  const setExclusiveStrength = (key: keyof StrengthSelection) => {
-    setStrengthSel({ strong: false, medium: false, weak: false, [key]: true });
-  };
-
-  const setStrengthFromModal = (key: keyof StrengthSelection, v: boolean) => {
-    setStrengthSel((prev) => normalizeStrengthSelection({ ...prev, [key]: v }));
-  };
-
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(0);
@@ -183,8 +165,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   );
 
   useEffect(() => {
-    const values = data?.data?.values as ValuesListType | undefined;
-    if (!values || !master) {
+    if (!master || !vault.isUnlocked) {
       setCache(null);
       return;
     }
@@ -195,18 +176,26 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
       if (cancelled) return;
 
       (async () => {
-        const pepper = await deriveAnalysisPepperFromMaster(master);
-        const result = await buildAnalysisCache(values, pepper);
-        startTransition(() => {
-          if (!cancelled) setCache(result);
-        });
+        try {
+          const full = vault.exportFullData();
+          const values = full?.values ?? [];
+
+          const pepper = await deriveAnalysisPepperFromMaster(master);
+          const result = await buildAnalysisCache(values, pepper);
+
+          startTransition(() => {
+            if (!cancelled) setCache(result);
+          });
+        } catch {
+          if (!cancelled) setCache(null);
+        }
       })();
     });
 
     return () => {
       cancelled = true;
     };
-  }, [data?.data?.values, master]);
+  }, [vault.dirty, vault.isUnlocked, master, vault]);
 
   useEffect(() => {
     setMaxFindingWidth(null);
@@ -268,7 +257,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
           (typeof it?.stats?.length === "number" ? it.stats.length : undefined);
 
         if (typeof len === "number") return len < 12;
-
         return false;
       }
 
@@ -674,7 +662,9 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                       );
                     }}
                     style={findingCardStyle(activeFindingKey === f.key, [
-                      maxFindingWidth != null ? { width: maxFindingWidth } : null,
+                      maxFindingWidth != null
+                        ? { width: maxFindingWidth }
+                        : null,
                       { alignSelf: "flex-start" },
                     ])}
                   >
@@ -692,7 +682,11 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                 ))
               ) : (
                 <View
-                  style={{ padding: 12, opacity: 0.7, alignSelf: "flex-start" }}
+                  style={{
+                    padding: 12,
+                    opacity: 0.7,
+                    alignSelf: "flex-start",
+                  }}
                 >
                   <Text>
                     {t("analysis:noFindings", { defaultValue: "No findings." })}

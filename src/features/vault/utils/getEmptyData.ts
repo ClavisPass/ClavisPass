@@ -1,7 +1,7 @@
-import DataType from "../model/DataType";
+import VaultDataType from "../model/VaultDataType";
 
 function getEmptyData() {
-  let data: DataType = {
+  let data: VaultDataType = {
     version: "1",
     folder: [],
     values: [],

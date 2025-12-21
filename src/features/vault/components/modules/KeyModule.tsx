@@ -5,10 +5,11 @@ import KeyModuleType from "../../model/modules/KeyModuleType";
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
-import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import identifyKeyType from "../../utils/regex/identifyKeyType";
 import { useTranslation } from "react-i18next";
+import ModulesEnum from "../../model/ModulesEnum";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 
 function KeyModule(props: KeyModuleType & Props) {
   const didMount = useRef(false);
@@ -36,7 +37,7 @@ function KeyModule(props: KeyModuleType & Props) {
       title={t("modules:key")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      icon={ModuleIconsEnum.KEY}
+      icon={MODULE_ICON[ModulesEnum.KEY]}
       fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>

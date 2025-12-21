@@ -12,11 +12,12 @@ import { open } from "@tauri-apps/plugin-shell";
 import * as Linking from "expo-linking";
 
 import validator from "validator";
-import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 
 import { Image } from "expo-image";
 import { useTranslation } from "react-i18next";
+import ModulesEnum from "../../model/ModulesEnum";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 
 function URLModule(props: URLModuleType & Props) {
   const didMount = useRef(false);
@@ -116,7 +117,7 @@ function URLModule(props: URLModuleType & Props) {
       title={t("modules:url")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      icon={ModuleIconsEnum.URL}
+      icon={MODULE_ICON[ModulesEnum.URL]}
       fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>

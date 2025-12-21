@@ -5,9 +5,7 @@ import AnimatedContainer from "../shared/components/container/AnimatedContainer"
 import { useTheme } from "../app/providers/ThemeProvider";
 import { Chip, Divider, Icon, Text, TextInput } from "react-native-paper";
 import ModulesEnum from "../features/vault/model/ModulesEnum";
-import ModuleIconsEnum from "../features/vault/model/ModuleIconsEnum";
 import WifiModuleType from "../features/vault/model/modules/WifiModuleType";
-import { ValuesListType } from "../features/vault/model/ValuesType";
 import { ScrollView, View, StyleSheet } from "react-native";
 import AnalysisEntry from "../features/analysis/components/AnalysisEntry";
 import AnalysisEntryGradient from "../features/analysis/components/AnalysisEntryGradient";
@@ -18,7 +16,6 @@ import getPasswordStrengthColor from "../features/analysis/utils/getPasswordStre
 import getPasswordStrengthIcon from "../features/analysis/utils/getPasswordStrengthIcon";
 import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import { useTranslation } from "react-i18next";
-import { useData } from "../app/providers/DataProvider";
 import { useAuth } from "../app/providers/AuthProvider";
 
 import passwordEntropy from "../features/analysis/utils/Entropy";
@@ -33,6 +30,8 @@ import {
   hasRepeatedChars,
   strengthFromEntropyBits,
 } from "../features/analysis/utils/analysisEngine";
+import { useVault } from "../app/providers/VaultProvider";
+import { MODULE_ICON } from "../features/vault/model/ModuleIconsEnum";
 
 type AnalysisDetailScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -104,7 +103,7 @@ function classifyPattern(password: string): string {
 }
 
 function resolveById(
-  values: ValuesListType,
+  values: any[],
   ref: AnalysisRef
 ): { title: string; password: string; typeIcon: any } | null {
   const value = values.find((v) => v.id === ref.valueId);
@@ -117,7 +116,7 @@ function resolveById(
     return {
       title: value.title,
       password: String((mod as any).value),
-      typeIcon: ModuleIconsEnum.PASSWORD,
+      typeIcon: MODULE_ICON[ModulesEnum.PASSWORD],
     };
   }
 
@@ -126,7 +125,7 @@ function resolveById(
     return {
       title: wifi.wifiName ?? value.title,
       password: wifi.value,
-      typeIcon: ModuleIconsEnum.WIFI,
+      typeIcon: MODULE_ICON[ModulesEnum.WIFI],
     };
   }
 
@@ -134,11 +133,7 @@ function resolveById(
 }
 
 function Badge({ text }: { text: string }) {
-  return (
-    <Chip style={{ borderRadius: 12 }}>
-      {text}
-    </Chip>
-  );
+  return <Chip style={{ borderRadius: 12 }}>{text}</Chip>;
 }
 
 const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
@@ -146,9 +141,8 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
   navigation,
 }) => {
   const { ref } = route.params;
-  const data = useData();
-  const values = data?.data?.values as ValuesListType | undefined;
 
+  const vault = useVault();
   const { master } = useAuth();
 
   const {
@@ -160,6 +154,15 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
     setHeaderSpacing,
   } = useTheme();
   const { t } = useTranslation();
+
+  const values = useMemo(() => {
+    if (!vault.isUnlocked) return undefined;
+    try {
+      return vault.exportFullData().values ?? [];
+    } catch {
+      return undefined;
+    }
+  }, [vault, vault.isUnlocked, vault.dirty]);
 
   const resolved = useMemo(() => {
     if (!values) return null;
@@ -266,7 +269,9 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
     }
   };
 
-  const shownPassword = secureTextEntry ? "••••••••••••" : (passwordPlain ?? "");
+  const shownPassword = secureTextEntry
+    ? "••••••••••••"
+    : (passwordPlain ?? "");
 
   const strength = computed?.strength ?? null;
 
@@ -396,7 +401,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             ) : null}
           </View>
 
-          {/* 3) Reused/Variant explanation lines (replace the old sentence) */}
+          {/* 3) Reused/Variant explanation lines */}
           {(showReused || showVariant) && computed ? (
             <View style={{ paddingHorizontal: 10, marginTop: -2 }}>
               {showReused ? (
@@ -415,7 +420,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             </View>
           ) : null}
 
-          {/* 4) Stats (same 6-pack layout as before) */}
+          {/* 4) Stats */}
           <Text
             variant="labelSmall"
             style={{ opacity: 0.7, userSelect: "none", marginLeft: 6 }}
@@ -495,7 +500,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             />
           </View>
 
-          {/* 5) Note block alone (between stats and "what this means") */}
+          {/* 5) Note block */}
           <View
             style={{
               marginHorizontal: 6,
@@ -512,7 +517,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             </Text>
           </View>
 
-          {/* 6) What these findings mean (6 bullets for the 6 stats) */}
+          {/* 6) What these values mean */}
           <View
             style={{
               marginHorizontal: 6,
@@ -554,11 +559,8 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
 
             <Text style={{ opacity: 0.8, marginTop: 6 }}>
               • <Text style={{ fontWeight: "700" }}>Reuse:</Text> Exact matches
-              found in other entries. Your value shows {Math.max(
-                0,
-                (computed?.reuseCount ?? 0) - 1
-              )}{" "}
-              other entries.
+              found in other entries. Your value shows{" "}
+              {Math.max(0, (computed?.reuseCount ?? 0) - 1)} other entries.
             </Text>
           </View>
 

@@ -1,5 +1,9 @@
 import ModulesEnum from "../model/ModulesEnum";
 
+function assertNever(x: never): never {
+  throw new Error(`Unhandled ModulesEnum: ${String(x)}`);
+}
+
 const getModuleNameByEnum = (moduleEnum: ModulesEnum, t: any): string => {
   switch (moduleEnum) {
     case ModulesEnum.CUSTOM_FIELD:
@@ -34,9 +38,8 @@ const getModuleNameByEnum = (moduleEnum: ModulesEnum, t: any): string => {
       return t("modules:recoveryCodes");
     case ModulesEnum.UNKNOWN:
       return t("modules:unknown");
-    default:
-      return t("modules:unknown");
   }
+  return assertNever(moduleEnum);
 };
 
 export default getModuleNameByEnum;

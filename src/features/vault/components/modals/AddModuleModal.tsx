@@ -9,19 +9,22 @@ import {
 import { Searchbar, Text, Icon, IconButton, Chip } from "react-native-paper";
 import Modal from "../../../../shared/components/modals/Modal";
 import ModulesEnum from "../../model/ModulesEnum";
-import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { useSetting } from "../../../../app/providers/SettingsProvider";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 
 type ModuleCategory = "Common" | "Security" | "vCard" | "Utility";
 
+// UI shows only these modules (exclude internal/structural ones)
+type UiModules = Exclude<ModulesEnum, ModulesEnum.UNKNOWN | ModulesEnum.TITLE>;
+
 type ModuleMeta = {
-  id: ModulesEnum;
+  id: UiModules;
   label: string;
-  icon: ModuleIconsEnum | string;
+  icon: string;
   category: ModuleCategory;
   keywords: string[];
 };
@@ -36,6 +39,20 @@ type Props = {
   onToggleFavorite?: (module: ModulesEnum, isFavorite: boolean) => void;
   onSelect?: (module: ModulesEnum) => void;
 };
+
+// ----- Compile-time coverage check helpers -----
+type IdsOf<T extends readonly { id: any }[]> = T[number]["id"];
+
+type MissingIds<List extends readonly { id: UiModules }[]> = Exclude<
+  UiModules,
+  IdsOf<List>
+>;
+
+function defineModules<const L extends readonly ModuleMeta[]>(
+  list: MissingIds<L> extends never ? L : never
+) {
+  return list;
+}
 
 function TinyFilterChip({
   label,
@@ -69,7 +86,7 @@ function ModuleTile({
   isFavorite,
 }: {
   label: string;
-  icon: ModuleIconsEnum | string;
+  icon: string;
   onPress: () => void;
   onToggleFavorite: () => void;
   isFavorite: boolean;
@@ -156,106 +173,107 @@ export default function AddModuleModalCompactFav(props: Props) {
   const ScrollViewRef: any = useRef<ScrollView>(null);
   const [currentOffset, setCurrentOffset] = useState(0);
 
-  const MODULES: ModuleMeta[] = [
+  // IMPORTANT: defineModules(...) enforces that all UiModules appear exactly somewhere here
+  const MODULES = defineModules([
     {
       id: ModulesEnum.USERNAME,
       label: t("modules:username"),
-      icon: ModuleIconsEnum.USERNAME,
+      icon: MODULE_ICON[ModulesEnum.USERNAME],
       category: "Common",
       keywords: ["user", "login", "account"],
     },
     {
       id: ModulesEnum.E_MAIL,
       label: t("modules:email"),
-      icon: ModuleIconsEnum.E_MAIL,
+      icon: MODULE_ICON[ModulesEnum.E_MAIL],
       category: "Common",
       keywords: ["mail", "email", "kontakt"],
     },
     {
       id: ModulesEnum.PASSWORD,
       label: t("modules:password"),
-      icon: ModuleIconsEnum.PASSWORD,
+      icon: MODULE_ICON[ModulesEnum.PASSWORD],
       category: "Security",
       keywords: ["passwort", "credential", "login"],
     },
     {
       id: ModulesEnum.WIFI,
       label: t("modules:wifi"),
-      icon: ModuleIconsEnum.WIFI,
+      icon: MODULE_ICON[ModulesEnum.WIFI],
       category: "Utility",
       keywords: ["wlan", "network", "ssid"],
     },
     {
       id: ModulesEnum.URL,
       label: t("modules:url"),
-      icon: ModuleIconsEnum.URL,
+      icon: MODULE_ICON[ModulesEnum.URL],
       category: "Common",
       keywords: ["link", "website", "http"],
     },
     {
       id: ModulesEnum.DIGITAL_CARD,
       label: t("modules:digitalCard"),
-      icon: ModuleIconsEnum.DIGITAL_CARD,
+      icon: MODULE_ICON[ModulesEnum.DIGITAL_CARD],
       category: "Utility",
       keywords: ["card", "kontakt", "profile"],
     },
     {
       id: ModulesEnum.KEY,
       label: t("modules:key"),
-      icon: ModuleIconsEnum.KEY,
+      icon: MODULE_ICON[ModulesEnum.KEY],
       category: "Security",
       keywords: ["ssh", "api", "token"],
     },
     {
       id: ModulesEnum.CUSTOM_FIELD,
       label: t("modules:customField"),
-      icon: ModuleIconsEnum.CUSTOM_FIELD,
+      icon: MODULE_ICON[ModulesEnum.CUSTOM_FIELD],
       category: "Utility",
       keywords: ["frei", "meta", "notizen"],
     },
     {
       id: ModulesEnum.PHONE_NUMBER,
       label: t("modules:phoneNumber"),
-      icon: ModuleIconsEnum.PHONE_NUMBER,
+      icon: MODULE_ICON[ModulesEnum.PHONE_NUMBER],
       category: "vCard",
       keywords: ["telefon", "mobil", "kontakt"],
     },
     {
       id: ModulesEnum.TASK,
       label: t("modules:task"),
-      icon: ModuleIconsEnum.TASK,
+      icon: MODULE_ICON[ModulesEnum.TASK],
       category: "Utility",
       keywords: ["todo", "aufgabe", "reminder"],
     },
     {
       id: ModulesEnum.TOTP,
       label: t("modules:totp"),
-      icon: ModuleIconsEnum.TOTP,
+      icon: MODULE_ICON[ModulesEnum.TOTP],
       category: "Security",
       keywords: ["2fa", "otp", "totp", "mfa"],
     },
     {
       id: ModulesEnum.RECOVERY_CODES,
       label: t("modules:recoveryCodes"),
-      icon: ModuleIconsEnum.RECOVERY_CODES,
+      icon: MODULE_ICON[ModulesEnum.RECOVERY_CODES],
       category: "Security",
       keywords: ["2fa", "otp", "totp", "mfa", "recovery", "codes"],
     },
     {
       id: ModulesEnum.NOTE,
       label: t("modules:note"),
-      icon: ModuleIconsEnum.NOTE,
+      icon: MODULE_ICON[ModulesEnum.NOTE],
       category: "Utility",
       keywords: ["notiz", "text", "memo"],
     },
     {
       id: ModulesEnum.EXPIRY,
       label: t("modules:expiry"),
-      icon: ModuleIconsEnum.EXPIRY,
+      icon: MODULE_ICON[ModulesEnum.EXPIRY],
       category: "Utility",
       keywords: ["ablauf", "gültig", "verfall"],
     },
-  ];
+  ] as const);
 
   const change = (direction: "+" | "-") => {
     const { width } = Dimensions.get("window");
@@ -266,14 +284,10 @@ export default function AddModuleModalCompactFav(props: Props) {
       animated: true,
       offset: nextOffset,
     });
+    setCurrentOffset(nextOffset);
   };
 
-  const categories: ModuleCategory[] = [
-    "Common",
-    "Security",
-    "vCard",
-    "Utility",
-  ];
+  const categories: ModuleCategory[] = ["Common", "Security", "vCard", "Utility"];
   const [activeCats, setActiveCats] = useState<Set<ModuleCategory>>(new Set());
   const toggleCat = (c: ModuleCategory) =>
     setActiveCats((s) => {
@@ -285,14 +299,14 @@ export default function AddModuleModalCompactFav(props: Props) {
   const normalizedQuery = query.trim().toLowerCase();
 
   const filtered = useMemo(() => {
-    let list = MODULES;
+    let list = MODULES as readonly ModuleMeta[];
     if (activeCats.size > 0)
       list = list.filter((m) => activeCats.has(m.category));
     if (normalizedQuery.length > 0) {
       const tokens = normalizedQuery.split(/\s+/);
       list = list.filter((m) => {
         const hay = (m.label + " " + m.keywords.join(" ")).toLowerCase();
-        return tokens.every((t) => hay.includes(t));
+        return tokens.every((tok) => hay.includes(tok));
       });
     }
     return list;
@@ -300,11 +314,11 @@ export default function AddModuleModalCompactFav(props: Props) {
 
   const sections = useMemo(() => {
     const byId = new Map(filtered.map((m) => [m.id, m]));
-    const favItems = favs
-      .map((id) => byId.get(id))
+    const favItems = (favs as ModulesEnum[])
+      .map((id) => byId.get(id as UiModules))
       .filter(Boolean) as ModuleMeta[];
     const recentItems = (props.recent ?? [])
-      .map((id) => byId.get(id))
+      .map((id) => byId.get(id as UiModules))
       .filter(Boolean) as ModuleMeta[];
 
     const taken = new Set([
@@ -324,6 +338,7 @@ export default function AddModuleModalCompactFav(props: Props) {
 
   const handleSelect = useCallback(
     (m: ModuleMeta) => {
+      // UiModules is a subset of ModulesEnum, so this is safe
       props.addModule(m.id);
       props.onSelect?.(m.id);
       hideModal();
@@ -331,7 +346,7 @@ export default function AddModuleModalCompactFav(props: Props) {
     [props]
   );
 
-  const isFavorite = (id: ModulesEnum) => favs.includes(id);
+  const isFavorite = (id: ModulesEnum) => (favs as ModulesEnum[]).includes(id);
 
   const toggleFavorite = (id: ModulesEnum) => {
     const nowFav = !isFavorite(id);
@@ -416,26 +431,21 @@ export default function AddModuleModalCompactFav(props: Props) {
           horizontal
           style={{ gap: 6, maxHeight: 36 }}
         >
-          {(["Common", "Security", "vCard", "Utility"] as ModuleCategory[]).map(
-            (c) => {
-              const selected = activeCats.has(c);
-              return (
-                <TinyFilterChip
-                  key={c}
-                  label={c}
-                  icon={catIcon(c)}
-                  selected={selected}
-                  onPress={() => toggleCat(c)}
-                />
-              );
-            }
-          )}
+          {(categories as ModuleCategory[]).map((c) => {
+            const selected = activeCats.has(c);
+            return (
+              <TinyFilterChip
+                key={c}
+                label={c}
+                icon={catIcon(c)}
+                selected={selected}
+                onPress={() => toggleCat(c)}
+              />
+            );
+          })}
         </ScrollView>
 
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 8 }}
-        >
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 8 }}>
           {sections.length === 0 && <EmptyState />}
 
           {sections.map((sec) => {
@@ -468,14 +478,9 @@ export default function AddModuleModalCompactFav(props: Props) {
                       </View>
                     ))}
                     {row.length < columns &&
-                      Array.from({ length: columns - row.length }).map(
-                        (_, k) => (
-                          <View
-                            key={`spacer-${k}`}
-                            style={{ flex: 1, padding: 6 }}
-                          />
-                        )
-                      )}
+                      Array.from({ length: columns - row.length }).map((_, k) => (
+                        <View key={`spacer-${k}`} style={{ flex: 1, padding: 6 }} />
+                      ))}
                   </View>
                 ))}
               </View>

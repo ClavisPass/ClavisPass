@@ -9,7 +9,6 @@ import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
 
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
-import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import PasswordTextbox from "../../../../shared/components/PasswordTextbox";
 import PasswordGeneratorModal from "../modals/PasswordGeneratorModal";
@@ -21,6 +20,8 @@ import {
   entropyToProgress,
   entropyToStrength,
 } from "../../utils/entropyUi";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
+import ModulesEnum from "../../model/ModulesEnum";
 
 function PasswordModule(props: PasswordModuleType & Props) {
   const didMount = useRef(false);
@@ -63,7 +64,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
       title={t("modules:password")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      icon={ModuleIconsEnum.PASSWORD}
+      icon={MODULE_ICON[ModulesEnum.PASSWORD]}
       fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>

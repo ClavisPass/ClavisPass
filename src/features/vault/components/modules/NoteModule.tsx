@@ -3,9 +3,10 @@ import { TextInput } from "react-native-paper";
 import NoteModuleType from "../../model/modules/NoteModuleType";
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
-import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { useTranslation } from "react-i18next";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
+import ModulesEnum from "../../model/ModulesEnum";
 
 function NoteModule(props: NoteModuleType & Props) {
   const didMount = useRef(false);
@@ -30,7 +31,7 @@ function NoteModule(props: NoteModuleType & Props) {
       title={t("modules:note")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      icon={ModuleIconsEnum.NOTE}
+      icon={MODULE_ICON[ModulesEnum.NOTE]}
       fastAccess={props.fastAccess}
     >
       <TextInput

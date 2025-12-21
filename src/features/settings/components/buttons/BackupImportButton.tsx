@@ -1,14 +1,15 @@
 import * as DocumentPicker from "expo-document-picker";
 import { useTranslation } from "react-i18next";
-import { useData } from "../../../../app/providers/DataProvider";
+
 import { CryptoTypeSchema } from "../../../../infrastructure/crypto/CryptoType";
-import { DataTypeSchema } from "../../../vault/model/DataType";
+import { VaultDataTypeSchema } from "../../../vault/model/VaultDataType";
 import { decrypt } from "../../../../infrastructure/crypto/CryptoLayer";
 import { logger } from "../../../../infrastructure/logging/logger";
 import SettingsItem from "../SettingsItem";
+import { useVault } from "../../../../app/providers/VaultProvider";
 
 function BackupImportButton() {
-  const data = useData();
+  const vault = useVault();
   const { t } = useTranslation();
 
   const importBackup = async () => {
@@ -17,20 +18,29 @@ function BackupImportButton() {
         type: "application/json",
       });
 
-      if (!result.canceled && result.assets.length > 0) {
-        const fileData = await fetch(result.assets[0].uri).then((res) =>
-          res.text()
-        );
+      if (result.canceled || result.assets.length === 0) return;
 
-        const parsedCryptoData = CryptoTypeSchema.parse(JSON.parse(fileData));
-        const decryptedData = decrypt(parsedCryptoData, "test");
-        const jsonData = JSON.parse(decryptedData);
+      const fileData = await fetch(result.assets[0].uri).then((res) =>
+        res.text()
+      );
 
-        const parsedData = DataTypeSchema.parse(jsonData);
-        data.setData(parsedData);
-        data.setLastUpdated(parsedCryptoData.lastUpdated);
-        data.setShowSave(true);
+      const parsedCryptoData = CryptoTypeSchema.parse(JSON.parse(fileData));
+
+      // TODO: replace "test" with real master password prompt if this is production logic
+      const decryptedData = decrypt(parsedCryptoData, "test");
+      const jsonData = JSON.parse(decryptedData);
+
+      const parsedData = VaultDataTypeSchema.parse(jsonData);
+      if (!parsedData) {
+        logger.error("[BackupImport] Parsed vault is null.");
+        return;
       }
+
+      vault.unlockWithDecryptedVault(parsedData);
+
+      vault.update((draft) => {
+        draft.version = draft.version;
+      });
     } catch (error) {
       logger.error("Fehler beim Importieren des Backups:", error);
     }

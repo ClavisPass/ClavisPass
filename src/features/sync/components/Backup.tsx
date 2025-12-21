@@ -1,20 +1,24 @@
 import { useEffect, useRef, useState } from "react";
-import CryptoType, { CryptoTypeSchema } from "../../../infrastructure/crypto/CryptoType";
-import { ActivityIndicator, Icon, Text } from "react-native-paper";
 import { View } from "react-native";
+import { ActivityIndicator, Icon, Text } from "react-native-paper";
+import { useTranslation } from "react-i18next";
+
+import CryptoType, {
+  CryptoTypeSchema,
+} from "../../../infrastructure/crypto/CryptoType";
+import { decrypt } from "../../../infrastructure/crypto/CryptoLayer";
+import { VaultDataTypeSchema } from "../../vault/model/VaultDataType";
+import { logger } from "../../../infrastructure/logging/logger";
+
 import PasswordTextbox from "../../../shared/components/PasswordTextbox";
 import Button from "../../../shared/components/buttons/Button";
 import { useTheme } from "../../../app/providers/ThemeProvider";
-import { useData } from "../../../app/providers/DataProvider";
 import { useAuth } from "../../../app/providers/AuthProvider";
-import { DataTypeSchema } from "../../vault/model/DataType";
-import { decrypt } from "../../../infrastructure/crypto/CryptoLayer";
-import { logger } from "../../../infrastructure/logging/logger";
 
 import * as DeviceStorageClient from "../../../infrastructure/cloud/clients/DeviceStorageClient";
-import { useTranslation } from "react-i18next";
 import { formatAbsoluteLocal } from "../../vault/utils/expiry";
 import { useSetting } from "../../../app/providers/SettingsProvider";
+import { useVault } from "../../../app/providers/VaultProvider";
 
 function Backup() {
   const { t } = useTranslation();
@@ -28,8 +32,9 @@ function Backup() {
   const [loading, setLoading] = useState<boolean>(true);
 
   const auth = useAuth();
+  const vault = useVault();
+
   const { theme } = useTheme();
-  const { setData, setLastUpdated } = useData();
 
   const [capsLock, setCapsLock] = useState(false);
   const [error, setError] = useState(false);
@@ -65,26 +70,25 @@ function Backup() {
     cryptoData: CryptoType | null
   ) => {
     try {
-      if (!cryptoData) {
-        return;
-      }
+      if (!cryptoData) return;
 
-      const lastUpdated = cryptoData.lastUpdated;
       const decryptedData = decrypt(cryptoData, masterPassword);
       const jsonData = JSON.parse(decryptedData);
 
-      const parsedData = DataTypeSchema.parse(jsonData);
-      setData(parsedData);
-      setLastUpdated(lastUpdated);
+      const parsedData = VaultDataTypeSchema.parse(jsonData);
+      if (!parsedData) {
+        throw new Error("[Backup] Parsed vault is null (unexpected).");
+      }
+
+      vault.unlockWithDecryptedVault(parsedData);
+      vault.markSaved();
       auth.login(masterPassword);
-    } catch (error) {
-      logger.error("[Backup] Error decrypting backup data:", error);
+    } catch (err) {
+      logger.error("[Backup] Error decrypting backup data:", err);
       textInputRef.current?.focus?.();
       setValue("");
       setError(true);
-      setTimeout(() => {
-        setError(false);
-      }, 1000);
+      setTimeout(() => setError(false), 1000);
     }
   };
 
@@ -136,6 +140,7 @@ function Backup() {
               timeFormat
             )}
           </Text>
+
           <View style={{ width: "100%" }}>
             <PasswordTextbox
               setCapsLock={setCapsLock}
@@ -148,10 +153,12 @@ function Backup() {
               onSubmitEditing={() => login(value, parsedCryptoData)}
             />
           </View>
+
           <Button
             text={t("login:login")}
             onPress={() => login(value, parsedCryptoData)}
           />
+
           {capsLock && (
             <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
               {t("common:capsLockOn")}
@@ -159,10 +166,9 @@ function Backup() {
           )}
         </View>
       ) : (
-        <>
-          <Text>{t("login:noBackupFound")}</Text>
-        </>
+        <Text>{t("login:noBackupFound")}</Text>
       )}
+
       <View
         style={{
           display: "flex",
@@ -172,7 +178,7 @@ function Backup() {
           justifyContent: "flex-end",
           gap: 6,
         }}
-      ></View>
+      />
     </View>
   );
 }

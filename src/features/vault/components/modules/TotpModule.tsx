@@ -3,7 +3,6 @@ import { View } from "react-native";
 import { Button, Text } from "react-native-paper";
 
 import ModuleContainer from "../ModuleContainer";
-import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import Props from "../../model/ModuleProps";
 import { codeFromUri, parseOtpauth } from "../../utils/totp";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
@@ -13,6 +12,8 @@ import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboa
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { useTranslation } from "react-i18next";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import ModulesEnum from "../../model/ModulesEnum";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 
 export function Totp(props: { value: string }) {
   const { theme } = useTheme();
@@ -172,7 +173,7 @@ function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
       title={t("modules:totp")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      icon={ModuleIconsEnum.TOTP}
+      icon={MODULE_ICON[ModulesEnum.TOTP]}
       fastAccess={props.fastAccess}
     >
       <View style={[globalStyles.moduleView]}>

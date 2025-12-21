@@ -1,19 +1,19 @@
 import { Animated, View } from "react-native";
-
 import { useEffect, useRef } from "react";
-
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Icon, Text } from "react-native-paper";
+
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import { useAuth } from "../../../app/providers/AuthProvider";
 import { useOnline } from "../../../app/providers/OnlineProvider";
-import { useData } from "../../../app/providers/DataProvider";
 import { useToken } from "../../../app/providers/CloudProvider";
+
 import { getDateTime } from "../../../shared/utils/Timestamp";
 import { encrypt } from "../../../infrastructure/crypto/CryptoLayer";
 import { uploadRemoteVaultFile } from "../../../infrastructure/cloud/clients/CloudStorageClient";
 import { logger } from "../../../infrastructure/logging/logger";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
+import { useVault } from "../../../app/providers/VaultProvider";
 
 type Props = {
   refreshing: boolean;
@@ -24,16 +24,20 @@ type Props = {
 const Sync = (props: Props) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
+
   const auth = useAuth();
+  const vault = useVault();
+
   const { isOnline } = useOnline();
-  const data = useData();
   const { accessToken, provider } = useToken();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
+  const showSync = vault.dirty || props.refreshing;
+
   useEffect(() => {
-    if (data.showSave) {
+    if (showSync) {
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 48,
@@ -60,29 +64,40 @@ const Sync = (props: Props) => {
         }),
       ]).start();
     }
-  }, [data.showSave]);
+  }, [showSync, fadeAnim, slideAnim]);
 
   const save = async () => {
-    props.setRefreshing(true);
-    const lastUpdated = getDateTime();
-    const encryptedData = await encrypt(
-      data.data,
-      auth.master ? auth.master : "",
-      lastUpdated
-    );
+    if (!vault.isUnlocked) return;
 
-    uploadRemoteVaultFile({
-      provider,
-      accessToken: accessToken ?? "",
-      remotePath: "clavispass.lock",
-      content: encryptedData,
-      onCompleted: () => {
-        logger.info("Remote vault upload completed.");
-        data.setShowSave(false);
-        props.setRefreshing(false);
-      },
-    });
+    props.setRefreshing(true);
+
+    try {
+      const lastUpdated = getDateTime();
+
+      const fullData = vault.exportFullData();
+      const encryptedData = await encrypt(
+        fullData,
+        auth.master ? auth.master : "",
+        lastUpdated
+      );
+
+      uploadRemoteVaultFile({
+        provider,
+        accessToken: accessToken ?? "",
+        remotePath: "clavispass.lock",
+        content: encryptedData,
+        onCompleted: () => {
+          logger.info("[Sync] Remote vault upload completed.");
+          vault.markSaved();
+          props.setRefreshing(false);
+        },
+      });
+    } catch (err) {
+      logger.error("[Sync] Save failed:", err);
+      props.setRefreshing(false);
+    }
   };
+
   return (
     <Animated.View
       style={{
@@ -94,7 +109,7 @@ const Sync = (props: Props) => {
         overflow: "hidden",
       }}
     >
-      {data.showSave && (
+      {showSync && (
         <View
           style={{
             height: 48,
@@ -140,6 +155,7 @@ const Sync = (props: Props) => {
                         </Text>
                       </AnimatedPressable>
                     </View>
+
                     <AnimatedPressable
                       onPress={props.refreshData}
                       style={{
@@ -153,10 +169,7 @@ const Sync = (props: Props) => {
                     >
                       <Text
                         variant="bodyLarge"
-                        style={{
-                          color: "white",
-                          userSelect: "none",
-                        }}
+                        style={{ color: "white", userSelect: "none" }}
                       >
                         {t("common:reload")}
                       </Text>

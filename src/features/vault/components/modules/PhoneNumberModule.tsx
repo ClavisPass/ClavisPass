@@ -4,12 +4,13 @@ import { TextInput, IconButton } from "react-native-paper";
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
-import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import PhoneNumberModuleType from "../../model/modules/PhoneNumberModuleType";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import * as Linking from "expo-linking";
 import { useTranslation } from "react-i18next";
+import ModulesEnum from "../../model/ModulesEnum";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 
 function PhoneNumberModule(props: PhoneNumberModuleType & Props) {
   const didMount = useRef(false);
@@ -56,7 +57,7 @@ function PhoneNumberModule(props: PhoneNumberModuleType & Props) {
       title={t("modules:phoneNumber")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      icon={ModuleIconsEnum.PHONE_NUMBER}
+      icon={MODULE_ICON[ModulesEnum.PHONE_NUMBER]}
       fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>

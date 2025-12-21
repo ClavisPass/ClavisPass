@@ -8,8 +8,7 @@ import { start, onUrl, cancel } from "@fabianlars/tauri-plugin-oauth";
 import * as Random from "expo-random";
 import { logger } from "../../../infrastructure/logging/logger";
 import { useToken } from "../../../app/providers/CloudProvider";
-import { useData } from "../../../app/providers/DataProvider";
-import { G } from "react-native-svg";
+import { useVault } from "../../../app/providers/VaultProvider";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -35,7 +34,7 @@ async function randState(len = 32) {
 
 function GoogleDriveLoginButton() {
   const { setSession } = useToken();
-  const { setShowSave } = useData();
+  const vault = useVault();
 
   // Flow-Refs
   const unsubscribeRef = useRef<null | (() => void)>(null);
@@ -74,7 +73,10 @@ function GoogleDriveLoginButton() {
             refreshToken: data.refresh_token,
             expiresIn: data.expires_in,
           });
-          setShowSave(true);
+          vault.update((draft) => {
+            // no-op write to mark dirty (update() setzt dirty)
+            draft.version = draft.version;
+          });
         } else {
           logger.error("[GoogleDrive] Token response missing tokens:", data);
         }
@@ -82,7 +84,7 @@ function GoogleDriveLoginButton() {
         logger.error("[GoogleDrive] Token exchange error:", err);
       }
     },
-    [setSession]
+    [setSession, vault]
   );
 
   const MOBILE_REDIRECT_URI = useMemo(

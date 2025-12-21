@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import "react-native-gesture-handler";
 import { AuthProvider } from "./src/app/providers/AuthProvider";
-import { DataProvider } from "./src/app/providers/DataProvider";
 import { Platform, View } from "react-native";
 import CustomTitlebar from "./src/shared/components/CustomTitlebar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -21,6 +20,7 @@ import { SettingsProvider } from "./src/app/providers/SettingsProvider";
 import I18nBridge from "./src/shared/components/I18nBridge";
 import DropdownLayer from "./src/shared/components/web/DropdownLayer";
 import NavigationContainer from "./src/app/navigation/NavigationContainer";
+import { VaultProvider } from "./src/app/providers/VaultProvider";
 
 const Tab = createBottomTabNavigator();
 
@@ -60,7 +60,7 @@ export function AppWithNavigation() {
             <OnlineProvider>
               <AuthProvider>
                 <CloudProvider>
-                  <DataProvider>
+                  <VaultProvider>
                     <DevModeProvider>
                       <GlobalErrorSnackbar />
                       <View
@@ -80,7 +80,7 @@ export function AppWithNavigation() {
                         <NavigationContainer />
                       </View>
                     </DevModeProvider>
-                  </DataProvider>
+                  </VaultProvider>
                 </CloudProvider>
               </AuthProvider>
             </OnlineProvider>

@@ -1,6 +1,6 @@
 import * as Crypto from "expo-crypto";
 import CryptoJS from "crypto-js";
-import DataType from "../../features/vault/model/DataType";
+import VaultDataType from "../../features/vault/model/VaultDataType";
 import CryptoType from "./CryptoType";
 import { getDateTime } from "../../shared/utils/Timestamp";
 
@@ -18,7 +18,7 @@ const deriveKey = (password: string, salt: CryptoJS.lib.WordArray) => {
 };
 
 export const encrypt = async (
-  data: DataType,
+  data: VaultDataType,
   password: string,
   lastUpdated?: string
 ) => {

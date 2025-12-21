@@ -1,19 +1,22 @@
-enum ModuleIconsEnum {
-  CUSTOM_FIELD = "card-text",
-  E_MAIL = "email",
-  KEY = "key-variant",
-  NOTE = "note",
-  PASSWORD = "form-textbox-password",
-  URL = "web",
-  USERNAME = "account",
-  WIFI = "wifi",
-  DIGITAL_CARD = "credit-card",
-  TASK = "checkbox-marked",
-  PHONE_NUMBER = "phone",
-  UNKNOWN = "help-circle-outline",
-  TOTP = "two-factor-authentication",
-  EXPIRY = "calendar",
-  RECOVERY_CODES = "keys",
-}
+import ModulesEnum from "./ModulesEnum";
 
-export default ModuleIconsEnum;
+export type IconName = string;
+
+export const MODULE_ICON = {
+  [ModulesEnum.CUSTOM_FIELD]: "card-text",
+  [ModulesEnum.E_MAIL]: "email",
+  [ModulesEnum.KEY]: "key-variant",
+  [ModulesEnum.NOTE]: "note",
+  [ModulesEnum.PASSWORD]: "form-textbox-password",
+  [ModulesEnum.URL]: "web",
+  [ModulesEnum.USERNAME]: "account",
+  [ModulesEnum.WIFI]: "wifi",
+  [ModulesEnum.DIGITAL_CARD]: "credit-card",
+  [ModulesEnum.TASK]: "checkbox-marked",
+  [ModulesEnum.PHONE_NUMBER]: "phone",
+  [ModulesEnum.TOTP]: "two-factor-authentication",
+  [ModulesEnum.EXPIRY]: "calendar",
+  [ModulesEnum.RECOVERY_CODES]: "list-status",
+  [ModulesEnum.TITLE]: "format-title",
+  [ModulesEnum.UNKNOWN]: "help-circle-outline",
+} satisfies Record<ModulesEnum, IconName>;

@@ -7,9 +7,10 @@ import UsernameModuleType from "../../model/modules/UsernameModuleType";
 import ModuleContainer from "../ModuleContainer";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
 import Props from "../../model/ModuleProps";
-import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { useTranslation } from "react-i18next";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
+import ModulesEnum from "../../model/ModulesEnum";
 
 function UsernameModule(props: UsernameModuleType & Props) {
   const didMount = useRef(false);
@@ -34,7 +35,7 @@ function UsernameModule(props: UsernameModuleType & Props) {
       title={t("modules:username")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      icon={ModuleIconsEnum.USERNAME}
+      icon={MODULE_ICON[ModulesEnum.USERNAME]}
       fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>

@@ -3,7 +3,6 @@ import { View } from "react-native";
 import { Button, IconButton, Text } from "react-native-paper";
 
 import ModuleContainer from "../ModuleContainer";
-import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import Props from "../../model/ModuleProps";
 import {
   getStatus,
@@ -16,6 +15,8 @@ import ExpiryModuleType from "../../model/modules/ExpiryModuleType";
 
 import { useTranslation } from "react-i18next";
 import { useSetting } from "../../../../app/providers/SettingsProvider";
+import ModulesEnum from "../../model/ModulesEnum";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 
 function ExpiryModule(props: ExpiryModuleType & Props) {
   const didMount = useRef(false);
@@ -73,7 +74,7 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
       title={t("modules:expiry")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      icon={ModuleIconsEnum.EXPIRY}
+      icon={MODULE_ICON[ModulesEnum.EXPIRY]}
       fastAccess={props.fastAccess}
     >
       <View style={[globalStyles.moduleView]}>

@@ -14,15 +14,16 @@ import EmailModuleType from "../../model/modules/EmailModuleType";
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
-import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
-import { useData } from "../../../../app/providers/DataProvider";
 import { ValuesListType } from "../../model/ValuesType";
 import ModulesEnum from "../../model/ModulesEnum";
 import { ModuleType } from "../../model/ModulesType";
 import validateEmail from "../../utils/regex/validateEmail";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import { useTranslation } from "react-i18next";
+import { useVault } from "../../../../app/providers/VaultProvider";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
+
 
 const ITEM_HEIGHT = 44;
 const MAX_VISIBLE_ITEMS = 6;
@@ -30,7 +31,7 @@ const MAX_VISIBLE_ITEMS = 6;
 function EmailModule(props: EmailModuleType & Props) {
   const didMount = useRef(false);
 
-  const data = useData();
+  const vault = useVault();
   const { globalStyles, theme } = useTheme();
   const { t } = useTranslation();
 
@@ -46,8 +47,17 @@ function EmailModule(props: EmailModuleType & Props) {
     if (h > 0) setInputHeight(h);
   };
 
+  const vaultData = useMemo(() => {
+    try {
+      if (!vault.isUnlocked) return null;
+      return vault.exportFullData();
+    } catch {
+      return null;
+    }
+  }, [vault.isUnlocked, vault.entries, vault.folders, vault.dirty]);
+
   const knownEmails = useMemo(() => {
-    const values = data?.data?.values;
+    const values = vaultData?.values;
     if (!values) return [];
     const out = new Set<string>();
     (values as ValuesListType).forEach((item) => {
@@ -58,7 +68,7 @@ function EmailModule(props: EmailModuleType & Props) {
         .forEach((m: ModuleType) => out.add(String(m.value)));
     });
     return Array.from(out);
-  }, [data?.data?.values]);
+  }, [vaultData?.values]);
 
   const baseItems = useMemo(
     () =>
@@ -101,7 +111,10 @@ function EmailModule(props: EmailModuleType & Props) {
 
   const containerStyle = StyleSheet.flatten([
     globalStyles.moduleView,
-    { position: "relative" as const, overflow: "visible" as ViewStyle["overflow"] },
+    {
+      position: "relative" as const,
+      overflow: "visible" as ViewStyle["overflow"],
+    },
   ]);
 
   const leftColumnStyle = StyleSheet.flatten([
@@ -144,7 +157,7 @@ function EmailModule(props: EmailModuleType & Props) {
       title={t("modules:email")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      icon={ModuleIconsEnum.E_MAIL}
+      icon={MODULE_ICON[ModulesEnum.E_MAIL]}
       fastAccess={props.fastAccess}
     >
       <View style={containerStyle}>
@@ -233,9 +246,7 @@ function EmailModule(props: EmailModuleType & Props) {
               </ScrollView>
             </View>
           )}
-          <View
-            style={{ height: showSuggestions ? dropdownMaxHeight + 8 : 0 }}
-          />
+          <View style={{ height: showSuggestions ? dropdownMaxHeight + 8 : 0 }} />
         </View>
       </View>
     </ModuleContainer>

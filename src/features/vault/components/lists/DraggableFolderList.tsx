@@ -5,22 +5,32 @@ import DraggableFlatList, {
 } from "react-native-draggable-flatlist";
 import { Icon, IconButton, Text } from "react-native-paper";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
-import { DataContextType } from "../../../../app/providers/DataProvider";
-import changeFolder from "../../utils/changeFolder";
 import FolderType from "../../model/FolderType";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import { useTranslation } from "react-i18next";
+import { useVault } from "../../../../app/providers/VaultProvider";
 
 type Props = {
-  data: DataContextType;
   folder: FolderType[];
   setSelectedFolder?: (folder: FolderType | null) => void;
   deleteFolder: (folder: FolderType) => void;
+  draggableDisabled?: boolean;
 };
 
 function DraggableFolderList(props: Props) {
   const { globalStyles, theme } = useTheme();
   const { t } = useTranslation();
+  const vault = useVault();
+
+  const persistFolderOrder = useCallback(
+    (nextFolders: FolderType[]) => {
+      vault.update((draft) => {
+        draft.folder = nextFolders;
+      });
+    },
+    [vault]
+  );
+
   const renderItem = useCallback(
     ({ item, drag, isActive }: RenderItemParams<FolderType>) => {
       return (
@@ -30,12 +40,14 @@ function DraggableFolderList(props: Props) {
             backgroundColor: theme.colors.background,
             borderRadius: 12,
             marginBottom: 4,
+            opacity: isActive ? 0.9 : 1,
           }}
         >
           <View style={[globalStyles.folderContainer]}>
-            <Pressable onPressIn={drag}>
+            <Pressable onPressIn={drag} disabled={props.draggableDisabled}>
               <Icon source="drag" size={20} />
             </Pressable>
+
             <AnimatedPressable
               style={{
                 borderRadius: 12,
@@ -48,9 +60,7 @@ function DraggableFolderList(props: Props) {
               }}
               onPress={
                 props.setSelectedFolder
-                  ? () => {
-                      props.setSelectedFolder?.(item);
-                    }
+                  ? () => props.setSelectedFolder?.(item)
                   : undefined
               }
             >
@@ -68,19 +78,25 @@ function DraggableFolderList(props: Props) {
                 </Text>
               </>
             </AnimatedPressable>
+
             <IconButton
               icon="close"
               size={14}
               style={{ margin: 0 }}
-              onPress={() => {
-                props.deleteFolder(item);
-              }}
+              onPress={() => props.deleteFolder(item)}
             />
           </View>
         </View>
       );
     },
-    [props.folder]
+    [
+      globalStyles.folderContainer,
+      props.deleteFolder,
+      props.draggableDisabled,
+      props.setSelectedFolder,
+      theme.colors.background,
+      theme.colors.primary,
+    ]
   );
 
   return (
@@ -128,15 +144,16 @@ function DraggableFolderList(props: Props) {
           </View>
         </View>
       )}
+
       <DraggableFlatList
         data={props.folder}
         renderItem={renderItem}
         keyExtractor={(item, index) => `drag-item-${item.id}-${index}`}
+        activationDistance={props.draggableDisabled ? 10_000 : 8}
+        scrollEnabled={!props.draggableDisabled}
         onDragEnd={(event) => {
-          if (event?.data) {
-            changeFolder(event.data, props.data);
-            props.data.setShowSave(true);
-          }
+          if (props.draggableDisabled) return;
+          if (event?.data) persistFolderOrder(event.data);
         }}
       />
     </View>

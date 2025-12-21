@@ -9,7 +9,6 @@ import Animated, {
   FadeOut,
   LinearTransition,
   interpolateColor,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -17,10 +16,11 @@ import Animated, {
 
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
-import ModuleIconsEnum from "../../model/ModuleIconsEnum";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 
 import RecoveryCodesModuleType from "../../model/modules/RecoveryCodesModuleType";
+import ModulesEnum from "../../model/ModulesEnum";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 
 function tokenize(input: string): string[] {
   return input
@@ -181,10 +181,10 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
   return (
     <ModuleContainer
       id={props.id}
-      title={t("modules:recoveryCodes", "Recovery Codes")}
+      title={t("modules:recoveryCodes")}
       onDragStart={props.onDragStart}
       deleteModule={props.deleteModule}
-      icon={ModuleIconsEnum.KEY}
+      icon={MODULE_ICON[ModulesEnum.RECOVERY_CODES]}
       fastAccess={props.fastAccess}
     >
       <View style={{ gap: 8 }}>
