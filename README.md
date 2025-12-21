@@ -42,36 +42,129 @@ Download the latest release for your platform from the [Releases Page](https://g
 
 ---
 
-## Security
+## Security-Oriented Architecture Overview
 
-ClavisPass encrypts your data using modern cryptographic standards (AES-256).  
-Only you hold the key – no servers, no tracking, no compromise.
+This project follows a **security-first client architecture** with a strong emphasis on **minimizing the exposure of sensitive data in memory**, **centralizing trust boundaries**, and **making security-critical responsibilities explicit and auditable**.
 
-You can even inspect the source code or build it yourself!
+The core guiding principle is:
 
-```mermaid
-graph TD
-  A[Input: Data and Password] --> B[Create Salt]
-  B --> C[Create IV]
-  C --> D[Derive Key]
-  D --> E[Encrypt Data]
-  E --> F[Return Ciphertext, Salt, IV, Timestamp]
+> **Secrets exist in exactly one place, for the shortest possible time, and are never part of reactive UI state.**
+
+---
+
+## Authentication & Master Secret Handling
+
+### Design Goals
+- Avoid storing secrets in React state or context values
+- Prevent accidental leakage via re-renders, props, logs, or DevTools
+- Keep cryptographic material **ephemeral and non-reactive**
+
+### Implementation
+
+The master password is **never stored in React state**.
+
+Instead:
+- It is held **only in memory** using a `useRef` inside `AuthProvider`
+- The React context exposes **functions**, not the secret itself
+
+```ts
+const masterRef = useRef<string | null>(null);
 ```
 
+The context API deliberately provides:
+- `getMaster()` – nullable, non-reactive access
+- `requireMaster()` – explicit failure if no secret is present
 
-ClavisPass uses a secure and modern approach to encrypt your sensitive data:
+This ensures:
+- No component can accidentally subscribe to secret changes
+- No re-render is ever triggered by secret updates
+- Secrets are not visible through React DevTools or context inspection
 
-- **Salt Generation**: A random 16-byte salt is generated using `Crypto.getRandomBytesAsync()`. This ensures that the derived key is unique even if the same password is used.
-- **IV Generation**: A random 12-byte initialization vector (IV) is created for use in AES encryption, adding an additional layer of randomness and security.
-- **Key Derivation**: The key is derived from the password and salt using the **PBKDF2** algorithm with 1000 iterations. This helps defend against brute-force attacks.
-- **AES Encryption**: The data is converted to a JSON string and encrypted using **AES-CBC** mode with **PKCS7 padding**.
-- **Output**: The encryption function returns an object containing:
-  - `ciphertext`: the encrypted data
-  - `salt`: the salt used for key derivation (hex encoded)
-  - `iv`: the initialization vector used during encryption (hex encoded)
-  - `lastUpdated`: a UTC timestamp indicating when the encryption took place
+### Session Lifecycle
+- Sessions are time-boxed (automatic logout after a fixed interval)
+- Logout **actively wipes the secret from memory**
+- All timers are centrally managed and cleaned up on unmount
 
-This design ensures that your data remains private and can only be decrypted with the correct password.
+---
+
+## Vault Architecture & Trust Boundaries
+
+The vault is split into **two strictly separated layers**.
+
+---
+
+### 1. VaultSession (Authoritative & Secret-Capable)
+
+Responsibilities:
+- Holds the **full decrypted vault**
+- Lives outside React (non-reactive)
+- Performs all mutations and dirty-state tracking
+- Acts as the **single source of truth**
+
+This layer is the only place where full vault data exists.
+
+---
+
+### 2. VaultProvider (UI-Safe Projection)
+
+The React-facing vault context **never exposes raw secrets**.
+
+It provides only:
+- `EntryMeta[]` – derived, non-sensitive metadata
+- Folder structures and UI-safe state
+- Controlled write helpers (`update`, `upsertEntry`, `deleteEntry`)
+
+Secrets are accessed **on-demand only**:
+
+```ts
+getSecretValue(entryId, module)
+getSecretPayload(entryId, module)
+```
+
+Guarantees:
+- Secrets are never stored in React state
+- Secrets are fetched only when explicitly required (e.g. copy, decrypt)
+- UI components remain secure by default
+
+---
+
+## Module Policy System
+
+All module behavior is governed by a **central policy registry**.
+
+Each module declares:
+- Its classification (`meta`, `secret`, `hybrid`, `structured`)
+- How metadata is extracted
+- How secret payloads are derived
+
+```ts
+export const MODULE_POLICY satisfies Record<ManagedModules, ModulePolicy>;
+```
+
+Benefits:
+- **Compile-time enforcement** that every module is handled
+- Immediate TypeScript errors when adding a new module without integration
+- One auditable location for all security-relevant logic
+
+---
+
+## Defensive Defaults
+
+- Unknown or unsupported modules always fall back to a **safe renderer**
+- Missing policies result in `null` secrets (secure default)
+- Rendering never fails hard due to malformed or future module data
+
+---
+
+## Summary
+
+This architecture intentionally:
+- Keeps secrets **out of React state**
+- Centralizes all sensitive logic
+- Minimizes the blast radius of bugs or misuse
+- Makes security decisions explicit and reviewable
+
+The result is a system that is **predictable, auditable, and resilient by design**, without sacrificing developer ergonomics.
 
 ---
 
