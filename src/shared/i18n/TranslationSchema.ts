@@ -1,3 +1,5 @@
+import { unknown } from "zod";
+
 export type TranslationSchema = {
   bar: {
     Home: string;
@@ -150,6 +152,7 @@ export type TranslationSchema = {
     wifi: string;
     created: string;
     lastUpdated: string;
+    unknownModule: string;
   };
   moduleTemplates: {
     password: string;

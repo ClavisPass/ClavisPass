@@ -153,6 +153,7 @@ const en: TranslationSchema = {
     wifi: "WiFi",
     created: "Created",
     lastUpdated: "Last Updated",
+    unknownModule: "Unknown Module",
   },
   moduleTemplates: {
     password: "Password",
