@@ -11,6 +11,7 @@ import { logger } from "../../logging/logger";
 import Provider from "../model/Provider";
 import UserInfoType from "../../../features/sync/model/UserInfoType";
 import { triggerGlobalError } from "../../events/errorBus";
+import { VaultFetchResult } from "../model/VaultFetchResult";
 
 export const fetchUserInfo = async (
   token: string,
@@ -45,24 +46,39 @@ export const fetchUserInfo = async (
   }
 };
 
-export const fetchRemoteVaultFile = async (
-  params: FetchFileParams
-): Promise<RemoteFileContent> => {
+export const fetchRemoteVaultFile = async (params: {
+  provider: Provider;
+  accessToken: string;
+  remotePath: string;
+}): Promise<VaultFetchResult> => {
   const { provider, accessToken, remotePath } = params;
 
-  switch (provider) {
-    case "dropbox":
-      return DropboxClient.fetchFile(accessToken, remotePath);
-    case "googleDrive":
-      return GoogleDriveClient.fetchFile(accessToken, remotePath);
-    case "device":
-      return DeviceStorageClient.fetchFile();
-    default: {
-      logger.error("[CloudStorage] Unsupported provider:", provider);
-      return null;
+  try {
+    switch (provider) {
+      case "dropbox":
+        return await DropboxClient.fetchFile(accessToken, remotePath);
+
+      case "googleDrive":
+        return await GoogleDriveClient.fetchFile(accessToken, remotePath);
+
+      case "device":
+        return await DeviceStorageClient.fetchFile();
+
+      default: {
+        const _exhaustiveCheck: never = provider;
+        return {
+          status: "error",
+          message: `Unsupported provider: ${String(provider)}`,
+        };
+      }
     }
+  } catch (e) {
+    logger.error("[CloudStorage] fetchRemoteVaultFileSafe failed:", e);
+    return { status: "error", message: "Fetch failed", cause: e };
   }
 };
+
+
 
 export const uploadRemoteVaultFile = async (
   params: UploadFileParams

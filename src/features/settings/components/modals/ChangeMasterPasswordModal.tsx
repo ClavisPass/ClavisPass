@@ -98,7 +98,7 @@ function ChangeMasterPasswordModal(props: Props) {
       return;
     }
 
-    if (currentPassword !== auth.master) {
+    if (currentPassword !== auth.getMaster()) {
       flashError();
       setCurrentPassword("");
       textInputRef.current?.focus?.();

@@ -12,7 +12,7 @@ type Props = {
 const ProtectedRoute = ({ children, loginScreen }: Props) => {
   const auth = useAuth();
   const { theme } = useTheme();
-  const isAuthed = auth.master != null;
+  const isAuthed = auth.getMaster() != null;
 
   return (
     <Animated.View

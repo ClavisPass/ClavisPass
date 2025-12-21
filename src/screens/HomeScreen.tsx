@@ -182,7 +182,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   }, [vaultData, searchQuery, selectedFolder, selectedFav]);
 
   const refreshData = () => {
-    const master = auth.master;
+    const master = auth.getMaster();
 
     if (!master || !provider) {
       setRefreshing(false);
@@ -204,18 +204,31 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           }
         }
 
-        const response = await fetchRemoteVaultFile({
+        const result = await fetchRemoteVaultFile({
           provider,
           accessToken: tokenToUse ?? "",
           remotePath: "clavispass.lock",
         });
 
-        if (response == null) {
+        if (result.status === "error") {
+          logger.warn(
+            "[Home] refreshData fetch error:",
+            result.message,
+            result.cause
+          );
           setRefreshing(false);
           return;
         }
 
-        const parsedCryptoData = CryptoTypeSchema.parse(JSON.parse(response));
+        if (result.status === "not_found") {
+          logger.info("[Home] No vault found during refreshData.");
+          setRefreshing(false);
+          return;
+        }
+
+        const parsedCryptoData = CryptoTypeSchema.parse(
+          JSON.parse(result.content)
+        );
         const decryptedData = decrypt(parsedCryptoData, master);
         const jsonData = JSON.parse(decryptedData);
 
@@ -228,12 +241,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         vault.unlockWithDecryptedVault(parsedData);
         vault.markSaved();
 
-        setRefreshing(false);
-
         setSelectedFolder(null);
         saveSelectedFavState(false);
         saveSelected2FAState(false);
         saveSelectedCardState(false);
+
+        setRefreshing(false);
       } catch (error) {
         logger.error("[Home] Error during refreshData:", error);
         setRefreshing(false);

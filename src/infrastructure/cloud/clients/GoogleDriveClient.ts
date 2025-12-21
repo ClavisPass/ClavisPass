@@ -6,6 +6,7 @@ import { triggerGlobalError } from "../../events/errorBus";
 import * as DeviceStorageClient from "./DeviceStorageClient";
 import RemoteFileContent from "../model/RemoteFileContent";
 import TokenRefreshResult from "../model/oauth/TokenRefreshResult";
+import { VaultFetchResult } from "../model/VaultFetchResult";
 
 export const fetchUserInfo = async (
   token: string,
@@ -65,7 +66,7 @@ export const fetchUserInfo = async (
 export const fetchFile = async (
   accessToken: string,
   fileId: string
-): Promise<RemoteFileContent> => {
+): Promise<VaultFetchResult> => {
   try {
     const response = await fetch(
       `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(
@@ -79,23 +80,48 @@ export const fetchFile = async (
       }
     );
 
-    if (!response.ok) {
-      logger.warn(
-        `[GoogleDrive] Failed to download file "${fileId}": ${response.status} ${response.statusText}`
-      );
-      return null;
+    if (response.ok) {
+      const fileContent = await response.text();
+      return { status: "ok", content: fileContent };
     }
 
-    const fileContent = await response.text();
-    return fileContent;
-  } catch (error) {
-    logger.error("[GoogleDrive] Error downloading file:", error);
-    triggerGlobalError({
+    // ✅ Datei existiert nicht
+    if (response.status === 404) {
+      return { status: "not_found" };
+    }
+
+    // ✅ Sonst echter Fehler (401/403/5xx/etc.)
+    const errorText = await response.text().catch(() => "");
+    logger.warn(
+      `[GoogleDrive] Failed to download file "${fileId}": ${response.status} ${response.statusText} ${errorText}`
+    );
+
+    // Optional: nur bei "echten" Errors global melden
+    triggerGlobalError?.({
       title: "GoogleDrive",
       message: "Error downloading file.",
       code: "FETCH_FILE_FAILED",
     });
-    return null;
+
+    return {
+      status: "error",
+      message: `Google Drive fetch failed (${response.status})`,
+      cause: errorText,
+    };
+  } catch (error) {
+    logger.error("[GoogleDrive] Error downloading file:", error);
+
+    triggerGlobalError?.({
+      title: "GoogleDrive",
+      message: "Error downloading file.",
+      code: "FETCH_FILE_FAILED",
+    });
+
+    return {
+      status: "error",
+      message: "Google Drive network error",
+      cause: error,
+    };
   }
 };
 

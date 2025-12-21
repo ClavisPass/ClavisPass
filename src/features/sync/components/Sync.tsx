@@ -77,7 +77,7 @@ const Sync = (props: Props) => {
       const fullData = vault.exportFullData();
       const encryptedData = await encrypt(
         fullData,
-        auth.master ? auth.master : "",
+        auth.getMaster() ?? "",
         lastUpdated
       );
 

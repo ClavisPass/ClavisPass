@@ -6,6 +6,7 @@ import { logger } from "../../logging/logger";
 import UserInfoType from "../../../features/sync/model/UserInfoType";
 import { triggerGlobalError } from "../../events/errorBus";
 import * as DeviceStorageClient from "./DeviceStorageClient";
+import { VaultFetchResult } from "../model/VaultFetchResult";
 
 export const fetchUserInfo = async (
   token: string,
@@ -60,38 +61,46 @@ export const fetchUserInfo = async (
 export const fetchFile = async (
   accessToken: string,
   filePath: string
-): Promise<RemoteFileContent> => {
-  try {
-    const response = await fetch(
-      "https://content.dropboxapi.com/2/files/download",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Dropbox-API-Arg": JSON.stringify({
-            path: filePath.startsWith("/") ? filePath : `/${filePath}`,
-          }),
-        },
-      }
-    );
+): Promise<VaultFetchResult> => {
+  const normalizedPath = filePath.startsWith("/") ? filePath : `/${filePath}`;
 
-    if (!response.ok) {
-      logger.warn(
-        `[Dropbox] Failed to download file "${filePath}": ${response.status} ${response.statusText}`
-      );
-      return null;
+  try {
+    const response = await fetch("https://content.dropboxapi.com/2/files/download", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Dropbox-API-Arg": JSON.stringify({ path: normalizedPath }),
+      },
+    });
+
+    if (response.ok) {
+      const content = await response.text();
+      return { status: "ok", content };
     }
 
-    const fileContent = await response.text();
-    return fileContent;
-  } catch (error) {
-    logger.error("[Dropbox] Error downloading file:", error);
-    triggerGlobalError({
-      title: "Dropbox",
-      message: "Error downloading file.",
-      code: "FETCH_FILE_FAILED",
-    });
-    return null;
+    // Dropbox: Not found kommt oft als 409 + JSON error payload
+    const bodyText = await response.text().catch(() => "");
+    let body: any = null;
+    try { body = bodyText ? JSON.parse(bodyText) : null; } catch {}
+
+    const isNotFound =
+      response.status === 409 &&
+      body?.error_summary?.includes("path/not_found");
+
+    if (isNotFound) {
+      return { status: "not_found" };
+    }
+
+    logger.warn("[Dropbox] fetch failed:", response.status, response.statusText, bodyText);
+
+    return {
+      status: "error",
+      message: `Dropbox fetch failed (${response.status})`,
+      cause: bodyText,
+    };
+  } catch (e) {
+    logger.warn("[Dropbox] network/error:", e);
+    return { status: "error", message: "Dropbox network error", cause: e };
   }
 };
 

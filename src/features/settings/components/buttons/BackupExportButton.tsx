@@ -22,7 +22,7 @@ function BackupExportButton() {
         return;
       }
 
-      const master = auth.master;
+      const master = auth.getMaster();
       if (!master) {
         logger.warn("[BackupExport] No master password in session.");
         return;
