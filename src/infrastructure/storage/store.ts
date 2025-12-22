@@ -115,6 +115,10 @@ export const storeSchema = {
     type: "number",
     default: 20,
   },
+  SESSION_DURATION: {
+    type: "number",
+    default: 30 * 60,
+  },
 } as const satisfies Record<
   string,
   | EnumDef<readonly string[], string>

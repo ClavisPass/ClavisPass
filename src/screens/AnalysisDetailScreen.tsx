@@ -32,6 +32,7 @@ import {
 } from "../features/analysis/utils/analysisEngine";
 import { useVault } from "../app/providers/VaultProvider";
 import { MODULE_ICON } from "../features/vault/model/ModuleIconsEnum";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 type AnalysisDetailScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -143,7 +144,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
   const { ref } = route.params;
 
   const vault = useVault();
-  const { master } = useAuth();
+  const { getMaster } = useAuth();
 
   const {
     globalStyles,
@@ -190,6 +191,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
     let cancelled = false;
 
     (async () => {
+      const master = getMaster();
       if (!resolved || !values || !master) {
         setComputed(null);
         return;
@@ -255,7 +257,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [resolved, values, master]);
+  }, [resolved, values, getMaster]);
 
   const onToggleEye = () => {
     if (!resolved) return;

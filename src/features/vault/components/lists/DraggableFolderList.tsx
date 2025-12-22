@@ -8,28 +8,18 @@ import { useTheme } from "../../../../app/providers/ThemeProvider";
 import FolderType from "../../model/FolderType";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import { useTranslation } from "react-i18next";
-import { useVault } from "../../../../app/providers/VaultProvider";
 
 type Props = {
   folder: FolderType[];
   setSelectedFolder?: (folder: FolderType | null) => void;
   deleteFolder: (folder: FolderType) => void;
   draggableDisabled?: boolean;
+  persistFolderOrder: (nextFolders: FolderType[]) => void;
 };
 
 function DraggableFolderList(props: Props) {
   const { globalStyles, theme } = useTheme();
   const { t } = useTranslation();
-  const vault = useVault();
-
-  const persistFolderOrder = useCallback(
-    (nextFolders: FolderType[]) => {
-      vault.update((draft) => {
-        draft.folder = nextFolders;
-      });
-    },
-    [vault]
-  );
 
   const renderItem = useCallback(
     ({ item, drag, isActive }: RenderItemParams<FolderType>) => {
@@ -144,7 +134,6 @@ function DraggableFolderList(props: Props) {
           </View>
         </View>
       )}
-
       <DraggableFlatList
         data={props.folder}
         renderItem={renderItem}
@@ -153,7 +142,7 @@ function DraggableFolderList(props: Props) {
         scrollEnabled={!props.draggableDisabled}
         onDragEnd={(event) => {
           if (props.draggableDisabled) return;
-          if (event?.data) persistFolderOrder(event.data);
+          if (event?.data) props.persistFolderOrder(event.data);
         }}
       />
     </View>

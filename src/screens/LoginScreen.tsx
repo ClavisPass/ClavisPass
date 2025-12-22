@@ -37,6 +37,7 @@ import DropboxLoginButton from "../features/sync/components/DropboxLoginButton";
 import GoogleDriveLoginButton from "../features/sync/components/GoogleDriveLoginButton";
 import SettingsDivider from "../features/settings/components/SettingsDivider";
 import { useTranslation } from "react-i18next";
+import SettingsItem from "../features/settings/components/SettingsItem";
 
 type LoginScreenProps = NativeStackScreenProps<RootStackParamList, "Login">;
 
@@ -248,6 +249,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               <DropboxLoginButton />
               <SettingsDivider />
               <GoogleDriveLoginButton />
+              <SettingsDivider />
+              <SettingsItem
+                leadingIcon={"qrcode-scan"}
+                onPress={() => navigation.navigate("Scan")}
+              >
+                Scan QR-Code
+              </SettingsItem>
               <SettingsDivider />
             </BottomSheetView>
           </BottomSheetModal>

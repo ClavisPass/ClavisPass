@@ -3,7 +3,7 @@ import * as WebBrowser from "expo-web-browser";
 import { useEffect, useMemo, useRef, useCallback } from "react";
 import { Platform } from "react-native";
 import SettingsItem from "../../settings/components/SettingsItem";
-import { GOOGLE_CLIENT_ID } from "@env";
+import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "@env";
 import { start, onUrl, cancel } from "@fabianlars/tauri-plugin-oauth";
 import * as Random from "expo-random";
 import { logger } from "../../../infrastructure/logging/logger";
@@ -55,6 +55,7 @@ function GoogleDriveLoginButton() {
             code,
             grant_type: "authorization_code",
             client_id: GOOGLE_CLIENT_ID,
+            client_secret: GOOGLE_CLIENT_SECRET,
             redirect_uri: redirectUri,
             ...(codeVerifier ? { code_verifier: codeVerifier } : {}),
           }).toString(),
@@ -171,7 +172,7 @@ function GoogleDriveLoginButton() {
       const redirectUri = `http://127.0.0.1:${port}`;
 
       // 2) PKCE + CSRF state (nur Tauri)
-      const { createPkcePair } = require("../../utils/pkce.web");
+      const { createPkcePair } = require("../utils/pkce.web");
       const { codeVerifier, codeChallenge, method } = await createPkcePair();
       stateRef.current = await randState();
 

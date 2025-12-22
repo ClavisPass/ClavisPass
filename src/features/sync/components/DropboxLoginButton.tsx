@@ -159,7 +159,7 @@ function DropboxLoginButton() {
       const redirectUri = `http://127.0.0.1:${port}`;
 
       // 2) PKCE + CSRF state (nur Tauri)
-      const { createPkcePair } = require("../../utils/pkce.web");
+      const { createPkcePair } = require("../utils/pkce.web");
       const { codeVerifier, codeChallenge, method } = await createPkcePair();
       stateRef.current = await randState();
 

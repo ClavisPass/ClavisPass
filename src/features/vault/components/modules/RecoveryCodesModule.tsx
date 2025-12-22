@@ -21,6 +21,7 @@ import { useTheme } from "../../../../app/providers/ThemeProvider";
 import RecoveryCodesModuleType from "../../model/modules/RecoveryCodesModuleType";
 import ModulesEnum from "../../model/ModulesEnum";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
+import { useClipboardCopy } from "../../../../shared/hooks/useClipboardCopy";
 
 function tokenize(input: string): string[] {
   return input
@@ -48,6 +49,8 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
 
   const { t } = useTranslation();
   const { theme } = useTheme();
+
+  const { copy } = useClipboardCopy();
 
   const [input, setInput] = useState("");
   const [codes, setCodes] = useState(props.codes ?? []);
@@ -132,14 +135,6 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
     }
   };
 
-  const copyCode = async (code: string) => {
-    try {
-      await Clipboard.setStringAsync(code);
-    } catch {
-      // ignore
-    }
-  };
-
   const onFocus = () => {
     setIsFocused(true);
     focusSv.value = withTiming(1, { duration: 140 });
@@ -208,7 +203,7 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
                     compact
                     style={styles.chip}
                     textStyle={styles.chipText}
-                    onPress={() => copyCode(c.code)}
+                    onPress={() => copy(c.code)}
                     onClose={() => removeCode(c.code)}
                     closeIcon="close"
                   >
@@ -234,7 +229,7 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
                     onBlur={onBlur}
                     placeholder={
                       codes.length === 0
-                        ? t("modules:recoveryCodesPlaceholder", "Paste codes…")
+                        ? t("modules:recoveryCodesPlaceholder")
                         : ""
                     }
                     autoCapitalize="none"
@@ -254,7 +249,7 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
         </Pressable>
 
         <Text variant="bodySmall" style={{ opacity: 0.7 }}>
-          {t("modules:recoveryCodesHelp", "Tip: tap a chip to copy. Paste GitHub blocks directly.")}
+          {t("modules:recoveryCodesHelp")}
         </Text>
       </View>
     </ModuleContainer>

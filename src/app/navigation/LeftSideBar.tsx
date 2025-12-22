@@ -151,7 +151,7 @@ export default function LeftSideTabBar({
         const isAction = name === "AddTrigger" || name === "Logout";
         const bgActive =
           name === "AddTrigger"
-            ? theme.colors.surface
+            ? theme.colors.background
             : isFocused
               ? theme.colors.secondaryContainer
               : "transparent";

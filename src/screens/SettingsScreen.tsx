@@ -79,12 +79,15 @@ const styles = StyleSheet.create({
   },
 });
 
-type SettingsScreenProps = NativeStackScreenProps<RootStackParamList, "Settings">;
+type SettingsScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  "Settings"
+>;
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const { headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
     useTheme();
-  const { master } = useAuth();
+  const { getMaster } = useAuth();
   const { devMode } = useDevMode();
   const { t } = useTranslation();
 
@@ -108,6 +111,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 
   const { value: copyDurationSeconds, setValue: setCopyDurationSeconds } =
     useSetting("COPY_DURATION");
+
+  const { value: sessionDurationSeconds, setValue: setSessionDurationSeconds } =
+    useSetting("SESSION_DURATION");
 
   const closeBehavior = closeBehaviorValue === "hide";
   const hideOnStartup = startBehaviorValue === "hidden";
@@ -147,8 +153,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         plattform: null,
       },
       {
-        title: t("settings:authentication"),
-        icon: "fingerprint",
+        title: t("settings:security"),
+        icon: "shield-outline",
         ref: authSettingsRef,
         plattform: null,
       },
@@ -183,6 +189,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 
   const changeAuthentication = async (authentication: boolean) => {
     if (authentication) {
+      const master = getMaster();
       authenticateUser().then((isAuthenticated) => {
         if (isAuthenticated && master !== null) {
           saveAuthentication(master);
@@ -389,24 +396,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               </SettingsItem>
               <SettingsDivider />
               <SettingsSwitch
+              leadingIcon="fingerprint"
                 label={t("settings:useSystemAuth")}
                 value={useAuthentication}
                 onValueChange={(checked) => {
                   changeAuthentication(checked);
-                }}
-              />
-            </SettingsContainer>
-
-            <SettingsContainer
-              ref={quickSelectItems[4].ref}
-              icon={quickSelectItems[4].icon}
-              title={quickSelectItems[4].title}
-            >
-              <SettingsSwitch
-                label={t("settings:autoOpenFastAccess")}
-                value={fastAccess}
-                onValueChange={(checked) => {
-                  changeFastAccessBehavior(checked);
                 }}
               />
               <SettingsDivider />
@@ -444,6 +438,60 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                     value: "60",
                   },
                 ]}
+              />
+              <SettingsDivider />
+
+              <SettingsDropdownItem
+                value={String(sessionDurationSeconds ?? 3600)}
+                setValue={(v) => setSessionDurationSeconds(Number(v))}
+                label={t("settings:sessionDuration")}
+                leadingIcon="timer-outline"
+                dropdownMaxWidth={260}
+                dropdownMinWidth={200}
+                options={[
+                  {
+                    label: t("settings:minutes", { count: 5 }),
+                    value: String(5 * 60),
+                  },
+                  {
+                    label: t("settings:minutes", { count: 10 }),
+                    value: String(10 * 60),
+                  },
+                  {
+                    label: t("settings:minutes", { count: 15 }),
+                    value: String(15 * 60),
+                  },
+                  {
+                    label: t("settings:minutes", { count: 30 }),
+                    value: String(30 * 60),
+                  },
+                  {
+                    label: t("settings:minutes", { count: 60 }),
+                    value: String(60 * 60),
+                  },
+                  {
+                    label: t("settings:hours", { count: 2 }),
+                    value: String(2 * 60 * 60),
+                  },
+                  {
+                    label: t("settings:hours", { count: 4 }),
+                    value: String(4 * 60 * 60),
+                  },
+                ]}
+              />
+            </SettingsContainer>
+
+            <SettingsContainer
+              ref={quickSelectItems[4].ref}
+              icon={quickSelectItems[4].icon}
+              title={quickSelectItems[4].title}
+            >
+              <SettingsSwitch
+                label={t("settings:autoOpenFastAccess")}
+                value={fastAccess}
+                onValueChange={(checked) => {
+                  changeFastAccessBehavior(checked);
+                }}
               />
             </SettingsContainer>
 

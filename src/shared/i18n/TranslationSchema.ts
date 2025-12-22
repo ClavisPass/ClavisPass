@@ -56,7 +56,7 @@ export type TranslationSchema = {
     sync: string;
     system: string;
     appearance: string;
-    authentication: string;
+    security: string;
     fastAccess: string;
     backup: string;
     import: string;
@@ -75,10 +75,12 @@ export type TranslationSchema = {
     exportBackup: string;
     importPasswords: string;
     website: string;
+    hours: string;
     minutes: string;
     seconds: string;
     copyDuration: string;
     copyDurationOff: string;
+    sessionDuration: string;
   };
   analysis: {
     topFindings: string;
@@ -153,6 +155,8 @@ export type TranslationSchema = {
     created: string;
     lastUpdated: string;
     unknownModule: string;
+    recoveryCodesPlaceholder: string;
+    recoveryCodesHelp: string;
   };
   moduleTemplates: {
     password: string;

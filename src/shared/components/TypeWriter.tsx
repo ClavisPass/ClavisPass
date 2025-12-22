@@ -64,7 +64,8 @@ function TypeWriterComponent(props: Props) {
           userSelect: "none",
           color: theme.colors.onSurface,
         }}
-        minDelay={20}
+        minDelay={30}
+        maxDelay={40}
         typing={1}
         onTypingEnd={() => {
           if (props.displayName == "") {
@@ -82,7 +83,8 @@ function TypeWriterComponent(props: Props) {
             { fontSize: 20, userSelect: "none" },
             { color: theme.colors.primary, fontWeight: "bold" },
           ]}
-          minDelay={20}
+          minDelay={30}
+          maxDelay={40}
           typing={startUsername}
           onTypingEnd={() => setStartExclamationMark(1)}
         >
@@ -95,7 +97,8 @@ function TypeWriterComponent(props: Props) {
           userSelect: "none",
           color: theme.colors.onSurface,
         }}
-        minDelay={20}
+        minDelay={30}
+        maxDelay={40}
         typing={startExclamationMark}
       >
         {"!"}

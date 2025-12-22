@@ -103,14 +103,18 @@ function DigitalCardModule(
       <View style={[globalStyles.moduleView]}>
         <AnimatedPressable
           key={props.key}
-          style={[{ borderRadius: 12 }]}
-          onPress={() => {
-            props.navigation.navigate("CardDetails", {
-              value: value,
-              title: props.title,
-              type: type,
-            });
-          }}
+          style={[{ borderRadius: 12, marginRight: 21 }]}
+          onPress={
+            value !== ""
+              ? () => {
+                  props.navigation.navigate("CardDetails", {
+                    value: value,
+                    title: props.title,
+                    type: type,
+                  });
+                }
+              : undefined
+          }
         >
           <View
             style={{
@@ -123,7 +127,6 @@ function DigitalCardModule(
               borderRadius: 12,
               padding: 8,
               backgroundColor: value === "" ? theme.colors.background : "white",
-              marginRight: 21,
             }}
           >
             {value !== "" ? (

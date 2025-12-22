@@ -77,7 +77,7 @@ const truthy = (v: any) => v === true;
 
 const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   const vault = useVault();
-  const { master } = useAuth();
+  const { getMaster } = useAuth();
 
   const { theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
     useTheme();
@@ -165,6 +165,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   );
 
   useEffect(() => {
+    const master = getMaster();
     if (!master || !vault.isUnlocked) {
       setCache(null);
       return;
@@ -195,7 +196,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
     return () => {
       cancelled = true;
     };
-  }, [vault.dirty, vault.isUnlocked, master, vault]);
+  }, [vault.dirty, vault.isUnlocked, getMaster, vault]);
 
   useEffect(() => {
     setMaxFindingWidth(null);

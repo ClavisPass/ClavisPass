@@ -4,6 +4,7 @@ import {
   Platform,
   useWindowDimensions,
   InteractionManager,
+  RefreshControl,
 } from "react-native";
 import { Searchbar, IconButton } from "react-native-paper";
 
@@ -54,13 +55,14 @@ import { fetchRemoteVaultFile } from "../infrastructure/cloud/clients/CloudStora
 import { useSetting } from "../app/providers/SettingsProvider";
 import Sync from "../features/sync/components/Sync";
 import { useVault } from "../app/providers/VaultProvider";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 type HomeScreenProps = NativeStackScreenProps<RootStackParamList, "Home">;
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const triggerAdd = route.params?.triggerAdd ?? false;
 
-  const { headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
+  const { headerWhite, setHeaderWhite, darkmode, setHeaderSpacing, theme } =
     useTheme();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
@@ -256,6 +258,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   const searchRef = useRef<any>(null);
 
+  const refreshControl = useMemo(
+    () => (
+      <RefreshControl
+        refreshing={false}
+        onRefresh={refreshData}
+        colors={[theme.colors.primary]}
+        progressBackgroundColor={theme.colors.background}
+        tintColor={theme.colors.primary}
+        title={t("common:refreshing")}
+        titleColor={theme.colors.primary}
+      />
+    ),
+    [refreshing, refreshData, theme.colors.primary, theme.colors.background, t]
+  );
+
   function renderFlashList() {
     if (selectedCard && searchQuery === "") {
       let cardEntries: any[] = [];
@@ -277,9 +294,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       }
       return (
         <FlashList
+          refreshControl={refreshControl}
           contentContainerStyle={{ paddingRight: 4 }}
-          refreshing={false}
-          onRefresh={refreshData}
           data={cardEntries}
           renderItem={({ item, index }) => (
             <CardItem
@@ -322,9 +338,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       }
       return (
         <FlashList
+          refreshControl={refreshControl}
           contentContainerStyle={{ paddingRight: 4 }}
-          refreshing={false}
-          onRefresh={refreshData}
           data={totpEntries}
           renderItem={({ item, index }) => (
             <TotpItem
@@ -343,9 +358,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     }
     const flashList = (
       <FlashList
+        refreshControl={refreshControl}
         contentContainerStyle={{ paddingRight: 4 }}
-        refreshing={false}
-        onRefresh={refreshData}
         data={filteredValues}
         renderItem={({ item, index }) => (
           <ListItem
@@ -366,160 +380,162 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   return (
     <AnimatedContainer style={{ display: "flex", justifyContent: "center" }}>
-      <View style={{ flex: 1 }}>
-        <StatusBar
-          animated={true}
-          style={headerWhite ? "light" : darkmode ? "light" : "dark"}
-          translucent={true}
-        />
-        <ContentProtection enabled={true} />
-        <WebSpecific>
-          <SearchShortcut searchRef={searchRef} />
-        </WebSpecific>
-        <LinearGradient
-          colors={getColors()}
-          dither={true}
-          style={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            padding: 10,
-            marginBottom: 4,
-            paddingTop: Constants.statusBarHeight,
-            borderBottomLeftRadius: 12,
-            borderBottomRightRadius: 12,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: 0.4,
-            shadowRadius: 6,
-            elevation: 5,
-          }}
-          end={{ x: 0.1, y: 0.2 }}
-        >
-          <View
+      <BottomSheetModalProvider>
+        <View style={{ flex: 1 }}>
+          <StatusBar
+            animated={true}
+            style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+            translucent={true}
+          />
+          <ContentProtection enabled={true} />
+          <WebSpecific>
+            <SearchShortcut searchRef={searchRef} />
+          </WebSpecific>
+          <LinearGradient
+            colors={getColors()}
+            dither={true}
             style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginTop: 12,
-              marginBottom: 8,
-              marginLeft: 4,
               width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              padding: 10,
+              marginBottom: 4,
+              paddingTop: Constants.statusBarHeight,
+              borderBottomLeftRadius: 12,
+              borderBottomRightRadius: 12,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 0 },
+              shadowOpacity: 0.4,
+              shadowRadius: 6,
+              elevation: 5,
             }}
+            end={{ x: 0.1, y: 0.2 }}
           >
             <View
               style={{
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
-                gap: 8,
+                justifyContent: "space-between",
+                marginTop: 12,
+                marginBottom: 8,
+                marginLeft: 4,
+                width: "100%",
               }}
             >
-              <LogoColored width={20} height={20} />
-              <Text
+              <View
                 style={{
-                  fontFamily: "LexendExa_400Regular",
-                  fontSize: 16,
-                  color: "white",
-                  userSelect: "none",
-                  width: 110,
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 8,
                 }}
               >
-                ClavisPass
-              </Text>
+                <LogoColored width={20} height={20} />
+                <Text
+                  style={{
+                    fontFamily: "LexendExa_400Regular",
+                    fontSize: 16,
+                    color: "white",
+                    userSelect: "none",
+                    width: 110,
+                  }}
+                >
+                  ClavisPass
+                </Text>
+              </View>
             </View>
-          </View>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <Searchbar
+                ref={searchRef}
+                inputStyle={{ height: 40, minHeight: 40, color: "white" }}
+                style={{
+                  height: 40,
+                  flex: 1,
+                  borderRadius: 10,
+                  backgroundColor: "rgba(217, 217, 217, 0.21)",
+                }}
+                placeholder={t("home:search")}
+                onChangeText={setSearchQuery}
+                value={searchQuery}
+                loading={false}
+                iconColor={"#ffffff80"}
+                placeholderTextColor={"#ffffff80"}
+              />
+              <IconButton
+                icon="sort-variant"
+                size={25}
+                onPress={() => {
+                  setShowMenu(true);
+                }}
+                iconColor="white"
+                style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
+              />
+            </View>
+          </LinearGradient>
+          <Sync
+            refreshData={refreshData}
+            refreshing={refreshing}
+            setRefreshing={setRefreshing}
+          />
           <View
             style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
+              flex: 1,
+              width: "100%",
+              padding: 4,
+              paddingRight: 0,
+              paddingLeft: width > 600 ? 0 : 4,
+              flexDirection: width > 600 ? "row-reverse" : "column",
             }}
           >
-            <Searchbar
-              ref={searchRef}
-              inputStyle={{ height: 40, minHeight: 40, color: "white" }}
-              style={{
-                height: 40,
-                flex: 1,
-                borderRadius: 10,
-                backgroundColor: "rgba(217, 217, 217, 0.21)",
-              }}
-              placeholder={t("home:search")}
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              loading={false}
-              iconColor={"#ffffff80"}
-              placeholderTextColor={"#ffffff80"}
-            />
-            <IconButton
-              icon="sort-variant"
-              size={25}
-              onPress={() => {
-                setShowMenu(true);
-              }}
-              iconColor="white"
-              style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
+            {renderFlashList()}
+            <FolderFilter
+              folder={vaultData?.folder}
+              selectedFav={selectedFav}
+              setSelectedFav={saveSelectedFavState}
+              selectedFolder={selectedFolder}
+              setSelectedFolder={setSelectedFolder}
+              setFolderModalVisible={setFolderModalVisible}
+              selected2FA={selected2FA}
+              setSelected2FA={saveSelected2FAState}
+              selectedCard={selectedCard}
+              setSelectedCard={saveSelectedCardState}
             />
           </View>
-        </LinearGradient>
-        <Sync
-          refreshData={refreshData}
-          refreshing={refreshing}
-          setRefreshing={setRefreshing}
-        />
-        <View
-          style={{
-            flex: 1,
-            width: "100%",
-            padding: 4,
-            paddingRight: 0,
-            paddingLeft: width > 600 ? 0 : 4,
-            flexDirection: width > 600 ? "row-reverse" : "column",
-          }}
-        >
-          {renderFlashList()}
-          <FolderFilter
-            folder={vaultData?.folder}
-            selectedFav={selectedFav}
-            setSelectedFav={saveSelectedFavState}
-            selectedFolder={selectedFolder}
-            setSelectedFolder={setSelectedFolder}
-            setFolderModalVisible={setFolderModalVisible}
-            selected2FA={selected2FA}
-            setSelected2FA={saveSelected2FAState}
-            selectedCard={selectedCard}
-            setSelectedCard={saveSelectedCardState}
+
+          <HomeFilterMenu
+            visible={showMenu}
+            setVisible={setShowMenu}
+            positionY={
+              Constants.statusBarHeight +
+              TITLEBAR_HEIGHT +
+              (Platform.OS === "web" ? 48 : 90)
+            }
+            openEditFolder={() => setFolderModalVisible(true)}
+            refreshData={refreshData}
+          />
+
+          <FolderModal
+            visible={folderModalVisible}
+            setVisible={setFolderModalVisible}
+            folder={vaultData?.folder ?? []}
+          />
+          <AddValueModal
+            visible={valueModalVisible}
+            setVisible={setValueModalVisible}
+            navigation={navigation}
+            favorite={selectedFav}
+            folder={selectedFolder}
           />
         </View>
-
-        <HomeFilterMenu
-          visible={showMenu}
-          setVisible={setShowMenu}
-          positionY={
-            Constants.statusBarHeight +
-            TITLEBAR_HEIGHT +
-            (Platform.OS === "web" ? 48 : 90)
-          }
-          openEditFolder={() => setFolderModalVisible(true)}
-          refreshData={refreshData}
-        />
-
-        <FolderModal
-          visible={folderModalVisible}
-          setVisible={setFolderModalVisible}
-          folder={vaultData?.folder ?? []}
-        />
-        <AddValueModal
-          visible={valueModalVisible}
-          setVisible={setValueModalVisible}
-          navigation={navigation}
-          favorite={selectedFav}
-          folder={selectedFolder}
-        />
-      </View>
+      </BottomSheetModalProvider>
     </AnimatedContainer>
   );
 };

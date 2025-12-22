@@ -8,24 +8,21 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-
-const SESSION_LIMIT_MS = 60 * 60 * 1000;
+import { useSetting } from "./SettingsProvider";
 
 export interface AuthContextType {
-  // Status
   isLoggedIn: boolean;
 
-  // Session
   sessionStart: number | null;
-  sessionRemaining: number; // seconds remaining
+  sessionRemaining: number;
 
-  // Auth actions
   login: (master: string) => void;
   logout: () => void;
 
-  // Secret access (not reactive)
   getMaster: () => string | null;
   requireMaster: () => string;
+
+  sessionLimitSeconds: number;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -37,14 +34,29 @@ type Props = {
 export const AuthProvider = ({ children }: Props) => {
   const masterRef = useRef<string | null>(null);
 
+  // NEW: Session-Dauer aus Settings (Sekunden)
+  const { value: sessionDurationSeconds } = useSetting("SESSION_DURATION");
+
+  // Guardrails
+  const sessionLimitSeconds = useMemo(() => {
+    const n = Number(sessionDurationSeconds);
+    if (!Number.isFinite(n)) return 60 * 60;
+    // Minimum 60s, Maximum z.B. 24h (optional)
+    return Math.max(60, Math.min(24 * 60 * 60, Math.floor(n)));
+  }, [sessionDurationSeconds]);
+
+  const sessionLimitMs = sessionLimitSeconds * 1000;
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [sessionStart, setSessionStart] = useState<number | null>(null);
   const [sessionRemaining, setSessionRemaining] = useState<number>(
-    Math.floor(SESSION_LIMIT_MS / 1000)
+    sessionLimitSeconds
   );
 
   const logoutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tickIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const sessionStartRef = useRef<number | null>(null);
 
   const clearTimers = useCallback(() => {
     if (logoutTimerRef.current) {
@@ -58,43 +70,47 @@ export const AuthProvider = ({ children }: Props) => {
   }, []);
 
   const logout = useCallback(() => {
-    // Clear secret first
     masterRef.current = null;
 
     clearTimers();
+    sessionStartRef.current = null;
+
     setIsLoggedIn(false);
     setSessionStart(null);
-    setSessionRemaining(Math.floor(SESSION_LIMIT_MS / 1000));
-  }, [clearTimers]);
+    setSessionRemaining(sessionLimitSeconds);
+  }, [clearTimers, sessionLimitSeconds]);
 
   const login = useCallback(
     (master: string) => {
       masterRef.current = master;
 
       const now = Date.now();
+      sessionStartRef.current = now;
+
       setIsLoggedIn(true);
       setSessionStart(now);
-      setSessionRemaining(Math.floor(SESSION_LIMIT_MS / 1000));
+      setSessionRemaining(sessionLimitSeconds);
 
       clearTimers();
 
-      // 1) Hard logout timer
+      // Hard logout timer
       logoutTimerRef.current = setTimeout(() => {
         logout();
-      }, SESSION_LIMIT_MS);
+      }, sessionLimitMs);
 
-      // 2) 1s ticker for UI countdown
+      // 1s ticker for UI countdown
       tickIntervalRef.current = setInterval(() => {
-        const start = now;
+        const start = sessionStartRef.current;
+        if (!start) return;
+
         const elapsed = Date.now() - start;
-        const remainingMs = Math.max(0, SESSION_LIMIT_MS - elapsed);
+        const remainingMs = Math.max(0, sessionLimitMs - elapsed);
         setSessionRemaining(Math.floor(remainingMs / 1000));
-        if (remainingMs <= 0) {
-          logout();
-        }
+
+        if (remainingMs <= 0) logout();
       }, 1000);
     },
-    [clearTimers, logout]
+    [clearTimers, logout, sessionLimitMs, sessionLimitSeconds]
   );
 
   const getMaster = useCallback(() => masterRef.current, []);
@@ -104,10 +120,14 @@ export const AuthProvider = ({ children }: Props) => {
     return m;
   }, []);
 
-  // Safety: cleanup on unmount
+  // Wenn User NICHT eingeloggt ist und Setting ändert:
+  // Countdown-Default aktualisieren (kein Überraschungseffekt während aktiver Session)
+  useEffect(() => {
+    if (!isLoggedIn) setSessionRemaining(sessionLimitSeconds);
+  }, [isLoggedIn, sessionLimitSeconds]);
+
   useEffect(() => {
     return () => {
-      // Clear secret and timers
       masterRef.current = null;
       clearTimers();
     };
@@ -122,8 +142,18 @@ export const AuthProvider = ({ children }: Props) => {
       logout,
       getMaster,
       requireMaster,
+      sessionLimitSeconds,
     }),
-    [isLoggedIn, sessionStart, sessionRemaining, login, logout, getMaster, requireMaster]
+    [
+      isLoggedIn,
+      sessionStart,
+      sessionRemaining,
+      login,
+      logout,
+      getMaster,
+      requireMaster,
+      sessionLimitSeconds,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

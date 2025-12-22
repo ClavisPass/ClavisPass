@@ -20,12 +20,8 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+    "assetBundlePatterns": ["**/*"],
+    "runtimeVersion": "1.4.2",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.clavispass.app"
@@ -36,9 +32,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.clavispass.app",
-      "permissions": [
-        "android.permission.CAMERA"
-      ]
+      "permissions": ["android.permission.CAMERA"]
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -1,6 +1,6 @@
 import { Pressable, View } from "react-native";
-import { Icon, Switch, Text } from "react-native-paper";
-import { useTheme } from "../../../app/providers/ThemeProvider";
+import { Switch } from "react-native-paper";
+import SettingsItem from "./SettingsItem";
 
 type Props = {
   label: string;
@@ -10,7 +10,6 @@ type Props = {
 };
 
 const SettingsSwitch = (props: Props) => {
-  const { theme } = useTheme();
   return (
     <View
       style={{
@@ -18,6 +17,7 @@ const SettingsSwitch = (props: Props) => {
         minHeight: 44,
         maxHeight: 44,
         padding: 10,
+        paddingLeft: 0,
         flex: 1,
         display: "flex",
         flexDirection: "row",
@@ -26,44 +26,9 @@ const SettingsSwitch = (props: Props) => {
       }}
     >
       <Pressable onPress={() => props.onValueChange(!props.value)}>
-        {props.leadingIcon ? (
-          <View
-            style={{
-              flex: 1,
-              display: "flex",
-              padding: 10,
-              minWidth: 140,
-              minHeight: 30,
-              height: 30,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 6,
-            }}
-          >
-            <Icon
-              size={20}
-              color={theme.colors.primary}
-              source={props.leadingIcon}
-            />
-            <Text
-              variant="bodyLarge"
-              style={{ userSelect: "none" }}
-              ellipsizeMode="tail"
-              numberOfLines={1}
-            >
-              {props.label}
-            </Text>
-          </View>
-        ) : (
-          <Text
-            variant="bodyLarge"
-            style={{ userSelect: "none" }}
-            ellipsizeMode="tail"
-            numberOfLines={1}
-          >
-            {props.label}
-          </Text>
-        )}
+        <SettingsItem leadingIcon={props.leadingIcon} onPress={undefined}>
+          {props.label}
+        </SettingsItem>
       </Pressable>
       <Switch value={props.value} onValueChange={props.onValueChange} />
     </View>

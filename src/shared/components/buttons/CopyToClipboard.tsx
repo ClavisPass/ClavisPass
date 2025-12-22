@@ -1,11 +1,9 @@
 import React from "react";
 import { View } from "react-native";
 import { IconButton } from "react-native-paper";
-import * as Clipboard from "expo-clipboard";
 
 import theme from "../../ui/theme";
-import { useSetting } from "../../../app/providers/SettingsProvider";
-import { clipboardClearScheduler } from "../../../infrastructure/clipboard/clipboardClearScheduler";
+import { useClipboardCopy } from "../../hooks/useClipboardCopy";
 
 type Props = {
   value: string;
@@ -19,7 +17,7 @@ function CopyToClipboard({ value, disabled, margin }: Props) {
     "content-copy"
   );
 
-  const { value: copyDurationSeconds } = useSetting("COPY_DURATION");
+  const { copy } = useClipboardCopy();
 
   const iconTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -34,17 +32,10 @@ function CopyToClipboard({ value, disabled, margin }: Props) {
   const copyToClipboard = async () => {
     if (iconTimerRef.current) clearTimeout(iconTimerRef.current);
 
-    const durationMs = Math.max(
-      0,
-      Math.floor((copyDurationSeconds ?? 0) * 1000)
-    );
-
-    await Clipboard.setStringAsync(value);
+    await copy(value);
 
     setIcon("check");
     iconTimerRef.current = setTimeout(() => setIcon("content-copy"), 1000);
-
-    clipboardClearScheduler.scheduleClear(value, durationMs);
 
     onToggleSnackBar();
   };
