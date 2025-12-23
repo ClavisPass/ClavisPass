@@ -28,7 +28,6 @@ import ContainerButton from "../shared/components/buttons/ContainerButton";
 import SquaredContainerButton from "../shared/components/buttons/SquaredContainerButton";
 import DeleteModal from "../features/vault/components/modals/DeleteModal";
 import Button from "../shared/components/buttons/Button";
-import { RootStackParamList } from "../app/navigation/stacks/Stack";
 
 import useAppLifecycle from "../shared/hooks/useAppLifecycle";
 import {
@@ -44,8 +43,9 @@ import { useSetting } from "../app/providers/SettingsProvider";
 import DraggableModulesListWeb from "../features/vault/components/lists/DraggableModulesListWeb";
 import DraggableModulesList from "../features/vault/components/lists/DraggableModulesList";
 import { useVault } from "../app/providers/VaultProvider";
+import { HomeStackParamList } from "../app/navigation/model/types";
 
-type EditScreenProps = NativeStackScreenProps<RootStackParamList, "Edit">;
+type EditScreenProps = NativeStackScreenProps<HomeStackParamList, "Edit">;
 
 const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const {

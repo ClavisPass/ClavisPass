@@ -1,8 +1,8 @@
 import React from "react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../app/navigation/stacks/Stack";
+import { LogoutStackParamList } from "../app/navigation/model/types";
 
-type LogoutScreenProps = NativeStackScreenProps<RootStackParamList, "Logout">;
+type LogoutScreenProps = NativeStackScreenProps<LogoutStackParamList, "Logout">;
 
 const LogoutScreen: React.FC<LogoutScreenProps> = ({}) => {
   return <></>;

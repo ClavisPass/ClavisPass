@@ -7,12 +7,12 @@ import AnimatedContainer from "../shared/components/container/AnimatedContainer"
 import { useTheme } from "../app/providers/ThemeProvider";
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import QRCode from "react-qr-code";
 import Barcode from "@kichiyaki/react-native-barcode-generator";
+import { HomeStackParamList } from "../app/navigation/model/types";
 
 type CardDetailsScreenProps = NativeStackScreenProps<
-  RootStackParamList,
+  HomeStackParamList,
   "CardDetails"
 >;
 

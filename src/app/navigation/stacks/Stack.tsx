@@ -1,38 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import ValuesType from "../../../features/vault/model/ValuesType";
-import FolderType from "../../../features/vault/model/FolderType";
-import DigitalCardType from "../../../features/vault/model/DigitalCardType";
-import AnalysisRef from "../../../features/analysis/model/AnalysisRef";
-
-export type RootStackParamList = {
-  Home: {
-    triggerAdd: boolean | undefined;
-  };
-  Edit: {
-    value: ValuesType;
-    favorite?: boolean;
-    folder?: FolderType | null;
-  };
-  Analysis: undefined;
-  AnalysisDetail: { ref: AnalysisRef };
-  Settings: undefined;
-  Login: undefined;
-  Scan: undefined;
-  DigitalCardScan: {
-    setData: (data: string, type: string) => void;
-  };
-  TotpScan: {
-    setOtpauth: (uri: string) => void;
-  };
-  Logout: undefined;
-  AddTrigger: undefined;
-  CardDetails: {
-    value: string;
-    title: string;
-    type: DigitalCardType;
-  };
-};
+import { RootStackParamList } from "../model/types";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-
 export default Stack;

@@ -8,9 +8,9 @@ import { Button, Icon, IconButton, Text } from "react-native-paper";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import DigitalCardType from "../features/vault/model/DigitalCardType";
 import { logger } from "../infrastructure/logging/logger";
+import { HomeStackParamList } from "../app/navigation/model/types";
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -61,7 +61,7 @@ export const BARCODE_TYPE_MAP: Record<string, DigitalCardType | undefined> = {
 };
 
 type DigitalCardScanScreenProps = NativeStackScreenProps<
-  RootStackParamList,
+  HomeStackParamList,
   "DigitalCardScan"
 >;
 

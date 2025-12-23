@@ -23,7 +23,6 @@ import { useOnline } from "../app/providers/OnlineProvider";
 import { useTheme } from "../app/providers/ThemeProvider";
 import { useFocusEffect } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import { useToken } from "../app/providers/CloudProvider";
 import { fetchUserInfo } from "../infrastructure/cloud/clients/CloudStorageClient";
 import { logger } from "../infrastructure/logging/logger";
@@ -38,8 +37,9 @@ import GoogleDriveLoginButton from "../features/sync/components/GoogleDriveLogin
 import SettingsDivider from "../features/settings/components/SettingsDivider";
 import { useTranslation } from "react-i18next";
 import SettingsItem from "../features/settings/components/SettingsItem";
+import { LoginStackParamList } from "../app/navigation/model/types";
 
-type LoginScreenProps = NativeStackScreenProps<RootStackParamList, "Login">;
+type LoginScreenProps = NativeStackScreenProps<LoginStackParamList, "Login">;
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { isOnline } = useOnline();

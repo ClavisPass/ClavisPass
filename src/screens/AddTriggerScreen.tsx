@@ -1,9 +1,10 @@
 import React from "react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../app/navigation/stacks/Stack";
+import { AddTriggerStackParamList } from "../app/navigation/model/types";
+
 
 type AddTriggerScreenProps = NativeStackScreenProps<
-  RootStackParamList,
+  AddTriggerStackParamList,
   "AddTrigger"
 >;
 

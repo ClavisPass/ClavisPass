@@ -41,7 +41,6 @@ import {
 } from "@expo-google-fonts/lexend-exa";
 import LogoColored from "../shared/ui/LogoColored";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import FolderType from "../features/vault/model/FolderType";
 import { useTranslation } from "react-i18next";
 
@@ -56,8 +55,9 @@ import { useSetting } from "../app/providers/SettingsProvider";
 import Sync from "../features/sync/components/Sync";
 import { useVault } from "../app/providers/VaultProvider";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { HomeStackParamList } from "../app/navigation/model/types";
 
-type HomeScreenProps = NativeStackScreenProps<RootStackParamList, "Home">;
+type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const triggerAdd = route.params?.triggerAdd ?? false;

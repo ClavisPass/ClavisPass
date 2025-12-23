@@ -1,5 +1,8 @@
-import Stack from "./Stack";
 import AddTriggerScreen from "../../../screens/AddTriggerScreen";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { AddTriggerStackParamList } from "../model/types";
+
+const Stack = createNativeStackNavigator<AddTriggerStackParamList>();
 
 function AddTriggerStack() {
   return (

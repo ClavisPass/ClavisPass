@@ -8,12 +8,12 @@ import { Button, Icon, IconButton, Text } from "react-native-paper";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import { logger } from "../infrastructure/logging/logger";
 import { useToken } from "../app/providers/CloudProvider";
 import { refreshAccessToken as refreshCloudAccessToken } from "../infrastructure/cloud/clients/CloudStorageClient";
 import isSessionQrPayload from "../shared/utils/isSessionQrPayload";
 import SessionQrPayload from "../infrastructure/cloud/model/SessionQrPayload";
+import { RootStackParamList } from "../app/navigation/model/types";
 
 const styles = StyleSheet.create({
   scrollView: {

@@ -41,7 +41,6 @@ import SettingsQuickSelect from "../features/settings/components/SettingsQuickSe
 import QuickSelectItem from "../features/settings/model/QuickSelectItem";
 import SettingsShortcutItem from "../features/settings/components/SettingsShortcutItem";
 import { useDevMode } from "../app/providers/DevModeProvider";
-import { RootStackParamList } from "../app/navigation/stacks/Stack";
 import SettingsDropdownItem from "../features/settings/components/SettingsDropdownItem";
 import {
   formatAbsoluteDate,
@@ -56,6 +55,7 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import BackupImportButton from "../features/settings/components/buttons/BackupImportButton";
 import BackupExportButton from "../features/settings/components/buttons/BackupExportButton";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { SettingsStackParamList } from "../app/navigation/model/types";
 
 const styles = StyleSheet.create({
   surface: {
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
 });
 
 type SettingsScreenProps = NativeStackScreenProps<
-  RootStackParamList,
+  SettingsStackParamList,
   "Settings"
 >;
 

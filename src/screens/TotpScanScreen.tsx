@@ -10,7 +10,7 @@ import { Button, Icon, IconButton, Text } from "react-native-paper";
 import Header from "../shared/components/Header";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import { useTheme } from "../app/providers/ThemeProvider";
-import { RootStackParamList } from "../app/navigation/stacks/Stack";
+import { HomeStackParamList } from "../app/navigation/model/types";
 
 const styles = StyleSheet.create({
   scrollView: { minWidth: 0 },
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
 });
 
 type TotpScanScreenProps = NativeStackScreenProps<
-  RootStackParamList,
+  HomeStackParamList,
   "TotpScan"
 >;
 

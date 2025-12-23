@@ -46,7 +46,7 @@ export default function LeftSideTabBar({
 
   const orderedRoutes = React.useMemo(() => {
     const r = [...state.routes];
-    const i = r.findIndex((rt) => rt.name === "AddTrigger");
+    const i = r.findIndex((rt) => rt.name === "AddTriggerStack");
     if (i > 0) {
       const [add] = r.splice(i, 1);
       r.unshift(add);
@@ -95,12 +95,12 @@ export default function LeftSideTabBar({
 
         const { options } = descriptors[route.key];
         const label =
-          name === "AddTrigger"
+          name === "AddTriggerStack"
             ? ""
             : (options.tabBarLabel ?? options.title ?? (route.name as string));
 
         let iconEl: React.ReactNode = null;
-        if (name === "AddTrigger") {
+        if (name === "AddTriggerStack") {
           iconEl = (
             <IconButton
               icon="plus"
@@ -111,7 +111,7 @@ export default function LeftSideTabBar({
               onPress={goAdd}
             />
           );
-        } else if (name === "Logout") {
+        } else if (name === "LogoutStack") {
           iconEl = (
             <MaterialCommunityIcons
               name="logout"
@@ -129,11 +129,11 @@ export default function LeftSideTabBar({
         }
 
         const onPress = () => {
-          if (name === "Logout") {
+          if (name === "LogoutStack") {
             handleLogout();
             return;
           }
-          if (name === "AddTrigger") {
+          if (name === "AddTriggerStack") {
             if (isAddDisabled) return;
             goAdd();
             return;
@@ -148,9 +148,9 @@ export default function LeftSideTabBar({
           }
         };
 
-        const isAction = name === "AddTrigger" || name === "Logout";
+        const isAction = name === "AddTriggerStack" || name === "LogoutStack";
         const bgActive =
-          name === "AddTrigger"
+          name === "AddTriggerStack"
             ? theme.colors.background
             : isFocused
               ? theme.colors.secondaryContainer
@@ -159,14 +159,14 @@ export default function LeftSideTabBar({
         return (
           <AnimatedPressable
             key={route.key}
-            onPress={name === "AddTrigger" ? undefined : onPress}
+            onPress={name === "AddTriggerStack" ? undefined : onPress}
             style={[
               styles.item,
               { backgroundColor: bgActive, opacity: isOnline ? 1 : 0.85 },
               isAction && styles.itemAction,
-              name === "AddTrigger" && isAddDisabled && { opacity: 0.45 },
+              name === "AddTriggerStack" && isAddDisabled && { opacity: 0.45 },
             ]}
-            disabled={(name === "AddTrigger" && isAddDisabled) || false}
+            disabled={(name === "AddTriggerStack" && isAddDisabled) || false}
           >
             <View style={styles.itemInner}>
               {iconEl}

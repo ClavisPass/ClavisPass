@@ -34,8 +34,8 @@ const CustomBottomTab = ({
     activeRouteName === "Edit" || activeRouteName === "EditScreen";
 
   const routes = state.routes.map((route, idx) => {
-    const isAdd = route.name === "AddTrigger";
-    const isLogout = route.name === "Logout";
+    const isAdd = route.name === "AddTriggerStack";
+    const isLogout = route.name === "LogoutStack";
     const isFocused = state.index === idx;
 
     const isAddDisabled = isInEditScreen;
