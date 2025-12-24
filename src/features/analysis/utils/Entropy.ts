@@ -1,5 +1,3 @@
-// features/analysis/utils/Entropy.ts
-
 /**
  * Entropy (bits) as a conservative UI metric.
  *
@@ -15,8 +13,18 @@ const log2 = (n: number) => Math.log(n) / Math.LN2;
 // - Fallback to ASCII regex if needed.
 const hasUnicodeProps = (() => {
   try {
+    // Some runtimes accept \p{L} but behave inconsistently for other properties.
+    // Only enable Unicode property regexes if ALL properties we rely on are supported.
+    // eslint-disable-next-line no-new
+    new RegExp("\\p{Ll}", "u");
+    // eslint-disable-next-line no-new
+    new RegExp("\\p{Lu}", "u");
     // eslint-disable-next-line no-new
     new RegExp("\\p{L}", "u");
+    // eslint-disable-next-line no-new
+    new RegExp("\\p{Nd}", "u");
+    // eslint-disable-next-line no-new
+    new RegExp("[\\p{S}\\p{P}]", "u");
     return true;
   } catch {
     return false;

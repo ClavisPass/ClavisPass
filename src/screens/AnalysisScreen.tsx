@@ -1,14 +1,11 @@
 import React, {
   useEffect,
   useMemo,
-  useRef,
   useState,
   useDeferredValue,
   startTransition,
 } from "react";
 import {
-  Dimensions,
-  FlatList,
   InteractionManager,
   Platform,
   StyleSheet,
@@ -17,7 +14,7 @@ import {
   ViewStyle,
   StyleProp,
 } from "react-native";
-import { Chip, Divider, IconButton, Searchbar, Text } from "react-native-paper";
+import { Chip, Divider, Searchbar, Text } from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
 import { useFocusEffect } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -46,12 +43,18 @@ import { useVault } from "../app/providers/VaultProvider";
 
 import ModulesEnum from "../features/vault/model/ModulesEnum";
 import WifiModuleType from "../features/vault/model/modules/WifiModuleType";
-
-import WebSpecific from "../infrastructure/platform/WebSpecific";
-import { MenuItem } from "../shared/components/menus/MenuItem";
 import { AnalysisStackParamList } from "../app/navigation/model/types";
+import { FiltersNarrow, FiltersWide } from "../features/analysis/components/Filter";
 
-type AnalysisScreenProps = NativeStackScreenProps<AnalysisStackParamList, "Analysis">;
+import {
+  riskScoreFromCached,
+  severityForRiskScore,
+} from "../features/analysis/utils/riskModel";
+
+type AnalysisScreenProps = NativeStackScreenProps<
+  AnalysisStackParamList,
+  "Analysis"
+>;
 
 type RiskBucket = "all" | "itemsToFix" | "reused" | "weak" | "similar";
 type FilterItem = { key: RiskBucket; title: string };
@@ -95,6 +98,8 @@ function getItemRisk(it: any) {
   const flags = it?.flags ?? {};
   const strength = it?.strength as PasswordStrengthLevel;
 
+  const riskScore = riskScoreFromCached(strength, flags);
+
   const reused = (flags.reuseGroupSize ?? 0) >= 2;
   const similar = (flags.variantGroupSize ?? 0) >= 2;
   const tooShort = !!flags.isShort;
@@ -102,15 +107,15 @@ function getItemRisk(it: any) {
   const repeated = !!flags.hasRepeatedChars;
   const weak = strength === PasswordStrengthLevel.WEAK;
 
-  let weight = 0;
-  if (reused) weight += 60;
-  if (weak) weight += 45;
-  if (tooShort) weight += 25;
-  if (similar) weight += 20;
-  if (sequential) weight += 15;
-  if (repeated) weight += 10;
-
-  return { reused, similar, weak, tooShort, sequential, repeated, weight };
+  return {
+    reused,
+    similar,
+    weak,
+    tooShort,
+    sequential,
+    repeated,
+    weight: riskScore,
+  };
 }
 
 function matchesBucket(it: any, bucket: RiskBucket) {
@@ -120,8 +125,7 @@ function matchesBucket(it: any, bucket: RiskBucket) {
   if (bucket === "itemsToFix") return r.weight > 0;
   if (bucket === "reused") return r.reused;
   if (bucket === "similar") return r.similar;
-  if (bucket === "weak")
-    return r.weak || r.tooShort || r.sequential || r.repeated;
+  if (bucket === "weak") return r.weak || r.tooShort || r.sequential || r.repeated;
 
   return true;
 }
@@ -148,14 +152,6 @@ function computeSecurityScore(list: any[]) {
 
 type Severity = "Critical" | "High" | "Medium" | "Low" | "OK";
 
-function severityFor(weight: number): Severity {
-  if (weight >= 90) return "Critical";
-  if (weight >= 60) return "High";
-  if (weight >= 30) return "Medium";
-  if (weight > 0) return "Low";
-  return "OK";
-}
-
 function riskProgress(weight: number) {
   return Math.min(1, Math.max(0, weight / 100));
 }
@@ -170,7 +166,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
 
   const isWide = width > 600;
 
-  // Sidebar sizing: smaller default, capped max, and never more than ~28% of screen.
   const SIDEBAR_MAX = 280;
   const sidebarWidth = Math.min(
     SIDEBAR_MAX,
@@ -180,33 +175,9 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   const [cache, setCache] = useState<CacheResult | null>(null);
   const [bucket, setBucket] = useState<RiskBucket>("itemsToFix");
 
-  // UI query (immediate) vs applied query (debounced) to reduce mobile jank.
   const [searchQuery, setSearchQuery] = useState("");
   const [appliedQuery, setAppliedQuery] = useState("");
   const deferredAppliedQuery = useDeferredValue(appliedQuery.trim());
-
-  // Horizontal filter scroll state (refs, not state, to avoid re-render resets)
-  const filterListRef = useRef<FlatList<FilterItem>>(null);
-  const filterOffsetRef = useRef(0);
-
-  const onFilterScrollEnd = (event: any) => {
-    const x = event?.nativeEvent?.contentOffset?.x ?? 0;
-    filterOffsetRef.current = x;
-  };
-
-  const scrollFiltersTo = (offset: number) => {
-    const next = Math.max(0, offset);
-    filterOffsetRef.current = next;
-    filterListRef.current?.scrollToOffset({ animated: true, offset: next });
-  };
-
-  const change = (direction: "+" | "-") => {
-    const { width } = Dimensions.get("window");
-    const step = Math.max(120, width - 140);
-    const cur = filterOffsetRef.current ?? 0;
-    const next = direction === "+" ? cur + step : cur - step;
-    scrollFiltersTo(next);
-  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -215,7 +186,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
     }, [setHeaderSpacing, setHeaderWhite])
   );
 
-  // Debounce search application (reduces filter+sort churn on mobile)
   useEffect(() => {
     const id = setTimeout(() => {
       startTransition(() => setAppliedQuery(searchQuery));
@@ -324,8 +294,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
     cardStyle,
     selected
       ? {
-          backgroundColor:
-            theme.colors.surfaceVariant ?? theme.colors.background,
+          backgroundColor: theme.colors.surfaceVariant ?? theme.colors.background,
           opacity: 0.95,
         }
       : undefined,
@@ -336,7 +305,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   ];
 
   const severityColor = (sev: Severity) => {
-    // Explicit fixed colors (readability). If you prefer theme-derived only, tell me.
     if (sev === "Critical") return "#D32F2F";
     if (sev === "High") return "#F57C00";
     if (sev === "Medium") return "#FBC02D";
@@ -345,10 +313,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   };
 
   const progressTrackColor = (sev: Severity) => {
-    // muted track by severity; keeps "full bar" readable
-    const c = severityColor(sev);
-    // quick rgba-ish fallback for RN: use opacity via backgroundColor
-    // (RN doesn't support hex alpha everywhere reliably)
     if (sev === "Critical") return "rgba(211,47,47,0.18)";
     if (sev === "High") return "rgba(245,124,0,0.18)";
     if (sev === "Medium") return "rgba(251,192,45,0.18)";
@@ -378,24 +342,11 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
             }}
           >
             <View style={{ flex: 1, minWidth: 0 }}>
-              <Text
-                style={{
-                  fontWeight: "800",
-                  userSelect: "none",
-                  color: "white",
-                }}
-              >
+              <Text style={{ fontWeight: "800", userSelect: "none", color: "white" }}>
                 {t("analysis:securityScore", { defaultValue: "Security score" })}
               </Text>
               {!compact ? (
-                <Text
-                  style={{
-                    opacity: 0.85,
-                    userSelect: "none",
-                    marginTop: 2,
-                    color: "white",
-                  }}
-                >
+                <Text style={{ opacity: 0.85, userSelect: "none", marginTop: 2, color: "white" }}>
                   {t("analysis:scoreHint", {
                     defaultValue: "Fix the items below to improve your score.",
                   })}
@@ -436,94 +387,9 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
     </AnimatedPressable>
   );
 
-  const FiltersWide = () => (
-    <View style={{ marginTop: GAP, borderRadius: 12, overflow: "hidden" }}>
-      <FlatList
-        showsVerticalScrollIndicator={false}
-        data={filterItems}
-        keyExtractor={(it) => it.key}
-        renderItem={({ item, index }) => (
-          <>
-            {index !== 0 ? <Divider /> : null}
-            <MenuItem selected={bucket === item.key} onPress={() => setBucket(item.key)}>
-              {item.title}
-            </MenuItem>
-          </>
-        )}
-      />
-    </View>
-  );
-
-  const FiltersNarrow = () => (
-    <View
-      style={{
-        paddingHorizontal: 4,
-        paddingVertical: 0,
-        marginHorizontal: 8,
-        marginTop: 0,
-        marginBottom: 0,
-        height: 40,
-        width: "auto",
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-      }}
-    >
-      <WebSpecific>
-        <IconButton
-          icon={"chevron-left"}
-          style={{ margin: 0 }}
-          onPress={() => change("-")}
-          size={12}
-        />
-      </WebSpecific>
-
-      <View style={{ flexBasis: "auto", flexShrink: 1, overflow: "hidden" }}>
-        <FlatList
-          ref={filterListRef}
-          data={filterItems}
-          horizontal
-          showsHorizontalScrollIndicator={true}
-          style={{ flexShrink: 1 }}
-          scrollEventThrottle={16}
-          removeClippedSubviews={false}
-          disableIntervalMomentum={false}
-          decelerationRate="fast"
-          overScrollMode="never"
-          // IMPORTANT: don't set state here; store offset in a ref.
-          onScrollEndDrag={onFilterScrollEnd}
-          onMomentumScrollEnd={onFilterScrollEnd}
-          // keep position stable across re-renders
-          maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
-          renderItem={({ item, index }) => (
-            <Chip
-              key={index}
-              icon={() => null}
-              selected={bucket === item.key}
-              showSelectedOverlay
-              onPress={() => setBucket(item.key)}
-              style={styles.chip}
-            >
-              {item.title}
-            </Chip>
-          )}
-        />
-      </View>
-
-      <WebSpecific>
-        <IconButton
-          icon={"chevron-right"}
-          style={{ margin: 0 }}
-          onPress={() => change("+")}
-          size={12}
-        />
-      </WebSpecific>
-    </View>
-  );
-
   const renderListItem = ({ item, index }: any) => {
     const r = getItemRisk(item);
-    const sev = severityFor(r.weight);
+    const sev = severityForRiskScore(r.weight);
     const pct = riskProgress(r.weight);
 
     const fill = severityColor(sev);
@@ -536,7 +402,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
           borderRadius: 12,
           marginHorizontal: 8,
           marginBottom: 4,
-          marginTop: 0,
           overflow: "hidden",
           backgroundColor: theme.colors?.background,
           boxShadow: theme.colors?.shadow,
@@ -548,7 +413,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
           onPress={() => navigation.navigate("AnalysisDetail", { ref: item.ref })}
         >
           <View>
-            {/* TOP */}
             <View style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                 <View
@@ -568,19 +432,45 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                   </Text>
                 </View>
 
-                <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, justifyContent: "flex-end" }}>
-                  {r.reused ? <Chip compact style={{ borderRadius: 12 }}>{t("analysis:badge.reused", { defaultValue: "Reused" })}</Chip> : null}
-                  {r.similar ? <Chip compact style={{ borderRadius: 12 }}>{t("analysis:badge.similar", { defaultValue: "Similar" })}</Chip> : null}
-                  {r.tooShort ? <Chip compact style={{ borderRadius: 12 }}>{t("analysis:badge.short", { defaultValue: "Too short" })}</Chip> : null}
-                  {r.sequential ? <Chip compact style={{ borderRadius: 12 }}>{t("analysis:badge.sequential", { defaultValue: "Sequential" })}</Chip> : null}
-                  {r.repeated ? <Chip compact style={{ borderRadius: 12 }}>{t("analysis:badge.repeated", { defaultValue: "Repeated" })}</Chip> : null}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    gap: 6,
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  {r.reused ? (
+                    <Chip compact style={{ borderRadius: 12 }}>
+                      {t("analysis:badge.reused", { defaultValue: "Reused" })}
+                    </Chip>
+                  ) : null}
+                  {r.similar ? (
+                    <Chip compact style={{ borderRadius: 12 }}>
+                      {t("analysis:badge.similar", { defaultValue: "Similar" })}
+                    </Chip>
+                  ) : null}
+                  {r.tooShort ? (
+                    <Chip compact style={{ borderRadius: 12 }}>
+                      {t("analysis:badge.short", { defaultValue: "Too short" })}
+                    </Chip>
+                  ) : null}
+                  {r.sequential ? (
+                    <Chip compact style={{ borderRadius: 12 }}>
+                      {t("analysis:badge.sequential", { defaultValue: "Sequential" })}
+                    </Chip>
+                  ) : null}
+                  {r.repeated ? (
+                    <Chip compact style={{ borderRadius: 12 }}>
+                      {t("analysis:badge.repeated", { defaultValue: "Repeated" })}
+                    </Chip>
+                  ) : null}
                 </View>
               </View>
             </View>
 
             <Divider />
 
-            {/* BOTTOM */}
             <View
               style={{
                 paddingHorizontal: 10,
@@ -604,13 +494,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                   overflow: "hidden",
                 }}
               >
-                <View
-                  style={{
-                    width: `${pct * 100}%`,
-                    height: "100%",
-                    backgroundColor: fill,
-                  }}
-                />
+                <View style={{ width: `${pct * 100}%`, height: "100%", backgroundColor: fill }} />
               </View>
             </View>
           </View>
@@ -621,47 +505,56 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
 
   return (
     <AnimatedContainer>
-      <StatusBar animated style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent />
+      <StatusBar
+        animated
+        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        translucent
+      />
+
       <Header title={t("bar:Analysis", { defaultValue: "Analysis" })} />
 
-      <View style={{ flex: 1, flexDirection: isWide ? "row" : "column", width: "100%", alignItems: "stretch" }}>
-        {/* LEFT */}
+      <View
+        style={{
+          flex: 1,
+          flexDirection: isWide ? "row" : "column",
+          width: "100%",
+          alignItems: "stretch",
+        }}
+      >
         <View style={{ flex: 1, minWidth: 0 }}>
-          {/* spacing top */}
-          <View style={{ height: GAP }} />
-
-          {/* Narrow: Score FIRST */}
           {!isWide ? (
             <View style={{ marginHorizontal: 8 }}>
               <ScoreBlock compact={false} />
             </View>
           ) : null}
-
-          {/* spacing between score and strength */}
           {!isWide ? <View style={{ height: GAP }} /> : null}
 
-          {/* Strength tiles (no label) */}
           <View style={{ flexDirection: "row", marginHorizontal: 8, gap: 8 }}>
             <View style={[pillCardStyle(false) as any, { flex: 1, minWidth: 0 }]}>
               <Text style={{ fontWeight: "700", userSelect: "none" }}>{counts.strong}</Text>
-              <Text style={{ opacity: 0.8, userSelect: "none" }}>{t("analysis:strong", { defaultValue: "Strong" })}</Text>
+              <Text style={{ opacity: 0.8, userSelect: "none" }}>
+                {t("analysis:strong", { defaultValue: "Strong" })}
+              </Text>
             </View>
 
             <View style={[pillCardStyle(false) as any, { flex: 1, minWidth: 0 }]}>
               <Text style={{ fontWeight: "700", userSelect: "none" }}>{counts.medium}</Text>
-              <Text style={{ opacity: 0.8, userSelect: "none" }}>{t("analysis:medium", { defaultValue: "Medium" })}</Text>
+              <Text style={{ opacity: 0.8, userSelect: "none" }}>
+                {t("analysis:medium", { defaultValue: "Medium" })}
+              </Text>
             </View>
 
             <View style={[pillCardStyle(false) as any, { flex: 1, minWidth: 0 }]}>
               <Text style={{ fontWeight: "700", userSelect: "none" }}>{counts.weak}</Text>
-              <Text style={{ opacity: 0.8, userSelect: "none" }}>{t("analysis:weak", { defaultValue: "Weak" })}</Text>
+              <Text style={{ opacity: 0.8, userSelect: "none" }}>
+                {t("analysis:weak", { defaultValue: "Weak" })}
+              </Text>
             </View>
           </View>
 
-          {/* spacing strength -> search */}
           <View style={{ height: GAP }} />
 
-          {/* Search (plain bg, less churn due to debounce) */}
+          {/* Search */}
           <View
             style={{
               marginHorizontal: 8,
@@ -675,33 +568,49 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
           >
             <Searchbar
               inputStyle={{ height: 40, minHeight: 40 }}
-              style={{ height: 40, borderRadius: 10, backgroundColor: theme.colors.background }}
+              style={{
+                height: 40,
+                borderRadius: 10,
+                backgroundColor: theme.colors.background,
+              }}
               placeholder={t("common:search", { defaultValue: "Search" })}
               onChangeText={(txt) => setSearchQuery(txt)}
               value={searchQuery}
             />
           </View>
 
-          {/* spacing search -> filters (same as strength->search) */}
-          <View style={{ height: GAP }} />
+          {!isWide ? (
+            <FiltersNarrow
+              filterItems={filterItems}
+              bucket={bucket}
+              setBucket={setBucket}
+              // if your FiltersNarrow uses onMomentumScrollEnd etc, you can forward these:
+              // listRef={filterListRef}
+              // onMomentumScrollEnd={onFilterScrollEnd}
+            />
+          ) : null}
 
-          {!isWide ? <FiltersNarrow /> : null}
-
-          {/* List */}
           <View style={{ flex: 1, minWidth: 0, marginTop: GAP }}>
             <FlashList
               data={filteredValues}
-              keyExtractor={(x: any) => `${x.ref.valueId}:${x.ref.moduleId}:${x.ref.type}`}
+              keyExtractor={(x: any) =>
+                `${x.ref.valueId}:${x.ref.moduleId}:${x.ref.type}`
+              }
               removeClippedSubviews
               renderItem={renderListItem}
-              //estimatedItemSize={92}
             />
           </View>
         </View>
 
-        {/* Divider + RIGHT */}
         {isWide ? (
-          <View style={{ width: StyleSheet.hairlineWidth, alignSelf: "stretch", backgroundColor: theme.colors.outlineVariant, flexShrink: 0 }} />
+          <View
+            style={{
+              width: StyleSheet.hairlineWidth,
+              alignSelf: "stretch",
+              backgroundColor: theme.colors.outlineVariant,
+              flexShrink: 0,
+            }}
+          />
         ) : null}
 
         {isWide ? (
@@ -709,16 +618,13 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
             style={{
               width: sidebarWidth,
               maxWidth: SIDEBAR_MAX,
-              paddingTop: GAP, // top spacing consistent
-              paddingLeft: GAP, // gap from divider
-              paddingRight: 8,  // flush to the right edge visually (no extra "air")
+              paddingTop: 0,
+              paddingLeft: GAP,
+              paddingRight: 8,
             }}
           >
             <ScoreBlock compact={true} />
-            {/* spacing score -> filters */}
-            <View style={{ height: GAP }} />
-            {/* Filters should go to the edge: no extra outer margin */}
-            <FiltersWide />
+            <FiltersWide filterItems={filterItems} bucket={bucket} setBucket={setBucket} />
           </View>
         ) : null}
       </View>

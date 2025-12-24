@@ -85,27 +85,42 @@ const de: TranslationSchema = {
     sessionDuration: "Sitzungsdauer",
   },
   analysis: {
-    topFindings: "Wichtigste Findings",
-    noFindings: "Keine Auffälligkeiten.",
-    strengthDistribution: "Stärkeverteilung",
-    strong: "Stark",
-    medium: "Mittel",
-    weak: "Schwach",
+  topFindings: "Top-Funde",
+  noFindings: "Keine Funde.",
+  strengthDistribution: "Stärke-Verteilung",
 
-    finding: {
-      reused: "Wiederverwendete Passwörter",
-      weak: "Schwache Passwörter",
-      short: "Zu kurz",
-      variants: "Passwort-Varianten",
-      sequential: "Sequentielle Muster",
-    },
+  securityScore: "Sicherheits-Score",
+  scoreHint: "Behebe die Punkte unten, um deinen Score zu verbessern.",
 
-    badge: {
-      reused: "Reuse",
-      variant: "Variante",
-    },
+  strong: "Stark",
+  medium: "Mittel",
+  weak: "Schwach",
+
+  all: "Alle",
+  itemsToFix: "Zu beheben",
+  reused: "Wiederverwendet",
+  similar: "Ähnlich",
+
+  badge: {
+    reused: "Wiederverwendet",
+    similar: "Ähnlich",
+    short: "Zu kurz",
+    sequential: "Sequenziell",
+    repeated: "Wiederholt",
+    variant: "Variante",
   },
+
+  finding: {
+    reused: "Wiederverwendete Passwörter",
+    weak: "Schwache Passwörter",
+    short: "Zu kurz",
+    variants: "Passwort-Varianten",
+    sequential: "Sequenzielle Muster",
+  },
+},
+
   analysisDetail: {
+    // existing
     title: "Analyse",
     yourPassword: "Dein Passwort",
     statistics: "Statistiken",
@@ -117,7 +132,62 @@ const de: TranslationSchema = {
     repeatedChars: "Wiederholte Zeichen",
     sequentialPatterns: "Sequentielle Muster",
     revealHint: "Zum Anzeigen der Detailanalyse Passwort einblenden.",
+
+    // NEW: actions
+    editEntry: "Eintrag bearbeiten",
+
+    // NEW: sections
+    whyRisky: "Warum das riskant ist",
+    whyHint:
+      "Priorisiere wiederverwendete Passwörter zuerst. Auch starke Passwörter werden durch Wiederverwendung riskant.",
+    advancedDetails: "Erweiterte Details",
+
+    // NEW: severity labels for “Why risky”
+    severityHigh: "Hoch",
+    severityMedium: "Mittel",
+    severityLow: "Niedrig",
+
+    // NEW: risk label chip (Critical/High/Medium/Low/OK)
+    riskCritical: "Kritisch",
+    riskHigh: "Hoch",
+    riskMedium: "Mittel",
+    riskLow: "Niedrig",
+    riskOk: "OK",
+
+    // NEW: Strength vs Risk explanation block
+    strengthVsRiskTitle: "Stärke vs. Risiko",
+    strengthVsRiskBase:
+      "Stärke beschreibt, wie schwer ein Passwort zu erraten ist (Entropie). Risiko berücksichtigt zusätzlich Faktoren wie Wiederverwendung, Ähnlichkeiten und Muster.",
+    strengthVsRiskDrivers:
+      "Dieses Passwort ist vor allem riskant, weil es {{drivers}}.",
+    strengthVsRiskDriversFallback:
+      "Dieses Passwort ist aufgrund von Kontext-Risikofaktoren riskant.",
+    strengthVsRiskNoteStrongButRisky:
+      "Deshalb kann ein Passwort stark sein und trotzdem riskant, wenn es z. B. wiederverwendet wird.",
+    strengthVsRiskMeta: "Entropie: {{bits}} Bits · Risiko-Score: {{score}}/100",
+
+    driverReused: "{{count}}× wiederverwendet",
+    driverSimilar: "ähnlich zu {{count}} anderen Einträgen",
+    driverShort: "zu kurz ({{length}})",
+    driverSequential: "sequentielle Muster enthält",
+    driverRepeated: "wiederholte Zeichen enthält",
+
+    whyReused: "In {{count}} anderen Einträgen wiederverwendet.",
+    whyWeak:
+      "Schwach und wahrscheinlich leicht zu erraten. Ersetze es durch ein generiertes Passwort.",
+    whyShort: "Zu kurz ({{length}}). Ziel: {{min}}+ Zeichen.",
+    whySimilar:
+      "Ähnlich zu {{count}} anderen Einträgen. Verwende pro Dienst ein einzigartiges Passwort.",
+    whySequential: "Enthält sequentielle Muster ({{seq}}).",
+    whyRepeated: "Enthält wiederholte Zeichen.",
+    whyOk: "Keine auffälligen Probleme erkannt.",
+
+    riskScore: "Risiko-Score",
+    riskScoreValue: "{{score}}/100",
+    bitsValue: "{{bits}} Bits",
+    countPercent: "{{count}} ({{percent}}%)",
   },
+
   greetings: {
     1: "Hi",
     2: "Hey",
@@ -160,8 +230,7 @@ const de: TranslationSchema = {
     lastUpdated: "Zuletzt aktualisiert",
     unknownModule: "Unbekanntes Modul",
     recoveryCodesPlaceholder: "Codes einfügen…",
-    recoveryCodesHelp:
-      "Tippe auf einen Chip, um ihn zu kopieren.",
+    recoveryCodesHelp: "Tippe auf einen Chip, um ihn zu kopieren.",
   },
   moduleTemplates: {
     password: "Passwort",

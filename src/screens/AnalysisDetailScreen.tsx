@@ -6,15 +6,7 @@ import { useNavigation, CommonActions } from "@react-navigation/native";
 
 import { ScrollView, View, StyleSheet } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import {
-  Button,
-  Chip,
-  Divider,
-  Icon,
-  List,
-  Text,
-  TextInput,
-} from "react-native-paper";
+import { Button, Chip, Divider, Icon, List, Text, TextInput } from "react-native-paper";
 import { useFocusEffect } from "@react-navigation/native";
 
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
@@ -30,28 +22,20 @@ import WifiModuleType from "../features/vault/model/modules/WifiModuleType";
 import AnalysisRef from "../features/analysis/model/AnalysisRef";
 import PasswordStrengthLevel from "../features/analysis/model/PasswordStrengthLevel";
 
-import passwordEntropy from "../features/analysis/utils/Entropy";
 import {
   canonicalizeForVariants,
   deriveAnalysisPepperFromMaster,
   fingerprintPassword,
-  findSequentialTriples,
-  hasRepeatedChars,
-  strengthFromEntropyBits,
 } from "../features/analysis/utils/analysisEngine";
 
 import getPasswordStrengthColor from "../features/analysis/utils/getPasswordStrengthColor";
 import getPasswordStrengthIcon from "../features/analysis/utils/getPasswordStrengthIcon";
 import { MODULE_ICON } from "../features/vault/model/ModuleIconsEnum";
-import {
-  AnalysisStackParamList,
-  AppTabsParamList,
-} from "../app/navigation/model/types";
+import { AnalysisStackParamList, AppTabsParamList } from "../app/navigation/model/types";
 
-type AnalysisDetailScreenProps = NativeStackScreenProps<
-  AnalysisStackParamList,
-  "AnalysisDetail"
->;
+import { evaluatePasswordForDetail } from "../features/analysis/utils/riskModel";
+
+type AnalysisDetailScreenProps = NativeStackScreenProps<AnalysisStackParamList, "AnalysisDetail">;
 
 type CharacterAnalysis = {
   letters: number;
@@ -65,6 +49,9 @@ type CharacterAnalysis = {
 type DetailComputed = {
   entropyBits: number;
   strength: PasswordStrengthLevel;
+
+  riskScore: number;
+  riskSeverity: "Critical" | "High" | "Medium" | "Low" | "OK";
 
   length: number;
   pattern: string;
@@ -113,9 +100,9 @@ function classifyPattern(password: string): string {
 }
 
 function analyzeCharacterComposition(input: string): CharacterAnalysis {
-  let letters = 0,
-    digits = 0,
-    specialCharacters = 0;
+  let letters = 0;
+  let digits = 0;
+  let specialCharacters = 0;
 
   for (const char of input) {
     if (/[a-zA-Z]/.test(char)) letters++;
@@ -163,13 +150,13 @@ function resolveById(values: any[], ref: AnalysisRef): Resolved | null {
   return null;
 }
 
-function severityLabel(s: WhyItem["severity"]) {
-  if (s === "high") return "High";
-  if (s === "medium") return "Medium";
-  return "Low";
+function severityLabelKey(severity: WhyItem["severity"]) {
+  if (severity === "high") return "analysisDetail:severity.high";
+  if (severity === "medium") return "analysisDetail:severity.medium";
+  return "analysisDetail:severity.low";
 }
 
-function buildWhyRisky(computed: DetailComputed | null): WhyItem[] {
+function buildWhyRisky(computed: DetailComputed | null, t: (k: string, o?: any) => string): WhyItem[] {
   if (!computed) return [];
 
   const reuseOthers = Math.max(0, (computed.reuseCount ?? 0) - 1);
@@ -186,7 +173,10 @@ function buildWhyRisky(computed: DetailComputed | null): WhyItem[] {
     out.push({
       key: "reused",
       severity: "high",
-      text: `Reused in ${reuseOthers} other entr${reuseOthers === 1 ? "y" : "ies"}.`,
+      text: t("analysisDetail:why.reused", {
+        defaultValue: "Reused in {{count}} other entries.",
+        count: reuseOthers,
+      }),
     });
   }
 
@@ -194,7 +184,9 @@ function buildWhyRisky(computed: DetailComputed | null): WhyItem[] {
     out.push({
       key: "weak",
       severity: "high",
-      text: "Weak and likely guessable. Replace with a generated password.",
+      text: t("analysisDetail:why.weak", {
+        defaultValue: "Weak and likely guessable. Replace with a generated password.",
+      }),
     });
   }
 
@@ -202,7 +194,11 @@ function buildWhyRisky(computed: DetailComputed | null): WhyItem[] {
     out.push({
       key: "short",
       severity: "medium",
-      text: `Too short (${computed.length}). Aim for ${MIN_LENGTH}+ characters.`,
+      text: t("analysisDetail:why.short", {
+        defaultValue: "Too short ({{length}}). Aim for {{min}}+ characters.",
+        length: computed.length,
+        min: MIN_LENGTH,
+      }),
     });
   }
 
@@ -210,9 +206,10 @@ function buildWhyRisky(computed: DetailComputed | null): WhyItem[] {
     out.push({
       key: "similar",
       severity: "medium",
-      text: `Similar to ${variantOthers} other entr${
-        variantOthers === 1 ? "y" : "ies"
-      }. Consider unique passwords per site.`,
+      text: t("analysisDetail:why.similar", {
+        defaultValue: "Similar to {{count}} other entries. Consider unique passwords per site.",
+        count: variantOthers,
+      }),
     });
   }
 
@@ -220,7 +217,10 @@ function buildWhyRisky(computed: DetailComputed | null): WhyItem[] {
     out.push({
       key: "sequential",
       severity: "low",
-      text: `Contains sequential patterns (${computed.sequentialTriples.join(", ")}).`,
+      text: t("analysisDetail:why.sequential", {
+        defaultValue: "Contains sequential patterns ({{seq}}).",
+        seq: computed.sequentialTriples.join(", "),
+      }),
     });
   }
 
@@ -228,7 +228,9 @@ function buildWhyRisky(computed: DetailComputed | null): WhyItem[] {
     out.push({
       key: "repeated",
       severity: "low",
-      text: "Contains repeated characters.",
+      text: t("analysisDetail:why.repeated", {
+        defaultValue: "Contains repeated characters.",
+      }),
     });
   }
 
@@ -236,31 +238,109 @@ function buildWhyRisky(computed: DetailComputed | null): WhyItem[] {
     out.push({
       key: "ok",
       severity: "low",
-      text: "No notable issues detected.",
+      text: t("analysisDetail:why.ok", {
+        defaultValue: "No notable issues detected.",
+      }),
     });
   }
 
   return out;
 }
 
-const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
-  route,
-  navigation,
-}) => {
+function strengthLabelKey(strength: PasswordStrengthLevel) {
+  // you already use `analysis:weak|medium|strong` elsewhere, so keep consistent
+  return `analysis:${String(strength).toLowerCase()}`;
+}
+
+function riskSeverityLabelKey(sev: DetailComputed["riskSeverity"]) {
+  return `analysisDetail:risk.${String(sev).toLowerCase()}`;
+}
+
+function buildStrengthVsRiskExplanation(
+  computed: DetailComputed | null,
+  t: (k: string, o?: any) => string
+): string | null {
+  if (!computed) return null;
+  if (computed.riskSeverity === "OK") return null;
+
+  const reuseOthers = Math.max(0, (computed.reuseCount ?? 0) - 1);
+  const variantOthers = Math.max(0, (computed.variantCount ?? 0) - 1);
+
+  // build “drivers” in a translated way
+  const drivers: string[] = [];
+
+  if ((computed.reuseCount ?? 0) >= 2) {
+    drivers.push(
+      t("analysisDetail:svr.driver.reused", {
+        defaultValue: "reused {{count}} time(s)",
+        count: reuseOthers,
+      })
+    );
+  }
+  if ((computed.variantCount ?? 0) >= 2) {
+    drivers.push(
+      t("analysisDetail:svr.driver.similar", {
+        defaultValue: "similar to {{count}} other entry/entries",
+        count: variantOthers,
+      })
+    );
+  }
+  if (computed.length > 0 && computed.length < MIN_LENGTH) {
+    drivers.push(
+      t("analysisDetail:svr.driver.short", {
+        defaultValue: "too short ({{length}})",
+        length: computed.length,
+      })
+    );
+  }
+  if ((computed.sequentialTriples?.length ?? 0) > 0) {
+    drivers.push(
+      t("analysisDetail:svr.driver.sequential", {
+        defaultValue: "sequential patterns",
+      })
+    );
+  }
+  if (computed.repeated) {
+    drivers.push(
+      t("analysisDetail:svr.driver.repeated", {
+        defaultValue: "repeated characters",
+      })
+    );
+  }
+
+  const base = t("analysisDetail:svr.base", {
+    defaultValue:
+      "Strength measures guessability (entropy). Risk also considers exposure and patterns like reuse, similarity, and short/predictable structures.",
+  });
+
+  const driversLine =
+    drivers.length > 0
+      ? t("analysisDetail:svr.drivers", {
+          defaultValue: "This password is risky mainly because it is {{drivers}}.",
+          drivers: drivers.join(", "),
+        })
+      : t("analysisDetail:svr.driversFallback", {
+          defaultValue: "This password is risky due to contextual risk factors.",
+        });
+
+  const note =
+    computed.strength === PasswordStrengthLevel.STRONG && computed.riskScore > 0
+      ? t("analysisDetail:svr.noteStrongButRisky", {
+          defaultValue: "So it can be strong and still risky if it is exposed (for example by reuse).",
+        })
+      : "";
+
+  return [base, driversLine, note].filter(Boolean).join(" ");
+}
+
+const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navigation }) => {
   const { ref } = route.params;
 
   const tabNav = useNavigation<BottomTabNavigationProp<AppTabsParamList>>();
 
   const vault = useVault();
   const { getMaster } = useAuth();
-  const {
-    globalStyles,
-    theme,
-    headerWhite,
-    setHeaderWhite,
-    darkmode,
-    setHeaderSpacing,
-  } = useTheme();
+  const { globalStyles, theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } = useTheme();
   const { t } = useTranslation();
 
   const values = useMemo(() => {
@@ -272,7 +352,6 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
     }
   }, [vault.isUnlocked, vault.dirty, vault]);
 
-  // valueItem is the actual entry object expected by EditScreen (same as HomeScreen)
   const valueItem = useMemo(() => {
     if (!values) return null;
     return values.find((v: any) => v.id === ref.valueId) ?? null;
@@ -311,15 +390,9 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
       }
 
       const pw = String(resolved.password ?? "");
-      const entropyBits = passwordEntropy(pw);
-      const strength = strengthFromEntropyBits(
-        entropyBits
-      ) as PasswordStrengthLevel;
 
       const length = pw.length;
       const pattern = classifyPattern(pw);
-      const sequentialTriples = findSequentialTriples(pw);
-      const repeated = hasRepeatedChars(pw);
       const charAnalysis = analyzeCharacterComposition(pw);
 
       const pepper = await deriveAnalysisPepperFromMaster(master);
@@ -339,18 +412,13 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             ? String((m as any).value ?? "")
             : String((m as WifiModuleType).value ?? "");
 
-          // ignore empty secrets
           if (!otherPw.trim()) continue;
 
           const otherFp = await fingerprintPassword(pepper, otherPw);
           if (otherFp === fp) reuseCount++;
 
           const otherCanonical = canonicalizeForVariants(otherPw);
-          if (
-            canonical &&
-            canonical.length >= 4 &&
-            otherCanonical === canonical
-          ) {
+          if (canonical && canonical.length >= 4 && otherCanonical === canonical) {
             variantCount++;
           }
         }
@@ -358,13 +426,19 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
 
       if (cancelled) return;
 
+      const ev = evaluatePasswordForDetail(pw, reuseCount, variantCount);
+
       setComputed({
-        entropyBits,
-        strength,
+        entropyBits: ev.entropyBits,
+        strength: ev.strength,
+
+        riskScore: ev.riskScore,
+        riskSeverity: ev.severity,
+
         length,
         pattern,
-        sequentialTriples,
-        repeated,
+        sequentialTriples: ev.sequentialTriples,
+        repeated: ev.repeated,
         charAnalysis,
         reuseCount,
         variantCount,
@@ -388,22 +462,21 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
     }
   };
 
-  const shownPassword = secureTextEntry
-    ? "••••••••••••"
-    : (passwordPlain ?? "");
+  const shownPassword = secureTextEntry ? "••••••••••••" : passwordPlain ?? "";
+
   const strength = computed?.strength ?? null;
-  const why = useMemo(() => buildWhyRisky(computed), [computed]);
+  const riskSeverity = computed?.riskSeverity ?? null;
+
+  const why = useMemo(() => buildWhyRisky(computed, t), [computed, t]);
+  const strengthVsRiskText = useMemo(() => buildStrengthVsRiskExplanation(computed, t), [computed, t]);
 
   const showReused = (computed?.reuseCount ?? 0) >= 2;
   const showSimilar = (computed?.variantCount ?? 0) >= 2;
-  const showShort =
-    (computed?.length ?? 0) > 0 && (computed?.length ?? 0) < MIN_LENGTH;
+  const showShort = (computed?.length ?? 0) > 0 && (computed?.length ?? 0) < MIN_LENGTH;
   const showSequential = (computed?.sequentialTriples?.length ?? 0) > 0;
   const showRepeated = computed?.repeated ?? false;
 
-  const strengthPillBg = strength
-    ? getPasswordStrengthColor(strength as any)
-    : theme.colors.primary;
+  const strengthPillBg = strength ? getPasswordStrengthColor(strength as any) : theme.colors.primary;
 
   const secretTypeLabel =
     resolved?.kind === "wifi"
@@ -426,71 +499,45 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
 
   return (
     <AnimatedContainer style={globalStyles.container}>
-      <StatusBar
-        animated
-        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
-        translucent
-      />
+      <StatusBar animated style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent />
 
       <Header
         onPress={() => navigation.goBack()}
-        title={
-          resolved?.title ??
-          t("analysisDetail:title", { defaultValue: "Analysis" })
-        }
+        title={resolved?.title ?? t("analysisDetail:title", { defaultValue: "Analysis" })}
       />
 
-      <ScrollView
-        style={{ width: "100%" }}
-        contentContainerStyle={{ padding: 8 }}
-      >
-        <View style={{ gap: GAP }}>
-          <View style={{ height: GAP }} />
+      <ScrollView style={{ width: "100%" }} contentContainerStyle={{ padding: 8, paddingTop: 0 }}>
+        <View style={{ gap: 8 }}>
 
-          {/* Top row: Secret type chip + Strength pill */}
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              gap: 8,
-              alignItems: "center",
-            }}
-          >
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
             {resolved ? (
               <Chip
-                icon={() => (
-                  <Icon
-                    source={resolved.typeIcon}
-                    size={18}
-                    color={theme.colors.primary}
-                  />
-                )}
+                icon={() => <Icon source={resolved.typeIcon} size={18} color={theme.colors.primary} />}
+                style={{ borderRadius: 12}}
               >
                 {secretTypeLabel}
               </Chip>
             ) : null}
 
             {strength ? (
-              <View
-                style={[
-                  styles.pill,
-                  {
-                    backgroundColor: strengthPillBg,
-                    borderColor: "transparent",
-                  },
-                ]}
+              <Chip
+                style={{ borderRadius: 12, backgroundColor: strengthPillBg }}
+                textStyle={{ color: "white", fontWeight: "800" }}
+                icon={() => <Icon source={getPasswordStrengthIcon(strength as any)} size={18} color="white" />}
               >
-                <Icon
-                  source={getPasswordStrengthIcon(strength as any)}
-                  size={18}
-                  color={"white"}
-                />
-                <Text style={{ color: "white", fontWeight: "800" }}>
-                  {t(`analysis:${String(strength).toLowerCase()}`, {
-                    defaultValue: String(strength),
-                  })}
-                </Text>
-              </View>
+                {t(strengthLabelKey(strength), { defaultValue: String(strength) })}
+              </Chip>
+            ) : null}
+
+            {riskSeverity ? (
+              <Chip
+                style={{
+                  borderRadius: 12,
+                  
+                }}
+              >
+                {t(riskSeverityLabelKey(riskSeverity), { defaultValue: String(riskSeverity) })}
+              </Chip>
             ) : null}
           </View>
 
@@ -505,22 +552,14 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
               },
             ]}
           >
-            <Text
-              variant="labelSmall"
-              style={{ opacity: 0.7, marginBottom: 6 }}
-            >
-              {t("analysisDetail:yourPassword", {
-                defaultValue: "Your password",
-              })}
+            <Text variant="labelSmall" style={{ opacity: 0.7, marginBottom: 6 }}>
+              {t("analysisDetail:yourPassword", { defaultValue: "Your password" })}
             </Text>
 
             <TextInput
               outlineStyle={[
                 globalStyles.outlineStyle,
-                {
-                  borderColor: theme.colors.primary,
-                  borderWidth: 2,
-                },
+                { borderColor: theme.colors.primary, borderWidth: 2 },
               ]}
               style={[globalStyles.textInputStyle, { userSelect: "none" }]}
               value={shownPassword}
@@ -538,14 +577,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             />
 
             {/* Findings badges */}
-            <View
-              style={{
-                flexDirection: "row",
-                flexWrap: "wrap",
-                gap: 8,
-                marginTop: 10,
-              }}
-            >
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
               {showReused ? (
                 <Chip compact style={{ borderRadius: 12 }}>
                   {t("analysis:badge.reused", { defaultValue: "Reused" })}
@@ -563,9 +595,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
               ) : null}
               {showSequential ? (
                 <Chip compact style={{ borderRadius: 12 }}>
-                  {t("analysis:badge.sequential", {
-                    defaultValue: "Sequential",
-                  })}
+                  {t("analysis:badge.sequential", { defaultValue: "Sequential" })}
                 </Chip>
               ) : null}
               {showRepeated ? (
@@ -577,12 +607,18 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
 
             <Divider style={{ marginVertical: 10 }} />
 
-            <Button mode="outlined" onPress={goToEdit} disabled={!valueItem}>
+            <Button
+              mode="outlined"
+              onPress={goToEdit}
+              disabled={!valueItem}
+              style={{ borderRadius: 12 }}
+              contentStyle={{ borderRadius: 12 }}
+            >
               {t("analysisDetail:editEntry", { defaultValue: "Edit entry" })}
             </Button>
           </View>
 
-          {/* Why risky with dividers between items */}
+          {/* Why risky */}
           <View
             style={[
               styles.card,
@@ -594,24 +630,15 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             ]}
           >
             <Text style={{ fontWeight: "900", marginBottom: 8 }}>
-              {t("analysisDetail:whyRisky", {
-                defaultValue: "Why this is risky",
-              })}
+              {t("analysisDetail:whyRisky", { defaultValue: "Why this is risky" })}
             </Text>
 
             <View style={{ borderRadius: 12, overflow: "hidden" }}>
               {why.map((w, idx) => (
                 <View key={w.key}>
                   {idx !== 0 ? <Divider /> : null}
-                  <View
-                    style={{
-                      paddingVertical: 10,
-                      flexDirection: "row",
-                      gap: 10,
-                      alignItems: "flex-start",
-                    }}
-                  >
-                    <Chip compact>{severityLabel(w.severity)}</Chip>
+                  <View style={{ paddingVertical: 10, flexDirection: "row", gap: 10, alignItems: "flex-start" }}>
+                    <Chip compact>{t(severityLabelKey(w.severity), { defaultValue: w.severity })}</Chip>
                     <Text style={{ flex: 1, opacity: 0.85 }}>{w.text}</Text>
                   </View>
                 </View>
@@ -620,12 +647,42 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
 
             <Text variant="bodySmall" style={{ opacity: 0.65, marginTop: 10 }}>
               {t("analysisDetail:whyHint", {
-                defaultValue: "Prioritize reused and weak passwords first.",
+                defaultValue: "Fix reused passwords first. Even strong passwords become risky when reused.",
               })}
             </Text>
           </View>
 
-          {/* Advanced details compact accordion */}
+          {/* Strength vs Risk (moved down: above Advanced details) */}
+          {strengthVsRiskText ? (
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: theme.colors.background,
+                  borderColor: darkmode ? theme.colors.outlineVariant : "white",
+                  padding: 10,
+                },
+              ]}
+            >
+              <Text style={{ fontWeight: "900", marginBottom: 6 }}>
+                {t("analysisDetail:strengthVsRiskTitle", { defaultValue: "Strength vs. Risk" })}
+              </Text>
+
+              <Text style={{ opacity: 0.85 }}>{strengthVsRiskText}</Text>
+
+              {computed ? (
+                <Text style={{ marginTop: 8, opacity: 0.7 }}>
+                  {t("analysisDetail:strengthVsRiskMeta", {
+                    defaultValue: "Entropy: {{bits}} bits · Risk score: {{score}}/100",
+                    bits: Math.floor(computed.entropyBits),
+                    score: computed.riskScore,
+                  })}
+                </Text>
+              ) : null}
+            </View>
+          ) : null}
+
+          {/* Advanced details */}
           <View
             style={[
               styles.card,
@@ -638,58 +695,73 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
             ]}
           >
             <List.Accordion
-              title={t("analysisDetail:advanced", {
-                defaultValue: "Advanced details",
-              })}
+              title={t("analysisDetail:advanced", { defaultValue: "Advanced details" })}
               style={{ paddingHorizontal: 8, paddingVertical: 0 }}
               titleStyle={{ fontWeight: "800" }}
             >
-              <View
-                style={{ paddingHorizontal: 10, paddingBottom: 10, gap: 10 }}
-              >
+              <View style={{ paddingHorizontal: 10, paddingBottom: 10, gap: 10 }}>
                 <View style={styles.kvRow}>
-                  <Text style={styles.kvKey}>Entropy</Text>
+                  <Text style={styles.kvKey}>{t("analysisDetail:advanced.entropy", { defaultValue: "Entropy" })}</Text>
                   <Text style={styles.kvVal}>
-                    {Math.floor(computed?.entropyBits ?? 0)} bits
+                    {t("analysisDetail:advanced.bitsValue", {
+                      defaultValue: "{{bits}} bits",
+                      bits: Math.floor(computed?.entropyBits ?? 0),
+                    })}
                   </Text>
                 </View>
 
                 <View style={styles.kvRow}>
-                  <Text style={styles.kvKey}>Length</Text>
+                  <Text style={styles.kvKey}>{t("analysisDetail:advanced.riskScore", { defaultValue: "Risk score" })}</Text>
+                  <Text style={styles.kvVal}>
+                    {t("analysisDetail:advanced.riskScoreValue", {
+                      defaultValue: "{{score}}/100",
+                      score: computed?.riskScore ?? 0,
+                    })}
+                  </Text>
+                </View>
+
+                <View style={styles.kvRow}>
+                  <Text style={styles.kvKey}>{t("analysisDetail:advanced.length", { defaultValue: "Length" })}</Text>
                   <Text style={styles.kvVal}>{computed?.length ?? 0}</Text>
                 </View>
 
                 <Divider />
 
                 <View style={styles.kvRow}>
-                  <Text style={styles.kvKey}>Pattern</Text>
+                  <Text style={styles.kvKey}>{t("analysisDetail:advanced.pattern", { defaultValue: "Pattern" })}</Text>
                   <Text style={styles.kvVal}>{computed?.pattern ?? "-"}</Text>
                 </View>
 
                 <View style={styles.kvRow}>
-                  <Text style={styles.kvKey}>Letters</Text>
+                  <Text style={styles.kvKey}>{t("analysisDetail:advanced.letters", { defaultValue: "Letters" })}</Text>
                   <Text style={styles.kvVal}>
-                    {computed?.charAnalysis?.letters ?? 0} (
-                    {Math.round(computed?.charAnalysis?.lettersPercent ?? 0)}%)
+                    {t("analysisDetail:advanced.countPercent", {
+                      defaultValue: "{{count}} ({{percent}}%)",
+                      count: computed?.charAnalysis?.letters ?? 0,
+                      percent: Math.round(computed?.charAnalysis?.lettersPercent ?? 0),
+                    })}
                   </Text>
                 </View>
 
                 <View style={styles.kvRow}>
-                  <Text style={styles.kvKey}>Digits</Text>
+                  <Text style={styles.kvKey}>{t("analysisDetail:advanced.digits", { defaultValue: "Digits" })}</Text>
                   <Text style={styles.kvVal}>
-                    {computed?.charAnalysis?.digits ?? 0} (
-                    {Math.round(computed?.charAnalysis?.digitsPercent ?? 0)}%)
+                    {t("analysisDetail:advanced.countPercent", {
+                      defaultValue: "{{count}} ({{percent}}%)",
+                      count: computed?.charAnalysis?.digits ?? 0,
+                      percent: Math.round(computed?.charAnalysis?.digitsPercent ?? 0),
+                    })}
                   </Text>
                 </View>
 
                 <View style={styles.kvRow}>
-                  <Text style={styles.kvKey}>Symbols</Text>
+                  <Text style={styles.kvKey}>{t("analysisDetail:advanced.symbols", { defaultValue: "Symbols" })}</Text>
                   <Text style={styles.kvVal}>
-                    {computed?.charAnalysis?.specialCharacters ?? 0} (
-                    {Math.round(
-                      computed?.charAnalysis?.specialCharactersPercent ?? 0
-                    )}
-                    %)
+                    {t("analysisDetail:advanced.countPercent", {
+                      defaultValue: "{{count}} ({{percent}}%)",
+                      count: computed?.charAnalysis?.specialCharacters ?? 0,
+                      percent: Math.round(computed?.charAnalysis?.specialCharactersPercent ?? 0),
+                    })}
                   </Text>
                 </View>
 
@@ -697,10 +769,10 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
                   <>
                     <Divider />
                     <View style={styles.kvRow}>
-                      <Text style={styles.kvKey}>Sequential</Text>
-                      <Text style={styles.kvVal}>
-                        {computed?.sequentialTriples.join(", ")}
+                      <Text style={styles.kvKey}>
+                        {t("analysisDetail:advanced.sequential", { defaultValue: "Sequential" })}
                       </Text>
+                      <Text style={styles.kvVal}>{computed?.sequentialTriples.join(", ")}</Text>
                     </View>
                   </>
                 ) : null}
@@ -718,16 +790,6 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({
 const styles = StyleSheet.create({
   card: {
     borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  pill: {
-    alignSelf: "flex-start",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 999,
     borderWidth: StyleSheet.hairlineWidth,
   },
   kvRow: {

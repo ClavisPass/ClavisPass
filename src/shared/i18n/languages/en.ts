@@ -84,24 +84,46 @@ const en: TranslationSchema = {
     sessionDuration: "Session Duration",
   },
   analysis: {
-    topFindings: "Top findings",
-    noFindings: "No findings.",
-    strengthDistribution: "Strength distribution",
-    strong: "Strong",
-    medium: "Medium",
-    weak: "Weak",
-    finding: {
-      reused: "Reused passwords",
-      weak: "Weak passwords",
-      short: "Too short",
-      variants: "Password variants",
-      sequential: "Sequential patterns",
-    },
-    badge: {
-      reused: "Reused",
-      variant: "Variant",
-    },
+  // headline blocks (optional – falls du später "Top findings" wieder einblendest)
+  topFindings: "Top findings",
+  noFindings: "No findings.",
+  strengthDistribution: "Strength distribution",
+
+  // score card
+  securityScore: "Security score",
+  scoreHint: "Fix the items below to improve your score.",
+
+  // strength buckets
+  strong: "Strong",
+  medium: "Medium",
+  weak: "Weak",
+
+  // filter buckets
+  all: "All",
+  itemsToFix: "Items to fix",
+  reused: "Reused",
+  similar: "Similar",
+
+  // badges
+  badge: {
+    reused: "Reused",
+    similar: "Similar",
+    short: "Too short",
+    sequential: "Sequential",
+    repeated: "Repeated",
+    variant: "Variant",
   },
+
+  // findings list (optional – falls du sie nutzt)
+  finding: {
+    reused: "Reused passwords",
+    weak: "Weak passwords",
+    short: "Too short",
+    variants: "Password variants",
+    sequential: "Sequential patterns",
+  },
+},
+
   analysisDetail: {
     title: "Analysis",
     yourPassword: "Your password",
@@ -114,6 +136,49 @@ const en: TranslationSchema = {
     repeatedChars: "Repeated characters",
     sequentialPatterns: "Sequential patterns",
     revealHint: "Reveal to view detailed analysis.",
+    editEntry: "Edit entry",
+    whyRisky: "Why this is risky",
+    whyHint:
+      "Fix reused passwords first. Even strong passwords become risky when reused.",
+    advancedDetails: "Advanced details",
+    severityHigh: "High",
+    severityMedium: "Medium",
+    severityLow: "Low",
+    riskCritical: "Critical",
+    riskHigh: "High",
+    riskMedium: "Medium",
+    riskLow: "Low",
+    riskOk: "OK",
+
+    strengthVsRiskTitle: "Strength vs. Risk",
+    strengthVsRiskBase:
+      "Strength measures guessability (entropy). Risk also considers exposure and patterns like reuse, similarity, and short/predictable structures.",
+    strengthVsRiskDrivers:
+      "This password is risky mainly because it is {{drivers}}.",
+    strengthVsRiskDriversFallback:
+      "This password is risky due to contextual risk factors.",
+    strengthVsRiskNoteStrongButRisky:
+      "So it can be strong and still risky if it is exposed (for example by reuse).",
+    strengthVsRiskMeta: "Entropy: {{bits}} bits · Risk score: {{score}}/100",
+
+    driverReused: "reused {{count}} time(s)",
+    driverSimilar: "similar to {{count}} other entry/entries",
+    driverShort: "too short ({{length}})",
+    driverSequential: "sequential patterns",
+    driverRepeated: "repeated characters",
+
+    whyReused: "Reused in {{count}} other entries.",
+    whyWeak: "Weak and likely guessable. Replace with a generated password.",
+    whyShort: "Too short ({{length}}). Aim for {{min}}+ characters.",
+    whySimilar:
+      "Similar to {{count}} other entries. Consider unique passwords per site.",
+    whySequential: "Contains sequential patterns ({{seq}}).",
+    whyRepeated: "Contains repeated characters.",
+    whyOk: "No notable issues detected.",
+    riskScore: "Risk score",
+    riskScoreValue: "{{score}}/100",
+    bitsValue: "{{bits}} bits",
+    countPercent: "{{count}} ({{percent}}%)",
   },
   greetings: {
     1: "Hi",

@@ -83,24 +83,40 @@ export type TranslationSchema = {
     sessionDuration: string;
   };
   analysis: {
-    topFindings: string;
-    noFindings: string;
-    strengthDistribution: string;
-    strong: string;
-    medium: string;
-    weak: string;
-    finding: {
-      reused: string;
-      weak: string;
-      short: string;
-      variants: string;
-      sequential: string;
-    };
-    badge: {
-      reused: string;
-      variant: string;
-    };
+  topFindings: string;
+  noFindings: string;
+  strengthDistribution: string;
+
+  securityScore: string;
+  scoreHint: string;
+
+  strong: string;
+  medium: string;
+  weak: string;
+
+  all: string;
+  itemsToFix: string;
+  reused: string;
+  similar: string;
+
+  badge: {
+    reused: string;
+    similar: string;
+    short: string;
+    sequential: string;
+    repeated: string;
+    variant: string;
   };
+
+  finding: {
+    reused: string;
+    weak: string;
+    short: string;
+    variants: string;
+    sequential: string;
+  };
+};
+
   analysisDetail: {
     title: string;
     yourPassword: string;
@@ -113,7 +129,50 @@ export type TranslationSchema = {
     repeatedChars: string;
     sequentialPatterns: string;
     revealHint: string;
+
+    editEntry: string;
+
+    whyRisky: string;
+    whyHint: string;
+    advancedDetails: string;
+
+    severityHigh: string;
+    severityMedium: string;
+    severityLow: string;
+
+    riskCritical: string;
+    riskHigh: string;
+    riskMedium: string;
+    riskLow: string;
+    riskOk: string;
+
+    strengthVsRiskTitle: string;
+    strengthVsRiskBase: string;
+    strengthVsRiskDrivers: string;
+    strengthVsRiskDriversFallback: string;
+    strengthVsRiskNoteStrongButRisky: string;
+    strengthVsRiskMeta: string;
+
+    driverReused: string;
+    driverSimilar: string;
+    driverShort: string;
+    driverSequential: string;
+    driverRepeated: string;
+
+    whyReused: string;
+    whyWeak: string;
+    whyShort: string;
+    whySimilar: string;
+    whySequential: string;
+    whyRepeated: string;
+    whyOk: string;
+
+    riskScore: string;
+    riskScoreValue: string;
+    bitsValue: string;
+    countPercent: string;
   };
+
   greetings: {
     1: string;
     2: string;

@@ -2,7 +2,7 @@ import * as Crypto from "expo-crypto";
 import ModulesEnum from "../../vault/model/ModulesEnum";
 import WifiModuleType from "../../vault/model/modules/WifiModuleType";
 import { ValuesListType } from "../../vault/model/ValuesType";
-import passwordEntropy from "./Entropy";
+import { passwordEntropyBits } from "./Entropy";
 import PasswordStrengthLevel from "../model/PasswordStrengthLevel";
 import CachedAnalysisItem from "../model/CachedAnalysisItem";
 import CacheResult from "../model/CacheResult";
@@ -11,7 +11,7 @@ export const normalize = (t: string) =>
   t
     .toLowerCase()
     .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "");
+    .replace(/[\u0300-\u036f]/g, "");
 
 const MIN_LENGTH = 12;
 
@@ -89,7 +89,8 @@ export async function fingerprintPassword(
   pepper: string,
   password: string
 ): Promise<string> {
-  const input = `${pepper}\u0000${password}`;
+  const pw = String(password ?? "");
+  const input = `${pepper}|${pw.length}|${pw}`;
   return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, input);
 }
 
@@ -119,7 +120,19 @@ export async function buildAnalysisCache(
         : ((mod as WifiModuleType).wifiName ?? value.title);
       const normalizedTitle = isPwd ? normalizedValueTitle : normalize(title);
 
-      const entropyBits = passwordEntropy(pwd);
+      const isShort = pwd.length < MIN_LENGTH;
+      const hasSeq = findSequentialTriples(pwd).length > 0;
+      const hasRep = hasRepeatedChars(pwd);
+
+      const entropyBits = passwordEntropyBits(pwd, {
+        capBits: 128,
+        penalties: {
+          veryShort: isShort,
+          sequentialTriples: hasSeq,
+          repeatedChars: hasRep,
+        },
+      });
+
       const strength = strengthFromEntropyBits(entropyBits);
 
       const reuseFp = await fingerprintPassword(pepper, pwd);
@@ -139,9 +152,9 @@ export async function buildAnalysisCache(
           entropyBits,
           strength,
           flags: {
-            isShort: pwd.length < MIN_LENGTH,
-            hasSequential: findSequentialTriples(pwd).length > 0,
-            hasRepeatedChars: hasRepeatedChars(pwd),
+            isShort,
+            hasSequential: hasSeq,
+            hasRepeatedChars: hasRep,
             reuseGroupSize: 1,
             variantGroupSize: 1,
           },
