@@ -1,5 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod screen_lock;
+
 use serde::{Deserialize, Serialize};
 use std::{fs, path::PathBuf};
 use tauri::{
@@ -124,6 +126,12 @@ pub fn run() {
                 .build()?;
 
             let _ = main_window.center();
+
+            #[cfg(desktop)]
+            {
+                let app_handle_for_lock = app.handle().clone();
+                screen_lock::start(app_handle_for_lock);
+            }
 
             #[cfg(desktop)]
             {

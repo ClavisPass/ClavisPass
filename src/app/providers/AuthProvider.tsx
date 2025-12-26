@@ -9,6 +9,8 @@ import React, {
   ReactNode,
 } from "react";
 import { useSetting } from "./SettingsProvider";
+import { initScreenLockLogout } from "../../features/auth/utils/screenLockLogout";
+import ScreenLockLogoutController from "../../features/auth/model/ScreenLockLogoutController";
 
 export interface AuthContextType {
   isLoggedIn: boolean;
@@ -34,14 +36,11 @@ type Props = {
 export const AuthProvider = ({ children }: Props) => {
   const masterRef = useRef<string | null>(null);
 
-  // NEW: Session-Dauer aus Settings (Sekunden)
   const { value: sessionDurationSeconds } = useSetting("SESSION_DURATION");
 
-  // Guardrails
   const sessionLimitSeconds = useMemo(() => {
     const n = Number(sessionDurationSeconds);
     if (!Number.isFinite(n)) return 60 * 60;
-    // Minimum 60s, Maximum z.B. 24h (optional)
     return Math.max(60, Math.min(24 * 60 * 60, Math.floor(n)));
   }, [sessionDurationSeconds]);
 
@@ -93,12 +92,10 @@ export const AuthProvider = ({ children }: Props) => {
 
       clearTimers();
 
-      // Hard logout timer
       logoutTimerRef.current = setTimeout(() => {
         logout();
       }, sessionLimitMs);
 
-      // 1s ticker for UI countdown
       tickIntervalRef.current = setInterval(() => {
         const start = sessionStartRef.current;
         if (!start) return;
@@ -120,8 +117,6 @@ export const AuthProvider = ({ children }: Props) => {
     return m;
   }, []);
 
-  // Wenn User NICHT eingeloggt ist und Setting ändert:
-  // Countdown-Default aktualisieren (kein Überraschungseffekt während aktiver Session)
   useEffect(() => {
     if (!isLoggedIn) setSessionRemaining(sessionLimitSeconds);
   }, [isLoggedIn, sessionLimitSeconds]);
@@ -132,6 +127,28 @@ export const AuthProvider = ({ children }: Props) => {
       clearTimers();
     };
   }, [clearTimers]);
+
+  useEffect(() => {
+  let controller: ScreenLockLogoutController | null = null;
+  let cancelled = false;
+
+  (async () => {
+    controller = await initScreenLockLogout({
+      onLock: () => {
+        if (isLoggedIn) logout();
+      },
+      oncePerLockCycle: true,
+    });
+
+    if (cancelled) controller.dispose();
+  })();
+
+  return () => {
+    cancelled = true;
+    controller?.dispose();
+    controller = null;
+  };
+}, [isLoggedIn, logout]);
 
   const value = useMemo<AuthContextType>(
     () => ({
