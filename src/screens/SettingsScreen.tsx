@@ -56,6 +56,8 @@ import BackupImportButton from "../features/settings/components/buttons/BackupIm
 import BackupExportButton from "../features/settings/components/buttons/BackupExportButton";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { SettingsStackParamList } from "../app/navigation/model/types";
+import { invoke } from "@tauri-apps/api/core";
+import { ContentProtectionSettingsToggle } from "../features/settings/components/ContentProtectionSettingsToggle";
 
 const styles = StyleSheet.create({
   surface: {
@@ -94,6 +96,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const [startup, setStartup] = React.useState(false);
   const { width } = useWindowDimensions();
   const [useAuthentication, setUseAuthentication] = React.useState(false);
+
+  const [contentProtection, setContentProtection] = React.useState(true);
 
   const { value: closeBehaviorValue, setValue: setCloseBehaviorValue } =
     useSetting("CLOSE_BEHAVIOR");
@@ -154,7 +158,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
       },
       {
         title: t("settings:security"),
-        icon: "shield-outline",
+        icon: "shield",
         ref: authSettingsRef,
         plattform: null,
       },
@@ -223,6 +227,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
       setStartup(false);
     }
   };
+
+  async function toggleContentProtection(next: boolean) {
+    try {
+      await invoke("set_content_protection", { enabled: next });
+      setContentProtection(next);
+    } catch (e: any) {
+    } finally {
+    }
+  }
 
   const getAutoStart = async () => {
     const value = await isEnabled();
@@ -404,6 +417,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 }}
               />
               <SettingsDivider />
+              <ContentProtectionSettingsToggle />
+              <SettingsDivider />
               <SettingsDropdownItem
                 value={String(copyDurationSeconds ?? 0)}
                 setValue={(v) => setCopyDurationSeconds(Number(v))}
@@ -445,7 +460,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 value={String(sessionDurationSeconds ?? 3600)}
                 setValue={(v) => setSessionDurationSeconds(Number(v))}
                 label={t("settings:sessionDuration")}
-                leadingIcon="timer-outline"
+                leadingIcon="timer"
                 dropdownMaxWidth={260}
                 dropdownMinWidth={200}
                 options={[

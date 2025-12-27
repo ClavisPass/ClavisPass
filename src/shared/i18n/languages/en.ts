@@ -82,6 +82,9 @@ const en: TranslationSchema = {
     copyDuration: "Copy Duration",
     copyDurationOff: "Off",
     sessionDuration: "Session Duration",
+    contentProtection: "Content Protection",
+    scanqrcode: "Scan QR Code",
+    showqrcode: "Show QR Code",
   },
   analysis: {
   // headline blocks (optional – falls du später "Top findings" wieder einblendest)

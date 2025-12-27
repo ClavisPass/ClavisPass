@@ -392,12 +392,12 @@ export default function AddModuleModalCompactFav(props: Props) {
 
   const catIcon = (c: ModuleCategory) =>
     c === "Security"
-      ? "shield-lock-outline"
+      ? "shield-lock"
       : c === "vCard"
-        ? "account-box-outline"
+        ? "account-box"
         : c === "Utility"
-          ? "wrench-outline"
-          : "view-dashboard-outline";
+          ? "wrench"
+          : "view-dashboard";
 
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>

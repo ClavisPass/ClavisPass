@@ -89,7 +89,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
         <IconButton
           style={{ margin: 0, marginLeft: 8, marginRight: 8 }}
           iconColor={theme.colors.primary}
-          icon="lock-check-outline"
+          icon="lock-check"
           size={16}
           onPress={() => setVisible(true)}
         />

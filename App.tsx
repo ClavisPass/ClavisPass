@@ -21,6 +21,7 @@ import I18nBridge from "./src/shared/components/I18nBridge";
 import DropdownLayer from "./src/shared/components/web/DropdownLayer";
 import NavigationContainer from "./src/app/navigation/NavigationContainer";
 import { VaultProvider } from "./src/app/providers/VaultProvider";
+import { ContentProtectionProvider } from "./src/app/providers/ContentProtectionProvider";
 
 const Tab = createBottomTabNavigator();
 
@@ -54,37 +55,39 @@ export function AppWithNavigation() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AutocompleteDropdownContextProvider>
         <SettingsProvider>
-          <ThemeProvider>
-            <DropdownLayer />
-            <I18nBridge />
-            <OnlineProvider>
-              <AuthProvider>
-                <CloudProvider>
-                  <VaultProvider>
-                    <DevModeProvider>
-                      <GlobalErrorSnackbar />
-                      <View
-                        style={{
-                          borderRadius: Platform.OS === "web" ? 6 : 0,
-                          borderColor:
-                            Platform.OS === "web"
-                              ? theme.colors.primary
-                              : undefined,
-                          borderWidth: Platform.OS === "web" ? 1 : 0,
-                          overflow: "hidden",
-                          flex: 1,
-                        }}
-                      >
-                        <GlobalShortcuts />
-                        <CustomTitlebar />
-                        <NavigationContainer />
-                      </View>
-                    </DevModeProvider>
-                  </VaultProvider>
-                </CloudProvider>
-              </AuthProvider>
-            </OnlineProvider>
-          </ThemeProvider>
+          <ContentProtectionProvider defaultEnabled={true}>
+            <ThemeProvider>
+              <DropdownLayer />
+              <I18nBridge />
+              <OnlineProvider>
+                <AuthProvider>
+                  <CloudProvider>
+                    <VaultProvider>
+                      <DevModeProvider>
+                        <GlobalErrorSnackbar />
+                        <View
+                          style={{
+                            borderRadius: Platform.OS === "web" ? 6 : 0,
+                            borderColor:
+                              Platform.OS === "web"
+                                ? theme.colors.primary
+                                : undefined,
+                            borderWidth: Platform.OS === "web" ? 1 : 0,
+                            overflow: "hidden",
+                            flex: 1,
+                          }}
+                        >
+                          <GlobalShortcuts />
+                          <CustomTitlebar />
+                          <NavigationContainer />
+                        </View>
+                      </DevModeProvider>
+                    </VaultProvider>
+                  </CloudProvider>
+                </AuthProvider>
+              </OnlineProvider>
+            </ThemeProvider>
+          </ContentProtectionProvider>
         </SettingsProvider>
       </AutocompleteDropdownContextProvider>
     </GestureHandlerRootView>

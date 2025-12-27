@@ -388,6 +388,8 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   );
 
   const renderListItem = ({ item, index }: any) => {
+const stacked = width < 600;
+
     const r = getItemRisk(item);
     const sev = severityForRiskScore(r.weight);
     const pct = riskProgress(r.weight);
@@ -413,8 +415,8 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
           onPress={() => navigation.navigate("AnalysisDetail", { ref: item.ref })}
         >
           <View>
-            <View style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+            <View style={{  paddingVertical: 8 }}>
+              <View style={{ flexDirection: stacked ? "column" : "row", alignItems: stacked ? "flex-start" : "center", gap: 10 }}>
                 <View
                   style={{
                     flex: 1,
@@ -422,6 +424,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                     flexDirection: "row",
                     alignItems: "center",
                     gap: 6,
+                    paddingHorizontal: 8,
                   }}
                 >
                   <Text style={{ color: theme.colors.primary, userSelect: "none" }}>
@@ -432,12 +435,15 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                   </Text>
                 </View>
 
+                <Divider style={{ height: stacked ? StyleSheet.hairlineWidth : 0, width: stacked ? "100%" : 0, margin: 0 }} />
+
                 <View
                   style={{
                     flexDirection: "row",
                     flexWrap: "wrap",
                     gap: 6,
                     justifyContent: "flex-end",
+                    paddingHorizontal: 8,
                   }}
                 >
                   {r.reused ? (

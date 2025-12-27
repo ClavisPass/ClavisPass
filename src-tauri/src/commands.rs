@@ -1,5 +1,6 @@
 use keytar::{delete_password, get_password, set_password};
 use tauri;
+use tauri::{AppHandle, Manager};
 
 #[tauri::command]
 pub fn save_key(key: &str, value: &str) {
@@ -32,4 +33,14 @@ pub fn remove_key(key: &str) {
         }
         Err(e) => eprintln!("Schlüssel nicht gefunden: {:?}", e),
     }
+}
+
+#[tauri::command]
+pub async fn set_content_protection(app: AppHandle, enabled: bool) -> Result<(), String> {
+  let win = app
+    .get_webview_window("main")
+    .ok_or("main window not found")?;
+
+  win.set_content_protected(enabled).map_err(|e| e.to_string())?;
+  Ok(())
 }

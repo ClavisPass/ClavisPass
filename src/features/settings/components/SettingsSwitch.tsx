@@ -7,6 +7,7 @@ type Props = {
   value: boolean;
   onValueChange: (checked: boolean) => void;
   leadingIcon?: string;
+  disabled?: boolean;
 };
 
 const SettingsSwitch = (props: Props) => {
@@ -25,12 +26,12 @@ const SettingsSwitch = (props: Props) => {
         justifyContent: "space-between",
       }}
     >
-      <Pressable onPress={() => props.onValueChange(!props.value)}>
+      <Pressable disabled={props.disabled} onPress={() => props.onValueChange(!props.value)}>
         <SettingsItem leadingIcon={props.leadingIcon} onPress={undefined}>
           {props.label}
         </SettingsItem>
       </Pressable>
-      <Switch value={props.value} onValueChange={props.onValueChange} />
+      <Switch value={props.value} onValueChange={props.onValueChange} disabled={props.disabled} />
     </View>
   );
 };

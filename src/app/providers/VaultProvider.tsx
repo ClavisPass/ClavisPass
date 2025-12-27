@@ -7,7 +7,7 @@ import React, {
   useCallback,
 } from "react";
 
-import type DataType from "../../features/vault/model/VaultDataType";
+import type VaultDataType from "../../features/vault/model/VaultDataType";
 import type FolderType from "../../features/vault/model/FolderType";
 import type ValuesType from "../../features/vault/model/ValuesType";
 
@@ -21,7 +21,7 @@ import {
 
 import { VaultSession } from "../../features/vault/utils/VaultSession";
 
-type VaultData = NonNullable<DataType>;
+type VaultData = NonNullable<VaultDataType>;
 
 export type VaultContextType = {
   // Meta / UI-safe state

@@ -22,7 +22,6 @@ import HomeFilterMenu from "../features/vault/components/menus/HomeFilterMenu";
 import Blur from "../shared/components/Blur";
 import FolderFilter from "../features/vault/components/FolderFilter";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
-import ContentProtection from "../shared/components/ContentProtection";
 import { useFocusEffect } from "@react-navigation/native";
 import { TITLEBAR_HEIGHT } from "../shared/components/CustomTitlebar";
 import FolderModal from "../features/vault/components/modals/FolderModal";
@@ -56,6 +55,7 @@ import Sync from "../features/sync/components/Sync";
 import { useVault } from "../app/providers/VaultProvider";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { HomeStackParamList } from "../app/navigation/model/types";
+import { useContentProtection } from "../app/providers/ContentProtectionProvider";
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
@@ -387,7 +387,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             style={headerWhite ? "light" : darkmode ? "light" : "dark"}
             translucent={true}
           />
-          <ContentProtection enabled={true} />
           <WebSpecific>
             <SearchShortcut searchRef={searchRef} />
           </WebSpecific>

@@ -83,6 +83,9 @@ const de: TranslationSchema = {
     copyDuration: "Kopierdauer",
     copyDurationOff: "Aus",
     sessionDuration: "Sitzungsdauer",
+    contentProtection: "Inhaltsschutz",
+    scanqrcode: "QR-Code scannen",
+    showqrcode: "QR-Code anzeigen",
   },
   analysis: {
   topFindings: "Top-Funde",

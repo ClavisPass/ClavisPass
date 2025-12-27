@@ -176,7 +176,7 @@ const Sync = (props: Props) => {
                     </AnimatedPressable>
                   </>
                 ) : (
-                  <Icon source="cloud-off-outline" color="white" size={20} />
+                  <Icon source="cloud-off" color="white" size={20} />
                 )}
               </>
             )}

@@ -230,6 +230,7 @@ pub fn run() {
             commands::save_key,
             commands::get_key,
             commands::remove_key,
+            commands::set_content_protection,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

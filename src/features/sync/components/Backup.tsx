@@ -189,7 +189,7 @@ function Backup() {
         }}
       >
         <Icon
-          source="cloud-off-outline"
+          source="cloud-off"
           color={theme.colors.primary}
           size={50}
         />

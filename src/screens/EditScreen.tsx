@@ -369,7 +369,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         )}
         <SquaredContainerButton onPress={() => setDeleteModalVisible(true)}>
           <Icon
-            source="trash-can-outline"
+            source="trash-can"
             size={20}
             color={theme.colors?.error}
           />

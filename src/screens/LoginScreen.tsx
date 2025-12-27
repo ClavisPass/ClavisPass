@@ -12,7 +12,6 @@ import { BlurView } from "expo-blur";
 
 import { Text } from "react-native-paper";
 
-import ContentProtection from "../shared/components/ContentProtection";
 import Login from "../features/auth/components/Login";
 import Backup from "../features/sync/components/Backup";
 import AnimatedLogo from "../shared/ui/AnimatedLogo";
@@ -175,7 +174,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           style={headerWhite ? "light" : darkmode ? "light" : "dark"}
           translucent={true}
         />
-        <ContentProtection enabled={false} />
         <View style={{ height: 17 }}></View>
         <BlurView
           intensity={80}
@@ -254,7 +252,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 leadingIcon={"qrcode-scan"}
                 onPress={() => navigation.navigate("Scan")}
               >
-                Scan QR-Code
+                {t("settings:scanqrcode")}
               </SettingsItem>
               <SettingsDivider />
             </BottomSheetView>

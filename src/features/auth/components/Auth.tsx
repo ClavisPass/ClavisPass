@@ -1,8 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { Divider } from "react-native-paper";
-
-import { Button } from "react-native-paper";
 
 import ShowQRCodeButton from "../../settings/components/buttons/ShowQRCodeButton";
 import UserInformation from "../../sync/components/UserInformation";
@@ -10,6 +8,7 @@ import UserInfoType from "../../sync/model/UserInfoType";
 import SettingsItem from "../../settings/components/SettingsItem";
 import SettingsDivider from "../../settings/components/SettingsDivider";
 import { View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   navigation: any;
@@ -17,6 +16,7 @@ type Props = {
 };
 
 function Auth(props: Props) {
+  const { t } = useTranslation();
   return (
     <View>
       <UserInformation setUserInfo={props.setUserInfo} />
@@ -25,7 +25,7 @@ function Auth(props: Props) {
         leadingIcon={"qrcode-scan"}
         onPress={() => props.navigation.navigate("Scan")}
       >
-        Scan QR-Code
+        {t("settings:scanqrcode")}
       </SettingsItem>
       <SettingsDivider />
       <ShowQRCodeButton />

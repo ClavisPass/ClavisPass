@@ -81,6 +81,9 @@ export type TranslationSchema = {
     copyDuration: string;
     copyDurationOff: string;
     sessionDuration: string;
+    contentProtection: string;
+    scanqrcode: string;
+    showqrcode: string;
   };
   analysis: {
   topFindings: string;

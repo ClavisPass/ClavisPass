@@ -18,5 +18,5 @@ export const MODULE_ICON = {
   [ModulesEnum.EXPIRY]: "calendar",
   [ModulesEnum.RECOVERY_CODES]: "list-status",
   [ModulesEnum.TITLE]: "format-title",
-  [ModulesEnum.UNKNOWN]: "help-circle-outline",
+  [ModulesEnum.UNKNOWN]: "help-circle",
 } satisfies Record<ModulesEnum, IconName>;
