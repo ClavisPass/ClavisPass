@@ -7,7 +7,6 @@ import Props from "../../model/ModuleProps";
 import {
   getStatus,
   formatRelative,
-  formatAbsoluteLocal,
 } from "../../utils/expiry";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import ExpiryPickerModal from "../modals/ExpiryPickerModal";
@@ -17,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { useSetting } from "../../../../app/providers/SettingsProvider";
 import ModulesEnum from "../../model/ModulesEnum";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
+import { formatAbsoluteLocal } from "../../../../shared/utils/Timestamp";
 
 function ExpiryModule(props: ExpiryModuleType & Props) {
   const didMount = useRef(false);

@@ -7,13 +7,13 @@ import Props from "../../model/ModuleProps";
 import { codeFromUri, parseOtpauth } from "../../utils/totp";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import TotpModuleType from "../../model/modules/TotpModuleType";
-import { RootStackParamList } from "../../../../app/navigation/stacks/Stack";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { useTranslation } from "react-i18next";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import ModulesEnum from "../../model/ModulesEnum";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
+import { HomeStackParamList } from "../../../../app/navigation/model/types";
 
 export function Totp(props: { value: string }) {
   const { theme } = useTheme();
@@ -112,7 +112,7 @@ export function Totp(props: { value: string }) {
 }
 
 type TotpModuleModuleProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, "Edit", undefined>;
+  navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>;
 };
 
 function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {

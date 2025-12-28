@@ -86,6 +86,7 @@ const de: TranslationSchema = {
     contentProtection: "Inhaltsschutz",
     scanqrcode: "QR-Code scannen",
     showqrcode: "QR-Code anzeigen",
+    manageDevices: "Geräte verwalten",
   },
   analysis: {
   topFindings: "Top-Funde",
@@ -190,6 +191,38 @@ const de: TranslationSchema = {
     bitsValue: "{{bits}} Bits",
     countPercent: "{{count}} ({{percent}}%)",
   },
+  devices: {
+  title: "Geräte",
+  you: "Du",
+
+  status: {
+    new: "Neu",
+    active: "Aktiv",
+    archived: "Archiviert",
+  },
+
+  sections: {
+    new: "Neu",
+    active: "Aktiv",
+    archived: "Archiviert",
+  },
+  hintLine:
+    "Diese Liste zeigt nur Geräte/Installationen, die den Vault mindestens einmal gespeichert oder synchronisiert haben (also geschrieben haben). Geräte, die den Vault nur gelesen haben (z. B. heruntergeladen, entsperrt oder angezeigt), erscheinen hier nicht.",
+
+  toggleArchivedOn: "Archivierte anzeigen: An",
+  toggleArchivedOff: "Archivierte anzeigen: Aus",
+
+  empty:
+    "Noch keine Geräte registriert. Geräte erscheinen nach dem ersten Save/Sync.",
+  emptyNew: "Keine neuen Geräte.",
+  emptyActive: "Keine aktiven Geräte.",
+  emptyArchived: "Keine archivierten Geräte.",
+
+  lastShort: "Zuletzt",
+  lastWrite: "Zuletzt geschrieben",
+  firstWrite: "Erstes Schreiben",
+  id: "ID",
+},
 
   greetings: {
     1: "Hi",

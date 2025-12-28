@@ -24,8 +24,10 @@ use tauri_plugin_oauth;
 use tauri_plugin_shell;
 use tauri_plugin_single_instance;
 use tauri_plugin_updater;
+use tauri_plugin_os;
 
 mod commands;
+mod device_identity;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct WindowSize {
@@ -65,6 +67,7 @@ fn load_window_size(app_handle: &AppHandle) -> Option<WindowSize> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_oauth::init())
         .plugin(tauri_plugin_cli::init())
         .plugin(tauri_plugin_fs::init())
@@ -231,6 +234,7 @@ pub fn run() {
             commands::get_key,
             commands::remove_key,
             commands::set_content_protection,
+            device_identity::get_device_identity
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

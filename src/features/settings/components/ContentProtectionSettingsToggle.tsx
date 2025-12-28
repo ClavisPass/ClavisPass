@@ -14,7 +14,6 @@ export function ContentProtectionSettingsToggle() {
   return (
       <SettingsSwitch
         label={t("settings:contentProtection")}
-        leadingIcon="shield-lock"
         value={enabled}
         disabled={busy}
          onValueChange={async (next) => {

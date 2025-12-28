@@ -47,7 +47,7 @@ function BackupImportButton() {
   };
 
   return (
-    <SettingsItem leadingIcon="database-import" onPress={importBackup}>
+    <SettingsItem onPress={importBackup}>
       {t("settings:importBackup")}
     </SettingsItem>
   );

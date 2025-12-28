@@ -42,10 +42,6 @@ import QuickSelectItem from "../features/settings/model/QuickSelectItem";
 import SettingsShortcutItem from "../features/settings/components/SettingsShortcutItem";
 import { useDevMode } from "../app/providers/DevModeProvider";
 import SettingsDropdownItem from "../features/settings/components/SettingsDropdownItem";
-import {
-  formatAbsoluteDate,
-  formatAbsoluteTime,
-} from "../features/vault/utils/expiry";
 import { AppLanguage } from "../shared/i18n/types";
 import { i18n } from "../shared/i18n";
 import { useTranslation } from "react-i18next";
@@ -58,6 +54,10 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { SettingsStackParamList } from "../app/navigation/model/types";
 import { invoke } from "@tauri-apps/api/core";
 import { ContentProtectionSettingsToggle } from "../features/settings/components/ContentProtectionSettingsToggle";
+import {
+  formatAbsoluteDate,
+  formatAbsoluteTime,
+} from "../shared/utils/Timestamp";
 
 const styles = StyleSheet.create({
   surface: {
@@ -409,7 +409,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               </SettingsItem>
               <SettingsDivider />
               <SettingsSwitch
-              leadingIcon="fingerprint"
                 label={t("settings:useSystemAuth")}
                 value={useAuthentication}
                 onValueChange={(checked) => {
@@ -419,11 +418,18 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               <SettingsDivider />
               <ContentProtectionSettingsToggle />
               <SettingsDivider />
+              <SettingsItem
+                onPress={
+                  ()=>{navigation.navigate("Devices")}
+                }
+              >
+                {t("settings:manageDevices")}
+              </SettingsItem>
+              <SettingsDivider />
               <SettingsDropdownItem
                 value={String(copyDurationSeconds ?? 0)}
                 setValue={(v) => setCopyDurationSeconds(Number(v))}
                 label={t("settings:copyDuration")}
-                leadingIcon="content-copy"
                 dropdownMaxWidth={260}
                 dropdownMinWidth={200}
                 options={[
@@ -460,7 +466,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 value={String(sessionDurationSeconds ?? 3600)}
                 setValue={(v) => setSessionDurationSeconds(Number(v))}
                 label={t("settings:sessionDuration")}
-                leadingIcon="timer"
                 dropdownMaxWidth={260}
                 dropdownMinWidth={200}
                 options={[

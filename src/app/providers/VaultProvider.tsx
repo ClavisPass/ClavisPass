@@ -20,6 +20,7 @@ import {
 } from "../../features/vault/utils/modulePolicy";
 
 import { VaultSession } from "../../features/vault/utils/VaultSession";
+import VaultDeviceType from "../../features/vault/model/VaultDeviceType";
 
 type VaultData = NonNullable<VaultDataType>;
 
@@ -54,6 +55,7 @@ export type VaultContextType = {
   // Persistence helpers (encrypt+save+sync outside)
   exportFullData: () => VaultData;
   markSaved: () => void;
+  devices: VaultDeviceType[];
 };
 
 const VaultContext = createContext<VaultContextType | null>(null);
@@ -64,6 +66,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
   // UI-safe derived state
   const [entries, setEntries] = useState<EntryMeta[]>([]);
   const [folders, setFoldersState] = useState<FolderType[]>([]);
+  const [devices, setDevices] = useState<VaultDeviceType[]>([]);
   const [dirty, setDirty] = useState(false);
 
   const refresh = useCallback(() => {
@@ -75,6 +78,8 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     setFoldersState(fs);
 
     setDirty(VaultSession.isDirty());
+    const ds = VaultSession.getDevices();
+    setDevices(ds);
   }, []);
 
   const unlockWithDecryptedVault = useCallback(
@@ -92,6 +97,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     setEntries([]);
     setFoldersState([]);
     setDirty(false);
+    setDevices([]);
   }, []);
 
   const getSecretPayload = useCallback(
@@ -149,6 +155,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
         ...snapshot,
         folder: [...(snapshot.folder ?? [])],
         values: [...(snapshot.values ?? [])],
+        devices: [...(snapshot.devices ?? [])], // ✅ NEW
       };
 
       recipe(next);
@@ -180,6 +187,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       isUnlocked,
       entries,
       folders,
+      devices,
       dirty,
       unlockWithDecryptedVault,
       lock,
@@ -197,6 +205,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       isUnlocked,
       entries,
       folders,
+      devices,
       dirty,
       unlockWithDecryptedVault,
       lock,

@@ -20,6 +20,7 @@ export type AnalysisStackParamList = {
 export type SettingsStackParamList = {
   Settings: undefined;
   Scan: undefined;
+  Devices: undefined;
 };
 
 export type LoginStackParamList = {

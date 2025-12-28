@@ -18,15 +18,15 @@ import DigitalCardType, {
 } from "../../model/DigitalCardType";
 import QRCode from "react-qr-code";
 import Barcode from "@kichiyaki/react-native-barcode-generator";
-import { RootStackParamList } from "../../../../app/navigation/stacks/Stack";
 import { useTranslation } from "react-i18next";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import ModulesEnum from "../../model/ModulesEnum";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
+import { HomeStackParamList } from "../../../../app/navigation/model/types";
 
 type DigitalCardModuleProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, "Edit", undefined>;
+  navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>;
   title: string;
 };
 

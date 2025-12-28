@@ -16,9 +16,9 @@ import { useTheme } from "../../../app/providers/ThemeProvider";
 import { useAuth } from "../../../app/providers/AuthProvider";
 
 import * as DeviceStorageClient from "../../../infrastructure/cloud/clients/DeviceStorageClient";
-import { formatAbsoluteLocal } from "../../vault/utils/expiry";
 import { useSetting } from "../../../app/providers/SettingsProvider";
 import { useVault } from "../../../app/providers/VaultProvider";
+import { formatAbsoluteLocal } from "../../../shared/utils/Timestamp";
 
 type BackupState =
   | { status: "loading" }

@@ -1,6 +1,7 @@
 import FolderType from "../model/FolderType";
 import ValuesType from "../model/ValuesType";
-import VaultData from "../model/VaultData";
+import VaultDataType from "../model/VaultDataType";
+import VaultDeviceType from "../model/VaultDeviceType";
 import VaultSessionState from "../model/VaultSessionState";
 
 let session: VaultSessionState | null = null;
@@ -10,7 +11,7 @@ export const VaultSession = {
     return session !== null;
   },
 
-  unlock(decrypted: VaultData) {
+  unlock(decrypted: VaultDataType) {
     session = { data: decrypted, dirty: false, unlockedAt: Date.now() };
   },
 
@@ -31,13 +32,13 @@ export const VaultSession = {
   },
 
   getEntry(id: string): ValuesType | null {
-    return session?.data.values.find((v) => v.id === id) ?? null;
+    return session?.data.values.find((v: any) => v.id === id) ?? null;
   },
 
   updateEntry(id: string, updater: (prev: ValuesType) => ValuesType) {
     if (!session) throw new Error("Vault locked");
 
-    const idx = session.data.values.findIndex((v) => v.id === id);
+    const idx = session.data.values.findIndex((v: any) => v.id === id);
     if (idx < 0) throw new Error("Entry not found");
 
     const nextValues = [...session.data.values];
@@ -47,7 +48,7 @@ export const VaultSession = {
     session.dirty = true;
   },
 
-  exportFullData(): VaultData {
+  exportFullData(): VaultDataType {
     if (!session) throw new Error("Vault locked");
     return session.data;
   },
@@ -63,7 +64,7 @@ export const VaultSession = {
   upsertEntry(entry: ValuesType) {
     if (!session) throw new Error("Vault locked");
 
-    const idx = session.data.values.findIndex((v) => v.id === entry.id);
+    const idx = session.data.values.findIndex((v: any) => v.id === entry.id);
     const nextValues = [...session.data.values];
 
     if (idx >= 0) nextValues[idx] = entry;
@@ -78,7 +79,19 @@ export const VaultSession = {
 
     session.data = {
       ...session.data,
-      values: session.data.values.filter((v) => v.id !== id),
+      values: session.data.values.filter((v: any) => v.id !== id),
+    };
+    session.dirty = true;
+  },
+  getDevices(): VaultDeviceType[] {
+    return session?.data.devices ?? [];
+  },
+  setDevices(nextDevices: VaultDeviceType[]) {
+    if (!session) throw new Error("Vault locked");
+
+    session.data = {
+      ...session.data,
+      devices: nextDevices,
     };
     session.dirty = true;
   },

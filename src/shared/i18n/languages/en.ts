@@ -85,47 +85,48 @@ const en: TranslationSchema = {
     contentProtection: "Content Protection",
     scanqrcode: "Scan QR Code",
     showqrcode: "Show QR Code",
+    manageDevices: "Manage Devices",
   },
   analysis: {
-  // headline blocks (optional – falls du später "Top findings" wieder einblendest)
-  topFindings: "Top findings",
-  noFindings: "No findings.",
-  strengthDistribution: "Strength distribution",
+    // headline blocks (optional – falls du später "Top findings" wieder einblendest)
+    topFindings: "Top findings",
+    noFindings: "No findings.",
+    strengthDistribution: "Strength distribution",
 
-  // score card
-  securityScore: "Security score",
-  scoreHint: "Fix the items below to improve your score.",
+    // score card
+    securityScore: "Security score",
+    scoreHint: "Fix the items below to improve your score.",
 
-  // strength buckets
-  strong: "Strong",
-  medium: "Medium",
-  weak: "Weak",
+    // strength buckets
+    strong: "Strong",
+    medium: "Medium",
+    weak: "Weak",
 
-  // filter buckets
-  all: "All",
-  itemsToFix: "Items to fix",
-  reused: "Reused",
-  similar: "Similar",
-
-  // badges
-  badge: {
+    // filter buckets
+    all: "All",
+    itemsToFix: "Items to fix",
     reused: "Reused",
     similar: "Similar",
-    short: "Too short",
-    sequential: "Sequential",
-    repeated: "Repeated",
-    variant: "Variant",
-  },
 
-  // findings list (optional – falls du sie nutzt)
-  finding: {
-    reused: "Reused passwords",
-    weak: "Weak passwords",
-    short: "Too short",
-    variants: "Password variants",
-    sequential: "Sequential patterns",
+    // badges
+    badge: {
+      reused: "Reused",
+      similar: "Similar",
+      short: "Too short",
+      sequential: "Sequential",
+      repeated: "Repeated",
+      variant: "Variant",
+    },
+
+    // findings list (optional – falls du sie nutzt)
+    finding: {
+      reused: "Reused passwords",
+      weak: "Weak passwords",
+      short: "Too short",
+      variants: "Password variants",
+      sequential: "Sequential patterns",
+    },
   },
-},
 
   analysisDetail: {
     title: "Analysis",
@@ -183,6 +184,37 @@ const en: TranslationSchema = {
     bitsValue: "{{bits}} bits",
     countPercent: "{{count}} ({{percent}}%)",
   },
+  devices: {
+  title: "Devices",
+  you: "You",
+
+  status: {
+    new: "New",
+    active: "Active",
+    archived: "Archived",
+  },
+
+  sections: {
+    new: "New",
+    active: "Active",
+    archived: "Archived",
+  },
+  hintLine:
+    "This list only shows devices/installations that have saved or synced the vault at least once (i.e. wrote to it). Devices that only read the vault (downloaded, unlocked, viewed) do not appear here.",
+
+  toggleArchivedOn: "Show archived: On",
+  toggleArchivedOff: "Show archived: Off",
+
+  empty: "No devices registered yet. Devices appear after the first save/sync.",
+  emptyNew: "No new devices.",
+  emptyActive: "No active devices.",
+  emptyArchived: "No archived devices.",
+
+  lastShort: "Last",
+  lastWrite: "Last write",
+  firstWrite: "First write",
+  id: "ID",
+},
   greetings: {
     1: "Hi",
     2: "Hey",

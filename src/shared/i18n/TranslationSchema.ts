@@ -84,6 +84,7 @@ export type TranslationSchema = {
     contentProtection: string;
     scanqrcode: string;
     showqrcode: string;
+    manageDevices: string;
   };
   analysis: {
   topFindings: string;
@@ -175,7 +176,36 @@ export type TranslationSchema = {
     bitsValue: string;
     countPercent: string;
   };
+  devices: {
+  title: string;
+  you: string;
 
+  status: {
+    new: string;
+    active: string;
+    archived: string;
+  };
+
+  sections: {
+    new: string;
+    active: string;
+    archived: string;
+  };
+  hintLine: string;
+
+  toggleArchivedOn: string;
+  toggleArchivedOff: string;
+
+  empty: string;
+  emptyNew: string;
+  emptyActive: string;
+  emptyArchived: string;
+
+  lastShort: string;
+  lastWrite: string;
+  firstWrite: string;
+  id: string;
+};
   greetings: {
     1: string;
     2: string;

@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, StyleSheet } from "react-native";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { MenuItem } from "../../../../shared/components/menus/MenuItem";
 
-import { formatAbsoluteLocal } from "../../utils/expiry";
 import { useTranslation } from "react-i18next";
 import { useSetting } from "../../../../app/providers/SettingsProvider";
+import { formatAbsoluteLocal } from "../../../../shared/utils/Timestamp";
 
 type MetaInformationModuleType = {
   lastUpdated: string;

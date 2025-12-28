@@ -14,6 +14,9 @@ import { uploadRemoteVaultFile } from "../../../infrastructure/cloud/clients/Clo
 import { logger } from "../../../infrastructure/logging/logger";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 import { useVault } from "../../../app/providers/VaultProvider";
+import { upsertVaultDevice } from "../../vault/utils/vaultDevices";
+import { getOrCreateDeviceId } from "../../../infrastructure/device/deviceId";
+import { getDeviceDisplayName, getPlatformString } from "../../vault/utils/deviceInfo";
 
 type Props = {
   refreshing: boolean;
@@ -67,36 +70,42 @@ const Sync = (props: Props) => {
   }, [showSync, fadeAnim, slideAnim]);
 
   const save = async () => {
-    if (!vault.isUnlocked) return;
+  if (!vault.isUnlocked) return;
 
-    props.setRefreshing(true);
+  props.setRefreshing(true);
 
-    try {
-      const lastUpdated = getDateTime();
+  try {
+    const lastUpdated = getDateTime();
 
-      const fullData = vault.exportFullData();
-      const encryptedData = await encrypt(
-        fullData,
-        auth.getMaster() ?? "",
-        lastUpdated
-      );
+    const deviceId = await getOrCreateDeviceId();
+    const platform = await getPlatformString();
+    const name = await getDeviceDisplayName();
 
-      uploadRemoteVaultFile({
-        provider,
-        accessToken: accessToken ?? "",
-        remotePath: "clavispass.lock",
-        content: encryptedData,
-        onCompleted: () => {
-          logger.info("[Sync] Remote vault upload completed.");
-          vault.markSaved();
-          props.setRefreshing(false);
-        },
-      });
-    } catch (err) {
-      logger.error("[Sync] Save failed:", err);
-      props.setRefreshing(false);
-    }
-  };
+    const iso = getDateTime();
+
+    vault.update((draft) => {
+      draft.devices = upsertVaultDevice(draft.devices, { id: deviceId, name, platform }, iso);
+    });
+
+    const fullData = vault.exportFullData();
+    const encryptedData = await encrypt(fullData, auth.getMaster() ?? "", lastUpdated);
+
+    uploadRemoteVaultFile({
+      provider,
+      accessToken: accessToken ?? "",
+      remotePath: "clavispass.lock",
+      content: encryptedData,
+      onCompleted: () => {
+        logger.info("[Sync] Remote vault upload completed.");
+        vault.markSaved();
+        props.setRefreshing(false);
+      },
+    });
+  } catch (err) {
+    logger.error("[Sync] Save failed:", err);
+    props.setRefreshing(false);
+  }
+};
 
   return (
     <Animated.View

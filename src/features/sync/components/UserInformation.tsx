@@ -111,8 +111,6 @@ function UserInformation(props: Props) {
               minWidth: 140,
               minHeight: 54,
               height: 92,
-              //flexDirection: "row",
-              //alignItems: "center",
               gap: 8,
             }}
           >

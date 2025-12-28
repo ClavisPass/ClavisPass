@@ -78,7 +78,7 @@ function BackupExportButton() {
   };
 
   return (
-    <SettingsItem leadingIcon="database-export" onPress={exportBackup}>
+    <SettingsItem onPress={exportBackup}>
       {t("settings:exportBackup")}
     </SettingsItem>
   );

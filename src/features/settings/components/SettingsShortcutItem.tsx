@@ -23,12 +23,12 @@ function SettingsItem(props: Props) {
           alignItems: "center",
           gap: 6,
         }}
-      >
+      >{/*
         <Icon
           size={20}
           color={theme.colors.primary}
           source={"keyboard"}
-        />
+        />*/}
         <Text
           variant="bodyLarge"
           style={{ userSelect: "none" }}

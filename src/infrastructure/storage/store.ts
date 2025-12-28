@@ -54,6 +54,12 @@ function normalizeFavoriteModules(input: unknown): ModulesEnum[] | null {
 }
 
 export const storeSchema = {
+  DEVICE_ID: {
+    type: "json",
+    default: null as string | null,
+    validate: (v: unknown): v is string | null =>
+      v === null || (typeof v === "string" && v.length >= 16),
+  },
   THEME_PREFERENCE: {
     type: "enum",
     values: ["light", "dark"] as const,
