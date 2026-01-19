@@ -260,6 +260,7 @@ const en: TranslationSchema = {
     created: "Created",
     lastUpdated: "Last Updated",
     unknownModule: "Unknown Module",
+    recoveryCodes: "Recovery Codes",
     recoveryCodesPlaceholder: "Paste codes…",
     recoveryCodesHelp: "Tap a chip to copy.",
   },

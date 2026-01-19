@@ -1,3 +1,4 @@
+import { StringFormat } from "expo-clipboard";
 import { unknown } from "zod";
 
 export type TranslationSchema = {
@@ -251,6 +252,7 @@ export type TranslationSchema = {
     created: string;
     lastUpdated: string;
     unknownModule: string;
+    recoveryCodes: string;
     recoveryCodesPlaceholder: string;
     recoveryCodesHelp: string;
   };

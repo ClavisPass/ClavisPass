@@ -22,7 +22,7 @@ export default function TabNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        // Hinweis: "animation" ist keine BottomTab option; falls es bei dir ohne Fehler lief, ignoriert RN das.
+        freezeOnBlur: true,
         sceneStyle: width > 600 ? { marginLeft: 88 } : undefined,
       }}
       tabBar={(props) =>

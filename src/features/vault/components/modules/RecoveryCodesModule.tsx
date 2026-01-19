@@ -173,6 +173,12 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
 
   const shouldRenderInput = showInput || isFocused || input.length > 0 || codes.length === 0;
 
+  const toggleUsed = (code: string) => {
+  setCodes((prev) =>
+    prev.map((c) => (c.code === code ? { ...c, used: !c.used } : c))
+  );
+};
+
   return (
     <ModuleContainer
       id={props.id}
@@ -201,11 +207,16 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
                 >
                   <Chip
                     compact
+                    selected={c.used}
+                    icon={() => null}
+                    showSelectedOverlay={true}
                     style={styles.chip}
                     textStyle={styles.chipText}
                     onPress={() => copy(c.code)}
                     onClose={() => removeCode(c.code)}
                     closeIcon="close"
+                    onLongPress={() => toggleUsed(c.code)}
+                    delayLongPress={300}
                   >
                     {c.code}
                   </Chip>

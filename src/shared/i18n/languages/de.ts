@@ -269,6 +269,7 @@ const de: TranslationSchema = {
     created: "Erstellt",
     lastUpdated: "Zuletzt aktualisiert",
     unknownModule: "Unbekanntes Modul",
+    recoveryCodes: "Wiederherstellungscodes",
     recoveryCodesPlaceholder: "Codes einfügen…",
     recoveryCodesHelp: "Tippe auf einen Chip, um ihn zu kopieren.",
   },
