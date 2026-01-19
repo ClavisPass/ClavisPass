@@ -125,6 +125,10 @@ export const storeSchema = {
     type: "number",
     default: 30 * 60,
   },
+  ONBOARDING_DONE: {
+    type: "boolean",
+    default: false,
+  },
 } as const satisfies Record<
   string,
   | EnumDef<readonly string[], string>

@@ -37,6 +37,8 @@ import SettingsDivider from "../features/settings/components/SettingsDivider";
 import { useTranslation } from "react-i18next";
 import SettingsItem from "../features/settings/components/SettingsItem";
 import { LoginStackParamList } from "../app/navigation/model/types";
+import FirstOpened from "../features/onboarding/components/FirstOpened";
+import { useSetting } from "../app/providers/SettingsProvider";
 
 type LoginScreenProps = NativeStackScreenProps<LoginStackParamList, "Login">;
 
@@ -45,6 +47,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { headerWhite, setHeaderWhite, darkmode, theme, setHeaderSpacing } =
     useTheme();
   const { t } = useTranslation();
+  const { value: onboardingDone } = useSetting("ONBOARDING_DONE");
 
   const {
     provider,
@@ -144,24 +147,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   };
 
   return (
-    <ImageBackground
-      source={
-        darkmode
-          ? require("../../assets/blurred-bg-dark.png")
-          : require("../../assets/blurred-bg.png")
-      }
-      resizeMode="cover"
-      style={{
-        flex: 1,
-        width: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <View
+    <BottomSheetModalProvider>
+      <ImageBackground
+        source={
+          darkmode
+            ? require("../../assets/blurred-bg-dark.png")
+            : require("../../assets/blurred-bg.png")
+        }
+        resizeMode="cover"
         style={{
-          padding: 20,
           flex: 1,
           width: "100%",
           display: "flex",
@@ -169,66 +163,86 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           justifyContent: "center",
         }}
       >
-        <StatusBar
-          animated={true}
-          style={headerWhite ? "light" : darkmode ? "light" : "dark"}
-          translucent={true}
-        />
-        <View style={{ height: 17 }}></View>
-        <BlurView
-          intensity={80}
-          tint={darkmode ? "dark" : undefined}
+        <View
           style={{
-            height: "80%",
-            maxHeight: 500,
-            borderRadius: 12,
             padding: 20,
-            overflow: "hidden",
-            margin: 8,
-            minWidth: 300,
-            maxWidth: 300,
+            flex: 1,
+            width: "100%",
             display: "flex",
+            alignItems: "center",
             justifyContent: "center",
-            boxShadow: theme.colors.shadow,
-            borderWidth: StyleSheet.hairlineWidth,
-            borderColor: darkmode ? theme.colors.outlineVariant : "white",
           }}
         >
-          <Animated.View
-            key={currentKey}
-            entering={FadeIn.duration(500).easing(
-              Easing.bezier(0.4, 0, 0.2, 1)
-            )}
-            exiting={FadeOut.duration(500).easing(
-              Easing.bezier(0.4, 0, 0.2, 1)
-            )}
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          <StatusBar
+            animated={true}
+            style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+            translucent={true}
+          />
+          <View style={{ height: 17 }}></View>
+          <BlurView
+            intensity={80}
+            tint={darkmode ? "dark" : undefined}
+            style={{
+              height: "80%",
+              maxHeight: 500,
+              borderRadius: 12,
+              padding: 20,
+              overflow: "hidden",
+              margin: 8,
+              minWidth: 300,
+              maxWidth: 300,
+              display: "flex",
+              justifyContent: "center",
+              boxShadow: theme.colors.shadow,
+              borderWidth: StyleSheet.hairlineWidth,
+              borderColor: darkmode ? theme.colors.outlineVariant : "white",
+            }}
           >
-            {!isOnline ? (
-              <Backup />
-            ) : isInitializing || loadingUserInfo ? (
-              <AnimatedLogo />
-            ) : (
-              <Login userInfo={userInfo} />
-            )}
-          </Animated.View>
-        </BlurView>
-        {provider === "device" ? (
-          <Text
-            style={{ marginTop: 8, textDecorationLine: "underline" }}
-            onPress={handlePresentModalPress}
-          >
-            {t("login:cloudSave")}
-          </Text>
-        ) : (
-          <Text
-            style={{ marginTop: 8, textDecorationLine: "underline" }}
-            onPress={handleLogout}
-          >
-            {t("login:deviceSave")}
-          </Text>
-        )}
-        <BottomSheetModalProvider>
+            <Animated.View
+              key={currentKey}
+              entering={FadeIn.duration(500).easing(
+                Easing.bezier(0.4, 0, 0.2, 1)
+              )}
+              exiting={FadeOut.duration(500).easing(
+                Easing.bezier(0.4, 0, 0.2, 1)
+              )}
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {!isOnline ? (
+                <Backup />
+              ) : isInitializing || loadingUserInfo ? (
+                <AnimatedLogo />
+              ) : !onboardingDone ? (
+                <FirstOpened
+                  onFinish={() => {
+                    /* optional: noop */
+                  }}
+                />
+              ) : (
+                <Login userInfo={userInfo} />
+              )}
+            </Animated.View>
+          </BlurView>
+          {provider === "device" ? (
+            <Text
+              style={{ marginTop: 8, textDecorationLine: "underline" }}
+              onPress={handlePresentModalPress}
+            >
+              {t("login:cloudSave")}
+            </Text>
+          ) : (
+            <Text
+              style={{ marginTop: 8, textDecorationLine: "underline" }}
+              onPress={handleLogout}
+            >
+              {t("login:deviceSave")}
+            </Text>
+          )}
+
           <BottomSheetModal
             ref={bottomSheetModalRef}
             style={{
@@ -257,9 +271,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               <SettingsDivider />
             </BottomSheetView>
           </BottomSheetModal>
-        </BottomSheetModalProvider>
-      </View>
-    </ImageBackground>
+        </View>
+      </ImageBackground>
+    </BottomSheetModalProvider>
   );
 };
 

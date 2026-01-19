@@ -58,6 +58,7 @@ import {
   formatAbsoluteDate,
   formatAbsoluteTime,
 } from "../shared/utils/Timestamp";
+import AppearanceSettingsSection from "../features/settings/components/AppearanceSettingsSection";
 
 const styles = StyleSheet.create({
   surface: {
@@ -106,12 +107,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const { value: fastAccessValue, setValue: setFastAccessValue } =
     useSetting("FAST_ACCESS");
 
-  const { value: language, setValue: setLanguageSetting } =
-    useSetting("LANGUAGE");
-  const { value: dateFormat, setValue: setDateFormatSetting } =
-    useSetting("DATE_FORMAT");
-  const { value: timeFormat, setValue: setTimeFormatSetting } =
-    useSetting("TIME_FORMAT");
+  const { value: language } = useSetting("LANGUAGE");
 
   const { value: copyDurationSeconds, setValue: setCopyDurationSeconds } =
     useSetting("COPY_DURATION");
@@ -325,74 +321,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               icon={quickSelectItems[2].icon}
               title={quickSelectItems[2].title}
             >
-              <DarkModeSwitch />
-              <SettingsDivider />
-
-              <SettingsDropdownItem
-                value={language}
-                setValue={(lang) => {
-                  i18n.changeLanguage(lang);
-                  setLanguageSetting(lang as AppLanguage);
-                }}
-                label={t("settings:language")}
-                options={[
-                  { label: "English", value: "en" },
-                  { label: "Deutsch", value: "de" },
-                ]}
-              />
-
-              <SettingsDivider />
-
-              <SettingsDropdownItem
-                value={dateFormat}
-                setValue={(df) => {
-                  setDateFormatSetting(df as "de-DE" | "en-US");
-                }}
-                label={t("settings:dateFormat")}
-                dropdownMaxWidth={120}
-                options={[
-                  {
-                    label: formatAbsoluteDate(
-                      new Date().toISOString(),
-                      "de-DE"
-                    ),
-                    value: "de-DE",
-                  },
-                  {
-                    label: formatAbsoluteDate(
-                      new Date().toISOString(),
-                      "en-US"
-                    ),
-                    value: "en-US",
-                  },
-                ]}
-              />
-
-              <SettingsDivider />
-
-              <SettingsDropdownItem
-                value={timeFormat}
-                setValue={(tf) => {
-                  setTimeFormatSetting(tf as "de-DE" | "en-US");
-                }}
-                label={t("settings:timeFormat")}
-                options={[
-                  {
-                    label: formatAbsoluteTime(
-                      new Date().toISOString(),
-                      "de-DE"
-                    ),
-                    value: "de-DE",
-                  },
-                  {
-                    label: formatAbsoluteTime(
-                      new Date().toISOString(),
-                      "en-US"
-                    ),
-                    value: "en-US",
-                  },
-                ]}
-              />
+              <AppearanceSettingsSection dropdownMaxWidth={160}/>
             </SettingsContainer>
 
             <SettingsContainer
@@ -419,9 +348,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               <ContentProtectionSettingsToggle />
               <SettingsDivider />
               <SettingsItem
-                onPress={
-                  ()=>{navigation.navigate("Devices")}
-                }
+                onPress={() => {
+                  navigation.navigate("Devices");
+                }}
               >
                 {t("settings:manageDevices")}
               </SettingsItem>

@@ -21,7 +21,6 @@ const SCOPES = [
 const isMobile = Platform.OS === "ios" || Platform.OS === "android";
 const isWeb = Platform.OS === "web";
 
-// -------- Helpers --------
 function getMobileRedirectUri() {
   return AuthSession.makeRedirectUri({ native: "clavispass://redirect" });
 }

@@ -30,6 +30,10 @@ const en: TranslationSchema = {
     reset: "Reset",
     verify: "Verify",
     reload: "Reload",
+    back: "Back",
+    next: "Next",
+    done: "Done",
+    offline: "Offline",
   },
   login: {
     masterPassword: "Master Password",

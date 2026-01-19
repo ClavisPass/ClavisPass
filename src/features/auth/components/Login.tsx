@@ -83,7 +83,6 @@ function Login(props: Props) {
       setIsUsingAuthenticationButtonVisible(hasAuthentication);
 
       if (!provider) {
-        // Wenn du provider nie null haben willst, kannst du das weglassen.
         logger.warn("[Login] No provider configured – treating as new vault.");
         setShowNewData(true);
         setLoading(false);
@@ -107,7 +106,6 @@ function Login(props: Props) {
       });
 
       if (res.status === "not_found") {
-        // ✅ Nur in diesem Fall neues Passwort abfragen
         setShowNewData(true);
         setLoading(false);
         setTimeout(() => textInputNewRef.current?.focus?.(), 50);
@@ -115,13 +113,11 @@ function Login(props: Props) {
       }
 
       if (res.status === "error") {
-        // ✅ Kein New Vault – sondern Retry UI
         setFetchError(res.message || "Failed to load vault.");
         setLoading(false);
         return;
       }
 
-      // status === "ok"
       const parsed = CryptoTypeSchema.parse(JSON.parse(res.content));
       setParsedCryptoData(parsed);
       setLoading(false);
@@ -196,7 +192,6 @@ function Login(props: Props) {
       >
         <TypeWriterComponent displayName={props.userInfo?.username ?? ""} />
 
-        {/* ✅ Fehlerblock + Retry statt "new vault" */}
         {fetchError && !showNewData && (
           <View style={{ width: "100%", gap: 8 }}>
             <Text style={{ color: theme.colors.error, textAlign: "center" }}>
@@ -206,7 +201,6 @@ function Login(props: Props) {
           </View>
         )}
 
-        {/* ✅ New Vault nur bei not_found */}
         {!fetchError && showNewData ? (
           <>
             <View style={{ width: "100%", display: "flex", flexDirection: "column", gap: 6 }}>

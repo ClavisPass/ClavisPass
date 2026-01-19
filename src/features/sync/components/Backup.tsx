@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { View } from "react-native";
-import { ActivityIndicator, Icon, Text } from "react-native-paper";
+import { ActivityIndicator, Button as RNPButton, Icon, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
 import CryptoType, {
@@ -11,7 +11,6 @@ import { VaultDataTypeSchema } from "../../vault/model/VaultDataType";
 import { logger } from "../../../infrastructure/logging/logger";
 
 import PasswordTextbox from "../../../shared/components/PasswordTextbox";
-import Button from "../../../shared/components/buttons/Button";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import { useAuth } from "../../../app/providers/AuthProvider";
 
@@ -19,12 +18,8 @@ import * as DeviceStorageClient from "../../../infrastructure/cloud/clients/Devi
 import { useSetting } from "../../../app/providers/SettingsProvider";
 import { useVault } from "../../../app/providers/VaultProvider";
 import { formatAbsoluteLocal } from "../../../shared/utils/Timestamp";
-
-type BackupState =
-  | { status: "loading" }
-  | { status: "ready"; crypto: CryptoType }
-  | { status: "empty" }
-  | { status: "error"; message: string };
+import Button from "../../../shared/components/buttons/Button";
+import BackupStateType from "../model/BackupStateType";
 
 function Backup() {
   const { t } = useTranslation();
@@ -41,7 +36,7 @@ function Backup() {
   const textInputRef = useRef<any>(null);
   const [value, setValue] = useState("");
 
-  const [state, setState] = useState<BackupState>({ status: "loading" });
+  const [state, setState] = useState<BackupStateType>({ status: "loading" });
 
   const fetchBackup = useCallback(async () => {
     try {
@@ -117,7 +112,7 @@ function Backup() {
           }}
         >
           <Text style={{ textAlign: "center" }}>{state.message}</Text>
-          <Button text={t("common:retry")} onPress={fetchBackup} />
+          <RNPButton mode="outlined" onPress={fetchBackup}>{t("common:retry")}</RNPButton>
         </View>
       );
     }
