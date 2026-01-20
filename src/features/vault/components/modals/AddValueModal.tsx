@@ -7,13 +7,16 @@ import CategoryItem from "../items/CategoryItem";
 import FolderType from "../../model/FolderType";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { HomeStackParamList } from "../../../../app/navigation/model/types";
 
 type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  navigation: any;
+  navigation: NativeStackNavigationProp<HomeStackParamList, "Home", undefined>;
   favorite: boolean;
   folder: FolderType | null;
+  searchstring: string | null;
 };
 
 function AddValueModal(props: Props) {
@@ -25,6 +28,7 @@ function AddValueModal(props: Props) {
       value: getTemplate(template),
       favorite: props.favorite,
       folder: props.folder,
+      searchstring: props.searchstring,
     });
     props.setVisible(false);
   };

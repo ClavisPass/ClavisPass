@@ -52,6 +52,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     value: routeValue,
     favorite: routeFavorite,
     folder: routeFolder,
+    searchstring: routeSearchstring,
   } = route.params!;
   const vault = useVault();
 
@@ -304,6 +305,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             discardChanges={() => {
               discardChangesRef.current = true;
             }}
+            initialTitle={routeSearchstring ?? null}
           />
         }
       ></Header>

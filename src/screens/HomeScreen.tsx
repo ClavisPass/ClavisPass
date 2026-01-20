@@ -532,6 +532,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             navigation={navigation}
             favorite={selectedFav}
             folder={selectedFolder}
+            searchstring={searchQuery !== "" && filteredValues.length === 0 ? searchQuery : null}
           />
         </View>
       </BottomSheetModalProvider>

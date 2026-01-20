@@ -34,7 +34,6 @@ import DigitalCardModule from "../components/modules/DigitalCardModule";
 import TaskModule from "../components/modules/TaskModule";
 import TaskModuleType from "../model/modules/TaskModuleType";
 
-import { RootStackParamList } from "../../../app/navigation/stacks/Stack";
 import UnknownModule from "../components/modules/UnknownModule";
 import createUniqueID from "../../../shared/utils/createUniqueID";
 
@@ -51,6 +50,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import RecoveryCodesModule from "../components/modules/RecoveryCodesModule";
 import RecoveryCodesModuleType from "../model/modules/RecoveryCodesModuleType";
+import { HomeStackParamList } from "../../../app/navigation/model/types";
 
 type RenderableModules = Exclude<
   ModulesEnum,
@@ -62,7 +62,7 @@ type GetModuleArgs = {
   deleteModule: (id: string) => void;
   changeModule: (module: ModuleType) => void;
   fastAccess: FastAccessType | null;
-  navigation: NativeStackNavigationProp<RootStackParamList, "Edit", undefined>;
+  navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>;
   title: string;
 };
 
@@ -296,7 +296,7 @@ function getModule(
   deleteModule: (id: string) => void,
   changeModule: (module: ModuleType) => void,
   fastAccess: FastAccessType | null,
-  navigation: NativeStackNavigationProp<RootStackParamList, "Edit", undefined>,
+  navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>,
   title: string
 ): ReactNode {
   const args: GetModuleArgs = {

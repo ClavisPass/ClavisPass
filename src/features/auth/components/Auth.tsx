@@ -9,9 +9,11 @@ import SettingsItem from "../../settings/components/SettingsItem";
 import SettingsDivider from "../../settings/components/SettingsDivider";
 import { View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { SettingsStackParamList } from "../../../app/navigation/model/types";
 
 type Props = {
-  navigation: any;
+  navigation: NativeStackNavigationProp<SettingsStackParamList, "Settings", undefined>;
   setUserInfo?: (userInfo: UserInfoType) => void;
 };
 

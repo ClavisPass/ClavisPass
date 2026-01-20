@@ -10,6 +10,7 @@ type Props = {
   value: ValuesType;
   setValue: (value: ValuesType) => void;
   discardChanges: () => void;
+  initialTitle: string | null;
 };
 
 function TitleModule(props: Props) {
@@ -27,6 +28,9 @@ function TitleModule(props: Props) {
 
   useEffect(() => {
     if (textInputRef.current && props.value.title === "") {
+      if (props.initialTitle !== null) {
+        changeTitle(props.initialTitle);
+      }
       textInputRef.current.focus();
     }
   }, []);

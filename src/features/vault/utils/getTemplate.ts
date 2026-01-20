@@ -16,9 +16,6 @@ function getTemplate(template: TemplateEnum) {
     created: dateTime,
     lastUpdated: dateTime,
   };
-  if (template == TemplateEnum.BLANK) {
-    return value;
-  }
   if (template == TemplateEnum.DIGITAL_CARD) {
     const digitalCard = getModuleData(ModulesEnum.DIGITAL_CARD);
     if (digitalCard) {
@@ -57,6 +54,7 @@ function getTemplate(template: TemplateEnum) {
     }
     return value;
   }
+  return value;
 }
 
 export default getTemplate;
