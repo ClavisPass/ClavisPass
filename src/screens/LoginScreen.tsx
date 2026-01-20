@@ -47,7 +47,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { headerWhite, setHeaderWhite, darkmode, theme, setHeaderSpacing } =
     useTheme();
   const { t } = useTranslation();
-  const { value: onboardingDone } = useSetting("ONBOARDING_DONE");
+  const { value: onboardingDone } =
+    useSetting("ONBOARDING_DONE");
 
   const {
     provider,
@@ -64,7 +65,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     React.useCallback(() => {
       setHeaderSpacing(0);
       setHeaderWhite(false);
-    }, [setHeaderSpacing, setHeaderWhite])
+    }, [setHeaderSpacing, setHeaderWhite]),
   );
 
   const loadUserInfo = useCallback(async () => {
@@ -88,7 +89,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         const freshToken = accessToken ?? (await ensureFreshAccessToken());
         if (!freshToken) {
           logger.warn(
-            "[LoginScreen] No access token – treating userInfo as null."
+            "[LoginScreen] No access token – treating userInfo as null.",
           );
           setUserInfo(null);
           setLoadingUserInfo(false);
@@ -105,7 +106,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         },
         () => {
           setLoadingUserInfo(false);
-        }
+        },
       );
     } catch (error) {
       logger.error("[LoginScreen] Error during userInfo fetch:", error);
@@ -201,10 +202,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             <Animated.View
               key={currentKey}
               entering={FadeIn.duration(500).easing(
-                Easing.bezier(0.4, 0, 0.2, 1)
+                Easing.bezier(0.4, 0, 0.2, 1),
               )}
               exiting={FadeOut.duration(500).easing(
-                Easing.bezier(0.4, 0, 0.2, 1)
+                Easing.bezier(0.4, 0, 0.2, 1),
               )}
               style={{
                 flex: 1,
@@ -218,9 +219,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 <AnimatedLogo />
               ) : !onboardingDone ? (
                 <FirstOpened
-                  onFinish={() => {
-                    /* optional: noop */
-                  }}
+                  navigation={navigation}
                 />
               ) : (
                 <Login userInfo={userInfo} />

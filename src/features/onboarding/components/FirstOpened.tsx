@@ -19,14 +19,24 @@ import { useOnline } from "../../../app/providers/OnlineProvider";
 import AppearanceSettingsSection from "../../settings/components/AppearanceSettingsSection";
 import { useSetting } from "../../../app/providers/SettingsProvider";
 import { useToken } from "../../../app/providers/CloudProvider";
+import SettingsItem from "../../settings/components/SettingsItem";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { LoginStackParamList } from "../../../app/navigation/model/types";
 
-type Props = { onFinish: () => void };
+type Props = {
+  onFinish?: () => void;
+  navigation: NativeStackNavigationProp<
+    LoginStackParamList,
+    "Login",
+    undefined
+  >;
+};
 type Step = 0 | 1;
 type Direction = "forward" | "back";
 
 const DURATION = 180;
 
-const FirstOpened: React.FC<Props> = ({ onFinish }) => {
+const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { isOnline } = useOnline();
@@ -55,7 +65,7 @@ const FirstOpened: React.FC<Props> = ({ onFinish }) => {
 
   const finish = async () => {
     await setOnboardingDone(true);
-    onFinish();
+    onFinish?.();
   };
 
   const finishingRef = useRef(false);
@@ -166,6 +176,13 @@ const FirstOpened: React.FC<Props> = ({ onFinish }) => {
           <DropboxLoginButton />
           <SettingsDivider />
           <GoogleDriveLoginButton />
+          <SettingsDivider />
+          <SettingsItem
+            leadingIcon={"qrcode-scan"}
+            onPress={() => navigation.navigate("Scan")}
+          >
+            {t("settings:scanqrcode")}
+          </SettingsItem>
           <SettingsDivider />
         </View>
 
