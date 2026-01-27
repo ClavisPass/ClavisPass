@@ -3,6 +3,7 @@ import { useState } from "react";
 import SettingsItem from "../SettingsItem";
 import { useToken } from "../../../../app/providers/CloudProvider";
 import { useTranslation } from "react-i18next";
+import SettingsDivider from "../SettingsDivider";
 
 function ShowQRCodeButton() {
   const { refreshToken } = useToken();
@@ -12,6 +13,7 @@ function ShowQRCodeButton() {
     <>
       {refreshToken && (
         <>
+        <SettingsDivider />
           <SettingsItem
             leadingIcon={"qrcode"}
             onPress={() => setQrCodeVisible(true)}

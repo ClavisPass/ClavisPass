@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useMemo } from "react";
 import * as WebBrowser from "expo-web-browser";
-import { Chip, Text, Avatar, Icon } from "react-native-paper";
+import { Avatar, Icon, IconButton, Text, useTheme } from "react-native-paper";
 import { Skeleton } from "moti/skeleton";
 import { View } from "react-native";
 import { MotiView } from "moti";
+
 import DropboxLoginButton from "./DropboxLoginButton";
-import UserInfoType from "../model/UserInfoType";
-import { useTheme } from "../../../app/providers/ThemeProvider";
-import { useToken } from "../../../app/providers/CloudProvider";
-import { logger } from "../../../infrastructure/logging/logger";
-import { fetchUserInfo } from "../../../infrastructure/cloud/clients/CloudStorageClient";
 import GoogleDriveLoginButton from "./GoogleDriveLoginButton";
 import SettingsDivider from "../../settings/components/SettingsDivider";
+
+import UserInfoType from "../model/UserInfoType";
+import { useToken } from "../../../app/providers/CloudProvider";
 import { useOnline } from "../../../app/providers/OnlineProvider";
+import { fetchUserInfo } from "../../../infrastructure/cloud/clients/CloudStorageClient";
+import { logger } from "../../../infrastructure/logging/logger";
+import { useTheme as useAppTheme } from "../../../app/providers/ThemeProvider";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -21,9 +23,10 @@ type Props = {
 };
 
 function UserInformation(props: Props) {
-  const { darkmode } = useTheme();
+  const paperTheme = useTheme();
+  const { darkmode } = useAppTheme();
   const { isOnline } = useOnline();
-  const { theme } = useTheme();
+
   const {
     provider,
     accessToken,
@@ -51,7 +54,6 @@ function UserInformation(props: Props) {
       setLoading(true);
 
       const token = accessToken ?? (await ensureFreshAccessToken());
-
       if (!token) {
         logger.warn("[UserInformation] No access token available.");
         setLoading(false);
@@ -65,9 +67,7 @@ function UserInformation(props: Props) {
           setUserInfoState(info);
           props.setUserInfo?.(info);
         },
-        () => {
-          setLoading(false);
-        }
+        () => setLoading(false)
       );
     } catch (err) {
       logger.error("[UserInformation] Failed to load user info:", err);
@@ -89,108 +89,124 @@ function UserInformation(props: Props) {
     }
   };
 
+  const providerLabel =
+    provider === "dropbox"
+      ? "Dropbox verbunden"
+      : provider === "googleDrive"
+      ? "Google Drive verbunden"
+      : "Nicht verbunden";
+
+  const providerIcon =
+    provider === "dropbox"
+      ? "dropbox"
+      : provider === "googleDrive"
+      ? "google-drive"
+      : "cloud-off-outline";
+
   return (
-    <View
-      style={{
-        width: "100%",
-      }}
-    >
+    <View style={{ width: "100%" }}>
       {hasCloudSession ? (
         <MotiView
-          from={{ opacity: 0, translateY: -4 }}
+          from={{ opacity: 0, translateY: -6 }}
           animate={{ opacity: 1, translateY: 0 }}
           exit={{ opacity: 0 }}
-          transition={{ type: "timing", duration: 250 }}
+          transition={{ type: "timing", duration: 220 }}
         >
+          {/* Account Card */}
           <View
             style={{
-              flex: 1,
-              display: "flex",
-              padding: 10,
-              paddingLeft: 8,
-              minWidth: 140,
-              minHeight: 54,
-              height: 92,
-              gap: 8,
+              width: "100%",
+              borderRadius: 12,
+              padding: 8,
+              //backgroundColor: paperTheme.colors.elevation.level1,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 12,
             }}
           >
+            {/* Avatar */}
             {loading || !userInfo ? (
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 6,
-                }}
-              >
-                <Skeleton
-                  show
-                  height={30}
-                  width={30}
-                  radius={50}
-                  colorMode={darkmode ? "dark" : "light"}
-                />
-                <Skeleton
-                  show
-                  height={20}
-                  width={100}
-                  radius={6}
-                  colorMode={darkmode ? "dark" : "light"}
-                />
-              </View>
+              <Skeleton
+                show
+                height={48}
+                width={48}
+                radius={999}
+                colorMode={darkmode ? "dark" : "light"}
+              />
+            ) : userInfo.avatar ? (
+              <Avatar.Image size={48} source={{ uri: userInfo.avatar }} />
             ) : (
-              <MotiView
-                from={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ type: "timing", duration: 300, delay: 100 }}
-                style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
-              >
-                {userInfo.avatar ? (
-                  <Avatar.Image size={30} source={{ uri: userInfo.avatar }} />
-                ) : (
-                  <Avatar.Text size={30} label={userInfo.username.charAt(0)} />
-                )}
-                <Text
-                  variant="bodyLarge"
-                  style={{ userSelect: "none" as any }}
-                  ellipsizeMode="tail"
-                  numberOfLines={1}
-                >
-                  {userInfo.username}
-                </Text>
-              </MotiView>
+              <Avatar.Text
+                size={48}
+                label={(userInfo?.username?.charAt(0) ?? "?").toUpperCase()}
+              />
             )}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 6,
-              }}
-            >
-              {provider === "dropbox" ? (
-                <Icon
-                  source={"dropbox"}
-                  size={24}
-                  color={theme.colors.primary}
-                />
-              ) : null}
-              {provider === "googleDrive" ? (
-                <Icon
-                  source={"google-drive"}
-                  size={24}
-                  color={theme.colors.primary}
-                />
-              ) : null}
-              <Chip style={{ width: 100 }} onPress={handleLogout} icon="logout">
-                Logout
-              </Chip>
+
+            {/* Name + Provider */}
+            <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
+              {loading || !userInfo ? (
+                <>
+                  <Skeleton
+                    show
+                    height={16}
+                    width={140}
+                    radius={6}
+                    colorMode={darkmode ? "dark" : "light"}
+                  />
+                  <Skeleton
+                    show
+                    height={12}
+                    width={110}
+                    radius={6}
+                    colorMode={darkmode ? "dark" : "light"}
+                  />
+                </>
+              ) : (
+                <>
+                  <Text variant="titleMedium" numberOfLines={1}>
+                    {userInfo.username}
+                  </Text>
+
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 6,
+                    }}
+                  >
+                    <Icon
+                      source={providerIcon}
+                      size={18}
+                      color={paperTheme.colors.primary}
+                    />
+                    <Text
+                      variant="bodySmall"
+                      style={{ color: paperTheme.colors.onSurfaceVariant }}
+                      numberOfLines={1}
+                    >
+                      {providerLabel}
+                      {!isOnline ? " • offline" : ""}
+                    </Text>
+                  </View>
+                </>
+              )}
             </View>
+
+            {/* Logout action */}
+            <IconButton
+              icon="logout"
+              mode="contained-tonal"
+              onPress={handleLogout}
+              disabled={loading}
+              accessibilityLabel="Logout"
+            />
           </View>
         </MotiView>
       ) : (
         <MotiView
-          from={{ opacity: 0, scale: 0.95 }}
+          from={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: "timing", duration: 300 }}
+          transition={{ type: "timing", duration: 220 }}
         >
           <DropboxLoginButton />
           <SettingsDivider />

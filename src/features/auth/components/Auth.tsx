@@ -29,7 +29,6 @@ function Auth(props: Props) {
       >
         {t("settings:scanqrcode")}
       </SettingsItem>
-      <SettingsDivider />
       <ShowQRCodeButton />
     </View>
   );
