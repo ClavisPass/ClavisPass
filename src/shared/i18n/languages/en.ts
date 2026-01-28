@@ -34,6 +34,7 @@ const en: TranslationSchema = {
     next: "Next",
     done: "Done",
     offline: "Offline",
+    copiedFor: "Copied for {{seconds}} seconds",
   },
   login: {
     masterPassword: "Master Password",

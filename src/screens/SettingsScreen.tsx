@@ -384,7 +384,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                     value: "30",
                   },
                   {
-                    label: t("settings:minutes", { count: 1 }),
+                    label: t("settings:seconds", { count: 60 }),
                     value: "60",
                   },
                 ]}

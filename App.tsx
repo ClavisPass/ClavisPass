@@ -22,6 +22,7 @@ import DropdownLayer from "./src/shared/components/web/DropdownLayer";
 import NavigationContainer from "./src/app/navigation/NavigationContainer";
 import { VaultProvider } from "./src/app/providers/VaultProvider";
 import { ContentProtectionProvider } from "./src/app/providers/ContentProtectionProvider";
+import GlobalClipboardSnackbar from "./src/shared/components/GlobalClipboardSnackbar";
 
 const Tab = createBottomTabNavigator();
 
@@ -65,6 +66,7 @@ export function AppWithNavigation() {
                     <VaultProvider>
                       <DevModeProvider>
                         <GlobalErrorSnackbar />
+                        <GlobalClipboardSnackbar />
                         <View
                           style={{
                             borderRadius: Platform.OS === "web" ? 6 : 0,

@@ -1,52 +1,70 @@
 import * as Clipboard from "expo-clipboard";
 
-type TimeoutHandle = ReturnType<typeof setTimeout>;
-
 class ClipboardClearScheduler {
-  private clearTimer: TimeoutHandle | null = null;
-  private lastCopiedValue: string | null = null;
+  private timeoutId: ReturnType<typeof setTimeout> | null = null;
+  private lastValue: string | null = null;
 
-  /**
-   * Schedules a clipboard clear after durationMs.
-   * Any new schedule cancels the previous one and restarts the full duration.
-   */
-  scheduleClear(valueJustCopied: string, durationMs: number) {
+  scheduleClear(value: string, durationMs: number) {
     this.cancel();
+    this.lastValue = value;
 
-    this.lastCopiedValue = valueJustCopied;
+    const ms = Math.max(0, Math.floor(durationMs));
 
-    if (durationMs <= 0) return;
+    if (ms === 0) {
+      void this.forceClear(); // best effort
+      return;
+    }
 
-    this.clearTimer = setTimeout(async () => {
-      try {
-        const current = await Clipboard.getStringAsync();
-        if (current === this.lastCopiedValue) {
-          await Clipboard.setStringAsync("");
-        }
-      } catch {
-      } finally {
-        this.clearTimer = null;
-      }
-    }, durationMs);
+    this.timeoutId = setTimeout(() => {
+      void this.forceClearIfStillMatches(value);
+    }, ms);
   }
 
   cancel() {
-    if (this.clearTimer) {
-      clearTimeout(this.clearTimer);
-      this.clearTimer = null;
+    if (this.timeoutId) clearTimeout(this.timeoutId);
+    this.timeoutId = null;
+  }
+
+  private async safeReadClipboard(): Promise<string | null> {
+    try {
+      return await Clipboard.getStringAsync();
+    } catch {
+      return null;
     }
   }
 
-
-  async clearNowIfMatchesLast() {
+  async forceClear() {
     try {
-      const current = await Clipboard.getStringAsync();
-      if (current === this.lastCopiedValue) {
+      if (!this.lastValue) return;
+
+      const current = await this.safeReadClipboard();
+      if (current === null) {
+        return;
+      }
+
+      if (current === this.lastValue) {
         await Clipboard.setStringAsync("");
       }
     } catch {
-      // ignore
     } finally {
+      this.lastValue = null;
+      this.cancel();
+    }
+  }
+
+  private async forceClearIfStillMatches(value: string) {
+    try {
+      const current = await this.safeReadClipboard();
+      if (current === null) {
+        return;
+      }
+
+      if (current === value) {
+        await Clipboard.setStringAsync("");
+      }
+    } catch {
+    } finally {
+      if (this.lastValue === value) this.lastValue = null;
       this.cancel();
     }
   }

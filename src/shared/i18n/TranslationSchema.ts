@@ -34,6 +34,7 @@ export type TranslationSchema = {
     next: string;
     done: string;
     offline: string;
+    copiedFor: string;
   };
   login: {
     masterPassword: string;

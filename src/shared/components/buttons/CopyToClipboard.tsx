@@ -4,6 +4,7 @@ import { IconButton } from "react-native-paper";
 
 import theme from "../../ui/theme";
 import { useClipboardCopy } from "../../hooks/useClipboardCopy";
+import { emitClipboardCopied } from "../../../infrastructure/events/clipboardBus";
 
 type Props = {
   value: string;
@@ -12,16 +13,12 @@ type Props = {
 };
 
 function CopyToClipboard({ value, disabled, margin }: Props) {
-  const [visible, setVisible] = React.useState(false);
   const [icon, setIcon] = React.useState<"content-copy" | "check">(
-    "content-copy"
+    "content-copy",
   );
-
   const { copy } = useClipboardCopy();
 
   const iconTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const onToggleSnackBar = () => setVisible((v) => !v);
 
   React.useEffect(() => {
     return () => {
@@ -32,12 +29,15 @@ function CopyToClipboard({ value, disabled, margin }: Props) {
   const copyToClipboard = async () => {
     if (iconTimerRef.current) clearTimeout(iconTimerRef.current);
 
-    await copy(value);
+    const { durationMs } = await copy(value);
 
     setIcon("check");
     iconTimerRef.current = setTimeout(() => setIcon("content-copy"), 1000);
-
-    onToggleSnackBar();
+    if (!durationMs || durationMs <= 0) return;
+    emitClipboardCopied({
+      durationMs,
+      createdAt: Date.now(),
+    });
   };
 
   return (
