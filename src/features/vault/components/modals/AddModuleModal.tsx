@@ -329,10 +329,10 @@ export default function AddModuleModalCompactFav(props: Props) {
     const allItems = filtered.filter((m) => !taken.has(m.id));
 
     const s: Array<{ title: string; data: ModuleMeta[] }> = [];
-    if (favItems.length) s.push({ title: "Favorites", data: favItems });
+    if (favItems.length) s.push({ title: t("common:favorites"), data: favItems });
     if (recentItems.length)
-      s.push({ title: "Recently Used", data: recentItems });
-    s.push({ title: "All Modules", data: allItems });
+      s.push({ title: t("common:recentlyUsed"), data: recentItems });
+    s.push({ title: t("common:allModules"), data: allItems });
     return s.filter((sec) => sec.data.length > 0);
   }, [filtered, favs, props.recent]);
 

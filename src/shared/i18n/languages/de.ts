@@ -35,6 +35,11 @@ const de: TranslationSchema = {
     done: "Fertig",
     offline: "Offline",
     copiedFor: "Kopiert für {{seconds}} Sekunden",
+    connected: "verbunden",
+    notConnected: "nicht verbunden",
+    favorites: "Favoriten",
+    allModules: "Alle Module",
+    recentlyUsed: "Kürzlich verwendet",
   },
   login: {
     masterPassword: "Master Passwort",

@@ -14,7 +14,7 @@ const theme: MD3Theme = {
     elevation: {
       level0: "transparent",
       level1: "rgb(39, 35, 41)",
-      level2: "#0D0D0D", //rgb(44, 40, 48)
+      level2: "#0D0D0D",
       level3: "#262626",
       level4: "rgb(52, 46, 57)",
       level5: "rgb(56, 49, 62)",

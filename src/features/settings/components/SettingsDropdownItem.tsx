@@ -105,11 +105,9 @@ export default function SettingsDropdownItem({
     const close = () => setOpenWeb(false);
 
     window.addEventListener("resize", close);
-    window.addEventListener("scroll", close, true);
 
     return () => {
       window.removeEventListener("resize", close);
-      window.removeEventListener("scroll", close, true);
     };
   }, [openWeb]);
 
@@ -149,80 +147,73 @@ export default function SettingsDropdownItem({
 
         <Popover.Portal container={portalContainer as any}>
           <Popover.Content
-            side="bottom"
-            align="end"
-            sideOffset={yOffset}
-            collisionPadding={8}
-            onOpenAutoFocus={(e: any) => e.preventDefault()}
-            onCloseAutoFocus={(e: any) => e.preventDefault()}
+  side="bottom"
+  align="end"
+  sideOffset={yOffset}
+  collisionPadding={8}
+  style={{
+    pointerEvents: "auto",
+    zIndex: 10001,
+
+    minWidth: `max(${dropdownMinWidth}px, var(--radix-popover-trigger-width))`,
+    maxWidth: dropdownMaxWidth,
+
+    // outer shell only
+    maxHeight: "min(var(--radix-popover-content-available-height), 520px)",
+    overflow: "hidden",
+
+    borderRadius: 12,
+    background: theme.colors.background as any,
+    border: `${StyleSheet.hairlineWidth}px solid ${theme.colors.outlineVariant}`,
+    boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
+  }}
+>
+  {/* Web: use a real div for scroll reliability */}
+  <div
+    style={{
+      maxHeight: "min(var(--radix-popover-content-available-height), 520px)",
+      overflowY: "auto",
+      overscrollBehavior: "contain",
+      WebkitOverflowScrolling: "touch",
+    }}
+  >
+    {options.map((opt, i) => (
+      <div key={String(opt.value)}>
+        <AnimatedPressable
+          onPress={() => {
+            setValue(String(opt.value));
+            setOpenWeb(false);
+          }}
+          style={{
+            height: ITEM_HEIGHT,
+            justifyContent: "center",
+            paddingHorizontal: 10,
+          }}
+        >
+          <Text
+            numberOfLines={1}
+            selectable={false}
             style={{
-              pointerEvents: "auto",
-              zIndex: 10001,
-
-              // IMPORTANT: no fixed width -> content can be smaller
-              // Typical dropdown feel: at least as wide as trigger
-              minWidth: `max(${dropdownMinWidth}px, var(--radix-popover-trigger-width))`,
-              maxWidth: dropdownMaxWidth,
-
-              borderRadius: 12,
-              background: theme.colors.background as any,
-              border: `${StyleSheet.hairlineWidth}px solid ${theme.colors.outlineVariant}`,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
-              overflow: "hidden",
-              transformOrigin: "var(--radix-popover-content-transform-origin)",
-              animation: "cpPopoverIn 140ms cubic-bezier(0.16, 1, 0.3, 1)",
+              color: theme.colors.onSurface,
+              fontSize: 14,
+              lineHeight: 18,
+              textAlign: "right",
+              ...(Platform.OS === "web"
+                ? ({ whiteSpace: "nowrap" } as any)
+                : null),
             }}
           >
-            <style>
-              {`
-                @keyframes cpPopoverIn {
-                  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
-                  to { opacity: 1; transform: translateY(0) scale(1); }
-                }
-              `}
-            </style>
+            {String(opt.label)}
+          </Text>
+        </AnimatedPressable>
 
-            <View>
-              {options.map((opt, i) => (
-                <View key={String(opt.value)}>
-                  <AnimatedPressable
-                    onPress={() => {
-                      setValue(String(opt.value));
-                      setOpenWeb(false);
-                    }}
-                    style={{
-                      height: ITEM_HEIGHT,
-                      justifyContent: "center",
-                      paddingHorizontal: 10, // slightly smaller -> looks tighter
-                    }}
-                  >
-                    <Text
-                      numberOfLines={1}
-                      selectable={false}
-                      style={{
-                        color: theme.colors.onSurface,
-                        fontSize: 14,
-                        lineHeight: 18,
-                        textAlign: "right",
-                        // Web-only: prevents wrapping that can make it feel “wide/odd”
-                        ...(Platform.OS === "web"
-                          ? ({ whiteSpace: "nowrap" } as any)
-                          : null),
-                      }}
-                    >
-                      {String(opt.label)}
-                    </Text>
-                  </AnimatedPressable>
-
-                  {i < options.length - 1 && (
-                    <Divider
-                      style={{ backgroundColor: theme.colors.outlineVariant }}
-                    />
-                  )}
-                </View>
-              ))}
-            </View>
-          </Popover.Content>
+        {i < options.length - 1 && (
+          <Divider style={{ backgroundColor: theme.colors.outlineVariant }} />
+        )}
+      </div>
+    ))}
+  </div>
+</Popover.Content>
         </Popover.Portal>
       </Popover.Root>
     );

@@ -15,6 +15,7 @@ import { useOnline } from "../../../app/providers/OnlineProvider";
 import { fetchUserInfo } from "../../../infrastructure/cloud/clients/CloudStorageClient";
 import { logger } from "../../../infrastructure/logging/logger";
 import { useTheme as useAppTheme } from "../../../app/providers/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -26,6 +27,7 @@ function UserInformation(props: Props) {
   const paperTheme = useTheme();
   const { darkmode } = useAppTheme();
   const { isOnline } = useOnline();
+  const { t } = useTranslation();
 
   const {
     provider,
@@ -91,10 +93,10 @@ function UserInformation(props: Props) {
 
   const providerLabel =
     provider === "dropbox"
-      ? "Dropbox verbunden"
+      ? "Dropbox " + t("common:connected")
       : provider === "googleDrive"
-      ? "Google Drive verbunden"
-      : "Nicht verbunden";
+      ? "Google Drive " + t("common:connected")
+      : t("common:notConnected");
 
   const providerIcon =
     provider === "dropbox"
@@ -191,8 +193,6 @@ function UserInformation(props: Props) {
                 </>
               )}
             </View>
-
-            {/* Logout action */}
             <IconButton
               icon="logout"
               mode="contained-tonal"

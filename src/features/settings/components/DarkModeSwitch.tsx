@@ -71,7 +71,7 @@ export default function DarkModeSwitch({ size = "large" }: Props) {
         marginTop: size === "small" ? 6 : 10,
         marginLeft: size === "small" ? 0 : 10,
         marginBottom: size === "small" ? 0 : 4,
-        justifyContent: "center",
+        justifyContent: size === "small" ? "center" : "flex-start",
       }}
     >
       <DarkModeSwitchPreview value="light" checked={checked} onSelect={onSelect} theme={theme} size={size} />

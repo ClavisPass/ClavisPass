@@ -55,7 +55,6 @@ import Sync from "../features/sync/components/Sync";
 import { useVault } from "../app/providers/VaultProvider";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { HomeStackParamList } from "../app/navigation/model/types";
-import { useContentProtection } from "../app/providers/ContentProtectionProvider";
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 

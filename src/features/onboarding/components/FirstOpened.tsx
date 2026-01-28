@@ -73,34 +73,21 @@ const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
     if (finishingRef.current) return;
     if (onboardingDone) return;
 
-    // erst wenn der Cloud-Step wirklich offen ist
     if (step !== 1) return;
     if (animating) return;
 
-    // provider muss vorhanden sein und darf nicht "device" sein
     if (!provider) return;
     if (provider === "device") return;
 
     finishingRef.current = true;
     void finish();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, animating, provider, onboardingDone]);
-  // --- end auto-finish
 
   const appliedDefaultsRef = useRef(false);
   useEffect(() => {
     if (appliedDefaultsRef.current) return;
     if (onboardingDone) return;
     if (step !== 0) return;
-
-    const hasLanguage = language != null && String(language).length > 0;
-    const hasDateFormat = dateFormat != null && String(dateFormat).length > 0;
-    const hasTimeFormat = timeFormat != null && String(timeFormat).length > 0;
-
-    if (hasLanguage && hasDateFormat && hasTimeFormat) {
-      appliedDefaultsRef.current = true;
-      return;
-    }
 
     const firstLocale = Localization.getLocales()?.[0];
     const localeTag = (
@@ -112,9 +99,9 @@ const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
     const inferredLanguage = localeTag.startsWith("de") ? "de" : "en";
     const inferredFormat = localeTag.startsWith("de") ? "de-DE" : "en-US";
 
-    if (!hasLanguage) setLanguage(inferredLanguage as any);
-    if (!hasDateFormat) setDateFormat(inferredFormat as any);
-    if (!hasTimeFormat) setTimeFormat(inferredFormat as any);
+    setLanguage(inferredLanguage as any);
+    setDateFormat(inferredFormat as any);
+    setTimeFormat(inferredFormat as any);
 
     appliedDefaultsRef.current = true;
   }, [

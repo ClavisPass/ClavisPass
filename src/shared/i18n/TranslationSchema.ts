@@ -35,6 +35,11 @@ export type TranslationSchema = {
     done: string;
     offline: string;
     copiedFor: string;
+    connected: string;
+    notConnected: string;
+    favorites: string;
+    allModules: string;
+    recentlyUsed: string;
   };
   login: {
     masterPassword: string;
@@ -93,39 +98,39 @@ export type TranslationSchema = {
     manageDevices: string;
   };
   analysis: {
-  topFindings: string;
-  noFindings: string;
-  strengthDistribution: string;
+    topFindings: string;
+    noFindings: string;
+    strengthDistribution: string;
 
-  securityScore: string;
-  scoreHint: string;
+    securityScore: string;
+    scoreHint: string;
 
-  strong: string;
-  medium: string;
-  weak: string;
+    strong: string;
+    medium: string;
+    weak: string;
 
-  all: string;
-  itemsToFix: string;
-  reused: string;
-  similar: string;
-
-  badge: {
+    all: string;
+    itemsToFix: string;
     reused: string;
     similar: string;
-    short: string;
-    sequential: string;
-    repeated: string;
-    variant: string;
-  };
 
-  finding: {
-    reused: string;
-    weak: string;
-    short: string;
-    variants: string;
-    sequential: string;
+    badge: {
+      reused: string;
+      similar: string;
+      short: string;
+      sequential: string;
+      repeated: string;
+      variant: string;
+    };
+
+    finding: {
+      reused: string;
+      weak: string;
+      short: string;
+      variants: string;
+      sequential: string;
+    };
   };
-};
 
   analysisDetail: {
     title: string;
@@ -183,35 +188,35 @@ export type TranslationSchema = {
     countPercent: string;
   };
   devices: {
-  title: string;
-  you: string;
+    title: string;
+    you: string;
 
-  status: {
-    new: string;
-    active: string;
-    archived: string;
+    status: {
+      new: string;
+      active: string;
+      archived: string;
+    };
+
+    sections: {
+      new: string;
+      active: string;
+      archived: string;
+    };
+    hintLine: string;
+
+    toggleArchivedOn: string;
+    toggleArchivedOff: string;
+
+    empty: string;
+    emptyNew: string;
+    emptyActive: string;
+    emptyArchived: string;
+
+    lastShort: string;
+    lastWrite: string;
+    firstWrite: string;
+    id: string;
   };
-
-  sections: {
-    new: string;
-    active: string;
-    archived: string;
-  };
-  hintLine: string;
-
-  toggleArchivedOn: string;
-  toggleArchivedOff: string;
-
-  empty: string;
-  emptyNew: string;
-  emptyActive: string;
-  emptyArchived: string;
-
-  lastShort: string;
-  lastWrite: string;
-  firstWrite: string;
-  id: string;
-};
   greetings: {
     1: string;
     2: string;
