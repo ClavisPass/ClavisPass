@@ -28,9 +28,9 @@ import FolderModal from "../features/vault/components/modals/FolderModal";
 import { VaultDataTypeSchema } from "../features/vault/model/VaultDataType";
 import SearchShortcut from "../shared/components/shortcuts/SearchShortcut";
 import AddValueModal from "../features/vault/components/modals/AddValueModal";
-import { decrypt } from "../infrastructure/crypto/CryptoLayer";
+import { decrypt } from "../infrastructure/crypto/legacy/CryptoLayer";
 import { useAuth } from "../app/providers/AuthProvider";
-import { CryptoTypeSchema } from "../infrastructure/crypto/CryptoType";
+import { CryptoTypeSchema } from "../infrastructure/crypto/legacy/CryptoType";
 import { useTheme } from "../app/providers/ThemeProvider";
 
 import {

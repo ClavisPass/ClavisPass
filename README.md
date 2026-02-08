@@ -11,7 +11,7 @@ ClavisPass is a modern, privacy-focused password manager that works *with your o
 ## Features
 
 - **Local Encryption Only**  
-  Your data is encrypted on your device — it never leaves your hands unprotected.
+  Your data is encrypted on your device using modern cryptography and never leaves your hands unprotected.
 
 - **Sync with Your Cloud**  
   Use Dropbox (or any cloud provider) to sync your vault privately without a centralized server.
@@ -49,6 +49,54 @@ This project follows a **security-first client architecture** with a strong emph
 The core guiding principle is:
 
 > **Secrets exist in exactly one place, for the shortest possible time, and are never part of reactive UI state.**
+
+---
+
+## Cryptography & Encryption Model
+
+ClavisPass uses a **modern, audited cryptographic design** based on industry-standard primitives.
+All encryption and decryption happens **locally on the client device**.  
+At no point does the application or any sync provider gain access to plaintext data or encryption keys.
+
+The security model follows a strict **zero-knowledge approach**.
+
+### Key Derivation
+
+Your master password is never used directly as an encryption key.
+
+Instead, ClavisPass derives a strong encryption key using:
+
+- **Argon2id** (memory-hard password hashing)
+- A **random per-vault salt**
+- Configured to resist brute-force and GPU-based attacks
+
+This ensures that even if an attacker gains access to your encrypted vault file,
+offline attacks remain computationally expensive.
+
+### Vault Encryption
+
+Vault contents are encrypted using:
+
+- **XChaCha20-Poly1305 (IETF)**
+- 256-bit encryption key
+- Authenticated encryption (AEAD)
+
+This provides:
+- Confidentiality (data cannot be read)
+- Integrity (data cannot be modified undetected)
+- Authentication (tampering is reliably detected)
+
+Each encryption operation uses a **unique random nonce** and includes
+additional authenticated metadata to protect the vault structure itself.
+
+### Platform Consistency
+
+The same cryptographic design is used across:
+- Web
+- Mobile (iOS / Android)
+- Desktop (Windows / macOS / Linux)
+
+This guarantees that vaults are fully portable and behave identically on all platforms.
 
 ---
 
@@ -187,7 +235,8 @@ The result is a system that is **predictable, auditable, and resilient by design
 - [Dropbox API](https://www.dropbox.com/developers) – as Cloud-Synchronisation
 
 ### Security
-- AES-256 encryption
+- End-to-end encryption using **XChaCha20-Poly1305**
+- Memory-hard key derivation via **Argon2id**
 - Local key management – no external servers involved
 
 ### CI / CD & Deployment

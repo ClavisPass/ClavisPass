@@ -1,10 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import RemoteFileContent from "../model/RemoteFileContent";
-import CryptoType from "../../crypto/CryptoType";
 import { logger } from "../../logging/logger";
 import { triggerGlobalError } from "../../events/errorBus";
 import UserInfoType from "../../../features/sync/model/UserInfoType";
 import { VaultFetchResult } from "../model/VaultFetchResult";
+import type { UploadContent } from "../model/UploadFileParams";
 
 const LOCAL_SYNC_KEY = "LOCAL_SYNC";
 
@@ -45,11 +44,12 @@ export const fetchFile = async (): Promise<VaultFetchResult> => {
 };
 
 export const uploadFile = async (
-  content: CryptoType,
+  content: UploadContent,
   onCompleted?: () => void
 ): Promise<void> => {
   try {
-    await AsyncStorage.setItem(LOCAL_SYNC_KEY, JSON.stringify(content));
+    const toStore = typeof content === "string" ? content : JSON.stringify(content);
+    await AsyncStorage.setItem(LOCAL_SYNC_KEY, toStore);
     onCompleted?.();
   } catch (error) {
     logger.error(
@@ -64,3 +64,4 @@ export const uploadFile = async (
     throw new Error("Error writing file to local device storage");
   }
 };
+

@@ -5,12 +5,13 @@
 
 import TokenRefreshResult from "../model/oauth/TokenRefreshResult";
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "@env";
-import CryptoType from "../../crypto/CryptoType";
+import CryptoType from "../../crypto/legacy/CryptoType";
 import { logger } from "../../logging/logger";
 import UserInfoType from "../../../features/sync/model/UserInfoType";
 import { triggerGlobalError } from "../../events/errorBus";
 import * as DeviceStorageClient from "./DeviceStorageClient";
 import { VaultFetchResult } from "../model/VaultFetchResult";
+import { UploadContent } from "../model/UploadFileParams";
 
 const DRIVE_API = "https://www.googleapis.com/drive/v3";
 const DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3";
@@ -227,7 +228,7 @@ export const fetchFile = async (
 
 export const uploadFile = async (
   accessToken: string,
-  content: CryptoType,
+  content: UploadContent,
   filePath: string,
   onCompleted?: () => void
 ): Promise<void> => {
@@ -239,8 +240,10 @@ export const uploadFile = async (
 
   const name = filePath;
 
+  const payload = typeof content === "string" ? content : JSON.stringify(content);
+
   try {
-    await upsertByName(accessToken, name, JSON.stringify(content));
+    await upsertByName(accessToken, name, payload);
     onCompleted?.();
   } catch (error) {
     logger.error(`[GoogleDrive] Error uploading file "${name}":`, error);

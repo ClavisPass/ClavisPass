@@ -1,9 +1,9 @@
 import * as DocumentPicker from "expo-document-picker";
 import { useTranslation } from "react-i18next";
 
-import { CryptoTypeSchema } from "../../../../infrastructure/crypto/CryptoType";
+import { CryptoTypeSchema } from "../../../../infrastructure/crypto/legacy/CryptoType";
 import { VaultDataTypeSchema } from "../../../vault/model/VaultDataType";
-import { decrypt } from "../../../../infrastructure/crypto/CryptoLayer";
+import { decrypt } from "../../../../infrastructure/crypto/legacy/CryptoLayer";
 import { logger } from "../../../../infrastructure/logging/logger";
 import SettingsItem from "../SettingsItem";
 import { useVault } from "../../../../app/providers/VaultProvider";

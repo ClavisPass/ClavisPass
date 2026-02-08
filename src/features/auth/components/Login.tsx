@@ -6,23 +6,31 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../../../app/providers/AuthProvider";
 import { useToken } from "../../../app/providers/CloudProvider";
 import { useTheme } from "../../../app/providers/ThemeProvider";
+import { useVault } from "../../../app/providers/VaultProvider";
 
 import UserInfoType from "../../sync/model/UserInfoType";
 import Button from "../../../shared/components/buttons/Button";
 import TypeWriterComponent from "../../../shared/components/TypeWriter";
 import PasswordTextbox from "../../../shared/components/PasswordTextbox";
-
-import CryptoType, { CryptoTypeSchema } from "../../../infrastructure/crypto/CryptoType";
-import { decrypt } from "../../../infrastructure/crypto/CryptoLayer";
-import { VaultDataTypeSchema } from "../../vault/model/VaultDataType";
-import getEmptyData from "../../vault/utils/getEmptyData";
-
-import { authenticateUser, isUsingAuthentication, loadAuthentication } from "../utils/authenticateUser";
-
 import Logo from "../../../shared/ui/Logo";
+
+import getEmptyData from "../../vault/utils/getEmptyData";
 import { logger } from "../../../infrastructure/logging/logger";
-import { useVault } from "../../../app/providers/VaultProvider";
-import { fetchRemoteVaultFile } from "../../../infrastructure/cloud/clients/CloudStorageClient";
+
+import {
+  authenticateUser,
+  isUsingAuthentication,
+  loadAuthentication,
+} from "../utils/authenticateUser";
+
+import {
+  fetchRemoteVaultFile,
+  uploadRemoteVaultFile,
+} from "../../../infrastructure/cloud/clients/CloudStorageClient";
+
+import { decryptVaultContent } from "../../../infrastructure/crypto/decryptVaultContent";
+import { getCryptoProvider } from "../../../infrastructure/crypto/provider";
+import { encryptVaultV1 } from "../../../infrastructure/crypto/vault/v1/VaultV1";
 
 type Props = { userInfo: UserInfoType };
 
@@ -33,7 +41,7 @@ function Login(props: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
-  const [parsedCryptoData, setParsedCryptoData] = useState<CryptoType | null>(null);
+  const [vaultFileContent, setVaultFileContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showNewData, setShowNewData] = useState(false);
 
@@ -50,34 +58,79 @@ function Login(props: Props) {
   const [masterPassword, setMasterPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
 
-  const [isUsingAuthenticationButtonVisible, setIsUsingAuthenticationButtonVisible] = useState(false);
+  const [isUsingAuthenticationButtonVisible, setIsUsingAuthenticationButtonVisible] =
+    useState(false);
 
-  const loginWithMasterPassword = async (masterPassword: string, cryptoData: CryptoType | null) => {
-    try {
-      if (!cryptoData) return;
+  const resolveAccessToken = useCallback(async (): Promise<string> => {
+    if (!provider || provider === "device") return "";
+    return accessToken ?? (await ensureFreshAccessToken()) ?? "";
+  }, [provider, accessToken, ensureFreshAccessToken]);
 
-      const decryptedData = decrypt(cryptoData, masterPassword);
-      const jsonData = JSON.parse(decryptedData);
+  const writeVaultJson = useCallback(
+    async (vaultJson: string) => {
+      if (!provider) return;
 
-      const parsed = VaultDataTypeSchema.parse(jsonData);
-      const parsedData = parsed ?? getEmptyData();
-      vault.unlockWithDecryptedVault(parsedData);
-      auth.login(masterPassword);
-    } catch (err) {
-      logger.error("[Login] Error decrypting data:", err);
-      textInputRef.current?.focus?.();
-      setMasterPassword("");
-      setError(true);
-      setTimeout(() => setError(false), 1000);
-    }
-  };
+      const token = await resolveAccessToken();
+
+      await uploadRemoteVaultFile({
+        provider,
+        accessToken: token,
+        remotePath: "clavispass.lock",
+        content: vaultJson, // string ist ok, wenn UploadFileParams.content string erlaubt
+        onCompleted: undefined,
+      });
+    },
+    [provider, resolveAccessToken]
+  );
+
+  const loginWithMasterPassword = useCallback(
+    async (masterPasswordToUse: string, content: string | null) => {
+      try {
+        if (!content) return;
+
+        const cryptoProvider = await getCryptoProvider();
+
+
+        const result = await decryptVaultContent(
+          cryptoProvider,
+          content,
+          masterPasswordToUse
+        );
+
+        if (!result.ok) {
+          throw result.error ?? new Error(result.reason);
+        }
+
+        // 1) unlock
+        vault.unlockWithDecryptedVault(result.payload);
+        auth.login(masterPasswordToUse);
+
+        // 2) best-effort migration writeback (nur wenn legacy erkannt wurde)
+        if (result.migratedVaultJson && provider) {
+          try {
+            await writeVaultJson(result.migratedVaultJson);
+            logger.info("[Login] Legacy vault migrated to V1 and written back.");
+          } catch (e) {
+            logger.warn("[Login] Migration write-back failed (continuing):", e);
+          }
+        }
+      } catch (err) {
+        logger.error("[Login] Error decrypting vault:", err);
+        textInputRef.current?.focus?.();
+        setMasterPassword("");
+        setError(true);
+        setTimeout(() => setError(false), 1000);
+      }
+    },
+    [auth, vault, provider, writeVaultJson]
+  );
 
   const authenticate = useCallback(async () => {
     try {
       setLoading(true);
       setFetchError(null);
       setShowNewData(false);
-      setParsedCryptoData(null);
+      setVaultFileContent(null);
 
       const hasAuthentication = await isUsingAuthentication();
       setIsUsingAuthenticationButtonVisible(hasAuthentication);
@@ -86,22 +139,20 @@ function Login(props: Props) {
         logger.warn("[Login] No provider configured – treating as new vault.");
         setShowNewData(true);
         setLoading(false);
+        setTimeout(() => textInputNewRef.current?.focus?.(), 50);
         return;
       }
 
-      let tokenToUse: string | null = null;
-      if (provider !== "device") {
-        tokenToUse = accessToken ?? (await ensureFreshAccessToken());
-        if (!tokenToUse) {
-          setFetchError(t("login:cloudAuthMissing") ?? "No access token available.");
-          setLoading(false);
-          return;
-        }
+      const tokenToUse = await resolveAccessToken();
+      if (provider !== "device" && !tokenToUse) {
+        setFetchError(t("login:cloudAuthMissing") ?? "No access token available.");
+        setLoading(false);
+        return;
       }
 
       const res = await fetchRemoteVaultFile({
         provider,
-        accessToken: tokenToUse ?? "",
+        accessToken: tokenToUse,
         remotePath: "clavispass.lock",
       });
 
@@ -118,8 +169,7 @@ function Login(props: Props) {
         return;
       }
 
-      const parsed = CryptoTypeSchema.parse(JSON.parse(res.content));
-      setParsedCryptoData(parsed);
+      setVaultFileContent(res.content);
       setLoading(false);
 
       if (hasAuthentication) {
@@ -127,7 +177,7 @@ function Login(props: Props) {
         if (ok) {
           const storedPassword = await loadAuthentication();
           if (storedPassword) {
-            await loginWithMasterPassword(storedPassword, parsed);
+            await loginWithMasterPassword(storedPassword, res.content);
             return;
           }
         }
@@ -140,26 +190,46 @@ function Login(props: Props) {
       setFetchError("Unexpected error while loading vault.");
       setLoading(false);
     }
-  }, [provider, accessToken, ensureFreshAccessToken, t]);
+  }, [provider, resolveAccessToken, t, loginWithMasterPassword]);
 
   useEffect(() => {
     authenticate();
   }, [authenticate]);
 
   const handlePasswordLogin = () => {
-    if (!parsedCryptoData) return;
-    void loginWithMasterPassword(masterPassword, parsedCryptoData);
+    if (!vaultFileContent) return;
+    void loginWithMasterPassword(masterPassword, vaultFileContent);
   };
 
-  const newMasterPassword = () => {
-    if (masterPassword === newPasswordConfirm && masterPassword && newPasswordConfirm) {
+  const newMasterPassword = useCallback(async () => {
+    try {
+      if (!(masterPassword === newPasswordConfirm && masterPassword && newPasswordConfirm)) {
+        logger.error("[Login] Master password confirmation does not match.");
+        return;
+      }
+
+      // 1) create empty vault payload
       const empty = getEmptyData();
+
+      const cryptoProvider = await getCryptoProvider();
+
+      // 2) encrypt as VaultV1 JSON string
+      //    encryptVaultV1(crypto, masterPassword, payload) -> Promise<string>
+      const vaultJson = await encryptVaultV1(cryptoProvider, masterPassword, empty);
+
+      // 3) write to provider
+      if (provider) {
+        await writeVaultJson(vaultJson);
+      }
+
+      // 4) unlock
       vault.unlockWithDecryptedVault(empty);
       auth.login(masterPassword);
-    } else {
-      logger.error("[Login] Master password confirmation does not match.");
+    } catch (e) {
+      logger.error("[Login] Failed to create new vault:", e);
+      setFetchError("Failed to create vault.");
     }
-  };
+  }, [auth, masterPassword, newPasswordConfirm, provider, vault, writeVaultJson]);
 
   if (loading) {
     return <ActivityIndicator size={"large"} animating={true} />;

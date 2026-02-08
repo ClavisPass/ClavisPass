@@ -1,0 +1,66 @@
+# dependencies
+node_modules/
+
+# Expo/React Native tooling
+.expo/
+.expo-shared/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Metro / packager caches
+.metro-cache/
+*.log
+
+# Android / Gradle (HUGE)
+android/.gradle/
+android/build/
+android/app/build/
+**/*.keystore
+**/*.jks
+
+# iOS build artifacts (if present)
+ios/build/
+DerivedData/
+Pods/
+
+# JS/TS build outputs
+dist/
+build/
+out/
+coverage/
+*.tsbuildinfo
+
+# Expo exports
+web-build/
+dist-web/
+**/expo-export*/
+**/*.map
+
+# Tauri
+src-tauri/target/
+src-tauri/gen/
+src-tauri/node_modules/
+*.dmg
+*.msi
+*.exe
+*.AppImage
+*.deb
+
+# Git / CI
+.git/
+.github/
+.vscode/
+.idea/
+
+# Large media / misc
+**/*.psd
+**/*.ai
+**/*.mov
+**/*.mp4
+**/*.mkv
+**/*.zip
+**/*.7z
+**/*.rar
+**/*.afdesign

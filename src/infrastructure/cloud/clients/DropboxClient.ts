@@ -1,12 +1,11 @@
-import RemoteFileContent from "../model/RemoteFileContent";
 import TokenRefreshResult from "../model/oauth/TokenRefreshResult";
 import { DROPBOX_CLIENT_ID } from "@env";
-import CryptoType from "../../crypto/CryptoType";
 import { logger } from "../../logging/logger";
 import UserInfoType from "../../../features/sync/model/UserInfoType";
 import { triggerGlobalError } from "../../events/errorBus";
 import * as DeviceStorageClient from "./DeviceStorageClient";
 import { VaultFetchResult } from "../model/VaultFetchResult";
+import { UploadContent } from "../model/UploadFileParams";
 
 export const fetchUserInfo = async (
   token: string,
@@ -106,7 +105,7 @@ export const fetchFile = async (
 
 export const uploadFile = async (
   accessToken: string,
-  content: CryptoType,
+  content: UploadContent,
   filePath: string,
   onCompleted?: () => void
 ): Promise<void> => {
@@ -117,8 +116,9 @@ export const uploadFile = async (
   }
 
   const uploadEndpoint = "https://content.dropboxapi.com/2/files/upload";
-
   const normalizedPath = filePath.startsWith("/") ? filePath : `/${filePath}`;
+
+  const payload = typeof content === "string" ? content : JSON.stringify(content);
 
   const response = await fetch(uploadEndpoint, {
     method: "POST",
@@ -132,7 +132,7 @@ export const uploadFile = async (
       }),
       "Content-Type": "application/octet-stream",
     },
-    body: JSON.stringify(content),
+    body: payload,
   });
 
   if (!response.ok) {
@@ -150,9 +150,6 @@ export const uploadFile = async (
     });
     throw new Error("Error uploading the file to Dropbox");
   }
-
-  // Optional: Response auswerten
-  // const data = await response.json();
 
   onCompleted?.();
 };

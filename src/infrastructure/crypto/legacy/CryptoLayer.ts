@@ -1,8 +1,8 @@
 import * as Crypto from "expo-crypto";
 import CryptoJS from "crypto-js";
-import VaultDataType from "../../features/vault/model/VaultDataType";
+import VaultDataType from "../../../features/vault/model/VaultDataType";
+import { getDateTime } from "../../../shared/utils/Timestamp";
 import CryptoType from "./CryptoType";
-import { getDateTime } from "../../shared/utils/Timestamp";
 
 const getRandomBytes = async (size: number) => {
   const randomBytes = await Crypto.getRandomBytesAsync(size);
@@ -40,7 +40,7 @@ export const encrypt = async (
   } as CryptoType;
 };
 
-export const decrypt = (crypto: CryptoType, password: string) => {
+export const decrypt:any = (crypto: CryptoType, password: string) => {
   const key = deriveKey(password, CryptoJS.enc.Hex.parse(crypto.salt));
   const decrypted = CryptoJS.AES.decrypt(crypto.ciphertext, key, {
     iv: CryptoJS.enc.Hex.parse(crypto.iv),

@@ -1,0 +1,717 @@
+diff --git a/node_modules/react-native-sodium-jsi/android/CMakeLists.txt b/node_modules/react-native-sodium-jsi/android/CMakeLists.txt
+index 762f913..e6b9a53 100644
+--- a/node_modules/react-native-sodium-jsi/android/CMakeLists.txt
++++ b/node_modules/react-native-sodium-jsi/android/CMakeLists.txt
+@@ -1,5 +1,7 @@
+ cmake_minimum_required(VERSION 3.9.0)
+ 
++project(reactnativesodiumjsi)
++
+ set (PACKAGE_NAME "react-native-sodium-jsi")
+ set (BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
+ 
+@@ -44,18 +46,21 @@ add_library(reactnativesodiumjsi
+         )
+ set_target_properties(
+         reactnativesodiumjsi PROPERTIES
+-        CXX_STANDARD 14
++        CXX_STANDARD 17
+         CXX_EXTENSIONS OFF
+         POSITION_INDEPENDENT_CODE ON
+ )
+ 
+-file (GLOB LIBRN_DIR "${PREBUILT_DIR}/${ANDROID_ABI}")
++set(LIBRN_DIR "${PREBUILT_DIR}/${ANDROID_ABI}")
++
++message(STATUS "LIBRN_DIR = ${LIBRN_DIR}")
+ 
+ find_library(
+         log-lib
+         log
+ )
+ 
++# RN <=0.73 had libreactnativejni.so, RN 0.85+ often ships libreactnative.so
+ find_library(
+         REACT_NATIVE_JNI_LIB
+         reactnativejni
+@@ -63,6 +68,40 @@ find_library(
+         NO_CMAKE_FIND_ROOT_PATH
+ )
+ 
++if(NOT REACT_NATIVE_JNI_LIB)
++  find_library(
++          REACT_NATIVE_JNI_LIB
++          reactnative
++          PATHS ${LIBRN_DIR}
++          NO_CMAKE_FIND_ROOT_PATH
++  )
++endif()
++
++if(NOT REACT_NATIVE_JNI_LIB)
++  message(FATAL_ERROR
++    "REACT_NATIVE_JNI_LIB not found. Looked for 'reactnativejni' and 'reactnative' in: ${LIBRN_DIR}"
++  )
++endif()
++
++if(${REACT_NATIVE_VERSION} LESS 66)
++  # JSI lib didn't exist on RN 0.65 and before. Simply omit it.
++  set(JSI_LIB "")
++else()
++  # RN 0.66+ distributes libjsi.so
++  find_library(
++          JSI_LIB
++          jsi
++          PATHS ${LIBRN_DIR}
++          NO_CMAKE_FIND_ROOT_PATH
++  )
++
++  if(NOT JSI_LIB)
++    message(FATAL_ERROR "JSI_LIB not found (jsi) in: ${LIBRN_DIR}")
++  endif()
++endif()
++
++
++
+ if(${REACT_NATIVE_VERSION} LESS 66)
+   # JSI lib didn't exist on RN 0.65 and before. Simply omit it.
+   set (JSI_LIB "")
+diff --git a/node_modules/react-native-sodium-jsi/android/build.gradle b/node_modules/react-native-sodium-jsi/android/build.gradle
+index 7adc99e..01d0b32 100644
+--- a/node_modules/react-native-sodium-jsi/android/build.gradle
++++ b/node_modules/react-native-sodium-jsi/android/build.gradle
+@@ -1,10 +1,11 @@
+ import org.apache.tools.ant.filters.ReplaceTokens
+ import java.nio.file.Paths
++import com.android.build.api.attributes.BuildTypeAttr
++
++// -------------------- helpers --------------------
+ 
+ static def findNodeModules(baseDir) {
+   def basePath = baseDir.toPath().normalize()
+-  // Node's module resolution algorithm searches up to the root directory,
+-  // after which the base path will be null
+   while (basePath) {
+     def nodeModulesPath = Paths.get(basePath.toString(), "node_modules")
+     def reactNativePath = Paths.get(nodeModulesPath.toString(), "react-native")
+@@ -24,12 +25,8 @@ buildscript {
+     google()
+     jcenter()
+     mavenCentral()
+-    maven {
+-      url "https://plugins.gradle.org/m2/"
+-    }
++    maven { url "https://plugins.gradle.org/m2/" }
+   }
+-
+-
+   dependencies {
+     classpath 'com.android.tools.build:gradle:7.0.4'
+     classpath 'de.undercouch:gradle-download-task:5.0.2'
+@@ -39,14 +36,6 @@ buildscript {
+ apply plugin: 'com.android.library'
+ apply plugin: 'de.undercouch.download'
+ 
+-def getExtOrDefault(name) {
+-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['SodiumJSI_' + name]
+-}
+-
+-def getExtOrIntegerDefault(name) {
+-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['SodiumJSI_' + name]).toInteger()
+-}
+-
+ def reactNativeArchitectures() {
+   def value = project.getProperties().get("reactNativeArchitectures")
+   return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
+@@ -65,120 +54,193 @@ if (rootProject.ext.has('reactNativeAndroidRoot')) {
+   defaultDir = project(':ReactAndroid').projectDir
+   androidSourcesDir = defaultDir.parentFile.toString()
+ } else {
+-  defaultDir = file("$nodeModules/react-native/android")
+-  androidSourcesDir = defaultDir.parentFile.toString()
++  // RN >=0.71 / Expo: node_modules/react-native/android existiert nicht mehr zuverlässig.
++  // Wir bauen nicht aus RN-Quellen, sondern holen alles über Maven (react-android AAR).
++  sourceBuild = false
++  defaultDir = null
++  androidSourcesDir = file("$nodeModules/react-native").toString()
+ }
+ 
+-if (!defaultDir.exists()) {
+-  throw new GradleException(
+-    "${project.name}: React Native android directory (node_modules/react-native/android) does not exist! Resolved node_modules to: ${nodeModules}"
++// ------------------------------------------------------------
++// Resolve react-android AAR early so we can pass a REAL (non-wildcard)
++// PREBUILT_DIR to CMake. CMake does NOT expand globs like 0*.
++// ------------------------------------------------------------
++def requestedBuildType =
++  gradle.startParameter.taskNames.any { it.toLowerCase().contains("release") }
++    ? "release"
++    : "debugOptimized" // RN 0.85 nightlies often publish debugOptimized
++
++def resolveReactAndroidAar = { String bt ->
++  def c = configurations.detachedConfiguration(
++    dependencies.create("com.facebook.react:react-android:+")
++  )
++  c.setTransitive(false)
++  c.attributes.attribute(
++    BuildTypeAttr.ATTRIBUTE,
++    project.objects.named(BuildTypeAttr, bt)
+   )
++
++  return c.incoming.artifactView { view ->
++    view.attributes { attrs ->
++      attrs.attribute(
++        BuildTypeAttr.ATTRIBUTE,
++        project.objects.named(BuildTypeAttr, bt)
++      )
++    }
++  }.artifacts.artifactFiles.singleFile
+ }
++
++def rnAAR = null
++if (!sourceBuild) {
++  try {
++    rnAAR = resolveReactAndroidAar(requestedBuildType)
++  } catch (Exception ignored) {
++    rnAAR = resolveReactAndroidAar("debug")
++  }
++}
++
++// CMake expects libs under PREBUILT_DIR/jni/<abi>/libjsi.so etc.
++// Our extractJNIFiles task extracts into: $buildDir/<aarFileName>/jni/...
+ def prebuiltDir = sourceBuild
+   ? "$nodeModules/react-native/ReactAndroid/src/main/jni/prebuilt/lib"
+-  : "$buildDir/react-native-0*/jni"
++  : "$buildDir/${rnAAR.name}/jni"
++
+ 
++// React Native version (minor)
+ def reactProperties = new Properties()
+ file("$nodeModules/react-native/ReactAndroid/gradle.properties").withInputStream { reactProperties.load(it) }
+ def REACT_NATIVE_VERSION = reactProperties.getProperty("VERSION_NAME").split("\\.")[1].toInteger()
++
++def resolveIntExt(String name, Integer fallback = null) {
++  if (rootProject.ext.has(name)) return (rootProject.ext.get(name) as Integer)
++  def prop = project.properties['SodiumJSI_' + name]
++  if (prop != null) return prop.toString().toInteger()
++  if (fallback != null) return fallback
++  return null
++}
++
++def resolveAnyExt(String name) {
++  if (rootProject.ext.has(name)) return rootProject.ext.get(name)
++  return project.properties['SodiumJSI_' + name]
++}
++
++// -------------------- android config --------------------
++
+ android {
+-  compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
+-  buildToolsVersion getExtOrDefault('buildToolsVersion')
+-  ndkVersion getExtOrDefault('ndkVersion')
++  def cs = resolveIntExt('compileSdkVersion', null)
++  if (cs == null && rootProject.ext.has('compileSdk')) cs = (rootProject.ext.get('compileSdk') as Integer)
++  if (cs == null) cs = 34
++  compileSdkVersion cs
++
++  def ts = resolveIntExt('targetSdkVersion', null)
++  if (ts == null && rootProject.ext.has('targetSdk')) ts = (rootProject.ext.get('targetSdk') as Integer)
++  if (ts == null) ts = cs
++
++  def bt = resolveAnyExt('buildToolsVersion')
++  if (bt != null) { buildToolsVersion = bt }
++
++  def ndkVer = resolveAnyExt('ndkVersion')
++  if (ndkVer != null) { ndkVersion = ndkVer }
++
++
+   defaultConfig {
+-    minSdkVersion 21
+-    targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
++    minSdkVersion 24
++    targetSdkVersion ts
+     versionCode 1
+     versionName "1.0"
+ 
+     externalNativeBuild {
+       cmake {
+-        cppFlags "-fexceptions", "-frtti", "-std=c++1y", "-DONANDROID"
++        cppFlags "-fexceptions", "-frtti", "-std=c++17", "-DONANDROID"
++
+         arguments '-DANDROID_STL=c++_shared',
+           "-DREACT_NATIVE_VERSION=${REACT_NATIVE_VERSION}",
+           "-DNODE_MODULES_DIR=${nodeModules}",
+           "-DPREBUILT_DIR=${prebuiltDir}"
+       }
+     }
++
+     ndk {
+-      abiFilters (*reactNativeArchitectures())
++      abiFilters.clear()
++      abiFilters.addAll(reactNativeArchitectures() as List<String>)
+     }
+-
+-  }
+-
+-  dexOptions {
+-    javaMaxHeapSize "4g"
+   }
+ 
+   externalNativeBuild {
+-    cmake {
+-      path "CMakeLists.txt"
+-    }
++    cmake { path "CMakeLists.txt" }
+   }
+ 
+-  packagingOptions {
+-    excludes = ["**/libc++_shared.so", "**/libfbjni.so", "**/libreactnativejni.so", "**/libjsi.so", "**/MANIFEST.MF"]
++  packaging {
++  resources {
++    excludes += [
++      "**/libc++_shared.so",
++      "**/libfbjni.so",
++      "**/libreactnativejni.so",
++      "**/libjsi.so",
++      "**/MANIFEST.MF"
++    ]
+   }
++}
++
+ 
+   buildTypes {
+-    release {
+-      minifyEnabled false
+-    }
++    release { minifyEnabled false }
+   }
++
+   lintOptions {
+     disable 'GradleCompatible'
+   }
++
+   compileOptions {
+     sourceCompatibility JavaVersion.VERSION_11
+     targetCompatibility JavaVersion.VERSION_11
+   }
++
+   configurations {
+     extractHeaders
+     extractJNI
+   }
+-
+ }
+ 
+ repositories {
+   mavenCentral()
+   google()
+ 
+-  maven {
+-    url defaultDir.toString()
+-    name androidSourcesName
++  if (defaultDir != null) {
++    maven {
++      url = uri(defaultDir.toString())
++      name = androidSourcesName
++    }
+   }
+ }
+ 
++// -------------------- deps --------------------
++
+ dependencies {
+   //noinspection GradleDynamicVersion
+-  implementation "com.facebook.react:react-native:+"
++  implementation "com.facebook.react:react-android:+"
+   implementation 'de.undercouch:gradle-download-task:5.0.2'
+-  // From node_modules
++
+   extractHeaders("com.facebook.fbjni:fbjni:+:headers")
+   //noinspection GradleDynamicVersion
+   extractJNI("com.facebook.fbjni:fbjni:+")
+ 
+   if (!sourceBuild) {
+-    def rnAAR = fileTree("${defaultDir.toString()}").matching({ it.include "**/**/*.aar" }).singleFile
+     extractJNI(files(rnAAR))
+   }
++
+ }
+ 
++// -------------------- third-party versions (properties or TOML) --------------------
++
++// ------------------------------------------------------------
++// RN >= 0.85 / Expo: Third-Party NDK deps (boost/folly/glog/...)
++// are no longer exposed via ReactAndroid/gradle.properties in a
++// stable way. In AAR-only builds we skip the legacy download flow.
++// ------------------------------------------------------------
+ 
+ def downloadsDir = new File("$buildDir/downloads")
+ def thirdPartyNdkDir = new File("$buildDir/third-party-ndk")
+-def thirdPartyVersionsFile = new File("${androidSourcesDir.toString()}/ReactAndroid/gradle.properties")
+-def thirdPartyVersions = new Properties()
+-thirdPartyVersions.load(new FileInputStream(thirdPartyVersionsFile))
+-
+-def BOOST_VERSION = thirdPartyVersions["BOOST_VERSION"]
+-def boost_file = new File(downloadsDir, "boost_${BOOST_VERSION}.tar.gz")
+-def DOUBLE_CONVERSION_VERSION = thirdPartyVersions["DOUBLE_CONVERSION_VERSION"]
+-def double_conversion_file = new File(downloadsDir, "double-conversion-${DOUBLE_CONVERSION_VERSION}.tar.gz")
+-def FOLLY_VERSION = thirdPartyVersions["FOLLY_VERSION"]
+-def folly_file = new File(downloadsDir, "folly-${FOLLY_VERSION}.tar.gz")
+-def GLOG_VERSION = thirdPartyVersions["GLOG_VERSION"]
+-def glog_file = new File(downloadsDir, "glog-${GLOG_VERSION}.tar.gz")
+ 
+ task createNativeDepsDirectories {
+   doLast {
+@@ -187,115 +249,14 @@ task createNativeDepsDirectories {
+   }
+ }
+ 
+-task downloadBoost(dependsOn: createNativeDepsDirectories, type: Download) {
+- src("https://github.com/react-native-community/boost-for-react-native/releases/download/v${BOOST_VERSION.replace("_", ".")}-0/boost_${BOOST_VERSION}.tar.gz")
+- onlyIfNewer(true)
+- overwrite(false)
+- dest(boost_file)
+-}
+-
+-task prepareBoost(dependsOn: downloadBoost, type: Copy) {
+- from(tarTree(resources.gzip(downloadBoost.dest)))
+- from("src/main/jni/third-party/boost/Android.mk")
+- include("Android.mk", "boost_${BOOST_VERSION}/boost/**/*.hpp", "boost/boost/**/*.hpp")
+- includeEmptyDirs = false
+- into("$thirdPartyNdkDir") // /boost_X_XX_X
+- doLast {
+-   file("$thirdPartyNdkDir/boost_${BOOST_VERSION}").renameTo("$thirdPartyNdkDir/boost")
+- }
+-}
+-
+-task downloadDoubleConversion(dependsOn: createNativeDepsDirectories, type: Download) {
+-  src("https://github.com/google/double-conversion/archive/v${DOUBLE_CONVERSION_VERSION}.tar.gz")
+-  onlyIfNewer(true)
+-  overwrite(false)
+-  dest(double_conversion_file)
+-}
+-
+-task prepareDoubleConversion(dependsOn: downloadDoubleConversion, type: Copy) {
+-  from(tarTree(downloadDoubleConversion.dest))
+-  from("src/main/jni/third-party/double-conversion/Android.mk")
+-  include("double-conversion-${DOUBLE_CONVERSION_VERSION}/src/**/*", "Android.mk")
+-  filesMatching("*/src/**/*", { fname -> fname.path = "double-conversion/${fname.name}" })
+-  includeEmptyDirs = false
+-  into("$thirdPartyNdkDir/double-conversion")
+-}
+-
+-task downloadFolly(dependsOn: createNativeDepsDirectories, type: Download) {
+-  src("https://github.com/facebook/folly/archive/v${FOLLY_VERSION}.tar.gz")
+-  onlyIfNewer(true)
+-  overwrite(false)
+-  dest(folly_file)
+-}
+-
+-task prepareFolly(dependsOn: downloadFolly, type: Copy) {
+-  from(tarTree(downloadFolly.dest))
+-  from("src/main/jni/third-party/folly/Android.mk")
+-  include("folly-${FOLLY_VERSION}/folly/**/*", "Android.mk")
+-  eachFile { fname -> fname.path = (fname.path - "folly-${FOLLY_VERSION}/") }
+-  includeEmptyDirs = false
+-  into("$thirdPartyNdkDir/folly")
+-}
+-
+-task downloadGlog(dependsOn: createNativeDepsDirectories, type: Download) {
+-  src("https://github.com/google/glog/archive/v${GLOG_VERSION}.tar.gz")
+-  onlyIfNewer(true)
+-  overwrite(false)
+-  dest(glog_file)
+-}
+-
+-task prepareGlog(dependsOn: downloadGlog, type: Copy) {
+-  from(tarTree(downloadGlog.dest))
+-  from("src/main/jni/third-party/glog/")
+-  include("glog-${GLOG_VERSION}/src/**/*", "Android.mk", "config.h")
+-  includeEmptyDirs = false
+-  filesMatching("**/*.h.in") {
+-    filter(ReplaceTokens, tokens: [
+-      ac_cv_have_unistd_h           : "1",
+-      ac_cv_have_stdint_h           : "1",
+-      ac_cv_have_systypes_h         : "1",
+-      ac_cv_have_inttypes_h         : "1",
+-      ac_cv_have_libgflags          : "0",
+-      ac_google_start_namespace     : "namespace google {",
+-      ac_cv_have_uint16_t           : "1",
+-      ac_cv_have_u_int16_t          : "1",
+-      ac_cv_have___uint16           : "0",
+-      ac_google_end_namespace       : "}",
+-      ac_cv_have___builtin_expect   : "1",
+-      ac_google_namespace           : "google",
+-      ac_cv___attribute___noinline  : "__attribute__ ((noinline))",
+-      ac_cv___attribute___noreturn  : "__attribute__ ((noreturn))",
+-      ac_cv___attribute___printf_4_5: "__attribute__((__format__ (__printf__, 4, 5)))"
+-    ])
+-    it.path = (it.name - ".in")
+-  }
+-  into("$thirdPartyNdkDir/glog")
+-
++// Keep the task name because other parts may depend on it,
++// but make it a NO-OP for RN 0.85+.
++task prepareThirdPartyNdkHeaders(dependsOn: createNativeDepsDirectories) {
+   doLast {
+-    copy {
+-      from(fileTree(dir: "$thirdPartyNdkDir/glog", includes: ["stl_logging.h", "logging.h", "raw_logging.h", "vlog_is_on.h", "**/src/glog/log_severity.h"]).files)
+-      includeEmptyDirs = false
+-      into("$thirdPartyNdkDir/glog/exported/glog")
+-    }
++    logger.lifecycle("react-native-sodium-jsi: Skipping third-party NDK downloads (RN >= 0.85 / AAR-only build).")
+   }
+ }
+ 
+-task prepareThirdPartyNdkHeaders {
+-  if (!boost_file.exists()) {
+-    dependsOn(prepareBoost)
+-  }
+-  if (!double_conversion_file.exists()) {
+-    dependsOn(prepareDoubleConversion)
+-  }
+-  if (!folly_file.exists()) {
+-    dependsOn(prepareFolly)
+-  }
+-  if (!glog_file.exists()) {
+-    dependsOn(prepareGlog)
+-  }
+-}
+-
+-prepareThirdPartyNdkHeaders.mustRunAfter createNativeDepsDirectories
+ 
+ task extractAARHeaders {
+   doLast {
+@@ -315,7 +276,6 @@ task extractJNIFiles {
+   doLast {
+     configurations.extractJNI.files.each {
+       def file = it.absoluteFile
+-
+       copy {
+         from zipTree(file)
+         into "$buildDir/$file.name"
+@@ -328,7 +288,8 @@ extractJNIFiles.mustRunAfter extractAARHeaders
+ 
+ def nativeBuildDependsOn(dependsOnTask, variant) {
+   def buildTasks = tasks.findAll({ task ->
+-    !task.name.contains("Clean") && (task.name.contains("externalNative") || task.name.contains("CMake")) })
++    !task.name.contains("Clean") && (task.name.contains("externalNative") || task.name.contains("CMake"))
++  })
+   if (variant != null) {
+     buildTasks = buildTasks.findAll({ task -> task.name.contains(variant) })
+   }
+diff --git a/node_modules/react-native-sodium-jsi/cpp/sodium-jsi.cpp b/node_modules/react-native-sodium-jsi/cpp/sodium-jsi.cpp
+index 72d43d7..1bc84be 100644
+--- a/node_modules/react-native-sodium-jsi/cpp/sodium-jsi.cpp
++++ b/node_modules/react-native-sodium-jsi/cpp/sodium-jsi.cpp
+@@ -29,7 +29,7 @@ static std::vector<uint8_t> hexToBin(jsi::Runtime &runtime, const std::string &s
+     ret.resize(str.size());
+     size_t decoded_len = 0;
+     if (str.size() % 2 || sodium_hex2bin(ret.data(), ret.size(), str.data(), str.size(), nullptr, &decoded_len, nullptr) != 0)
+-        jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] invalid hex input");
++        throw jsi::JSError(runtime, "[react-native-sodium-jsi] invalid hex input");
+     ret.resize(decoded_len);
+     return ret;
+ }
+@@ -54,7 +54,7 @@ static std::vector<uint8_t> base64ToBin(jsi::Runtime &runtime, const std::string
+     size_t decoded_len = 0;
+     if (sodium_base642bin(ret.data(), ret.size(), str.data(), str.size(), nullptr, &decoded_len, nullptr, sodium_base64_VARIANT_ORIGINAL) != 0)
+     {
+-        jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] invalid base64 input");
++        throw jsi::JSError(runtime, "[react-native-sodium-jsi] invalid base64 input");
+     }
+     ret.resize(decoded_len);
+     return ret;
+@@ -69,14 +69,14 @@ static jsi::ArrayBuffer asArrayBuffer(jsi::Runtime &runtime, const jsi::Value &v
+ {
+     jsi::Object obj = val.asObject(runtime);
+     if (!obj.isArrayBuffer(runtime))
+-        jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] expected ArrayBuffer");
++        throw jsi::JSError(runtime, "[react-native-sodium-jsi] expected ArrayBuffer");
+     return obj.getArrayBuffer(runtime);
+ }
+ static uint8_t *extractArrayBuffer(jsi::Runtime &runtime, const jsi::Value &val, size_t size)
+ {
+     jsi::ArrayBuffer buf = asArrayBuffer(runtime, val);
+     if (buf.size(runtime) != size)
+-        jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] unexpected ArrayBuffer size");
++        throw jsi::JSError(runtime, "[react-native-sodium-jsi] unexpected ArrayBuffer size");
+     return buf.data(runtime);
+ }
+ template <typename T>
+@@ -91,7 +91,7 @@ void install(jsi::Runtime &jsiRuntime)
+               << "\n";
+ 
+     if (sodium_init() == -1)
+-        jsi::detail::throwJSError(jsiRuntime, "[react-native-sodium-jsi] sodium_init() failed");
++        throw jsi::JSError(jsiRuntime, "[react-native-sodium-jsi] sodium_init() failed");
+ 
+     auto jsi_crypto_aead_xchacha20poly1305_ietf_keygen = jsi::Function::createFromHostFunction(
+         jsiRuntime,
+@@ -126,7 +126,7 @@ void install(jsi::Runtime &jsiRuntime)
+         {
+             if (arguments[0].isNull())
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] size cannot be null in randombytes_buf");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] size cannot be null in randombytes_buf");
+                 return {};
+             }
+             size_t size = arguments[0].asNumber();
+@@ -144,7 +144,7 @@ void install(jsi::Runtime &jsiRuntime)
+         {
+             if (arguments[0].isNull() || arguments[1].isNull() || arguments[2].isNull())
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] jsi_crypto_aead_xchacha20poly1305_ietf_encrypt arguments are null");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] jsi_crypto_aead_xchacha20poly1305_ietf_encrypt arguments are null");
+             }
+ 
+             std::string message = arguments[0].asString(runtime).utf8(runtime);
+@@ -157,11 +157,11 @@ void install(jsi::Runtime &jsiRuntime)
+ 
+             if (npub.size() != crypto_aead_xchacha20poly1305_ietf_NPUBBYTES)
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] crypto_aead_xchacha20poly1305_ietf_encrypt wrong nonce length");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] crypto_aead_xchacha20poly1305_ietf_encrypt wrong nonce length");
+             }
+             if (k.size() != crypto_aead_xchacha20poly1305_IETF_KEYBYTES)
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] crypto_aead_xchacha20poly1305_ietf_encrypt wrong key length");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] crypto_aead_xchacha20poly1305_ietf_encrypt wrong key length");
+             }
+ 
+             std::vector<uint8_t> c;
+@@ -188,7 +188,7 @@ void install(jsi::Runtime &jsiRuntime)
+         {
+             if (arguments[0].isNull() || arguments[1].isNull() || arguments[2].isNull())
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] crypto_aead_xchacha20poly1305_ietf_decrypt arguments are null");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] crypto_aead_xchacha20poly1305_ietf_decrypt arguments are null");
+                 return {};
+             }
+ 
+@@ -203,11 +203,11 @@ void install(jsi::Runtime &jsiRuntime)
+ 
+             if (npub.size() != crypto_aead_xchacha20poly1305_ietf_NPUBBYTES)
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] crypto_aead_xchacha20poly1305_ietf_decrypt wrong nonce length");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] crypto_aead_xchacha20poly1305_ietf_decrypt wrong nonce length");
+             }
+             if (k.size() != crypto_aead_xchacha20poly1305_IETF_KEYBYTES)
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] crypto_aead_xchacha20poly1305_ietf_decrypt wrong key length");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] crypto_aead_xchacha20poly1305_ietf_decrypt wrong key length");
+             }
+ 
+             unsigned long long m_len = c.size();
+@@ -234,7 +234,7 @@ void install(jsi::Runtime &jsiRuntime)
+         {
+             if (arguments[0].isNull() || arguments[1].isNull() || arguments[2].isNull() || arguments[3].isNull() || arguments[4].isNull())
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] jsi_crypto_pwhash arguments are null");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] jsi_crypto_pwhash arguments are null");
+             }
+ 
+             unsigned long long length = arguments[0].asNumber();
+@@ -245,11 +245,11 @@ void install(jsi::Runtime &jsiRuntime)
+ 
+             if (length < crypto_pwhash_argon2id_BYTES_MIN || length > crypto_pwhash_argon2id_BYTES_MAX)
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] crypto_pwhash wrong output length");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] crypto_pwhash wrong output length");
+             }
+             if (salt.size() != crypto_pwhash_argon2id_SALTBYTES)
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] crypto_pwhash wrong salt length");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] crypto_pwhash wrong salt length");
+             }
+ 
+             std::vector<uint8_t> ret;
+@@ -276,13 +276,13 @@ void install(jsi::Runtime &jsiRuntime)
+         {
+             if (arguments[0].isNull())
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_init_push arguments are null");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_init_push arguments are null");
+             }
+ 
+             std::vector<uint8_t> k = hexToBin(runtime, arguments[0].asString(runtime).utf8(runtime));
+             if (k.size() != crypto_secretstream_xchacha20poly1305_keybytes())
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_init_push wrong key length");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_init_push wrong key length");
+             }
+ 
+             jsi::Value state = createArrayBuffer(runtime, sizeof(crypto_secretstream_xchacha20poly1305_state));
+@@ -314,7 +314,7 @@ void install(jsi::Runtime &jsiRuntime)
+         {
+             if (arguments[0].isNull())
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_push arguments are null");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_push arguments are null");
+             }
+ 
+             auto *state_pointer = extractArrayBuffer<crypto_secretstream_xchacha20poly1305_state>(runtime, arguments[0]);
+@@ -347,19 +347,19 @@ void install(jsi::Runtime &jsiRuntime)
+         {
+             if (arguments[0].isNull())
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_init_pull arguments are null");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_init_pull arguments are null");
+             }
+ 
+             std::vector<uint8_t> header = base64ToBin(runtime, arguments[0].asString(runtime).utf8(runtime));
+             if (header.size() != crypto_secretstream_xchacha20poly1305_HEADERBYTES)
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_init_pull wrong header length");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_init_pull wrong header length");
+             }
+ 
+             std::vector<uint8_t> key = hexToBin(runtime, arguments[1].asString(runtime).utf8(runtime));
+             if (key.size() != crypto_secretstream_xchacha20poly1305_keybytes())
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_init_push wrong key length");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_init_push wrong key length");
+             }
+ 
+             jsi::Value state = createArrayBuffer(runtime, sizeof(crypto_secretstream_xchacha20poly1305_state));
+@@ -387,7 +387,7 @@ void install(jsi::Runtime &jsiRuntime)
+         {
+             if (arguments[0].isNull())
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_pull arguments are null");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_pull arguments are null");
+             }
+ 
+             auto *state_pointer = extractArrayBuffer<crypto_secretstream_xchacha20poly1305_state>(runtime, arguments[0]);
+@@ -395,7 +395,7 @@ void install(jsi::Runtime &jsiRuntime)
+             std::string assoc_data = arguments[2].asString(runtime).utf8(runtime);
+ 
+             if (ciphertext.size(runtime) < crypto_secretstream_xchacha20poly1305_ABYTES)
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_pull too short ciphertext");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] crypto_secretstream_xchacha20poly1305_pull too short ciphertext");
+             size_t ret_size = ciphertext.size(runtime) - crypto_secretstream_xchacha20poly1305_ABYTES;
+             jsi::Value message = createArrayBuffer(runtime, ret_size);
+             uint8_t *message_ptr = extractArrayBuffer(runtime, message, ret_size);
+@@ -425,12 +425,12 @@ void install(jsi::Runtime &jsiRuntime)
+         {
+             if (arguments[0].isNull())
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] string cannot be null in to_base64");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] string cannot be null in to_base64");
+                 return {};
+             }
+             if (arguments[1].isNull())
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] variant cannot be null in to_base64");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] variant cannot be null in to_base64");
+                 return {};
+             }
+ 
+@@ -449,7 +449,7 @@ void install(jsi::Runtime &jsiRuntime)
+         {
+             if (arguments[0].isNull())
+             {
+-                jsi::detail::throwJSError(runtime, "[react-native-sodium-jsi] string cannot be null in from_base64");
++                throw jsi::JSError(runtime, "[react-native-sodium-jsi] string cannot be null in from_base64");
+                 return {};
+             }
+ 

@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next";
 
 import CryptoType, {
   CryptoTypeSchema,
-} from "../../../infrastructure/crypto/CryptoType";
-import { decrypt } from "../../../infrastructure/crypto/CryptoLayer";
+} from "../../../infrastructure/crypto/legacy/CryptoType";
+import { decrypt } from "../../../infrastructure/crypto/legacy/CryptoLayer";
 import { VaultDataTypeSchema } from "../../vault/model/VaultDataType";
 import { logger } from "../../../infrastructure/logging/logger";
 

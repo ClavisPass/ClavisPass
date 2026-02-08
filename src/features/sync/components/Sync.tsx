@@ -9,7 +9,7 @@ import { useOnline } from "../../../app/providers/OnlineProvider";
 import { useToken } from "../../../app/providers/CloudProvider";
 
 import { getDateTime } from "../../../shared/utils/Timestamp";
-import { encrypt } from "../../../infrastructure/crypto/CryptoLayer";
+import { encrypt } from "../../../infrastructure/crypto/legacy/CryptoLayer";
 import { uploadRemoteVaultFile } from "../../../infrastructure/cloud/clients/CloudStorageClient";
 import { logger } from "../../../infrastructure/logging/logger";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";

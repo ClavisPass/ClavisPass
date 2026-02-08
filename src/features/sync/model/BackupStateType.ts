@@ -1,4 +1,4 @@
-import CryptoType from "../../../infrastructure/crypto/CryptoType";
+import CryptoType from "../../../infrastructure/crypto/legacy/CryptoType";
 
 type BackupStateType =
   | { status: "loading" }

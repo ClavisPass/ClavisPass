@@ -3,7 +3,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import { useTranslation } from "react-i18next";
 
-import { encrypt } from "../../../../infrastructure/crypto/CryptoLayer";
+import { encrypt } from "../../../../infrastructure/crypto/legacy/CryptoLayer";
 import { logger } from "../../../../infrastructure/logging/logger";
 import SettingsItem from "../SettingsItem";
 

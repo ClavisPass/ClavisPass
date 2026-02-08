@@ -11,7 +11,7 @@ import { useAuth } from "../../../../app/providers/AuthProvider";
 import { useToken } from "../../../../app/providers/CloudProvider";
 
 import { logger } from "../../../../infrastructure/logging/logger";
-import { encrypt } from "../../../../infrastructure/crypto/CryptoLayer";
+import { encrypt } from "../../../../infrastructure/crypto/legacy/CryptoLayer";
 import { uploadRemoteVaultFile } from "../../../../infrastructure/cloud/clients/CloudStorageClient";
 import { getDateTime } from "../../../../shared/utils/Timestamp";
 import { useVault } from "../../../../app/providers/VaultProvider";
