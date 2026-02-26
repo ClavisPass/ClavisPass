@@ -69,17 +69,116 @@ export default function LeftSideTabBar({
           paddingVertical: 8,
           borderColor: theme.colors.outlineVariant,
           backgroundColor: theme.colors.background,
+          justifyContent: "space-between",
+          paddingBottom:0,
         },
       ]}
     >
+      <View>
+        {orderedRoutes.map((route, _index) => {
+          const isFocused = route.key === focusedKey;
+          const name = route.name;
+
+          const { options } = descriptors[route.key];
+          const label =
+            name === "AddTriggerStack"
+              ? ""
+              : (options.tabBarLabel ??
+                options.title ??
+                (route.name as string));
+
+          let iconEl: React.ReactNode = null;
+          if (name === "AddTriggerStack") {
+            iconEl = (
+              <IconButton
+                icon="plus"
+                size={30}
+                mode="contained-tonal"
+                selected={true}
+                iconColor={theme.colors.primary}
+                onPress={goAdd}
+              />
+            );
+          } else if (name === "LogoutStack") {
+            iconEl = (
+              <MaterialCommunityIcons
+                name="logout"
+                size={26}
+                color={isFocused ? theme.colors.primary : "#777"}
+              />
+            );
+          } else {
+            iconEl =
+              options.tabBarIcon?.({
+                focused: isFocused,
+                color: isFocused ? theme.colors.primary : "#777",
+                size: 26,
+              }) ?? null;
+          }
+
+          const onPress = () => {
+            if (name === "LogoutStack") {
+              handleLogout();
+              return;
+            }
+            if (name === "AddTriggerStack") {
+              if (isAddDisabled) return;
+              goAdd();
+              return;
+            }
+            const event = navigation.emit({
+              type: "tabPress",
+              target: route.key,
+              canPreventDefault: true,
+            });
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name as never);
+            }
+          };
+
+          const isAction = name === "AddTriggerStack" || name === "LogoutStack";
+          const bgActive =
+            name === "AddTriggerStack"
+              ? theme.colors.background
+              : isFocused
+                ? theme.colors.secondaryContainer
+                : "transparent";
+
+          return (
+            <AnimatedPressable
+              key={route.key}
+              onPress={name === "AddTriggerStack" ? undefined : onPress}
+              style={[
+                styles.item,
+                { backgroundColor: bgActive, opacity: isOnline ? 1 : 0.85 },
+                isAction && styles.itemAction,
+                name === "AddTriggerStack" &&
+                  isAddDisabled && { opacity: 0.45 },
+              ]}
+              disabled={(name === "AddTriggerStack" && isAddDisabled) || false}
+            >
+              <View style={styles.itemInner}>
+                {iconEl}
+                {label ? (
+                  <Text
+                    style={[
+                      styles.label,
+                      { color: isFocused ? theme.colors.onSurface : "#777" },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {t(`bar:${label}`)}
+                  </Text>
+                ) : null}
+              </View>
+            </AnimatedPressable>
+          );
+        })}
+      </View>
       {!isOnline && (
         <View
           style={{
             backgroundColor: theme.colors.secondary,
-            marginHorizontal: 8,
-            marginTop: 8,
-            marginBottom: 4,
-            borderRadius: 10,
             paddingVertical: 4,
           }}
         >
@@ -88,103 +187,6 @@ export default function LeftSideTabBar({
           </Text>
         </View>
       )}
-
-      {orderedRoutes.map((route, _index) => {
-        const isFocused = route.key === focusedKey;
-        const name = route.name;
-
-        const { options } = descriptors[route.key];
-        const label =
-          name === "AddTriggerStack"
-            ? ""
-            : (options.tabBarLabel ?? options.title ?? (route.name as string));
-
-        let iconEl: React.ReactNode = null;
-        if (name === "AddTriggerStack") {
-          iconEl = (
-            <IconButton
-              icon="plus"
-              size={30}
-              mode="contained-tonal"
-              selected={true}
-              iconColor={theme.colors.primary}
-              onPress={goAdd}
-            />
-          );
-        } else if (name === "LogoutStack") {
-          iconEl = (
-            <MaterialCommunityIcons
-              name="logout"
-              size={26}
-              color={isFocused ? theme.colors.primary : "#777"}
-            />
-          );
-        } else {
-          iconEl =
-            options.tabBarIcon?.({
-              focused: isFocused,
-              color: isFocused ? theme.colors.primary : "#777",
-              size: 26,
-            }) ?? null;
-        }
-
-        const onPress = () => {
-          if (name === "LogoutStack") {
-            handleLogout();
-            return;
-          }
-          if (name === "AddTriggerStack") {
-            if (isAddDisabled) return;
-            goAdd();
-            return;
-          }
-          const event = navigation.emit({
-            type: "tabPress",
-            target: route.key,
-            canPreventDefault: true,
-          });
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name as never);
-          }
-        };
-
-        const isAction = name === "AddTriggerStack" || name === "LogoutStack";
-        const bgActive =
-          name === "AddTriggerStack"
-            ? theme.colors.background
-            : isFocused
-              ? theme.colors.secondaryContainer
-              : "transparent";
-
-        return (
-          <AnimatedPressable
-            key={route.key}
-            onPress={name === "AddTriggerStack" ? undefined : onPress}
-            style={[
-              styles.item,
-              { backgroundColor: bgActive, opacity: isOnline ? 1 : 0.85 },
-              isAction && styles.itemAction,
-              name === "AddTriggerStack" && isAddDisabled && { opacity: 0.45 },
-            ]}
-            disabled={(name === "AddTriggerStack" && isAddDisabled) || false}
-          >
-            <View style={styles.itemInner}>
-              {iconEl}
-              {label ? (
-                <Text
-                  style={[
-                    styles.label,
-                    { color: isFocused ? theme.colors.onSurface : "#777" },
-                  ]}
-                  numberOfLines={1}
-                >
-                  {t(`bar:${label}`)}
-                </Text>
-              ) : null}
-            </View>
-          </AnimatedPressable>
-        );
-      })}
     </View>
   );
 }

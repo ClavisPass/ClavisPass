@@ -67,6 +67,7 @@ function TaskModule(props: TaskModuleType & Props) {
           />
           <View style={{ flex: 1, marginRight: 8 }}>
             <TextInput
+              autoFocus
               mode="outlined"
               multiline
               scrollEnabled={false}
@@ -87,7 +88,7 @@ function TaskModule(props: TaskModuleType & Props) {
                   paddingHorizontal: 0,
                   paddingVertical: 0,
                   margin: 0,
-                  borderWidth: 0
+                  borderWidth: 0,
                 },
               ]}
               style={[

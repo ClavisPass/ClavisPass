@@ -24,7 +24,6 @@ import { useTranslation } from "react-i18next";
 import { useVault } from "../../../../app/providers/VaultProvider";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 
-
 const ITEM_HEIGHT = 44;
 const MAX_VISIBLE_ITEMS = 6;
 
@@ -63,7 +62,7 @@ function EmailModule(props: EmailModuleType & Props) {
     (values as ValuesListType).forEach((item) => {
       item.modules
         .filter(
-          (m) => m.module === ModulesEnum.E_MAIL && typeof m.value === "string"
+          (m) => m.module === ModulesEnum.E_MAIL && typeof m.value === "string",
         )
         .forEach((m: ModuleType) => out.add(String(m.value)));
     });
@@ -75,7 +74,7 @@ function EmailModule(props: EmailModuleType & Props) {
       knownEmails
         .filter((v) => v.trim().length > 0)
         .map((v) => ({ id: v, title: v })),
-    [knownEmails]
+    [knownEmails],
   );
 
   const filteredItems = useMemo(() => {
@@ -168,6 +167,7 @@ function EmailModule(props: EmailModuleType & Props) {
           >
             <View style={{ height: 40, flex: 1 }}>
               <TextInput
+                autoFocus
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => {
                   setTimeout(() => {
@@ -246,7 +246,9 @@ function EmailModule(props: EmailModuleType & Props) {
               </ScrollView>
             </View>
           )}
-          <View style={{ height: showSuggestions ? dropdownMaxHeight + 8 : 0 }} />
+          <View
+            style={{ height: showSuggestions ? dropdownMaxHeight + 8 : 0 }}
+          />
         </View>
       </View>
     </ModuleContainer>

@@ -30,7 +30,10 @@ function tokenize(input: string): string[] {
     .filter(Boolean);
 }
 
-function splitKeepingRemainder(text: string): { tokens: string[]; remainder: string } {
+function splitKeepingRemainder(text: string): {
+  tokens: string[];
+  remainder: string;
+} {
   if (!/[\s,;]/.test(text)) return { tokens: [], remainder: text };
 
   const m = text.match(/^(.*?)[\s,;]+([^ \t\r\n,;]*)$/);
@@ -38,7 +41,9 @@ function splitKeepingRemainder(text: string): { tokens: string[]; remainder: str
 
   const all = tokenize(text);
   const tokens =
-    remainder && all.length > 0 && all[all.length - 1] === remainder ? all.slice(0, -1) : all;
+    remainder && all.length > 0 && all[all.length - 1] === remainder
+      ? all.slice(0, -1)
+      : all;
 
   return { tokens, remainder };
 }
@@ -130,7 +135,11 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
   };
 
   const onKeyPress = ({ nativeEvent }: any) => {
-    if (nativeEvent.key === "Backspace" && input.length === 0 && codes.length > 0) {
+    if (
+      nativeEvent.key === "Backspace" &&
+      input.length === 0 &&
+      codes.length > 0
+    ) {
       removeCode(codes[codes.length - 1].code);
     }
   };
@@ -156,7 +165,7 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
     const borderColor = interpolateColor(
       focusSv.value,
       [0, 1],
-      [theme.colors.outline, theme.colors.primary]
+      [theme.colors.outline, theme.colors.primary],
     );
     return { borderColor, borderWidth: 1 };
   }, [theme.colors.outline, theme.colors.primary]);
@@ -171,13 +180,14 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
     requestAnimationFrame(() => inputRef.current?.focus?.());
   };
 
-  const shouldRenderInput = showInput || isFocused || input.length > 0 || codes.length === 0;
+  const shouldRenderInput =
+    showInput || isFocused || input.length > 0 || codes.length === 0;
 
   const toggleUsed = (code: string) => {
-  setCodes((prev) =>
-    prev.map((c) => (c.code === code ? { ...c, used: !c.used } : c))
-  );
-};
+    setCodes((prev) =>
+      prev.map((c) => (c.code === code ? { ...c, used: !c.used } : c)),
+    );
+  };
 
   return (
     <ModuleContainer
@@ -197,7 +207,10 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
               animatedContainerStyle,
             ]}
           >
-            <Animated.View style={styles.inlineWrap} layout={LinearTransition.duration(160)}>
+            <Animated.View
+              style={styles.inlineWrap}
+              layout={LinearTransition.duration(160)}
+            >
               {codes.map((c) => (
                 <Animated.View
                   key={c.code}
@@ -230,6 +243,7 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
                   layout={LinearTransition.duration(160)}
                 >
                   <TextInput
+                    autoFocus
                     ref={inputRef}
                     mode="outlined"
                     value={input}

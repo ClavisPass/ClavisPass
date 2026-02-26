@@ -63,6 +63,7 @@ function PhoneNumberModule(props: PhoneNumberModuleType & Props) {
       <View style={globalStyles.moduleView}>
         <View style={{ height: 40, flex: 1 }}>
           <TextInput
+            autoFocus
             outlineStyle={[
               globalStyles.outlineStyle,
               !isValid ? { borderColor: theme.colors.error } : null,
