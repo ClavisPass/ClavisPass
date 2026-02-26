@@ -96,6 +96,7 @@ export type TranslationSchema = {
     scanqrcode: string;
     showqrcode: string;
     manageDevices: string;
+    encryption: string;
   };
   analysis: {
     topFindings: string;

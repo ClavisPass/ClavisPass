@@ -96,6 +96,7 @@ const en: TranslationSchema = {
     scanqrcode: "Scan QR Code",
     showqrcode: "Show QR Code",
     manageDevices: "Manage Devices",
+    encryption: "Encryption",
   },
   analysis: {
     // headline blocks (optional – falls du später "Top findings" wieder einblendest)

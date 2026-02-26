@@ -4,23 +4,25 @@ import getEmptyData from "../../features/vault/utils/getEmptyData";
 import CryptoType, { CryptoTypeSchema } from "./legacy/CryptoType";
 import { decrypt as legacyDecrypt } from "./legacy/CryptoLayer";
 
-import type { CryptoProvider } from "./provider/CryptoProvider";
-import { decryptVaultV1, encryptVaultV1 } from "./vault/v1/VaultV1";
+// V1 bleibt optional für später
+import { decryptVaultV1 } from "./vault/v1/VaultV1";
 import { VaultV1Schema } from "./vault/v1/VaultV1Schema";
 
 export type DecryptVaultContentResult =
-  | {
-      ok: true;
-      payload: ReturnType<typeof VaultDataTypeSchema.parse>;
-      migratedVaultJson?: string;
-    }
+  | { ok: true; payload: ReturnType<typeof VaultDataTypeSchema.parse>; format: "legacy" | "v1" }
   | { ok: false; reason: "FORMAT" | "AUTH_FAILED"; error?: unknown };
 
+type DecryptOptions = {
+  allowV1?: boolean;
+};
+
 export const decryptVaultContent = async (
-  crypto: CryptoProvider,
   content: string,
-  masterPassword: string
+  masterPassword: string,
+  opts: DecryptOptions = {},
 ): Promise<DecryptVaultContentResult> => {
+  const allowV1 = opts.allowV1 ?? true;
+
   let parsedJson: unknown;
 
   // 1) content muss JSON sein
@@ -30,35 +32,34 @@ export const decryptVaultContent = async (
     return { ok: false, reason: "FORMAT", error: e };
   }
 
-  // 2) V1?
-  const v1 = VaultV1Schema.safeParse(parsedJson);
-  if (v1.success) {
-    try {
-      const decryptedVault = await decryptVaultV1(crypto, v1.data, masterPassword);
-      const payload = VaultDataTypeSchema.parse(decryptedVault) ?? getEmptyData();
-      return { ok: true, payload };
-    } catch (e) {
-      return { ok: false, reason: "AUTH_FAILED", error: e };
-    }
-  }
-
-  // 3) Legacy?
+  // 2) Legacy FIRST (Hauptpfad)
   const legacy = CryptoTypeSchema.safeParse(parsedJson);
   if (legacy.success) {
     try {
       const decrypted = legacyDecrypt(legacy.data as CryptoType, masterPassword);
       const jsonData = JSON.parse(decrypted);
       const payload = VaultDataTypeSchema.parse(jsonData) ?? getEmptyData();
-
-      // migrate to V1
-      const migratedVaultJson = await encryptVaultV1(crypto, masterPassword, payload);
-
-      return { ok: true, payload, migratedVaultJson };
+      return { ok: true, payload, format: "legacy" };
     } catch (e) {
       return { ok: false, reason: "AUTH_FAILED", error: e };
     }
   }
 
-  // 4) Unbekanntes Format
+  // 3) V1 optional
+  const { getCryptoProvider } = await import("./provider");
+  const cryptoProvider = await getCryptoProvider();
+  if (allowV1) {
+    const v1 = VaultV1Schema.safeParse(parsedJson);
+    if (v1.success) {
+      try {
+        const decryptedVault = await decryptVaultV1(cryptoProvider, v1.data, masterPassword);
+        const payload = VaultDataTypeSchema.parse(decryptedVault) ?? getEmptyData();
+        return { ok: true, payload, format: "v1" };
+      } catch (e) {
+        return { ok: false, reason: "AUTH_FAILED", error: e };
+      }
+    }
+  }
+
   return { ok: false, reason: "FORMAT" };
 };

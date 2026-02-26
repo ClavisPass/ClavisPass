@@ -13,7 +13,6 @@ const moduleStyles = StyleSheet.create({
     flex: 1,
   },
   inner: {
-    //padding: 10,
     paddingTop: 0,
     marginLeft: 8,
     marginRight: 8,

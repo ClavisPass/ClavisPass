@@ -329,6 +329,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               icon={quickSelectItems[3].icon}
               title={quickSelectItems[3].title}
             >
+              
+                <SettingsShortcutItem shortcut="XChaCha20-Poly1305">
+                  {t("settings:encryption")}
+                </SettingsShortcutItem>
+                <SettingsDivider />
               <SettingsItem
                 onPress={() => {
                   setShowChangeMasterPasswordModal(true);

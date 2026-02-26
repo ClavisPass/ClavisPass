@@ -10,7 +10,7 @@ export type AnimatedPressableProps = Omit<
   "style" | "children"
 > & {
   style?: StyleProp<ViewStyle>;
-  children?: React.ReactNode; // erlaubt mehrere Kinder, Fragments, Arrays, etc.
+  children?: React.ReactNode;
 };
 
 const AnimatedPressable = React.forwardRef<any, AnimatedPressableProps>(

@@ -10,6 +10,7 @@ import {
 import { Divider, Icon, IconButton } from "react-native-paper";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import Animated, { FadeInDown, FadeOutUp, Layout } from "react-native-reanimated";
+import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 
 export type EditRowControlsContainerProps = {
   id: string;
@@ -33,7 +34,6 @@ export function EditRowControlsContainer({
   return (
     <Animated.View
       exiting={FadeOutUp.duration(150)}
-      //entering={FadeInDown.delay(50).duration(250)}
       style={[
         {
           flexDirection: "row",
@@ -56,9 +56,9 @@ export function EditRowControlsContainer({
         {Platform.OS === "web" ? (
           <Icon source="drag" size={20} />
         ) : (
-          <Pressable onPressIn={onDragStart}>
+          <AnimatedPressable onPressIn={onDragStart}>
             <Icon source="drag" size={20} />
-          </Pressable>
+          </AnimatedPressable>
         )}
         <Divider
           style={{

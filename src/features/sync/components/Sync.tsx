@@ -9,14 +9,19 @@ import { useOnline } from "../../../app/providers/OnlineProvider";
 import { useToken } from "../../../app/providers/CloudProvider";
 
 import { getDateTime } from "../../../shared/utils/Timestamp";
-import { encrypt } from "../../../infrastructure/crypto/legacy/CryptoLayer";
 import { uploadRemoteVaultFile } from "../../../infrastructure/cloud/clients/CloudStorageClient";
 import { logger } from "../../../infrastructure/logging/logger";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 import { useVault } from "../../../app/providers/VaultProvider";
 import { upsertVaultDevice } from "../../vault/utils/vaultDevices";
 import { getOrCreateDeviceId } from "../../../infrastructure/device/deviceId";
-import { getDeviceDisplayName, getPlatformString } from "../../vault/utils/deviceInfo";
+import {
+  getDeviceDisplayName,
+  getPlatformString,
+} from "../../vault/utils/deviceInfo";
+
+import { getCryptoProvider } from "../../../infrastructure/crypto/provider";
+import { encryptVaultContent } from "../../../infrastructure/crypto/encryptVaultContent";
 
 type Props = {
   refreshing: boolean;
@@ -70,42 +75,69 @@ const Sync = (props: Props) => {
   }, [showSync, fadeAnim, slideAnim]);
 
   const save = async () => {
-  if (!vault.isUnlocked) return;
+    if (!vault.isUnlocked) return;
 
-  props.setRefreshing(true);
+    props.setRefreshing(true);
 
-  try {
-    const lastUpdated = getDateTime();
+    try {
+      if (!provider) throw new Error("[Sync] No provider configured");
+      if (provider !== "device" && !accessToken)
+        throw new Error("[Sync] Missing access token");
 
-    const deviceId = await getOrCreateDeviceId();
-    const platform = await getPlatformString();
-    const name = await getDeviceDisplayName();
+      const deviceId = await getOrCreateDeviceId();
+      const platform = await getPlatformString();
+      const name = await getDeviceDisplayName();
+      const iso = getDateTime();
 
-    const iso = getDateTime();
+      // 1) Metadaten updaten
+      vault.update((draft) => {
+        draft.devices = upsertVaultDevice(
+          draft.devices,
+          { id: deviceId, name, platform },
+          iso,
+        );
+      });
 
-    vault.update((draft) => {
-      draft.devices = upsertVaultDevice(draft.devices, { id: deviceId, name, platform }, iso);
-    });
+      // 2) Payload exportieren
+      const payload = vault.exportFullData();
 
-    const fullData = vault.exportFullData();
-    const encryptedData = await encrypt(fullData, auth.getMaster() ?? "", lastUpdated);
+      // 3) Encrypt über deinen Layer
+      const master = auth.getMaster();
+      if (!master)
+        throw new Error("[Sync] Missing master password in auth context");
 
-    uploadRemoteVaultFile({
-      provider,
-      accessToken: accessToken ?? "",
-      remotePath: "clavispass.lock",
-      content: encryptedData,
-      onCompleted: () => {
-        logger.info("[Sync] Remote vault upload completed.");
-        vault.markSaved();
-        props.setRefreshing(false);
-      },
-    });
-  } catch (err) {
-    logger.error("[Sync] Save failed:", err);
-    props.setRefreshing(false);
-  }
-};
+      const result = await encryptVaultContent(
+        payload,
+        master,
+        {
+          mode: "legacy",
+          lastUpdated: iso,
+        },
+      );
+
+      if (!result.ok) {
+        throw result.error;
+      }
+
+      const encryptedJson = result.content;
+
+      // 4) Upload
+      await uploadRemoteVaultFile({
+        provider,
+        accessToken: accessToken ?? "",
+        remotePath: "clavispass.lock",
+        content: encryptedJson,
+        onCompleted: () => {
+          logger.info("[Sync] Remote vault upload completed.");
+          vault.markSaved();
+          props.setRefreshing(false);
+        },
+      });
+    } catch (err) {
+      logger.error("[Sync] Save failed:", err);
+      props.setRefreshing(false);
+    }
+  };
 
   return (
     <Animated.View

@@ -84,46 +84,39 @@ function Login(props: Props) {
   );
 
   const loginWithMasterPassword = useCallback(
-    async (masterPasswordToUse: string, content: string | null) => {
-      try {
-        if (!content) return;
+  async (masterPasswordToUse: string, content: string | null) => {
+    try {
+      if (!content) return;
 
-        const cryptoProvider = await getCryptoProvider();
+      // V1 erstmal parken? -> allowV1: false
+      const result = await decryptVaultContent(
+        content,
+        masterPasswordToUse,
+        { allowV1: false } // <-- wenn du V1 komplett deaktivieren willst
+      );
 
-
-        const result = await decryptVaultContent(
-          cryptoProvider,
-          content,
-          masterPasswordToUse
-        );
-
-        if (!result.ok) {
-          throw result.error ?? new Error(result.reason);
-        }
-
-        // 1) unlock
-        vault.unlockWithDecryptedVault(result.payload);
-        auth.login(masterPasswordToUse);
-
-        // 2) best-effort migration writeback (nur wenn legacy erkannt wurde)
-        if (result.migratedVaultJson && provider) {
-          try {
-            await writeVaultJson(result.migratedVaultJson);
-            logger.info("[Login] Legacy vault migrated to V1 and written back.");
-          } catch (e) {
-            logger.warn("[Login] Migration write-back failed (continuing):", e);
-          }
-        }
-      } catch (err) {
-        logger.error("[Login] Error decrypting vault:", err);
-        textInputRef.current?.focus?.();
-        setMasterPassword("");
-        setError(true);
-        setTimeout(() => setError(false), 1000);
+      if (!result.ok) {
+        throw result.error ?? new Error(result.reason);
       }
-    },
-    [auth, vault, provider, writeVaultJson]
-  );
+
+      // 1) unlock
+      vault.unlockWithDecryptedVault(result.payload);
+      auth.login(masterPasswordToUse);
+
+      // 2) Migration/Writeback entfernt
+      // Wenn du später wieder migrieren willst:
+      // if (result.format === "legacy") { ...encryptVaultV1 + writeVaultJson... }
+
+    } catch (err) {
+      logger.error("[Login] Error decrypting vault:", err);
+      textInputRef.current?.focus?.();
+      setMasterPassword("");
+      setError(true);
+      setTimeout(() => setError(false), 1000);
+    }
+  },
+  [auth, vault, writeVaultJson] // provider kannst du evtl. auch rausnehmen, wenn nur dafür drin war
+);
 
   const authenticate = useCallback(async () => {
     try {

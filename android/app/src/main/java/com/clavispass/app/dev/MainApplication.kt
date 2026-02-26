@@ -1,4 +1,4 @@
-package com.clavispass.app
+package com.clavispass.app.dev
 
 import android.app.Application
 import android.content.res.Configuration

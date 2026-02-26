@@ -97,6 +97,7 @@ const de: TranslationSchema = {
     scanqrcode: "QR-Code scannen",
     showqrcode: "QR-Code anzeigen",
     manageDevices: "Geräte verwalten",
+    encryption: "Verschlüsselung",
   },
   analysis: {
   topFindings: "Top-Funde",

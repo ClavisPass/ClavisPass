@@ -1,4 +1,4 @@
-package com.clavispass.app
+package com.clavispass.app.dev
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build
