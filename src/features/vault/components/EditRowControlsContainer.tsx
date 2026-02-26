@@ -9,7 +9,11 @@ import {
 } from "react-native";
 import { Divider, Icon, IconButton } from "react-native-paper";
 import { useTheme } from "../../../app/providers/ThemeProvider";
-import Animated, { FadeInDown, FadeOutUp, Layout } from "react-native-reanimated";
+import Animated, {
+  FadeInDown,
+  FadeOutUp,
+  Layout,
+} from "react-native-reanimated";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 
 export type EditRowControlsContainerProps = {
@@ -41,6 +45,7 @@ export function EditRowControlsContainer({
           borderRadius: 12,
           borderColor: darkmode ? theme.colors.outlineVariant : "white",
           borderWidth: StyleSheet.hairlineWidth,
+          overflow: "hidden",
         },
         style,
       ]}
@@ -53,13 +58,17 @@ export function EditRowControlsContainer({
           alignItems: "center",
         }}
       >
-        {Platform.OS === "web" ? (
+        <AnimatedPressable
+          style={{
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onPressIn={Platform.OS === "web" ? ()=>{} : onDragStart}
+        >
           <Icon source="drag" size={20} />
-        ) : (
-          <AnimatedPressable onPressIn={onDragStart}>
-            <Icon source="drag" size={20} />
-          </AnimatedPressable>
-        )}
+        </AnimatedPressable>
         <Divider
           style={{
             width: StyleSheet.hairlineWidth,

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { Easing, Platform, View, StyleSheet } from "react-native";
+import { Animated, Easing, Platform, View, StyleSheet } from "react-native";
 import { BottomNavigation, IconButton, Text } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../providers/ThemeProvider";
@@ -15,6 +15,9 @@ function getActiveRouteName(state: any): string | undefined {
   return route.state ? getActiveRouteName(route.state) : route.name;
 }
 
+const OFFLINE_BAR_HEIGHT = 16;
+const PLUS_TOP_ONLINE = 8;
+
 const CustomBottomTab = ({
   state,
   descriptors,
@@ -25,9 +28,39 @@ const CustomBottomTab = ({
   const { isOnline } = useOnline();
   const { t } = useTranslation();
 
-  const handleLogout = () => {
-    auth.logout();
-  };
+  // Offline badge: height JS, opacity native (aber NICHT im gleichen View!)
+  const offlineHeight = useRef(new Animated.Value(0)).current; // 0..16 (JS)
+  const offlineOpacity = useRef(new Animated.Value(0)).current; // 0..1 (native)
+
+  // Plus button: translateY native
+  const plusTranslateY = useRef(new Animated.Value(0)).current; // 0..16 (native)
+
+  useEffect(() => {
+    const easing = Easing.bezier(0.2, 0.7, 0.3, 1);
+
+    Animated.timing(offlineHeight, {
+      toValue: isOnline ? 0 : OFFLINE_BAR_HEIGHT,
+      duration: 250,
+      easing,
+      useNativeDriver: false, // height => JS
+    }).start();
+
+    Animated.timing(offlineOpacity, {
+      toValue: isOnline ? 0 : 1,
+      duration: isOnline ? 200 : 250,
+      easing,
+      useNativeDriver: true, // opacity => native
+    }).start();
+
+    Animated.timing(plusTranslateY, {
+      toValue: isOnline ? 0 : OFFLINE_BAR_HEIGHT,
+      duration: 250,
+      easing,
+      useNativeDriver: true, // transform => native
+    }).start();
+  }, [isOnline, offlineHeight, offlineOpacity, plusTranslateY]);
+
+  const handleLogout = () => auth.logout();
 
   const activeRouteName = getActiveRouteName(state as any);
   const isInEditScreen =
@@ -37,8 +70,6 @@ const CustomBottomTab = ({
     const isAdd = route.name === "AddTriggerStack";
     const isLogout = route.name === "LogoutStack";
     const isFocused = state.index === idx;
-
-    const isAddDisabled = isInEditScreen;
 
     const label = isAdd
       ? ""
@@ -66,7 +97,7 @@ const CustomBottomTab = ({
         if (isLogout) {
           handleLogout();
         } else if (isAdd) {
-          if (isAddDisabled) return;
+          if (isInEditScreen) return;
           navigation.navigate("HomeStack", {
             screen: "Home",
             params: { triggerAdd: Date.now() },
@@ -77,9 +108,7 @@ const CustomBottomTab = ({
             target: route.key,
             canPreventDefault: true,
           });
-          if (!event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
+          if (!event.defaultPrevented) navigation.navigate(route.name);
         }
       },
     };
@@ -96,6 +125,7 @@ const CustomBottomTab = ({
           : theme.colors.secondary,
       }}
     >
+      {/* Hintergrund-"Kante" unten */}
       <View
         style={{
           position: "absolute",
@@ -109,36 +139,51 @@ const CustomBottomTab = ({
           zIndex: 0,
         }}
       />
-      {!isOnline && (
-        <View
+
+      {/* OFFLINE BADGE: Outer animiert height (JS), inner animiert opacity (native) */}
+      <Animated.View
+        style={{
+          height: offlineHeight,
+          overflow: "hidden",
+        }}
+      >
+        <Animated.View
           style={{
+            flex: 1,
+            opacity: offlineOpacity,
             backgroundColor: theme.colors.secondary,
-            height: 16,
             borderRadius: 12,
             borderBottomLeftRadius: 0,
             borderBottomRightRadius: 0,
+            justifyContent: "center",
           }}
         >
-          <Text
-            style={{
-              textAlign: "center",
-              color: "white",
-              fontSize: 12,
-            }}
-          >
-            {"Offline"}
-          </Text>
-        </View>
-      )}
-      <View
+          {!isOnline ? (
+            <Text
+              style={{
+                textAlign: "center",
+                color: "white",
+                fontSize: 12,
+                lineHeight: 16,
+              }}
+            >
+              Offline
+            </Text>
+          ) : null}
+        </Animated.View>
+      </Animated.View>
+
+      {/* Plus Button: base top + translateY (native) */}
+      <Animated.View
         style={[
           {
             position: "absolute",
-            top: isOnline ? 8 : 24,
+            top: PLUS_TOP_ONLINE,
             alignSelf: "center",
             zIndex: 10,
             backgroundColor: theme.colors.background,
             borderRadius: 28,
+            transform: [{ translateY: plusTranslateY }],
           },
           {
             shadowColor: "#000",
@@ -164,8 +209,9 @@ const CustomBottomTab = ({
             });
           }}
         />
-      </View>
+      </Animated.View>
 
+      {/* Tab Bar */}
       <View
         style={[
           {
@@ -189,9 +235,7 @@ const CustomBottomTab = ({
             navigationState={{ index: state.index, routes }}
             onTabPress={({ route }) => route.onPress()}
             shifting={true}
-            style={{
-              backgroundColor: theme.colors.background,
-            }}
+            style={{ backgroundColor: theme.colors.background }}
             activeIndicatorStyle={{
               backgroundColor: theme.colors.secondaryContainer,
               borderRadius: 12,

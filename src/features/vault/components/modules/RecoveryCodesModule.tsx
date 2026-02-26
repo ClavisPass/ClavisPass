@@ -234,7 +234,6 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
                     mode="outlined"
                     value={input}
                     onChangeText={onChangeText}
-                    onSubmitEditing={finalizeCurrent}
                     onKeyPress={onKeyPress}
                     onFocus={onFocus}
                     onBlur={onBlur}

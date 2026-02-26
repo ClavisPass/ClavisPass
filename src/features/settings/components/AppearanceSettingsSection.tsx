@@ -44,8 +44,9 @@ const AppearanceSettingsSection: React.FC<Props> = ({
         }}
         label={t("settings:language")}
         options={[
-          { label: "English", value: "en" },
           { label: "Deutsch", value: "de" },
+          { label: "English", value: "en" },
+          
         ]}
       />
 
