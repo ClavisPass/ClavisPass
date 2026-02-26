@@ -135,7 +135,7 @@ function URLModule(props: URLModuleType & Props) {
         </View>
         <View style={{ height: 40, flex: 1 }}>
           <TextInput
-            autoFocus
+            autoFocus={value === "" ? true : false}
             outlineStyle={[
               globalStyles.outlineStyle,
               !isValid ? { borderColor: theme.colors.error } : null,

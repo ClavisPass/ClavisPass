@@ -67,7 +67,7 @@ function TaskModule(props: TaskModuleType & Props) {
           />
           <View style={{ flex: 1, marginRight: 8 }}>
             <TextInput
-              autoFocus
+              autoFocus={value === "" ? true : false}
               mode="outlined"
               multiline
               scrollEnabled={false}

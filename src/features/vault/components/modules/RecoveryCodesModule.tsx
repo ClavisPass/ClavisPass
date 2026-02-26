@@ -243,7 +243,6 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
                   layout={LinearTransition.duration(160)}
                 >
                   <TextInput
-                    autoFocus
                     ref={inputRef}
                     mode="outlined"
                     value={input}

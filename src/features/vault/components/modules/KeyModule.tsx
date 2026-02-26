@@ -43,7 +43,7 @@ function KeyModule(props: KeyModuleType & Props) {
       <View style={globalStyles.moduleView}>
         <View style={{ height: 40, flex: 1 }}>
           <TextInput
-            autoFocus
+            autoFocus={value === "" ? true : false}
             outlineStyle={globalStyles.outlineStyle}
             style={globalStyles.textInputStyle}
             value={value}

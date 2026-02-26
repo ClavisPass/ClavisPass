@@ -46,7 +46,7 @@ function TitleModule(props: Props) {
       }}
     >
       <TextInput
-        autoFocus
+        autoFocus={props.value.title === "" ? true : false}
         ref={textInputRef}
         placeholder={`${t("modules:title")}...`}
         placeholderTextColor={"lightgrey"}

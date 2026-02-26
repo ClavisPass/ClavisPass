@@ -35,7 +35,7 @@ function NoteModule(props: NoteModuleType & Props) {
       fastAccess={props.fastAccess}
     >
       <TextInput
-        autoFocus
+        autoFocus={value === "" ? true : false}
         outlineStyle={globalStyles.outlineStyle}
         style={globalStyles.textInputNoteStyle}
         value={value}
