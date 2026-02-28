@@ -76,7 +76,7 @@ function Login(props: Props) {
         provider,
         accessToken: token,
         remotePath: "clavispass.lock",
-        content: vaultJson, // string ist ok, wenn UploadFileParams.content string erlaubt
+        content: vaultJson,
         onCompleted: undefined,
       });
     },
@@ -88,18 +88,14 @@ function Login(props: Props) {
     try {
       if (!content) return;
 
-      // V1 erstmal parken? -> allowV1: false
       const result = await decryptVaultContent(
         content,
         masterPasswordToUse,
-        { allowV1: false } // <-- wenn du V1 komplett deaktivieren willst
       );
 
       if (!result.ok) {
         throw result.error ?? new Error(result.reason);
       }
-
-      // 1) unlock
       vault.unlockWithDecryptedVault(result.payload);
       auth.login(masterPasswordToUse);
 
@@ -115,7 +111,7 @@ function Login(props: Props) {
       setTimeout(() => setError(false), 1000);
     }
   },
-  [auth, vault, writeVaultJson] // provider kannst du evtl. auch rausnehmen, wenn nur dafür drin war
+  [auth, vault, writeVaultJson]
 );
 
   const authenticate = useCallback(async () => {

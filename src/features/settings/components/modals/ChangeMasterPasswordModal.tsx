@@ -11,10 +11,9 @@ import { useAuth } from "../../../../app/providers/AuthProvider";
 import { useToken } from "../../../../app/providers/CloudProvider";
 
 import { logger } from "../../../../infrastructure/logging/logger";
-import { encrypt } from "../../../../infrastructure/crypto/legacy/CryptoLayer";
 import { uploadRemoteVaultFile } from "../../../../infrastructure/cloud/clients/CloudStorageClient";
-import { getDateTime } from "../../../../shared/utils/Timestamp";
 import { useVault } from "../../../../app/providers/VaultProvider";
+import { encryptVaultContent } from "../../../../infrastructure/crypto/encryptVaultContent";
 
 type Props = {
   visible: boolean;
@@ -116,19 +115,20 @@ function ChangeMasterPasswordModal(props: Props) {
 
     setProcessing(true);
     try {
-      // 1) Klartext-Vault exportieren (kurzzeitig)
       const data = vault.exportFullData();
 
-      // 2) Neu verschlüsseln mit neuem Master-Passwort
-      const lastUpdated = getDateTime();
-      const crypto = await encrypt(data, newPassword, lastUpdated);
-      const content = JSON.stringify(crypto);
+      const enc = await encryptVaultContent(data, newPassword);
 
-      // 3) Persistieren (device oder remote provider)
+      if (!enc.ok) {
+        throw enc.error;
+      }
+
+      const content = enc.content;
+
       if (!provider) {
-        // Falls "kein Provider" bei dir wirklich existiert, musst du hier deinen lokalen Save-Path aufrufen.
-        // In deinem Setup sieht es eher so aus, dass immer provider gesetzt ist (mindestens "device").
-        logger.warn("[ChangeMasterPassword] No provider configured; cannot persist.");
+        logger.warn(
+          "[ChangeMasterPassword] No provider configured; cannot persist.",
+        );
         throw new Error("No provider configured");
       }
 
@@ -147,13 +147,15 @@ function ChangeMasterPasswordModal(props: Props) {
         onCompleted: undefined,
       } as any);
 
-      // 4) Session aktualisieren: auth master wechseln, dirty reset
       auth.login(newPassword);
       vault.markSaved();
 
       hideModal();
     } catch (e) {
-      logger.error("[ChangeMasterPassword] Failed to change master password:", e);
+      logger.error(
+        "[ChangeMasterPassword] Failed to change master password:",
+        e,
+      );
       flashError();
     } finally {
       setProcessing(false);
@@ -175,8 +177,18 @@ function ChangeMasterPasswordModal(props: Props) {
       >
         {!passwordConfirmed ? (
           <>
-            <View style={{ display: "flex", flexDirection: "column", gap: 6, flexGrow: 1 }}>
-              <Text variant="headlineSmall" style={{ userSelect: "none" as any }}>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+                flexGrow: 1,
+              }}
+            >
+              <Text
+                variant="headlineSmall"
+                style={{ userSelect: "none" as any }}
+              >
                 {t("common:verify")}
               </Text>
               <Text variant="bodyMedium" style={{ userSelect: "none" as any }}>
@@ -205,8 +217,18 @@ function ChangeMasterPasswordModal(props: Props) {
           </>
         ) : (
           <>
-            <View style={{ display: "flex", flexDirection: "column", gap: 6, flexGrow: 1 }}>
-              <Text variant="headlineSmall" style={{ userSelect: "none" as any }}>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+                flexGrow: 1,
+              }}
+            >
+              <Text
+                variant="headlineSmall"
+                style={{ userSelect: "none" as any }}
+              >
                 {t("login:newMasterPassword")}
               </Text>
             </View>
@@ -228,7 +250,9 @@ function ChangeMasterPasswordModal(props: Props) {
                 setValue={setConfirmPassword}
                 value={confirmPassword}
                 placeholder={t("login:confirmMasterPassword")}
-                onSubmitEditing={passwordNotEqual ? undefined : applyNewPassword}
+                onSubmitEditing={
+                  passwordNotEqual ? undefined : applyNewPassword
+                }
               />
             </View>
 

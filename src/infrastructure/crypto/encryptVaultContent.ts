@@ -20,7 +20,6 @@ export const encryptVaultContent = async (
   try {
     const mode: EncryptMode = options?.mode ?? "legacy";
 
-    // --- Legacy (DEFAULT) ---
     if (mode === "legacy") {
       const encrypted = await legacyEncrypt(
         payload,
@@ -34,7 +33,6 @@ export const encryptVaultContent = async (
       };
     }
 
-    // --- V1 (für später) ---
     const { getCryptoProvider } = await import("./provider");
     const cryptoProvider = await getCryptoProvider();
     if (mode === "v1") {

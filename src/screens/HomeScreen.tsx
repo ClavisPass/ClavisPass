@@ -25,12 +25,9 @@ import AnimatedContainer from "../shared/components/container/AnimatedContainer"
 import { useFocusEffect } from "@react-navigation/native";
 import { TITLEBAR_HEIGHT } from "../shared/components/CustomTitlebar";
 import FolderModal from "../features/vault/components/modals/FolderModal";
-import { VaultDataTypeSchema } from "../features/vault/model/VaultDataType";
 import SearchShortcut from "../shared/components/shortcuts/SearchShortcut";
 import AddValueModal from "../features/vault/components/modals/AddValueModal";
-import { decrypt } from "../infrastructure/crypto/legacy/CryptoLayer";
 import { useAuth } from "../app/providers/AuthProvider";
-import { CryptoTypeSchema } from "../infrastructure/crypto/legacy/CryptoType";
 import { useTheme } from "../app/providers/ThemeProvider";
 
 import {
@@ -55,6 +52,7 @@ import Sync from "../features/sync/components/Sync";
 import { useVault } from "../app/providers/VaultProvider";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { HomeStackParamList } from "../app/navigation/model/types";
+import { decryptVaultContent } from "../infrastructure/crypto/decryptVaultContent";
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
@@ -193,65 +191,56 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     setRefreshing(true);
 
     (async () => {
-      try {
-        let tokenToUse: string | null = null;
+    try {
+      let tokenToUse: string | null = null;
 
-        if (provider !== "device") {
-          tokenToUse = accessToken ?? (await ensureFreshAccessToken());
-          if (!tokenToUse) {
-            logger.warn("[Home] No access token available for refreshData.");
-            setRefreshing(false);
-            return;
-          }
-        }
-
-        const result = await fetchRemoteVaultFile({
-          provider,
-          accessToken: tokenToUse ?? "",
-          remotePath: "clavispass.lock",
-        });
-
-        if (result.status === "error") {
-          logger.warn(
-            "[Home] refreshData fetch error:",
-            result.message,
-            result.cause
-          );
+      if (provider !== "device") {
+        tokenToUse = accessToken ?? (await ensureFreshAccessToken());
+        if (!tokenToUse) {
+          logger.warn("[Home] No access token available for refreshData.");
           setRefreshing(false);
           return;
         }
-
-        if (result.status === "not_found") {
-          logger.info("[Home] No vault found during refreshData.");
-          setRefreshing(false);
-          return;
-        }
-
-        const parsedCryptoData = CryptoTypeSchema.parse(
-          JSON.parse(result.content)
-        );
-        const decryptedData = decrypt(parsedCryptoData, master);
-        const jsonData = JSON.parse(decryptedData);
-
-        const parsedData = VaultDataTypeSchema.parse(jsonData);
-        if (!parsedData) {
-          setRefreshing(false);
-          return;
-        }
-
-        vault.unlockWithDecryptedVault(parsedData);
-        vault.markSaved();
-
-        setSelectedFolder(null);
-        saveSelectedFavState(false);
-        saveSelected2FAState(false);
-        saveSelectedCardState(false);
-
-        setRefreshing(false);
-      } catch (error) {
-        logger.error("[Home] Error during refreshData:", error);
-        setRefreshing(false);
       }
+
+      const result = await fetchRemoteVaultFile({
+        provider,
+        accessToken: tokenToUse ?? "",
+        remotePath: "clavispass.lock",
+      });
+
+      if (result.status === "error") {
+        logger.warn("[Home] refreshData fetch error:", result.message, result.cause);
+        setRefreshing(false);
+        return;
+      }
+
+      if (result.status === "not_found") {
+        logger.info("[Home] No vault found during refreshData.");
+        setRefreshing(false);
+        return;
+      }
+
+      const decrypted = await decryptVaultContent(result.content, master);
+
+      if (!decrypted.ok) {
+        logger.warn("[Home] refreshData decrypt failed:", decrypted.reason, decrypted.error);
+        setRefreshing(false);
+        return;
+      }
+
+      vault.unlockWithDecryptedVault(decrypted.payload);
+      vault.markSaved();
+
+      setSelectedFolder(null);
+      saveSelectedFavState(false);
+      saveSelected2FAState(false);
+      saveSelectedCardState(false);
+    } catch (error) {
+      logger.error("[Home] Error during refreshData:", error);
+    } finally {
+      setRefreshing(false);
+    }
     })();
   };
 

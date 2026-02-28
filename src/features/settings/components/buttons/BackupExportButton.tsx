@@ -2,13 +2,12 @@ import { Platform } from "react-native";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import { useTranslation } from "react-i18next";
-
-import { encrypt } from "../../../../infrastructure/crypto/legacy/CryptoLayer";
 import { logger } from "../../../../infrastructure/logging/logger";
 import SettingsItem from "../SettingsItem";
 
 import { useAuth } from "../../../../app/providers/AuthProvider";
 import { useVault } from "../../../../app/providers/VaultProvider";
+import { encryptVaultContent } from "../../../../infrastructure/crypto/encryptVaultContent";
 
 function BackupExportButton() {
   const { t } = useTranslation();
@@ -29,11 +28,20 @@ function BackupExportButton() {
       }
 
       const fullData = vault.exportFullData();
-      const backupData = await encrypt(fullData, master);
 
-      const contents = JSON.stringify(backupData);
-      const timestamp = new Date()
-        .toISOString()
+      const iso = new Date().toISOString();
+
+      const encResult = await encryptVaultContent(fullData, master, {
+        lastUpdated: iso,
+      });
+
+      if (!encResult.ok) {
+        throw encResult.error;
+      }
+
+      const contents = encResult.content;
+
+      const timestamp = iso
         .replace(/[:.]/g, "-")
         .replace("T", "_")
         .slice(0, 19);

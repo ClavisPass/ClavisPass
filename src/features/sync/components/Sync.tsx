@@ -19,8 +19,6 @@ import {
   getDeviceDisplayName,
   getPlatformString,
 } from "../../vault/utils/deviceInfo";
-
-import { getCryptoProvider } from "../../../infrastructure/crypto/provider";
 import { encryptVaultContent } from "../../../infrastructure/crypto/encryptVaultContent";
 
 type Props = {
@@ -89,7 +87,6 @@ const Sync = (props: Props) => {
       const name = await getDeviceDisplayName();
       const iso = getDateTime();
 
-      // 1) Metadaten updaten
       vault.update((draft) => {
         draft.devices = upsertVaultDevice(
           draft.devices,
@@ -98,10 +95,7 @@ const Sync = (props: Props) => {
         );
       });
 
-      // 2) Payload exportieren
       const payload = vault.exportFullData();
-
-      // 3) Encrypt über deinen Layer
       const master = auth.getMaster();
       if (!master)
         throw new Error("[Sync] Missing master password in auth context");
@@ -121,7 +115,6 @@ const Sync = (props: Props) => {
 
       const encryptedJson = result.content;
 
-      // 4) Upload
       await uploadRemoteVaultFile({
         provider,
         accessToken: accessToken ?? "",

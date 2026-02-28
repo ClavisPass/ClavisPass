@@ -21,18 +21,16 @@ export const decryptVaultContent = async (
   masterPassword: string,
   opts: DecryptOptions = {},
 ): Promise<DecryptVaultContentResult> => {
-  const allowV1 = opts.allowV1 ?? true;
+  const allowV1 = opts.allowV1 ?? false;
 
   let parsedJson: unknown;
 
-  // 1) content muss JSON sein
   try {
     parsedJson = JSON.parse(content);
   } catch (e) {
     return { ok: false, reason: "FORMAT", error: e };
   }
 
-  // 2) Legacy FIRST (Hauptpfad)
   const legacy = CryptoTypeSchema.safeParse(parsedJson);
   if (legacy.success) {
     try {
@@ -45,7 +43,6 @@ export const decryptVaultContent = async (
     }
   }
 
-  // 3) V1 optional
   const { getCryptoProvider } = await import("./provider");
   const cryptoProvider = await getCryptoProvider();
   if (allowV1) {

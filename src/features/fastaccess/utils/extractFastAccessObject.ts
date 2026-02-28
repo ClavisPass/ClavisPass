@@ -3,6 +3,7 @@ import FastAccessType from "../model/FastAccessType";
 import EmailModuleType from "../../vault/model/modules/EmailModuleType";
 import UsernameModuleType from "../../vault/model/modules/UsernameModuleType";
 import WifiModuleType from "../../vault/model/modules/WifiModuleType";
+import PasswordModuleType from "../../vault/model/modules/PasswordModuleType";
 import ModulesType from "../../vault/model/ModulesType";
 
 const extractFastAccessObject = (modules: ModulesType, title: string) => {
@@ -10,42 +11,55 @@ const extractFastAccessObject = (modules: ModulesType, title: string) => {
   let usernameId = "";
   let password = "";
   let passwordId = "";
+
   for (const module of modules) {
-    if (module.module === ModulesEnum.USERNAME && username === "") {
-      username = (module as UsernameModuleType).value;
-      usernameId = (module as UsernameModuleType).id;
+    if (module.module === ModulesEnum.USERNAME && !username) {
+      const m = module as UsernameModuleType;
+      username = m.value;
+      usernameId = m.id;
+      continue;
     }
-    if (module.module === ModulesEnum.E_MAIL && username === "") {
-      username = (module as EmailModuleType).value;
-      usernameId = (module as EmailModuleType).id;
+
+    if (module.module === ModulesEnum.E_MAIL && !username) {
+      const m = module as EmailModuleType;
+      username = m.value;
+      usernameId = m.id;
+      continue;
     }
-    if (module.module === ModulesEnum.PASSWORD && password === "") {
-      password = (module as UsernameModuleType).value;
-      passwordId = (module as UsernameModuleType).id;
+
+    if (module.module === ModulesEnum.PASSWORD && !password) {
+      const m = module as PasswordModuleType; // <- wichtig
+      password = m.value;
+      passwordId = m.id;
+      continue;
     }
+
     if (module.module === ModulesEnum.WIFI) {
-      const wifiModule = module as WifiModuleType;
-      if (username === "" || password === "") {
-        username = wifiModule.wifiName;
-        usernameId = wifiModule.id;
-        password = wifiModule.value;
-        passwordId = wifiModule.id;
+      const m = module as WifiModuleType;
+      // nur auffüllen, wenn noch was fehlt
+      if (!username) {
+        username = m.wifiName;
+        usernameId = m.id;
+      }
+      if (!password) {
+        password = m.value;
+        passwordId = m.id;
       }
     }
-    if (username !== "" && password !== "") {
-      break;
-    }
+
+    if (username && password) break;
   }
-  if (username === "" || password === "") {
-    return null;
-  }
+
+  if (!username || !password) return null;
+
   const fastAccessObject: FastAccessType = {
-    title: title,
-    username: username,
-    usernameId: usernameId,
-    password: password,
-    passwordId: passwordId,
+    title,
+    username,
+    usernameId,
+    password,
+    passwordId,
   };
+
   return fastAccessObject;
 };
 
