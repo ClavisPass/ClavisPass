@@ -15,7 +15,7 @@
     "name": "ClavisPass",
     "scheme": "clavispass",
     "slug": "clavispass",
-    "version": "1.4.8",
+    "version": "1.5.0",
     "owner": "clavispass",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,7 +23,7 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "runtimeVersion": "1.4.6",
+    "runtimeVersion": "1.5.0",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.clavispass.app"
