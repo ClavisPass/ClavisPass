@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
   container: {
     marginLeft: 4,
     marginRight: 4,
-    marginBottom: 4,
+    marginBottom: 8,
     borderRadius: 12,
   },
   ripple: {
@@ -57,6 +57,7 @@ function TotpItem(props: Props) {
         key={props.key}
         style={styles.ripple}
         onPress={props.onPress}
+        borderless={false}
       >
         <Totp value={props.value} variant="list" />
       </AnimatedPressable>

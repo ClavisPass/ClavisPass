@@ -119,8 +119,13 @@ export function Totp(props: { value: string; variant?: "module" | "list" }) {
       style={[
         styles.card,
         {
-          backgroundColor: theme.colors.background,
-          borderColor: darkmode ? theme.colors.outlineVariant : "white",
+          backgroundColor: isListVariant ? "transparent" : theme.colors.background,
+          borderColor: isListVariant
+            ? "transparent"
+            : darkmode
+              ? theme.colors.outlineVariant
+              : "white",
+          borderWidth: isListVariant ? 0 : StyleSheet.hairlineWidth,
         },
       ]}
     >
