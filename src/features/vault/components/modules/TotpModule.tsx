@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { Button, Divider, Text } from "react-native-paper";
 
 import ModuleContainer from "../ModuleContainer";
@@ -110,6 +110,7 @@ export function Totp(props: { value: string; variant?: "module" | "list" }) {
       ? info.account
       : info?.issuer ?? info?.account ?? "";
   const isListVariant = props.variant === "list";
+  const useTransparentListShell = isListVariant && Platform.OS === "web";
   const headerPaddingVertical = isListVariant ? 12 : 8;
   const bodyPaddingTop = isListVariant ? 14 : 8;
   const bodyPaddingBottom = isListVariant ? 14 : 8;
@@ -119,13 +120,15 @@ export function Totp(props: { value: string; variant?: "module" | "list" }) {
       style={[
         styles.card,
         {
-          backgroundColor: isListVariant ? "transparent" : theme.colors.background,
-          borderColor: isListVariant
+          backgroundColor: useTransparentListShell
+            ? "transparent"
+            : theme.colors.background,
+          borderColor: useTransparentListShell
             ? "transparent"
             : darkmode
               ? theme.colors.outlineVariant
               : "white",
-          borderWidth: isListVariant ? 0 : StyleSheet.hairlineWidth,
+          borderWidth: useTransparentListShell ? 0 : StyleSheet.hairlineWidth,
         },
       ]}
     >

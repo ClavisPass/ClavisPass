@@ -20,6 +20,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flex: 1,
+    overflow: "hidden",
+    borderRadius: 12,
   },
 });
 
@@ -57,7 +59,6 @@ function TotpItem(props: Props) {
         key={props.key}
         style={styles.ripple}
         onPress={props.onPress}
-        borderless={false}
       >
         <Totp value={props.value} variant="list" />
       </AnimatedPressable>
