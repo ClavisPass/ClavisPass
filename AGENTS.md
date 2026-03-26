@@ -47,6 +47,8 @@ Use this file as the fast-start context for future work, then open [docs/project
 - When adding a vault module, update both the model/rendering side and the central `MODULE_POLICY`.
 - When changing sync behavior, inspect all provider implementations in `src/infrastructure/cloud/clients`.
 - Desktop-only behavior often hides behind `Platform.OS === "web"` because Expo web is used inside Tauri.
+- When adding or changing user-facing text, update the typed i18n contract in src/shared/i18n/TranslationSchema.ts and add matching entries in both src/shared/i18n/languages/de.ts and src/shared/i18n/languages/en.ts.
+- Prefer real translation keys over local hardcoded fallbacks; use defaultValue only as a temporary bridge when needed during a change.
 
 ## Suggested First Files To Read
 
@@ -57,3 +59,4 @@ Use this file as the fast-start context for future work, then open [docs/project
 5. [src/app/providers/VaultProvider.tsx](/e:/Projects/ClavisPass/src/app/providers/VaultProvider.tsx)
 6. [src/features/vault/utils/VaultSession.ts](/e:/Projects/ClavisPass/src/features/vault/utils/VaultSession.ts)
 7. [src/features/vault/utils/modulePolicy.ts](/e:/Projects/ClavisPass/src/features/vault/utils/modulePolicy.ts)
+

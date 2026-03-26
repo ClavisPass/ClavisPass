@@ -281,6 +281,7 @@ Recommended guardrails:
 - Do not add a new module without updating `MODULE_POLICY`.
 - Do not assume desktop is a separate JS codebase; it is usually the Expo web bundle running inside Tauri.
 - Do not assume the V1 crypto path is fully active everywhere without checking the call sites.
+- Do not add new user-facing copy in only one place; update TranslationSchema.ts plus both de.ts and en.ts together so the typed i18n contract stays in sync.
 
 ## Good First Files For Orientation
 
@@ -294,3 +295,4 @@ Recommended guardrails:
 - [src/infrastructure/storage/store.ts](/e:/Projects/ClavisPass/src/infrastructure/storage/store.ts)
 - [src/infrastructure/storage/secureStore.ts](/e:/Projects/ClavisPass/src/infrastructure/storage/secureStore.ts)
 - [src-tauri/src/lib.rs](/e:/Projects/ClavisPass/src-tauri/src/lib.rs)
+
