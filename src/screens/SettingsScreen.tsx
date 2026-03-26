@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
 import WebSpecific from "../infrastructure/platform/WebSpecific";
 
 import { enable, isEnabled, disable } from "@tauri-apps/plugin-autostart";
@@ -123,6 +123,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     useState(false);
 
   const scrollRef = useRef<ScrollView>(null);
+  useScrollToTop(scrollRef);
 
   const authRef = useRef<View>(null);
   const systemRef = useRef<View>(null);

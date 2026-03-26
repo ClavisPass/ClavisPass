@@ -22,7 +22,7 @@ import HomeFilterMenu from "../features/vault/components/menus/HomeFilterMenu";
 import Blur from "../shared/components/Blur";
 import FolderFilter from "../features/vault/components/FolderFilter";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
 import { TITLEBAR_HEIGHT } from "../shared/components/CustomTitlebar";
 import FolderModal from "../features/vault/components/modals/FolderModal";
 import SearchShortcut from "../shared/components/shortcuts/SearchShortcut";
@@ -245,6 +245,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   };
 
   const searchRef = useRef<any>(null);
+  const activeListRef = useRef<any>(null);
+  const setActiveListRef = React.useCallback((instance: any | null) => {
+    activeListRef.current = instance;
+  }, []);
+
+  const scrollToTopRef = useRef({
+    scrollToTop: () => {
+      activeListRef.current?.scrollToOffset?.({
+        offset: 0,
+        animated: true,
+      });
+    },
+  });
+
+  useScrollToTop(scrollToTopRef);
 
   const refreshControl = useMemo(
     () => (
@@ -282,6 +297,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       }
       return (
         <FlashList
+          ref={setActiveListRef}
           refreshControl={refreshControl}
           contentContainerStyle={{ paddingRight: 4 }}
           data={cardEntries}
@@ -326,6 +342,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       }
       return (
         <FlashList
+          ref={setActiveListRef}
           refreshControl={refreshControl}
           contentContainerStyle={{ paddingRight: 4 }}
           data={totpEntries}
@@ -346,6 +363,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     }
     const flashList = (
       <FlashList
+        ref={setActiveListRef}
         refreshControl={refreshControl}
         contentContainerStyle={{ paddingRight: 4 }}
         data={filteredValues}

@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { Chip, Divider, Searchbar, Text } from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { FlashList } from "@shopify/flash-list";
@@ -178,6 +178,18 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [appliedQuery, setAppliedQuery] = useState("");
   const deferredAppliedQuery = useDeferredValue(appliedQuery.trim());
+  const listRef = React.useRef<any>(null);
+
+  const scrollToTopRef = React.useRef({
+    scrollToTop: () => {
+      listRef.current?.scrollToOffset?.({
+        offset: 0,
+        animated: true,
+      });
+    },
+  });
+
+  useScrollToTop(scrollToTopRef);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -598,6 +610,7 @@ const stacked = width < 600;
 
           <View style={{ flex: 1, minWidth: 0, marginTop: GAP }}>
             <FlashList
+              ref={listRef}
               data={filteredValues}
               keyExtractor={(x: any) =>
                 `${x.ref.valueId}:${x.ref.moduleId}:${x.ref.type}`
