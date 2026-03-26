@@ -9,10 +9,10 @@
     "tauri:build": "tauri build",
     "web:build-tauri": "npx expo export --platform web",
     "upgrade": "npx expo install --fix",
-    "release": "node release.js",
+    "release:prod": "node release.js",
+    "release:dev": "eas build -p android --profile development --clear-cache",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "eas:dev:android": "eas build -p android --profile development --clear-cache",
     "postinstall": "patch-package"
   },
   "dependencies": {
