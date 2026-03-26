@@ -28,6 +28,7 @@ import ContainerButton from "../shared/components/buttons/ContainerButton";
 import SquaredContainerButton from "../shared/components/buttons/SquaredContainerButton";
 import DeleteModal from "../features/vault/components/modals/DeleteModal";
 import Button from "../shared/components/buttons/Button";
+import DeleteModuleModal from "../features/vault/components/modals/DeleteModuleModal";
 
 import useAppLifecycle from "../shared/hooks/useAppLifecycle";
 import {
@@ -77,6 +78,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const discardChangesRef = useRef(false);
 
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deleteModuleModalVisible, setDeleteModuleModalVisible] =
+    useState(false);
+  const [pendingModuleDeleteId, setPendingModuleDeleteId] = useState<
+    string | null
+  >(null);
 
   const [favIcon, setFavIcon] = useState("star-outline");
 
@@ -261,6 +267,46 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     discardChangesRef.current = true;
   };
 
+  const moduleHasMeaningfulContent = (input: unknown): boolean => {
+    if (input === null || input === undefined) return false;
+    if (typeof input === "string") return input.trim().length > 0;
+    if (typeof input === "boolean") return input;
+    if (typeof input === "number") return Number.isFinite(input) && input !== 0;
+
+    if (Array.isArray(input)) {
+      if (input.length === 0) return false;
+      return input.some((item) => moduleHasMeaningfulContent(item));
+    }
+
+    if (typeof input === "object") {
+      return Object.entries(input as Record<string, unknown>)
+        .filter(([key]) => !["id", "module"].includes(key))
+        .some(([, value]) => moduleHasMeaningfulContent(value));
+    }
+
+    return false;
+  };
+
+  const requestDeleteModule = (id: string) => {
+    const moduleToDelete = value.modules.find((item) => item.id === id);
+
+    if (!moduleToDelete || !moduleHasMeaningfulContent(moduleToDelete)) {
+      deleteModule(id);
+      return;
+    }
+
+    setPendingModuleDeleteId(id);
+    setDeleteModuleModalVisible(true);
+  };
+
+  const confirmDeleteModule = () => {
+    if (!pendingModuleDeleteId) return;
+
+    deleteModule(pendingModuleDeleteId);
+    setPendingModuleDeleteId(null);
+    setDeleteModuleModalVisible(false);
+  };
+
   const changeModule = (module: ModuleType) => {
     const index = value.modules.findIndex((val) => val.id === module.id);
     const newModules = [...value.modules];
@@ -382,7 +428,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           value={value}
           setValue={setValue}
           changeModules={changeModules}
-          deleteModule={deleteModule}
+          deleteModule={requestDeleteModule}
           changeModule={changeModule}
           addModule={addModule}
           setDiscardoChanges={() => (discardChangesRef.current = true)}
@@ -395,7 +441,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           value={value}
           setValue={setValue}
           changeModules={changeModules}
-          deleteModule={deleteModule}
+          deleteModule={requestDeleteModule}
           changeModule={changeModule}
           addModule={addModule}
           setDiscardoChanges={() => (discardChangesRef.current = true)}
@@ -442,6 +488,14 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         onDelete={() => {
           deleteValue(value.id);
         }}
+      />
+      <DeleteModuleModal
+        visible={deleteModuleModalVisible}
+        setVisible={(visible) => {
+          setDeleteModuleModalVisible(visible);
+          if (!visible) setPendingModuleDeleteId(null);
+        }}
+        onDelete={confirmDeleteModule}
       />
     </AnimatedContainer>
   );

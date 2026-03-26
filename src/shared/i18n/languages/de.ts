@@ -34,6 +34,8 @@ const de: TranslationSchema = {
     next: "Weiter",
     done: "Fertig",
     offline: "Offline",
+    deleteModuleText:
+      "Dieses Modul enthält bereits Daten. Möchtest du es wirklich löschen?",
     copiedFor: "Kopiert für {{seconds}} Sekunden",
     connected: "verbunden",
     notConnected: "nicht verbunden",

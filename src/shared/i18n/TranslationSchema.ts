@@ -34,6 +34,7 @@ export type TranslationSchema = {
     next: string;
     done: string;
     offline: string;
+    deleteModuleText:string;
     copiedFor: string;
     connected: string;
     notConnected: string;
