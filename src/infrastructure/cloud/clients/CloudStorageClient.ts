@@ -6,6 +6,7 @@ import TokenRefreshResult from "../model/oauth/TokenRefreshResult";
 import * as DropboxClient from "./DropboxClient";
 import * as GoogleDriveClient from "./GoogleDriveClient";
 import * as DeviceStorageClient from "./DeviceStorageClient";
+import * as ClavisPassHubClient from "./ClavisPassHubClient";
 
 import { logger } from "../../logging/logger";
 import Provider from "../model/Provider";
@@ -28,6 +29,9 @@ export const fetchUserInfo = async (
 
     case "device":
       return DeviceStorageClient.fetchUserInfo(token, setUserInfo, callback);
+
+    case "clavispassHub":
+      return ClavisPassHubClient.fetchUserInfo(token, setUserInfo, callback);
 
     default: {
       const _exhaustiveCheck: never = provider as never;
@@ -63,6 +67,9 @@ export const fetchRemoteVaultFile = async (params: {
 
       case "device":
         return await DeviceStorageClient.fetchFile();
+
+      case "clavispassHub":
+        return await ClavisPassHubClient.fetchFile(accessToken, remotePath);
 
       default: {
         const _exhaustiveCheck: never = provider;
@@ -103,6 +110,13 @@ export const uploadRemoteVaultFile = async (
       );
     case "device":
       return DeviceStorageClient.uploadFile(content, onCompleted);
+    case "clavispassHub":
+      return ClavisPassHubClient.uploadFile(
+        accessToken,
+        content,
+        remotePath,
+        onCompleted
+      );
     default: {
       logger.error("[CloudStorage] Unsupported provider for upload:", provider);
       throw new Error("Unsupported cloud storage provider");
@@ -122,6 +136,8 @@ export const refreshAccessToken = async (
       return GoogleDriveClient.refreshAccessToken(refreshToken);
     case "device":
       throw new Error("[OAuth] Device provider does not support token refresh");
+    case "clavispassHub":
+      return ClavisPassHubClient.refreshAccessToken(refreshToken);
     default: {
       throw new Error(`[OAuth] Unsupported provider: ${String(provider)}`);
     }

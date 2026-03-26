@@ -7,6 +7,7 @@ import { MotiView } from "moti";
 
 import DropboxLoginButton from "./DropboxLoginButton";
 import GoogleDriveLoginButton from "./GoogleDriveLoginButton";
+import ClavisPassHubLoginButton from "./ClavisPassHubLoginButton";
 import SettingsDivider from "../../settings/components/SettingsDivider";
 
 import UserInfoType from "../model/UserInfoType";
@@ -16,6 +17,7 @@ import { fetchUserInfo } from "../../../infrastructure/cloud/clients/CloudStorag
 import { logger } from "../../../infrastructure/logging/logger";
 import { useTheme as useAppTheme } from "../../../app/providers/ThemeProvider";
 import { useTranslation } from "react-i18next";
+import LogoColored from "../../../shared/ui/LogoColored";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -96,6 +98,8 @@ function UserInformation(props: Props) {
       ? "Dropbox " + t("common:connected")
       : provider === "googleDrive"
       ? "Google Drive " + t("common:connected")
+      : provider === "clavispassHub"
+      ? "ClavisPass Hub " + t("common:connected")
       : t("common:notConnected");
 
   const providerIcon =
@@ -103,6 +107,8 @@ function UserInformation(props: Props) {
       ? "dropbox"
       : provider === "googleDrive"
       ? "google-drive"
+      : provider === "clavispassHub"
+      ? "server-network"
       : "cloud-off-outline";
 
   return (
@@ -139,6 +145,7 @@ function UserInformation(props: Props) {
               <Avatar.Image size={48} source={{ uri: userInfo.avatar }} />
             ) : (
               <Avatar.Text
+              style={{ backgroundColor: paperTheme.colors.surfaceVariant }}
                 size={48}
                 label={(userInfo?.username?.charAt(0) ?? "?").toUpperCase()}
               />
@@ -176,11 +183,19 @@ function UserInformation(props: Props) {
                       gap: 6,
                     }}
                   >
-                    <Icon
-                      source={providerIcon}
-                      size={18}
-                      color={paperTheme.colors.primary}
-                    />
+                    {provider === "clavispassHub" ? (
+                      <LogoColored
+                        width={14}
+                        height={14}
+                        fillColor={paperTheme.colors.primary}
+                      />
+                    ) : (
+                      <Icon
+                        source={providerIcon}
+                        size={18}
+                        color={paperTheme.colors.primary}
+                      />
+                    )}
                     <Text
                       variant="bodySmall"
                       style={{ color: paperTheme.colors.onSurfaceVariant }}
@@ -211,6 +226,8 @@ function UserInformation(props: Props) {
           <DropboxLoginButton />
           <SettingsDivider />
           <GoogleDriveLoginButton />
+          <SettingsDivider />
+          <ClavisPassHubLoginButton />
         </MotiView>
       )}
     </View>

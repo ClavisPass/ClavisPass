@@ -6,6 +6,7 @@ type Props = {
   children: ReactNode;
   onPress?: () => void;
   leadingIcon?: string;
+  leading?: ReactNode;
   selected?: boolean;
   label?: string;
 };
@@ -14,6 +15,7 @@ function SettingsItem(props: Props) {
     <MenuItem
       onPress={props.onPress}
       leadingIcon={props.leadingIcon}
+      leading={props.leading}
       selected={props.selected}
       label={props.label}
     >

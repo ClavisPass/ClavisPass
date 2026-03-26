@@ -8,6 +8,7 @@ type Props = {
   children: ReactNode;
   onPress?: () => void;
   leadingIcon?: string;
+  leading?: ReactNode;
   selected?: boolean;
   label?: string;
   rightText?: string;
@@ -35,13 +36,13 @@ export function MenuItem(props: Props) {
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-            {props.leadingIcon && (
+            {props.leading ?? (props.leadingIcon && (
               <Icon
                 size={20}
                 color={theme.colors.primary}
                 source={props.leadingIcon}
               />
-            )}
+            ))}
             {props.label ? (
               <View style={{ display: "flex", flexDirection: "column" }}>
                 <Text

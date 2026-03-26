@@ -5,6 +5,7 @@ type SessionQrPayload = {
   version: 1;
   provider: Provider;
   refreshToken: string;
+  hostUrl?: string;
 };
 
 export default SessionQrPayload;

@@ -33,6 +33,7 @@ import {
 } from "@gorhom/bottom-sheet";
 import DropboxLoginButton from "../features/sync/components/DropboxLoginButton";
 import GoogleDriveLoginButton from "../features/sync/components/GoogleDriveLoginButton";
+import ClavisPassHubLoginButton from "../features/sync/components/ClavisPassHubLoginButton";
 import SettingsDivider from "../features/settings/components/SettingsDivider";
 import { useTranslation } from "react-i18next";
 import SettingsItem from "../features/settings/components/SettingsItem";
@@ -260,6 +261,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               <DropboxLoginButton />
               <SettingsDivider />
               <GoogleDriveLoginButton />
+              <SettingsDivider />
+              <ClavisPassHubLoginButton />
               <SettingsDivider />
               <SettingsItem
                 leadingIcon={"qrcode-scan"}

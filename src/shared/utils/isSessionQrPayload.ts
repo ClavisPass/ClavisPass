@@ -8,7 +8,8 @@ function isSessionQrPayload(value: unknown): value is SessionQrPayload {
     v.kind === "clavispass:session" &&
     v.version === 1 &&
     typeof v.provider === "string" &&
-    typeof v.refreshToken === "string"
+    typeof v.refreshToken === "string" &&
+    (typeof v.hostUrl === "undefined" || typeof v.hostUrl === "string")
   );
 }
 

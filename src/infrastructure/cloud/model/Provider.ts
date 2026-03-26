@@ -1,3 +1,3 @@
-type Provider = "dropbox" | "googleDrive" | "device";
+type Provider = "dropbox" | "googleDrive" | "device" | "clavispassHub";
 
 export default Provider;

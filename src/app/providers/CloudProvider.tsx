@@ -9,6 +9,8 @@ import React, {
 
 import { getData, saveData, removeData } from "../../infrastructure/storage/secureStore";
 import { refreshAccessToken } from "../../infrastructure/cloud/clients/CloudStorageClient";
+import { clearClavisPassHubVaultEtag } from "../../infrastructure/cloud/clients/ClavisPassHubConfig";
+import { logout as logoutClavisPassHub } from "../../infrastructure/cloud/clients/ClavisPassHubClient";
 import Provider from "../../infrastructure/cloud/model/Provider";
 import { logger } from "../../infrastructure/logging/logger";
 
@@ -155,6 +157,16 @@ export const CloudProvider = ({ children }: Props) => {
   );
 
   const clearSession = useCallback(async () => {
+    if (provider === "clavispassHub" && accessToken && refreshToken) {
+      try {
+        await logoutClavisPassHub(accessToken, refreshToken);
+      } catch (error) {
+        logger.warn("[TokenContext] ClavisPass Hub logout failed:", error);
+      }
+    } else if (provider === "clavispassHub") {
+      await clearClavisPassHubVaultEtag();
+    }
+
     setProvider("device");
     setAccessToken(null);
     setRefreshToken(null);
@@ -168,7 +180,7 @@ export const CloudProvider = ({ children }: Props) => {
         error
       );
     }
-  }, []);
+  }, [provider, accessToken, refreshToken]);
 
   const performTokenRefresh = useCallback(async (): Promise<string | null> => {
     if (!provider || !refreshToken) {
@@ -186,6 +198,11 @@ export const CloudProvider = ({ children }: Props) => {
 
       setAccessToken(result.accessToken);
 
+      const nextRefreshToken = result.refreshToken ?? refreshToken;
+      if (nextRefreshToken !== refreshToken) {
+        setRefreshToken(nextRefreshToken);
+      }
+
       if (result.expiresIn) {
         const expiresAt =
           Date.now() + Math.max(result.expiresIn - 60, 30) * 1000;
@@ -199,14 +216,17 @@ export const CloudProvider = ({ children }: Props) => {
       // Wir gehen in deinem bisherigen Setup davon aus, dass sich das Refresh-Token
       // meistens nicht ändert. Wenn doch, hier entsprechend updaten & persistieren.
 
-      await persistRefreshToken(refreshToken, provider);
+      await persistRefreshToken(nextRefreshToken, provider);
 
       return result.accessToken;
     } catch (error) {
       logger.error("[TokenContext] Fehler beim Token-Refresh:", error);
+      if (provider === "clavispassHub") {
+        await clearSession();
+      }
       return null;
     }
-  }, [provider, refreshToken, persistRefreshToken]);
+  }, [provider, refreshToken, persistRefreshToken, clearSession]);
 
   /**
    * Stellt sicher, dass ein valides Access-Token vorhanden ist.

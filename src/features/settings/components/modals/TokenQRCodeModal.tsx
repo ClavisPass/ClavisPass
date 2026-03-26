@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import SessionQrPayload from "../../../../infrastructure/cloud/model/SessionQrPayload";
+import { getClavisPassHubHostUrl } from "../../../../infrastructure/cloud/clients/ClavisPassHubConfig";
 
 type Props = {
   visible: boolean;
@@ -23,17 +24,33 @@ function TokenQRCodeModal(props: Props) {
   const hideModal = () => props.setVisible(false);
 
   useEffect(() => {
-    if (refreshToken) {
+    let cancelled = false;
+
+    (async () => {
+      if (!refreshToken) {
+        if (!cancelled) setValue("");
+        return;
+      }
+
       const payload: SessionQrPayload = {
         kind: "clavispass:session",
         version: 1,
         provider,
         refreshToken,
       };
-      setValue(JSON.stringify(payload));
-    } else {
-      setValue("");
-    }
+
+      if (provider === "clavispassHub") {
+        payload.hostUrl = (await getClavisPassHubHostUrl()) ?? undefined;
+      }
+
+      if (!cancelled) {
+        setValue(JSON.stringify(payload));
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [provider, refreshToken]);
 
   // Ob du automatisch schließen willst, wenn kein Token da ist,

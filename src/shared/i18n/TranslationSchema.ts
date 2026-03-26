@@ -49,9 +49,22 @@ export type TranslationSchema = {
     setNewPassword: string;
     noBackupFound: string;
     backupTitle: string;
+    backupLoadFailed: string;
     enterMasterPassword: string;
     cloudSave: string;
     deviceSave: string;
+    cloudAuthMissing: string;
+    hubConnect: string;
+    hubHostUrl: string;
+    hubUsername: string;
+    hubPassword: string;
+    hubSignIn: string;
+    hubHostRequired: string;
+    hubCredentialsRequired: string;
+    hubInvalidCredentials: string;
+    hubAccountDisabled: string;
+    hubMissingHostUrl: string;
+    hubNetworkError: string;
   };
   home: {
     search: string;

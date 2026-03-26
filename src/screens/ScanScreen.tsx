@@ -11,6 +11,7 @@ import { StatusBar } from "expo-status-bar";
 import { logger } from "../infrastructure/logging/logger";
 import { useToken } from "../app/providers/CloudProvider";
 import { refreshAccessToken as refreshCloudAccessToken } from "../infrastructure/cloud/clients/CloudStorageClient";
+import { setClavisPassHubHostUrl } from "../infrastructure/cloud/clients/ClavisPassHubConfig";
 import isSessionQrPayload from "../shared/utils/isSessionQrPayload";
 import SessionQrPayload from "../infrastructure/cloud/model/SessionQrPayload";
 import { RootStackParamList } from "../app/navigation/model/types";
@@ -104,6 +105,17 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
           return;
         }
 
+        if (payload.provider === "clavispassHub") {
+          if (!payload.hostUrl) {
+            logger.warn(
+              "Session payload with provider 'clavispassHub' is missing the host URL."
+            );
+            return;
+          }
+
+          await setClavisPassHubHostUrl(payload.hostUrl);
+        }
+
         // Einmal Refresh auf dem Zielgerät, um ein frisches Access-Token zu holen
         const result = await refreshCloudAccessToken({
           provider: payload.provider,
@@ -120,7 +132,7 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
         await setSession({
           provider: payload.provider,
           accessToken: result.accessToken,
-          refreshToken: payload.refreshToken,
+          refreshToken: result.refreshToken ?? payload.refreshToken,
           expiresIn: result.expiresIn,
         });
 

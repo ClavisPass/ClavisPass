@@ -35,7 +35,7 @@ const Sync = (props: Props) => {
   const vault = useVault();
 
   const { isOnline } = useOnline();
-  const { accessToken, provider } = useToken();
+  const { accessToken, provider, ensureFreshAccessToken } = useToken();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -79,8 +79,14 @@ const Sync = (props: Props) => {
 
     try {
       if (!provider) throw new Error("[Sync] No provider configured");
-      if (provider !== "device" && !accessToken)
-        throw new Error("[Sync] Missing access token");
+
+      let tokenToUse = accessToken ?? "";
+      if (provider !== "device") {
+        tokenToUse = accessToken ?? (await ensureFreshAccessToken()) ?? "";
+        if (!tokenToUse) {
+          throw new Error("[Sync] Missing access token");
+        }
+      }
 
       const deviceId = await getOrCreateDeviceId();
       const platform = await getPlatformString();
@@ -117,7 +123,7 @@ const Sync = (props: Props) => {
 
       await uploadRemoteVaultFile({
         provider,
-        accessToken: accessToken ?? "",
+        accessToken: tokenToUse,
         remotePath: "clavispass.lock",
         content: encryptedJson,
         onCompleted: () => {
