@@ -1,5 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { KeyboardAvoidingView, Platform, View } from "react-native";
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  View,
+} from "react-native";
 import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
@@ -39,6 +44,10 @@ function DraggableModulesList(props: Props) {
   // ⬇️ Ref auf die Liste + Content-Höhe für Fallback
   const listRef = useRef<any>(null);
   const contentHeightRef = useRef(0);
+  const pendingKeyboardAwareScrollRef = useRef(false);
+  const keyboardRetryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   const scrollToBottom = () => {
     const list = listRef.current as any;
@@ -66,6 +75,11 @@ function DraggableModulesList(props: Props) {
     });
   };
 
+  const scheduleKeyboardAwareScroll = useCallback(() => {
+    pendingKeyboardAwareScrollRef.current = true;
+    scrollToBottom();
+  }, []);
+
   const renderItem = useCallback(
     ({ item, drag, isActive }: RenderItemParams<ModuleType>) => {
       return getModule(
@@ -90,10 +104,49 @@ function DraggableModulesList(props: Props) {
     const curr = props.value.modules.length;
     const prev = prevLenRef.current;
     if (curr > prev) {
-      scrollToBottom();
+      scheduleKeyboardAwareScroll();
     }
     prevLenRef.current = curr;
-  }, [props.value.modules.length]);
+  }, [props.value.modules.length, scheduleKeyboardAwareScroll]);
+
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+
+    const handleKeyboardShown = () => {
+      if (!pendingKeyboardAwareScrollRef.current) return;
+
+      scrollToBottom();
+
+      if (keyboardRetryTimeoutRef.current) {
+        clearTimeout(keyboardRetryTimeoutRef.current);
+      }
+
+      keyboardRetryTimeoutRef.current = setTimeout(() => {
+        scrollToBottom();
+        pendingKeyboardAwareScrollRef.current = false;
+        keyboardRetryTimeoutRef.current = null;
+      }, 120);
+    };
+
+    const handleKeyboardHidden = () => {
+      pendingKeyboardAwareScrollRef.current = false;
+      if (keyboardRetryTimeoutRef.current) {
+        clearTimeout(keyboardRetryTimeoutRef.current);
+        keyboardRetryTimeoutRef.current = null;
+      }
+    };
+
+    const showSub = Keyboard.addListener("keyboardDidShow", handleKeyboardShown);
+    const hideSub = Keyboard.addListener("keyboardDidHide", handleKeyboardHidden);
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+      if (keyboardRetryTimeoutRef.current) {
+        clearTimeout(keyboardRetryTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <KeyboardAvoidingView
@@ -136,8 +189,7 @@ function DraggableModulesList(props: Props) {
                   icon={"plus"}
                   onPress={() => {
                     props.addModule(modulePrediction);
-                    // Optionales sofortiges Feedback; der Effekt oben greift ohnehin
-                    setTimeout(scrollToBottom, 0);
+                    setTimeout(scheduleKeyboardAwareScroll, 0);
                   }}
                   style={{ position: "absolute", left: 8 }}
                 >
@@ -150,7 +202,6 @@ function DraggableModulesList(props: Props) {
                 style={{ margin: 0 }}
                 onPress={() => {
                   props.showAddModuleModal();
-                  // Optional sofort scrollen (Effekt deckt es später ab)
                   setTimeout(scrollToBottom, 0);
                 }}
                 size={20}
