@@ -4,6 +4,7 @@ import React, {
   useContext,
   ReactNode,
   useEffect,
+  useCallback,
 } from "react";
 import * as Network from "expo-network";
 import { Platform } from "react-native";
@@ -27,11 +28,57 @@ type Props = {
 export const OnlineProvider = ({ children }: Props) => {
   const [isCloudOnline, setIsCloudOnline] = useState(true);
 
+  const probeBrowserConnectivity = useCallback(async (): Promise<boolean> => {
+    if (typeof window === "undefined") {
+      return true;
+    }
+
+    if (!navigator.onLine) {
+      return false;
+    }
+
+    const probeUrls = [
+      "https://www.gstatic.com/generate_204",
+      "https://clavispass.github.io/ClavisPass/",
+    ];
+
+    for (const url of probeUrls) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+      try {
+        await fetch(`${url}?_=${Date.now()}`, {
+          method: "GET",
+          cache: "no-store",
+          mode: "no-cors",
+          signal: controller.signal,
+        });
+
+        return true;
+      } catch (error) {
+        logger.warn("[OnlineProvider] Browser connectivity probe failed:", {
+          url,
+          error,
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    }
+
+    return false;
+  }, []);
+
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined;
 
     async function checkNetwork() {
       try {
+        if (Platform.OS === "web") {
+          const online = await probeBrowserConnectivity();
+          setIsCloudOnline(online);
+          return;
+        }
+
         const state = await Network.getNetworkStateAsync();
         setIsCloudOnline(
           !!state.isConnected && state.isInternetReachable !== false
@@ -43,16 +90,20 @@ export const OnlineProvider = ({ children }: Props) => {
     }
 
     if (Platform.OS === "web") {
-      const handleOnline = () => setIsCloudOnline(true);
+      const handleOnline = () => {
+        void checkNetwork();
+      };
       const handleOffline = () => setIsCloudOnline(false);
 
       window.addEventListener("online", handleOnline);
       window.addEventListener("offline", handleOffline);
-      setIsCloudOnline(navigator.onLine);
+      void checkNetwork();
+      interval = setInterval(checkNetwork, 15000);
 
       return () => {
         window.removeEventListener("online", handleOnline);
         window.removeEventListener("offline", handleOffline);
+        if (interval) clearInterval(interval);
       };
     } else {
       checkNetwork();
@@ -62,7 +113,7 @@ export const OnlineProvider = ({ children }: Props) => {
         if (interval) clearInterval(interval);
       };
     }
-  }, []);
+  }, [probeBrowserConnectivity]);
 
   return (
     <OnlineContext.Provider value={{ isCloudOnline }}>

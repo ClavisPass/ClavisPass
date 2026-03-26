@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Animated, Easing } from "react-native";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { IconButton, Text } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 
 const SIDEBAR_WIDTH = 88;
 export const sidebarWidth = SIDEBAR_WIDTH;
+const OFFLINE_BAR_HEIGHT = 24;
 
 function getActiveRouteName(state: any): string | undefined {
   if (!state) return undefined;
@@ -28,6 +29,8 @@ export default function LeftSideTabBar({
   const auth = useAuth();
   const { isOnline } = useOnline();
   const { t } = useTranslation();
+  const offlineHeight = React.useRef(new Animated.Value(0)).current;
+  const offlineOpacity = React.useRef(new Animated.Value(0)).current;
 
   const handleLogout = () => auth.logout();
 
@@ -55,6 +58,24 @@ export default function LeftSideTabBar({
   }, [state.routes]);
 
   const focusedKey = state.routes[state.index]?.key;
+
+  React.useEffect(() => {
+    const easing = Easing.bezier(0.2, 0.7, 0.3, 1);
+
+    Animated.timing(offlineHeight, {
+      toValue: isOnline ? 0 : OFFLINE_BAR_HEIGHT,
+      duration: 250,
+      easing,
+      useNativeDriver: false,
+    }).start();
+
+    Animated.timing(offlineOpacity, {
+      toValue: isOnline ? 0 : 1,
+      duration: isOnline ? 200 : 250,
+      easing,
+      useNativeDriver: true,
+    }).start();
+  }, [isOnline, offlineHeight, offlineOpacity]);
 
   return (
     <View
@@ -150,7 +171,10 @@ export default function LeftSideTabBar({
               onPress={name === "AddTriggerStack" ? undefined : onPress}
               style={[
                 styles.item,
-                { backgroundColor: bgActive, opacity: isOnline ? 1 : 0.85 },
+                {
+                  backgroundColor: bgActive,
+                  opacity: isOnline ? 1 : 0.85,
+                },
                 isAction && styles.itemAction,
                 name === "AddTriggerStack" &&
                   isAddDisabled && { opacity: 0.45 },
@@ -175,18 +199,27 @@ export default function LeftSideTabBar({
           );
         })}
       </View>
-      {!isOnline && (
-        <View
+      <Animated.View
+        style={{
+          height: offlineHeight,
+          overflow: "hidden",
+        }}
+      >
+        <Animated.View
           style={{
+            flex: 1,
+            opacity: offlineOpacity,
             backgroundColor: theme.colors.secondary,
-            paddingVertical: 4,
+            justifyContent: "center",
           }}
         >
-          <Text style={{ textAlign: "center", color: "white", fontSize: 11 }}>
-            Offline
-          </Text>
-        </View>
-      )}
+          {!isOnline ? (
+            <Text style={{ textAlign: "center", color: "white", fontSize: 11 }}>
+              {t("common:offline")}
+            </Text>
+          ) : null}
+        </Animated.View>
+      </Animated.View>
     </View>
   );
 }
