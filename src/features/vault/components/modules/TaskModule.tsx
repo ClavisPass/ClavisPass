@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View } from "react-native";
-import { TextInput, Text, Checkbox } from "react-native-paper";
+import { Platform, View } from "react-native";
+import { TextInput, Checkbox } from "react-native-paper";
 import Props from "../../model/ModuleProps";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import TaskModuleType from "../../model/modules/TaskModuleType";
@@ -14,9 +14,8 @@ function TaskModule(props: TaskModuleType & Props) {
   const [value, setValue] = useState(props.value);
   const [checked, setChecked] = useState(props.completed);
 
-  // NEU: dynamische Höhe für das TextInput
-  const [inputHeight, setInputHeight] = useState<number>(0);
-  const MIN_HEIGHT = 30; // Grundhöhe einer Zeile (anpassen, wenn du 'dense' nutzt)
+  const MIN_HEIGHT = 36;
+  const [inputHeight, setInputHeight] = useState<number>(MIN_HEIGHT);
 
   useEffect(() => {
     if (didMount.current) {
@@ -57,7 +56,6 @@ function TaskModule(props: TaskModuleType & Props) {
               justifyContent: "flex-start",
               width: undefined,
               flex: 1,
-              marginRight: 21,
             },
           ]}
         >
@@ -65,16 +63,20 @@ function TaskModule(props: TaskModuleType & Props) {
             status={checked ? "checked" : "unchecked"}
             onPress={() => setChecked(!checked)}
           />
-          <View style={{ flex: 1, marginRight: 8 }}>
+          <View style={{ flex: 1, minWidth: 0 }}>
             <TextInput
               autoFocus={value === "" ? true : false}
               mode="outlined"
               multiline
               scrollEnabled={false}
               dense
-              onContentSizeChange={(e) =>
-                setInputHeight(e.nativeEvent.contentSize.height)
-              }
+              onContentSizeChange={(e) => {
+                const nextHeight = Math.max(
+                  MIN_HEIGHT,
+                  Math.ceil(e.nativeEvent.contentSize.height)
+                );
+                setInputHeight((prev) => (prev === nextHeight ? prev : nextHeight));
+              }}
               outlineStyle={[
                 globalStyles.outlineStyle,
                 { borderWidth: 0, padding: 0 },
@@ -86,9 +88,10 @@ function TaskModule(props: TaskModuleType & Props) {
                 {
                   textAlignVertical: "top",
                   paddingHorizontal: 0,
-                  paddingVertical: 0,
+                  paddingVertical: Platform.OS === "web" ? 6 : 4,
                   margin: 0,
                   borderWidth: 0,
+                  lineHeight: 18,
                 },
               ]}
               style={[
@@ -99,11 +102,14 @@ function TaskModule(props: TaskModuleType & Props) {
                   paddingHorizontal: 0,
                   paddingVertical: 0,
                   borderWidth: 0,
-                  height: Math.max(MIN_HEIGHT, inputHeight),
+                  minHeight: MIN_HEIGHT,
+                  height: inputHeight,
+                  justifyContent: "center",
                 },
               ]}
               value={value}
               onChangeText={setValue}
+              placeholder={t("modules:task")}
             />
           </View>
         </View>

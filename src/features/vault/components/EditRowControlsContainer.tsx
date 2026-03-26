@@ -34,6 +34,7 @@ export function EditRowControlsContainer({
   contentStyle,
 }: EditRowControlsContainerProps) {
   const { theme, darkmode } = useTheme();
+  const trailingControlWidth = 36;
 
   return (
     <Animated.View
@@ -78,9 +79,17 @@ export function EditRowControlsContainer({
         />
       </View>
       <View style={[{ flex: 1 }, contentStyle]}>{children}</View>
-      <View>
+      <View
+        style={{
+          width: trailingControlWidth,
+          alignItems: "center",
+          justifyContent: "flex-start",
+          paddingTop: 2,
+          flexShrink: 0,
+        }}
+      >
         <IconButton
-          style={{ position: "absolute", right: 0, width: 24, height: 24 }}
+          style={{ margin: 0, width: 24, height: 24 }}
           selected
           mode="contained-tonal"
           icon="close"
