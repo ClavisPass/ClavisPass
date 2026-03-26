@@ -53,6 +53,7 @@ import { useVault } from "../app/providers/VaultProvider";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { HomeStackParamList } from "../app/navigation/model/types";
 import { decryptVaultContent } from "../infrastructure/crypto/decryptVaultContent";
+import { extractUrlFromEntry } from "../features/vault/utils/digitalCardTheme";
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
@@ -291,6 +292,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               value: moduleType.value,
               type: moduleType.type,
               title: item.title,
+              sourceUrl: extractUrlFromEntry(item),
             });
           }
         }
@@ -307,17 +309,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               value={item.value}
               type={item.type}
               item={item.item}
+              sourceUrl={item.sourceUrl}
               index={index}
               onPressEdit={() => {
                 navigation.navigate("Edit", {
                   value: item.item,
                 });
               }}
-              onPress={() => {
+              onPress={({ accentColor, sourceUrl, faviconUrl }) => {
                 navigation.navigate("CardDetails", {
                   value: item.value,
                   title: item.title,
                   type: item.type,
+                  sourceUrl: sourceUrl ?? item.sourceUrl,
+                  faviconUrl: faviconUrl ?? null,
+                  accentColor: accentColor ?? null,
                 });
               }}
             />

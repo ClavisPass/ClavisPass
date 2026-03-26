@@ -47,6 +47,8 @@ const styles = StyleSheet.create({
   },
 });
 
+const VISUAL_CENTER_OFFSET = 6;
+
 function DigitalCardModule(
   props: DigitalCardModuleType & Props & DigitalCardModuleProps
 ) {
@@ -103,7 +105,13 @@ function DigitalCardModule(
       <View style={[globalStyles.moduleView]}>
         <AnimatedPressable
           key={props.key}
-          style={[{ borderRadius: 12, marginRight: 21 }]}
+          style={[
+            {
+              borderRadius: 12,
+              width: "100%",
+              transform: [{ translateX: VISUAL_CENTER_OFFSET }],
+            },
+          ]}
           onPress={
             value !== ""
               ? () => {
@@ -111,6 +119,9 @@ function DigitalCardModule(
                     value: value,
                     title: props.title,
                     type: type,
+                    sourceUrl: null,
+                    faviconUrl: null,
+                    accentColor: null,
                   });
                 }
               : undefined
@@ -126,6 +137,7 @@ function DigitalCardModule(
               height: 112,
               borderRadius: 12,
               padding: 8,
+              width: "100%",
               backgroundColor: value === "" ? theme.colors.background : "white",
             }}
           >

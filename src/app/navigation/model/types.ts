@@ -9,7 +9,14 @@ export type HomeStackParamList = {
   Edit: { value: ValuesType; favorite?: boolean; folder?: FolderType | null, searchstring?: string | null };
   DigitalCardScan: { setData: (data: string, type: string) => void };
   TotpScan: { setOtpauth: (uri: string) => void };
-  CardDetails: { value: string; title: string; type: DigitalCardType };
+  CardDetails: {
+    value: string;
+    title: string;
+    type: DigitalCardType;
+    sourceUrl?: string | null;
+    faviconUrl?: string | null;
+    accentColor?: string | null;
+  };
 };
 
 export type AnalysisStackParamList = {
