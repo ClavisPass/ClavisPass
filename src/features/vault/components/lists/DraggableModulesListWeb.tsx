@@ -1,4 +1,4 @@
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   DragDropContext,
   Droppable,
@@ -10,8 +10,8 @@ import {
   DroppableStateSnapshot,
 } from "@hello-pangea/dnd";
 
-import { View } from "react-native";
-import { Chip, IconButton } from "react-native-paper";
+import { StyleSheet, View } from "react-native";
+import { Chip, IconButton, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import ModulesEnum from "../../model/ModulesEnum";
 import ModulesType, { ModuleType } from "../../model/ModulesType";
@@ -55,12 +55,33 @@ const getListStyle = (isDraggingOver: boolean) => ({
   overflow: "auto",
 });
 
+const styles = StyleSheet.create({
+  footer: {
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    paddingBottom: 8,
+    position: "relative",
+  },
+  predictionChip: {
+    position: "absolute",
+    left: 8,
+    maxWidth: "60%",
+  },
+  predictionChipContent: {
+    flexShrink: 1,
+    minWidth: 0,
+  },
+});
+
 function DraggableModulesListWeb(props: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const [modulePrediction, setModulePrediction] = useState<ModulesEnum | null>(
     null
   );
+  const [footerWidth, setFooterWidth] = useState(0);
+  const [predictionChipWidth, setPredictionChipWidth] = useState(0);
 
   const listRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -92,6 +113,16 @@ function DraggableModulesListWeb(props: Props) {
     }
     prevLenRef.current = modulesLength;
   }, [modulesLength]);
+
+  const addButtonBaseWidth = 40;
+  const leftPadding = 8;
+  const safetyGap = 4;
+  const centeredButtonLeft = Math.max(0, (footerWidth - addButtonBaseWidth) / 2);
+  const predictionChipRight = leftPadding + predictionChipWidth;
+  const requiredShift =
+    footerWidth > 0
+      ? Math.max(0, predictionChipRight + safetyGap - centeredButtonLeft)
+      : 0;
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -142,12 +173,9 @@ function DraggableModulesListWeb(props: Props) {
             <div ref={bottomRef} style={{ height: 1 }} />
 
             <View
-              style={{
-                display: "flex",
-                alignItems: "center",
-                width: "100%",
-                paddingBottom: 8,
-                position: "relative",
+              style={styles.footer}
+              onLayout={(event) => {
+                setFooterWidth(event.nativeEvent.layout.width);
               }}
             >
               {modulePrediction && (
@@ -157,16 +185,26 @@ function DraggableModulesListWeb(props: Props) {
                     props.addModule(modulePrediction);
                     setTimeout(scrollToBottom, 0);
                   }}
-                  style={{ position: "absolute", left: 8 }}
+                  style={styles.predictionChip}
+                  onLayout={(event) => {
+                    setPredictionChipWidth(event.nativeEvent.layout.width);
+                  }}
+                  compact
                 >
-                  {getModuleNameByEnum(modulePrediction, t)}
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={styles.predictionChipContent}
+                  >
+                    {getModuleNameByEnum(modulePrediction, t)}
+                  </Text>
                 </Chip>
               )}
 
               <IconButton
                 icon={"plus"}
                 iconColor={theme.colors.primary}
-                style={{ margin: 0 }}
+                style={{ margin: 0, transform: [{ translateX: requiredShift }] }}
                 onPress={() => {
                   props.showAddModuleModal();
                 }}

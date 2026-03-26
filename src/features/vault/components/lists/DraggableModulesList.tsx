@@ -2,13 +2,15 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
+  LayoutChangeEvent,
   Platform,
+  StyleSheet,
   View,
 } from "react-native";
 import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
-import { Chip, IconButton } from "react-native-paper";
+import { Chip, IconButton, Text } from "react-native-paper";
 
 import { InteractionManager } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -22,6 +24,25 @@ import predictNextModule from "../../utils/predictNextModule";
 import getModule from "../../utils/getModule";
 import getModuleNameByEnum from "../../utils/getModuleNameByEnum";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+const styles = StyleSheet.create({
+  footer: {
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    paddingBottom: 8,
+    position: "relative",
+  },
+  predictionChip: {
+    position: "absolute",
+    left: 8,
+    maxWidth: "60%",
+  },
+  predictionChipContent: {
+    flexShrink: 1,
+    minWidth: 0,
+  },
+});
 
 type Props = {
   value: ValuesType;
@@ -40,6 +61,8 @@ function DraggableModulesList(props: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const [modulePrediction, setModulePrediction] = useState<ModulesEnum | null>(null);
+  const [footerWidth, setFooterWidth] = useState(0);
+  const [predictionChipWidth, setPredictionChipWidth] = useState(0);
 
   // ⬇️ Ref auf die Liste + Content-Höhe für Fallback
   const listRef = useRef<any>(null);
@@ -148,6 +171,24 @@ function DraggableModulesList(props: Props) {
     };
   }, []);
 
+  const handleFooterLayout = useCallback((event: LayoutChangeEvent) => {
+    setFooterWidth(event.nativeEvent.layout.width);
+  }, []);
+
+  const handlePredictionChipLayout = useCallback((event: LayoutChangeEvent) => {
+    setPredictionChipWidth(event.nativeEvent.layout.width);
+  }, []);
+
+  const addButtonBaseWidth = 40;
+  const leftPadding = 8;
+  const safetyGap = 4;
+  const centeredButtonLeft = Math.max(0, (footerWidth - addButtonBaseWidth) / 2);
+  const predictionChipRight = leftPadding + predictionChipWidth;
+  const requiredShift =
+    footerWidth > 0
+      ? Math.max(0, predictionChipRight + safetyGap - centeredButtonLeft)
+      : 0;
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, width: "100%" }}
@@ -175,15 +216,7 @@ function DraggableModulesList(props: Props) {
             contentHeightRef.current = height;
           }}
           ListFooterComponent={
-            <View
-              style={{
-                display: "flex",
-                alignItems: "center",
-                width: "100%",
-                paddingBottom: 8,
-                position: "relative",
-              }}
-            >
+            <View style={styles.footer} onLayout={handleFooterLayout}>
               {modulePrediction && (
                 <Chip
                   icon={"plus"}
@@ -191,15 +224,23 @@ function DraggableModulesList(props: Props) {
                     props.addModule(modulePrediction);
                     setTimeout(scheduleKeyboardAwareScroll, 0);
                   }}
-                  style={{ position: "absolute", left: 8 }}
+                  style={styles.predictionChip}
+                  onLayout={handlePredictionChipLayout}
+                  compact
                 >
-                  {getModuleNameByEnum(modulePrediction, t)}
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={styles.predictionChipContent}
+                  >
+                    {getModuleNameByEnum(modulePrediction, t)}
+                  </Text>
                 </Chip>
               )}
               <IconButton
                 icon={"plus"}
                 iconColor={theme.colors.primary}
-                style={{ margin: 0 }}
+                style={{ margin: 0, transform: [{ translateX: requiredShift }] }}
                 onPress={() => {
                   props.showAddModuleModal();
                   setTimeout(scrollToBottom, 0);

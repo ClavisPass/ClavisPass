@@ -13,19 +13,13 @@ const styles = StyleSheet.create({
     marginRight: 4,
     marginBottom: 4,
     borderRadius: 12,
-    overflow: "hidden",
-    height: 80,
   },
   ripple: {
-    padding: 0,
-    paddingLeft: 8,
-    paddingRight: 8,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     flex: 1,
-    overflow: "hidden",
   },
 });
 
@@ -55,6 +49,7 @@ function TotpItem(props: Props) {
           boxShadow: theme.colors?.shadow,
           borderWidth: StyleSheet.hairlineWidth,
           borderColor: darkmode ? theme.colors.outlineVariant : "white",
+          overflow: "hidden",
         },
       ]}
     >
@@ -63,7 +58,7 @@ function TotpItem(props: Props) {
         style={styles.ripple}
         onPress={props.onPress}
       >
-        <Totp value={props.value} />
+        <Totp value={props.value} variant="list" />
       </AnimatedPressable>
     </Animated.View>
   );
