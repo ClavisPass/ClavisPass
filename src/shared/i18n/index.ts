@@ -59,4 +59,6 @@ export async function initI18n(initialLng: keyof typeof resources) {
   return i18n;
 }
 
+void initI18n("en");
+
 export { i18n };

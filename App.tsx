@@ -23,6 +23,7 @@ import NavigationContainer from "./src/app/navigation/NavigationContainer";
 import { VaultProvider } from "./src/app/providers/VaultProvider";
 import { ContentProtectionProvider } from "./src/app/providers/ContentProtectionProvider";
 import GlobalClipboardSnackbar from "./src/shared/components/GlobalClipboardSnackbar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const Tab = createBottomTabNavigator();
 
@@ -53,46 +54,48 @@ export function AppWithNavigation() {
   }, []);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <AutocompleteDropdownContextProvider>
-        <SettingsProvider>
-          <ContentProtectionProvider defaultEnabled={true}>
-            <ThemeProvider>
-              <DropdownLayer />
-              <I18nBridge />
-              <OnlineProvider>
-                <AuthProvider>
-                  <CloudProvider>
-                    <VaultProvider>
-                      <DevModeProvider>
-                        <GlobalErrorSnackbar />
-                        <GlobalClipboardSnackbar />
-                        <View
-                          style={{
-                            borderRadius: Platform.OS === "web" ? 6 : 0,
-                            borderColor:
-                              Platform.OS === "web"
-                                ? theme.colors.primary
-                                : undefined,
-                            borderWidth: Platform.OS === "web" ? 1 : 0,
-                            overflow: "hidden",
-                            flex: 1,
-                          }}
-                        >
-                          <GlobalShortcuts />
-                          <CustomTitlebar />
-                          <NavigationContainer />
-                        </View>
-                      </DevModeProvider>
-                    </VaultProvider>
-                  </CloudProvider>
-                </AuthProvider>
-              </OnlineProvider>
-            </ThemeProvider>
-          </ContentProtectionProvider>
-        </SettingsProvider>
-      </AutocompleteDropdownContextProvider>
-    </GestureHandlerRootView>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AutocompleteDropdownContextProvider>
+          <SettingsProvider>
+            <ContentProtectionProvider defaultEnabled={true}>
+              <ThemeProvider>
+                <DropdownLayer />
+                <I18nBridge />
+                <OnlineProvider>
+                  <AuthProvider>
+                    <CloudProvider>
+                      <VaultProvider>
+                        <DevModeProvider>
+                          <GlobalErrorSnackbar />
+                          <GlobalClipboardSnackbar />
+                          <View
+                            style={{
+                              borderRadius: Platform.OS === "web" ? 6 : 0,
+                              borderColor:
+                                Platform.OS === "web"
+                                  ? theme.colors.primary
+                                  : undefined,
+                              borderWidth: Platform.OS === "web" ? 1 : 0,
+                              overflow: "hidden",
+                              flex: 1,
+                            }}
+                          >
+                            <GlobalShortcuts />
+                            <CustomTitlebar />
+                            <NavigationContainer />
+                          </View>
+                        </DevModeProvider>
+                      </VaultProvider>
+                    </CloudProvider>
+                  </AuthProvider>
+                </OnlineProvider>
+              </ThemeProvider>
+            </ContentProtectionProvider>
+          </SettingsProvider>
+        </AutocompleteDropdownContextProvider>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }
 
@@ -133,12 +136,14 @@ export default function App() {
 
   if (view === "popup") {
     return (
-      <SettingsProvider>
-        <ThemeProvider>
-          <I18nBridge />
-          <FastAccessScreen />
-        </ThemeProvider>
-      </SettingsProvider>
+      <SafeAreaProvider>
+        <SettingsProvider>
+          <ThemeProvider>
+            <I18nBridge />
+            <FastAccessScreen />
+          </ThemeProvider>
+        </SettingsProvider>
+      </SafeAreaProvider>
     );
   }
 
