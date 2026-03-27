@@ -66,6 +66,14 @@ export default function ExpiryOverviewItem(props: ExpiryOverviewEntry) {
       : props.status === "dueSoon"
         ? "#D9A400"
         : theme.colors.primary;
+  const emphasisStatusChip = darkmode && props.status === "expired";
+  const statusChipBackground = emphasisStatusChip
+    ? statusColor
+    : darkmode
+      ? `${statusColor}22`
+      : `${statusColor}18`;
+  const statusChipTextColor = emphasisStatusChip ? "#ffffff" : statusColor;
+  const statusIconColor = emphasisStatusChip ? "#ffffff" : statusColor;
 
   return (
     <View
@@ -85,13 +93,11 @@ export default function ExpiryOverviewItem(props: ExpiryOverviewEntry) {
             style={[
               styles.left,
               {
-                backgroundColor: darkmode
-                  ? `${statusColor}22`
-                  : `${statusColor}18`,
+                backgroundColor: statusChipBackground,
               },
             ]}
           >
-            <Icon source="calendar-clock" size={18} color={statusColor} />
+            <Icon source="calendar-clock" size={18} color={statusIconColor} />
           </View>
 
           <View style={styles.content}>
@@ -106,13 +112,11 @@ export default function ExpiryOverviewItem(props: ExpiryOverviewEntry) {
                 style={[
                   styles.statusChip,
                   {
-                    backgroundColor: darkmode
-                      ? `${statusColor}22`
-                      : `${statusColor}18`,
+                    backgroundColor: statusChipBackground,
                   },
                 ]}
               >
-                <Text style={{ color: statusColor, fontWeight: "700" }}>
+                <Text style={{ color: statusChipTextColor, fontWeight: "700" }}>
                   {props.statusLabel}
                 </Text>
               </View>

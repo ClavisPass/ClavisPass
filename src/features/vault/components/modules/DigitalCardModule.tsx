@@ -130,15 +130,25 @@ function DigitalCardModule(
               borderRadius: 12,
               padding: 8,
               width: "100%",
-              backgroundColor: value === "" ? theme.colors.background : "white",
+              backgroundColor: theme.colors.background,
             }}
           >
             {value !== "" ? (
-              type === "QR-Code" ? (
-                <QRCode value={value} size={90} />
-              ) : (
-                <Barcode height={70} format={type} value={value} text={value} />
-              )
+              <View
+                style={{
+                  padding: 10,
+                  backgroundColor: "white",
+                  borderRadius: 16,
+                  borderWidth: StyleSheet.hairlineWidth,
+                  borderColor: "rgba(0, 0, 0, 0.06)",
+                }}
+              >
+                {type === "QR-Code" ? (
+                  <QRCode value={value} size={90} />
+                ) : (
+                  <Barcode height={70} format={type} value={value} text={value} />
+                )}
+              </View>
             ) : (
               <Button
                 style={{ borderRadius: 12 }}

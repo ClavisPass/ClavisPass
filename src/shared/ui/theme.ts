@@ -27,7 +27,7 @@ const theme: MD3Theme = {
     surfaceDisabled: "rgba(29, 27, 30, 0.12)",
     onSurfaceDisabled: "rgba(29, 27, 30, 0.38)",
     background: "#FFFFFF",
-    error: "#D2222D",
+    error: "#D4476A",
     //errorContainer: "#808080",
     //onPrimary: "#00FFFF",
     //onPrimaryContainer: "#FFFFFF",

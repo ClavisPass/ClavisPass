@@ -570,17 +570,26 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 iconColor={"#ffffff80"}
                 placeholderTextColor={"#ffffff80"}
               />
-              <View style={{ position: "relative" }}>
-                <IconButton
-                  icon="calendar-clock"
-                  size={24}
-                  onPress={() => {
-                    setExpiryModalVisible(true);
-                  }}
-                  iconColor="white"
-                  style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
-                />
-                {expiryEntries.length > 0 ? (
+              <IconButton
+                icon="sort-variant"
+                size={25}
+                onPress={() => {
+                  setShowMenu(true);
+                }}
+                iconColor="white"
+                style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
+              />
+              {expiryEntries.length > 0 ? (
+                <View style={{ position: "relative" }}>
+                  <IconButton
+                    icon="calendar-clock"
+                    size={24}
+                    onPress={() => {
+                      setExpiryModalVisible(true);
+                    }}
+                    iconColor="white"
+                    style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
+                  />
                   <Badge
                     size={18}
                     style={{
@@ -592,17 +601,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                   >
                     {expiryEntries.length > 99 ? "99+" : String(expiryEntries.length)}
                   </Badge>
-                ) : null}
-              </View>
-              <IconButton
-                icon="sort-variant"
-                size={25}
-                onPress={() => {
-                  setShowMenu(true);
-                }}
-                iconColor="white"
-                style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
-              />
+                </View>
+              ) : null}
             </View>
           </LinearGradient>
           <Sync

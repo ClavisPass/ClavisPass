@@ -56,7 +56,7 @@ function DeleteModal(props: Props) {
           </Button>
           <Button
             style={{ borderRadius: 12 }}
-            buttonColor="#D2222D"
+            buttonColor={theme.colors.error}
             mode="contained"
             onPress={props.onDelete}
           >

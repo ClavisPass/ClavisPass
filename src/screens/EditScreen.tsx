@@ -419,7 +419,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           <Icon
             source="trash-can"
             size={20}
-            color={theme.colors?.error}
+            color={theme.colors.error}
           />
         </SquaredContainerButton>
       </View>

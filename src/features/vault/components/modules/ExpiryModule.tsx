@@ -111,6 +111,14 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
     statusInfo.status === "active" || statusInfo.status === "dueSoon"
       ? 1 - Math.min(1, Math.max(0, statusInfo.remainingMs / warnBeforeMs))
       : 1;
+  const emphasisStatusChip =
+    darkmode && statusInfo.status === "expired";
+  const statusChipBackground = emphasisStatusChip
+    ? statusColor
+    : darkmode
+      ? `${statusColor}22`
+      : `${statusColor}18`;
+  const statusChipTextColor = emphasisStatusChip ? "#ffffff" : statusColor;
 
   const formatRelativeLabel = (remainingMs: number) => {
     const relative = getRelativeInfo(remainingMs);
@@ -199,14 +207,10 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
               <View
                 style={[
                   styles.statusChip,
-                  {
-                    backgroundColor: darkmode
-                      ? `${statusColor}22`
-                      : `${statusColor}18`,
-                  },
+                  { backgroundColor: statusChipBackground },
                 ]}
               >
-                <Text style={{ color: statusColor, fontWeight: "700" }}>
+                <Text style={{ color: statusChipTextColor, fontWeight: "700" }}>
                   {statusText}
                 </Text>
               </View>
