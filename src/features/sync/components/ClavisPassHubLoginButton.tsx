@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import {
   ActivityIndicator,
-  Button as PaperButton,
   Icon,
   Portal,
   Text,
@@ -348,10 +347,6 @@ function ClavisPassHubLoginButton() {
               loading={loading}
               disabled={loading}
             />
-
-            <PaperButton disabled={loading} onPress={() => setVisible(false)}>
-              {t("common:cancel")}
-            </PaperButton>
           </View>
         </Modal>
       </Portal>
