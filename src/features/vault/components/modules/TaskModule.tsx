@@ -14,7 +14,7 @@ function TaskModule(props: TaskModuleType & Props) {
   const [value, setValue] = useState(props.value);
   const [checked, setChecked] = useState(props.completed);
 
-  const MIN_HEIGHT = 36;
+  const MIN_HEIGHT = Platform.OS === "web" ? 36 : 44;
   const [inputHeight, setInputHeight] = useState<number>(MIN_HEIGHT);
 
   useEffect(() => {
