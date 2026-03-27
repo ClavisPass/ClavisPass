@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import { StyleSheet, useWindowDimensions, View } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
+import {
+  useFonts,
+  LexendExa_400Regular,
+} from "@expo-google-fonts/lexend-exa";
 
 import { useAuth } from "../../../app/providers/AuthProvider";
 import { useToken } from "../../../app/providers/CloudProvider";
@@ -40,6 +44,11 @@ function Login(props: Props) {
   const { provider, accessToken, ensureFreshAccessToken } = useToken();
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const isWideLayout = width >= 600;
+  const [fontsLoaded] = useFonts({
+    LexendExa_400Regular,
+  });
 
   const [vaultFileContent, setVaultFileContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -220,8 +229,173 @@ function Login(props: Props) {
     }
   }, [auth, masterPassword, newPasswordConfirm, provider, vault, writeVaultJson]);
 
-  if (loading) {
+  if (loading || !fontsLoaded) {
     return <ActivityIndicator size={"large"} animating={true} />;
+  }
+
+  const formContent = (
+    <>
+      <TypeWriterComponent displayName={props.userInfo?.username ?? ""} />
+
+      {fetchError && !showNewData && (
+        <View style={{ width: "100%", gap: 8 }}>
+          <Text style={{ color: theme.colors.error, textAlign: "center" }}>
+            {fetchError}
+          </Text>
+          <Button text={t("common:retry") ?? "Retry"} onPress={authenticate} />
+        </View>
+      )}
+
+      {!fetchError && showNewData ? (
+        <>
+          <View style={{ width: "100%", display: "flex", flexDirection: "column", gap: 6 }}>
+            <PasswordTextbox
+              autofocus
+              textInputRef={textInputNewRef}
+              setCapsLock={setCapsLock}
+              setValue={setMasterPassword}
+              value={masterPassword}
+              placeholder={t("login:newMasterPassword")}
+              onSubmitEditing={() => textInputNewConfirmRef.current?.focus?.()}
+            />
+            <PasswordTextbox
+              textInputRef={textInputNewConfirmRef}
+              setCapsLock={setCapsLock}
+              setValue={setNewPasswordConfirm}
+              value={newPasswordConfirm}
+              placeholder={t("login:confirmMasterPassword")}
+            />
+          </View>
+          <Button text={t("login:setNewPassword")} onPress={newMasterPassword} />
+        </>
+      ) : !fetchError ? (
+        <>
+          <View style={{ width: "100%" }}>
+            <PasswordTextbox
+              setCapsLock={setCapsLock}
+              textInputRef={textInputRef}
+              errorColor={error}
+              autofocus={autofocus}
+              setValue={setMasterPassword}
+              value={masterPassword}
+              placeholder={t("login:masterPassword")}
+              onSubmitEditing={handlePasswordLogin}
+            />
+          </View>
+          <Button text={t("login:login")} onPress={handlePasswordLogin} />
+        </>
+      ) : null}
+
+      {capsLock && (
+        <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
+          {t("common:capslockOn")}
+        </Text>
+      )}
+
+      {isUsingAuthenticationButtonVisible && !showNewData && !fetchError && (
+        <Button
+          maxWidth={"100%"}
+          color="black"
+          icon="fingerprint"
+          onPress={authenticate}
+        />
+      )}
+    </>
+  );
+
+  const brandingContent = (
+    <View
+      style={{
+        width: "100%",
+        maxWidth: isWideLayout ? 320 : 360,
+        gap: 10,
+        alignItems: "center",
+      }}
+    >
+      <Logo
+        width={isWideLayout ? 76 : 44}
+        height={isWideLayout ? 76 : 44}
+      />
+      <Text
+        style={{
+          textAlign: "center",
+          fontFamily: "LexendExa_400Regular",
+          fontSize: isWideLayout ? 18 : 15,
+        }}
+      >
+        ClavisPass
+      </Text>
+      {isWideLayout ? (
+        <Text
+          style={{
+            opacity: 0.72,
+            textAlign: "center",
+          }}
+        >
+          {showNewData
+            ? t("login:introCreateVault")
+            : t("login:introUnlockVault")}
+        </Text>
+      ) : null}
+    </View>
+  );
+
+  if (isWideLayout) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "100%",
+          paddingHorizontal: 24,
+          paddingVertical: 24,
+          gap: 24,
+          backgroundColor: "transparent",
+        }}
+      >
+        <View
+          style={{
+            flex: 0.95,
+            alignItems: "center",
+            justifyContent: "center",
+            alignSelf: "stretch",
+          }}
+        >
+          {brandingContent}
+        </View>
+
+        <View
+          style={{
+            width: StyleSheet.hairlineWidth,
+            alignSelf: "stretch",
+            backgroundColor: theme.colors.outlineVariant,
+            opacity: 0.85,
+          }}
+        />
+
+        <View
+          style={{
+            flex: 1.55,
+            alignItems: "center",
+            justifyContent: "center",
+            alignSelf: "stretch",
+          }}
+        >
+          <View
+            style={{
+              width: "100%",
+              maxWidth: 760,
+              gap: 10,
+              alignSelf: "center",
+            }}
+          >
+            {formContent}
+          </View>
+        </View>
+      </View>
+    );
   }
 
   return (
@@ -231,95 +405,42 @@ function Login(props: Props) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "space-between",
+        justifyContent: "center",
         backgroundColor: "transparent",
         width: "100%",
+        paddingHorizontal: 6,
+        paddingVertical: 20,
+        gap: 14,
       }}
     >
-      <Logo width={50} height={50} style={{ alignSelf: "center", flexGrow: 1 }} />
-
       <View
         style={{
-          display: "flex",
-          flexDirection: "column",
+          width: "100%",
           alignItems: "center",
           justifyContent: "center",
-          gap: 8,
-          width: "100%",
-          marginBottom: 0,
+          marginBottom: 8,
         }}
       >
-        <TypeWriterComponent displayName={props.userInfo?.username ?? ""} />
-
-        {fetchError && !showNewData && (
-          <View style={{ width: "100%", gap: 8 }}>
-            <Text style={{ color: theme.colors.error, textAlign: "center" }}>
-              {fetchError}
-            </Text>
-            <Button text={t("common:retry") ?? "Retry"} onPress={authenticate} />
-          </View>
-        )}
-
-        {!fetchError && showNewData ? (
-          <>
-            <View style={{ width: "100%", display: "flex", flexDirection: "column", gap: 6 }}>
-              <PasswordTextbox
-                autofocus
-                textInputRef={textInputNewRef}
-                setCapsLock={setCapsLock}
-                setValue={setMasterPassword}
-                value={masterPassword}
-                placeholder={t("login:newMasterPassword")}
-                onSubmitEditing={() => textInputNewConfirmRef.current?.focus?.()}
-              />
-              <PasswordTextbox
-                textInputRef={textInputNewConfirmRef}
-                setCapsLock={setCapsLock}
-                setValue={setNewPasswordConfirm}
-                value={newPasswordConfirm}
-                placeholder={t("login:confirmMasterPassword")}
-              />
-            </View>
-            <Button text={t("login:setNewPassword")} onPress={newMasterPassword} />
-          </>
-        ) : !fetchError ? (
-          <>
-            <View style={{ width: "100%" }}>
-              <PasswordTextbox
-                setCapsLock={setCapsLock}
-                textInputRef={textInputRef}
-                errorColor={error}
-                autofocus={autofocus}
-                setValue={setMasterPassword}
-                value={masterPassword}
-                placeholder={t("login:masterPassword")}
-                onSubmitEditing={handlePasswordLogin}
-              />
-            </View>
-            <Button text={t("login:login")} onPress={handlePasswordLogin} />
-          </>
-        ) : null}
-
-        {capsLock && (
-          <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
-            {t("common:capslockOn")}
-          </Text>
-        )}
+        {brandingContent}
       </View>
 
       <View
         style={{
-          display: "flex",
           alignItems: "center",
+          justifyContent: "center",
           width: "100%",
-          flexGrow: 1,
-          justifyContent: "flex-end",
-          gap: 6,
         }}
       >
-        {isUsingAuthenticationButtonVisible && !showNewData && !fetchError && (
-          <Button maxWidth={"100%"} color="black" icon="fingerprint" onPress={authenticate} />
-        )}
+        <View
+          style={{
+            width: "84%",
+            maxWidth: 340,
+            gap: 10,
+            alignSelf: "center",
+          }}
+        >
+          {formContent}
+        </View>
       </View>
     </View>
   );

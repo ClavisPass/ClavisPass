@@ -79,6 +79,8 @@ const en: TranslationSchema = {
     hubAccountDisabled: "Your account has been disabled.",
     hubMissingHostUrl: "Host URL is missing. Please sign in again.",
     hubNetworkError: "Network error while connecting to ClavisPass Hub.",
+    introCreateVault: "Create your encrypted vault and start with a clean setup.",
+    introUnlockVault: "Unlock your vault and continue where you left off.",
   },
   home: {
     search: "Search",

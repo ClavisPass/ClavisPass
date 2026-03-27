@@ -80,6 +80,8 @@ const de: TranslationSchema = {
     hubAccountDisabled: "Dein Account wurde deaktiviert.",
     hubMissingHostUrl: "Host URL fehlt. Bitte erneut anmelden.",
     hubNetworkError: "Netzwerkfehler beim Verbinden mit ClavisPass Hub.",
+    introCreateVault: "Erstelle deinen verschluesselten Vault und starte mit einer sauberen Einrichtung.",
+    introUnlockVault: "Entsperre deinen Vault und arbeite direkt weiter.",
   },
   home: {
     search: "Suche",

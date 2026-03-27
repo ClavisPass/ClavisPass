@@ -78,6 +78,8 @@ export type TranslationSchema = {
     hubAccountDisabled: string;
     hubMissingHostUrl: string;
     hubNetworkError: string;
+    introCreateVault: string;
+    introUnlockVault: string;
   };
   home: {
     search: string;

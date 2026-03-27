@@ -5,7 +5,12 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { View, StyleSheet, ImageBackground } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ImageBackground,
+  useWindowDimensions,
+} from "react-native";
 import Animated, { Easing, FadeIn, FadeOut } from "react-native-reanimated";
 import { StatusBar } from "expo-status-bar";
 import { BlurView } from "expo-blur";
@@ -48,8 +53,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { headerWhite, setHeaderWhite, darkmode, theme, setHeaderSpacing } =
     useTheme();
   const { t } = useTranslation();
+  const { width } = useWindowDimensions();
   const { value: onboardingDone } =
     useSetting("ONBOARDING_DONE");
+  const isWideLoginLayout = width >= 600;
+  const loginCardWidth = isWideLoginLayout
+    ? Math.min(width - 220, 760)
+    : 300;
 
   const {
     provider,
@@ -187,12 +197,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             style={{
               height: "80%",
               maxHeight: 500,
+              width: loginCardWidth,
               borderRadius: 12,
-              padding: 20,
+              paddingHorizontal: isWideLoginLayout ? 16 : 8,
+              paddingVertical: isWideLoginLayout ? 18 : 12,
               overflow: "hidden",
-              margin: 8,
-              minWidth: 300,
-              maxWidth: 300,
+              margin: isWideLoginLayout ? 8 : 4,
+              minWidth: isWideLoginLayout ? 560 : 300,
+              maxWidth: loginCardWidth,
               display: "flex",
               justifyContent: "center",
               boxShadow: theme.colors.shadow,
