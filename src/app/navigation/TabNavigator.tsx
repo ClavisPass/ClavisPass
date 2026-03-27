@@ -22,7 +22,8 @@ export default function TabNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        freezeOnBlur: true,
+        animation: "fade",
+        freezeOnBlur: false,
         sceneStyle: width > 600 ? { marginLeft: 88 } : undefined,
       }}
       tabBar={(props) =>
