@@ -7,6 +7,7 @@ import { useTheme } from "../providers/ThemeProvider";
 import { useAuth } from "../providers/AuthProvider";
 import { useOnline } from "../providers/OnlineProvider";
 import { useTranslation } from "react-i18next";
+import { emitOpenAddValue } from "../../infrastructure/events/openAddValueBus";
 
 function getActiveRouteName(state: any): string | undefined {
   if (!state) return undefined;
@@ -98,6 +99,7 @@ const CustomBottomTab = ({
           handleLogout();
         } else if (isAdd) {
           if (isInEditScreen) return;
+          emitOpenAddValue();
           navigation.navigate("HomeStack", {
             screen: "Home",
             params: { triggerAdd: Date.now() },
@@ -203,6 +205,7 @@ const CustomBottomTab = ({
           disabled={isInEditScreen}
           onPress={() => {
             if (isInEditScreen) return;
+            emitOpenAddValue();
             navigation.navigate("HomeStack", {
               screen: "Home",
               params: { triggerAdd: Date.now() },

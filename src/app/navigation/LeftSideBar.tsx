@@ -8,6 +8,7 @@ import { useAuth } from "../providers/AuthProvider";
 import { useOnline } from "../providers/OnlineProvider";
 import AnimatedPressable from "../../shared/components/AnimatedPressable";
 import { useTranslation } from "react-i18next";
+import { emitOpenAddValue } from "../../infrastructure/events/openAddValueBus";
 
 const SIDEBAR_WIDTH = 88;
 export const sidebarWidth = SIDEBAR_WIDTH;
@@ -41,6 +42,7 @@ export default function LeftSideTabBar({
 
   const goAdd = () => {
     if (isAddDisabled) return;
+    emitOpenAddValue();
     navigation.navigate("HomeStack", {
       screen: "Home",
       params: { triggerAdd: Date.now() },

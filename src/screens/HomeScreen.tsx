@@ -59,6 +59,10 @@ import ExpiryOverviewModal from "../features/vault/components/modals/ExpiryOverv
 import type ExpiryModuleType from "../features/vault/model/modules/ExpiryModuleType";
 import { getRelativeInfo, getStatus } from "../features/vault/utils/expiry";
 import { formatAbsoluteLocal } from "../shared/utils/Timestamp";
+import {
+  subscribeOpenAddValue,
+  unsubscribeOpenAddValue,
+} from "../infrastructure/events/openAddValueBus";
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
@@ -116,7 +120,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       setValueModalVisible(true);
       navigation.setParams({ triggerAdd: undefined });
     }
-  }, [triggerAdd]);
+  }, [triggerAdd, navigation]);
+
+  useEffect(() => {
+    const openAddValue = () => {
+      setValueModalVisible(true);
+    };
+
+    subscribeOpenAddValue(openAddValue);
+    return () => unsubscribeOpenAddValue(openAddValue);
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
