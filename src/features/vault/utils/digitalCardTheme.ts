@@ -8,7 +8,7 @@ export type DigitalCardPalette = {
   hostname: string | null;
 };
 
-function normalizeUrl(raw: string): string | null {
+export function normalizeUrl(raw: string): string | null {
   const trimmed = raw.trim();
   if (!trimmed) return null;
 
@@ -36,7 +36,7 @@ export function buildFaviconUrl(sourceUrl: string | null): string | null {
     const parsed = new URL(sourceUrl);
     const hostname = parsed.hostname;
     if (!hostname) return null;
-    return `https://www.google.com/s2/favicons?domain=${hostname}&sz=128`;
+    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=128`;
   } catch {
     return null;
   }

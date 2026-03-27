@@ -610,6 +610,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                       top: 2,
                       right: 2,
                       backgroundColor: theme.colors.primary,
+                      color: "white",
                     }}
                   >
                     {expiryEntries.length > 99 ? "99+" : String(expiryEntries.length)}
