@@ -80,6 +80,9 @@ export type TranslationSchema = {
     hubNetworkError: string;
     introCreateVault: string;
     introUnlockVault: string;
+    deviceSaveConfirmTitle: string;
+    deviceSaveConfirmText: string;
+    deviceSaveConfirmAction: string;
   };
   home: {
     search: string;

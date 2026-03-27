@@ -16,6 +16,7 @@ import { StatusBar } from "expo-status-bar";
 import { BlurView } from "expo-blur";
 
 import { Text } from "react-native-paper";
+import { Button } from "react-native-paper";
 
 import Login from "../features/auth/components/Login";
 import Backup from "../features/sync/components/Backup";
@@ -45,6 +46,7 @@ import SettingsItem from "../features/settings/components/SettingsItem";
 import { LoginStackParamList } from "../app/navigation/model/types";
 import FirstOpened from "../features/onboarding/components/FirstOpened";
 import { useSetting } from "../app/providers/SettingsProvider";
+import Modal from "../shared/components/modals/Modal";
 
 type LoginScreenProps = NativeStackScreenProps<LoginStackParamList, "Login">;
 
@@ -71,6 +73,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
   const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
   const [loadingUserInfo, setLoadingUserInfo] = useState(true);
+  const [deviceSaveModalVisible, setDeviceSaveModalVisible] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -247,11 +250,66 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           ) : (
             <Text
               style={{ marginTop: 8, textDecorationLine: "underline" }}
-              onPress={handleLogout}
+              onPress={() => setDeviceSaveModalVisible(true)}
             >
               {t("login:deviceSave")}
             </Text>
           )}
+
+          <Modal
+            visible={deviceSaveModalVisible}
+            onDismiss={() => setDeviceSaveModalVisible(false)}
+          >
+            <View
+              style={{
+                width: 280,
+                minHeight: 170,
+                display: "flex",
+                flexDirection: "column",
+                padding: 14,
+                justifyContent: "space-between",
+                borderRadius: 12,
+                borderWidth: StyleSheet.hairlineWidth,
+                borderColor: theme.colors.outlineVariant,
+              }}
+            >
+              <View style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <Text variant="headlineSmall" style={{ userSelect: "none" }}>
+                  {t("login:deviceSaveConfirmTitle")}
+                </Text>
+                <Text variant="bodyMedium" style={{ userSelect: "none" }}>
+                  {t("login:deviceSaveConfirmText")}
+                </Text>
+              </View>
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 6,
+                  alignSelf: "flex-end",
+                  marginTop: 16,
+                }}
+              >
+                <Button
+                  style={{ borderRadius: 12 }}
+                  mode="contained-tonal"
+                  onPress={() => setDeviceSaveModalVisible(false)}
+                >
+                  {t("common:cancel")}
+                </Button>
+                <Button
+                  style={{ borderRadius: 12 }}
+                  mode="contained"
+                  onPress={async () => {
+                    setDeviceSaveModalVisible(false);
+                    await handleLogout();
+                  }}
+                >
+                  {t("login:deviceSaveConfirmAction")}
+                </Button>
+              </View>
+            </View>
+          </Modal>
 
           <BottomSheetModal
             ref={bottomSheetModalRef}

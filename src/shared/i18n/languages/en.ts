@@ -81,6 +81,10 @@ const en: TranslationSchema = {
     hubNetworkError: "Network error while connecting to ClavisPass Hub.",
     introCreateVault: "Create your encrypted vault and start with a clean setup.",
     introUnlockVault: "Unlock your vault and continue where you left off.",
+    deviceSaveConfirmTitle: "Enable Local Storage?",
+    deviceSaveConfirmText:
+      "Do you really want to disconnect from cloud storage and switch back to local storage only?",
+    deviceSaveConfirmAction: "Confirm",
   },
   home: {
     search: "Search",

@@ -82,6 +82,10 @@ const de: TranslationSchema = {
     hubNetworkError: "Netzwerkfehler beim Verbinden mit ClavisPass Hub.",
     introCreateVault: "Erstelle deinen verschluesselten Vault und starte mit einer sauberen Einrichtung.",
     introUnlockVault: "Entsperre deinen Vault und arbeite direkt weiter.",
+    deviceSaveConfirmTitle: "Lokale Speicherung aktivieren?",
+    deviceSaveConfirmText:
+      "Möchtest du die Cloud-Speicherung wirklich trennen und wieder nur lokale Speicherung verwenden?",
+    deviceSaveConfirmAction: "Bestätigen",
   },
   home: {
     search: "Suche",
