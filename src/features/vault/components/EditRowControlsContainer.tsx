@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react";
 import {
   View,
-  Pressable,
   Platform,
   ViewStyle,
   StyleProp,
@@ -9,11 +8,7 @@ import {
 } from "react-native";
 import { Divider, Icon, IconButton } from "react-native-paper";
 import { useTheme } from "../../../app/providers/ThemeProvider";
-import Animated, {
-  FadeInDown,
-  FadeOutUp,
-  Layout,
-} from "react-native-reanimated";
+import Animated, { FadeOutUp } from "react-native-reanimated";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 
 export type EditRowControlsContainerProps = {
@@ -23,7 +18,11 @@ export type EditRowControlsContainerProps = {
   onDelete?: (id: string) => void;
   style?: StyleProp<ViewStyle>;
   contentStyle?: StyleProp<ViewStyle>;
+  topRightInset?: number;
 };
+
+const DRAG_RAIL_WIDTH = 29;
+const DELETE_BUTTON_ZONE = 36;
 
 export function EditRowControlsContainer({
   id,
@@ -32,9 +31,9 @@ export function EditRowControlsContainer({
   onDelete,
   style,
   contentStyle,
+  topRightInset = 0,
 }: EditRowControlsContainerProps) {
   const { theme, darkmode } = useTheme();
-  const trailingControlWidth = 36;
 
   return (
     <Animated.View
@@ -47,26 +46,30 @@ export function EditRowControlsContainer({
           borderColor: darkmode ? theme.colors.outlineVariant : "white",
           borderWidth: StyleSheet.hairlineWidth,
           overflow: "hidden",
+          position: "relative",
         },
         style,
       ]}
     >
       <View
         style={{
+          width: DRAG_RAIL_WIDTH,
           justifyContent: "center",
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
+          flexShrink: 0,
         }}
       >
         <AnimatedPressable
           style={{
             height: "100%",
+            width: DRAG_RAIL_WIDTH,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
-          onPressIn={Platform.OS === "web" ? ()=>{} : onDragStart}
+          onPressIn={Platform.OS === "web" ? () => {} : onDragStart}
         >
           <Icon source="drag" size={20} />
         </AnimatedPressable>
@@ -78,14 +81,20 @@ export function EditRowControlsContainer({
           }}
         />
       </View>
-      <View style={[{ flex: 1 }, contentStyle]}>{children}</View>
+
+      <View style={[{ flex: 1, paddingRight: topRightInset }, contentStyle]}>
+        {children}
+      </View>
+
       <View
+        pointerEvents="box-none"
         style={{
-          width: trailingControlWidth,
+          position: "absolute",
+          top: 6,
+          right: 1,
+          width: DELETE_BUTTON_ZONE,
           alignItems: "center",
           justifyContent: "flex-start",
-          paddingTop: 2,
-          flexShrink: 0,
         }}
       >
         <IconButton

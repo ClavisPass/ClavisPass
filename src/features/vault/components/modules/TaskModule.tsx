@@ -53,6 +53,7 @@ function TaskModule(props: TaskModuleType & Props) {
             globalStyles.moduleView,
             {
               padding: 0,
+              paddingRight: 36,
               justifyContent: "flex-start",
               width: undefined,
               flex: 1,

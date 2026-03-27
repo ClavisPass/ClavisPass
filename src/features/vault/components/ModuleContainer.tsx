@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { View, StyleSheet, Pressable, Platform } from "react-native";
+import { View, StyleSheet, Platform } from "react-native";
 import { Divider, Icon, Text } from "react-native-paper";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import FastAccessType from "../../fastaccess/model/FastAccessType";
@@ -73,6 +73,7 @@ export default function ModuleContainer({
             alignItems: "center",
             gap: 4,
             width: "100%",
+            paddingRight: 36,
           }}
         >
           <AnimatedPressable
