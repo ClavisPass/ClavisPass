@@ -83,34 +83,35 @@ function WifiModule(props: WifiModuleType & Props) {
       fastAccess={props.fastAccess}
     >
       <View style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        <View
-          style={[
-            {
-              //marginLeft: 6,
-              marginRight: 48,
+        <View style={globalStyles.moduleView}>
+          <View
+            style={{
+              height: 40,
+              flex: 1,
               borderRadius: 12,
               overflow: "hidden",
-            },
-          ]}
-        >
-          <Dropdown
-            CustomDropdownInput={CustomDropdownInput}
-            menuContentStyle={{
-              borderRadius: 12,
-              backgroundColor: theme.colors.background,
-              boxShadow: theme.colors.shadow,
-              overflow: "hidden",
             }}
-            mode={"flat"}
-            hideMenuHeader={true}
-            options={OPTIONS}
-            value={wifiType}
-            onSelect={(value?: string) => {
-              if (value === "WPA" || value === "WEP" || value === "blank") {
-                setWifiType(value);
-              }
-            }}
-          />
+          >
+            <Dropdown
+              CustomDropdownInput={CustomDropdownInput}
+              menuContentStyle={{
+                borderRadius: 12,
+                backgroundColor: theme.colors.background,
+                boxShadow: theme.colors.shadow,
+                overflow: "hidden",
+              }}
+              mode={"flat"}
+              hideMenuHeader={true}
+              options={OPTIONS}
+              value={wifiType}
+              onSelect={(value?: string) => {
+                if (value === "WPA" || value === "WEP" || value === "blank") {
+                  setWifiType(value);
+                }
+              }}
+            />
+          </View>
+          <View style={{ width: 48 }} />
         </View>
 
         <View style={globalStyles.moduleView}>
@@ -126,6 +127,7 @@ function WifiModule(props: WifiModuleType & Props) {
           </View>
           <View style={{ width: 48 }}>
             <IconButton
+              style={{ margin: 0 }}
               iconColor={theme.colors.primary}
               icon="qrcode"
               size={20}
@@ -159,7 +161,7 @@ function WifiModule(props: WifiModuleType & Props) {
               }
             />
           </View>
-          <CopyToClipboard value={value} />
+          <CopyToClipboard value={value} margin={0} />
         </View>
       </View>
       <WifiQRCodeModal
