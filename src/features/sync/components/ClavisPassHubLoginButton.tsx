@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import {
   ActivityIndicator,
+  Chip,
   Icon,
   Portal,
   Text,
@@ -30,6 +31,10 @@ import PasswordTextbox from "../../../shared/components/PasswordTextbox";
 import LogoColored from "../../../shared/ui/LogoColored";
 import Divider from "../../../shared/components/Divider";
 import SettingsItem from "../../settings/components/SettingsItem";
+import { open } from "@tauri-apps/plugin-shell";
+import * as Linking from "expo-linking";
+
+const CLAVISPASS_HUB_REPO_URL = "https://github.com/ClavisPass/ClavisPass-Hub";
 
 function ClavisPassHubLoginButton() {
   const { t } = useTranslation();
@@ -261,6 +266,14 @@ function ClavisPassHubLoginButton() {
     return null;
   };
 
+  const openURL = useCallback(async (value: string) => {
+    if (Platform.OS === "web") {
+      await open(value);
+    } else {
+      await Linking.openURL(value);
+    }
+  }, []);
+
   return (
     <>
       <SettingsItem
@@ -290,6 +303,19 @@ function ClavisPassHubLoginButton() {
             }}
           >
             <Text variant="titleMedium">{t("login:hubConnect")}</Text>
+
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+              <Chip
+                icon={"github"}
+                showSelectedOverlay={true}
+                onPress={() => {
+                  void openURL(CLAVISPASS_HUB_REPO_URL);
+                }}
+                style={{ borderRadius: 12 }}
+              >
+                ClavisPass Hub
+              </Chip>
+            </View>
 
             <View style={{ height: 40, position: "relative" }}>
               <TextInput
