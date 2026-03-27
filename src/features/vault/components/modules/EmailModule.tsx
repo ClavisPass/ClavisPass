@@ -215,9 +215,8 @@ function EmailModule(props: EmailModuleType & Props) {
                 }
               >
                 {filteredItems.map((item) => (
-                  <>
+                  <View key={item.id}>
                     <AnimatedPressable
-                      key={item.id}
                       onPress={() => {
                         setValue(item.title);
                         interactingListRef.current = false;
@@ -241,7 +240,7 @@ function EmailModule(props: EmailModuleType & Props) {
                       </Text>
                     </AnimatedPressable>
                     <Divider />
-                  </>
+                  </View>
                 ))}
               </ScrollView>
             </View>
