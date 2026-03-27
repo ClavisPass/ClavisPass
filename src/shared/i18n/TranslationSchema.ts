@@ -34,13 +34,25 @@ export type TranslationSchema = {
     next: string;
     done: string;
     offline: string;
-    deleteModuleText:string;
+    deleteModuleText: string;
     copiedFor: string;
     connected: string;
     notConnected: string;
     favorites: string;
     allModules: string;
     recentlyUsed: string;
+    expiryActive: string;
+    expiryDueSoon: string;
+    expiryExpired: string;
+    expiryExpires: string;
+    expiryExpiredPrefix: string;
+    expiryIn: string;
+    expiryAgo: string;
+    expiryNow: string;
+    expiryJustExpired: string;
+    expiryDayShort: string;
+    expiryHourShort: string;
+    expiryMinuteShort: string;
   };
   login: {
     masterPassword: string;
@@ -72,6 +84,8 @@ export type TranslationSchema = {
     favorite: string;
     card: string;
     twofa: string;
+    expiries: string;
+    noExpiries: string;
     entries: string;
     sortByTitle: string;
     sortByCreated: string;

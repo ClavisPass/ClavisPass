@@ -1,0 +1,135 @@
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import { Icon, Text } from "react-native-paper";
+import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
+import { useTheme } from "../../../../app/providers/ThemeProvider";
+
+export type ExpiryOverviewEntry = {
+  key: string;
+  title: string;
+  absoluteLabel: string;
+  relativeLabel: string;
+  statusLabel: string;
+  status: "active" | "dueSoon" | "expired";
+  onPress: () => void;
+};
+
+const styles = StyleSheet.create({
+  container: {
+    marginLeft: 4,
+    marginRight: 4,
+    marginBottom: 6,
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  ripple: {
+    paddingHorizontal: 8,
+    paddingVertical: 9,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    flex: 1,
+    overflow: "hidden",
+  },
+  left: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  content: {
+    flex: 1,
+    minWidth: 0,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  statusChip: {
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    flexShrink: 0,
+  },
+});
+
+export default function ExpiryOverviewItem(props: ExpiryOverviewEntry) {
+  const { theme, darkmode } = useTheme();
+
+  const statusColor =
+    props.status === "expired"
+      ? theme.colors.error
+      : props.status === "dueSoon"
+        ? "#D9A400"
+        : theme.colors.primary;
+
+  return (
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: theme.colors.background,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: darkmode ? theme.colors.outlineVariant : "white",
+          boxShadow: theme.colors.shadow,
+        },
+      ]}
+    >
+      <AnimatedPressable style={styles.ripple} onPress={props.onPress}>
+        <View style={styles.ripple}>
+          <View
+            style={[
+              styles.left,
+              {
+                backgroundColor: darkmode
+                  ? `${statusColor}22`
+                  : `${statusColor}18`,
+              },
+            ]}
+          >
+            <Icon source="calendar-clock" size={18} color={statusColor} />
+          </View>
+
+          <View style={styles.content}>
+            <View style={styles.row}>
+              <Text
+                numberOfLines={1}
+                style={{ fontWeight: "700", flex: 1, minWidth: 0 }}
+              >
+                {props.title}
+              </Text>
+              <View
+                style={[
+                  styles.statusChip,
+                  {
+                    backgroundColor: darkmode
+                      ? `${statusColor}22`
+                      : `${statusColor}18`,
+                  },
+                ]}
+              >
+                <Text style={{ color: statusColor, fontWeight: "700" }}>
+                  {props.statusLabel}
+                </Text>
+              </View>
+            </View>
+
+            <Text style={{ color: theme.colors.primary, marginTop: 2 }}>
+              {props.absoluteLabel}
+            </Text>
+            <Text
+              numberOfLines={1}
+              style={{ opacity: 0.72, marginTop: 2, color: theme.colors.onSurface }}
+            >
+              {props.relativeLabel}
+            </Text>
+          </View>
+        </View>
+      </AnimatedPressable>
+    </View>
+  );
+}

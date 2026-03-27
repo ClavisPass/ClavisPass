@@ -4,7 +4,7 @@ import { Button, IconButton, ProgressBar, Text } from "react-native-paper";
 
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
-import { getStatus, formatRelative } from "../../utils/expiry";
+import { getRelativeInfo, getStatus } from "../../utils/expiry";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import ExpiryPickerModal from "../modals/ExpiryPickerModal";
 import ExpiryModuleType from "../../model/modules/ExpiryModuleType";
@@ -112,17 +112,42 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
       ? 1 - Math.min(1, Math.max(0, statusInfo.remainingMs / warnBeforeMs))
       : 1;
 
+  const formatRelativeLabel = (remainingMs: number) => {
+    const relative = getRelativeInfo(remainingMs);
+    const unit =
+      relative.kind === "future" || relative.kind === "past"
+        ? relative.unit === "day"
+          ? t("common:expiryDayShort")
+          : relative.unit === "hour"
+            ? t("common:expiryHourShort")
+            : t("common:expiryMinuteShort")
+        : "";
+
+    if (relative.kind === "future") {
+      return t("common:expiryIn", { value: relative.value, unit });
+    }
+    if (relative.kind === "past") {
+      return t("common:expiryAgo", { value: relative.value, unit });
+    }
+    if (relative.kind === "now") return t("common:expiryNow");
+    return t("common:expiryJustExpired");
+  };
+
   const statusLabel =
     statusInfo.status === "expired"
-      ? "Expired"
+      ? t("common:expiryExpired")
       : statusInfo.status === "dueSoon"
-        ? "Due soon"
-        : "Active";
+        ? t("common:expiryDueSoon")
+        : t("common:expiryActive");
 
   const statusText =
     statusInfo.status === "expired"
-      ? `Expired ${formatRelative(statusInfo.remainingMs)}`
-      : `Expires ${formatRelative(statusInfo.remainingMs)}`;
+      ? `${t("common:expiryExpiredPrefix")} ${formatRelativeLabel(
+          statusInfo.remainingMs
+        )}`
+      : `${t("common:expiryExpires")} ${formatRelativeLabel(
+          statusInfo.remainingMs
+        )}`;
 
   return (
     <ModuleContainer
@@ -210,7 +235,7 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
             icon="calendar"
             textColor={theme.colors.primary}
           >
-            Set expiry date
+            {t("common:setExpiry")}
           </Button>
         </View>
       )}

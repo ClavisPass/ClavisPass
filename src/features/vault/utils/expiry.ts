@@ -2,6 +2,12 @@ import ExpiryStatus from "../model/ExpiryStatus";
 
 const DEFAULT_WARN = 24 * 60 * 60 * 1000;
 
+export type RelativeExpiryInfo =
+  | { kind: "future"; unit: "day" | "hour" | "minute"; value: number }
+  | { kind: "past"; unit: "day" | "hour" | "minute"; value: number }
+  | { kind: "now" }
+  | { kind: "justExpired" };
+
 export function getStatus(
   isoOrNull: string | null,
   nowMs = Date.now(),
@@ -18,7 +24,7 @@ export function getStatus(
   return { status: "active", remainingMs: remaining };
 }
 
-export function formatRelative(remainingMs: number): string {
+export function getRelativeInfo(remainingMs: number): RelativeExpiryInfo {
   const abs = Math.abs(remainingMs);
   const sign = remainingMs >= 0 ? 1 : -1;
 
@@ -26,8 +32,28 @@ export function formatRelative(remainingMs: number): string {
   const hours = Math.floor(mins / 60);
   const days = Math.floor(hours / 24);
 
-  if (days >= 1) return sign > 0 ? `in ${days} d` : `${days} d ago`;
-  if (hours >= 1) return sign > 0 ? `in ${hours} h` : `${hours} h ago`;
-  if (mins >= 1) return sign > 0 ? `in ${mins} min` : `${mins} min ago`;
-  return sign > 0 ? `now` : `just expired`;
+  if (days >= 1) {
+    return sign > 0
+      ? { kind: "future", unit: "day", value: days }
+      : { kind: "past", unit: "day", value: days };
+  }
+  if (hours >= 1) {
+    return sign > 0
+      ? { kind: "future", unit: "hour", value: hours }
+      : { kind: "past", unit: "hour", value: hours };
+  }
+  if (mins >= 1) {
+    return sign > 0
+      ? { kind: "future", unit: "minute", value: mins }
+      : { kind: "past", unit: "minute", value: mins };
+  }
+  return sign > 0 ? { kind: "now" } : { kind: "justExpired" };
+}
+
+export function formatRelative(remainingMs: number): string {
+  const info = getRelativeInfo(remainingMs);
+  if (info.kind === "future") return `in ${info.value} ${info.unit}`;
+  if (info.kind === "past") return `${info.value} ${info.unit} ago`;
+  if (info.kind === "now") return "now";
+  return "just expired";
 }

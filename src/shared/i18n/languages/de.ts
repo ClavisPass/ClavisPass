@@ -42,6 +42,18 @@ const de: TranslationSchema = {
     favorites: "Favoriten",
     allModules: "Alle Module",
     recentlyUsed: "Kürzlich verwendet",
+    expiryActive: "Aktiv",
+    expiryDueSoon: "Bald fällig",
+    expiryExpired: "Abgelaufen",
+    expiryExpires: "Läuft ab",
+    expiryExpiredPrefix: "Abgelaufen",
+    expiryIn: "in {{value}} {{unit}}",
+    expiryAgo: "vor {{value}} {{unit}}",
+    expiryNow: "jetzt",
+    expiryJustExpired: "gerade abgelaufen",
+    expiryDayShort: "T",
+    expiryHourShort: "Std",
+    expiryMinuteShort: "Min",
   },
   login: {
     masterPassword: "Master Passwort",
@@ -74,6 +86,8 @@ const de: TranslationSchema = {
     favorite: "Favorit",
     card: "Karten",
     twofa: "Zwei-Faktor",
+    expiries: "Abläufe",
+    noExpiries: "Keine Ablauf-Einträge gefunden.",
     entries: "Einträge",
     sortByTitle: "Nach Titel sortieren",
     sortByCreated: "Nach Erstellungsdatum sortieren",
@@ -306,3 +320,5 @@ const de: TranslationSchema = {
 };
 
 export default de;
+
+

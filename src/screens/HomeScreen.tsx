@@ -6,7 +6,7 @@ import {
   InteractionManager,
   RefreshControl,
 } from "react-native";
-import { Searchbar, IconButton } from "react-native-paper";
+import { Searchbar, IconButton, Badge } from "react-native-paper";
 
 import { Text } from "react-native-paper";
 
@@ -38,6 +38,7 @@ import {
 import LogoColored from "../shared/ui/LogoColored";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import FolderType from "../features/vault/model/FolderType";
+import ValuesType from "../features/vault/model/ValuesType";
 import { useTranslation } from "react-i18next";
 
 import TotpItem from "../features/vault/components/items/TotpItem";
@@ -54,6 +55,10 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { HomeStackParamList } from "../app/navigation/model/types";
 import { decryptVaultContent } from "../infrastructure/crypto/decryptVaultContent";
 import { extractUrlFromEntry } from "../features/vault/utils/digitalCardTheme";
+import ExpiryOverviewModal from "../features/vault/components/modals/ExpiryOverviewModal";
+import type ExpiryModuleType from "../features/vault/model/modules/ExpiryModuleType";
+import { getRelativeInfo, getStatus } from "../features/vault/utils/expiry";
+import { formatAbsoluteLocal } from "../shared/utils/Timestamp";
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
@@ -80,6 +85,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     useSetting("TWOFA_FILTER");
   const { value: selectedCard, setValue: setSelectedCard } =
     useSetting("CARD_FILTER");
+  const { value: dateFormat } = useSetting("DATE_FORMAT");
+  const { value: timeFormat } = useSetting("TIME_FORMAT");
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -87,6 +94,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [valueModalVisible, setValueModalVisible] = useState(false);
+  const [expiryModalVisible, setExpiryModalVisible] = useState(false);
   const { provider, accessToken, ensureFreshAccessToken } = useToken();
 
   const saveSelectedFavState = (fav: boolean) => {
@@ -180,6 +188,88 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
     return result;
   }, [vaultData, searchQuery, selectedFolder, selectedFav]);
+
+  const expiryEntries = useMemo(() => {
+    const entries: Array<{
+      key: string;
+      title: string;
+      absoluteLabel: string;
+      relativeLabel: string;
+      statusLabel: string;
+      status: "active" | "dueSoon" | "expired";
+      timestamp: number;
+      item: ValuesType;
+    }> = [];
+
+    const formatRelativeLabel = (remainingMs: number) => {
+      const relative = getRelativeInfo(remainingMs);
+      const unit =
+        relative.kind === "future" || relative.kind === "past"
+          ? relative.unit === "day"
+            ? t("common:expiryDayShort")
+            : relative.unit === "hour"
+              ? t("common:expiryHourShort")
+              : t("common:expiryMinuteShort")
+          : "";
+
+      if (relative.kind === "future") {
+        return t("common:expiryIn", { value: relative.value, unit });
+      }
+      if (relative.kind === "past") {
+        return t("common:expiryAgo", { value: relative.value, unit });
+      }
+      if (relative.kind === "now") return t("common:expiryNow");
+      return t("common:expiryJustExpired");
+    };
+
+    if (!vaultData?.values) return entries;
+
+    for (const item of vaultData.values) {
+      for (const mod of item.modules) {
+        if (mod.module !== ModulesEnum.EXPIRY) continue;
+
+        const expiryModule = mod as ExpiryModuleType;
+        const iso = expiryModule.value?.trim?.() ?? "";
+        if (!iso) continue;
+
+        const timestamp = Date.parse(iso);
+        if (Number.isNaN(timestamp)) continue;
+
+        const statusInfo = getStatus(
+          iso,
+          Date.now(),
+          expiryModule.warnBeforeMs ?? 24 * 60 * 60 * 1000
+        );
+
+        if (statusInfo.status === "empty") continue;
+
+        entries.push({
+          key: `${item.id}:${mod.id}`,
+          title: item.title,
+          absoluteLabel: formatAbsoluteLocal(iso, dateFormat, timeFormat),
+          relativeLabel:
+            statusInfo.status === "expired"
+              ? `${t("common:expiryExpiredPrefix")} ${formatRelativeLabel(
+                  statusInfo.remainingMs
+                )}`
+              : `${t("common:expiryExpires")} ${formatRelativeLabel(
+                  statusInfo.remainingMs
+                )}`,
+          statusLabel:
+            statusInfo.status === "expired"
+              ? t("common:expiryExpired")
+              : statusInfo.status === "dueSoon"
+                ? t("common:expiryDueSoon")
+                : t("common:expiryActive"),
+          status: statusInfo.status,
+          timestamp,
+          item,
+        });
+      }
+    }
+
+    return entries.sort((a, b) => a.timestamp - b.timestamp);
+  }, [vaultData, dateFormat, timeFormat, t]);
 
   const refreshData = () => {
     const master = auth.getMaster();
@@ -480,6 +570,30 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 iconColor={"#ffffff80"}
                 placeholderTextColor={"#ffffff80"}
               />
+              <View style={{ position: "relative" }}>
+                <IconButton
+                  icon="calendar-clock"
+                  size={24}
+                  onPress={() => {
+                    setExpiryModalVisible(true);
+                  }}
+                  iconColor="white"
+                  style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
+                />
+                {expiryEntries.length > 0 ? (
+                  <Badge
+                    size={18}
+                    style={{
+                      position: "absolute",
+                      top: 2,
+                      right: 2,
+                      backgroundColor: theme.colors.primary,
+                    }}
+                  >
+                    {expiryEntries.length > 99 ? "99+" : String(expiryEntries.length)}
+                  </Badge>
+                ) : null}
+              </View>
               <IconButton
                 icon="sort-variant"
                 size={25}
@@ -537,6 +651,24 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             visible={folderModalVisible}
             setVisible={setFolderModalVisible}
             folder={vaultData?.folder ?? []}
+          />
+          <ExpiryOverviewModal
+            visible={expiryModalVisible}
+            setVisible={setExpiryModalVisible}
+            items={expiryEntries.map((entry) => ({
+              key: entry.key,
+              title: entry.title,
+              absoluteLabel: entry.absoluteLabel,
+              relativeLabel: entry.relativeLabel,
+              statusLabel: entry.statusLabel,
+              status: entry.status,
+              onPress: () => {
+                setExpiryModalVisible(false);
+                navigation.navigate("Edit", {
+                  value: entry.item,
+                });
+              },
+            }))}
           />
           <AddValueModal
             visible={valueModalVisible}
