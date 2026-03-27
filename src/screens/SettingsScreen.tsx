@@ -129,6 +129,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const systemRef = useRef<View>(null);
   const designRef = useRef<View>(null);
   const authSettingsRef = useRef<View>(null);
+  const cryptoRef = useRef<View>(null);
   const fastAccessRef = useRef<View>(null);
   const backupRef = useRef<View>(null);
   const importRef = useRef<View>(null);
@@ -157,6 +158,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         title: t("settings:security"),
         icon: "shield",
         ref: authSettingsRef,
+        plattform: null,
+      },
+      {
+        title: t("settings:cryptography"),
+        icon: "key-chain",
+        ref: cryptoRef,
         plattform: null,
       },
       {
@@ -330,11 +337,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               icon={quickSelectItems[3].icon}
               title={quickSelectItems[3].title}
             >
-              
-                <SettingsShortcutItem shortcut="XChaCha20-Poly1305">
-                  {t("settings:encryption")}
-                </SettingsShortcutItem>
-                <SettingsDivider />
               <SettingsItem
                 onPress={() => {
                   setShowChangeMasterPasswordModal(true);
@@ -441,6 +443,20 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               icon={quickSelectItems[4].icon}
               title={quickSelectItems[4].title}
             >
+              <SettingsShortcutItem shortcut="XChaCha20">
+                {t("settings:encryption")}
+              </SettingsShortcutItem>
+              <SettingsDivider />
+              <SettingsShortcutItem shortcut="Argon2id">
+                {t("settings:keyDerivation")}
+              </SettingsShortcutItem>
+            </SettingsContainer>
+
+            <SettingsContainer
+              ref={quickSelectItems[5].ref}
+              icon={quickSelectItems[5].icon}
+              title={quickSelectItems[5].title}
+            >
               <SettingsSwitch
                 label={t("settings:autoOpenFastAccess")}
                 value={fastAccess}
@@ -451,9 +467,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             </SettingsContainer>
 
             <SettingsContainer
-              ref={quickSelectItems[5].ref}
-              icon={quickSelectItems[5].icon}
-              title={quickSelectItems[5].title}
+              ref={quickSelectItems[6].ref}
+              icon={quickSelectItems[6].icon}
+              title={quickSelectItems[6].title}
             >
               <BackupImportButton />
               <SettingsDivider />
@@ -461,9 +477,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             </SettingsContainer>
 
             <SettingsContainer
-              ref={quickSelectItems[6].ref}
-              icon={quickSelectItems[6].icon}
-              title={quickSelectItems[6].title}
+              ref={quickSelectItems[7].ref}
+              icon={quickSelectItems[7].icon}
+              title={quickSelectItems[7].title}
             >
               <Import
                 type={DocumentTypeEnum.FIREFOX}

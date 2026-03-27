@@ -118,6 +118,7 @@ export type TranslationSchema = {
     importBackup: string;
     exportBackup: string;
     importPasswords: string;
+    cryptography: string;
     website: string;
     hours: string;
     minutes: string;
@@ -130,6 +131,7 @@ export type TranslationSchema = {
     showqrcode: string;
     manageDevices: string;
     encryption: string;
+    keyDerivation: string;
   };
   analysis: {
     topFindings: string;

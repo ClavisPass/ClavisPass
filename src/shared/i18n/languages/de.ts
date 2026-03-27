@@ -121,6 +121,7 @@ const de: TranslationSchema = {
     importBackup: "Importieren",
     exportBackup: "Exportieren",
     importPasswords: "{{title}} Passwörter",
+    cryptography: "Kryptografie",
     website: "Webseite",
     hours: "{{count}} Stunden",
     minutes: "{{count}} Minuten",
@@ -133,6 +134,7 @@ const de: TranslationSchema = {
     showqrcode: "QR-Code anzeigen",
     manageDevices: "Geräte verwalten",
     encryption: "Verschlüsselung",
+    keyDerivation: "Schlüsselableitung",
   },
   analysis: {
   topFindings: "Top-Funde",
@@ -326,5 +328,7 @@ const de: TranslationSchema = {
 };
 
 export default de;
+
+
 
 

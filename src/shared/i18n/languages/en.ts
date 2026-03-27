@@ -120,6 +120,7 @@ const en: TranslationSchema = {
     importBackup: "Import",
     exportBackup: "Export",
     importPasswords: "{{title}} Passwords",
+    cryptography: "Cryptography",
     website: "Website",
     hours: "{{count}} hours",
     minutes: "{{count}} minutes",
@@ -132,6 +133,7 @@ const en: TranslationSchema = {
     showqrcode: "Show QR Code",
     manageDevices: "Manage Devices",
     encryption: "Encryption",
+    keyDerivation: "Key Derivation",
   },
   analysis: {
     // headline blocks (optional – falls du später "Top findings" wieder einblendest)
