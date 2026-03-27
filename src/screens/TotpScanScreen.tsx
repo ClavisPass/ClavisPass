@@ -20,23 +20,53 @@ const styles = StyleSheet.create({
   camera: { flex: 1, width: Dimensions.get("window").width },
   overlay: {
     position: "absolute",
-    flex: 1,
+    inset: 0,
     width: Dimensions.get("window").width,
     height: "100%",
-    backgroundColor: "transparent",
-    display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    flexDirection: "column",
-    gap: 6,
+    paddingBottom: 72,
   },
-  bottomBar: { position: "absolute", bottom: 12, flexDirection: "row", gap: 8 },
-  manualBox: {
+  scanFrameOuter: {
+    width: 248,
+    height: 248,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  scanFrameInner: {
+    width: 196,
+    height: 196,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+  },
+  hintCard: {
     position: "absolute",
-    left: 12,
-    right: 12,
-    bottom: 70,
+    bottom: 92,
+    alignSelf: "center",
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  bottomBar: {
+    position: "absolute",
+    bottom: 18,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
+    borderRadius: 18,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    borderWidth: 1,
   },
 });
 
@@ -73,7 +103,6 @@ const TotpScanScreen: React.FC<TotpScanScreenProps> = ({
 
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
-  const [torch, setTorch] = useState<boolean>(false);
 
   const lockedRef = useRef(false);
 
@@ -129,7 +158,12 @@ const TotpScanScreen: React.FC<TotpScanScreenProps> = ({
             We need your permission to show the camera.
           </Text>
           <View>
-            <Button style={{ borderRadius: 12 }} onPress={requestPermission}>
+            <Button
+              mode="contained"
+              contentStyle={{ paddingHorizontal: 10 }}
+              style={{ borderRadius: 12 }}
+              onPress={requestPermission}
+            >
               Grant Permission
             </Button>
           </View>
@@ -143,22 +177,59 @@ const TotpScanScreen: React.FC<TotpScanScreenProps> = ({
           onBarcodeScanned={handleScanned}
         >
           <View style={styles.overlay}>
-            <Icon source={"scan-helper"} size={200} />
+            <View
+              style={[
+                styles.scanFrameOuter,
+                {
+                  backgroundColor: "rgba(10, 14, 24, 0.16)",
+                  borderColor: "rgba(255,255,255,0.18)",
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.scanFrameInner,
+                  {
+                    backgroundColor: "rgba(255,255,255,0.08)",
+                    borderColor: "rgba(255,255,255,0.92)",
+                  },
+                ]}
+              >
+                <Icon source={"scan-helper"} size={108} color={"white"} />
+              </View>
+            </View>
           </View>
 
-          <View style={[styles.bottomBar, { alignSelf: "center" }]}>
+          <View
+            style={[
+              styles.hintCard,
+              {
+                backgroundColor: "rgba(10, 14, 24, 0.58)",
+                borderColor: "rgba(255,255,255,0.14)",
+              },
+            ]}
+          >
+            <Text style={{ color: "white", textAlign: "center" }}>
+              Scan QR Code
+            </Text>
+          </View>
+
+          <View
+            style={[
+              styles.bottomBar,
+              {
+                backgroundColor: "rgba(10, 14, 24, 0.62)",
+                borderColor: "rgba(255,255,255,0.14)",
+              },
+            ]}
+          >
             <IconButton
               selected
               mode="contained-tonal"
-              icon={torch ? "flashlight-off" : "flashlight"}
-              size={28}
-              onPress={() => setTorch((t) => !t)}
-            />
-            <IconButton
-              selected
-              mode="contained-tonal"
+              containerColor="rgba(255,255,255,0.12)"
+              iconColor="white"
               icon={"camera-flip"}
-              size={28}
+              size={24}
               onPress={toggleCameraFacing}
             />
           </View>
