@@ -9,6 +9,7 @@ import * as Random from "expo-random";
 import { logger } from "../../../infrastructure/logging/logger";
 import { useToken } from "../../../app/providers/CloudProvider";
 import { useVault } from "../../../app/providers/VaultProvider";
+import { getAppRedirectUri } from "../../../shared/utils/appScheme";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -22,7 +23,7 @@ const isMobile = Platform.OS === "ios" || Platform.OS === "android";
 const isWeb = Platform.OS === "web";
 
 function getMobileRedirectUri() {
-  return AuthSession.makeRedirectUri({ native: "clavispass://redirect" });
+  return AuthSession.makeRedirectUri({ native: getAppRedirectUri() });
 }
 
 async function randState(len = 32) {

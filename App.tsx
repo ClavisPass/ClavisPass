@@ -24,11 +24,12 @@ import { VaultProvider } from "./src/app/providers/VaultProvider";
 import { ContentProtectionProvider } from "./src/app/providers/ContentProtectionProvider";
 import GlobalClipboardSnackbar from "./src/shared/components/GlobalClipboardSnackbar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { getAppScheme } from "./src/shared/utils/appScheme";
 
 const Tab = createBottomTabNavigator();
 
 const protocol = async () => {
-  await register("clavispass");
+  await register(getAppScheme());
 };
 
 export function AppWithNavigation() {

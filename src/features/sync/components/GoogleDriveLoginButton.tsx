@@ -9,6 +9,7 @@ import * as Random from "expo-random";
 import { logger } from "../../../infrastructure/logging/logger";
 import { useToken } from "../../../app/providers/CloudProvider";
 import { useVault } from "../../../app/providers/VaultProvider";
+import { getAppRedirectUri } from "../../../shared/utils/appScheme";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -24,7 +25,7 @@ const isWeb = Platform.OS === "web";
 // -------- Helpers --------
 function getMobileRedirectUri() {
   // Wichtig: Für iOS/Android musst du dein Custom Scheme bei Google als Redirect-URI registrieren.
-  return AuthSession.makeRedirectUri({ native: "clavispass://redirect" });
+  return AuthSession.makeRedirectUri({ native: getAppRedirectUri() });
 }
 
 async function randState(len = 32) {
