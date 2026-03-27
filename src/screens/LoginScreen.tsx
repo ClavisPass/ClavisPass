@@ -199,8 +199,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               maxHeight: 500,
               width: loginCardWidth,
               borderRadius: 12,
-              paddingHorizontal: isWideLoginLayout ? 16 : 8,
-              paddingVertical: isWideLoginLayout ? 18 : 12,
               overflow: "hidden",
               margin: isWideLoginLayout ? 8 : 4,
               minWidth: isWideLoginLayout ? 560 : 300,

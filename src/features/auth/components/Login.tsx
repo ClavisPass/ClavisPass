@@ -381,12 +381,14 @@ function Login(props: Props) {
             alignItems: "center",
             justifyContent: "center",
             alignSelf: "stretch",
+            paddingLeft: 18,
+            paddingRight: 18,
           }}
         >
           <View
             style={{
               width: "100%",
-              maxWidth: 760,
+              maxWidth: "100%",
               gap: 10,
               alignSelf: "center",
             }}
@@ -433,8 +435,8 @@ function Login(props: Props) {
       >
         <View
           style={{
-            width: "84%",
-            maxWidth: 340,
+            width: "92%",
+            maxWidth: 380,
             gap: 10,
             alignSelf: "center",
           }}
