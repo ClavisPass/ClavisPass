@@ -47,8 +47,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const VISUAL_CENTER_OFFSET = 6;
-
 function DigitalCardModule(
   props: DigitalCardModuleType & Props & DigitalCardModuleProps
 ) {
@@ -105,13 +103,7 @@ function DigitalCardModule(
       <View style={[globalStyles.moduleView]}>
         <AnimatedPressable
           key={props.key}
-          style={[
-            {
-              borderRadius: 12,
-              width: "100%",
-              transform: [{ translateX: VISUAL_CENTER_OFFSET }],
-            },
-          ]}
+          style={[{ borderRadius: 12, width: "100%" }]}
           onPress={
             value !== ""
               ? () => {

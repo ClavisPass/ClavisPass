@@ -1,13 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { View } from "react-native";
-import { Button, IconButton, Text } from "react-native-paper";
+import { StyleSheet, View } from "react-native";
+import { Button, IconButton, ProgressBar, Text } from "react-native-paper";
 
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
-import {
-  getStatus,
-  formatRelative,
-} from "../../utils/expiry";
+import { getStatus, formatRelative } from "../../utils/expiry";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import ExpiryPickerModal from "../modals/ExpiryPickerModal";
 import ExpiryModuleType from "../../model/modules/ExpiryModuleType";
@@ -18,9 +15,56 @@ import ModulesEnum from "../../model/ModulesEnum";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import { formatAbsoluteLocal } from "../../../../shared/utils/Timestamp";
 
+const styles = StyleSheet.create({
+  card: {
+    width: "100%",
+    borderRadius: 14,
+    overflow: "hidden",
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  topRow: {
+    paddingHorizontal: 14,
+    paddingTop: 12,
+    paddingBottom: 10,
+  },
+  topLeft: {
+    minWidth: 0,
+    gap: 2,
+  },
+  dateRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: 4,
+  },
+  statusChip: {
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    alignSelf: "flex-start",
+  },
+  metaRow: {
+    paddingHorizontal: 14,
+    paddingBottom: 12,
+    gap: 8,
+  },
+  progress: {
+    height: 8,
+    borderRadius: 999,
+  },
+  emptyWrap: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyButton: {
+    borderRadius: 12,
+  },
+});
+
 function ExpiryModule(props: ExpiryModuleType & Props) {
   const didMount = useRef(false);
-  const { globalStyles, theme } = useTheme();
+  const { globalStyles, theme, darkmode } = useTheme();
   const { t } = useTranslation();
 
   const warnBeforeMs = props.warnBeforeMs ?? 24 * 60 * 60 * 1000;
@@ -37,7 +81,7 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
       const newModule: ExpiryModuleType = {
         id: props.id,
         module: props.module,
-        value: value,
+        value,
         warnBeforeMs,
       };
       props.changeModule(newModule);
@@ -56,17 +100,29 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
     [value, tick, warnBeforeMs]
   );
 
-  const colorByStatus =
+  const statusColor =
     statusInfo.status === "expired"
       ? theme.colors.error
       : statusInfo.status === "dueSoon"
-        ? "yellow"
+        ? "#D9A400"
         : theme.colors.primary;
 
   const progress =
     statusInfo.status === "active" || statusInfo.status === "dueSoon"
       ? 1 - Math.min(1, Math.max(0, statusInfo.remainingMs / warnBeforeMs))
       : 1;
+
+  const statusLabel =
+    statusInfo.status === "expired"
+      ? "Expired"
+      : statusInfo.status === "dueSoon"
+        ? "Due soon"
+        : "Active";
+
+  const statusText =
+    statusInfo.status === "expired"
+      ? `Expired ${formatRelative(statusInfo.remainingMs)}`
+      : `Expires ${formatRelative(statusInfo.remainingMs)}`;
 
   return (
     <ModuleContainer
@@ -77,41 +133,78 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
       icon={MODULE_ICON[ModulesEnum.EXPIRY]}
       fastAccess={props.fastAccess}
     >
-      <View style={[globalStyles.moduleView]}>
-        <View style={{ flex: 1 }}>
-          {value ? (
-            <>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
+      {value ? (
+        <View style={[globalStyles.moduleView]}>
+          <View
+            style={[
+              styles.card,
+              {
+                backgroundColor: theme.colors.background,
+                borderColor: darkmode ? theme.colors.outlineVariant : "white",
+              },
+            ]}
+          >
+            <View style={styles.topRow}>
+              <View style={styles.topLeft}>
                 <Text
-                  style={{
-                    fontSize: 24,
-                    color: theme.colors.primary,
-                  }}
+                  variant="labelMedium"
+                  style={{ color: statusColor, fontWeight: "700" }}
                 >
-                  {formatAbsoluteLocal(value, dateFormat, timeFormat)}
+                  {statusLabel}
                 </Text>
-                <IconButton
-                  style={{ margin: 0, marginLeft: 8, marginRight: 8 }}
-                  iconColor={theme.colors.primary}
-                  icon="pencil"
-                  size={18}
-                  onPress={() => setPickerVisible(true)}
-                />
+                <View style={styles.dateRow}>
+                  <Text
+                    variant="titleLarge"
+                    style={{ color: theme.colors.primary, fontWeight: "700" }}
+                  >
+                    {formatAbsoluteLocal(value, dateFormat, timeFormat)}
+                  </Text>
+                  <IconButton
+                    style={{ margin: 0 }}
+                    iconColor={theme.colors.primary}
+                    icon="pencil"
+                    size={18}
+                    onPress={() => setPickerVisible(true)}
+                  />
+                </View>
               </View>
-              <Text style={{ opacity: 0.7, marginTop: 2 }}>
-                {statusInfo.status === "expired"
-                  ? `Expired (${formatRelative(statusInfo.remainingMs)})`
-                  : `Expires ${formatRelative(statusInfo.remainingMs)}`}
-              </Text>
-            </>
-          ) : null}
-        </View>
-      </View>
+            </View>
 
-      {value ? null : (
-        <View style={[globalStyles.moduleView, { justifyContent: "center" }]}>
+            <View style={styles.metaRow}>
+              <View
+                style={[
+                  styles.statusChip,
+                  {
+                    backgroundColor: darkmode
+                      ? `${statusColor}22`
+                      : `${statusColor}18`,
+                  },
+                ]}
+              >
+                <Text style={{ color: statusColor, fontWeight: "700" }}>
+                  {statusText}
+                </Text>
+              </View>
+
+              <ProgressBar
+                progress={progress}
+                color={statusColor}
+                style={[
+                  styles.progress,
+                  {
+                    backgroundColor: darkmode
+                      ? "rgba(255,255,255,0.10)"
+                      : "rgba(0,0,0,0.06)",
+                  },
+                ]}
+              />
+            </View>
+          </View>
+        </View>
+      ) : (
+        <View style={[globalStyles.moduleView, styles.emptyWrap]}>
           <Button
-            style={{ borderRadius: 12, marginRight: 21 }}
+            style={styles.emptyButton}
             mode="contained-tonal"
             onPress={() => setPickerVisible(true)}
             icon="calendar"
