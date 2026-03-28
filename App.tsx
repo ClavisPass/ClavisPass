@@ -33,7 +33,9 @@ const protocol = async () => {
 };
 
 export function AppWithNavigation() {
-  protocol();
+  useEffect(() => {
+    protocol();
+  }, []);
 
   useEffect(() => {
     const cleanup = onOpenUrl((event) => {
@@ -123,7 +125,7 @@ export default function App() {
 
       try {
         const { label } = await getCurrentWindowSafe();
-        setView(label === "main" ? "main" : "popup");
+        setView(label === "popup" ? "popup" : "main");
       } catch (e) {
         logger.warn("Fehler beim Lesen des Fensters:", e);
         setView("main");

@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import { listen } from "@tauri-apps/api/event";
+import { emit } from "@tauri-apps/api/event";
 import { Icon, Text, TextInput } from "react-native-paper";
 import { useTheme } from "../app/providers/ThemeProvider";
 import Header from "../shared/components/Header";
 import PasswordTextbox from "../shared/components/PasswordTextbox";
 import CopyToClipboard from "../shared/components/buttons/CopyToClipboard";
 import { hideFastAccess } from "../features/fastaccess/utils/FastAccess";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
+import {
+  FAST_ACCESS_POPUP_LABEL,
+  FAST_ACCESS_READY_EVENT,
+  FAST_ACCESS_UPDATE_EVENT,
+} from "../features/fastaccess/constants";
 
 export default function FastAccessScreen() {
   const [title, setTitle] = useState("");
@@ -17,16 +23,32 @@ export default function FastAccessScreen() {
   const { theme, globalStyles } = useTheme();
 
   useEffect(() => {
-    listen("show-popup", (event) => {
-      const payload = event.payload as {
-        title: string;
-        username: string;
-        password: string;
-      };
-      setTitle(payload.title);
-      setUsername(payload.username);
-      setPassword(payload.password);
-    });
+    let unlisten: null | (() => void) = null;
+
+    const setup = async () => {
+      const currentWindow = getCurrentWindow();
+
+      unlisten = await currentWindow.listen(FAST_ACCESS_UPDATE_EVENT, (event) => {
+        const payload = event.payload as {
+          title: string;
+          username: string;
+          password: string;
+        };
+        setTitle(payload.title);
+        setUsername(payload.username);
+        setPassword(payload.password);
+      });
+
+      await emit(FAST_ACCESS_READY_EVENT, { label: FAST_ACCESS_POPUP_LABEL });
+    };
+
+    setup();
+
+    return () => {
+      if (unlisten) {
+        unlisten();
+      }
+    };
   }, []);
 
   return (
@@ -72,6 +94,7 @@ export default function FastAccessScreen() {
               await win.show();
               await win.unminimize();
               await win.setFocus();
+              await hideFastAccess();
             }}
             style={{
               cursor: "pointer",

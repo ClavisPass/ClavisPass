@@ -12,6 +12,7 @@ export default function useAppLifecycle({
   const blocked = useRef(false);
   const timeout = useRef<NodeJS.Timeout | null>(null);
   const entered = useRef(true);
+  const lastAppState = useRef<string>("active");
 
   const block = () => {
     blocked.current = true;
@@ -66,9 +67,15 @@ export default function useAppLifecycle({
       };
     } else {
       const subscription = AppState.addEventListener("change", (state) => {
+        const previousState = lastAppState.current;
+        lastAppState.current = state;
+
         if (state === "active") {
           onForeground();
-        } else if (state === "background") {
+        } else if (
+          state === "inactive" ||
+          (state === "background" && previousState !== "inactive")
+        ) {
           onBackground();
         }
       });

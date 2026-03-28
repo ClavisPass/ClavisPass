@@ -34,6 +34,7 @@ import useAppLifecycle from "../shared/hooks/useAppLifecycle";
 import {
   openFastAccess,
   hideFastAccess,
+  prepareFastAccess,
 } from "../features/fastaccess/utils/FastAccess";
 import extractFastAccessObject from "../features/fastaccess/utils/extractFastAccessObject";
 import FastAccessType from "../features/fastaccess/model/FastAccessType";
@@ -107,6 +108,16 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     const fastAccess = extractFastAccessObject(value.modules, value.title);
     setFastAccessObject(fastAccess);
   }, [value.modules, value.title, value]);
+
+  useEffect(() => {
+    if (fastAccessBehavior !== "auto") return;
+    if (Platform.OS === "web") return;
+    if (!fastAccessObject?.username || !fastAccessObject?.password) return;
+
+    prepareFastAccess().catch((error) => {
+      logger.warn("[EditScreen] Failed to prepare fast access:", error);
+    });
+  }, [fastAccessBehavior, fastAccessObject]);
 
   useAppLifecycle({
     onBackground: async () => {
