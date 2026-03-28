@@ -102,23 +102,15 @@ if (fs.existsSync(cargoTomlPath)) {
     console.log(`✅ Updated ${cargoTomlPath}`);
   }
 
-  // Keep Cargo.lock consistent
-  try {
-    execSync("cargo update --manifest-path src-tauri/Cargo.toml", { stdio: "inherit" });
-    console.log("✅ Cargo.lock updated");
-  } catch (e) {
-    console.error("❌ cargo update failed. Fix the error above and re-run.");
-    process.exit(1);
-  }
 } else {
   console.warn("⚠️  src-tauri/Cargo.toml not found; skipping Cargo version sync.");
 }
 
-// Ensure Cargo.lock is staged if present
-if (fs.existsSync("src-tauri/Cargo.lock")) {
-  try {
-    execSync("git add src-tauri/Cargo.lock", { stdio: "inherit" });
-  } catch {}
+try {
+  execSync("node scripts/check-tauri-version-sync.js", { stdio: "inherit" });
+} catch (e) {
+  console.error("❌ Aborting release because Tauri package versions are not aligned.");
+  process.exit(1);
 }
 
 // 3) Commit, tag and push changes via Git

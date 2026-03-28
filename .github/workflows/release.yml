@@ -6,8 +6,23 @@ on:
       - "v*.*.*"
 
 jobs:
+  validate-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify Tauri version alignment
+        run: npm run tauri:check-versions
+
   build-linux:
     runs-on: ubuntu-22.04
+    needs: validate-release
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -70,6 +85,7 @@ jobs:
 
   build-windows:
     runs-on: windows-latest
+    needs: validate-release
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -115,6 +131,7 @@ jobs:
 
   build-macos:
     runs-on: macos-latest
+    needs: validate-release
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -160,6 +177,7 @@ jobs:
   expo-ota-update:
     name: Expo OTA Update
     runs-on: ubuntu-latest
+    needs: validate-release
     environment: production
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -190,6 +208,7 @@ jobs:
 
   build-android-apk:
     runs-on: ubuntu-latest
+    needs: validate-release
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     steps:
