@@ -113,7 +113,7 @@ pub fn run() {
 
             let main_window = builder
                 .on_new_window(move |_url, features| {
-                    let popup_label = "DropboxAuth";
+                    let popup_label = "oauth-popup";
 
                     let popup = WebviewWindowBuilder::new(
                         &app_handle_for_new_window,

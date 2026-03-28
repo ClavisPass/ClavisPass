@@ -18,6 +18,7 @@ const SCOPES = [
   "files.content.read",
   "files.content.write",
 ];
+const POPUP_LABEL = "oauth-popup";
 
 const isMobile = Platform.OS === "ios" || Platform.OS === "android";
 const isWeb = Platform.OS === "web";
@@ -122,8 +123,10 @@ function DropboxLoginButton() {
   const closeAuthWindowIfAny = useCallback(async () => {
     try {
       const tauri = require("@tauri-apps/api/webviewWindow");
-      const win = await tauri.WebviewWindow.getByLabel("DropboxAuth");
-      win.close();
+      const win = await tauri.WebviewWindow.getByLabel(POPUP_LABEL);
+      if (win) {
+        await win.close();
+      }
       if (popupRef.current && !popupRef.current.closed)
         popupRef.current.close();
     } catch {}
@@ -136,7 +139,7 @@ function DropboxLoginButton() {
 
     const prePopup = window.open(
       "about:blank",
-      "DropboxAuth",
+      POPUP_LABEL,
       "width=720,height=840"
     );
 

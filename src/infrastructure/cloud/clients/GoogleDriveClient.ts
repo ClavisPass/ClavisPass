@@ -4,7 +4,6 @@
 // Upsert: list -> (PATCH multipart) oder (POST multipart).
 
 import TokenRefreshResult from "../model/oauth/TokenRefreshResult";
-import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "@env";
 import CryptoType from "../../crypto/legacy/CryptoType";
 import { logger } from "../../logging/logger";
 import UserInfoType from "../../../features/sync/model/UserInfoType";
@@ -12,6 +11,7 @@ import { triggerGlobalError } from "../../events/errorBus";
 import * as DeviceStorageClient from "./DeviceStorageClient";
 import { VaultFetchResult } from "../model/VaultFetchResult";
 import { UploadContent } from "../model/UploadFileParams";
+import { getGoogleClientIdForCurrentPlatform } from "../utils/googleOAuth";
 
 const DRIVE_API = "https://www.googleapis.com/drive/v3";
 const DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3";
@@ -260,17 +260,14 @@ export const refreshAccessToken = async (
   refreshToken: string
 ): Promise<TokenRefreshResult> => {
   const tokenEndpoint = "https://oauth2.googleapis.com/token";
+  const clientId = getGoogleClientIdForCurrentPlatform();
 
   try {
     const body = new URLSearchParams({
       grant_type: "refresh_token",
       refresh_token: refreshToken,
-      client_id: GOOGLE_CLIENT_ID,
+      client_id: clientId,
     });
-
-    if (GOOGLE_CLIENT_SECRET) {
-      body.set("client_secret", GOOGLE_CLIENT_SECRET);
-    }
 
     const response = await fetch(tokenEndpoint, {
       method: "POST",

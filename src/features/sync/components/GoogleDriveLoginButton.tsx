@@ -1,31 +1,38 @@
 import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
-import { useEffect, useMemo, useRef, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Platform } from "react-native";
-import SettingsItem from "../../settings/components/SettingsItem";
-import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "@env";
+import { GOOGLE_CLIENT_ID_DESKTOP } from "@env";
 import { start, onUrl, cancel } from "@fabianlars/tauri-plugin-oauth";
 import * as Random from "expo-random";
-import { logger } from "../../../infrastructure/logging/logger";
+import SettingsItem from "../../settings/components/SettingsItem";
 import { useToken } from "../../../app/providers/CloudProvider";
 import { useVault } from "../../../app/providers/VaultProvider";
-import { getAppRedirectUri } from "../../../shared/utils/appScheme";
+import { logger } from "../../../infrastructure/logging/logger";
+import {
+  getGoogleClientIdForCurrentPlatform,
+  getGoogleMobileRedirectUri,
+} from "../../../infrastructure/cloud/utils/googleOAuth";
 
 WebBrowser.maybeCompleteAuthSession();
 
-// Scopes für Google Drive (angepasst auf deinen Use Case)
 const SCOPES = [
   "https://www.googleapis.com/auth/drive.file",
   "https://www.googleapis.com/auth/drive.appdata",
 ];
+const POPUP_LABEL = "oauth-popup";
 
 const isMobile = Platform.OS === "ios" || Platform.OS === "android";
 const isWeb = Platform.OS === "web";
 
-// -------- Helpers --------
 function getMobileRedirectUri() {
-  // Wichtig: Für iOS/Android musst du dein Custom Scheme bei Google als Redirect-URI registrieren.
-  return AuthSession.makeRedirectUri({ native: getAppRedirectUri() });
+  const redirectUri = getGoogleMobileRedirectUri();
+
+  if (!redirectUri) {
+    return null;
+  }
+
+  return AuthSession.makeRedirectUri({ native: redirectUri });
 }
 
 async function randState(len = 32) {
@@ -36,8 +43,9 @@ async function randState(len = 32) {
 function GoogleDriveLoginButton() {
   const { setSession } = useToken();
   const vault = useVault();
+  const currentClientId = getGoogleClientIdForCurrentPlatform();
+  const desktopClientId = GOOGLE_CLIENT_ID_DESKTOP || currentClientId;
 
-  // Flow-Refs
   const unsubscribeRef = useRef<null | (() => void)>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const busyRef = useRef(false);
@@ -45,7 +53,6 @@ function GoogleDriveLoginButton() {
   const stateRef = useRef<string | null>(null);
   const popupRef = useRef<Window | null>(null);
 
-  // Gemeinsamer Token-Exchange
   const exchangeToken = useCallback(
     async (code: string, redirectUri: string, codeVerifier?: string) => {
       try {
@@ -55,8 +62,7 @@ function GoogleDriveLoginButton() {
           body: new URLSearchParams({
             code,
             grant_type: "authorization_code",
-            client_id: GOOGLE_CLIENT_ID,
-            client_secret: GOOGLE_CLIENT_SECRET,
+            client_id: currentClientId,
             redirect_uri: redirectUri,
             ...(codeVerifier ? { code_verifier: codeVerifier } : {}),
           }).toString(),
@@ -76,7 +82,6 @@ function GoogleDriveLoginButton() {
             expiresIn: data.expires_in,
           });
           vault.update((draft) => {
-            // no-op write to mark dirty (update() setzt dirty)
             draft.version = draft.version;
           });
         } else {
@@ -86,25 +91,24 @@ function GoogleDriveLoginButton() {
         logger.error("[GoogleDrive] Token exchange error:", err);
       }
     },
-    [setSession, vault]
+    [currentClientId, setSession, vault]
   );
 
-  const MOBILE_REDIRECT_URI = useMemo(
+  const mobileRedirectUri = useMemo(
     () => (isMobile ? getMobileRedirectUri() : "http://127.0.0.1/unused"),
-    [isMobile]
+    []
   );
 
-  // Expo Auth Request (Mobile)
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
-      clientId: GOOGLE_CLIENT_ID,
-      redirectUri: MOBILE_REDIRECT_URI,
+      clientId: currentClientId || "",
+      redirectUri: mobileRedirectUri || "http://127.0.0.1/unused",
       scopes: SCOPES,
       responseType: "code",
       usePKCE: true,
       extraParams: {
-        access_type: "offline", // wichtig für Refresh-Token
-        prompt: "consent", // erzwingt Consent, damit offline-Zugriff gewährt wird
+        access_type: "offline",
+        prompt: "consent",
       },
     },
     {
@@ -113,27 +117,29 @@ function GoogleDriveLoginButton() {
     }
   );
 
-  // Mobile-Flow
   useEffect(() => {
-    if (!isMobile) return;
-    if (response?.type === "success") {
-      const { code } = response.params;
-      const verifier = request?.codeVerifier || "";
-      exchangeToken(code, MOBILE_REDIRECT_URI, verifier);
+    if (!isMobile || response?.type !== "success") {
+      return;
     }
-  }, [
-    response,
-    isMobile,
-    MOBILE_REDIRECT_URI,
-    request?.codeVerifier,
-    exchangeToken,
-  ]);
+
+    const { code } = response.params;
+    const verifier = request?.codeVerifier || "";
+
+    if (!mobileRedirectUri) {
+      logger.error("[GoogleDrive] Missing mobile redirect URI for Google OAuth.");
+      return;
+    }
+
+    exchangeToken(code, mobileRedirectUri, verifier);
+  }, [exchangeToken, mobileRedirectUri, request?.codeVerifier, response]);
 
   const closeAuthWindowIfAny = useCallback(async () => {
     try {
       const tauri = require("@tauri-apps/api/webviewWindow");
-      const win = await tauri.WebviewWindow.getByLabel("GoogleDriveAuth");
-      win.close();
+      const win = await tauri.WebviewWindow.getByLabel(POPUP_LABEL);
+      if (win) {
+        await win.close();
+      }
       if (popupRef.current && !popupRef.current.closed) {
         popupRef.current.close();
       }
@@ -141,14 +147,13 @@ function GoogleDriveLoginButton() {
     popupRef.current = null;
   }, []);
 
-  // Tauri/Web-Flow
   const handleTauriAuth = useCallback(async () => {
     if (busyRef.current) return;
     busyRef.current = true;
 
     const prePopup = window.open(
       "about:blank",
-      "GoogleDriveAuth",
+      POPUP_LABEL,
       "width=720,height=840"
     );
 
@@ -159,25 +164,24 @@ function GoogleDriveLoginButton() {
       busyRef.current = false;
       return;
     }
+
     popupRef.current = prePopup;
+
     try {
-      prePopup.document.title = "Google Drive Login …";
+      prePopup.document.title = "Google Drive Login ...";
       prePopup.document.body.innerHTML =
         "<p style='font-family:system-ui;margin:16px'></p>";
     } catch {}
 
     try {
-      // 1) Lokalen Listener starten (feste/mehrere Ports optional)
       const port = await start({ ports: [57771, 57772, 57773] });
       portRef.current = port;
       const redirectUri = `http://127.0.0.1:${port}`;
 
-      // 2) PKCE + CSRF state (nur Tauri)
       const { createPkcePair } = require("../utils/pkce.web");
       const { codeVerifier, codeChallenge, method } = await createPkcePair();
       stateRef.current = await randState();
 
-      // 3) Redirect-Listener – Fenster SOFORT schließen, Rest im Hintergrund
       const unsubscribe = await onUrl(async (url) => {
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current);
@@ -196,9 +200,7 @@ function GoogleDriveLoginButton() {
 
         if (!code) return;
         if (!state || state !== stateRef.current) {
-          logger.warn(
-            "[GoogleDrive] State mismatch (tauri). Ignoring callback."
-          );
+          logger.warn("[GoogleDrive] State mismatch (tauri). Ignoring callback.");
           return;
         }
 
@@ -210,8 +212,8 @@ function GoogleDriveLoginButton() {
             unsubscribeRef.current = null;
           }
         } catch {}
-        closeAuthWindowIfAny();
 
+        closeAuthWindowIfAny();
         busyRef.current = false;
 
         (async () => {
@@ -221,47 +223,52 @@ function GoogleDriveLoginButton() {
             logger.error("[GoogleDrive] Token exchange (bg) failed:", e);
           } finally {
             try {
-              if (portRef.current != null) await cancel(portRef.current);
+              if (portRef.current != null) {
+                await cancel(portRef.current);
+              }
             } catch {}
             portRef.current = null;
           }
         })();
       });
+
       unsubscribeRef.current = unsubscribe;
 
-      // 4) Timeout (2 min)
       timeoutRef.current = setTimeout(async () => {
-        logger.warn("[GoogleDrive] OAuth timeout – kein Redirect erhalten.");
+        logger.warn("[GoogleDrive] OAuth timeout - kein Redirect erhalten.");
         try {
-          if (portRef.current != null) await cancel(portRef.current);
+          if (portRef.current != null) {
+            await cancel(portRef.current);
+          }
         } catch {}
         portRef.current = null;
+
         try {
           if (unsubscribeRef.current) {
             unsubscribeRef.current();
             unsubscribeRef.current = null;
           }
         } catch {}
+
         closeAuthWindowIfAny();
         busyRef.current = false;
         stateRef.current = null;
       }, 120_000);
 
       logger.info("[GoogleDrive] Redirect URI: ", redirectUri);
-      logger.info("[GoogleDrive] ClientID: ", GOOGLE_CLIENT_ID);
+      logger.info("[GoogleDrive] ClientID: ", desktopClientId);
 
-      // 5) Auth-URL
       const authUrl =
         "https://accounts.google.com/o/oauth2/v2/auth?" +
         new URLSearchParams({
-          client_id: GOOGLE_CLIENT_ID,
+          client_id: desktopClientId,
           response_type: "code",
           redirect_uri: redirectUri,
           scope: SCOPES.join(" "),
-          access_type: "offline", // Refresh-Token
-          prompt: "consent", // expliziter Consent
+          access_type: "offline",
+          prompt: "consent",
           code_challenge: codeChallenge,
-          code_challenge_method: method, // "S256"
+          code_challenge_method: method,
           state: stateRef.current!,
         }).toString();
 
@@ -273,30 +280,36 @@ function GoogleDriveLoginButton() {
     } catch (err) {
       logger.error("[GoogleDrive] OAuth flow failed (Tauri):", err);
       try {
-        if (portRef.current != null) await cancel(portRef.current);
+        if (portRef.current != null) {
+          await cancel(portRef.current);
+        }
       } catch {}
       portRef.current = null;
+
       try {
         if (unsubscribeRef.current) {
           unsubscribeRef.current();
           unsubscribeRef.current = null;
         }
       } catch {}
+
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
+
       stateRef.current = null;
       closeAuthWindowIfAny();
       busyRef.current = false;
     }
-  }, [exchangeToken, closeAuthWindowIfAny]);
+  }, [closeAuthWindowIfAny, desktopClientId, exchangeToken]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       try {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
       } catch {}
       timeoutRef.current = null;
 
@@ -309,7 +322,9 @@ function GoogleDriveLoginButton() {
 
       (async () => {
         try {
-          if (portRef.current != null) await cancel(portRef.current);
+          if (portRef.current != null) {
+            await cancel(portRef.current);
+          }
         } catch {}
         portRef.current = null;
         closeAuthWindowIfAny();
@@ -320,20 +335,31 @@ function GoogleDriveLoginButton() {
     };
   }, [closeAuthWindowIfAny]);
 
-  // Button
   const handleAuth = useCallback(() => {
     if (isWeb) {
       handleTauriAuth();
-    } else if (isMobile) {
-      promptAsync();
-    } else {
-      logger.error("[GoogleDrive] Unsupported platform for this auth flow.");
+      return;
     }
-  }, [handleTauriAuth, promptAsync]);
 
-  if (Platform.OS !== "web") {
-    return null;
-  }
+    if (isMobile) {
+      if (!currentClientId) {
+        logger.error("[GoogleDrive] Missing Google mobile client ID.");
+        return;
+      }
+
+      if (!mobileRedirectUri) {
+        logger.error(
+          "[GoogleDrive] Missing Google mobile redirect URI. Check platform client ID setup."
+        );
+        return;
+      }
+
+      promptAsync();
+      return;
+    }
+
+    logger.error("[GoogleDrive] Unsupported platform for this auth flow.");
+  }, [currentClientId, handleTauriAuth, mobileRedirectUri, promptAsync]);
 
   return (
     <SettingsItem leadingIcon="google-drive" onPress={handleAuth}>
