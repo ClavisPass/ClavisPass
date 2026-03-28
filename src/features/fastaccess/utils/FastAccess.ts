@@ -11,15 +11,22 @@ import {
   FAST_ACCESS_READY_EVENT,
   FAST_ACCESS_UPDATE_EVENT,
 } from "../constants";
+import { hideMobileFastAccess, showMobileFastAccess } from "./mobileFastAccessStore";
 
 let notificationListenerSet = false;
 let notificationCategorySet = false;
 let notificationHandlerSet = false;
 let lastNotificationId: string | null = null;
 let notificationPermissionGranted: boolean | null = null;
+let activeFastAccessKey: string | null = null;
+let activeSessionKey: string | null = null;
 let popupReady = false;
 let popupReadyListenerSet = false;
 let popupReadyResolvers: Array<() => void> = [];
+
+function buildFastAccessKey(title: string, username: string, password: string) {
+  return `${activeSessionKey ?? "no-session"}::${title}::${username}::${password}`;
+}
 
 function resolvePopupReady() {
   popupReady = true;
@@ -92,6 +99,7 @@ async function configureMobileFastAccess() {
       const data = (response.notification.request.content.data as {
         username?: string;
         password?: string;
+        title?: string;
       }) || { username: "", password: "" };
 
       switch (response.actionIdentifier) {
@@ -100,6 +108,13 @@ async function configureMobileFastAccess() {
           break;
         case "COPY_PASSWORD":
           if (data.password) Clipboard.setStringAsync(data.password);
+          break;
+        case Notifications.DEFAULT_ACTION_IDENTIFIER:
+          showMobileFastAccess({
+            title: data.title ?? response.notification.request.content.title ?? "Fast Access",
+            username: data.username ?? "",
+            password: data.password ?? "",
+          });
           break;
       }
     });
@@ -183,17 +198,32 @@ export async function openFastAccess(
     return;
   }
 
+  const nextKey = buildFastAccessKey(title, username, password);
+  if (lastNotificationId && activeFastAccessKey === nextKey) {
+    return;
+  }
+
+  if (lastNotificationId) {
+    try {
+      await Notifications.dismissNotificationAsync(lastNotificationId);
+    } catch (error) {
+      logger.warn("[FastAccess] Failed to dismiss previous notification:", error);
+    }
+    lastNotificationId = null;
+  }
+
   lastNotificationId = await Notifications.scheduleNotificationAsync({
     content: {
       title,
       categoryIdentifier: FAST_ACCESS_NOTIFICATION_CATEGORY,
       body: username,
       sound: false,
-      data: { username: username, password: password },
+      data: { title, username, password },
       priority: Notifications.AndroidNotificationPriority.MAX,
     },
     trigger: null,
   });
+  activeFastAccessKey = nextKey;
 }
 
 export async function hideFastAccess() {
@@ -207,6 +237,8 @@ export async function hideFastAccess() {
       logger.error("Fehler beim Verstecken des Fensters:", err);
     }
   } else {
+    hideMobileFastAccess();
+
     if (lastNotificationId) {
       await Notifications.dismissNotificationAsync(lastNotificationId);
       lastNotificationId = null;
@@ -215,6 +247,75 @@ export async function hideFastAccess() {
 
     await Notifications.dismissAllNotificationsAsync();
   }
+
+  activeFastAccessKey = null;
+}
+
+export async function syncFastAccessSession(sessionKey: string | null) {
+  if (activeSessionKey === sessionKey) {
+    return;
+  }
+
+  activeSessionKey = sessionKey;
+  activeFastAccessKey = null;
+  hideMobileFastAccess();
+
+  if (Platform.OS === "web") {
+    const win = await WebviewWindow.getByLabel(FAST_ACCESS_POPUP_LABEL);
+    if (win) {
+      try {
+        await win.hide();
+      } catch (error) {
+        logger.warn("[FastAccess] Failed to hide popup for session sync:", error);
+      }
+    }
+    return;
+  }
+
+  if (lastNotificationId) {
+    try {
+      await Notifications.dismissNotificationAsync(lastNotificationId);
+    } catch (error) {
+      logger.warn("[FastAccess] Failed to dismiss session notification:", error);
+    }
+    lastNotificationId = null;
+  }
+
+  if (sessionKey === null) {
+    try {
+      await Notifications.dismissAllNotificationsAsync();
+    } catch (error) {
+      logger.warn("[FastAccess] Failed to dismiss stale notifications:", error);
+    }
+  }
+}
+
+export async function cleanupFastAccessOnStartup(hasActiveSession: boolean) {
+  activeSessionKey = hasActiveSession ? activeSessionKey : null;
+  activeFastAccessKey = null;
+  hideMobileFastAccess();
+
+  if (Platform.OS === "web") {
+    const win = await WebviewWindow.getByLabel(FAST_ACCESS_POPUP_LABEL);
+    if (win) {
+      try {
+        await win.hide();
+      } catch (error) {
+        logger.warn("[FastAccess] Failed to hide popup during startup cleanup:", error);
+      }
+    }
+    return;
+  }
+
+  if (!hasActiveSession) {
+    try {
+      await Notifications.dismissAllNotificationsAsync();
+    } catch (error) {
+      logger.warn("[FastAccess] Failed startup cleanup for stale notifications:", error);
+    }
+  }
+
+  lastNotificationId = null;
 }
 
 export async function positionPopupBottomRight() {

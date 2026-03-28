@@ -25,6 +25,8 @@ import { ContentProtectionProvider } from "./src/app/providers/ContentProtection
 import GlobalClipboardSnackbar from "./src/shared/components/GlobalClipboardSnackbar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { getAppScheme } from "./src/shared/utils/appScheme";
+import MobileFastAccessOverlay from "./src/features/fastaccess/components/MobileFastAccessOverlay";
+import FastAccessSessionBridge from "./src/features/fastaccess/components/FastAccessSessionBridge";
 
 const Tab = createBottomTabNavigator();
 
@@ -67,11 +69,13 @@ export function AppWithNavigation() {
                 <I18nBridge />
                 <OnlineProvider>
                   <AuthProvider>
+                    <FastAccessSessionBridge />
                     <CloudProvider>
                       <VaultProvider>
                         <DevModeProvider>
                           <GlobalErrorSnackbar />
                           <GlobalClipboardSnackbar />
+                          <MobileFastAccessOverlay />
                           <View
                             style={{
                               borderRadius: Platform.OS === "web" ? 6 : 0,

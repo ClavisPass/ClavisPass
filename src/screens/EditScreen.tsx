@@ -46,6 +46,7 @@ import DraggableModulesListWeb from "../features/vault/components/lists/Draggabl
 import DraggableModulesList from "../features/vault/components/lists/DraggableModulesList";
 import { useVault } from "../app/providers/VaultProvider";
 import { HomeStackParamList } from "../app/navigation/model/types";
+import { logger } from "../infrastructure/logging/logger";
 
 type EditScreenProps = NativeStackScreenProps<HomeStackParamList, "Edit">;
 
