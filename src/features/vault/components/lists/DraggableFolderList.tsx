@@ -112,7 +112,6 @@ function DraggableFolderList(props: Props) {
                 flexDirection: "row",
                 alignItems: "center",
                 gap: 4,
-                marginRight: 30,
                 overflow: "hidden",
               }}
               onPress={() => props.setSelectedFolder?.(null)}

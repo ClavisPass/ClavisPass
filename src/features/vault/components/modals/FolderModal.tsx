@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Platform, View, StyleSheet } from "react-native";
-import { IconButton, TextInput } from "react-native-paper";
+import { useCallback, useMemo, useState } from "react";
+import { Platform, Pressable, View, StyleSheet } from "react-native";
+import { Icon, Text, TextInput } from "react-native-paper";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import FolderType from "../../model/FolderType";
 import createUniqueID from "../../../../shared/utils/createUniqueID";
@@ -8,10 +8,7 @@ import { useTranslation } from "react-i18next";
 import DraggableFolderListWeb from "../lists/DraggableFolderListWeb";
 import DraggableFolderList from "../lists/DraggableFolderList";
 import Modal from "../../../../shared/components/modals/Modal";
-import {
-  useVault,
-  VaultProvider,
-} from "../../../../app/providers/VaultProvider";
+import { useVault } from "../../../../app/providers/VaultProvider";
 
 type Props = {
   visible: boolean;
@@ -22,36 +19,20 @@ type Props = {
 
 function FolderModal(props: Props) {
   const vault = useVault();
-  const { theme, globalStyles } = useTheme();
+  const { theme } = useTheme();
   const { t } = useTranslation();
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredValues = useMemo(() => {
-    return props.folder.filter((item) => item.name === searchQuery);
-  }, [props.folder, searchQuery]);
-
-  const [addButtonDisabled, setAddButtonDisabled] = useState(true);
-  const [draggableDisabled, setDraggableDisabled] = useState(false);
+  const normalizedQuery = searchQuery.trim();
+  const hasExactMatch = useMemo(() => {
+    return props.folder.some((item) => item.name === normalizedQuery);
+  }, [props.folder, normalizedQuery]);
+  const addButtonDisabled =
+    normalizedQuery === "" || normalizedQuery === "Favorite" || hasExactMatch;
+  const draggableDisabled = normalizedQuery !== "";
 
   const hideModal = () => props.setVisible(false);
-
-  useEffect(() => {
-    if (filteredValues.length === 0) setAddButtonDisabled(false);
-    else setAddButtonDisabled(true);
-
-    if (filteredValues.length === props.folder.length)
-      setDraggableDisabled(false);
-    else setDraggableDisabled(true);
-
-    if (searchQuery === "" || searchQuery === "Favorite") {
-      setAddButtonDisabled(true);
-    }
-  }, [filteredValues, searchQuery, props.folder.length]);
-
-  useEffect(() => {
-    setDraggableDisabled(!addButtonDisabled);
-  }, [addButtonDisabled]);
 
   const applyFolders = (nextFolders: FolderType[]) => {
     vault.update((draft) => {
@@ -76,69 +57,141 @@ function FolderModal(props: Props) {
   };
 
   const persistFolderOrder = useCallback(
-      (nextFolders: FolderType[]) => {
-        vault.update((draft) => {
-          draft.folder = nextFolders;
-        });
-      },
-      [vault]
-    );
+    (nextFolders: FolderType[]) => {
+      vault.update((draft) => {
+        draft.folder = nextFolders;
+      });
+    },
+    [vault]
+  );
 
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
+      <View
+        style={{
+          padding: 18,
+          display: "flex",
+          alignItems: "stretch",
+          justifyContent: "center",
+          flexDirection: "column",
+          height: 360,
+          width: 340,
+          maxWidth: "92%",
+          cursor: "auto",
+          gap: 12,
+          borderRadius: 12,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: theme.colors.outlineVariant,
+          backgroundColor: theme.colors.elevation.level2,
+          boxShadow: theme.colors.shadow,
+        }}
+      >
         <View
           style={{
-            padding: 16,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "column",
-            height: 350,
-            cursor: "auto",
-            gap: 6,
+            alignSelf: "stretch",
+            gap: 4,
+            paddingBottom: 2,
+          }}
+        >
+          <Text variant="titleLarge" style={{ userSelect: "none" }}>
+            {t("common:addFolder")}
+          </Text>
+        </View>
+
+        <View
+          style={{
+            alignSelf: "stretch",
+            padding: 8,
             borderRadius: 12,
             borderWidth: StyleSheet.hairlineWidth,
             borderColor: theme.colors.outlineVariant,
+            backgroundColor: theme.colors.elevation.level1,
           }}
         >
           <View
-            style={[
-              globalStyles.moduleView,
-              {
-                backgroundColor: "transparent",
-                opacity: draggableDisabled ? 0.98 : 1,
-              },
-            ]}
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "transparent",
+              opacity: draggableDisabled ? 0.98 : 1,
+              borderRadius: 12,
+              paddingHorizontal: 0,
+              minHeight: 52,
+              gap: 8,
+            }}
           >
-            <View style={{ flexGrow: 1 }}>
+            <View
+              style={{
+                width: 40,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Icon source="folder-plus-outline" size={20} color={theme.colors.onSurfaceVariant} />
+            </View>
+
+            <View style={{ flex: 1, minWidth: 0 }}>
               <TextInput
                 placeholder={t("common:addFolder")}
-                style={[
-                  globalStyles.textInputStyle,
-                  {
-                    borderColor: theme.colors.primary,
-                    borderBottomWidth: 0,
-                    backgroundColor: "transparent",
-                  },
-                ]}
+                style={{
+                  borderRadius: 12,
+                  borderBottomWidth: 0,
+                  backgroundColor: "transparent",
+                  paddingHorizontal: 0,
+                  margin: 0,
+                }}
                 value={searchQuery}
-                mode="flat"
+                mode="outlined"
                 onChangeText={(text) => setSearchQuery(text)}
-                autoCapitalize="none"
+                autoCapitalize="sentences"
+                returnKeyType="done"
+                onSubmitEditing={addFolder}
+                outlineColor="transparent"
+                activeOutlineColor="transparent"
+                contentStyle={{ paddingLeft: 0, paddingRight: 0 }}
               />
             </View>
 
-            <IconButton
-              selected
-              mode={addButtonDisabled ? undefined : "contained-tonal"}
+            <Pressable
               disabled={addButtonDisabled}
-              icon={"plus"}
-              iconColor={theme.colors.primary}
-              style={{ margin: 4 }}
               onPress={addFolder}
-            />
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 12,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: addButtonDisabled
+                  ? theme.colors.surfaceDisabled
+                  : theme.colors.primary,
+                opacity: addButtonDisabled ? 0.7 : 1,
+              }}
+            >
+              <Icon
+                source="plus"
+                size={20}
+                color={
+                  addButtonDisabled ? theme.colors.onSurfaceDisabled : theme.colors.onPrimary
+                }
+              />
+            </Pressable>
           </View>
+        </View>
 
+        <View
+          style={{
+            alignSelf: "stretch",
+            flex: 1,
+            borderRadius: 12,
+            borderWidth: StyleSheet.hairlineWidth,
+            borderColor: theme.colors.outlineVariant,
+            backgroundColor: theme.colors.elevation.level1,
+            paddingHorizontal: 8,
+            paddingTop: 8,
+            paddingBottom: 4,
+          }}
+        >
           {Platform.OS === "web" ? (
             <DraggableFolderListWeb
               folder={props.folder}
@@ -156,6 +209,7 @@ function FolderModal(props: Props) {
             />
           )}
         </View>
+      </View>
     </Modal>
   );
 }
