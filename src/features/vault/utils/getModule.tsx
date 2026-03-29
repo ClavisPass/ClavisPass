@@ -183,6 +183,7 @@ const MODULE_RENDERERS = {
         module={m.module}
         wifiName={m.wifiName}
         wifiType={m.wifiType}
+        hidden={m.hidden ?? false}
         value={m.value}
         onDragStart={args.onDragStart}
         deleteModule={args.deleteModule}

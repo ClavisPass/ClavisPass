@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import ModulesEnum from "../ModulesEnum";
-import WifiTypeEnum from "../WifiTypeEnum";
 
 const regex = new RegExp(ModulesEnum.WIFI);
 
@@ -11,6 +10,7 @@ export const WifiModuleTypeSchema = z.object({
   value: z.string(),
   wifiName: z.string(),
   wifiType: z.enum(["WEP", "WPA", "blank"]),
+  hidden: z.boolean().default(false),
 });
 
 type WifiModuleType = z.infer<typeof WifiModuleTypeSchema>;

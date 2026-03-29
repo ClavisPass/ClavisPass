@@ -310,6 +310,8 @@ const de: TranslationSchema = {
     url: "URL",
     username: "Benutzername",
     wifi: "WiFi",
+    wifiOpen: "Offen",
+    wifiHidden: "Verstecktes Netzwerk",
     created: "Erstellt",
     lastUpdated: "Zuletzt aktualisiert",
     unknownModule: "Unbekanntes Modul",

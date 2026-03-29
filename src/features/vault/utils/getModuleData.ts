@@ -86,6 +86,7 @@ const MODULE_DEFAULTS = {
       value: "",
       wifiName: "",
       wifiType: "WPA",
+      hidden: false,
     } satisfies WifiModuleType),
 
   [ModulesEnum.DIGITAL_CARD]: (id: string): ModuleType =>

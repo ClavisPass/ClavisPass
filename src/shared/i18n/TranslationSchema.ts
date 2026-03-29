@@ -291,6 +291,8 @@ export type TranslationSchema = {
     url: string;
     username: string;
     wifi: string;
+    wifiOpen: string;
+    wifiHidden: string;
     created: string;
     lastUpdated: string;
     unknownModule: string;
