@@ -1,6 +1,7 @@
 use keytar::{delete_password, get_password, set_password};
+use std::fs;
 use tauri;
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Manager, Size};
 
 #[tauri::command]
 pub fn save_key(key: &str, value: &str) {
@@ -43,4 +44,24 @@ pub async fn set_content_protection(app: AppHandle, enabled: bool) -> Result<(),
 
   win.set_content_protected(enabled).map_err(|e| e.to_string())?;
   Ok(())
+}
+
+#[tauri::command]
+pub async fn reset_window_size(app: AppHandle) -> Result<(), String> {
+    let win = app
+        .get_webview_window("main")
+        .ok_or("main window not found")?;
+
+    let app_data_dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
+    let size_file = app_data_dir.join("window-size.json");
+
+    if size_file.exists() {
+        fs::remove_file(&size_file).map_err(|e| e.to_string())?;
+    }
+
+    win.set_size(Size::Logical(tauri::LogicalSize::new(601.0, 400.0)))
+        .map_err(|e| e.to_string())?;
+    win.center().map_err(|e| e.to_string())?;
+
+    Ok(())
 }

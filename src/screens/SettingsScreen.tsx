@@ -246,6 +246,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     setStartup(value);
   };
 
+  const resetWindowSize = async () => {
+    if (Platform.OS !== "web") {
+      return;
+    }
+
+    await invoke("reset_window_size");
+  };
+
   useEffect(() => {
     getAutoStart();
     isUsingAuthentication().then((isAuthenticated) => {
@@ -309,6 +317,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                     changeStartBehavior(checked);
                   }}
                 />
+                <SettingsDivider />
+                <SettingsItem
+                  onPress={() => {
+                    resetWindowSize();
+                  }}
+                >
+                  {t("settings:resetWindowSize")}
+                </SettingsItem>
                 <SettingsDivider />
                 <SettingsSwitch
                   label={t("settings:minimizeToTray")}

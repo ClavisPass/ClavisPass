@@ -109,6 +109,7 @@ const en: TranslationSchema = {
     links: "Links",
     autostart: "Autostart",
     startMinimized: "Start Minimized",
+    resetWindowSize: "Reset Window Size",
     minimizeToTray: "Minimize to Tray",
     showHide: "Show/Hide",
     language: "Language",

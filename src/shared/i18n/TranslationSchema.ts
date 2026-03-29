@@ -107,6 +107,7 @@ export type TranslationSchema = {
     links: string;
     autostart: string;
     startMinimized: string;
+    resetWindowSize: string;
     minimizeToTray: string;
     showHide: string;
     language: string;

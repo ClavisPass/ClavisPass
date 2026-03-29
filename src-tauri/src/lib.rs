@@ -221,6 +221,7 @@ pub fn run() {
             commands::get_key,
             commands::remove_key,
             commands::set_content_protection,
+            commands::reset_window_size,
             device_identity::get_device_identity
         ])
         .run(tauri::generate_context!())
