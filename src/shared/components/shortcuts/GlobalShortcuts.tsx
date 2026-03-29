@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
 import { Platform } from "react-native";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
@@ -13,22 +13,55 @@ function GlobalShortcuts() {
       if (isDev) return;
 
       const handleContextMenu = (e: MouseEvent) => e.preventDefault();
-      const handleKeyDown = (event: KeyboardEvent) => {
-        if (
-          (event.ctrlKey &&
-            ["f", "p", "u", "+", "-", "j"].includes(event.key.toLowerCase())) ||
-          event.key === "F3"
-        ) {
+      const handleWheel = (event: WheelEvent) => {
+        if (event.ctrlKey || event.metaKey) {
           event.preventDefault();
         }
       };
+      const handleKeyDown = (event: KeyboardEvent) => {
+        const key = event.key.toLowerCase();
+        const isBrowserShortcut =
+          (event.ctrlKey &&
+            [
+              "0",
+              "=",
+              "+",
+              "-",
+              "c",
+              "f",
+              "i",
+              "j",
+              "l",
+              "o",
+              "p",
+              "r",
+              "s",
+              "u",
+            ].includes(key)) ||
+          (event.ctrlKey && event.shiftKey && ["c", "i", "j"].includes(key)) ||
+          ["f1", "f3", "f5", "f6", "f11", "f12"].includes(key) ||
+          (event.altKey && ["arrowleft", "arrowright", "home"].includes(key));
 
-      document.addEventListener("contextmenu", handleContextMenu);
-      document.addEventListener("keydown", handleKeyDown);
+        if (
+          isBrowserShortcut ||
+          ((event.metaKey || event.ctrlKey) && ["+", "-", "="].includes(key))
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      };
+
+      document.addEventListener("contextmenu", handleContextMenu, true);
+      window.addEventListener("keydown", handleKeyDown, true);
+      window.addEventListener("wheel", handleWheel, {
+        passive: false,
+        capture: true,
+      });
 
       return () => {
-        document.removeEventListener("contextmenu", handleContextMenu);
-        document.removeEventListener("keydown", handleKeyDown);
+        document.removeEventListener("contextmenu", handleContextMenu, true);
+        window.removeEventListener("keydown", handleKeyDown, true);
+        window.removeEventListener("wheel", handleWheel, true);
       };
     }
   }, []);

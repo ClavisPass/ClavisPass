@@ -3,7 +3,7 @@ import * as WebBrowser from "expo-web-browser";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Platform } from "react-native";
 import { GOOGLE_CLIENT_ID_DESKTOP } from "@env";
-import { start, onUrl, cancel } from "@fabianlars/tauri-plugin-oauth";
+import { cancel, onUrl, start } from "@fabianlars/tauri-plugin-oauth";
 import * as Random from "expo-random";
 import SettingsItem from "../../settings/components/SettingsItem";
 import { useToken } from "../../../app/providers/CloudProvider";
@@ -13,6 +13,10 @@ import {
   getGoogleClientIdForCurrentPlatform,
   getGoogleMobileRedirectUri,
 } from "../../../infrastructure/cloud/utils/googleOAuth";
+import {
+  closeOAuthPopupWindow,
+  openOAuthPopupWindow,
+} from "../utils/oauthPopup";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -20,7 +24,6 @@ const SCOPES = [
   "https://www.googleapis.com/auth/drive.file",
   "https://www.googleapis.com/auth/drive.appdata",
 ];
-const POPUP_LABEL = "oauth-popup";
 
 const isMobile = Platform.OS === "ios" || Platform.OS === "android";
 const isWeb = Platform.OS === "web";
@@ -51,7 +54,6 @@ function GoogleDriveLoginButton() {
   const busyRef = useRef(false);
   const portRef = useRef<number | null>(null);
   const stateRef = useRef<string | null>(null);
-  const popupRef = useRef<Window | null>(null);
 
   const exchangeToken = useCallback(
     async (code: string, redirectUri: string, codeVerifier?: string) => {
@@ -135,43 +137,16 @@ function GoogleDriveLoginButton() {
 
   const closeAuthWindowIfAny = useCallback(async () => {
     try {
-      const tauri = require("@tauri-apps/api/webviewWindow");
-      const win = await tauri.WebviewWindow.getByLabel(POPUP_LABEL);
-      if (win) {
-        await win.close();
-      }
-      if (popupRef.current && !popupRef.current.closed) {
-        popupRef.current.close();
-      }
+      await closeOAuthPopupWindow();
     } catch {}
-    popupRef.current = null;
   }, []);
 
   const handleTauriAuth = useCallback(async () => {
-    if (busyRef.current) return;
-    busyRef.current = true;
-
-    const prePopup = window.open(
-      "about:blank",
-      POPUP_LABEL,
-      "width=720,height=840"
-    );
-
-    if (!prePopup) {
-      logger.warn(
-        "[GoogleDrive] Popup konnte nicht geöffnet werden (Popup-Blocker/Policy)."
-      );
-      busyRef.current = false;
+    if (busyRef.current) {
       return;
     }
 
-    popupRef.current = prePopup;
-
-    try {
-      prePopup.document.title = "Google Drive Login ...";
-      prePopup.document.body.innerHTML =
-        "<p style='font-family:system-ui;margin:16px'></p>";
-    } catch {}
+    busyRef.current = true;
 
     try {
       const port = await start({ ports: [57771, 57772, 57773] });
@@ -188,17 +163,20 @@ function GoogleDriveLoginButton() {
           timeoutRef.current = null;
         }
 
-        const u = new URL(url);
-        const code = u.searchParams.get("code");
-        const state = u.searchParams.get("state");
-        const error = u.searchParams.get("error");
+        const parsedUrl = new URL(url);
+        const code = parsedUrl.searchParams.get("code");
+        const state = parsedUrl.searchParams.get("state");
+        const error = parsedUrl.searchParams.get("error");
 
         if (error) {
           logger.warn("[GoogleDrive] OAuth error:", error);
           return;
         }
 
-        if (!code) return;
+        if (!code) {
+          return;
+        }
+
         if (!state || state !== stateRef.current) {
           logger.warn("[GoogleDrive] State mismatch (tauri). Ignoring callback.");
           return;
@@ -213,14 +191,14 @@ function GoogleDriveLoginButton() {
           }
         } catch {}
 
-        closeAuthWindowIfAny();
+        await closeAuthWindowIfAny();
         busyRef.current = false;
 
         (async () => {
           try {
             await exchangeToken(code, redirectUri, codeVerifier);
-          } catch (e) {
-            logger.error("[GoogleDrive] Token exchange (bg) failed:", e);
+          } catch (error) {
+            logger.error("[GoogleDrive] Token exchange (bg) failed:", error);
           } finally {
             try {
               if (portRef.current != null) {
@@ -250,7 +228,7 @@ function GoogleDriveLoginButton() {
           }
         } catch {}
 
-        closeAuthWindowIfAny();
+        await closeAuthWindowIfAny();
         busyRef.current = false;
         stateRef.current = null;
       }, 120_000);
@@ -272,11 +250,7 @@ function GoogleDriveLoginButton() {
           state: stateRef.current!,
         }).toString();
 
-      try {
-        prePopup.location.href = authUrl;
-      } catch (e) {
-        logger.warn("[GoogleDrive] Konnte Popup nicht navigieren:", e);
-      }
+      await openOAuthPopupWindow(authUrl, "Google Drive Login");
     } catch (err) {
       logger.error("[GoogleDrive] OAuth flow failed (Tauri):", err);
       try {
@@ -299,7 +273,7 @@ function GoogleDriveLoginButton() {
       }
 
       stateRef.current = null;
-      closeAuthWindowIfAny();
+      await closeAuthWindowIfAny();
       busyRef.current = false;
     }
   }, [closeAuthWindowIfAny, desktopClientId, exchangeToken]);
@@ -327,7 +301,7 @@ function GoogleDriveLoginButton() {
           }
         } catch {}
         portRef.current = null;
-        closeAuthWindowIfAny();
+        await closeAuthWindowIfAny();
       })();
 
       stateRef.current = null;

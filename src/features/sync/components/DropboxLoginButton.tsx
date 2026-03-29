@@ -1,15 +1,19 @@
 import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
-import { useEffect, useMemo, useRef, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Platform } from "react-native";
 import SettingsItem from "../../settings/components/SettingsItem";
 import { DROPBOX_CLIENT_ID } from "@env";
-import { start, onUrl, cancel } from "@fabianlars/tauri-plugin-oauth";
+import { cancel, onUrl, start } from "@fabianlars/tauri-plugin-oauth";
 import * as Random from "expo-random";
 import { logger } from "../../../infrastructure/logging/logger";
 import { useToken } from "../../../app/providers/CloudProvider";
 import { useVault } from "../../../app/providers/VaultProvider";
 import { getAppRedirectUri } from "../../../shared/utils/appScheme";
+import {
+  closeOAuthPopupWindow,
+  openOAuthPopupWindow,
+} from "../utils/oauthPopup";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -18,7 +22,6 @@ const SCOPES = [
   "files.content.read",
   "files.content.write",
 ];
-const POPUP_LABEL = "oauth-popup";
 
 const isMobile = Platform.OS === "ios" || Platform.OS === "android";
 const isWeb = Platform.OS === "web";
@@ -36,15 +39,12 @@ function DropboxLoginButton() {
   const { setSession } = useToken();
   const vault = useVault();
 
-  // Flow-Refs
   const unsubscribeRef = useRef<null | (() => void)>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const busyRef = useRef(false);
   const portRef = useRef<number | null>(null);
   const stateRef = useRef<string | null>(null);
-  const popupRef = useRef<Window | null>(null);
 
-  // Gemeinsamer Token-Exchange
   const exchangeToken = useCallback(
     async (code: string, redirectUri: string, codeVerifier?: string) => {
       try {
@@ -72,7 +72,6 @@ function DropboxLoginButton() {
             expiresIn: data.expires_in,
           });
           vault.update((draft) => {
-            // no-op write to mark dirty (update() setzt dirty)
             draft.version = draft.version;
           });
         } else {
@@ -85,15 +84,15 @@ function DropboxLoginButton() {
     [setSession, vault]
   );
 
-  const MOBILE_REDIRECT_URI = useMemo(
+  const mobileRedirectUri = useMemo(
     () => (isMobile ? getMobileRedirectUri() : "http://127.0.0.1/unused"),
-    [isMobile]
+    []
   );
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId: DROPBOX_CLIENT_ID,
-      redirectUri: MOBILE_REDIRECT_URI,
+      redirectUri: mobileRedirectUri,
       scopes: SCOPES,
       responseType: "code",
       usePKCE: true,
@@ -106,107 +105,78 @@ function DropboxLoginButton() {
   );
 
   useEffect(() => {
-    if (!isMobile) return;
-    if (response?.type === "success") {
-      const { code } = response.params;
-      const verifier = request?.codeVerifier || "";
-      exchangeToken(code, MOBILE_REDIRECT_URI, verifier);
+    if (!isMobile || response?.type !== "success") {
+      return;
     }
-  }, [
-    response,
-    isMobile,
-    MOBILE_REDIRECT_URI,
-    request?.codeVerifier,
-    exchangeToken,
-  ]);
+
+    const { code } = response.params;
+    const verifier = request?.codeVerifier || "";
+    exchangeToken(code, mobileRedirectUri, verifier);
+  }, [exchangeToken, mobileRedirectUri, request?.codeVerifier, response]);
 
   const closeAuthWindowIfAny = useCallback(async () => {
     try {
-      const tauri = require("@tauri-apps/api/webviewWindow");
-      const win = await tauri.WebviewWindow.getByLabel(POPUP_LABEL);
-      if (win) {
-        await win.close();
-      }
-      if (popupRef.current && !popupRef.current.closed)
-        popupRef.current.close();
+      await closeOAuthPopupWindow();
     } catch {}
-    popupRef.current = null;
   }, []);
 
   const handleTauriAuth = useCallback(async () => {
-    if (busyRef.current) return;
-    busyRef.current = true;
-
-    const prePopup = window.open(
-      "about:blank",
-      POPUP_LABEL,
-      "width=720,height=840"
-    );
-
-    if (!prePopup) {
-      logger.warn("Popup konnte nicht geöffnet werden (Popup-Blocker/Policy).");
-      busyRef.current = false;
+    if (busyRef.current) {
       return;
     }
-    popupRef.current = prePopup;
-    try {
-      prePopup.document.title = "Dropbox Login …";
-      prePopup.document.body.innerHTML =
-        "<p style='font-family:system-ui;margin:16px'></p>";
-    } catch {}
+
+    busyRef.current = true;
 
     try {
-      // 1) Lokalen Listener starten (feste/mehrere Ports optional)
       const port = await start({ ports: [57771, 57772, 57773] });
       portRef.current = port;
       const redirectUri = `http://127.0.0.1:${port}`;
 
-      // 2) PKCE + CSRF state (nur Tauri)
       const { createPkcePair } = require("../utils/pkce.web");
       const { codeVerifier, codeChallenge, method } = await createPkcePair();
       stateRef.current = await randState();
 
-      // 3) Redirect-Listener – Fenster SOFORT schließen, Rest im Hintergrund
       const unsubscribe = await onUrl(async (url) => {
-        // Stoppe Timeout
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current);
           timeoutRef.current = null;
         }
 
-        const u = new URL(url);
-        const code = u.searchParams.get("code");
-        const state = u.searchParams.get("state");
-        if (!code) return;
+        const parsedUrl = new URL(url);
+        const code = parsedUrl.searchParams.get("code");
+        const state = parsedUrl.searchParams.get("state");
+
+        if (!code) {
+          return;
+        }
+
         if (!state || state !== stateRef.current) {
           logger.warn("State mismatch (tauri). Ignoring callback.");
           return;
         }
 
-        // a) State leeren
         stateRef.current = null;
 
-        // b) Listener & Popup sofort schließen
         try {
           if (unsubscribeRef.current) {
             unsubscribeRef.current();
             unsubscribeRef.current = null;
           }
         } catch {}
-        closeAuthWindowIfAny();
 
-        // c) UI freigeben
+        await closeAuthWindowIfAny();
         busyRef.current = false;
 
-        // d) Hintergrund-Tasks: Token tauschen + Port schließen
         (async () => {
           try {
             await exchangeToken(code, redirectUri, codeVerifier);
-          } catch (e) {
-            logger.error("Token exchange (bg) failed:", e);
+          } catch (error) {
+            logger.error("Token exchange (bg) failed:", error);
           } finally {
             try {
-              if (portRef.current != null) await cancel(portRef.current);
+              if (portRef.current != null) {
+                await cancel(portRef.current);
+              }
             } catch {}
             portRef.current = null;
           }
@@ -214,27 +184,29 @@ function DropboxLoginButton() {
       });
       unsubscribeRef.current = unsubscribe;
 
-      // 4) Timeout (2 min)
       timeoutRef.current = setTimeout(async () => {
-        logger.warn("OAuth timeout – kein Redirect erhalten.");
+        logger.warn("OAuth timeout - kein Redirect erhalten.");
         try {
-          if (portRef.current != null) await cancel(portRef.current);
+          if (portRef.current != null) {
+            await cancel(portRef.current);
+          }
         } catch {}
         portRef.current = null;
+
         try {
           if (unsubscribeRef.current) {
             unsubscribeRef.current();
             unsubscribeRef.current = null;
           }
         } catch {}
-        closeAuthWindowIfAny();
+
+        await closeAuthWindowIfAny();
         busyRef.current = false;
         stateRef.current = null;
       }, 120_000);
 
       logger.info("Redirect URI: ", redirectUri);
 
-      // 5) Auth-URL
       const authUrl =
         "https://www.dropbox.com/oauth2/authorize?" +
         new URLSearchParams({
@@ -244,44 +216,44 @@ function DropboxLoginButton() {
           token_access_type: "offline",
           scope: SCOPES.join(" "),
           code_challenge: codeChallenge,
-          code_challenge_method: method, // "S256"
+          code_challenge_method: method,
           state: stateRef.current!,
         }).toString();
 
-      // 6) Im bereits geöffneten Fenster navigieren (kein weiteres window.open nötig)
-      try {
-        prePopup.location.href = authUrl;
-      } catch (e) {
-        logger.warn("Konnte Popup nicht navigieren:", e);
-      }
+      await openOAuthPopupWindow(authUrl, "Dropbox Login");
     } catch (err) {
       logger.error("OAuth flow failed (Tauri):", err);
-      // Cleanup
       try {
-        if (portRef.current != null) await cancel(portRef.current);
+        if (portRef.current != null) {
+          await cancel(portRef.current);
+        }
       } catch {}
       portRef.current = null;
+
       try {
         if (unsubscribeRef.current) {
           unsubscribeRef.current();
           unsubscribeRef.current = null;
         }
       } catch {}
+
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
+
       stateRef.current = null;
-      closeAuthWindowIfAny();
+      await closeAuthWindowIfAny();
       busyRef.current = false;
     }
-  }, [exchangeToken, closeAuthWindowIfAny]);
+  }, [closeAuthWindowIfAny, exchangeToken]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       try {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
       } catch {}
       timeoutRef.current = null;
 
@@ -294,10 +266,12 @@ function DropboxLoginButton() {
 
       (async () => {
         try {
-          if (portRef.current != null) await cancel(portRef.current);
+          if (portRef.current != null) {
+            await cancel(portRef.current);
+          }
         } catch {}
         portRef.current = null;
-        closeAuthWindowIfAny();
+        await closeAuthWindowIfAny();
       })();
 
       stateRef.current = null;
@@ -305,7 +279,6 @@ function DropboxLoginButton() {
     };
   }, [closeAuthWindowIfAny]);
 
-  // Button
   const handleAuth = useCallback(() => {
     if (isWeb) {
       handleTauriAuth();

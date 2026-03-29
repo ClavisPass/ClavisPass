@@ -106,8 +106,9 @@ pub fn run() {
             .content_protected(true)
             .maximizable(false)
             .use_https_scheme(true)
+            .zoom_hotkeys_enabled(false)
             .visible(false)
-            .devtools(true);
+            .devtools(cfg!(debug_assertions));
 
             let app_handle_for_new_window = app.handle().clone();
 
@@ -121,6 +122,8 @@ pub fn run() {
                         WebviewUrl::External(Url::parse("about:blank").unwrap()),
                     )
                     .window_features(features)
+                    .zoom_hotkeys_enabled(false)
+                    .devtools(cfg!(debug_assertions))
                     .build()
                     .expect("failed to build popup window");
 
