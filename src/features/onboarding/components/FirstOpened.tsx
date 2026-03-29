@@ -1,27 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
-import {
-  Animated,
-  Easing,
-  Platform,
-  ScrollView,
-  View,
-  useColorScheme,
-} from "react-native";
-import { Button, Text } from "react-native-paper";
-import { useTranslation } from "react-i18next";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import * as Localization from "expo-localization";
+import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { ScrollView, View, useColorScheme } from "react-native";
+import { Button, Text } from "react-native-paper";
 
+import { LoginStackParamList } from "../../../app/navigation/model/types";
+import { useToken } from "../../../app/providers/CloudProvider";
+import { useOnline } from "../../../app/providers/OnlineProvider";
+import { useSetting } from "../../../app/providers/SettingsProvider";
+import { useTheme } from "../../../app/providers/ThemeProvider";
+import AppearanceSettingsSection from "../../settings/components/AppearanceSettingsSection";
 import SettingsDivider from "../../settings/components/SettingsDivider";
+import SettingsItem from "../../settings/components/SettingsItem";
+import ClavisPassHubLoginButton from "../../sync/components/ClavisPassHubLoginButton";
 import DropboxLoginButton from "../../sync/components/DropboxLoginButton";
 import GoogleDriveLoginButton from "../../sync/components/GoogleDriveLoginButton";
-import { useTheme } from "../../../app/providers/ThemeProvider";
-import { useOnline } from "../../../app/providers/OnlineProvider";
-import AppearanceSettingsSection from "../../settings/components/AppearanceSettingsSection";
-import { useSetting } from "../../../app/providers/SettingsProvider";
-import { useToken } from "../../../app/providers/CloudProvider";
-import SettingsItem from "../../settings/components/SettingsItem";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { LoginStackParamList } from "../../../app/navigation/model/types";
 
 type Props = {
   onFinish?: () => void;
@@ -32,9 +26,6 @@ type Props = {
   >;
 };
 type Step = 0 | 1;
-type Direction = "forward" | "back";
-
-const DURATION = 180;
 
 const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
   const { t } = useTranslation();
@@ -53,15 +44,6 @@ const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
     useSetting("TIME_FORMAT");
 
   const [step, setStep] = useState<Step>(0);
-  const [animating, setAnimating] = useState(false);
-  const [stageWidth, setStageWidth] = useState(320);
-
-  const currentX = useRef(new Animated.Value(0)).current;
-  const incomingX = useRef(new Animated.Value(0)).current;
-
-  const incomingStepRef = useRef<Step | null>(null);
-
-  const useNativeDriver = Platform.OS !== "web";
 
   const finish = async () => {
     await setOnboardingDone(true);
@@ -74,14 +56,12 @@ const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
     if (onboardingDone) return;
 
     if (step !== 1) return;
-    if (animating) return;
-
     if (!provider) return;
     if (provider === "device") return;
 
     finishingRef.current = true;
-    void finish();
-  }, [step, animating, provider, onboardingDone]);
+    finish();
+  }, [step, provider, onboardingDone]);
 
   const appliedDefaultsRef = useRef(false);
   useEffect(() => {
@@ -164,8 +144,10 @@ const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
           <SettingsDivider />
           <GoogleDriveLoginButton />
           <SettingsDivider />
+          <ClavisPassHubLoginButton />
+          <SettingsDivider />
           <SettingsItem
-            leadingIcon={"qrcode-scan"}
+            leadingIcon="qrcode-scan"
             onPress={() => navigation.navigate("Scan")}
           >
             {t("settings:scanqrcode")}
@@ -187,40 +169,8 @@ const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
     return <CloudStep />;
   };
 
-  const startTransition = (dir: Direction, to: Step) => {
-    if (animating) return;
-    if (to === step) return;
-
-    setAnimating(true);
-    incomingStepRef.current = to;
-    currentX.setValue(0);
-    incomingX.setValue(dir === "forward" ? stageWidth : -stageWidth);
-
-    Animated.parallel([
-      Animated.timing(currentX, {
-        toValue: dir === "forward" ? -stageWidth : stageWidth,
-        duration: DURATION,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver,
-      }),
-      Animated.timing(incomingX, {
-        toValue: 0,
-        duration: DURATION,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver,
-      }),
-    ]).start(() => {
-      setStep(to);
-      incomingStepRef.current = null;
-      currentX.setValue(0);
-      incomingX.setValue(0);
-
-      setAnimating(false);
-    });
-  };
-
-  const next = () => startTransition("forward", 1);
-  const back = () => startTransition("back", 0);
+  const next = () => setStep(1);
+  const back = () => setStep(0);
 
   const canGoBack = step === 1;
   const isLast = step === 1;
@@ -235,38 +185,11 @@ const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
       }}
     >
       <ScrollView
-        style={{ width: "100%", flexGrow: 1 }}
-        contentContainerStyle={{ justifyContent: "center" }}
+        style={{ width: "100%", flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 8 }}
         keyboardShouldPersistTaps="handled"
       >
-        <View
-          style={{ width: "100%", position: "relative", overflow: "hidden" }}
-          onLayout={(e) => {
-            const w = e.nativeEvent.layout.width;
-            if (w && w > 0) setStageWidth(w);
-          }}
-        >
-          <Animated.View
-            style={{ transform: [{ translateX: currentX }], width: "100%" }}
-          >
-            {renderStep(step)}
-          </Animated.View>
-
-          {incomingStepRef.current !== null && (
-            <Animated.View
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                transform: [{ translateX: incomingX }],
-              }}
-              pointerEvents="none"
-            >
-              {renderStep(incomingStepRef.current)}
-            </Animated.View>
-          )}
-        </View>
+        <View style={{ width: "100%" }}>{renderStep(step)}</View>
       </ScrollView>
 
       {renderStepIndicators()}
@@ -279,7 +202,6 @@ const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
                 mode="outlined"
                 style={{ borderRadius: 12 }}
                 onPress={back}
-                disabled={animating}
               >
                 {t("common:back")}
               </Button>
@@ -294,7 +216,6 @@ const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
                 mode="contained"
                 style={{ borderRadius: 12 }}
                 onPress={finish}
-                disabled={animating}
               >
                 {t("common:done")}
               </Button>
@@ -303,7 +224,6 @@ const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
                 mode="outlined"
                 style={{ borderRadius: 12 }}
                 onPress={next}
-                disabled={animating}
               >
                 {t("common:next")}
               </Button>
