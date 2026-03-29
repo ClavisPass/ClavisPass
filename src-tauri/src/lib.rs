@@ -17,7 +17,7 @@ use tauri::{
     WebviewWindowBuilder,
     WindowEvent,
 };
-use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
+use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_deep_link;
 use tauri_plugin_global_shortcut;
 use tauri_plugin_oauth;
@@ -87,6 +87,9 @@ pub fn run() {
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
+            // Autostart launches always pass --hidden.
+            // The frontend decides whether to keep the app hidden or show it
+            // based on the persisted START_BEHAVIOR setting.
             Some(vec!["--hidden"]),
         ))
         .setup(|app| {
@@ -138,25 +141,6 @@ pub fn run() {
                 let app_handle_for_lock = app.handle().clone();
                 screen_lock::start(app_handle_for_lock);
             }
-
-            #[cfg(desktop)]
-            {
-                let autostart_manager = app.autolaunch();
-
-                if let Err(e) = autostart_manager.enable() {
-                    eprintln!("Failed to enable autostart: {}", e);
-                }
-
-                match autostart_manager.is_enabled() {
-                    Ok(enabled) => println!("registered for autostart? {}", enabled),
-                    Err(e) => eprintln!("Failed to check autostart status: {}", e),
-                }
-
-                if let Err(e) = autostart_manager.disable() {
-                    eprintln!("Failed to disable autostart: {}", e);
-                }
-            }
-
             // Tray setup
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let show_i = MenuItem::with_id(app, "show", "Show", true, None::<&str>)?;
