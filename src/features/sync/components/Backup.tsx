@@ -2,6 +2,13 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { View } from "react-native";
 import { ActivityIndicator, Button as RNPButton, Icon, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
+import Animated, {
+  Easing,
+  FadeIn,
+  FadeInDown,
+  FadeOut,
+  LinearTransition,
+} from "react-native-reanimated";
 
 import CryptoType, {
   CryptoTypeSchema,
@@ -37,6 +44,8 @@ function Backup() {
   const [value, setValue] = useState("");
 
   const [state, setState] = useState<BackupStateType>({ status: "loading" });
+  const transitionEasing = Easing.bezier(0.22, 1, 0.36, 1);
+  const contentTransition = LinearTransition.duration(320).easing(transitionEasing);
 
   const fetchBackup = useCallback(async () => {
     try {
@@ -95,14 +104,34 @@ function Backup() {
     }
   };
 
+  const stageKey = state.status;
+
   const renderContent = () => {
     if (state.status === "loading") {
-      return <ActivityIndicator size={"large"} animating={true} />;
+      return (
+        <Animated.View
+          key="loading"
+          entering={FadeIn.duration(280).easing(transitionEasing)}
+          exiting={FadeOut.duration(220).easing(transitionEasing)}
+          style={{
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: 148,
+          }}
+        >
+          <ActivityIndicator size={"large"} animating={true} />
+        </Animated.View>
+      );
     }
 
     if (state.status === "error") {
       return (
-        <View
+        <Animated.View
+          key="error"
+          entering={FadeInDown.duration(320).easing(transitionEasing)}
+          exiting={FadeOut.duration(220).easing(transitionEasing)}
+          layout={contentTransition}
           style={{
             width: "100%",
             display: "flex",
@@ -113,18 +142,38 @@ function Backup() {
         >
           <Text style={{ textAlign: "center" }}>{state.message}</Text>
           <RNPButton mode="outlined" onPress={fetchBackup}>{t("common:retry")}</RNPButton>
-        </View>
+        </Animated.View>
       );
     }
 
     if (state.status === "empty") {
-      return <Text>{t("login:noBackupFound")}</Text>;
+      return (
+        <Animated.View
+          key="empty"
+          entering={FadeInDown.duration(320).easing(transitionEasing)}
+          exiting={FadeOut.duration(220).easing(transitionEasing)}
+          layout={contentTransition}
+          style={{
+            width: "100%",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <Text style={{ textAlign: "center", opacity: 0.78 }}>
+            {t("login:noBackupFound")}
+          </Text>
+        </Animated.View>
+      );
     }
 
     const crypto = state.crypto;
 
     return (
-      <View
+      <Animated.View
+        key="ready"
+        entering={FadeInDown.duration(320).easing(transitionEasing)}
+        exiting={FadeOut.duration(220).easing(transitionEasing)}
+        layout={contentTransition}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -134,12 +183,11 @@ function Backup() {
           width: "100%",
         }}
       >
-        <Text variant="bodyLarge">{t("login:backupTitle")}</Text>
         <Text variant="bodyLarge" style={{ color: theme.colors.primary }}>
           {formatAbsoluteLocal(crypto.lastUpdated, dateFormat, timeFormat)}
         </Text>
 
-        <View style={{ width: "100%" }}>
+        <Animated.View layout={contentTransition} style={{ width: "100%" }}>
           <PasswordTextbox
             setCapsLock={setCapsLock}
             textInputRef={textInputRef}
@@ -150,16 +198,18 @@ function Backup() {
             placeholder={t("login:masterPassword")}
             onSubmitEditing={() => login(value, crypto)}
           />
-        </View>
+        </Animated.View>
 
         <Button text={t("login:login")} onPress={() => login(value, crypto)} />
 
         {capsLock && (
-          <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
-            {t("common:capsLockOn")}
-          </Text>
+          <Animated.View layout={contentTransition}>
+            <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
+              {t("common:capsLockOn")}
+            </Text>
+          </Animated.View>
         )}
-      </View>
+      </Animated.View>
     );
   };
 
@@ -175,12 +225,17 @@ function Backup() {
         width: "100%",
       }}
     >
-      <View
+      <Animated.View
+        entering={FadeIn.duration(340).easing(transitionEasing)}
+        layout={contentTransition}
         style={{
-          flexGrow: 1,
           display: "flex",
-          justifyContent: "center",
+          flexDirection: "column",
           alignItems: "center",
+          justifyContent: "center",
+          gap: 10,
+          width: "100%",
+          flexGrow: 1,
         }}
       >
         <Icon
@@ -188,20 +243,27 @@ function Backup() {
           color={theme.colors.primary}
           size={50}
         />
-      </View>
+        <Text variant="titleMedium" style={{ textAlign: "center" }}>
+          {t("login:backupTitle")}
+        </Text>
+      </Animated.View>
 
-      {renderContent()}
-
-      <View
+      <Animated.View
+        key={stageKey}
+        entering={FadeInDown.delay(60).duration(340).easing(transitionEasing)}
+        exiting={FadeOut.duration(220).easing(transitionEasing)}
+        layout={contentTransition}
         style={{
-          display: "flex",
           alignItems: "center",
           width: "100%",
-          flexGrow: 1,
-          justifyContent: "flex-end",
-          gap: 6,
+          justifyContent: "center",
+          minHeight: 170,
         }}
-      />
+      >
+        {renderContent()}
+      </Animated.View>
+
+      <View style={{ width: "100%", flexGrow: 1 }} />
     </View>
   );
 }

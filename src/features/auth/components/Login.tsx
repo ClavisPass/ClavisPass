@@ -6,6 +6,13 @@ import {
   useFonts,
   LexendExa_400Regular,
 } from "@expo-google-fonts/lexend-exa";
+import Animated, {
+  Easing,
+  FadeIn,
+  FadeInDown,
+  FadeOut,
+  LinearTransition,
+} from "react-native-reanimated";
 
 import { useAuth } from "../../../app/providers/AuthProvider";
 import { useToken } from "../../../app/providers/CloudProvider";
@@ -69,6 +76,8 @@ function Login(props: Props) {
 
   const [isUsingAuthenticationButtonVisible, setIsUsingAuthenticationButtonVisible] =
     useState(false);
+  const transitionEasing = Easing.bezier(0.22, 1, 0.36, 1);
+  const contentTransition = LinearTransition.duration(320).easing(transitionEasing);
 
   const resolveAccessToken = useCallback(async (): Promise<string> => {
     if (!provider || provider === "device") return "";
@@ -229,82 +238,123 @@ function Login(props: Props) {
     }
   }, [auth, masterPassword, newPasswordConfirm, provider, vault, writeVaultJson]);
 
-  if (loading || !fontsLoaded) {
-    return <ActivityIndicator size={"large"} animating={true} />;
-  }
+  const stageKey =
+    loading || !fontsLoaded
+      ? "loading"
+      : fetchError && !showNewData
+        ? "error"
+        : showNewData
+          ? "create"
+          : "unlock";
 
-  const formContent = (
-    <>
-      <TypeWriterComponent displayName={props.userInfo?.username ?? ""} />
+  const renderStageContent = () => {
+    if (loading || !fontsLoaded) {
+      return (
+        <Animated.View
+          key="loading"
+          entering={FadeIn.duration(280).easing(transitionEasing)}
+          exiting={FadeOut.duration(220).easing(transitionEasing)}
+          style={{
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingVertical: isWideLayout ? 24 : 12,
+            minHeight: isWideLayout ? 154 : 128,
+          }}
+        >
+          <ActivityIndicator size={"large"} animating={true} />
+        </Animated.View>
+      );
+    }
 
-      {fetchError && !showNewData && (
-        <View style={{ width: "100%", gap: 8 }}>
-          <Text style={{ color: theme.colors.error, textAlign: "center" }}>
-            {fetchError}
-          </Text>
-          <Button text={t("common:retry") ?? "Retry"} onPress={authenticate} />
-        </View>
-      )}
+    return (
+      <Animated.View
+        key={stageKey}
+        entering={FadeInDown.duration(320).easing(transitionEasing)}
+        exiting={FadeOut.duration(220).easing(transitionEasing)}
+        layout={contentTransition}
+        style={{ width: "100%", gap: 10 }}
+      >
+        <TypeWriterComponent displayName={props.userInfo?.username ?? ""} />
 
-      {!fetchError && showNewData ? (
-        <>
-          <View style={{ width: "100%", display: "flex", flexDirection: "column", gap: 6 }}>
-            <PasswordTextbox
-              autofocus
-              textInputRef={textInputNewRef}
-              setCapsLock={setCapsLock}
-              setValue={setMasterPassword}
-              value={masterPassword}
-              placeholder={t("login:newMasterPassword")}
-              onSubmitEditing={() => textInputNewConfirmRef.current?.focus?.()}
+        {fetchError && !showNewData && (
+          <Animated.View layout={contentTransition} style={{ width: "100%", gap: 8 }}>
+            <Text style={{ color: theme.colors.error, textAlign: "center" }}>
+              {fetchError}
+            </Text>
+            <Button text={t("common:retry") ?? "Retry"} onPress={authenticate} />
+          </Animated.View>
+        )}
+
+        {!fetchError && showNewData ? (
+          <>
+            <Animated.View
+              layout={contentTransition}
+              style={{ width: "100%", display: "flex", flexDirection: "column", gap: 6 }}
+            >
+              <PasswordTextbox
+                autofocus
+                textInputRef={textInputNewRef}
+                setCapsLock={setCapsLock}
+                setValue={setMasterPassword}
+                value={masterPassword}
+                placeholder={t("login:newMasterPassword")}
+                onSubmitEditing={() => textInputNewConfirmRef.current?.focus?.()}
+              />
+              <PasswordTextbox
+                textInputRef={textInputNewConfirmRef}
+                setCapsLock={setCapsLock}
+                setValue={setNewPasswordConfirm}
+                value={newPasswordConfirm}
+                placeholder={t("login:confirmMasterPassword")}
+              />
+            </Animated.View>
+            <Button text={t("login:setNewPassword")} onPress={newMasterPassword} />
+          </>
+        ) : !fetchError ? (
+          <>
+            <Animated.View layout={contentTransition} style={{ width: "100%" }}>
+              <PasswordTextbox
+                setCapsLock={setCapsLock}
+                textInputRef={textInputRef}
+                errorColor={error}
+                autofocus={autofocus}
+                setValue={setMasterPassword}
+                value={masterPassword}
+                placeholder={t("login:masterPassword")}
+                onSubmitEditing={handlePasswordLogin}
+              />
+            </Animated.View>
+            <Button text={t("login:login")} onPress={handlePasswordLogin} />
+          </>
+        ) : null}
+
+        {capsLock && (
+          <Animated.View layout={contentTransition}>
+            <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
+              {t("common:capslockOn")}
+            </Text>
+          </Animated.View>
+        )}
+
+        {isUsingAuthenticationButtonVisible && !showNewData && !fetchError && (
+          <Animated.View layout={contentTransition}>
+            <Button
+              maxWidth={"100%"}
+              color="black"
+              icon="fingerprint"
+              onPress={authenticate}
             />
-            <PasswordTextbox
-              textInputRef={textInputNewConfirmRef}
-              setCapsLock={setCapsLock}
-              setValue={setNewPasswordConfirm}
-              value={newPasswordConfirm}
-              placeholder={t("login:confirmMasterPassword")}
-            />
-          </View>
-          <Button text={t("login:setNewPassword")} onPress={newMasterPassword} />
-        </>
-      ) : !fetchError ? (
-        <>
-          <View style={{ width: "100%" }}>
-            <PasswordTextbox
-              setCapsLock={setCapsLock}
-              textInputRef={textInputRef}
-              errorColor={error}
-              autofocus={autofocus}
-              setValue={setMasterPassword}
-              value={masterPassword}
-              placeholder={t("login:masterPassword")}
-              onSubmitEditing={handlePasswordLogin}
-            />
-          </View>
-          <Button text={t("login:login")} onPress={handlePasswordLogin} />
-        </>
-      ) : null}
-
-      {capsLock && (
-        <Text style={{ color: theme.colors.primary, marginTop: 10 }}>
-          {t("common:capslockOn")}
-        </Text>
-      )}
-
-      {isUsingAuthenticationButtonVisible && !showNewData && !fetchError && (
-        <Button
-          maxWidth={"100%"}
-          color="black"
-          icon="fingerprint"
-          onPress={authenticate}
-        />
-      )}
-    </>
-  );
+          </Animated.View>
+        )}
+      </Animated.View>
+    );
+  };
 
   const brandingContent = (
-    <View
+    <Animated.View
+      layout={contentTransition}
+      entering={FadeIn.duration(360).easing(transitionEasing)}
       style={{
         width: "100%",
         maxWidth: isWideLayout ? 320 : 360,
@@ -326,18 +376,25 @@ function Login(props: Props) {
         ClavisPass
       </Text>
       {isWideLayout ? (
-        <Text
-          style={{
-            opacity: 0.72,
-            textAlign: "center",
-          }}
+        <Animated.View
+          key={`intro-${showNewData ? "create" : "unlock"}`}
+          entering={FadeIn.duration(280).easing(transitionEasing)}
+          exiting={FadeOut.duration(180).easing(transitionEasing)}
+          layout={contentTransition}
         >
-          {showNewData
-            ? t("login:introCreateVault")
-            : t("login:introUnlockVault")}
-        </Text>
+          <Text
+            style={{
+              opacity: 0.72,
+              textAlign: "center",
+            }}
+          >
+            {showNewData
+              ? t("login:introCreateVault")
+              : t("login:introUnlockVault")}
+          </Text>
+        </Animated.View>
       ) : null}
-    </View>
+    </Animated.View>
   );
 
   if (isWideLayout) {
@@ -355,7 +412,8 @@ function Login(props: Props) {
           backgroundColor: "transparent",
         }}
       >
-        <View
+        <Animated.View
+          entering={FadeInDown.delay(60).duration(360).easing(transitionEasing)}
           style={{
             flex: 0.95,
             alignItems: "center",
@@ -364,7 +422,7 @@ function Login(props: Props) {
           }}
         >
           {brandingContent}
-        </View>
+        </Animated.View>
 
         <View
           style={{
@@ -375,7 +433,9 @@ function Login(props: Props) {
           }}
         />
 
-        <View
+        <Animated.View
+          entering={FadeInDown.delay(120).duration(360).easing(transitionEasing)}
+          layout={contentTransition}
           style={{
             flex: 1.55,
             alignItems: "center",
@@ -389,13 +449,12 @@ function Login(props: Props) {
             style={{
               width: "100%",
               maxWidth: "100%",
-              gap: 10,
               alignSelf: "center",
             }}
           >
-            {formContent}
+            {renderStageContent()}
           </View>
-        </View>
+        </Animated.View>
       </View>
     );
   }
@@ -415,7 +474,8 @@ function Login(props: Props) {
         gap: 14,
       }}
     >
-      <View
+      <Animated.View
+        entering={FadeInDown.delay(50).duration(340).easing(transitionEasing)}
         style={{
           width: "100%",
           alignItems: "center",
@@ -424,9 +484,11 @@ function Login(props: Props) {
         }}
       >
         {brandingContent}
-      </View>
+      </Animated.View>
 
-      <View
+      <Animated.View
+        entering={FadeInDown.delay(110).duration(360).easing(transitionEasing)}
+        layout={contentTransition}
         style={{
           alignItems: "center",
           justifyContent: "center",
@@ -437,13 +499,12 @@ function Login(props: Props) {
           style={{
             width: "92%",
             maxWidth: 380,
-            gap: 10,
             alignSelf: "center",
           }}
         >
-          {formContent}
+          {renderStageContent()}
         </View>
-      </View>
+      </Animated.View>
     </View>
   );
 }
