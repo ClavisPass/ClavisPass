@@ -59,6 +59,9 @@ import {
   formatAbsoluteTime,
 } from "../shared/utils/Timestamp";
 import AppearanceSettingsSection from "../features/settings/components/AppearanceSettingsSection";
+import { checkForDesktopUpdate } from "../shared/utils/desktopUpdater";
+import { publishUpdateCheck } from "../infrastructure/events/updateBus";
+import { logger } from "../infrastructure/logging/logger";
 
 const styles = StyleSheet.create({
   surface: {
@@ -97,6 +100,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const [startup, setStartup] = React.useState(false);
   const { width } = useWindowDimensions();
   const [useAuthentication, setUseAuthentication] = React.useState(false);
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const [manualUpdateLabel, setManualUpdateLabel] = useState<string | null>(
+    null
+  );
 
   const [contentProtection, setContentProtection] = React.useState(true);
 
@@ -130,6 +137,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const designRef = useRef<View>(null);
   const authSettingsRef = useRef<View>(null);
   const cryptoRef = useRef<View>(null);
+  const updatesRef = useRef<View>(null);
   const fastAccessRef = useRef<View>(null);
   const backupRef = useRef<View>(null);
   const importRef = useRef<View>(null);
@@ -146,6 +154,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         title: t("settings:system"),
         icon: "cogs",
         ref: systemRef,
+        plattform: "web",
+      },
+      {
+        title: t("settings:updates"),
+        icon: "update",
+        ref: updatesRef,
         plattform: "web",
       },
       {
@@ -254,6 +268,28 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     await invoke("reset_window_size");
   };
 
+  const checkForUpdates = async () => {
+    if (Platform.OS !== "web" || checkingUpdate) {
+      return;
+    }
+
+    setCheckingUpdate(true);
+    setManualUpdateLabel(t("settings:checkingForUpdates"));
+
+    try {
+      const update = await checkForDesktopUpdate();
+      publishUpdateCheck(update);
+      setManualUpdateLabel(
+        update ? t("settings:updateAvailable") : t("settings:noUpdatesAvailable")
+      );
+    } catch (error) {
+      logger.error("Manual update check failed:", error);
+      setManualUpdateLabel(t("settings:updateCheckFailed"));
+    } finally {
+      setCheckingUpdate(false);
+    }
+  };
+
   useEffect(() => {
     getAutoStart();
     isUsingAuthentication().then((isAuthenticated) => {
@@ -345,13 +381,33 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               icon={quickSelectItems[2].icon}
               title={quickSelectItems[2].title}
             >
-              <AppearanceSettingsSection dropdownMaxWidth={160}/>
+              <SettingsItem>
+                {checkingUpdate
+                  ? t("settings:checkingForUpdates")
+                  : manualUpdateLabel ?? t("settings:noUpdatesAvailable")}
+              </SettingsItem>
+              <SettingsDivider />
+              <SettingsItem
+                onPress={() => {
+                  checkForUpdates();
+                }}
+              >
+                {t("settings:checkForUpdates")}
+              </SettingsItem>
             </SettingsContainer>
 
             <SettingsContainer
               ref={quickSelectItems[3].ref}
               icon={quickSelectItems[3].icon}
               title={quickSelectItems[3].title}
+            >
+              <AppearanceSettingsSection dropdownMaxWidth={160} />
+            </SettingsContainer>
+
+            <SettingsContainer
+              ref={quickSelectItems[4].ref}
+              icon={quickSelectItems[4].icon}
+              title={quickSelectItems[4].title}
             >
               <SettingsItem
                 onPress={() => {
@@ -455,9 +511,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             </SettingsContainer>
 
             <SettingsContainer
-              ref={quickSelectItems[4].ref}
-              icon={quickSelectItems[4].icon}
-              title={quickSelectItems[4].title}
+              ref={quickSelectItems[5].ref}
+              icon={quickSelectItems[5].icon}
+              title={quickSelectItems[5].title}
             >
               <SettingsShortcutItem shortcut="XChaCha20">
                 {t("settings:encryption")}
@@ -469,9 +525,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             </SettingsContainer>
 
             <SettingsContainer
-              ref={quickSelectItems[5].ref}
-              icon={quickSelectItems[5].icon}
-              title={quickSelectItems[5].title}
+              ref={quickSelectItems[6].ref}
+              icon={quickSelectItems[6].icon}
+              title={quickSelectItems[6].title}
             >
               <SettingsSwitch
                 label={t("settings:autoOpenFastAccess")}
@@ -483,9 +539,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             </SettingsContainer>
 
             <SettingsContainer
-              ref={quickSelectItems[6].ref}
-              icon={quickSelectItems[6].icon}
-              title={quickSelectItems[6].title}
+              ref={quickSelectItems[7].ref}
+              icon={quickSelectItems[7].icon}
+              title={quickSelectItems[7].title}
             >
               <BackupImportButton />
               <SettingsDivider />
@@ -493,9 +549,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             </SettingsContainer>
 
             <SettingsContainer
-              ref={quickSelectItems[7].ref}
-              icon={quickSelectItems[7].icon}
-              title={quickSelectItems[7].title}
+              ref={quickSelectItems[8].ref}
+              icon={quickSelectItems[8].icon}
+              title={quickSelectItems[8].title}
             >
               <Import
                 type={DocumentTypeEnum.FIREFOX}

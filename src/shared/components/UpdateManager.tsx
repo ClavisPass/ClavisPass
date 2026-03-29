@@ -1,22 +1,26 @@
 import { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
-
-// Expo Updates für Mobile
 import * as Updates from "expo-updates";
-// Tauri Updater für Desktop
-import { check, Update as UpdateProp } from "@tauri-apps/plugin-updater";
-import { relaunch } from "@tauri-apps/plugin-process";
-import { useTheme } from "../../app/providers/ThemeProvider";
+import type { Update as UpdateProp } from "@tauri-apps/plugin-updater";
 import { Button, Icon, Text } from "react-native-paper";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "../../app/providers/ThemeProvider";
+import {
+  publishUpdateCheck,
+  subscribeUpdateCheck,
+  unsubscribeUpdateCheck,
+} from "../../infrastructure/events/updateBus";
 import { logger } from "../../infrastructure/logging/logger";
+import {
+  checkForDesktopUpdate,
+  installDesktopUpdate,
+} from "../utils/desktopUpdater";
 
 const UpdateManager = () => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const [updateAvailable, setUpdateAvailable] = useState(false);
-  const [updateMessage, setUpdateMessage] = useState(
-    "Searching for updates..."
-  );
-
+  const [updateMessage, setUpdateMessage] = useState("");
   const [getContentLength, setContentlength] = useState<number | undefined>(
     undefined
   );
@@ -31,17 +35,35 @@ const UpdateManager = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const handler = (nextUpdate: UpdateProp | null) => {
+      setUpdate(nextUpdate);
+
+      if (nextUpdate) {
+        setUpdateAvailable(true);
+        setUpdateMessage(t("settings:updateAvailable"));
+        return;
+      }
+
+      setUpdateAvailable(false);
+      setUpdateMessage(t("settings:noUpdatesAvailable"));
+    };
+
+    subscribeUpdateCheck(handler);
+    return () => unsubscribeUpdateCheck(handler);
+  }, [t]);
+
   const checkExpoUpdate = async () => {
     try {
-      const update = await Updates.checkForUpdateAsync();
-      if (update.isAvailable) {
+      const updateResult = await Updates.checkForUpdateAsync();
+      if (updateResult.isAvailable) {
         setUpdateAvailable(true);
-        setUpdateMessage("Update Available");
+        setUpdateMessage(t("settings:updateAvailable"));
       } else {
-        setUpdateMessage("No updates available");
+        setUpdateMessage(t("settings:noUpdatesAvailable"));
       }
     } catch (error) {
-      setUpdateMessage("Error while checking for updates");
+      setUpdateMessage(t("settings:updateCheckFailed"));
     }
   };
 
@@ -50,74 +72,75 @@ const UpdateManager = () => {
       await Updates.fetchUpdateAsync();
       await Updates.reloadAsync();
     } catch (error) {
-      setUpdateMessage("Error while applying update");
+      setUpdateMessage(t("settings:updateInstallFailed"));
     }
   };
 
   const checkTauriUpdate = async () => {
     try {
-      setUpdate(await check());
-      if (update) {
+      const nextUpdate = await checkForDesktopUpdate();
+      setUpdate(nextUpdate);
+      publishUpdateCheck(nextUpdate);
+      if (nextUpdate) {
         setUpdateAvailable(true);
-        setUpdateMessage("Update Available");
+        setUpdateMessage(t("settings:updateAvailable"));
       } else {
-        setUpdateMessage("No updates available");
+        setUpdateMessage(t("settings:noUpdatesAvailable"));
       }
     } catch (error) {
-      setUpdateMessage("Error while checking for updates");
+      setUpdateMessage(t("settings:updateCheckFailed"));
       logger.error("Error while checking for updates:", error);
     }
   };
 
   const applyTauriUpdate = async () => {
     try {
-      if (update) {
-        logger.info(
-          `found update ${update.version} from ${update.date} with notes ${update.body}`
-        );
-        let downloaded = 0;
-        await update.downloadAndInstall((event) => {
-          switch (event.event) {
-            case "Started":
-              setContentlength(event.data.contentLength);
-              logger.info(
-                `started downloading ${event.data.contentLength} bytes`
-              );
-              break;
-            case "Progress":
-              downloaded += event.data.chunkLength;
-              setDownloaded(downloaded);
-              logger.info(`downloaded ${downloaded} from ${getContentLength}`);
-              break;
-            case "Finished":
-              logger.info("download finished");
-              break;
-          }
-        });
-
-        logger.info("update installed");
-        await relaunch();
+      if (!update) {
+        return;
       }
+
+      logger.info(
+        `found update ${update.version} from ${update.date} with notes ${update.body}`
+      );
+      let downloadedBytes = 0;
+      await installDesktopUpdate(update, (event) => {
+        switch (event.event) {
+          case "Started":
+            setContentlength(event.data.contentLength);
+            logger.info(`started downloading ${event.data.contentLength} bytes`);
+            break;
+          case "Progress":
+            downloadedBytes += event.data.chunkLength;
+            setDownloaded(downloadedBytes);
+            logger.info(`downloaded ${downloadedBytes} from ${getContentLength}`);
+            break;
+          case "Finished":
+            logger.info("download finished");
+            break;
+        }
+      });
+
+      logger.info("update installed");
     } catch (error) {
       logger.error("Error while applying update:", error);
-      setUpdateMessage("Error while applying update");
+      setUpdateMessage(t("settings:updateInstallFailed"));
     }
   };
 
   const applyUpdate = async () => {
     if (Platform.OS === "web") {
-      applyTauriUpdate();
+      await applyTauriUpdate();
     } else {
-      applyExpoUpdate();
+      await applyExpoUpdate();
     }
   };
 
   useEffect(() => {
     if (update) {
       setUpdateAvailable(true);
-      setUpdateMessage("Update Available");
+      setUpdateMessage(t("settings:updateAvailable"));
     }
-  }, [update]);
+  }, [t, update]);
 
   if (!updateAvailable) return null;
 
@@ -156,11 +179,11 @@ const UpdateManager = () => {
             borderRadius: 12,
             borderBottomRightRadius: 0,
             borderTopRightRadius: 0,
-            width: 110
+            width: 110,
           }}
           onPress={applyUpdate}
         >
-          Update
+          {t("settings:updateNow")}
         </Button>
       </View>
     </View>

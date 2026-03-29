@@ -99,6 +99,7 @@ export type TranslationSchema = {
   settings: {
     sync: string;
     system: string;
+    updates: string;
     appearance: string;
     security: string;
     fastAccess: string;
@@ -108,6 +109,13 @@ export type TranslationSchema = {
     autostart: string;
     startMinimized: string;
     resetWindowSize: string;
+    checkForUpdates: string;
+    checkingForUpdates: string;
+    noUpdatesAvailable: string;
+    updateAvailable: string;
+    updateCheckFailed: string;
+    updateInstallFailed: string;
+    updateNow: string;
     minimizeToTray: string;
     showHide: string;
     language: string;
