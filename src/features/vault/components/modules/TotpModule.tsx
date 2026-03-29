@@ -1,21 +1,25 @@
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Platform, StyleSheet, View } from "react-native";
+import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { Button, Divider, Text } from "react-native-paper";
 
-import ModuleContainer from "../ModuleContainer";
-import Props from "../../model/ModuleProps";
-import { codeFromUri, parseOtpauth } from "../../utils/totp";
-import { useTheme } from "../../../../app/providers/ThemeProvider";
-import TotpModuleType from "../../model/modules/TotpModuleType";
-import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
-import { AnimatedCircularProgress } from "react-native-circular-progress";
-import { useTranslation } from "react-i18next";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import ModulesEnum from "../../model/ModulesEnum";
-import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import { HomeStackParamList } from "../../../../app/navigation/model/types";
+import { useTheme } from "../../../../app/providers/ThemeProvider";
+import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
+import Props from "../../model/ModuleProps";
+import ModulesEnum from "../../model/ModulesEnum";
+import TotpModuleType from "../../model/modules/TotpModuleType";
+import { codeFromUri, parseOtpauth } from "../../utils/totp";
+import ModuleContainer from "../ModuleContainer";
 
 const styles = StyleSheet.create({
+  scanButtonWrap: {
+    width: "100%",
+    alignItems: "center",
+  },
   content: {
     width: "100%",
   },
@@ -70,6 +74,8 @@ const styles = StyleSheet.create({
   },
   scanButton: {
     borderRadius: 12,
+    minWidth: 170,
+    transform: [{ translateX: -14 }],
   },
 });
 
@@ -88,7 +94,6 @@ export function Totp(props: { value: string; variant?: "module" | "list" }) {
   }, [props.value]);
 
   useEffect(() => {
-    let timer: any;
     const tick = () => {
       try {
         const { code, remaining } = codeFromUri(props.value);
@@ -100,15 +105,15 @@ export function Totp(props: { value: string; variant?: "module" | "list" }) {
       }
     };
     tick();
-    timer = setInterval(tick, 1000);
-    return () => clearInterval(timer);
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
   }, [props.value]);
 
   const primaryLabel = info?.issuer ?? info?.account ?? "Authenticator";
   const secondaryLabel =
     info?.issuer && info?.account
       ? info.account
-      : info?.issuer ?? info?.account ?? "";
+      : (info?.issuer ?? info?.account ?? "");
   const isListVariant = props.variant === "list";
   const useTransparentListShell = isListVariant && Platform.OS === "web";
   const headerPaddingVertical = isListVariant ? 12 : 8;
@@ -240,19 +245,21 @@ function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
         {value !== "" ? (
           <Totp value={value} />
         ) : (
-          <Button
-            style={styles.scanButton}
-            icon={"qrcode-scan"}
-            mode="contained-tonal"
-            textColor={theme.colors.primary}
-            onPress={() => {
-              props.navigation.navigate("TotpScan", {
-                setOtpauth: (uri: string) => setValue(uri),
-              });
-            }}
-          >
-            Scan Code
-          </Button>
+          <View style={styles.scanButtonWrap}>
+            <Button
+              style={styles.scanButton}
+              icon="qrcode-scan"
+              mode="contained-tonal"
+              textColor={theme.colors.primary}
+              onPress={() => {
+                props.navigation.navigate("TotpScan", {
+                  setOtpauth: (uri: string) => setValue(uri),
+                });
+              }}
+            >
+              Scan Code
+            </Button>
+          </View>
         )}
       </View>
     </ModuleContainer>

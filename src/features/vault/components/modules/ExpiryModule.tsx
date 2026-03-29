@@ -1,19 +1,18 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 import { Button, IconButton, ProgressBar, Text } from "react-native-paper";
 
-import ModuleContainer from "../ModuleContainer";
-import Props from "../../model/ModuleProps";
-import { getRelativeInfo, getStatus } from "../../utils/expiry";
-import { useTheme } from "../../../../app/providers/ThemeProvider";
-import ExpiryPickerModal from "../modals/ExpiryPickerModal";
-import ExpiryModuleType from "../../model/modules/ExpiryModuleType";
-
-import { useTranslation } from "react-i18next";
 import { useSetting } from "../../../../app/providers/SettingsProvider";
-import ModulesEnum from "../../model/ModulesEnum";
-import { MODULE_ICON } from "../../model/ModuleIconsEnum";
+import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { formatAbsoluteLocal } from "../../../../shared/utils/Timestamp";
+import { MODULE_ICON } from "../../model/ModuleIconsEnum";
+import Props from "../../model/ModuleProps";
+import ModulesEnum from "../../model/ModulesEnum";
+import ExpiryModuleType from "../../model/modules/ExpiryModuleType";
+import { getRelativeInfo, getStatus } from "../../utils/expiry";
+import ModuleContainer from "../ModuleContainer";
+import ExpiryPickerModal from "../modals/ExpiryPickerModal";
 
 const styles = StyleSheet.create({
   card: {
@@ -59,6 +58,8 @@ const styles = StyleSheet.create({
   },
   emptyButton: {
     borderRadius: 12,
+    minWidth: 170,
+    transform: [{ translateX: -14 }],
   },
 });
 
@@ -97,7 +98,7 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
 
   const statusInfo = useMemo(
     () => getStatus(value, Date.now(), warnBeforeMs),
-    [value, tick, warnBeforeMs]
+    [value, tick, warnBeforeMs],
   );
 
   const statusColor =
@@ -111,8 +112,7 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
     statusInfo.status === "active" || statusInfo.status === "dueSoon"
       ? 1 - Math.min(1, Math.max(0, statusInfo.remainingMs / warnBeforeMs))
       : 1;
-  const emphasisStatusChip =
-    darkmode && statusInfo.status === "expired";
+  const emphasisStatusChip = darkmode && statusInfo.status === "expired";
   const statusChipBackground = emphasisStatusChip
     ? statusColor
     : darkmode
@@ -151,10 +151,10 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
   const statusText =
     statusInfo.status === "expired"
       ? `${t("common:expiryExpiredPrefix")} ${formatRelativeLabel(
-          statusInfo.remainingMs
+          statusInfo.remainingMs,
         )}`
       : `${t("common:expiryExpires")} ${formatRelativeLabel(
-          statusInfo.remainingMs
+          statusInfo.remainingMs,
         )}`;
 
   return (
