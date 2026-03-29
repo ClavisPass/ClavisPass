@@ -2,10 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
-import {
-  useFonts,
-  LexendExa_400Regular,
-} from "@expo-google-fonts/lexend-exa";
 import Animated, {
   Easing,
   FadeIn,
@@ -53,9 +49,6 @@ function Login(props: Props) {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const isWideLayout = width >= 600;
-  const [fontsLoaded] = useFonts({
-    LexendExa_400Regular,
-  });
 
   const [vaultFileContent, setVaultFileContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -239,7 +232,7 @@ function Login(props: Props) {
   }, [auth, masterPassword, newPasswordConfirm, provider, vault, writeVaultJson]);
 
   const stageKey =
-    loading || !fontsLoaded
+    loading
       ? "loading"
       : fetchError && !showNewData
         ? "error"
@@ -248,7 +241,7 @@ function Login(props: Props) {
           : "unlock";
 
   const renderStageContent = () => {
-    if (loading || !fontsLoaded) {
+    if (loading) {
       return (
         <Animated.View
           key="loading"
@@ -368,9 +361,13 @@ function Login(props: Props) {
       />
       <Text
         style={{
+          width: "100%",
           textAlign: "center",
           fontFamily: "LexendExa_400Regular",
           fontSize: isWideLayout ? 18 : 15,
+          lineHeight: isWideLayout ? 24 : 21,
+          includeFontPadding: false,
+          paddingHorizontal: 6,
         }}
       >
         ClavisPass

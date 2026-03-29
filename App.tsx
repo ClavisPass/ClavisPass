@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import "react-native-gesture-handler";
+import {
+  useFonts,
+  LexendExa_400Regular,
+  LexendExa_700Bold,
+} from "@expo-google-fonts/lexend-exa";
 import { AuthProvider } from "./src/app/providers/AuthProvider";
 import { Platform, View } from "react-native";
 import CustomTitlebar from "./src/shared/components/CustomTitlebar";
@@ -118,6 +123,10 @@ if (Platform.OS === "web") {
 }
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    LexendExa_400Regular,
+    LexendExa_700Bold,
+  });
   const [view, setView] = useState<"main" | "popup" | null>(null);
 
   useEffect(() => {
@@ -139,7 +148,7 @@ export default function App() {
     detectWindow();
   }, []);
 
-  if (view === null) return <></>;
+  if (!fontsLoaded || view === null) return <></>;
 
   if (view === "popup") {
     return (

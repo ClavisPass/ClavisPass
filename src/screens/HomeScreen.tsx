@@ -30,11 +30,6 @@ import AddValueModal from "../features/vault/components/modals/AddValueModal";
 import { useAuth } from "../app/providers/AuthProvider";
 import { useTheme } from "../app/providers/ThemeProvider";
 
-import {
-  useFonts,
-  LexendExa_400Regular,
-  LexendExa_700Bold,
-} from "@expo-google-fonts/lexend-exa";
 import LogoColored from "../shared/ui/LogoColored";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import FolderType from "../features/vault/model/FolderType";
@@ -75,11 +70,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const { width } = useWindowDimensions();
   const auth = useAuth();
   const vault = useVault();
-
-  const [fontsLoaded] = useFonts({
-    LexendExa_400Regular,
-    LexendExa_700Bold,
-  });
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
@@ -551,9 +541,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                   style={{
                     fontFamily: "LexendExa_400Regular",
                     fontSize: 16,
+                    lineHeight: 22,
                     color: "white",
                     userSelect: "none",
-                    width: 110,
+                    includeFontPadding: false,
+                    paddingRight: 6,
                   }}
                 >
                   ClavisPass
