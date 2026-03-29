@@ -179,11 +179,14 @@ function Backup() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: 8,
+          gap: 10,
           width: "100%",
         }}
       >
-        <Text variant="bodyLarge" style={{ color: theme.colors.primary }}>
+        <Text
+          variant="headlineSmall"
+          style={{ color: theme.colors.primary, textAlign: "center" }}
+        >
           {formatAbsoluteLocal(crypto.lastUpdated, dateFormat, timeFormat)}
         </Text>
 
@@ -220,32 +223,44 @@ function Backup() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "space-between",
+        justifyContent: "center",
         backgroundColor: "transparent",
         width: "100%",
+        paddingHorizontal: 6,
+        paddingVertical: 20,
+        gap: 14,
       }}
     >
       <Animated.View
         entering={FadeIn.duration(340).easing(transitionEasing)}
         layout={contentTransition}
         style={{
-          display: "flex",
-          flexDirection: "column",
+          width: "100%",
           alignItems: "center",
           justifyContent: "center",
-          gap: 10,
-          width: "100%",
-          flexGrow: 1,
+          marginBottom: 8,
         }}
       >
-        <Icon
-          source="cloud-off"
-          color={theme.colors.primary}
-          size={50}
-        />
-        <Text variant="titleMedium" style={{ textAlign: "center" }}>
-          {t("login:backupTitle")}
-        </Text>
+        <View
+          style={{
+            width: "100%",
+            maxWidth: 320,
+            gap: 7,
+            alignItems: "center",
+          }}
+        >
+          <Icon
+            source="cloud-off"
+            color={theme.colors.primary}
+            size={44}
+          />
+          <Text
+            variant="titleMedium"
+            style={{ textAlign: "center", marginTop: 1 }}
+          >
+            {t("login:backupTitle")}
+          </Text>
+        </View>
       </Animated.View>
 
       <Animated.View
@@ -257,13 +272,18 @@ function Backup() {
           alignItems: "center",
           width: "100%",
           justifyContent: "center",
-          minHeight: 170,
         }}
       >
-        {renderContent()}
+        <View
+          style={{
+            width: "92%",
+            maxWidth: 380,
+            alignSelf: "center",
+          }}
+        >
+          {renderContent()}
+        </View>
       </Animated.View>
-
-      <View style={{ width: "100%", flexGrow: 1 }} />
     </View>
   );
 }
