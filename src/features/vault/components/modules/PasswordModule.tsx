@@ -14,7 +14,6 @@ import PasswordTextbox from "../../../../shared/components/PasswordTextbox";
 import PasswordGeneratorModal from "../modals/PasswordGeneratorModal";
 
 import PasswordStrengthLevel from "../../../analysis/model/PasswordStrengthLevel";
-import getPasswordStrengthColor from "../../../analysis/utils/getPasswordStrengthColor";
 import {
   computeEntropyBitsForUi,
   entropyToProgress,
@@ -28,10 +27,15 @@ function PasswordModule(props: PasswordModuleType & Props) {
   const { t } = useTranslation();
   const { globalStyles, theme } = useTheme();
   const [value, setValue] = useState(props.value);
+  const getStrengthColor = (strength: PasswordStrengthLevel) => {
+    if (strength === PasswordStrengthLevel.WEAK) return theme.colors.error;
+    if (strength === PasswordStrengthLevel.MEDIUM) return theme.colors.warning;
+    return theme.colors.success;
+  };
 
   const [entropyPercentage, setEntropyPercentage] = useState(0);
   const [progressbarColor, setProgressbarColor] = useState(
-    getPasswordStrengthColor(PasswordStrengthLevel.STRONG)
+    getStrengthColor(PasswordStrengthLevel.STRONG)
   );
 
   const [visible, setVisible] = useState(false);
@@ -45,7 +49,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
     const strength = entropyToStrength(entropyBits);
     const progress = entropyToProgress(entropyBits);
 
-    setProgressbarColor(getPasswordStrengthColor(strength));
+    setProgressbarColor(getStrengthColor(strength));
     setEntropyPercentage(progress);
   }, [value]);
 
@@ -85,7 +89,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
             color={progressbarColor}
             width={null}
             borderWidth={0}
-            unfilledColor={"lightgray"}
+            unfilledColor={theme.colors.outlineVariant}
             height={4}
           />
         </View>

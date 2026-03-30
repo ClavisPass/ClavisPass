@@ -521,7 +521,9 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
   const showRepeated = computed?.repeated ?? false;
   const showCompromised = (computed?.pwnedCount ?? 0) > 0;
 
-  const strengthPillBg = strength ? getPasswordStrengthColor(strength as any) : theme.colors.primary;
+  const strengthPillBg = strength
+    ? getPasswordStrengthColor(strength as any, theme.colors)
+    : theme.colors.primary;
 
   const secretTypeLabel =
     resolved?.kind === "wifi"

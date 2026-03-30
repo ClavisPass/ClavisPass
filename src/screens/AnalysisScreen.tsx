@@ -394,24 +394,24 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   ];
 
   const severityColor = (sev: Severity) => {
-    if (sev === "Critical") return "#D32F2F";
-    if (sev === "High") return "#F57C00";
-    if (sev === "Medium") return "#FBC02D";
-    if (sev === "Low") return "#1976D2";
-    return "#2E7D32";
+    if (sev === "Critical") return theme.colors.error;
+    if (sev === "High") return theme.colors.error;
+    if (sev === "Medium") return theme.colors.warning;
+    if (sev === "Low") return theme.colors.primary;
+    return theme.colors.success;
   };
 
   const progressTrackColor = (sev: Severity) => {
-    if (sev === "Critical") return "rgba(211,47,47,0.18)";
-    if (sev === "High") return "rgba(245,124,0,0.18)";
-    if (sev === "Medium") return "rgba(251,192,45,0.18)";
-    if (sev === "Low") return "rgba(25,118,210,0.16)";
-    return "rgba(46,125,50,0.16)";
+    if (sev === "Critical") return `${theme.colors.error}22`;
+    if (sev === "High") return `${theme.colors.error}1A`;
+    if (sev === "Medium") return `${theme.colors.warning}22`;
+    if (sev === "Low") return `${theme.colors.primary}22`;
+    return `${theme.colors.success}16`;
   };
 
   const renderQualityItem = (item: any, index: number) => {
     const strength = item.strength as PasswordStrengthLevel;
-    const strengthColor = getPasswordStrengthColor(strength);
+    const strengthColor = getPasswordStrengthColor(strength, theme.colors);
     const strengthIcon = getPasswordStrengthIcon(strength);
     const compromised = !!item?.flags?.isCompromised;
     const qualityProgress = Math.min(1, Math.max(0, item.entropyBits / 80));

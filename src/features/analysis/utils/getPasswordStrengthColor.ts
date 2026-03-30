@@ -1,13 +1,17 @@
 import PasswordStrengthLevel from "../model/PasswordStrengthLevel";
+import { AppColors } from "../../../shared/ui/appTheme";
 
-function getPasswordStrengthColor(passwordStrengthLevel: PasswordStrengthLevel) {
+function getPasswordStrengthColor(
+  passwordStrengthLevel: PasswordStrengthLevel,
+  colors?: Pick<AppColors, "error" | "warning" | "success">
+) {
   switch (passwordStrengthLevel) {
     case PasswordStrengthLevel.WEAK:
-      return "#D2222D";
+      return colors?.error ?? "#D2222D";
     case PasswordStrengthLevel.MEDIUM:
-      return "#FFBF00";
+      return colors?.warning ?? "#FFBF00";
     case PasswordStrengthLevel.STRONG:
-      return "#238823";
+      return colors?.success ?? "#238823";
     default:
       return "";
   }

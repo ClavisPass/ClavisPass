@@ -1,6 +1,7 @@
-import { MD3DarkTheme as DefaultTheme, MD3Theme } from "react-native-paper";
+import { MD3DarkTheme as DefaultTheme } from "react-native-paper";
+import { AppTheme } from "./appTheme";
 
-const theme: MD3Theme = {
+const theme: AppTheme = {
   ...DefaultTheme,
   dark: true,
   roundness: 4,
@@ -25,6 +26,8 @@ const theme: MD3Theme = {
     surfaceDisabled: "rgba(231, 225, 229, 0.12)",
     onSurfaceDisabled: "rgba(231, 225, 229, 0.38)",
     error: "#E05C82",
+    warning: "#F1C75B",
+    success: "#56B97A",
     inversePrimary: "rgb(120, 69, 172)",
   },
 };

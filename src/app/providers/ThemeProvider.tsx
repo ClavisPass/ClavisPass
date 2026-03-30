@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useMemo } from "react";
-import { MD3Theme, PaperProvider } from "react-native-paper";
+import { PaperProvider } from "react-native-paper";
 import lightTheme from "../../shared/ui/theme";
 import darkTheme from "../../shared/ui/theme-darkmode";
 import styles, { GlobalStyles } from "../../shared/ui/globalStyles";
@@ -8,13 +8,14 @@ import {
   DefaultTheme as NavigationLightTheme,
   type Theme as NavigationTheme,
 } from "@react-navigation/native";
+import { AppTheme } from "../../shared/ui/appTheme";
 
 import { useSetting } from "./SettingsProvider";
 
 interface ThemeContextType {
   darkmode: boolean;
   setDarkmode: (darkmode: boolean) => void;
-  theme: MD3Theme;
+  theme: AppTheme;
   navigationTheme: NavigationTheme;
   globalStyles: GlobalStyles;
   headerWhite: boolean;
