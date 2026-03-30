@@ -409,31 +409,12 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
     return "rgba(46,125,50,0.16)";
   };
 
-  const SummaryGrid = ({
-    items,
-  }: {
-    items: Array<{ key: string; value: number; label: string }>;
-  }) => (
-    <View style={{ flexDirection: "row", gap: 8 }}>
-      {items.map((item) => (
-        <View
-          key={item.key}
-          style={[pillCardStyle(false) as any, { flex: 1, minWidth: 0 }]}
-        >
-          <Text style={{ fontWeight: "700", userSelect: "none" }}>
-            {item.value}
-          </Text>
-          <Text style={{ opacity: 0.8, userSelect: "none" }}>{item.label}</Text>
-        </View>
-      ))}
-    </View>
-  );
-
   const renderQualityItem = (item: any, index: number) => {
     const strength = item.strength as PasswordStrengthLevel;
     const strengthColor = getPasswordStrengthColor(strength);
     const strengthIcon = getPasswordStrengthIcon(strength);
     const compromised = !!item?.flags?.isCompromised;
+    const qualityProgress = Math.min(1, Math.max(0, item.entropyBits / 80));
 
     return (
       <Animated.View
@@ -451,47 +432,86 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
         <AnimatedPressable
           onPress={() => navigation.navigate("AnalysisDetail", { ref: item.ref })}
         >
-          <View style={{ padding: 10, gap: 10 }}>
+          <View style={{ paddingVertical: 8, gap: 8 }}>
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
+                flexDirection: isWide ? "row" : "column",
+                alignItems: isWide ? "center" : "flex-start",
                 gap: 10,
+                paddingHorizontal: 8,
               }}
             >
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flex: 1 }}>
+              <View
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
                 <Text style={{ color: theme.colors.primary, userSelect: "none" }}>
                   {index + 1}.
                 </Text>
-                <Text style={{ flex: 1, userSelect: "none" }} numberOfLines={1}>
+                <Text style={{ userSelect: "none", flex: 1 }} numberOfLines={1}>
                   {item.title}
                 </Text>
               </View>
 
-              <Chip
-                compact
-                style={{ borderRadius: 12, backgroundColor: strengthColor }}
-                textStyle={{ color: "white", fontWeight: "800" }}
-                icon={() => (
-                  <Icon source={strengthIcon} size={18} color="white" />
-                )}
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: 6,
+                  justifyContent: "flex-end",
+                }}
               >
-                {t(`analysis:${String(strength).toLowerCase()}`)}
-              </Chip>
+                <Chip
+                  compact
+                  style={{ borderRadius: 12, backgroundColor: strengthColor }}
+                  textStyle={{ color: "white", fontWeight: "800" }}
+                  icon={() => (
+                    <Icon source={strengthIcon} size={18} color="white" />
+                  )}
+                >
+                  {t(`analysis:${String(strength).toLowerCase()}`)}
+                </Chip>
+                {compromised ? (
+                  <Chip compact style={{ borderRadius: 12 }}>
+                    {t("analysis:badge.compromised")}
+                  </Chip>
+                ) : null}
+              </View>
             </View>
 
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-              {compromised ? (
-                <Chip compact style={{ borderRadius: 12 }}>
-                  {t("analysis:badge.compromised")}
-                </Chip>
-              ) : null}
-              <Chip compact style={{ borderRadius: 12 }}>
-                {t("analysisDetail:bitsValue", {
-                  bits: Math.floor(item.entropyBits),
-                })}
-              </Chip>
+            <Divider />
+
+            <View
+              style={{
+                paddingHorizontal: 10,
+                paddingVertical: 2,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 12,
+              }}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  height: 8,
+                  borderRadius: 999,
+                  backgroundColor: `${strengthColor}22`,
+                  overflow: "hidden",
+                }}
+              >
+                <View
+                  style={{
+                    width: `${qualityProgress * 100}%`,
+                    height: "100%",
+                    backgroundColor: strengthColor,
+                  }}
+                />
+              </View>
             </View>
           </View>
         </AnimatedPressable>
@@ -639,7 +659,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   };
 
   const SectionCard = ({
-    summary,
     filters,
     bucket,
     setBucket,
@@ -647,7 +666,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
     emptyLabel,
     renderItem,
   }: {
-    summary: React.ReactNode;
     filters: FilterItem[];
     bucket: string;
     setBucket: (value: string) => void;
@@ -656,8 +674,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
     renderItem: (item: any, index: number) => React.ReactNode;
   }) => (
     <View style={{ gap: 10 }}>
-      {summary}
-
       <FiltersNarrow
         filterItems={filters}
         bucket={bucket}
@@ -773,16 +789,30 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                 <AnimatedPressable
                   key={tab.key}
                   onPress={() => setActiveTab(tab.key)}
+                  borderless={false}
+                  hoverBackgroundColor={
+                    activeTab === tab.key
+                      ? undefined
+                      : theme.colors.surfaceVariant ?? theme.colors.background
+                  }
                   style={[
                     pillCardStyle(activeTab === tab.key) as any,
                     {
                       flex: 1,
                       minWidth: 0,
-                      paddingVertical: 8,
+                      overflow: "hidden",
                     },
                   ]}
                 >
-                  <View style={{ gap: 2 }}>
+                  <View
+                    style={{
+                      paddingVertical: 8,
+                      paddingHorizontal: 10,
+                      gap: 2,
+                      minHeight: 56,
+                      justifyContent: "center",
+                    }}
+                  >
                     <Text style={{ fontWeight: "800", userSelect: "none" }}>
                       {tab.title}
                     </Text>
@@ -796,27 +826,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
 
             {activeTab === "quality" ? (
               <SectionCard
-                summary={
-                  <SummaryGrid
-                    items={[
-                      {
-                        key: "strong",
-                        value: counts.strong,
-                        label: t("analysis:strong"),
-                      },
-                      {
-                        key: "medium",
-                        value: counts.medium,
-                        label: t("analysis:medium"),
-                      },
-                      {
-                        key: "weak",
-                        value: counts.weak,
-                        label: t("analysis:weak"),
-                      },
-                    ]}
-                  />
-                }
                 filters={qualityFilters}
                 bucket={qualityBucket}
                 setBucket={(value) => setQualityBucket(value as QualityBucket)}
@@ -826,27 +835,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
               />
             ) : (
               <SectionCard
-                summary={
-                  <SummaryGrid
-                    items={[
-                      {
-                        key: "risky",
-                        value: riskCounts.itemsToFix,
-                        label: t("analysis:risky"),
-                      },
-                      {
-                        key: "compromised",
-                        value: counts.compromised,
-                        label: t("analysis:compromised"),
-                      },
-                      {
-                        key: "reused",
-                        value: counts.reused,
-                        label: t("analysis:reused"),
-                      },
-                    ]}
-                  />
-                }
                 filters={riskFilters}
                 bucket={riskBucket}
                 setBucket={(value) => setRiskBucket(value as RiskBucket)}
