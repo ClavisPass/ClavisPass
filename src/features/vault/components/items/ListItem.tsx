@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, StyleSheet, Platform, useWindowDimensions } from "react-native";
-import { Button, Icon, IconButton, Text } from "react-native-paper";
+import { Button, Divider, Icon, IconButton, Text } from "react-native-paper";
 import ValuesType from "../../model/ValuesType";
 import ModulesEnum from "../../model/ModulesEnum";
 
@@ -19,6 +19,8 @@ import AdaptiveMenu, {
 import DeleteModal from "../modals/DeleteModal";
 import { useVault } from "../../../../app/providers/VaultProvider";
 import { openFastAccess } from "../../../fastaccess/utils/FastAccess";
+import FolderSelectModal from "../modals/FolderSelectModal";
+import FolderType from "../../model/FolderType";
 
 const styles = StyleSheet.create({
   container: {
@@ -56,6 +58,9 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   actionIconButton: {
+    margin: 0,
+  },
+  actionMenuAnchor: {
     margin: 0,
   },
   title: {
@@ -115,6 +120,14 @@ const styles = StyleSheet.create({
     minWidth: 0,
     gap: 2,
   },
+  menuPreviewAction: {
+    margin: 0,
+  },
+  menuPreviewDivider: {
+    height: 20,
+    width: StyleSheet.hairlineWidth,
+    opacity: 0.5,
+  },
 });
 
 const ellipsize = (s: string, max = 16) => {
@@ -139,13 +152,14 @@ type Props = {
 function ListItem(props: Props) {
   const { theme, darkmode } = useTheme();
   const { t } = useTranslation();
-  const { height: windowHeight } = useWindowDimensions();
+  const { height: windowHeight, width: windowWidth } = useWindowDimensions();
   const { copy } = useClipboardCopy();
   const vault = useVault();
 
   const usernameTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const passwordTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const itemRef = useRef<any>(null);
+  const menuButtonRef = useRef<any>(null);
   const suppressNextPressRef = useRef(false);
 
   const [url, setUrl] = useState("");
@@ -153,6 +167,7 @@ function ListItem(props: Props) {
   const [hovered, setHovered] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [folderSelectVisible, setFolderSelectVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [menuOffsetY, setMenuOffsetY] = useState(6);
 
@@ -287,8 +302,33 @@ function ListItem(props: Props) {
   );
   const menuPreviewIcon = url !== "" ? null : icon;
 
+  const updateListItem = (recipe: (entry: ValuesType) => ValuesType) => {
+    vault.update((draft) => {
+      draft.values = draft.values.map((entry) =>
+        entry.id === props.item.id ? recipe(entry) : entry
+      );
+    });
+  };
+
   const listItemMenuItems = useMemo<AdaptiveMenuItem[]>(
     () => [
+      {
+        key: "fast-access",
+        icon: "tooltip-account",
+        label: t("common:fastAccess"),
+        onPress: () => {
+          openItemFastAccess().catch(() => {});
+        },
+        disabled: !fastAccessData,
+      },
+      {
+        key: "move-folder",
+        icon: "folder",
+        label: t("common:moveToFolder"),
+        onPress: () => {
+          setFolderSelectVisible(true);
+        },
+      },
       {
         key: "delete",
         icon: "trash-can",
@@ -297,7 +337,7 @@ function ListItem(props: Props) {
         withDivider: false,
       },
     ],
-    [t]
+    [fastAccessData, t]
   );
 
   const menuTopContent = (
@@ -322,32 +362,73 @@ function ListItem(props: Props) {
           {props.item.title}
         </Text>
       </View>
+      <Divider
+        style={[
+          styles.menuPreviewDivider,
+          { backgroundColor: theme.colors.outlineVariant },
+        ]}
+      />
+      <IconButton
+        icon={props.item.fav ? "star" : "star-outline"}
+        size={18}
+        onPress={() => {
+          updateListItem((entry) => ({
+            ...entry,
+            fav: !entry.fav,
+          }));
+        }}
+        style={styles.menuPreviewAction}
+        iconColor={theme.colors.primary}
+      />
     </View>
   );
 
-  const measureAndOpenMenu = () => {
-    const estimatedMenuHeight = 140;
-    const viewportBottomPadding = 12;
-    const itemHeight = 44;
-    const gap = 42;
-    const upwardGap = 12;
+  const measureAndOpenMenu = (anchor: "item" | "button" = "item") => {
+    const estimatedMenuHeight = 228;
+    const estimatedMenuWidth = 244;
+    const viewportPadding = 8;
+    const downwardGap = 8;
+    const upwardGap = -22;
+    const anchorRef =
+      Platform.OS === "web" && anchor === "button" && menuButtonRef.current
+        ? menuButtonRef
+        : itemRef;
 
     suppressNextPressRef.current = true;
-    itemRef.current?.measureInWindow?.((x: number, y: number, width: number) => {
-      const shouldOpenAbove =
-        y + estimatedMenuHeight > windowHeight - viewportBottomPadding;
+    anchorRef.current?.measureInWindow?.(
+      (x: number, y: number, width: number, height: number) => {
+        const menuLeft = Math.min(
+          Math.max(viewportPadding, x + width - estimatedMenuWidth),
+          Math.max(
+            viewportPadding,
+            windowWidth - estimatedMenuWidth - viewportPadding
+          )
+        );
 
-      setMenuPosition({
-        x: Math.max(8, x + width - 244),
-        y,
-      });
-      setMenuOffsetY(
-        shouldOpenAbove
-          ? -(estimatedMenuHeight - itemHeight + upwardGap)
-          : gap
-      );
-      setMenuVisible(true);
-    });
+        const anchorBottom = y + height;
+        const desiredTopBelow = anchorBottom + downwardGap;
+        const desiredTopAbove = y - estimatedMenuHeight - upwardGap;
+        const fitsBelow =
+          desiredTopBelow + estimatedMenuHeight <=
+          windowHeight - viewportPadding;
+
+        const unclampedTop = fitsBelow ? desiredTopBelow : desiredTopAbove;
+        const clampedTop = Math.min(
+          Math.max(viewportPadding, unclampedTop),
+          Math.max(
+            viewportPadding,
+            windowHeight - estimatedMenuHeight - viewportPadding
+          )
+        );
+
+        setMenuPosition({
+          x: menuLeft,
+          y,
+        });
+        setMenuOffsetY(clampedTop - y);
+        setMenuVisible(true);
+      }
+    );
   };
 
   const openItemFastAccess = async () => {
@@ -471,13 +552,19 @@ function ListItem(props: Props) {
               )}
 
               {Platform.OS === "web" && hovered ? (
-                <IconButton
-                  icon="dots-vertical"
-                  size={18}
-                  onPress={measureAndOpenMenu}
-                  style={styles.actionIconButton}
-                  iconColor={theme.colors.primary}
-                />
+                <View
+                  ref={menuButtonRef}
+                  collapsable={false}
+                  style={styles.actionMenuAnchor}
+                >
+                  <IconButton
+                    icon="dots-vertical"
+                    size={18}
+                    onPress={() => measureAndOpenMenu("button")}
+                    style={styles.actionIconButton}
+                    iconColor={theme.colors.primary}
+                  />
+                </View>
               ) : null}
 
               <Icon
@@ -504,6 +591,19 @@ function ListItem(props: Props) {
         onDelete={() => {
           vault.deleteEntry(props.item.id);
           setDeleteModalVisible(false);
+        }}
+      />
+      <FolderSelectModal
+        visible={folderSelectVisible}
+        setVisible={setFolderSelectVisible}
+        folders={vault.folders ?? []}
+        selectedFolder={props.item.folder}
+        onSelectFolder={(folder: FolderType | null) => {
+          updateListItem((entry) => ({
+            ...entry,
+            folder,
+          }));
+          setFolderSelectVisible(false);
         }}
       />
     </>

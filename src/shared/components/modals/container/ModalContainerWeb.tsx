@@ -1,5 +1,6 @@
 import { ReactNode, useEffect } from "react";
 import { Pressable, View } from "react-native";
+import { Portal } from "react-native-paper";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -41,47 +42,49 @@ function ModalContainerWeb(props: Props) {
   if (!props.visible) return null;
 
   return (
-    <Animated.View
-      style={[
-        {
-          position: "absolute",
-          top: props.top || 40,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 9999,
-        },
-        animatedOpacity,
-      ]}
-    >
-      <Pressable
-        style={{
-          position: "absolute",
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-        }}
-        onPress={props.onDismiss}
-      />
-      <View
-        style={{
-          overflow: "hidden",
-          backgroundColor: theme.colors?.background,
-          borderRadius: 12,
-          alignSelf: "center",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
-          zIndex: 10000,
-          display: "flex",
-          flexDirection: "column",
-        }}
+    <Portal>
+      <Animated.View
+        style={[
+          {
+            position: "absolute",
+            top: props.top || 40,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+          },
+          animatedOpacity,
+        ]}
       >
-        {props.children}
-      </View>
-    </Animated.View>
+        <Pressable
+          style={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+          }}
+          onPress={props.onDismiss}
+        />
+        <View
+          style={{
+            overflow: "hidden",
+            backgroundColor: theme.colors?.background,
+            borderRadius: 12,
+            alignSelf: "center",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+            zIndex: 10000,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {props.children}
+        </View>
+      </Animated.View>
+    </Portal>
   );
 }
 

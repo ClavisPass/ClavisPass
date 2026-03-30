@@ -71,6 +71,11 @@ export type TranslationSchema = {
     selectFolderDescription: string;
     manageFoldersDescription: string;
     selectedItem: string;
+    edit: string;
+    fastAccess: string;
+    addFavorite: string;
+    removeFavorite: string;
+    moveToFolder: string;
   };
   login: {
     masterPassword: string;
