@@ -806,10 +806,10 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                 >
                   <View
                     style={{
-                      paddingVertical: 8,
+                      paddingVertical: 4,
                       paddingHorizontal: 10,
-                      gap: 2,
-                      minHeight: 56,
+                      gap: 0,
+                      minHeight: 40,
                       justifyContent: "center",
                     }}
                   >
