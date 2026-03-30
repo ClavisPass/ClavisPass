@@ -8,6 +8,8 @@ type Props = {
   visible: boolean;
   onDismiss: () => void;
   positionY: number;
+  positionX?: number;
+  offsetY?: number;
 };
 function Menu(props: Props) {
   if (Platform.OS === "web")
@@ -16,6 +18,8 @@ function Menu(props: Props) {
         visible={props.visible}
         onDismiss={props.onDismiss}
         positionY={props.positionY}
+        positionX={props.positionX}
+        offsetY={props.offsetY}
       >
         {props.children}
       </MenuContainerWeb>
@@ -26,6 +30,8 @@ function Menu(props: Props) {
       visible={props.visible}
       onDismiss={props.onDismiss}
       positionY={props.positionY}
+      positionX={props.positionX}
+      offsetY={props.offsetY}
     >
       {props.children}
     </MenuContainer>

@@ -27,6 +27,8 @@ type Props = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
   positionY: number;
+  positionX?: number;
+  offsetY?: number;
   items: AdaptiveMenuItem[];
   topContent?: React.ReactNode;
   nativeSnapPoints?: (string | number)[];
@@ -85,6 +87,8 @@ function AdaptiveMenu(props: Props) {
         visible={props.visible}
         onDismiss={close}
         positionY={props.positionY}
+        positionX={props.positionX}
+        offsetY={props.offsetY}
       >
         <>
           {props.topContent}

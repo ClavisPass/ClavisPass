@@ -1,5 +1,6 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import { Pressable, View, StyleSheet } from "react-native";
+import { Portal } from "react-native-paper";
 import Animated, {
   Easing,
   Extrapolate,
@@ -35,6 +36,7 @@ function MenuContainerWeb({
   offsetY = 6,
 }: Props) {
   const { theme } = useTheme();
+  const opensUpward = offsetY < 0;
 
   // Ein progress steuert alles → smooth & synchron
   const progress = useSharedValue(0);
@@ -88,7 +90,7 @@ function MenuContainerWeb({
   if (!mounted) return null;
 
   return (
-    <>
+    <Portal>
       <View style={StyleSheet.absoluteFill} pointerEvents="auto">
         <Pressable style={{ flex: 1 }} onPress={onDismiss} />
       </View>
@@ -111,10 +113,10 @@ function MenuContainerWeb({
           style={{
             overflow: "hidden",
             backgroundColor: theme.colors?.elevation?.level3 ?? "white",
-            borderTopLeftRadius: 22,
-            borderTopRightRadius: 6,
-            borderBottomLeftRadius: 20,
-            borderBottomRightRadius: 20,
+            borderTopLeftRadius: opensUpward ? 20 : 22,
+            borderTopRightRadius: opensUpward ? 20 : 6,
+            borderBottomLeftRadius: opensUpward ? 22 : 20,
+            borderBottomRightRadius: opensUpward ? 6 : 20,
             minWidth: 180,
             ...(width ? { width } : null),
             boxShadow: theme.colors?.shadow ?? "0px 6px 18px rgba(0,0,0,0.15)",
@@ -128,7 +130,7 @@ function MenuContainerWeb({
           {children}
         </View>
       </Animated.View>
-    </>
+    </Portal>
   );
 }
 

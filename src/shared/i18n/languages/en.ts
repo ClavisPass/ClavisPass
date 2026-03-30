@@ -71,6 +71,7 @@ const en: TranslationSchema = {
     selectFolder: "Select Folder",
     selectFolderDescription: "Choose where this entry should live.",
     manageFoldersDescription: "Create, reorder, and remove folders here.",
+    selectedItem: "Selected item",
   },
   login: {
     masterPassword: "Master Password",

@@ -71,6 +71,7 @@ const de: TranslationSchema = {
     selectFolder: "Ordner auswählen",
     selectFolderDescription: "Wähle aus, wo dieser Eintrag liegen soll.",
     manageFoldersDescription: "Hier kannst du Ordner anlegen, sortieren und löschen.",
+    selectedItem: "Ausgewählter Eintrag",
   },
   login: {
     masterPassword: "Master Passwort",

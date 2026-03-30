@@ -42,8 +42,8 @@ const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
 const getListStyle = () => ({
   flex: 1,
   width: "100%",
-  overflowX: "hidden",
-  overflowY: "auto",
+  overflowX: "hidden" as const,
+  overflowY: "auto" as const,
   gap: "8px",
   paddingRight: 2,
   marginRight: -2,

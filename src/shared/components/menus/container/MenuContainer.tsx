@@ -37,6 +37,7 @@ export default function MenuContainer({
   offsetY = 6,
 }: Props) {
   const { theme } = useTheme();
+  const opensUpward = offsetY < 0;
   const progress = useSharedValue(0);
   const [mounted, setMounted] = useState(visible);
   useEffect(() => {
@@ -88,10 +89,10 @@ export default function MenuContainer({
           style={{
             overflow: "hidden",
             backgroundColor: theme.colors?.elevation?.level3 ?? "white",
-            borderTopLeftRadius: 22,
-            borderTopRightRadius: 6,
-            borderBottomLeftRadius: 20,
-            borderBottomRightRadius: 20,
+            borderTopLeftRadius: opensUpward ? 20 : 22,
+            borderTopRightRadius: opensUpward ? 20 : 6,
+            borderBottomLeftRadius: opensUpward ? 22 : 20,
+            borderBottomRightRadius: opensUpward ? 6 : 20,
             minWidth: 180,
             ...(width ? { width } : null),
             shadowColor: "#000",

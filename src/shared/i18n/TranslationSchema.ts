@@ -70,6 +70,7 @@ export type TranslationSchema = {
     selectFolder: string;
     selectFolderDescription: string;
     manageFoldersDescription: string;
+    selectedItem: string;
   };
   login: {
     masterPassword: string;
