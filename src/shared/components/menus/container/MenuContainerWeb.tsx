@@ -62,27 +62,21 @@ function MenuContainerWeb({
   }, [visible]);
 
   const menuStyle = useAnimatedStyle(() => {
-    // sanftes Grow & Drop
-    const scale = interpolate(
-      progress.value,
-      [0, 1],
-      [0.92, 1],
-      Extrapolate.CLAMP
-    );
+    const hiddenTranslateY = opensUpward ? 8 : -8;
     const translateY = interpolate(
       progress.value,
       [0, 1],
-      [-8, 0],
+      [hiddenTranslateY, 0],
       Extrapolate.CLAMP
     );
     const opacity = interpolate(
       progress.value,
       [0, 1],
-      [0.9, 1],
+      [0, 1],
       Extrapolate.CLAMP
     );
     return {
-      transform: [{ scale }, { translateY }],
+      transform: [{ translateY }],
       opacity,
     };
   });
