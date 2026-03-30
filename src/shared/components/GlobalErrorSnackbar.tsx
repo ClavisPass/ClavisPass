@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Portal, Snackbar } from "react-native-paper";
+import { View } from "react-native";
+import { Portal, Snackbar, Text, Icon } from "react-native-paper";
 import {
   subscribeGlobalError,
   unsubscribeGlobalError,
@@ -39,18 +40,47 @@ function GlobalErrorSnackbar() {
           label: "OK",
           onPress: hide,
         }}
+        wrapperStyle={{
+          alignItems: "center",
+        }}
         style={{
-          backgroundColor: theme.colors.errorContainer,
+          backgroundColor: theme.colors.error,
+          borderRadius: 14,
+          paddingVertical: 0,
+          maxWidth: 560,
+        }}
+        contentStyle={{
+          paddingVertical: 6,
+          paddingHorizontal: 8,
         }}
         theme={{
           colors: {
-            inverseOnSurface: theme.colors.onErrorContainer,
+            inverseOnSurface: theme.colors.onError,
+            inversePrimary: theme.colors.onError,
           },
         }}
       >
-        {error?.title
-          ? `${error.title}: ${error.message}`
-          : (error?.message ?? "")}
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <Icon source="alert-circle" size={18} color={theme.colors.onError} />
+          <View style={{ flex: 1, minWidth: 0 }}>
+            {error?.title ? (
+              <Text
+                variant="labelMedium"
+                style={{ color: theme.colors.onError, fontWeight: "800" }}
+                numberOfLines={1}
+              >
+                {error.title}
+              </Text>
+            ) : null}
+            <Text
+              variant="bodyMedium"
+              style={{ color: theme.colors.onError, opacity: 0.94 }}
+              numberOfLines={3}
+            >
+              {error?.message ?? ""}
+            </Text>
+          </View>
+        </View>
       </Snackbar>
     </Portal>
   );
