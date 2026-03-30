@@ -19,7 +19,7 @@ import AddModuleModal from "../features/vault/components/modals/AddModuleModal";
 import { getDateTime } from "../shared/utils/Timestamp";
 import TitleModule from "../features/vault/components/modules/TitleModule";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
-import FolderModal from "../features/vault/components/modals/FolderModal";
+import FolderSelectModal from "../features/vault/components/modals/FolderSelectModal";
 import { useTheme } from "../app/providers/ThemeProvider";
 import DiscardChangesModal from "../features/vault/components/modals/DiscardChangesModal";
 import { useFocusEffect } from "@react-navigation/native";
@@ -667,11 +667,12 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         visible={addModuleModalVisible}
         setVisible={setAddModuleModalVisible}
       />
-      <FolderModal
+      <FolderSelectModal
         visible={folderModalVisible}
         setVisible={setFolderModalVisible}
-        folder={vault.folders ?? []}
-        setSelectedFolder={changeSelectedFolder}
+        folders={vault.folders ?? []}
+        selectedFolder={value.folder}
+        onSelectFolder={changeSelectedFolder}
       />
       <DiscardChangesModal
         visible={discardChangesVisible}

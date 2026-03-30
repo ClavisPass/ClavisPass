@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { Platform, Pressable, View, StyleSheet } from "react-native";
+import { Platform, Pressable, View, StyleSheet, useWindowDimensions } from "react-native";
 import { Icon, Text, TextInput } from "react-native-paper";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import FolderType from "../../model/FolderType";
@@ -19,10 +19,12 @@ type Props = {
 
 function FolderModal(props: Props) {
   const vault = useVault();
-  const { theme } = useTheme();
+  const { theme, darkmode } = useTheme();
   const { t } = useTranslation();
+  const { height } = useWindowDimensions();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const modalHeight = height > 760 ? 460 : 360;
 
   const normalizedQuery = searchQuery.trim();
   const hasExactMatch = useMemo(() => {
@@ -74,10 +76,9 @@ function FolderModal(props: Props) {
           alignItems: "stretch",
           justifyContent: "center",
           flexDirection: "column",
-          height: 360,
+          height: modalHeight,
           width: 340,
           maxWidth: "92%",
-          cursor: "auto",
           gap: 12,
           borderRadius: 12,
           borderWidth: StyleSheet.hairlineWidth,
@@ -96,16 +97,20 @@ function FolderModal(props: Props) {
           <Text variant="titleLarge" style={{ userSelect: "none" }}>
             {t("common:addFolder")}
           </Text>
+          <Text variant="bodyMedium" style={{ userSelect: "none", opacity: 0.72 }}>
+            {t("common:manageFoldersDescription")}
+          </Text>
         </View>
 
         <View
           style={{
             alignSelf: "stretch",
-            padding: 8,
+            paddingHorizontal: 10,
+            paddingVertical: 8,
             borderRadius: 12,
             borderWidth: StyleSheet.hairlineWidth,
             borderColor: theme.colors.outlineVariant,
-            backgroundColor: theme.colors.elevation.level1,
+            backgroundColor: theme.colors.background,
           }}
         >
           <View
@@ -123,19 +128,23 @@ function FolderModal(props: Props) {
           >
             <View
               style={{
-                width: 40,
+                width: 32,
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <Icon source="folder-plus-outline" size={20} color={theme.colors.onSurfaceVariant} />
+              <Icon
+                source="folder-plus-outline"
+                size={20}
+                color={theme.colors.onSurfaceVariant}
+              />
             </View>
 
             <View style={{ flex: 1, minWidth: 0 }}>
               <TextInput
                 placeholder={t("common:addFolder")}
                 style={{
-                  borderRadius: 12,
+                  borderRadius: 10,
                   borderBottomWidth: 0,
                   backgroundColor: "transparent",
                   paddingHorizontal: 0,
@@ -149,7 +158,7 @@ function FolderModal(props: Props) {
                 onSubmitEditing={addFolder}
                 outlineColor="transparent"
                 activeOutlineColor="transparent"
-                contentStyle={{ paddingLeft: 0, paddingRight: 0 }}
+                contentStyle={{ paddingLeft: 0, paddingRight: 0, minHeight: 36 }}
               />
             </View>
 
@@ -186,10 +195,11 @@ function FolderModal(props: Props) {
             borderRadius: 12,
             borderWidth: StyleSheet.hairlineWidth,
             borderColor: theme.colors.outlineVariant,
-            backgroundColor: theme.colors.elevation.level1,
+            backgroundColor: theme.colors.background,
             paddingHorizontal: 8,
             paddingTop: 8,
             paddingBottom: 4,
+            overflow: "hidden",
           }}
         >
           {Platform.OS === "web" ? (

@@ -67,6 +67,9 @@ export type TranslationSchema = {
     editHistoryRedo: string;
     editHistorySaved: string;
     editHistoryOpened: string;
+    selectFolder: string;
+    selectFolderDescription: string;
+    manageFoldersDescription: string;
   };
   login: {
     masterPassword: string;

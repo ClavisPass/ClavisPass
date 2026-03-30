@@ -68,6 +68,9 @@ const de: TranslationSchema = {
     editHistoryRedo: "Änderung wiederhergestellt",
     editHistorySaved: "Änderungen gespeichert",
     editHistoryOpened: "Editor geöffnet",
+    selectFolder: "Ordner auswählen",
+    selectFolderDescription: "Wähle aus, wo dieser Eintrag liegen soll.",
+    manageFoldersDescription: "Hier kannst du Ordner anlegen, sortieren und löschen.",
   },
   login: {
     masterPassword: "Master Passwort",
