@@ -72,7 +72,7 @@ function ModalContainerWeb(props: Props) {
           overflow: "hidden",
           backgroundColor: theme.colors?.background,
           borderRadius: 12,
-          maxWidth: 400,
+          alignSelf: "center",
           boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
           zIndex: 10000,
           display: "flex",

@@ -1,4 +1,10 @@
-import { ScrollView, StyleSheet, View, useWindowDimensions } from "react-native";
+import {
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import { Icon, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
@@ -81,8 +87,12 @@ function FolderSelectModal(props: Props) {
         </View>
 
         <ScrollView
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
+          style={{ width: "100%" }}
+          contentContainerStyle={[
+            styles.listContent,
+            Platform.OS === "web" ? { width: "100%" } : null,
+          ]}
+          showsVerticalScrollIndicator={Platform.OS !== "web"}
         >
           {renderFolderItem(
             t("common:none"),
@@ -109,7 +119,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "column",
     width: 340,
-    maxWidth: "92%",
     gap: 12,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,

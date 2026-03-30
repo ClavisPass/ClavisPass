@@ -78,7 +78,6 @@ function FolderModal(props: Props) {
           flexDirection: "column",
           height: modalHeight,
           width: 340,
-          maxWidth: "92%",
           gap: 12,
           borderRadius: 12,
           borderWidth: StyleSheet.hairlineWidth,

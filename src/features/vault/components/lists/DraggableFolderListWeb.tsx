@@ -7,7 +7,6 @@ import {
   DraggableProvided,
   DraggableStateSnapshot,
   DroppableProvided,
-  DroppableStateSnapshot,
 } from "@hello-pangea/dnd";
 
 import { View } from "react-native";
@@ -40,11 +39,14 @@ const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
   ...draggableStyle,
 });
 
-const getListStyle = (isDraggingOver: boolean) => ({
+const getListStyle = () => ({
   flex: 1,
   width: "100%",
-  overflow: "auto",
+  overflowX: "hidden",
+  overflowY: "auto",
   gap: "8px",
+  paddingRight: 2,
+  marginRight: -2,
 });
 
 function DraggableFolderListWeb(props: Props) {
@@ -77,11 +79,11 @@ function DraggableFolderListWeb(props: Props) {
         droppableId="droppable"
         isDropDisabled={!!props.draggableDisabled}
       >
-        {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
+        {(provided: DroppableProvided) => (
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
-            style={getListStyle(snapshot.isDraggingOver)}
+            style={getListStyle()}
           >
             {props.setSelectedFolder && (
               <View style={[globalStyles.folderContainer, { marginBottom: 4 }]}>
