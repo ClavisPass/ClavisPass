@@ -53,6 +53,20 @@ export type TranslationSchema = {
     expiryDayShort: string;
     expiryHourShort: string;
     expiryMinuteShort: string;
+    editHistory: string;
+    editHistoryDescription: string;
+    editHistoryEmpty: string;
+    editHistoryTitleUpdated: string;
+    editHistoryModuleUpdated: string;
+    editHistoryModulesUpdated: string;
+    editHistoryModulesReordered: string;
+    editHistoryFavoriteUpdated: string;
+    editHistoryFolderUpdated: string;
+    editHistoryFolderFavoriteUpdated: string;
+    editHistoryUndo: string;
+    editHistoryRedo: string;
+    editHistorySaved: string;
+    editHistoryOpened: string;
   };
   login: {
     masterPassword: string;

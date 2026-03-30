@@ -89,7 +89,7 @@ export function useEditHistory(initialValue: ValuesType) {
         snapshot: cloneValue(initialValue),
         meta: {
           action: "init",
-          label: "Initial state",
+          label: "Editor opened",
         },
         timestamp: Date.now(),
       },
@@ -184,7 +184,7 @@ export function useEditHistory(initialValue: ValuesType) {
         index: prev.index - 1,
         log: appendLog(prev.log, {
           action: "undo",
-          label: "Undo",
+          label: "Undid latest change",
         }),
       };
     });
@@ -199,7 +199,7 @@ export function useEditHistory(initialValue: ValuesType) {
         index: prev.index + 1,
         log: appendLog(prev.log, {
           action: "redo",
-          label: "Redo",
+          label: "Restored change",
         }),
       };
     });
@@ -212,7 +212,7 @@ export function useEditHistory(initialValue: ValuesType) {
           snapshot: cloneValue(nextValue),
           meta: meta ?? {
             action: "save",
-            label: "Saved state",
+            label: "Saved changes",
           },
           timestamp: Date.now(),
         },

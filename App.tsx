@@ -32,6 +32,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { getAppScheme } from "./src/shared/utils/appScheme";
 import MobileFastAccessOverlay from "./src/features/fastaccess/components/MobileFastAccessOverlay";
 import FastAccessSessionBridge from "./src/features/fastaccess/components/FastAccessSessionBridge";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 const Tab = createBottomTabNavigator();
 
@@ -78,25 +79,27 @@ export function AppWithNavigation() {
                     <CloudProvider>
                       <VaultProvider>
                         <DevModeProvider>
-                          <GlobalErrorSnackbar />
-                          <GlobalClipboardSnackbar />
-                          <MobileFastAccessOverlay />
-                          <View
-                            style={{
-                              borderRadius: Platform.OS === "web" ? 6 : 0,
-                              borderColor:
-                                Platform.OS === "web"
-                                  ? theme.colors.primary
-                                  : undefined,
-                              borderWidth: Platform.OS === "web" ? 1 : 0,
-                              overflow: "hidden",
-                              flex: 1,
-                            }}
-                          >
-                            <GlobalShortcuts />
-                            <CustomTitlebar />
-                            <NavigationContainer />
-                          </View>
+                          <BottomSheetModalProvider>
+                            <GlobalErrorSnackbar />
+                            <GlobalClipboardSnackbar />
+                            <MobileFastAccessOverlay />
+                            <View
+                              style={{
+                                borderRadius: Platform.OS === "web" ? 6 : 0,
+                                borderColor:
+                                  Platform.OS === "web"
+                                    ? theme.colors.primary
+                                    : undefined,
+                                borderWidth: Platform.OS === "web" ? 1 : 0,
+                                overflow: "hidden",
+                                flex: 1,
+                              }}
+                            >
+                              <GlobalShortcuts />
+                              <CustomTitlebar />
+                              <NavigationContainer />
+                            </View>
+                          </BottomSheetModalProvider>
                         </DevModeProvider>
                       </VaultProvider>
                     </CloudProvider>

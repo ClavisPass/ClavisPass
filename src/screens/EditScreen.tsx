@@ -24,11 +24,13 @@ import { useTheme } from "../app/providers/ThemeProvider";
 import DiscardChangesModal from "../features/vault/components/modals/DiscardChangesModal";
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
+import Constants from "expo-constants";
 import ContainerButton from "../shared/components/buttons/ContainerButton";
 import SquaredContainerButton from "../shared/components/buttons/SquaredContainerButton";
 import DeleteModal from "../features/vault/components/modals/DeleteModal";
 import Button from "../shared/components/buttons/Button";
 import DeleteModuleModal from "../features/vault/components/modals/DeleteModuleModal";
+import EditHistoryModal from "../features/vault/components/modals/EditHistoryModal";
 
 import useAppLifecycle from "../shared/hooks/useAppLifecycle";
 import {
@@ -48,6 +50,9 @@ import { useVault } from "../app/providers/VaultProvider";
 import { HomeStackParamList } from "../app/navigation/model/types";
 import { logger } from "../infrastructure/logging/logger";
 import { useEditHistory } from "../features/vault/utils/editHistory";
+import AdaptiveMenu, {
+  AdaptiveMenuItem,
+} from "../shared/components/menus/AdaptiveMenu";
 
 type EditScreenProps = NativeStackScreenProps<HomeStackParamList, "Edit">;
 
@@ -77,6 +82,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     value,
     canUndo,
     canRedo,
+    sessionLog,
     applyChange,
     replaceCurrent,
     undo,
@@ -91,6 +97,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deleteModuleModalVisible, setDeleteModuleModalVisible] =
     useState(false);
+  const [historyModalVisible, setHistoryModalVisible] = useState(false);
+  const [overflowMenuVisible, setOverflowMenuVisible] = useState(false);
   const [pendingModuleDeleteId, setPendingModuleDeleteId] = useState<
     string | null
   >(null);
@@ -286,7 +294,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       }),
       {
         action: "modules",
-        label: "Updated modules",
+        label: t("common:editHistoryModulesUpdated"),
       }
     );
     setAddModuleModalVisible(false);
@@ -304,7 +312,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       }),
       {
         action: "folder",
-        label: "Updated folder and favorite",
+        label: t("common:editHistoryFolderFavoriteUpdated"),
       }
     );
     setFolderModalVisible(false);
@@ -318,7 +326,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       }),
       {
         action: "folder",
-        label: "Updated folder",
+        label: t("common:editHistoryFolderUpdated"),
       }
     );
     setFolderModalVisible(false);
@@ -332,7 +340,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       }),
       {
         action: "favorite",
-        label: "Updated favorite",
+        label: t("common:editHistoryFavoriteUpdated"),
       }
     );
   };
@@ -400,7 +408,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       },
       {
         action: "module",
-        label: "Updated module",
+        label: t("common:editHistoryModuleUpdated"),
         coalesceKey: `module:${module.id}`,
       }
     );
@@ -414,7 +422,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       }),
       {
         action: "title",
-        label: "Updated title",
+        label: t("common:editHistoryTitleUpdated"),
         coalesceKey: "title",
       }
     );
@@ -428,7 +436,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       }),
       {
         action: "modules",
-        label: "Reordered modules",
+        label: t("common:editHistoryModulesReordered"),
       }
     );
   };
@@ -446,6 +454,25 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       setFavIcon("star-outline");
     }
   }, [value, value.fav]);
+
+  const editOverflowItems = React.useMemo<AdaptiveMenuItem[]>(
+    () => [
+      {
+        key: "history",
+        icon: "history",
+        label: t("common:editHistory"),
+        onPress: () => setHistoryModalVisible(true),
+      },
+      {
+        key: "delete",
+        icon: "trash-can",
+        label: t("common:delete"),
+        onPress: () => setDeleteModalVisible(true),
+        withDivider: false,
+      },
+    ],
+    [sessionLog.length, t]
+  );
 
   return (
     <AnimatedContainer style={globalStyles.container}>
@@ -582,14 +609,20 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             />
           </SquaredContainerButton>
         )}
-        <SquaredContainerButton onPress={() => setDeleteModalVisible(true)}>
+        <SquaredContainerButton onPress={() => setOverflowMenuVisible(true)}>
           <Icon
-            source="trash-can"
+            source="dots-vertical"
             size={20}
-            color={theme.colors.error}
+            color={theme.colors?.primary}
           />
         </SquaredContainerButton>
       </View>
+      <AdaptiveMenu
+        visible={overflowMenuVisible}
+        setVisible={setOverflowMenuVisible}
+        positionY={Constants.statusBarHeight + (width > 600 ? 92 : 86)}
+        items={editOverflowItems}
+      />
       {Platform.OS === "web" ? (
         <DraggableModulesListWeb
           value={value}
@@ -659,6 +692,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           if (!visible) setPendingModuleDeleteId(null);
         }}
         onDelete={confirmDeleteModule}
+      />
+      <EditHistoryModal
+        visible={historyModalVisible}
+        setVisible={setHistoryModalVisible}
+        entries={sessionLog}
       />
     </AnimatedContainer>
   );
