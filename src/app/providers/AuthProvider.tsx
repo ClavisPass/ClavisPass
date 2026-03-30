@@ -28,6 +28,13 @@ export interface AuthContextType {
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
+type AuthMasterContextType = {
+  isLoggedIn: boolean;
+  getMaster: () => string | null;
+  requireMaster: () => string;
+};
+
+const AuthMasterContext = createContext<AuthMasterContextType | null>(null);
 
 type Props = {
   children: ReactNode;
@@ -173,11 +180,32 @@ export const AuthProvider = ({ children }: Props) => {
     ]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  const masterValue = useMemo<AuthMasterContextType>(
+    () => ({
+      isLoggedIn,
+      getMaster,
+      requireMaster,
+    }),
+    [isLoggedIn, getMaster, requireMaster]
+  );
+
+  return (
+    <AuthMasterContext.Provider value={masterValue}>
+      <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+    </AuthMasterContext.Provider>
+  );
 };
 
 export const useAuth = (): AuthContextType => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  return ctx;
+};
+
+export const useAuthMaster = (): AuthMasterContextType => {
+  const ctx = useContext(AuthMasterContext);
+  if (!ctx) {
+    throw new Error("useAuthMaster must be used within AuthProvider");
+  }
   return ctx;
 };

@@ -176,20 +176,33 @@ const en: TranslationSchema = {
     // score card
     securityScore: "Security score",
     scoreHint: "Fix the items below to improve your score.",
+    searchHint: "Search across quality and risk lists.",
+    loadingTitle: "Preparing analysis",
+    loadingHint: "Passwords are currently being evaluated for quality and risk.",
+
+    qualityTitle: "Password quality",
+    qualityHint: "This shows how hard passwords are to guess.",
+    riskTitle: "Security risks",
+    riskHint: "This highlights entries that need attention.",
+    noQualityMatches: "No matching quality entries found.",
+    noRiskMatches: "No matching risk entries found.",
 
     // strength buckets
     strong: "Strong",
     medium: "Medium",
     weak: "Weak",
+    compromised: "Compromised",
 
     // filter buckets
     all: "All",
     itemsToFix: "Items to fix",
     reused: "Reused",
     similar: "Similar",
+    risky: "Risky",
 
     // badges
     badge: {
+      compromised: "Compromised",
       reused: "Reused",
       similar: "Similar",
       short: "Too short",
@@ -200,6 +213,7 @@ const en: TranslationSchema = {
 
     // findings list (optional – falls du sie nutzt)
     finding: {
+      compromised: "Compromised passwords",
       reused: "Reused passwords",
       weak: "Weak passwords",
       short: "Too short",
@@ -220,6 +234,8 @@ const en: TranslationSchema = {
     repeatedChars: "Repeated characters",
     sequentialPatterns: "Sequential patterns",
     revealHint: "Reveal to view detailed analysis.",
+    loadingTitle: "Calculating details",
+    loadingHint: "Strength, risk, and known breach exposure are being checked.",
     editEntry: "Edit entry",
     whyRisky: "Why this is risky",
     whyHint:
@@ -245,12 +261,15 @@ const en: TranslationSchema = {
       "So it can be strong and still risky if it is exposed (for example by reuse).",
     strengthVsRiskMeta: "Entropy: {{bits}} bits · Risk score: {{score}}/100",
 
+    driverCompromised: "already appeared in known data breaches",
     driverReused: "reused {{count}} time(s)",
     driverSimilar: "similar to {{count}} other entry/entries",
     driverShort: "too short ({{length}})",
     driverSequential: "sequential patterns",
     driverRepeated: "repeated characters",
 
+    whyCompromised:
+      "This password was found in known data breaches. Replace it as soon as possible.",
     whyReused: "Reused in {{count}} other entries.",
     whyWeak: "Weak and likely guessable. Replace with a generated password.",
     whyShort: "Too short ({{length}}). Aim for {{min}}+ characters.",

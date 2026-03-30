@@ -486,7 +486,7 @@ function ListItem(props: Props) {
             }
             props.onPress();
           }}
-          onLongPress={measureAndOpenMenu}
+          onLongPress={() => measureAndOpenMenu()}
         >
           <>
             <View style={styles.left}>

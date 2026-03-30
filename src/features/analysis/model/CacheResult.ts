@@ -10,6 +10,7 @@ type CacheResult = {
     variants: number;
     short: number;
     sequential: number;
+    compromised: number;
   };
   findings: Array<{ key: string; count: number }>;
 };

@@ -4,8 +4,7 @@ import { Chip, Divider, IconButton } from "react-native-paper";
 import WebSpecific from "../../../infrastructure/platform/WebSpecific";
 import { MenuItem } from "../../../shared/components/menus/MenuItem";
 
-type RiskBucket = "all" | "itemsToFix" | "reused" | "weak" | "similar";
-type FilterItem = { key: RiskBucket; title: string };
+type FilterItem = { key: string; title: string };
 
 const styles = StyleSheet.create({
   chip: {
@@ -17,8 +16,8 @@ const styles = StyleSheet.create({
 
 type FiltersNarrowProps = {
   filterItems: FilterItem[];
-  bucket: RiskBucket;
-  setBucket: (b: RiskBucket) => void;
+  bucket: string;
+  setBucket: (b: string) => void;
 };
 
 export const FiltersNarrow = memo(function FiltersNarrow({
@@ -52,7 +51,6 @@ export const FiltersNarrow = memo(function FiltersNarrow({
     <View
       style={{
         marginHorizontal: 8,
-        marginTop: 8,
         flexDirection: "row",
         alignItems: "center",
       }}
@@ -94,8 +92,8 @@ export const FiltersNarrow = memo(function FiltersNarrow({
 
 type FiltersWideProps = {
   filterItems: FilterItem[];
-  bucket: RiskBucket;
-  setBucket: (b: RiskBucket) => void;
+  bucket: string;
+  setBucket: (b: string) => void;
 };
 
 export const FiltersWide = memo(function FiltersWide({

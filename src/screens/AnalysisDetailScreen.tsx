@@ -6,7 +6,16 @@ import { useNavigation, CommonActions } from "@react-navigation/native";
 
 import { ScrollView, View, StyleSheet } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { Button, Chip, Divider, Icon, List, Text, TextInput } from "react-native-paper";
+import {
+  ActivityIndicator,
+  Button,
+  Chip,
+  Divider,
+  Icon,
+  List,
+  Text,
+  TextInput,
+} from "react-native-paper";
 import { useFocusEffect } from "@react-navigation/native";
 
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
@@ -14,7 +23,7 @@ import Header from "../shared/components/Header";
 
 import { useTheme } from "../app/providers/ThemeProvider";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "../app/providers/AuthProvider";
+import { useAuthMaster } from "../app/providers/AuthProvider";
 import { useVault } from "../app/providers/VaultProvider";
 
 import ModulesEnum from "../features/vault/model/ModulesEnum";
@@ -27,6 +36,7 @@ import {
   deriveAnalysisPepperFromMaster,
   fingerprintPassword,
 } from "../features/analysis/utils/analysisEngine";
+import { getPwnedCountForPassword } from "../features/analysis/utils/hibp";
 
 import getPasswordStrengthColor from "../features/analysis/utils/getPasswordStrengthColor";
 import getPasswordStrengthIcon from "../features/analysis/utils/getPasswordStrengthIcon";
@@ -61,6 +71,7 @@ type DetailComputed = {
 
   reuseCount: number; // incl. this
   variantCount: number; // incl. this
+  pwnedCount: number | null;
 };
 
 type Resolved = {
@@ -151,9 +162,9 @@ function resolveById(values: any[], ref: AnalysisRef): Resolved | null {
 }
 
 function severityLabelKey(severity: WhyItem["severity"]) {
-  if (severity === "high") return "analysisDetail:severity.high";
-  if (severity === "medium") return "analysisDetail:severity.medium";
-  return "analysisDetail:severity.low";
+  if (severity === "high") return "analysisDetail:severityHigh";
+  if (severity === "medium") return "analysisDetail:severityMedium";
+  return "analysisDetail:severityLow";
 }
 
 function buildWhyRisky(computed: DetailComputed | null, t: (k: string, o?: any) => string): WhyItem[] {
@@ -166,14 +177,26 @@ function buildWhyRisky(computed: DetailComputed | null, t: (k: string, o?: any) 
   const weak = computed.strength === PasswordStrengthLevel.WEAK;
   const sequential = (computed.sequentialTriples?.length ?? 0) > 0;
   const repeated = computed.repeated;
+  const compromised = (computed.pwnedCount ?? 0) > 0;
 
   const out: WhyItem[] = [];
+
+  if (compromised) {
+    out.push({
+      key: "compromised",
+      severity: "high",
+      text: t("analysisDetail:whyCompromised", {
+        defaultValue:
+          "This password was found in known data breaches. Replace it as soon as possible.",
+      }),
+    });
+  }
 
   if ((computed.reuseCount ?? 0) >= 2) {
     out.push({
       key: "reused",
       severity: "high",
-      text: t("analysisDetail:why.reused", {
+      text: t("analysisDetail:whyReused", {
         defaultValue: "Reused in {{count}} other entries.",
         count: reuseOthers,
       }),
@@ -184,7 +207,7 @@ function buildWhyRisky(computed: DetailComputed | null, t: (k: string, o?: any) 
     out.push({
       key: "weak",
       severity: "high",
-      text: t("analysisDetail:why.weak", {
+      text: t("analysisDetail:whyWeak", {
         defaultValue: "Weak and likely guessable. Replace with a generated password.",
       }),
     });
@@ -194,7 +217,7 @@ function buildWhyRisky(computed: DetailComputed | null, t: (k: string, o?: any) 
     out.push({
       key: "short",
       severity: "medium",
-      text: t("analysisDetail:why.short", {
+      text: t("analysisDetail:whyShort", {
         defaultValue: "Too short ({{length}}). Aim for {{min}}+ characters.",
         length: computed.length,
         min: MIN_LENGTH,
@@ -206,7 +229,7 @@ function buildWhyRisky(computed: DetailComputed | null, t: (k: string, o?: any) 
     out.push({
       key: "similar",
       severity: "medium",
-      text: t("analysisDetail:why.similar", {
+      text: t("analysisDetail:whySimilar", {
         defaultValue: "Similar to {{count}} other entries. Consider unique passwords per site.",
         count: variantOthers,
       }),
@@ -217,7 +240,7 @@ function buildWhyRisky(computed: DetailComputed | null, t: (k: string, o?: any) 
     out.push({
       key: "sequential",
       severity: "low",
-      text: t("analysisDetail:why.sequential", {
+      text: t("analysisDetail:whySequential", {
         defaultValue: "Contains sequential patterns ({{seq}}).",
         seq: computed.sequentialTriples.join(", "),
       }),
@@ -228,7 +251,7 @@ function buildWhyRisky(computed: DetailComputed | null, t: (k: string, o?: any) 
     out.push({
       key: "repeated",
       severity: "low",
-      text: t("analysisDetail:why.repeated", {
+      text: t("analysisDetail:whyRepeated", {
         defaultValue: "Contains repeated characters.",
       }),
     });
@@ -238,7 +261,7 @@ function buildWhyRisky(computed: DetailComputed | null, t: (k: string, o?: any) 
     out.push({
       key: "ok",
       severity: "low",
-      text: t("analysisDetail:why.ok", {
+      text: t("analysisDetail:whyOk", {
         defaultValue: "No notable issues detected.",
       }),
     });
@@ -253,7 +276,8 @@ function strengthLabelKey(strength: PasswordStrengthLevel) {
 }
 
 function riskSeverityLabelKey(sev: DetailComputed["riskSeverity"]) {
-  return `analysisDetail:risk.${String(sev).toLowerCase()}`;
+  if (sev === "OK") return "analysisDetail:riskOk";
+  return `analysisDetail:risk${String(sev)}`;
 }
 
 function buildStrengthVsRiskExplanation(
@@ -269,9 +293,16 @@ function buildStrengthVsRiskExplanation(
   // build “drivers” in a translated way
   const drivers: string[] = [];
 
+  if ((computed.pwnedCount ?? 0) > 0) {
+    drivers.push(
+      t("analysisDetail:driverCompromised", {
+        defaultValue: "already appeared in known data breaches",
+      })
+    );
+  }
   if ((computed.reuseCount ?? 0) >= 2) {
     drivers.push(
-      t("analysisDetail:svr.driver.reused", {
+      t("analysisDetail:driverReused", {
         defaultValue: "reused {{count}} time(s)",
         count: reuseOthers,
       })
@@ -279,7 +310,7 @@ function buildStrengthVsRiskExplanation(
   }
   if ((computed.variantCount ?? 0) >= 2) {
     drivers.push(
-      t("analysisDetail:svr.driver.similar", {
+      t("analysisDetail:driverSimilar", {
         defaultValue: "similar to {{count}} other entry/entries",
         count: variantOthers,
       })
@@ -287,7 +318,7 @@ function buildStrengthVsRiskExplanation(
   }
   if (computed.length > 0 && computed.length < MIN_LENGTH) {
     drivers.push(
-      t("analysisDetail:svr.driver.short", {
+      t("analysisDetail:driverShort", {
         defaultValue: "too short ({{length}})",
         length: computed.length,
       })
@@ -295,37 +326,37 @@ function buildStrengthVsRiskExplanation(
   }
   if ((computed.sequentialTriples?.length ?? 0) > 0) {
     drivers.push(
-      t("analysisDetail:svr.driver.sequential", {
+      t("analysisDetail:driverSequential", {
         defaultValue: "sequential patterns",
       })
     );
   }
   if (computed.repeated) {
     drivers.push(
-      t("analysisDetail:svr.driver.repeated", {
+      t("analysisDetail:driverRepeated", {
         defaultValue: "repeated characters",
       })
     );
   }
 
-  const base = t("analysisDetail:svr.base", {
+  const base = t("analysisDetail:strengthVsRiskBase", {
     defaultValue:
       "Strength measures guessability (entropy). Risk also considers exposure and patterns like reuse, similarity, and short/predictable structures.",
   });
 
   const driversLine =
     drivers.length > 0
-      ? t("analysisDetail:svr.drivers", {
+      ? t("analysisDetail:strengthVsRiskDrivers", {
           defaultValue: "This password is risky mainly because it is {{drivers}}.",
           drivers: drivers.join(", "),
         })
-      : t("analysisDetail:svr.driversFallback", {
+      : t("analysisDetail:strengthVsRiskDriversFallback", {
           defaultValue: "This password is risky due to contextual risk factors.",
         });
 
   const note =
     computed.strength === PasswordStrengthLevel.STRONG && computed.riskScore > 0
-      ? t("analysisDetail:svr.noteStrongButRisky", {
+      ? t("analysisDetail:strengthVsRiskNoteStrongButRisky", {
           defaultValue: "So it can be strong and still risky if it is exposed (for example by reuse).",
         })
       : "";
@@ -339,7 +370,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
   const tabNav = useNavigation<BottomTabNavigationProp<AppTabsParamList>>();
 
   const vault = useVault();
-  const { getMaster } = useAuth();
+  const { getMaster } = useAuthMaster();
   const { globalStyles, theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } = useTheme();
   const { t } = useTranslation();
 
@@ -365,6 +396,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
   const [secureTextEntry, setSecureTextEntry] = useState(true);
   const [passwordPlain, setPasswordPlain] = useState<string | null>(null);
   const [computed, setComputed] = useState<DetailComputed | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -375,6 +407,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
         setSecureTextEntry(true);
         setPasswordPlain(null);
         setComputed(null);
+        setIsLoading(false);
       };
     }, [setHeaderSpacing, setHeaderWhite])
   );
@@ -386,8 +419,11 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
       const master = getMaster();
       if (!resolved || !values || !master) {
         setComputed(null);
+        setIsLoading(false);
         return;
       }
+
+      setIsLoading(true);
 
       const pw = String(resolved.password ?? "");
 
@@ -399,6 +435,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
       const fp = await fingerprintPassword(pepper, pw);
       const canonical = canonicalizeForVariants(pw);
 
+      const pwnedCount = await getPwnedCountForPassword(pw);
       let reuseCount = 0;
       let variantCount = 0;
 
@@ -426,7 +463,12 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
 
       if (cancelled) return;
 
-      const ev = evaluatePasswordForDetail(pw, reuseCount, variantCount);
+      const ev = evaluatePasswordForDetail(
+        pw,
+        reuseCount,
+        variantCount,
+        pwnedCount
+      );
 
       setComputed({
         entropyBits: ev.entropyBits,
@@ -442,7 +484,9 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
         charAnalysis,
         reuseCount,
         variantCount,
+        pwnedCount,
       });
+      setIsLoading(false);
     })();
 
     return () => {
@@ -475,6 +519,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
   const showShort = (computed?.length ?? 0) > 0 && (computed?.length ?? 0) < MIN_LENGTH;
   const showSequential = (computed?.sequentialTriples?.length ?? 0) > 0;
   const showRepeated = computed?.repeated ?? false;
+  const showCompromised = (computed?.pwnedCount ?? 0) > 0;
 
   const strengthPillBg = strength ? getPasswordStrengthColor(strength as any) : theme.colors.primary;
 
@@ -541,6 +586,31 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
             ) : null}
           </View>
 
+          {isLoading ? (
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: theme.colors.background,
+                  borderColor: darkmode ? theme.colors.outlineVariant : "white",
+                  padding: 16,
+                  alignItems: "center",
+                  gap: 10,
+                },
+              ]}
+            >
+              <ActivityIndicator animating color={theme.colors.primary} />
+              <Text style={{ fontWeight: "800" }}>
+                {t("analysisDetail:loadingTitle")}
+              </Text>
+              <Text style={{ opacity: 0.72, textAlign: "center" }}>
+                {t("analysisDetail:loadingHint")}
+              </Text>
+            </View>
+          ) : null}
+
+          {!isLoading ? (
+            <>
           {/* Password textbox block */}
           <View
             style={[
@@ -581,6 +651,13 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
               {showReused ? (
                 <Chip compact style={{ borderRadius: 12 }}>
                   {t("analysis:badge.reused", { defaultValue: "Reused" })}
+                </Chip>
+              ) : null}
+              {showCompromised ? (
+                <Chip compact style={{ borderRadius: 12 }}>
+                  {t("analysis:badge.compromised", {
+                    defaultValue: "Compromised",
+                  })}
                 </Chip>
               ) : null}
               {showSimilar ? (
@@ -779,6 +856,8 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
               </View>
             </List.Accordion>
           </View>
+            </>
+          ) : null}
 
           <View style={{ height: GAP }} />
         </View>

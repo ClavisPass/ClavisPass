@@ -4,11 +4,19 @@ import { passwordEntropyBits } from "./Entropy";
 import { findSequentialTriples, hasRepeatedChars, strengthFromEntropyBits } from "./analysisEngine";
 
 export type Severity = "Critical" | "High" | "Medium" | "Low" | "OK";
-export type IssueKey = "reused" | "similar" | "weak" | "short" | "sequential" | "repeated";
+export type IssueKey =
+  | "compromised"
+  | "reused"
+  | "similar"
+  | "weak"
+  | "short"
+  | "sequential"
+  | "repeated";
 
 const MIN_LENGTH = 12;
 
 const WEIGHTS: Record<IssueKey, number> = {
+  compromised: 100,
   reused: 60,
   weak: 45,
   short: 25,
@@ -26,6 +34,7 @@ export function severityForRiskScore(score: number): Severity {
 }
 
 export function riskScoreFromCached(strength: PasswordStrengthLevel, flags: any): number {
+  const compromised = !!flags?.isCompromised;
   const reused = (flags?.reuseGroupSize ?? 0) >= 2;
   const similar = (flags?.variantGroupSize ?? 0) >= 2;
   const short = !!flags?.isShort;
@@ -34,6 +43,7 @@ export function riskScoreFromCached(strength: PasswordStrengthLevel, flags: any)
   const weak = strength === PasswordStrengthLevel.WEAK;
 
   let score = 0;
+  if (compromised) score += WEIGHTS.compromised;
   if (reused) score += WEIGHTS.reused;
   if (weak) score += WEIGHTS.weak;
   if (short) score += WEIGHTS.short;
@@ -44,7 +54,12 @@ export function riskScoreFromCached(strength: PasswordStrengthLevel, flags: any)
   return Math.min(100, score);
 }
 
-export function evaluatePasswordForDetail(password: string, reuseCount: number, variantCount: number) {
+export function evaluatePasswordForDetail(
+  password: string,
+  reuseCount: number,
+  variantCount: number,
+  pwnedCount: number | null = null
+) {
   const pw = String(password ?? "");
   const length = pw.length;
 
@@ -69,6 +84,8 @@ export function evaluatePasswordForDetail(password: string, reuseCount: number, 
     isShort: short,
     hasSequential: sequentialTriples.length > 0,
     hasRepeatedChars: repeated,
+    pwnedCount,
+    isCompromised: (pwnedCount ?? 0) > 0,
   };
 
   const riskScore = riskScoreFromCached(strength, flags);

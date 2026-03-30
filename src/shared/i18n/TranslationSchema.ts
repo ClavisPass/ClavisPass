@@ -172,17 +172,30 @@ export type TranslationSchema = {
 
     securityScore: string;
     scoreHint: string;
+    searchHint: string;
+    loadingTitle: string;
+    loadingHint: string;
+
+    qualityTitle: string;
+    qualityHint: string;
+    riskTitle: string;
+    riskHint: string;
+    noQualityMatches: string;
+    noRiskMatches: string;
 
     strong: string;
     medium: string;
     weak: string;
+    compromised: string;
 
     all: string;
     itemsToFix: string;
     reused: string;
     similar: string;
+    risky: string;
 
     badge: {
+      compromised: string;
       reused: string;
       similar: string;
       short: string;
@@ -192,6 +205,7 @@ export type TranslationSchema = {
     };
 
     finding: {
+      compromised: string;
       reused: string;
       weak: string;
       short: string;
@@ -212,6 +226,8 @@ export type TranslationSchema = {
     repeatedChars: string;
     sequentialPatterns: string;
     revealHint: string;
+    loadingTitle: string;
+    loadingHint: string;
 
     editEntry: string;
 
@@ -236,12 +252,14 @@ export type TranslationSchema = {
     strengthVsRiskNoteStrongButRisky: string;
     strengthVsRiskMeta: string;
 
+    driverCompromised: string;
     driverReused: string;
     driverSimilar: string;
     driverShort: string;
     driverSequential: string;
     driverRepeated: string;
 
+    whyCompromised: string;
     whyReused: string;
     whyWeak: string;
     whyShort: string;

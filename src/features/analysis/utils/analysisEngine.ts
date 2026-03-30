@@ -6,6 +6,7 @@ import { passwordEntropyBits } from "./Entropy";
 import PasswordStrengthLevel from "../model/PasswordStrengthLevel";
 import CachedAnalysisItem from "../model/CachedAnalysisItem";
 import CacheResult from "../model/CacheResult";
+import { getPwnedCountsForPasswords } from "./hibp";
 
 export const normalize = (t: string) =>
   t
@@ -96,12 +97,16 @@ export async function fingerprintPassword(
 
 export async function buildAnalysisCache(
   values: ValuesListType,
-  pepper: string
+  pepper: string,
+  options?: {
+    includePwned?: boolean;
+  }
 ): Promise<CacheResult> {
   const tmp: Array<{
     item: CachedAnalysisItem;
     reuseFp: string;
     variantKey: string;
+    password: string;
   }> = [];
 
   for (const value of values) {
@@ -139,6 +144,7 @@ export async function buildAnalysisCache(
       const variantKey = canonicalizeForVariants(pwd);
 
       tmp.push({
+        password: pwd,
         reuseFp,
         variantKey,
         item: {
@@ -157,11 +163,18 @@ export async function buildAnalysisCache(
             hasRepeatedChars: hasRep,
             reuseGroupSize: 1,
             variantGroupSize: 1,
+            pwnedCount: null,
+            isCompromised: false,
           },
         },
       });
     }
   }
+
+  const pwnedMap =
+    options?.includePwned === false
+      ? new Map<string, number | null>()
+      : await getPwnedCountsForPasswords(tmp.map((entry) => entry.password));
 
   const reuseMap = new Map<string, number>();
   for (const x of tmp)
@@ -180,17 +193,22 @@ export async function buildAnalysisCache(
   let reused = 0,
     variants = 0,
     short = 0,
-    sequential = 0;
+    sequential = 0,
+    compromised = 0;
 
-  const list = tmp.map(({ item, reuseFp, variantKey }) => {
+  const list = tmp.map(({ item, reuseFp, variantKey, password }) => {
     const rg = reuseMap.get(reuseFp) ?? 1;
     const vg =
       variantKey && variantKey.length >= 4
         ? (variantMap.get(variantKey) ?? 1)
         : 1;
+    const pwnedCount = pwnedMap.get(password) ?? null;
+    const isCompromised = (pwnedCount ?? 0) > 0;
 
     item.flags.reuseGroupSize = rg;
     item.flags.variantGroupSize = vg;
+    item.flags.pwnedCount = pwnedCount;
+    item.flags.isCompromised = isCompromised;
 
     if (item.strength === PasswordStrengthLevel.WEAK) weak++;
     else if (item.strength === PasswordStrengthLevel.MEDIUM) medium++;
@@ -200,11 +218,13 @@ export async function buildAnalysisCache(
     if (vg >= 2) variants++;
     if (item.flags.isShort) short++;
     if (item.flags.hasSequential) sequential++;
+    if (isCompromised) compromised++;
 
     return item;
   });
 
   const findings = [
+    { key: "compromised", count: compromised },
     { key: "reused", count: reused },
     { key: "weak", count: weak },
     { key: "short", count: short },
@@ -214,7 +234,16 @@ export async function buildAnalysisCache(
 
   return {
     list,
-    counts: { weak, medium, strong, reused, variants, short, sequential },
+    counts: {
+      weak,
+      medium,
+      strong,
+      reused,
+      variants,
+      short,
+      sequential,
+      compromised,
+    },
     findings,
   };
 }

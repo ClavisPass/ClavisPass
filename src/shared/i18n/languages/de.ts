@@ -175,17 +175,30 @@ const de: TranslationSchema = {
 
   securityScore: "Sicherheits-Score",
   scoreHint: "Behebe die Punkte unten, um deinen Score zu verbessern.",
+  searchHint: "Suche in Qualitäts- und Risikolisten.",
+  loadingTitle: "Analyse wird vorbereitet",
+  loadingHint: "Passwörter werden gerade bewertet und auf Risiken geprüft.",
+
+  qualityTitle: "Passwortqualität",
+  qualityHint: "Hier siehst du, wie schwer Passwörter zu erraten sind.",
+  riskTitle: "Sicherheitsrisiken",
+  riskHint: "Hier stehen Einträge mit konkretem Handlungsbedarf.",
+  noQualityMatches: "Keine passenden Qualitäts-Einträge gefunden.",
+  noRiskMatches: "Keine passenden Risiko-Einträge gefunden.",
 
   strong: "Stark",
   medium: "Mittel",
   weak: "Schwach",
+  compromised: "Kompromittiert",
 
   all: "Alle",
   itemsToFix: "Zu beheben",
   reused: "Wiederverwendet",
   similar: "Ähnlich",
+  risky: "Riskant",
 
   badge: {
+    compromised: "Kompromittiert",
     reused: "Wiederverwendet",
     similar: "Ähnlich",
     short: "Zu kurz",
@@ -195,6 +208,7 @@ const de: TranslationSchema = {
   },
 
   finding: {
+    compromised: "Kompromittierte Passwörter",
     reused: "Wiederverwendete Passwörter",
     weak: "Schwache Passwörter",
     short: "Zu kurz",
@@ -216,6 +230,8 @@ const de: TranslationSchema = {
     repeatedChars: "Wiederholte Zeichen",
     sequentialPatterns: "Sequentielle Muster",
     revealHint: "Zum Anzeigen der Detailanalyse Passwort einblenden.",
+    loadingTitle: "Details werden berechnet",
+    loadingHint: "Stärke, Risiko und bekannte Leaks werden gerade geprüft.",
 
     // NEW: actions
     editEntry: "Eintrag bearbeiten",
@@ -250,12 +266,15 @@ const de: TranslationSchema = {
       "Deshalb kann ein Passwort stark sein und trotzdem riskant, wenn es z. B. wiederverwendet wird.",
     strengthVsRiskMeta: "Entropie: {{bits}} Bits · Risiko-Score: {{score}}/100",
 
+    driverCompromised: "bereits in bekannten Datenlecks aufgetaucht ist",
     driverReused: "{{count}}× wiederverwendet",
     driverSimilar: "ähnlich zu {{count}} anderen Einträgen",
     driverShort: "zu kurz ({{length}})",
     driverSequential: "sequentielle Muster enthält",
     driverRepeated: "wiederholte Zeichen enthält",
 
+    whyCompromised:
+      "Dieses Passwort wurde in bekannten Datenlecks gefunden. Bitte schnellstmöglich ersetzen.",
     whyReused: "In {{count}} anderen Einträgen wiederverwendet.",
     whyWeak:
       "Schwach und wahrscheinlich leicht zu erraten. Ersetze es durch ein generiertes Passwort.",
