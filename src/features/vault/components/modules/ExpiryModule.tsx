@@ -74,6 +74,10 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
   const [tick, setTick] = useState(0);
   const [pickerVisible, setPickerVisible] = useState(false);
 
+  useEffect(() => {
+    setValue(props.value ?? "");
+  }, [props.value]);
+
   const { value: dateFormat } = useSetting("DATE_FORMAT");
   const { value: timeFormat } = useSetting("TIME_FORMAT");
 

@@ -17,24 +17,22 @@ import ModulesEnum from "../../model/ModulesEnum";
 import ModulesType, { ModuleType } from "../../model/ModulesType";
 import ValuesType from "../../model/ValuesType";
 import FastAccessType from "../../../fastaccess/model/FastAccessType";
-import { RootStackParamList } from "../../../../app/navigation/stacks/Stack";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import predictNextModule from "../../utils/predictNextModule";
 import getModule from "../../utils/getModule";
 import getModuleNameByEnum from "../../utils/getModuleNameByEnum";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { HomeStackParamList } from "../../../../app/navigation/model/types";
 
 type Props = {
   value: ValuesType;
-  setValue: (value: ValuesType) => void;
   changeModules: (data: ModulesType) => void;
   deleteModule: (id: string) => void;
   changeModule: (module: ModuleType) => void;
   addModule: (module: ModulesEnum) => void;
-  setDiscardoChanges: () => void;
   showAddModuleModal: () => void;
   fastAccess: FastAccessType | null;
-  navigation: NativeStackNavigationProp<RootStackParamList, "Edit", undefined>;
+  navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>;
 };
 
 const reorder = (list: any, startIndex: number, endIndex: number) => {
@@ -98,7 +96,6 @@ function DraggableModulesListWeb(props: Props) {
       result.destination.index
     );
     props.changeModules(reordered);
-    props.setDiscardoChanges();
   };
 
   useEffect(() => {

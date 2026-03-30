@@ -73,6 +73,13 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
   const existingSet = useMemo(() => new Set(codes.map((c) => c.code)), [codes]);
 
   useEffect(() => {
+    const nextCodes = props.codes ?? [];
+    setCodes(nextCodes);
+    setInput("");
+    setShowInput(nextCodes.length === 0);
+  }, [props.codes]);
+
+  useEffect(() => {
     if (!didMount.current) {
       didMount.current = true;
       return;

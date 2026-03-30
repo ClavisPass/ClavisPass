@@ -22,6 +22,27 @@ function PhoneNumberModule(props: PhoneNumberModuleType & Props) {
   const [isValid, setIsValid] = useState(true);
 
   useEffect(() => {
+    setValue(props.value);
+  }, [props.value]);
+
+  useEffect(() => {
+    if (value === "") {
+      setFormattedNumber("");
+      setIsValid(true);
+      return;
+    }
+
+    const parsed = parsePhoneNumberFromString(value, "DE");
+    if (parsed && parsed.isValid()) {
+      setFormattedNumber(parsed.formatInternational());
+      setIsValid(true);
+    } else {
+      setFormattedNumber("");
+      setIsValid(false);
+    }
+  }, [value]);
+
+  useEffect(() => {
     if (didMount.current) {
       const newModule: PhoneNumberModuleType = {
         id: props.id,
@@ -36,19 +57,6 @@ function PhoneNumberModule(props: PhoneNumberModuleType & Props) {
 
   const handleChange = (input: string) => {
     setValue(input);
-
-    if (input === "") {
-      setIsValid(true);
-      return;
-    }
-    const parsed = parsePhoneNumberFromString(input, "DE");
-    if (parsed && parsed.isValid()) {
-      setFormattedNumber(parsed.formatInternational());
-      setIsValid(true);
-    } else {
-      setFormattedNumber("");
-      setIsValid(false);
-    }
   };
 
   return (

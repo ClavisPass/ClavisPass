@@ -18,6 +18,9 @@ function UsernameModule(props: UsernameModuleType & Props) {
   const { t } = useTranslation();
   const [value, setValue] = useState(props.value);
   useEffect(() => {
+    setValue(props.value);
+  }, [props.value]);
+  useEffect(() => {
     if (didMount.current) {
       const newModule: UsernameModuleType = {
         id: props.id,

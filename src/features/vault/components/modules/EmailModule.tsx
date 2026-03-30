@@ -41,6 +41,10 @@ function EmailModule(props: EmailModuleType & Props) {
   const interactingListRef = useRef(false);
   const [inputHeight, setInputHeight] = useState<number>(40);
 
+  useEffect(() => {
+    setValue(props.value ?? "");
+  }, [props.value]);
+
   const onInputLayout = (e: LayoutChangeEvent) => {
     const h = Math.round(e.nativeEvent.layout.height);
     if (h > 0) setInputHeight(h);

@@ -96,6 +96,16 @@ function DigitalCardModule(
   );
 
   useEffect(() => {
+    setValue(props.value);
+  }, [props.value]);
+
+  useEffect(() => {
+    if (isDigitalCardType(props.type)) {
+      setType(props.type);
+    }
+  }, [props.type]);
+
+  useEffect(() => {
     if (didMount.current) {
       const newModule: DigitalCardModuleType = {
         id: props.id,

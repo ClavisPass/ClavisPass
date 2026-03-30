@@ -18,6 +18,12 @@ function KeyModule(props: KeyModuleType & Props) {
   const [value, setValue] = useState(props.value);
   const [keyType, setKeyType] = useState(identifyKeyType(value));
   useEffect(() => {
+    setValue(props.value);
+  }, [props.value]);
+  useEffect(() => {
+    setKeyType(identifyKeyType(value));
+  }, [value]);
+  useEffect(() => {
     if (didMount.current) {
       const newModule: KeyModuleType = {
         id: props.id,
@@ -25,7 +31,6 @@ function KeyModule(props: KeyModuleType & Props) {
         value: value,
       };
       props.changeModule(newModule);
-      setKeyType(identifyKeyType(value));
     } else {
       didMount.current = true;
     }

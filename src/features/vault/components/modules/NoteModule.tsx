@@ -14,6 +14,9 @@ function NoteModule(props: NoteModuleType & Props) {
   const { globalStyles } = useTheme();
   const [value, setValue] = useState(props.value);
   useEffect(() => {
+    setValue(props.value);
+  }, [props.value]);
+  useEffect(() => {
     if (didMount.current) {
       const newModule: NoteModuleType = {
         id: props.id,

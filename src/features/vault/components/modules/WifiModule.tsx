@@ -54,6 +54,22 @@ function WifiModule(props: WifiModuleType & Props) {
     props.wifiType,
   );
 
+  useEffect(() => {
+    setName(props.wifiName);
+  }, [props.wifiName]);
+
+  useEffect(() => {
+    setValue(props.value);
+  }, [props.value]);
+
+  useEffect(() => {
+    setHidden(props.hidden ?? false);
+  }, [props.hidden]);
+
+  useEffect(() => {
+    setWifiType(props.wifiType);
+  }, [props.wifiType]);
+
   const [eyeIcon, setEyeIcon] = useState("eye");
 
   useEffect(() => {

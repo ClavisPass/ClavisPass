@@ -15,7 +15,6 @@ import { Chip, IconButton, Text } from "react-native-paper";
 import { InteractionManager } from "react-native";
 import { useTranslation } from "react-i18next";
 import ValuesType from "../../model/ValuesType";
-import { RootStackParamList } from "../../../../app/navigation/stacks/Stack";
 import FastAccessType from "../../../fastaccess/model/FastAccessType";
 import ModulesEnum from "../../model/ModulesEnum";
 import ModulesType, { ModuleType } from "../../model/ModulesType";
@@ -24,6 +23,7 @@ import predictNextModule from "../../utils/predictNextModule";
 import getModule from "../../utils/getModule";
 import getModuleNameByEnum from "../../utils/getModuleNameByEnum";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { HomeStackParamList } from "../../../../app/navigation/model/types";
 
 const styles = StyleSheet.create({
   footer: {
@@ -46,15 +46,13 @@ const styles = StyleSheet.create({
 
 type Props = {
   value: ValuesType;
-  setValue: (value: ValuesType) => void;
   changeModules: (data: ModulesType) => void;
   deleteModule: (id: string) => void;
   changeModule: (module: ModuleType) => void;
   addModule: (module: ModulesEnum) => void;
-  setDiscardoChanges: () => void;
   showAddModuleModal: () => void;
   fastAccess: FastAccessType | null;
-  navigation: NativeStackNavigationProp<RootStackParamList, "Edit", undefined>;
+  navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>;
 };
 
 function DraggableModulesList(props: Props) {
@@ -202,11 +200,7 @@ function DraggableModulesList(props: Props) {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           onDragEnd={({ data }) => {
-            props.setValue({
-              ...props.value,
-              modules: data,
-            });
-            props.setDiscardoChanges();
+            props.changeModules(data);
             // Nach Reorder kein Auto-Scroll
           }}
           keyboardShouldPersistTaps="always"

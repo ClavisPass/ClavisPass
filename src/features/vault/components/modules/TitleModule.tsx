@@ -8,8 +8,7 @@ import { useTranslation } from "react-i18next";
 
 type Props = {
   value: ValuesType;
-  setValue: (value: ValuesType) => void;
-  discardChanges: () => void;
+  changeTitle: (title: string) => void;
   initialTitle: string | null;
 };
 
@@ -20,10 +19,7 @@ function TitleModule(props: Props) {
   const textInputRef = useRef<any>(null);
 
   const changeTitle = (text: string) => {
-    const newValue = { ...props.value };
-    newValue.title = text;
-    props.setValue(newValue);
-    props.discardChanges();
+    props.changeTitle(text);
   };
 
   useEffect(() => {

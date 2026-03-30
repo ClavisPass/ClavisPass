@@ -37,6 +37,10 @@ function PasswordModule(props: PasswordModuleType & Props) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    setValue(props.value);
+  }, [props.value]);
+
+  useEffect(() => {
     const entropyBits = computeEntropyBitsForUi(value);
     const strength = entropyToStrength(entropyBits);
     const progress = entropyToProgress(entropyBits);

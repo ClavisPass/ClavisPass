@@ -47,6 +47,7 @@ import DraggableModulesList from "../features/vault/components/lists/DraggableMo
 import { useVault } from "../app/providers/VaultProvider";
 import { HomeStackParamList } from "../app/navigation/model/types";
 import { logger } from "../infrastructure/logging/logger";
+import { useEditHistory } from "../features/vault/utils/editHistory";
 
 type EditScreenProps = NativeStackScreenProps<HomeStackParamList, "Edit">;
 
@@ -72,12 +73,20 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   const { value: fastAccessBehavior } = useSetting("FAST_ACCESS");
 
-  const [value, setValue] = useState<ValuesType>({ ...routeValue });
+  const {
+    value,
+    canUndo,
+    canRedo,
+    applyChange,
+    replaceCurrent,
+    undo,
+    redo,
+    reset,
+  } = useEditHistory(routeValue);
 
   const [addModuleModalVisible, setAddModuleModalVisible] = useState(false);
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [discardChangesVisible, setDiscardChangesVisible] = useState(false);
-  const discardChangesRef = useRef(false);
 
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deleteModuleModalVisible, setDeleteModuleModalVisible] =
@@ -85,6 +94,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const [pendingModuleDeleteId, setPendingModuleDeleteId] = useState<
     string | null
   >(null);
+  const allowNextBeforeRemoveRef = useRef(false);
 
   const [favIcon, setFavIcon] = useState("star-outline");
 
@@ -133,13 +143,18 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("beforeRemove", (e) => {
-      if (!discardChangesRef.current) return;
+      if (allowNextBeforeRemoveRef.current) {
+        allowNextBeforeRemoveRef.current = false;
+        return;
+      }
+
+      if (!canUndo) return;
       e.preventDefault();
       setDiscardChangesVisible(true);
     });
 
     return unsubscribe;
-  }, [navigation]);
+  }, [canUndo, navigation]);
 
   useEffect(() => {
     if (routeFavorite !== undefined && routeFavorite === true) {
@@ -163,7 +178,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
     didValidateFolderRef.current = true;
 
-    setValue((prev) => {
+    replaceCurrent((prev) => {
       if (!prev.folder) return prev;
 
       const exists = folders.some((f) => f.id === prev.folder!.id);
@@ -171,7 +186,39 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
       return { ...prev, folder: null };
     });
-  }, [vault.folders]);
+  }, [replaceCurrent, vault.folders]);
+
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const isUndo =
+        (event.ctrlKey || event.metaKey) &&
+        !event.shiftKey &&
+        event.key.toLowerCase() === "z";
+      const isRedo =
+        (event.ctrlKey || event.metaKey) &&
+        (event.key.toLowerCase() === "y" ||
+          (event.shiftKey && event.key.toLowerCase() === "z"));
+
+      if (isUndo && canUndo) {
+        event.preventDefault();
+        undo();
+        return;
+      }
+
+      if (isRedo && canRedo) {
+        event.preventDefault();
+        redo();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [canRedo, canUndo, redo, undo]);
 
   const showFastAccess = () => {
     if (
@@ -205,12 +252,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     showFastAccess();
   };
 
-  const folderExists = (folder: FolderType | null | undefined) => {
-    if (!folder) return true;
-    const folders = vault.folders ?? [];
-    return folders.some((f) => f.id === folder.id);
-  };
-
   const saveValue = () => {
     const updated: ValuesType = {
       ...value,
@@ -218,12 +259,13 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     };
 
     vault.upsertEntry(updated);
+    reset(updated);
     goBack();
   };
 
   const goBack = () => {
-    discardChangesRef.current = false;
     setDiscardChangesVisible(false);
+    allowNextBeforeRemoveRef.current = true;
     navigation.goBack();
   };
 
@@ -234,13 +276,19 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       newElement as ModuleType,
     ];
     changeModules(newModules);
-    discardChangesRef.current = true;
   };
 
   const changeModules = (modules: ModulesType) => {
-    const newValue = { ...value };
-    newValue.modules = modules;
-    setValue(newValue);
+    applyChange(
+      (current) => ({
+        ...current,
+        modules,
+      }),
+      {
+        action: "modules",
+        label: "Updated modules",
+      }
+    );
     setAddModuleModalVisible(false);
   };
 
@@ -248,27 +296,45 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     folder: FolderType | null,
     favorite?: boolean
   ) => {
-    const newValue = { ...value };
-    newValue.folder = folder;
-    newValue.fav = favorite === undefined ? !value.fav : favorite;
-    setValue(newValue);
+    applyChange(
+      (current) => ({
+        ...current,
+        folder,
+        fav: favorite === undefined ? !current.fav : favorite,
+      }),
+      {
+        action: "folder",
+        label: "Updated folder and favorite",
+      }
+    );
     setFolderModalVisible(false);
-    discardChangesRef.current = true;
   };
 
   const changeSelectedFolder = (folder: FolderType | null) => {
-    const newValue = { ...value };
-    newValue.folder = folder;
-    setValue(newValue);
+    applyChange(
+      (current) => ({
+        ...current,
+        folder,
+      }),
+      {
+        action: "folder",
+        label: "Updated folder",
+      }
+    );
     setFolderModalVisible(false);
-    discardChangesRef.current = true;
   };
 
   const changeFav = (favorite?: boolean) => {
-    const newValue = { ...value };
-    newValue.fav = favorite === undefined ? !value.fav : favorite;
-    setValue(newValue);
-    discardChangesRef.current = true;
+    applyChange(
+      (current) => ({
+        ...current,
+        fav: favorite === undefined ? !current.fav : favorite,
+      }),
+      {
+        action: "favorite",
+        label: "Updated favorite",
+      }
+    );
   };
 
   const deleteModule = (id: string) => {
@@ -276,7 +342,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       ...value.modules.filter((item: ModuleType) => item.id !== id),
     ];
     changeModules(newModules);
-    discardChangesRef.current = true;
   };
 
   const moduleHasMeaningfulContent = (input: unknown): boolean => {
@@ -320,11 +385,52 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   };
 
   const changeModule = (module: ModuleType) => {
-    const index = value.modules.findIndex((val) => val.id === module.id);
-    const newModules = [...value.modules];
-    newModules[index] = module;
-    changeModules(newModules);
-    discardChangesRef.current = true;
+    applyChange(
+      (current) => {
+        const index = current.modules.findIndex((val) => val.id === module.id);
+        if (index === -1) return current;
+
+        const newModules = [...current.modules];
+        newModules[index] = module;
+
+        return {
+          ...current,
+          modules: newModules,
+        };
+      },
+      {
+        action: "module",
+        label: "Updated module",
+        coalesceKey: `module:${module.id}`,
+      }
+    );
+  };
+
+  const changeTitle = (title: string) => {
+    applyChange(
+      (current) => ({
+        ...current,
+        title,
+      }),
+      {
+        action: "title",
+        label: "Updated title",
+        coalesceKey: "title",
+      }
+    );
+  };
+
+  const reorderModules = (modules: ModulesType) => {
+    applyChange(
+      (current) => ({
+        ...current,
+        modules,
+      }),
+      {
+        action: "modules",
+        label: "Reordered modules",
+      }
+    );
   };
 
   const deleteValue = (id: string) => {
@@ -350,7 +456,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       />
       <Header
         onPress={() => {
-          if (discardChangesRef.current) {
+          if (canUndo) {
             setDiscardChangesVisible(true);
           } else {
             goBack();
@@ -359,10 +465,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         leftNode={
           <TitleModule
             value={value}
-            setValue={setValue}
-            discardChanges={() => {
-              discardChangesRef.current = true;
-            }}
+            changeTitle={changeTitle}
             initialTitle={routeSearchstring ?? null}
           />
         }
@@ -382,12 +485,64 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             <Button
               icon="content-save"
               onPress={saveValue}
-              disabled={!discardChangesRef.current || value.title === ""}
+              disabled={!canUndo || value.title === ""}
               style={{
                 boxShadow: theme.colors?.shadow,
               }}
             />
           </View>
+        )}
+        {width > 600 && (
+          <SquaredContainerButton onPress={undo} disabled={!canUndo}>
+            <Icon
+              source="undo-variant"
+              color={
+                canUndo
+                  ? theme.colors?.primary
+                  : theme.colors.onSurfaceDisabled
+              }
+              size={20}
+            />
+          </SquaredContainerButton>
+        )}
+        {width > 600 && (
+          <SquaredContainerButton onPress={redo} disabled={!canRedo}>
+            <Icon
+              source="redo-variant"
+              color={
+                canRedo
+                  ? theme.colors?.primary
+                  : theme.colors.onSurfaceDisabled
+              }
+              size={20}
+            />
+          </SquaredContainerButton>
+        )}
+        {!(width > 600) && (
+          <SquaredContainerButton onPress={undo} disabled={!canUndo}>
+            <Icon
+              source="undo-variant"
+              color={
+                canUndo
+                  ? theme.colors?.primary
+                  : theme.colors.onSurfaceDisabled
+              }
+              size={20}
+            />
+          </SquaredContainerButton>
+        )}
+        {!(width > 600) && (
+          <SquaredContainerButton onPress={redo} disabled={!canRedo}>
+            <Icon
+              source="redo-variant"
+              color={
+                canRedo
+                  ? theme.colors?.primary
+                  : theme.colors.onSurfaceDisabled
+              }
+              size={20}
+            />
+          </SquaredContainerButton>
         )}
         <SquaredContainerButton onPress={() => changeFav(!value.fav)}>
           <Icon source={favIcon} color={theme.colors?.primary} size={20} />
@@ -438,12 +593,10 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       {Platform.OS === "web" ? (
         <DraggableModulesListWeb
           value={value}
-          setValue={setValue}
-          changeModules={changeModules}
+          changeModules={reorderModules}
           deleteModule={requestDeleteModule}
           changeModule={changeModule}
           addModule={addModule}
-          setDiscardoChanges={() => (discardChangesRef.current = true)}
           fastAccess={fastAccessObject}
           navigation={navigation}
           showAddModuleModal={() => setAddModuleModalVisible(true)}
@@ -451,12 +604,10 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       ) : (
         <DraggableModulesList
           value={value}
-          setValue={setValue}
-          changeModules={changeModules}
+          changeModules={reorderModules}
           deleteModule={requestDeleteModule}
           changeModule={changeModule}
           addModule={addModule}
-          setDiscardoChanges={() => (discardChangesRef.current = true)}
           fastAccess={fastAccessObject}
           navigation={navigation}
           showAddModuleModal={() => setAddModuleModalVisible(true)}
@@ -467,7 +618,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           <Button
             icon="content-save"
             onPress={saveValue}
-            disabled={!discardChangesRef.current || value.title === ""}
+            disabled={!canUndo || value.title === ""}
             style={{
               boxShadow: theme.colors?.shadow,
             }}

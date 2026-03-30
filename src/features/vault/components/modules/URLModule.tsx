@@ -26,6 +26,9 @@ function URLModule(props: URLModuleType & Props) {
   const { globalStyles, theme } = useTheme();
   const { t } = useTranslation();
   const [value, setValue] = useState(props.value);
+  useEffect(() => {
+    setValue(props.value);
+  }, [props.value]);
   const normalizedUrl = normalizeUrl(value);
   const isValid = value.trim() === "" || normalizedUrl !== null;
   const faviconUrl = buildFaviconUrl(normalizedUrl);

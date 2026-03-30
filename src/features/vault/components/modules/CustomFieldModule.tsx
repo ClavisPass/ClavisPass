@@ -20,6 +20,12 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
   const [value, setValue] = useState(props.value);
   const [title, setTitle] = useState(props.title);
   useEffect(() => {
+    setValue(props.value);
+  }, [props.value]);
+  useEffect(() => {
+    setTitle(props.title);
+  }, [props.title]);
+  useEffect(() => {
     if (didMount.current) {
       const newModule: CustomFieldModuleType = {
         id: props.id,

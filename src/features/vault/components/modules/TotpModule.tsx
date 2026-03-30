@@ -220,6 +220,10 @@ function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
   const [value, setValue] = useState(props.value);
 
   useEffect(() => {
+    setValue(props.value);
+  }, [props.value]);
+
+  useEffect(() => {
     if (didMount.current) {
       const newModule: TotpModuleType = {
         id: props.id,
