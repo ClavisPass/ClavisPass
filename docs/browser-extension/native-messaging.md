@@ -99,61 +99,6 @@ V1 flow:
 
 This keeps writes inside the same app-side vault mutation path that the UI already uses and avoids letting the native host mutate the browser session snapshot on its own.
 
-### Write command payloads
-
-`createEntryFromBrowser`
-
-```json
-{
-  "title": "Example",
-  "username": "alice",
-  "password": "secret",
-  "url": "https://example.com/login",
-  "matchedHost": "example.com"
-}
-```
-
-`updateEntryFromBrowser`
-
-```json
-{
-  "entryId": "entry-123",
-  "username": "alice",
-  "password": "new-secret",
-  "url": "https://example.com/login",
-  "matchedHost": "example.com"
-}
-```
-
-### Write result payloads
-
-`createEntryFromBrowser` success result:
-
-```json
-{
-  "entryId": "generated-id",
-  "title": "Example",
-  "createdAt": "2026-03-31T12:34:56.000Z"
-}
-```
-
-`updateEntryFromBrowser` success result:
-
-```json
-{
-  "entryId": "entry-123",
-  "updatedAt": "2026-03-31T12:35:22.000Z",
-  "title": "Example"
-}
-```
-
-### Write security rules
-
-- only `paired` extensions may submit browser writes
-- write commands fail when no unlocked bridge session is published
-- the native host does not log request payloads or cleartext passwords
-- the app applies writes against the real unlocked vault state, not against a detached copy
-
 ## Native Messaging protocol
 
 Request shape:
@@ -202,6 +147,57 @@ Firefox uses:
 - `allowed_extensions`
 - required add-on ID: `clavispass-extension@clavispass.local`
 
+Chromium-family browsers use:
+
+- `allowed_origins`
+- origin format: `chrome-extension://<extension-id>/`
+
+This includes:
+
+- Microsoft Edge
+- Google Chrome
+- Chromium
+- other Chromium-based browsers that honor the same native messaging manifest format
+
+## Chromium and Edge registration
+
+The Chromium-family host manifest should contain at least:
+
+```json
+{
+  "name": "com.clavispass.native_host",
+  "description": "ClavisPass Native Messaging Host",
+  "path": "E:\\Projects\\ClavisPass\\src-tauri\\target\\debug\\clavispass_native_host.exe",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://<edge-extension-id>/",
+    "chrome-extension://<chrome-or-chromium-extension-id>/"
+  ]
+}
+```
+
+The same Chromium-family manifest can be reused for Edge, Chrome, and Chromium as long as every allowed extension origin is explicitly listed in `allowed_origins`.
+
+### Windows registry keys
+
+Chromium-family:
+
+- `HKCU\Software\Google\Chrome\NativeMessagingHosts\com.clavispass.native_host`
+- `HKCU\Software\Chromium\NativeMessagingHosts\com.clavispass.native_host`
+- `HKCU\Software\Microsoft\Edge\NativeMessagingHosts\com.clavispass.native_host`
+
+Firefox:
+
+- `HKCU\Software\Mozilla\NativeMessagingHosts\com.clavispass.native_host`
+
+The Chromium-family keys should all point to the Chromium manifest file:
+
+- `%LOCALAPPDATA%\ClavisPass\bridge\native-hosts\com.clavispass.native_host.chromium.json`
+
+Firefox should point to the Firefox manifest file:
+
+- `%LOCALAPPDATA%\ClavisPass\bridge\native-hosts\com.clavispass.native_host.firefox.json`
+
 ## Windows setup script
 
 This repo includes a setup script:
@@ -210,7 +206,7 @@ This repo includes a setup script:
 
 It can:
 
-- generate the Chromium manifest
+- generate the Chromium-family manifest
 - generate the Firefox manifest
 - register Chrome, Chromium, and Edge keys
 - register the Firefox key
@@ -224,10 +220,40 @@ cd src-tauri
 cargo build --bin clavispass_native_host
 ```
 
-Then run the setup script from the repo root:
+Then run the setup script from the repo root.
+
+Firefox plus one Chromium-family extension ID:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\setup-native-host.ps1 -ChromiumExtensionId "YOUR_CHROMIUM_EXTENSION_ID"
+powershell -ExecutionPolicy Bypass -File .\scripts\setup-native-host.ps1 -ChromiumExtensionId "YOUR_EXTENSION_ID"
+```
+
+Separate Edge and Chrome IDs:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\setup-native-host.ps1 `
+  -EdgeExtensionId "YOUR_EDGE_EXTENSION_ID" `
+  -ChromeExtensionId "YOUR_CHROME_EXTENSION_ID"
+```
+
+Multiple Chromium-family IDs:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\setup-native-host.ps1 `
+  -ChromiumExtensionIds @(
+    "YOUR_EDGE_EXTENSION_ID",
+    "YOUR_CHROME_EXTENSION_ID",
+    "YOUR_CHROMIUM_EXTENSION_ID"
+  )
+```
+
+Direct extra origins if needed:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\setup-native-host.ps1 `
+  -AdditionalChromiumOrigins @(
+    "chrome-extension://abcdefghijklmnopabcdefghijklmnop/"
+  )
 ```
 
 Notes:
@@ -235,7 +261,7 @@ Notes:
 - Firefox registration is enabled by default.
 - Firefox extension ID defaults to:
   - `clavispass-extension@clavispass.local`
-- Chromium registration is skipped automatically if `-ChromiumExtensionId` is omitted.
+- Chromium-family registration is skipped automatically if no valid Chromium-family origin is provided.
 - You can skip one side explicitly with:
   - `-SkipChromium`
   - `-SkipFirefox`
@@ -251,39 +277,57 @@ Written files:
 - `%LOCALAPPDATA%\ClavisPass\bridge\native-hosts\com.clavispass.native_host.chromium.json`
 - `%LOCALAPPDATA%\ClavisPass\bridge\native-hosts\com.clavispass.native_host.firefox.json`
 
-## Windows registry keys
+## Managing allowed_origins
 
-Chromium-family:
+For Chromium-family browsers, the browser does not use a Firefox-style add-on ID. It uses the extension origin:
 
-- `HKCU\Software\Google\Chrome\NativeMessagingHosts\com.clavispass.native_host`
-- `HKCU\Software\Chromium\NativeMessagingHosts\com.clavispass.native_host`
-- `HKCU\Software\Microsoft\Edge\NativeMessagingHosts\com.clavispass.native_host`
+- `chrome-extension://<extension-id>/`
 
-Firefox:
+That means:
 
-- `HKCU\Software\Mozilla\NativeMessagingHosts\com.clavispass.native_host`
+- Edge and Chrome can have different extension IDs for the same codebase
+- local dev and store builds can also have different IDs
+- every ID that should be able to connect must appear in `allowed_origins`
 
-In each case, the default registry value points to the corresponding manifest JSON file.
+Recommended strategy:
 
-## How to verify Firefox setup
+### Local development
+
+Prefer a stable development extension ID if possible.
+
+Best options:
+
+1. give the extension a fixed key/ID in the Chromium-family build so reloads keep the same ID
+2. if that is not available, rerun `setup-native-host.ps1` after loading the extension and copy the currently assigned extension ID into `-EdgeExtensionId` or `-ChromiumExtensionIds`
+
+### Store or packaged builds
+
+Once the final store/package ID is known, add that stable ID to the setup command and installer packaging.
+
+If you want dev and production to coexist, include both IDs in `allowed_origins`.
+
+## Edge verification
 
 1. Build the host:
    - `cargo build --bin clavispass_native_host`
-2. Run the setup script.
-3. Restart Firefox completely.
-4. Ensure the installed extension ID is:
-   - `clavispass-extension@clavispass.local`
-5. Trigger the extension path that calls `browser.runtime.connectNative("com.clavispass.native_host")`.
+2. Run the setup script with the Edge extension ID.
+3. Restart Edge completely.
+4. Open the loaded Edge extension.
+5. Trigger the code path that calls `chrome.runtime.connectNative("com.clavispass.native_host")`.
 
-If setup is correct, Firefox should stop showing:
+Expected results:
 
-- `No such native application com.clavispass.native_host`
+- if registration is missing: `No such native application com.clavispass.native_host`
+- if `allowed_origins` is wrong: native host connection fails or the request is rejected before a valid status returns
+- if setup is correct: `getStatus` returns from the desktop host
+- for a new client, `pairingStatus` will likely be `pending` until approved in ClavisPass desktop
 
-After the host is found, a new Firefox client should usually first report:
+Useful checks on Windows:
 
-- `pairingStatus = pending`
-
-That is expected until you open ClavisPass desktop and approve the browser in `Settings > Browser Extensions`.
+```powershell
+reg query "HKCU\Software\Microsoft\Edge\NativeMessagingHosts\com.clavispass.native_host" /ve
+Get-Content "$env:LOCALAPPDATA\ClavisPass\bridge\native-hosts\com.clavispass.native_host.chromium.json"
+```
 
 ## Expected failure cases
 
@@ -294,7 +338,9 @@ Typical errors if setup is incomplete:
 - permission / spawn error
   - manifest points to a missing or non-executable file
 - access denied / not authorized
-  - wrong `allowed_extensions` or wrong extension ID
+  - wrong `allowed_extensions` or wrong Firefox add-on ID
+- Chromium/Edge status not returned
+  - extension origin missing from `allowed_origins`
 - `pairingStatus = pending`
   - browser is waiting for manual approval in the desktop app
 - `APP_LOCKED`

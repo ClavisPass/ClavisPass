@@ -10,6 +10,18 @@ param(
   [string]$ChromiumExtensionId,
 
   [Parameter(Mandatory = $false)]
+  [string]$EdgeExtensionId,
+
+  [Parameter(Mandatory = $false)]
+  [string]$ChromeExtensionId,
+
+  [Parameter(Mandatory = $false)]
+  [string[]]$ChromiumExtensionIds,
+
+  [Parameter(Mandatory = $false)]
+  [string[]]$AdditionalChromiumOrigins,
+
+  [Parameter(Mandatory = $false)]
   [string]$FirefoxExtensionId = "clavispass-extension@clavispass.local",
 
   [switch]$SkipChromium,
@@ -20,6 +32,7 @@ $ErrorActionPreference = "Stop"
 
 $nativeHostName = "com.clavispass.native_host"
 $scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+$chromiumOrigins = @()
 
 if ([string]::IsNullOrWhiteSpace($HostExecutablePath)) {
   $HostExecutablePath = Join-Path $scriptRoot "..\src-tauri\target\debug\clavispass_native_host.exe"
@@ -66,6 +79,52 @@ function Set-RegistryDefaultValue {
   }
 }
 
+function Normalize-ChromiumOrigins {
+  param(
+    [string]$LegacyChromiumExtensionId,
+    [string]$EdgeId,
+    [string]$ChromeId,
+    [string[]]$ExtensionIds,
+    [string[]]$ExtraOrigins
+  )
+
+  $ids = @(
+    $LegacyChromiumExtensionId
+    $EdgeId
+    $ChromeId
+  ) + $ExtensionIds
+
+  $origins = New-Object System.Collections.Generic.List[string]
+
+  foreach ($id in $ids) {
+    if ([string]::IsNullOrWhiteSpace($id)) {
+      continue
+    }
+
+    $trimmedId = $id.Trim()
+    if ($trimmedId -match "^[a-z]{32}$") {
+      $origins.Add("chrome-extension://$trimmedId/")
+    } else {
+      Write-Warning "Skipping invalid Chromium extension ID '$trimmedId'. Expected a 32-character lowercase extension ID."
+    }
+  }
+
+  foreach ($origin in $ExtraOrigins) {
+    if ([string]::IsNullOrWhiteSpace($origin)) {
+      continue
+    }
+
+    $trimmedOrigin = $origin.Trim()
+    if ($trimmedOrigin -match "^chrome-extension://[a-z]{32}/$") {
+      $origins.Add($trimmedOrigin)
+    } else {
+      Write-Warning "Skipping invalid Chromium origin '$trimmedOrigin'. Expected format chrome-extension://<32-char-id>/"
+    }
+  }
+
+  return $origins | Sort-Object -Unique
+}
+
 if (-not (Test-Path -LiteralPath $resolvedHostPath)) {
   throw "Native host executable not found: $resolvedHostPath"
 }
@@ -75,8 +134,15 @@ Ensure-Directory -Path $resolvedManifestDir
 $writtenManifests = @()
 
 if (-not $SkipChromium) {
-  if ([string]::IsNullOrWhiteSpace($ChromiumExtensionId)) {
-    Write-Warning "Chromium extension ID missing. Chromium manifest/registry setup will be skipped."
+  $chromiumOrigins = Normalize-ChromiumOrigins `
+    -LegacyChromiumExtensionId $ChromiumExtensionId `
+    -EdgeId $EdgeExtensionId `
+    -ChromeId $ChromeExtensionId `
+    -ExtensionIds $ChromiumExtensionIds `
+    -ExtraOrigins $AdditionalChromiumOrigins
+
+  if ($chromiumOrigins.Count -eq 0) {
+    Write-Warning "No Chromium-family extension origins provided. Chromium/Edge manifest and registry setup will be skipped."
   } else {
     $chromiumManifestPath = Join-Path $resolvedManifestDir "$nativeHostName.chromium.json"
     $chromiumManifest = @{
@@ -84,9 +150,7 @@ if (-not $SkipChromium) {
       description = "ClavisPass Native Messaging Host"
       path = $resolvedHostPath
       type = "stdio"
-      allowed_origins = @(
-        "chrome-extension://$ChromiumExtensionId/"
-      )
+      allowed_origins = @($chromiumOrigins)
     }
 
     Write-JsonFile -Path $chromiumManifestPath -Content $chromiumManifest
@@ -119,6 +183,13 @@ if (-not $SkipFirefox) {
 Write-Host "Native host setup completed for $nativeHostName"
 Write-Host "Host executable: $resolvedHostPath"
 Write-Host "Manifest directory: $resolvedManifestDir"
+
+if (-not $SkipChromium -and $chromiumOrigins.Count -gt 0) {
+  Write-Host "Configured Chromium-family origins:"
+  foreach ($origin in $chromiumOrigins) {
+    Write-Host " - $origin"
+  }
+}
 
 if ($writtenManifests.Count -gt 0) {
   Write-Host "Written manifests:"
