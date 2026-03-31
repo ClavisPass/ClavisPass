@@ -1,6 +1,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod screen_lock;
+pub mod bridge;
+mod bridge_commands;
 
 use serde::{Deserialize, Serialize};
 use std::{fs, path::PathBuf};
@@ -222,8 +224,19 @@ pub fn run() {
             commands::remove_key,
             commands::set_content_protection,
             commands::reset_window_size,
-            device_identity::get_device_identity
+            device_identity::get_device_identity,
+            bridge_commands::bridge_publish_session,
+            bridge_commands::bridge_clear_session,
+            bridge_commands::bridge_list_pending_pairings,
+            bridge_commands::bridge_list_paired_clients,
+            bridge_commands::bridge_list_rejected_clients,
+            bridge_commands::bridge_approve_pairing,
+            bridge_commands::bridge_reject_pairing,
+            bridge_commands::bridge_revoke_pairing,
+            bridge_commands::bridge_claim_pending_writes,
+            bridge_commands::bridge_complete_write_request
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+

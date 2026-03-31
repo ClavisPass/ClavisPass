@@ -64,3 +64,7 @@ tauri-plugin-cli = "2"
 [[bin]]
 name = "app_main"
 path = "src/main.rs"
+
+[[bin]]
+name = "clavispass_native_host"
+path = "src/bin/clavispass_native_host.rs"

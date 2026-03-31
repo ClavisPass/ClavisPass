@@ -54,14 +54,11 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { SettingsStackParamList } from "../app/navigation/model/types";
 import { invoke } from "@tauri-apps/api/core";
 import { ContentProtectionSettingsToggle } from "../features/settings/components/ContentProtectionSettingsToggle";
-import {
-  formatAbsoluteDate,
-  formatAbsoluteTime,
-} from "../shared/utils/Timestamp";
 import AppearanceSettingsSection from "../features/settings/components/AppearanceSettingsSection";
 import { checkForDesktopUpdate } from "../shared/utils/desktopUpdater";
 import { publishUpdateCheck } from "../infrastructure/events/updateBus";
 import { logger } from "../infrastructure/logging/logger";
+import BrowserExtensionPairingSection from "../features/settings/components/BrowserExtensionPairingSection";
 
 const styles = StyleSheet.create({
   surface: {
@@ -523,6 +520,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 {t("settings:keyDerivation")}
               </SettingsShortcutItem>
             </SettingsContainer>
+
+            <WebSpecific>
+              <SettingsContainer icon={"web"} title={t("settings:browserExtensions")}>
+                <BrowserExtensionPairingSection />
+              </SettingsContainer>
+            </WebSpecific>
 
             <SettingsContainer
               ref={quickSelectItems[6].ref}

@@ -167,6 +167,26 @@ const de: TranslationSchema = {
     manageDevices: "Geräte verwalten",
     encryption: "Verschlüsselung",
     keyDerivation: "Schlüsselableitung",
+    browserExtensions: "Browser-Erweiterungen",
+    browserPairingDescription:
+      "Neue Browser-Anfragen werden hier geprüft, bevor eine Erweiterung auf Fill-Daten zugreifen darf.",
+    browserPendingRequests: "Offene Anfragen",
+    browserPendingHint:
+      "Neue Browser bleiben auf ausstehend, bis du sie ausdrücklich freigibst.",
+    browserPendingEmpty: "Aktuell wartet kein Browser auf Freigabe.",
+    browserPendingBadge: "Ausstehend",
+    browserPairedClients: "Freigegebene Browser",
+    browserPairedHint:
+      "Diese Browser wurden bestätigt und dürfen die Erweiterungs-Bridge nutzen.",
+    browserPairedEmpty: "Noch kein Browser freigegeben.",
+    browserPairedBadge: "Gekoppelt",
+    browserApprove: "Browser freigeben",
+    browserReject: "Browser ablehnen",
+    browserDisconnect: "Browser entfernen",
+    browserRequestedAt: "Angefragt: {{value}}",
+    browserApprovedAt: "Freigegeben: {{value}}",
+    browserLastSeenAt: "Zuletzt gesehen: {{value}}",
+    browserUnknownClient: "Browser-Client ({{extensionId}})",
   },
   analysis: {
   topFindings: "Top-Funde",

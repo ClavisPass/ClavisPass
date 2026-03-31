@@ -1,6 +1,7 @@
 import React from "react";
 import { TouchableRipple } from "react-native-paper";
 import type { ComponentProps } from "react";
+import { View } from "react-native";
 import type { StyleProp, ViewStyle } from "react-native";
 
 type TouchableRippleProps = ComponentProps<typeof TouchableRipple>;
@@ -51,7 +52,11 @@ const AnimatedPressable = React.forwardRef<any, AnimatedPressableProps>(
         }}
         {...rest}
       >
-        {children}
+        {React.isValidElement(children) && React.Children.count(children) === 1 ? (
+          children
+        ) : (
+          <View>{children}</View>
+        )}
       </TouchableRipple>
     );
   }

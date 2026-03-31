@@ -33,6 +33,8 @@ import { getAppScheme } from "./src/shared/utils/appScheme";
 import MobileFastAccessOverlay from "./src/features/fastaccess/components/MobileFastAccessOverlay";
 import FastAccessSessionBridge from "./src/features/fastaccess/components/FastAccessSessionBridge";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import BrowserBridgeSessionSync from "./src/features/browserBridge/components/BrowserBridgeSessionSync";
+import BrowserBridgeWriteSync from "./src/features/browserBridge/components/BrowserBridgeWriteSync";
 
 const Tab = createBottomTabNavigator();
 
@@ -78,6 +80,8 @@ export function AppWithNavigation() {
                     <FastAccessSessionBridge />
                     <CloudProvider>
                       <VaultProvider>
+                        <BrowserBridgeSessionSync />
+                        <BrowserBridgeWriteSync />
                         <DevModeProvider>
                           <BottomSheetModalProvider>
                             <GlobalErrorSnackbar />
@@ -168,3 +172,4 @@ export default function App() {
 
   return <AppWithNavigation />;
 }
+

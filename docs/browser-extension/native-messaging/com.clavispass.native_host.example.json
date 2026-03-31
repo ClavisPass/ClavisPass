@@ -1,0 +1,9 @@
+{
+  "name": "com.clavispass.native_host",
+  "description": "ClavisPass Native Messaging Host",
+  "path": "REPLACE_WITH_HOST_EXE_PATH",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://REPLACE_WITH_EXTENSION_ID/"
+  ]
+}

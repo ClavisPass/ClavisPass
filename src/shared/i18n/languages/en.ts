@@ -166,6 +166,26 @@ const en: TranslationSchema = {
     manageDevices: "Manage Devices",
     encryption: "Encryption",
     keyDerivation: "Key Derivation",
+    browserExtensions: "Browser Extensions",
+    browserPairingDescription:
+      "Review new browser requests here before a browser extension can access fill data.",
+    browserPendingRequests: "Pending requests",
+    browserPendingHint:
+      "New browsers stay pending until you explicitly approve them.",
+    browserPendingEmpty: "No browser is waiting for approval right now.",
+    browserPendingBadge: "Pending",
+    browserPairedClients: "Approved browsers",
+    browserPairedHint:
+      "These browsers were approved and may request extension bridge data.",
+    browserPairedEmpty: "No browser has been approved yet.",
+    browserPairedBadge: "Paired",
+    browserApprove: "Approve browser",
+    browserReject: "Reject browser",
+    browserDisconnect: "Remove browser",
+    browserRequestedAt: "Requested: {{value}}",
+    browserApprovedAt: "Approved: {{value}}",
+    browserLastSeenAt: "Last seen: {{value}}",
+    browserUnknownClient: "Browser client ({{extensionId}})",
   },
   analysis: {
     // headline blocks (optional – falls du später "Top findings" wieder einblendest)

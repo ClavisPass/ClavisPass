@@ -164,6 +164,23 @@ export type TranslationSchema = {
     manageDevices: string;
     encryption: string;
     keyDerivation: string;
+    browserExtensions: string;
+    browserPairingDescription: string;
+    browserPendingRequests: string;
+    browserPendingHint: string;
+    browserPendingEmpty: string;
+    browserPendingBadge: string;
+    browserPairedClients: string;
+    browserPairedHint: string;
+    browserPairedEmpty: string;
+    browserPairedBadge: string;
+    browserApprove: string;
+    browserReject: string;
+    browserDisconnect: string;
+    browserRequestedAt: string;
+    browserApprovedAt: string;
+    browserLastSeenAt: string;
+    browserUnknownClient: string;
   };
   analysis: {
     topFindings: string;
