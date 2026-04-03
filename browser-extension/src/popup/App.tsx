@@ -12,6 +12,12 @@ import type {
   SavePromptResolution,
   ContentDebugResponse
 } from "../shared/types";
+import {
+  CLAVISPASS_BRAND_NAME,
+  CLAVISPASS_POPUP_DESCRIPTION,
+  CLAVISPASS_POPUP_EYEBROW,
+  CLAVISPASS_POPUP_TITLE
+} from "../../../src/shared/branding/brand";
 
 const INITIAL_STATUS: DesktopBridgeStatusView = {
   transport: "native-messaging",
@@ -84,6 +90,7 @@ export function App() {
   const [isFilling, setIsFilling] = useState(false);
   const [isResolvingPrompt, setIsResolvingPrompt] = useState(false);
   const [isLoadingDebug, setIsLoadingDebug] = useState(false);
+  const [isOpeningDesktopApp, setIsOpeningDesktopApp] = useState(false);
   const [error, setError] = useState<string>();
   const [searchError, setSearchError] = useState<string>();
 
@@ -151,6 +158,23 @@ export function App() {
       setContentDebug(result);
     } finally {
       setIsLoadingDebug(false);
+    }
+  }
+
+  async function handleOpenDesktopApp(): Promise<void> {
+    setIsOpeningDesktopApp(true);
+
+    try {
+      const result = await sendRuntimeMessage("bridge:openDesktopApp", undefined);
+      setPromptMessage(result.detail);
+    } catch (openError) {
+      setPromptMessage(
+        openError instanceof Error
+          ? openError.message
+          : "The desktop app could not be opened."
+      );
+    } finally {
+      setIsOpeningDesktopApp(false);
     }
   }
 
@@ -227,9 +251,9 @@ export function App() {
   return (
     <main className="app-shell">
       <BrandHeader
-        eyebrow="ClavisPass"
-        title="Desktop Suggestions"
-        description="Native messaging, domain matching and controlled fill actions for the active tab."
+        eyebrow={CLAVISPASS_POPUP_EYEBROW}
+        title={CLAVISPASS_POPUP_TITLE}
+        description={CLAVISPASS_POPUP_DESCRIPTION}
         visual={<BrandLogo className="brand-logo" />}
       />
 
@@ -266,7 +290,7 @@ export function App() {
           </div>
           <div className="info-block">
             <p className="meta-label">Desktop app</p>
-            <p>{status.desktopName ?? "ClavisPass"}</p>
+            <p>{status.desktopName ?? CLAVISPASS_BRAND_NAME}</p>
           </div>
           <div className="info-block">
             <p className="meta-label">Host version</p>
@@ -285,8 +309,11 @@ export function App() {
         {error ? <p className="error-inline">{error}</p> : null}
 
         <div className="suggestion-actions">
-          <button className="refresh-button" type="button" onClick={() => void refreshStatus()} disabled={isRefreshing || isLoadingSuggestions || isPreparingFill || isFilling || isResolvingPrompt || isLoadingDebug}>
+          <button className="refresh-button" type="button" onClick={() => void refreshStatus()} disabled={isRefreshing || isLoadingSuggestions || isPreparingFill || isFilling || isResolvingPrompt || isLoadingDebug || isOpeningDesktopApp}>
             {isRefreshing ? "Checking..." : isLoadingSuggestions ? "Loading suggestions..." : "Refresh"}
+          </button>
+          <button className="row-button" type="button" onClick={() => void handleOpenDesktopApp()} disabled={isOpeningDesktopApp || isRefreshing}>
+            {isOpeningDesktopApp ? "Opening app..." : "Open app"}
           </button>
           <button className="row-button" type="button" onClick={() => void refreshContentDebug()} disabled={isRefreshing || isLoadingDebug}>
             {isLoadingDebug ? "Checking page..." : "Page debug"}

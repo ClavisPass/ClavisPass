@@ -8,18 +8,23 @@ use std::{
 
 use super::{path::session_store_path, vault::VaultData};
 
+pub const SESSION_TTL_MS: u64 = 5_000;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BridgeSessionSnapshot {
     pub version: u32,
     pub updated_at_ms: u64,
+    pub expires_at_ms: u64,
     pub vault: VaultData,
 }
 
 pub fn publish_session(vault: VaultData) -> io::Result<BridgeSessionSnapshot> {
+    let updated_at_ms = now_ms();
     let snapshot = BridgeSessionSnapshot {
         version: 1,
-        updated_at_ms: now_ms(),
+        updated_at_ms,
+        expires_at_ms: updated_at_ms + SESSION_TTL_MS,
         vault,
     };
     let path = session_store_path()?;
@@ -33,9 +38,15 @@ pub fn load_session() -> io::Result<Option<BridgeSessionSnapshot>> {
         return Ok(None);
     }
 
-    let content = fs::read_to_string(path)?;
+    let content = fs::read_to_string(&path)?;
     let parsed = serde_json::from_str::<BridgeSessionSnapshot>(&content)
         .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err))?;
+
+    if parsed.expires_at_ms <= now_ms() {
+        let _ = fs::remove_file(&path);
+        return Ok(None);
+    }
+
     Ok(Some(parsed))
 }
 
@@ -61,4 +72,22 @@ fn now_ms() -> u64 {
         .duration_since(UNIX_EPOCH)
         .unwrap_or_default()
         .as_millis() as u64
+}
+
+#[cfg(test)]
+mod tests {
+    use super::BridgeSessionSnapshot;
+    use crate::bridge::vault::VaultData;
+
+    #[test]
+    fn expired_snapshot_is_recognizable() {
+        let snapshot = BridgeSessionSnapshot {
+            version: 1,
+            updated_at_ms: 100,
+            expires_at_ms: 150,
+            vault: VaultData::default(),
+        };
+
+        assert!(snapshot.expires_at_ms > snapshot.updated_at_ms);
+    }
 }

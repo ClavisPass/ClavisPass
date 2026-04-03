@@ -11,6 +11,19 @@ import { getNormalizedDomainFromUrl } from "../shared/domain";
 const desktopBridge = new DesktopBridgeService();
 const state = new ExtensionState();
 
+function isScriptablePageUrl(url: string | undefined): boolean {
+  if (!url) {
+    return false;
+  }
+
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 async function injectContentScriptIntoTab(tabId: number): Promise<void> {
   await chrome.scripting.executeScript({
     target: { tabId, allFrames: true },
@@ -41,6 +54,51 @@ async function getActiveTabId(): Promise<number | undefined> {
   });
 
   return typeof activeTab?.id === "number" ? activeTab.id : undefined;
+}
+
+async function getActiveTab() {
+  const [activeTab] = await chrome.tabs.query({
+    active: true,
+    lastFocusedWindow: true
+  });
+
+  return activeTab;
+}
+
+async function openDesktopApp(): Promise<{ success: boolean; detail: string }> {
+  const launchUrls = ["clavispass://redirect", "clavispass-dev://redirect"];
+  let lastError: unknown;
+
+  for (const url of launchUrls) {
+    try {
+      const createdTab = await chrome.tabs.create({
+        url,
+        active: false
+      });
+
+      if (typeof createdTab.id === "number") {
+        setTimeout(() => {
+          void chrome.tabs.remove(createdTab.id!).catch(() => {
+          });
+        }, 1200);
+      }
+
+      return {
+        success: true,
+        detail: "Tried to open the ClavisPass desktop app."
+      };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  return {
+    success: false,
+    detail:
+      lastError instanceof Error
+        ? lastError.message
+        : "The browser could not open the ClavisPass desktop app."
+  };
 }
 
 async function prepareFillForActiveTab(entryId: string): Promise<{ tabId?: number; fillData?: FillDataResult; result: import("../shared/types").PrepareFillForActiveTabResult }> {
@@ -95,6 +153,37 @@ function isMissingReceiverError(error: unknown): boolean {
   return error instanceof Error && error.message.includes("Receiving end does not exist");
 }
 
+async function ensureContentScriptReady(tabId: number): Promise<void> {
+  let injected = false;
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    try {
+      const response = await sendMessageToRegisteredFrames<ContentDebugResponse>(tabId, {
+        type: "content:getDebugInfo",
+        payload: undefined
+      });
+
+      if (response && typeof response === "object" && response.status === "ok") {
+        return;
+      }
+    } catch (error) {
+      lastError = error;
+
+      if (!injected && isMissingReceiverError(error)) {
+        injected = true;
+        await injectContentScriptIntoTab(tabId);
+      }
+    }
+
+    await delay(180);
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("The content script did not become reachable in time.");
+}
+
 async function sendMessageToRegisteredFrames<TResponse>(tabId: number, message: ContentMessage): Promise<TResponse> {
   const registeredFrames = state.getRegisteredFrames(tabId);
   const frameIds = registeredFrames.length > 0 ? registeredFrames.map((frame) => frame.frameId) : [0];
@@ -121,6 +210,15 @@ async function sendMessageToRegisteredFrames<TResponse>(tabId: number, message: 
     } catch (error) {
       lastError = error;
     }
+  }
+
+  try {
+    const response = await chrome.tabs.sendMessage(tabId, message);
+    if (response !== undefined) {
+      return response as TResponse;
+    }
+  } catch (error) {
+    lastError = error;
   }
 
   if (firstReachableResponse !== undefined) {
@@ -164,14 +262,13 @@ async function sendContentDebugMessage(tabId: number): Promise<ContentDebugRespo
 
 async function fillPreparedDataInTab(tabId: number, fillData: FillDataResult): Promise<FillExecutionResult> {
   try {
-    await injectContentScriptIntoTab(tabId);
-    await delay(150);
+    await ensureContentScriptReady(tabId);
     return await sendFillMessage(tabId, fillData);
   } catch (error) {
     if (isMissingReceiverError(error)) {
       return {
         status: "failed",
-        detail: "ClavisPass could not attach to the active page context yet. Reload the page once and try again."
+        detail: "ClavisPass could not attach to the active page context yet. Try once again in a moment."
       };
     }
 
@@ -271,7 +368,9 @@ const router = new BackgroundMessageRouter({
     }
   },
   "bridge:getContentDebug": async () => {
-    const tabId = await getActiveTabId();
+    const activeTab = await getActiveTab();
+    const tabId = typeof activeTab?.id === "number" ? activeTab.id : undefined;
+
     if (typeof tabId !== "number") {
       return {
         status: "failed",
@@ -279,21 +378,28 @@ const router = new BackgroundMessageRouter({
       };
     }
 
+    if (!isScriptablePageUrl(activeTab?.url)) {
+      return {
+        status: "failed",
+        detail: "This page is not scriptable. Open a normal http or https website and try again."
+      };
+    }
+
     try {
-      await injectContentScriptIntoTab(tabId);
-      await delay(150);
+      await ensureContentScriptReady(tabId);
       return await sendContentDebugMessage(tabId);
     } catch (error) {
       return {
         status: "failed",
         detail: isMissingReceiverError(error)
-          ? "ClavisPass could not attach to the active page context yet. Reload the page once and try again."
+          ? "ClavisPass could not attach to the active page context yet. Try once again in a moment."
           : error instanceof Error
             ? error.message
             : "Page diagnostics could not reach the active tab."
       };
     }
   },
+  "bridge:openDesktopApp": async () => openDesktopApp(),
   "prompt:getPending": async () => ({
     prompt: state.getPendingPrompt()
   }),

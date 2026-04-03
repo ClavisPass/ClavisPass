@@ -9,6 +9,8 @@ import type {
   SavePromptCaptureResult,
   SavePromptCandidate,
   ContentDebugResponse
+  ,
+  OpenDesktopAppResult
 } from "./types";
 import type { GetFillDataForEntryPayload } from "./bridge";
 
@@ -32,6 +34,10 @@ export type MessageMap = {
   "bridge:getContentDebug": {
     request: undefined;
     response: ContentDebugResponse;
+  };
+  "bridge:openDesktopApp": {
+    request: undefined;
+    response: OpenDesktopAppResult;
   };
   "prompt:getPending": {
     request: undefined;

@@ -88,6 +88,11 @@ export interface ContentDebugResponse {
   info?: ContentDebugInfo;
 }
 
+export interface OpenDesktopAppResult {
+  success: boolean;
+  detail: string;
+}
+
 export type EntryActionType = "autofill" | "copy-username" | "copy-password" | "copy-totp";
 
 export interface EntryActionResult {

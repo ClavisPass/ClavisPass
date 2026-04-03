@@ -1,4 +1,4 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
 
 mod screen_lock;
 pub mod bridge;
@@ -95,6 +95,10 @@ pub fn run() {
             Some(vec!["--hidden"]),
         ))
         .setup(|app| {
+            if let Err(error) = bridge::session::clear_session() {
+                eprintln!("Failed to clear stale browser bridge session on startup: {error}");
+            }
+
             let app_handle = app.handle().clone();
 
             let builder = WebviewWindowBuilder::new(

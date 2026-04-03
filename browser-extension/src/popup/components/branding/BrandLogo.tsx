@@ -1,6 +1,13 @@
 import type { ImgHTMLAttributes } from "react";
-import brandMark from "../../assets/logo/clavispass-mark.svg";
+import brandMark from "../../../../../src/shared/branding/clavispass-mark.svg";
+import { CLAVISPASS_BRAND_NAME } from "../../../../../src/shared/branding/brand";
 
 export function BrandLogo(props: ImgHTMLAttributes<HTMLImageElement>) {
-  return <img alt={props.alt ?? "ClavisPass"} src={props.src ?? brandMark} {...props} />;
+  return (
+    <img
+      alt={props.alt ?? CLAVISPASS_BRAND_NAME}
+      src={props.src ?? brandMark}
+      {...props}
+    />
+  );
 }
