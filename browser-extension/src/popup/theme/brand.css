@@ -1,0 +1,27 @@
+/*
+  Derived from the main app's react-native-paper theme.
+  Keep popup styles referencing these variables instead of hardcoded colors.
+*/
+
+:root {
+  --cp-color-primary: #787ff6;
+  --cp-color-primary-container: #787ef5;
+  --cp-color-secondary: #69c4ff;
+  --cp-color-secondary-container: rgba(120, 126, 245, 0.09);
+  --cp-color-background: #ffffff;
+  --cp-color-surface: #ffffff;
+  --cp-color-surface-variant: #f5f5f5;
+  --cp-color-elevation-1: #fafafa;
+  --cp-color-elevation-2: #f5f5f5;
+  --cp-color-elevation-3: #ffffff;
+  --cp-color-border-soft: #e8e8ec;
+  --cp-color-outline-strong: #d7d9e0;
+  --cp-color-text-strong: #141826;
+  --cp-color-text-muted: #5f667a;
+  --cp-color-text-meta: #7b8297;
+  --cp-color-success: #3a9d5d;
+  --cp-color-warning: #d9a400;
+  --cp-color-danger: #d4476a;
+  --cp-shadow-card: rgba(99, 99, 99, 0.11) 0px 2px 8px 0px;
+  --cp-gradient-brand: linear-gradient(135deg, #787ff6 0%, #69c4ff 100%);
+}

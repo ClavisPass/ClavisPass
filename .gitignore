@@ -6,6 +6,7 @@ node_modules/
 # Expo
 .expo/
 dist/
+artifacts/
 web-build/
 
 # Native
@@ -33,6 +34,8 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+browser-extension/artifacts/
+browser-extension/.vite/
 
 release
 
