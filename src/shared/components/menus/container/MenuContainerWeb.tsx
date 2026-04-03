@@ -107,10 +107,7 @@ function MenuContainerWeb({
           style={{
             overflow: "hidden",
             backgroundColor: theme.colors?.elevation?.level3 ?? "white",
-            borderTopLeftRadius: opensUpward ? 20 : 22,
-            borderTopRightRadius: opensUpward ? 20 : 6,
-            borderBottomLeftRadius: opensUpward ? 22 : 20,
-            borderBottomRightRadius: opensUpward ? 6 : 20,
+            borderRadius: 20,
             minWidth: 180,
             ...(width ? { width } : null),
             boxShadow: theme.colors?.shadow ?? "0px 6px 18px rgba(0,0,0,0.15)",

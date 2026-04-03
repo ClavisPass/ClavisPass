@@ -367,6 +367,7 @@ const router = new BackgroundMessageRouter({
       state.clearPreparedFill(prepared.tabId);
     }
   },
+  "bridge:getFillDataForEntry": async (payload) => desktopBridge.getDesktopFillData(payload.entryId),
   "bridge:getContentDebug": async () => {
     const activeTab = await getActiveTab();
     const tabId = typeof activeTab?.id === "number" ? activeTab.id : undefined;

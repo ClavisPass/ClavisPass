@@ -159,7 +159,6 @@ function ListItem(props: Props) {
   const usernameTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const passwordTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const itemRef = useRef<any>(null);
-  const menuButtonRef = useRef<any>(null);
   const suppressNextPressRef = useRef(false);
 
   const [url, setUrl] = useState("");
@@ -208,7 +207,7 @@ function ListItem(props: Props) {
 
   useEffect(() => {
     const urlResult = props.item.modules.filter(
-      (module) => module.module === ModulesEnum.URL
+      (module) => module.module === ModulesEnum.URL,
     );
 
     if (urlResult.length > 0 && urlResult[0].value !== "") {
@@ -235,7 +234,7 @@ function ListItem(props: Props) {
 
   const copyToClipboard = async (
     value: string,
-    type: "username" | "password"
+    type: "username" | "password",
   ) => {
     if (!value) return;
 
@@ -298,14 +297,14 @@ function ListItem(props: Props) {
 
   const fastAccessData = useMemo(
     () => extractFastAccessObject(props.item.modules, props.item.title),
-    [props.item.modules, props.item.title]
+    [props.item.modules, props.item.title],
   );
   const menuPreviewIcon = url !== "" ? null : icon;
 
   const updateListItem = (recipe: (entry: ValuesType) => ValuesType) => {
     vault.update((draft) => {
       draft.values = draft.values.map((entry) =>
-        entry.id === props.item.id ? recipe(entry) : entry
+        entry.id === props.item.id ? recipe(entry) : entry,
       );
     });
   };
@@ -337,7 +336,7 @@ function ListItem(props: Props) {
         withDivider: false,
       },
     ],
-    [fastAccessData, t]
+    [fastAccessData, t],
   );
 
   const menuTopContent = (
@@ -383,26 +382,22 @@ function ListItem(props: Props) {
     </View>
   );
 
-  const measureAndOpenMenu = (anchor: "item" | "button" = "item") => {
+  const measureAndOpenMenu = () => {
     const estimatedMenuHeight = 228;
     const estimatedMenuWidth = 244;
     const viewportPadding = 8;
     const downwardGap = 8;
     const upwardGap = -22;
-    const anchorRef =
-      Platform.OS === "web" && anchor === "button" && menuButtonRef.current
-        ? menuButtonRef
-        : itemRef;
 
     suppressNextPressRef.current = true;
-    anchorRef.current?.measureInWindow?.(
+    itemRef.current?.measureInWindow?.(
       (x: number, y: number, width: number, height: number) => {
         const menuLeft = Math.min(
           Math.max(viewportPadding, x + width - estimatedMenuWidth),
           Math.max(
             viewportPadding,
-            windowWidth - estimatedMenuWidth - viewportPadding
-          )
+            windowWidth - estimatedMenuWidth - viewportPadding,
+          ),
         );
 
         const anchorBottom = y + height;
@@ -417,8 +412,8 @@ function ListItem(props: Props) {
           Math.max(viewportPadding, unclampedTop),
           Math.max(
             viewportPadding,
-            windowHeight - estimatedMenuHeight - viewportPadding
-          )
+            windowHeight - estimatedMenuHeight - viewportPadding,
+          ),
         );
 
         setMenuPosition({
@@ -427,8 +422,46 @@ function ListItem(props: Props) {
         });
         setMenuOffsetY(clampedTop - y);
         setMenuVisible(true);
-      }
+      },
     );
+  };
+
+  const openMenuAtPointer = (event: any) => {
+    const estimatedMenuHeight = 228;
+    const estimatedMenuWidth = 244;
+    const viewportPadding = 8;
+    const nativeEvent = event?.nativeEvent;
+    const pointerX = nativeEvent?.pageX ?? nativeEvent?.clientX;
+    const pointerY = nativeEvent?.pageY ?? nativeEvent?.clientY;
+
+    if (typeof pointerX !== "number" || typeof pointerY !== "number") {
+      measureAndOpenMenu();
+      return;
+    }
+
+    suppressNextPressRef.current = true;
+
+    const menuLeft = Math.min(
+      Math.max(viewportPadding, pointerX),
+      Math.max(
+        viewportPadding,
+        windowWidth - estimatedMenuWidth - viewportPadding,
+      ),
+    );
+    const menuTop = Math.min(
+      Math.max(viewportPadding, pointerY),
+      Math.max(
+        viewportPadding,
+        windowHeight - estimatedMenuHeight - viewportPadding,
+      ),
+    );
+
+    setMenuPosition({
+      x: menuLeft,
+      y: menuTop,
+    });
+    setMenuOffsetY(0);
+    setMenuVisible(true);
   };
 
   const openItemFastAccess = async () => {
@@ -447,7 +480,7 @@ function ListItem(props: Props) {
     await openFastAccess(
       fastAccessData.title,
       fastAccessData.username,
-      fastAccessData.password
+      fastAccessData.password,
     );
   };
 
@@ -470,10 +503,21 @@ function ListItem(props: Props) {
         onPointerLeave={() => Platform.OS === "web" && setHovered(false)}
         onPointerDown={(event: any) => {
           if (Platform.OS !== "web") return;
-          if (event?.nativeEvent?.button !== 2) return;
+          const button = event?.nativeEvent?.button;
+
+          if (button === 1) {
+            suppressNextPressRef.current = true;
+            event.preventDefault?.();
+            event.stopPropagation?.();
+            openItemFastAccess().catch(() => {});
+            return;
+          }
+        }}
+        onContextMenu={(event: any) => {
+          if (Platform.OS !== "web") return;
           event.preventDefault?.();
           event.stopPropagation?.();
-          openItemFastAccess().catch(() => {});
+          openMenuAtPointer(event);
         }}
       >
         <AnimatedPressable
@@ -517,55 +561,39 @@ function ListItem(props: Props) {
             <View style={styles.right}>
               {hovered && fastAccessObject && (
                 <View style={styles.chipRow}>
-                <Button
-                  mode="contained-tonal"
-                  compact
-                  icon={usernameIcon}
-                  onPress={() =>
-                    copyToClipboard(fastAccessObject.username, "username")
-                  }
-                  style={[styles.chip, styles.chipLeft, styles.chipUser]}
-                  contentStyle={styles.chipContent}
-                  textColor={theme.colors.primary}
-                >
-                  <Text numberOfLines={1} style={styles.chipText}>
-                    {ellipsize(fastAccessObject.username, 18)}
-                  </Text>
-                </Button>
+                  <Button
+                    mode="contained-tonal"
+                    compact
+                    icon={usernameIcon}
+                    onPress={() =>
+                      copyToClipboard(fastAccessObject.username, "username")
+                    }
+                    style={[styles.chip, styles.chipLeft, styles.chipUser]}
+                    contentStyle={styles.chipContent}
+                    textColor={theme.colors.primary}
+                  >
+                    <Text numberOfLines={1} style={styles.chipText}>
+                      {ellipsize(fastAccessObject.username, 18)}
+                    </Text>
+                  </Button>
 
-                <Button
-                  mode="contained-tonal"
-                  compact
-                  icon={passwordIcon}
-                  onPress={() =>
-                    copyToClipboard(fastAccessObject.password, "password")
-                  }
-                  style={[styles.chip, styles.chipRight, styles.chipPass]}
-                  contentStyle={styles.chipContent}
-                  textColor={theme.colors.primary}
-                >
-                  <Text numberOfLines={1} style={styles.chipText}>
-                    {maskPassword(fastAccessObject.password)}
+                  <Button
+                    mode="contained-tonal"
+                    compact
+                    icon={passwordIcon}
+                    onPress={() =>
+                      copyToClipboard(fastAccessObject.password, "password")
+                    }
+                    style={[styles.chip, styles.chipRight, styles.chipPass]}
+                    contentStyle={styles.chipContent}
+                    textColor={theme.colors.primary}
+                  >
+                    <Text numberOfLines={1} style={styles.chipText}>
+                      {maskPassword(fastAccessObject.password)}
                     </Text>
                   </Button>
                 </View>
               )}
-
-              {Platform.OS === "web" && hovered ? (
-                <View
-                  ref={menuButtonRef}
-                  collapsable={false}
-                  style={styles.actionMenuAnchor}
-                >
-                  <IconButton
-                    icon="dots-vertical"
-                    size={18}
-                    onPress={() => measureAndOpenMenu("button")}
-                    style={styles.actionIconButton}
-                    iconColor={theme.colors.primary}
-                  />
-                </View>
-              ) : null}
 
               <Icon
                 color={theme.colors?.primary}

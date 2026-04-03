@@ -31,6 +31,10 @@ export type MessageMap = {
     request: GetFillDataForEntryPayload;
     response: FillExecutionResult;
   };
+  "bridge:getFillDataForEntry": {
+    request: GetFillDataForEntryPayload;
+    response: import("./bridge").FillDataResult;
+  };
   "bridge:getContentDebug": {
     request: undefined;
     response: ContentDebugResponse;
