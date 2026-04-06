@@ -25,6 +25,10 @@ function FolderSelectModal(props: Props) {
   const { theme, darkmode } = useTheme();
   const { t } = useTranslation();
   const { height } = useWindowDimensions();
+  const hasMatchingSelectedFolder = Boolean(
+    props.selectedFolder &&
+      props.folders.some((folder) => folder.id === props.selectedFolder?.id),
+  );
 
   const hideModal = () => props.setVisible(false);
   const modalHeight = height > 760 ? 420 : 320;
@@ -97,7 +101,7 @@ function FolderSelectModal(props: Props) {
           {renderFolderItem(
             t("common:none"),
             () => props.onSelectFolder(null),
-            !props.selectedFolder
+            !hasMatchingSelectedFolder
           )}
           {props.folders.map((folder) =>
             renderFolderItem(
