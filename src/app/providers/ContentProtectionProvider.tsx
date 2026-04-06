@@ -10,6 +10,7 @@ import React, {
   useEffect,
 } from "react";
 import { Platform } from "react-native";
+import { detectTauriEnvironment } from "../../infrastructure/platform/isTauri";
 
 /**
  * Native (iOS/Android) screen-capture control via expo-screen-capture.
@@ -37,16 +38,6 @@ async function applyNativeContentProtection(enabled: boolean): Promise<void> {
  * - Works by attempting to import Tauri API.
  * - In a normal browser bundle, the import often fails (caught).
  */
-async function detectTauri(): Promise<boolean> {
-  if (Platform.OS !== "web") return false;
-  try {
-    const { invoke } = await import("@tauri-apps/api/core");
-    return typeof invoke === "function";
-  } catch {
-    return false;
-  }
-}
-
 async function applyTauriContentProtection(enabled: boolean): Promise<void> {
   if (Platform.OS !== "web") return;
 
@@ -96,7 +87,7 @@ export function ContentProtectionProvider({
     if (detectedRef.current) return;
     detectedRef.current = true;
 
-    const isTauri = await detectTauri();
+    const isTauri = await detectTauriEnvironment();
     setSupportsDesktopToggle(isTauri);
   }, []);
 

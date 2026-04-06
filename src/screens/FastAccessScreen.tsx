@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import { emit } from "@tauri-apps/api/event";
 import { Icon, Text, TextInput } from "react-native-paper";
 import { useTheme } from "../app/providers/ThemeProvider";
 import Header from "../shared/components/Header";
 import PasswordTextbox from "../shared/components/PasswordTextbox";
 import CopyToClipboard from "../shared/components/buttons/CopyToClipboard";
 import { hideFastAccess } from "../features/fastaccess/utils/FastAccess";
-import { getCurrentWindow } from "@tauri-apps/api/window";
-import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
 import {
   FAST_ACCESS_POPUP_LABEL,
   FAST_ACCESS_READY_EVENT,
   FAST_ACCESS_UPDATE_EVENT,
 } from "../features/fastaccess/constants";
+import { detectTauriEnvironment } from "../infrastructure/platform/isTauri";
 
 export default function FastAccessScreen() {
   const [title, setTitle] = useState("");
@@ -26,6 +24,13 @@ export default function FastAccessScreen() {
     let unlisten: null | (() => void) = null;
 
     const setup = async () => {
+      if (!(await detectTauriEnvironment())) {
+        return;
+      }
+      const [{ emit }, { getCurrentWindow }] = await Promise.all([
+        import("@tauri-apps/api/event"),
+        import("@tauri-apps/api/window"),
+      ]);
       const currentWindow = getCurrentWindow();
 
       unlisten = await currentWindow.listen(FAST_ACCESS_UPDATE_EVENT, (event) => {
@@ -87,6 +92,10 @@ export default function FastAccessScreen() {
         <View style={{ display: "flex", flexDirection: "row" }}>
           <AnimatedPressable
             onPress={async () => {
+              if (!(await detectTauriEnvironment())) {
+                return;
+              }
+              const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
               const win = await WebviewWindow.getByLabel("main");
               if (!win) {
                 return;

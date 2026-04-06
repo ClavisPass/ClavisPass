@@ -3,19 +3,14 @@ import {
   StyleSheet,
   ScrollView,
   View,
-  Platform,
   useWindowDimensions,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
-import WebSpecific from "../infrastructure/platform/WebSpecific";
-
-import { enable, isEnabled, disable } from "@tauri-apps/plugin-autostart";
 import Import, {
   DocumentTypeEnum,
 } from "../features/settings/model/documentPicker/Import";
-import DarkModeSwitch from "../features/settings/components/DarkModeSwitch";
 
 import Auth from "../features/auth/components/Auth";
 import { useTheme } from "../app/providers/ThemeProvider";
@@ -33,8 +28,6 @@ import SettingsItem from "../features/settings/components/SettingsItem";
 import SettingsSwitch from "../features/settings/components/SettingsSwitch";
 import SettingsFooter from "../features/settings/components/SettingsFooter";
 
-import { open } from "@tauri-apps/plugin-shell";
-
 import * as Linking from "expo-linking";
 import Header from "../shared/components/Header";
 import SettingsQuickSelect from "../features/settings/components/SettingsQuickSelect";
@@ -42,8 +35,6 @@ import QuickSelectItem from "../features/settings/model/QuickSelectItem";
 import SettingsShortcutItem from "../features/settings/components/SettingsShortcutItem";
 import { useDevMode } from "../app/providers/DevModeProvider";
 import SettingsDropdownItem from "../features/settings/components/SettingsDropdownItem";
-import { AppLanguage } from "../shared/i18n/types";
-import { i18n } from "../shared/i18n";
 import { useTranslation } from "react-i18next";
 import { Chip } from "react-native-paper";
 import { useSetting } from "../app/providers/SettingsProvider";
@@ -52,12 +43,15 @@ import BackupImportButton from "../features/settings/components/buttons/BackupIm
 import BackupExportButton from "../features/settings/components/buttons/BackupExportButton";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { SettingsStackParamList } from "../app/navigation/model/types";
-import { invoke } from "@tauri-apps/api/core";
 import { ContentProtectionSettingsToggle } from "../features/settings/components/ContentProtectionSettingsToggle";
 import AppearanceSettingsSection from "../features/settings/components/AppearanceSettingsSection";
 import { checkForDesktopUpdate } from "../shared/utils/desktopUpdater";
 import { publishUpdateCheck } from "../infrastructure/events/updateBus";
 import { logger } from "../infrastructure/logging/logger";
+import {
+  detectTauriEnvironment,
+  isTauriEnvironment,
+} from "../infrastructure/platform/isTauri";
 
 const styles = StyleSheet.create({
   surface: {
@@ -100,8 +94,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const [manualUpdateLabel, setManualUpdateLabel] = useState<string | null>(
     null,
   );
-
-  const [contentProtection, setContentProtection] = React.useState(true);
+  const [isTauri, setIsTauri] = useState(isTauriEnvironment());
 
   const { value: closeBehaviorValue, setValue: setCloseBehaviorValue } =
     useSetting("CLOSE_BEHAVIOR");
@@ -147,18 +140,22 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ref: authRef,
         plattform: null,
       },
-      {
-        title: t("settings:system"),
-        icon: "cogs",
-        ref: systemRef,
-        plattform: "web",
-      },
-      {
-        title: t("settings:updates"),
-        icon: "update",
-        ref: updatesRef,
-        plattform: "web",
-      },
+      ...(isTauri
+        ? ([
+            {
+              title: t("settings:system"),
+              icon: "cogs",
+              ref: systemRef,
+              plattform: "web",
+            },
+            {
+              title: t("settings:updates"),
+              icon: "update",
+              ref: updatesRef,
+              plattform: "web",
+            },
+          ] satisfies QuickSelectItem[])
+        : []),
       {
         title: t("settings:appearance"),
         icon: "theme-light-dark",
@@ -171,12 +168,16 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ref: authSettingsRef,
         plattform: null,
       },
-      {
-        title: t("settings:browserExtensions"),
-        icon: "puzzle",
-        ref: browserExtensionRef,
-        plattform: "web",
-      },
+      ...(isTauri
+        ? ([
+            {
+              title: t("settings:browserExtensions"),
+              icon: "puzzle",
+              ref: browserExtensionRef,
+              plattform: "web",
+            },
+          ] satisfies QuickSelectItem[])
+        : []),
       {
         title: t("settings:cryptography"),
         icon: "key-chain",
@@ -202,7 +203,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         plattform: null,
       },
     ],
-    [t, language],
+    [isTauri, t, language],
   );
 
   useFocusEffect(
@@ -240,6 +241,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   };
 
   const changeAutoStart = async (startup: boolean) => {
+    if (!(await detectTauriEnvironment())) {
+      return;
+    }
+    const { enable, disable } = await import("@tauri-apps/plugin-autostart");
     if (startup) {
       await enable();
       setStartup(true);
@@ -249,30 +254,27 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     }
   };
 
-  async function toggleContentProtection(next: boolean) {
-    try {
-      await invoke("set_content_protection", { enabled: next });
-      setContentProtection(next);
-    } catch (e: any) {
-    } finally {
-    }
-  }
-
   const getAutoStart = async () => {
+    if (!(await detectTauriEnvironment())) {
+      setStartup(false);
+      return;
+    }
+    const { isEnabled } = await import("@tauri-apps/plugin-autostart");
     const value = await isEnabled();
     setStartup(value);
   };
 
   const resetWindowSize = async () => {
-    if (Platform.OS !== "web") {
+    if (!(await detectTauriEnvironment())) {
       return;
     }
 
+    const { invoke } = await import("@tauri-apps/api/core");
     await invoke("reset_window_size");
   };
 
   const checkForUpdates = async () => {
-    if (Platform.OS !== "web" || checkingUpdate) {
+    if (!(await detectTauriEnvironment()) || checkingUpdate) {
       return;
     }
 
@@ -296,6 +298,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   };
 
   useEffect(() => {
+    void (async () => {
+      setIsTauri(await detectTauriEnvironment());
+    })();
     getAutoStart();
     isUsingAuthentication().then((isAuthenticated) => {
       setUseAuthentication(isAuthenticated);
@@ -303,10 +308,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   }, []);
 
   const openURL = async (value: string) => {
-    if (Platform.OS === "web") {
+    if (await detectTauriEnvironment()) {
+      const { open } = await import("@tauri-apps/plugin-shell");
       await open(value);
     } else {
-      Linking.openURL(value);
+      await Linking.openURL(value);
     }
   };
 
@@ -330,24 +336,24 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           <SettingsQuickSelect scrollRef={scrollRef} items={quickSelectItems} />
           <ScrollView ref={scrollRef} style={styles.scrollView}>
             <SettingsContainer
-              ref={quickSelectItems[0].ref}
-              icon={quickSelectItems[0].icon}
-              title={quickSelectItems[0].title}
+              ref={authRef}
+              icon="sync"
+              title={t("settings:sync")}
             >
               <Auth navigation={navigation} />
             </SettingsContainer>
 
-            <WebSpecific>
+            {isTauri ? (
               <SettingsContainer
-                ref={quickSelectItems[1].ref}
-                icon={quickSelectItems[1].icon}
-                title={quickSelectItems[1].title}
+                ref={systemRef}
+                icon="cogs"
+                title={t("settings:system")}
               >
                 <SettingsSwitch
                   label={t("settings:autostart")}
                   value={startup}
                   onValueChange={(checked) => {
-                    changeAutoStart(checked);
+                    void changeAutoStart(checked);
                   }}
                 />
                 <SettingsDivider />
@@ -371,7 +377,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                   label={t("settings:minimizeToTray")}
                   value={closeBehavior}
                   onValueChange={(checked) => {
-                    changeCloseBehavior(checked);
+                    void changeCloseBehavior(checked);
                   }}
                 />
                 <SettingsDivider />
@@ -379,40 +385,42 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                   {t("settings:showHide")}
                 </SettingsShortcutItem>
               </SettingsContainer>
-            </WebSpecific>
+            ) : null}
 
-            <SettingsContainer
-              ref={quickSelectItems[2].ref}
-              icon={quickSelectItems[2].icon}
-              title={quickSelectItems[2].title}
-            >
-              <SettingsItem>
-                {checkingUpdate
-                  ? t("settings:checkingForUpdates")
-                  : (manualUpdateLabel ?? t("settings:noUpdatesAvailable"))}
-              </SettingsItem>
-              <SettingsDivider />
-              <SettingsItem
-                onPress={() => {
-                  checkForUpdates();
-                }}
+            {isTauri ? (
+              <SettingsContainer
+                ref={updatesRef}
+                icon="update"
+                title={t("settings:updates")}
               >
-                {t("settings:checkForUpdates")}
-              </SettingsItem>
-            </SettingsContainer>
+                <SettingsItem>
+                  {checkingUpdate
+                    ? t("settings:checkingForUpdates")
+                    : (manualUpdateLabel ?? t("settings:noUpdatesAvailable"))}
+                </SettingsItem>
+                <SettingsDivider />
+                <SettingsItem
+                  onPress={() => {
+                    void checkForUpdates();
+                  }}
+                >
+                  {t("settings:checkForUpdates")}
+                </SettingsItem>
+              </SettingsContainer>
+            ) : null}
 
             <SettingsContainer
-              ref={quickSelectItems[3].ref}
-              icon={quickSelectItems[3].icon}
-              title={quickSelectItems[3].title}
+              ref={designRef}
+              icon="theme-light-dark"
+              title={t("settings:appearance")}
             >
               <AppearanceSettingsSection dropdownMaxWidth={160} />
             </SettingsContainer>
 
             <SettingsContainer
-              ref={quickSelectItems[4].ref}
-              icon={quickSelectItems[4].icon}
-              title={quickSelectItems[4].title}
+              ref={authSettingsRef}
+              icon="shield"
+              title={t("settings:security")}
             >
               <SettingsItem
                 onPress={() => {
@@ -515,7 +523,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               />
             </SettingsContainer>
 
-            <WebSpecific>
+            {isTauri ? (
               <SettingsContainer
                 ref={browserExtensionRef}
                 icon="puzzle"
@@ -537,12 +545,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                   {t("settings:browserManageConnections")}
                 </SettingsItem>
               </SettingsContainer>
-            </WebSpecific>
+            ) : null}
 
             <SettingsContainer
-              ref={quickSelectItems[6].ref}
-              icon={quickSelectItems[6].icon}
-              title={quickSelectItems[6].title}
+              ref={cryptoRef}
+              icon="key-chain"
+              title={t("settings:cryptography")}
             >
               <SettingsShortcutItem shortcut="XChaCha20">
                 {t("settings:encryption")}
@@ -554,9 +562,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             </SettingsContainer>
 
             <SettingsContainer
-              ref={quickSelectItems[7].ref}
-              icon={quickSelectItems[7].icon}
-              title={quickSelectItems[7].title}
+              ref={fastAccessRef}
+              icon="tooltip-account"
+              title={t("settings:fastAccess")}
             >
               <SettingsSwitch
                 label={t("settings:autoOpenFastAccess")}
@@ -568,9 +576,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             </SettingsContainer>
 
             <SettingsContainer
-              ref={quickSelectItems[8].ref}
-              icon={quickSelectItems[8].icon}
-              title={quickSelectItems[8].title}
+              ref={backupRef}
+              icon="database"
+              title={t("settings:backup")}
             >
               <BackupImportButton />
               <SettingsDivider />
@@ -578,9 +586,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             </SettingsContainer>
 
             <SettingsContainer
-              ref={quickSelectItems[9].ref}
-              icon={quickSelectItems[9].icon}
-              title={quickSelectItems[9].title}
+              ref={importRef}
+              icon="import"
+              title={t("settings:import")}
             >
               <Import
                 type={DocumentTypeEnum.FIREFOX}

@@ -1,4 +1,5 @@
 import { Platform } from "react-native";
+import { detectTauriEnvironment } from "../../../infrastructure/platform/isTauri";
 
 // Optional: Expo native info (iOS/Android)
 let ExpoDevice: any = null;
@@ -15,8 +16,7 @@ type DeviceIdentity = {
 };
 
 async function tryGetTauriDeviceIdentity(): Promise<DeviceIdentity | null> {
-  // Web === Desktop renderer (Tauri)
-  if (Platform.OS !== "web") return null;
+  if (!(await detectTauriEnvironment())) return null;
 
   try {
     const { invoke } = await import("@tauri-apps/api/core");

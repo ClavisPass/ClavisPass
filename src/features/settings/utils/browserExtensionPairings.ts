@@ -1,5 +1,4 @@
-import { Platform } from "react-native";
-import { invoke } from "@tauri-apps/api/core";
+import { detectTauriEnvironment } from "../../../infrastructure/platform/isTauri";
 
 export type PendingPairing = {
   extensionId: string;
@@ -21,13 +20,14 @@ export type PairedClient = {
 };
 
 export async function listBrowserExtensionPairings() {
-  if (Platform.OS !== "web") {
+  if (!(await detectTauriEnvironment())) {
     return {
       pending: [] as PendingPairing[],
       paired: [] as PairedClient[],
     };
   }
 
+  const { invoke } = await import("@tauri-apps/api/core");
   const [pending, paired] = await Promise.all([
     invoke<PendingPairing[]>("bridge_list_pending_pairings"),
     invoke<PairedClient[]>("bridge_list_paired_clients"),
@@ -37,6 +37,24 @@ export async function listBrowserExtensionPairings() {
     pending: pending ?? [],
     paired: paired ?? [],
   };
+}
+
+export async function actOnBrowserExtensionPairing(
+  action:
+    | "bridge_approve_pairing"
+    | "bridge_reject_pairing"
+    | "bridge_revoke_pairing",
+  item: { extensionId: string; clientInstanceId?: string | null },
+) {
+  if (!(await detectTauriEnvironment())) {
+    return;
+  }
+
+  const { invoke } = await import("@tauri-apps/api/core");
+  await invoke(action, {
+    extensionId: item.extensionId,
+    clientInstanceId: item.clientInstanceId ?? null,
+  });
 }
 
 export function buildBrowserClientKey(

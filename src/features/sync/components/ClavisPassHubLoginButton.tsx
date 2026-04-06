@@ -31,8 +31,8 @@ import PasswordTextbox from "../../../shared/components/PasswordTextbox";
 import LogoColored from "../../../shared/ui/LogoColored";
 import Divider from "../../../shared/components/Divider";
 import SettingsItem from "../../settings/components/SettingsItem";
-import { open } from "@tauri-apps/plugin-shell";
 import * as Linking from "expo-linking";
+import { detectTauriEnvironment } from "../../../infrastructure/platform/isTauri";
 
 const CLAVISPASS_HUB_REPO_URL = "https://github.com/ClavisPass/ClavisPass-Hub";
 
@@ -267,7 +267,8 @@ function ClavisPassHubLoginButton() {
   };
 
   const openURL = useCallback(async (value: string) => {
-    if (Platform.OS === "web") {
+    if (await detectTauriEnvironment()) {
+      const { open } = await import("@tauri-apps/plugin-shell");
       await open(value);
     } else {
       await Linking.openURL(value);

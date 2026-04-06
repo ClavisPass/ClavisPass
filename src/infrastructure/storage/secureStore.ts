@@ -1,36 +1,45 @@
 import { Platform } from "react-native";
+import { detectTauriEnvironment } from "../platform/isTauri";
 
-let SecureStore: any;
-let tauri: any;
+let nativeSecureStore: any;
 
 if (Platform.OS === "ios" || Platform.OS === "android") {
-  SecureStore = require("expo-secure-store");
+  nativeSecureStore = require("expo-secure-store");
 }
 
-if (Platform.OS === "web") {
-  tauri = require("@tauri-apps/api/core");
+async function getTauriCore() {
+  if (!(await detectTauriEnvironment())) {
+    throw new Error("Tauri secure storage is not available in this environment.");
+  }
+
+  return import("@tauri-apps/api/core");
 }
 
 export const saveData = async (key: string, value: string) => {
   if (Platform.OS === "ios" || Platform.OS === "android") {
-    await SecureStore.setItemAsync(key, value);
-  } else if (Platform.OS === "web") {
-    await tauri.invoke('save_key', { key, value });
+    await nativeSecureStore.setItemAsync(key, value);
+    return;
   }
+
+  const tauri = await getTauriCore();
+  await tauri.invoke("save_key", { key, value });
 };
 
 export const getData = async (key: string) => {
   if (Platform.OS === "ios" || Platform.OS === "android") {
-    return await SecureStore.getItemAsync(key) as string;
-  } else if (Platform.OS === "web") {
-    return await tauri.invoke('get_key', { key }) as string;
+    return (await nativeSecureStore.getItemAsync(key)) as string;
   }
+
+  const tauri = await getTauriCore();
+  return (await tauri.invoke("get_key", { key })) as string;
 };
 
 export const removeData = async (key: string) => {
   if (Platform.OS === "ios" || Platform.OS === "android") {
-    await SecureStore.deleteItemAsync(key);
-  } else if (Platform.OS === "web") {
-    await tauri.invoke('remove_key', { key });
+    await nativeSecureStore.deleteItemAsync(key);
+    return;
   }
+
+  const tauri = await getTauriCore();
+  await tauri.invoke("remove_key", { key });
 };

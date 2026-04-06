@@ -1,10 +1,8 @@
 import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 import * as Clipboard from "expo-clipboard";
-import { listen } from "@tauri-apps/api/event";
-import { currentMonitor, LogicalPosition } from "@tauri-apps/api/window";
-import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { logger } from "../../../infrastructure/logging/logger";
+import { detectTauriEnvironment } from "../../../infrastructure/platform/isTauri";
 import {
   FAST_ACCESS_NOTIFICATION_CATEGORY,
   FAST_ACCESS_POPUP_LABEL,
@@ -39,6 +37,11 @@ async function ensurePopupReadyListener() {
     return;
   }
 
+  if (!(await detectTauriEnvironment())) {
+    return;
+  }
+
+  const { listen } = await import("@tauri-apps/api/event");
   await listen(FAST_ACCESS_READY_EVENT, () => {
     resolvePopupReady();
   });
@@ -123,7 +126,7 @@ async function configureMobileFastAccess() {
 }
 
 export async function prepareFastAccess() {
-  if (Platform.OS === "web") {
+  if (await detectTauriEnvironment()) {
     await ensurePopupReadyListener();
     return;
   }
@@ -144,6 +147,10 @@ export async function prepareFastAccess() {
 }
 
 async function ensurePopupWindow() {
+  if (!(await detectTauriEnvironment())) {
+    throw new Error("Fast access popup is only available in Tauri.");
+  }
+  const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
   let win = await WebviewWindow.getByLabel(FAST_ACCESS_POPUP_LABEL);
   if (win) return win;
 
@@ -177,7 +184,7 @@ export async function openFastAccess(
   username: string,
   password: string
 ) {
-  if (Platform.OS === "web") {
+  if (await detectTauriEnvironment()) {
     try {
       await prepareFastAccess();
       const win = await ensurePopupWindow();
@@ -227,8 +234,9 @@ export async function openFastAccess(
 }
 
 export async function hideFastAccess() {
-  if (Platform.OS === "web") {
+  if (await detectTauriEnvironment()) {
     try {
+      const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
       const win = await WebviewWindow.getByLabel(FAST_ACCESS_POPUP_LABEL);
       if (win) {
         await win.hide();
@@ -260,7 +268,8 @@ export async function syncFastAccessSession(sessionKey: string | null) {
   activeFastAccessKey = null;
   hideMobileFastAccess();
 
-  if (Platform.OS === "web") {
+  if (await detectTauriEnvironment()) {
+    const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
     const win = await WebviewWindow.getByLabel(FAST_ACCESS_POPUP_LABEL);
     if (win) {
       try {
@@ -295,7 +304,8 @@ export async function cleanupFastAccessOnStartup(hasActiveSession: boolean) {
   activeFastAccessKey = null;
   hideMobileFastAccess();
 
-  if (Platform.OS === "web") {
+  if (await detectTauriEnvironment()) {
+    const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
     const win = await WebviewWindow.getByLabel(FAST_ACCESS_POPUP_LABEL);
     if (win) {
       try {
@@ -319,6 +329,14 @@ export async function cleanupFastAccessOnStartup(hasActiveSession: boolean) {
 }
 
 export async function positionPopupBottomRight() {
+  if (!(await detectTauriEnvironment())) {
+    return;
+  }
+  const [{ WebviewWindow }, { currentMonitor, LogicalPosition }] =
+    await Promise.all([
+      import("@tauri-apps/api/webviewWindow"),
+      import("@tauri-apps/api/window"),
+    ]);
   const win = await WebviewWindow.getByLabel(FAST_ACCESS_POPUP_LABEL);
   if (!win) {
     logger.warn("Popup-Fenster nicht gefunden");

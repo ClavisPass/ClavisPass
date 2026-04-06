@@ -1,7 +1,11 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
-import { Platform, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { useTheme } from "./ThemeProvider";
 import { Text } from "react-native-paper";
+import {
+  detectTauriEnvironment,
+  useIsTauriEnvironment,
+} from "../../infrastructure/platform/isTauri";
 
 interface DevModeContextType {
   devMode: boolean;
@@ -17,16 +21,18 @@ type Props = {
 export const DevModeProvider = ({ children }: Props) => {
   const { theme } = useTheme();
   const [devMode, setDevMode] = useState(false);
+  const isTauri = useIsTauriEnvironment();
 
   const startDevTools = async () => {
-    if (Platform.OS === "web") {
-      const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
-      const win = await WebviewWindow.getByLabel("main");
-      if (!win) {
-        return;
-      }
-      //win.openDevTools();
+    if (!(await detectTauriEnvironment())) {
+      return;
     }
+    const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
+    const win = await WebviewWindow.getByLabel("main");
+    if (!win) {
+      return;
+    }
+    //win.openDevTools();
   };
 
   return (
@@ -60,7 +66,7 @@ export const DevModeProvider = ({ children }: Props) => {
               alignItems: "center",
             }}
           >
-            {Platform.OS === "web" && (
+            {isTauri && (
               <TouchableOpacity
                 onPress={startDevTools}
                 style={{

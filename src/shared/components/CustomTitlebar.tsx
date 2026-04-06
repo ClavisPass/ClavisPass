@@ -1,17 +1,19 @@
 import React, { useEffect } from "react";
-import { Platform, View, StyleSheet, useWindowDimensions } from "react-native";
+import { View, StyleSheet, useWindowDimensions } from "react-native";
 import { Icon } from "react-native-paper";
 import theme from "../ui/theme";
-import WebSpecific from "../../infrastructure/platform/WebSpecific";
-import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useAuth } from "../../app/providers/AuthProvider";
-import { exit } from "@tauri-apps/plugin-process";
 import { useTheme } from "../../app/providers/ThemeProvider";
 import showMainWindow from "../../infrastructure/platform/showMainWindow";
 import AnimatedPressable from "./AnimatedPressable";
 import { useSetting } from "../../app/providers/SettingsProvider";
+import {
+  detectTauriEnvironment,
+  isTauriEnvironment,
+  useIsTauriEnvironment,
+} from "../../infrastructure/platform/isTauri";
 
-export const TITLEBAR_HEIGHT = Platform.OS === "web" ? 40 : 0;
+export const TITLEBAR_HEIGHT = isTauriEnvironment() ? 40 : 0;
 
 const styles = StyleSheet.create({
   titlebar: {
@@ -26,23 +28,21 @@ type Props = {
 };
 
 export function TitlebarHeight(props: Props) {
+  if (!isTauriEnvironment()) {
+    return null;
+  }
+
   if (props.filled) {
     return (
-      <WebSpecific>
-        <View
-          style={[
-            styles.titlebar,
-            { backgroundColor: "white", borderRadius: 20, marginBottom: 4 },
-          ]}
-        />
-      </WebSpecific>
+      <View
+        style={[
+          styles.titlebar,
+          { backgroundColor: "white", borderRadius: 20, marginBottom: 4 },
+        ]}
+      />
     );
   }
-  return (
-    <WebSpecific>
-      <View style={styles.titlebar} />
-    </WebSpecific>
-  );
+  return <View style={styles.titlebar} />;
 }
 
 function CustomTitlebar() {
@@ -52,9 +52,10 @@ function CustomTitlebar() {
 
   const { value: closeBehavior } = useSetting("CLOSE_BEHAVIOR");
   const { value: startBehavior } = useSetting("START_BEHAVIOR");
+  const isTauri = useIsTauriEnvironment();
 
   useEffect(() => {
-    if (Platform.OS === "web") {
+    if (isTauri) {
       if (document) {
         document
           .getElementById("titlebar")
@@ -67,22 +68,29 @@ function CustomTitlebar() {
         document.adoptedStyleSheets = [sheet];
       }
     }
-  }, []);
+  }, [isTauri]);
 
   useEffect(() => {
-    if (Platform.OS === "web") {
+    if (isTauri) {
       showMainWindow(startBehavior);
     }
-  }, [startBehavior]);
+  }, [isTauri, startBehavior]);
 
-  const minimizeWindow = () => {
+  const minimizeWindow = async () => {
+    if (!(await detectTauriEnvironment())) return;
+    const { getCurrentWindow } = await import("@tauri-apps/api/window");
     const appWindow = getCurrentWindow();
     if (appWindow) {
-      appWindow.minimize();
+      await appWindow.minimize();
     }
   };
 
   const closeWindow = async () => {
+    if (!(await detectTauriEnvironment())) return;
+    const [{ getCurrentWindow }, { exit }] = await Promise.all([
+      import("@tauri-apps/api/window"),
+      import("@tauri-apps/plugin-process"),
+    ]);
     const appWindow = getCurrentWindow();
     if (!appWindow) return;
 
@@ -96,7 +104,7 @@ function CustomTitlebar() {
   };
 
   return (
-    <WebSpecific>
+    <>{isTauri ? (
       <View
         style={{
           left: 0,
@@ -171,7 +179,7 @@ function CustomTitlebar() {
           </View>
         </View>
       </View>
-    </WebSpecific>
+    ) : null}</>
   );
 }
 

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import "react-native-gesture-handler";
 import {
   useFonts,
@@ -7,18 +6,16 @@ import {
   LexendExa_700Bold,
 } from "@expo-google-fonts/lexend-exa";
 import { AuthProvider } from "./src/app/providers/AuthProvider";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 import CustomTitlebar from "./src/shared/components/CustomTitlebar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import GlobalShortcuts from "./src/shared/components/shortcuts/GlobalShortcuts";
 import { ThemeProvider } from "./src/app/providers/ThemeProvider";
 import { CloudProvider } from "./src/app/providers/CloudProvider";
-import theme from "./src/shared/ui/theme";
 import { OnlineProvider } from "./src/app/providers/OnlineProvider";
 import FastAccessScreen from "./src/screens/FastAccessScreen";
 import { DevModeProvider } from "./src/app/providers/DevModeProvider";
 import { AutocompleteDropdownContextProvider } from "react-native-autocomplete-dropdown";
-import { onOpenUrl, register } from "@tauri-apps/plugin-deep-link";
 import { logger } from "./src/infrastructure/logging/logger";
 import GlobalErrorSnackbar from "./src/shared/components/GlobalErrorSnackbar";
 import { SettingsProvider } from "./src/app/providers/SettingsProvider";
@@ -36,34 +33,46 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import BrowserBridgeSessionSync from "./src/features/browserBridge/components/BrowserBridgeSessionSync";
 import BrowserBridgeWriteSync from "./src/features/browserBridge/components/BrowserBridgeWriteSync";
 import { useTheme } from "./src/app/providers/ThemeProvider";
-
-const Tab = createBottomTabNavigator();
-
-const protocol = async () => {
-  await register(getAppScheme());
-};
+import {
+  detectTauriEnvironment,
+  useIsTauriEnvironment,
+} from "./src/infrastructure/platform/isTauri";
 
 export function AppWithNavigation() {
   useEffect(() => {
-    protocol();
+    void (async () => {
+      if (!(await detectTauriEnvironment())) {
+        return;
+      }
+
+      const { register } = await import("@tauri-apps/plugin-deep-link");
+      await register(getAppScheme());
+    })();
   }, []);
 
   useEffect(() => {
-    const cleanup = onOpenUrl((event) => {
-      logger.info("Deep link received:", event);
-      try {
-        const url = new URL(event as any);
-        const code = url.searchParams.get("code");
-        if (code) {
-          logger.info("Received code:", code);
-        }
-      } catch (err) {
-        logger.error("Fehler beim Parsen der URL:", err);
+    let cleanup: Promise<() => void> | null = null;
+    void (async () => {
+      if (!(await detectTauriEnvironment())) {
+        return;
       }
-    });
 
+      const { onOpenUrl } = await import("@tauri-apps/plugin-deep-link");
+      cleanup = onOpenUrl((event) => {
+        logger.info("Deep link received:", event);
+        try {
+          const url = new URL(event as any);
+          const code = url.searchParams.get("code");
+          if (code) {
+            logger.info("Received code:", code);
+          }
+        } catch (err) {
+          logger.error("Fehler beim Parsen der URL:", err);
+        }
+      });
+    })();
     return () => {
-      cleanup.then((off) => off());
+      cleanup?.then((off) => off());
     };
   }, []);
 
@@ -86,16 +95,15 @@ export function AppWithNavigation() {
   );
 }
 
-let getCurrentWindowSafe: (() => Promise<{ label: string }>) | null = null;
-
-if (Platform.OS === "web") {
-  getCurrentWindowSafe = async () => {
-    const { getCurrentWindow } = await import("@tauri-apps/api/window");
-    const win = getCurrentWindow();
-    const label = await win.label;
-    return { label };
-  };
-}
+const getCurrentWindowSafe = async () => {
+  if (!(await detectTauriEnvironment())) {
+    return null;
+  }
+  const { getCurrentWindow } = await import("@tauri-apps/api/window");
+  const win = getCurrentWindow();
+  const label = await win.label;
+  return { label };
+};
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -106,13 +114,18 @@ export default function App() {
 
   useEffect(() => {
     const detectWindow = async () => {
-      if (Platform.OS !== "web" || !getCurrentWindowSafe) {
+      if (!(await detectTauriEnvironment())) {
         setView("main");
         return;
       }
 
       try {
-        const { label } = await getCurrentWindowSafe();
+        const windowInfo = await getCurrentWindowSafe();
+        if (!windowInfo) {
+          setView("main");
+          return;
+        }
+        const { label } = windowInfo;
         setView(label === "popup" ? "popup" : "main");
       } catch (e) {
         logger.warn("Fehler beim Lesen des Fensters:", e);
@@ -143,6 +156,7 @@ export default function App() {
 
 function AppShell() {
   const { theme } = useTheme();
+  const isTauri = useIsTauriEnvironment();
 
   return (
     <>
@@ -163,12 +177,10 @@ function AppShell() {
                   <View style={{ flex: 1, backgroundColor: "transparent" }}>
                     <View
                       style={{
-                        borderRadius: Platform.OS === "web" ? 6 : 0,
                         borderColor:
-                          Platform.OS === "web"
-                            ? theme.colors.primary
-                            : undefined,
-                        borderWidth: Platform.OS === "web" ? 1 : 0,
+                          isTauri ? theme.colors.primary : undefined,
+                        borderRadius: isTauri ? 6 : 0,
+                        borderWidth: isTauri ? 1 : 0,
                         backgroundColor: theme.colors.background,
                         overflow: "hidden",
                         flex: 1,

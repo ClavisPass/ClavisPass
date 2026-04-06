@@ -1,8 +1,12 @@
-import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { detectTauriEnvironment } from "../../../infrastructure/platform/isTauri";
 
 export const OAUTH_POPUP_LABEL = "oauth-popup";
 
 export async function closeOAuthPopupWindow() {
+  if (!(await detectTauriEnvironment())) {
+    return;
+  }
+  const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
   const popup = await WebviewWindow.getByLabel(OAUTH_POPUP_LABEL);
 
   if (!popup) {
@@ -13,6 +17,10 @@ export async function closeOAuthPopupWindow() {
 }
 
 export async function openOAuthPopupWindow(url: string, title: string) {
+  if (!(await detectTauriEnvironment())) {
+    return null;
+  }
+  const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
   const existing = await WebviewWindow.getByLabel(OAUTH_POPUP_LABEL);
 
   if (existing) {

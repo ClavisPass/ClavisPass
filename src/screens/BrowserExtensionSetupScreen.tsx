@@ -1,12 +1,11 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import { Chip, Icon, Text } from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
 import { useTranslation } from "react-i18next";
 import * as Linking from "expo-linking";
-import { open } from "@tauri-apps/plugin-shell";
 
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import Header from "../shared/components/Header";
@@ -16,6 +15,7 @@ import HintCard from "../shared/components/HintCard";
 import { useTheme } from "../app/providers/ThemeProvider";
 import { SettingsStackParamList } from "../app/navigation/model/types";
 import { listBrowserExtensionPairings } from "../features/settings/utils/browserExtensionPairings";
+import { detectTauriEnvironment } from "../infrastructure/platform/isTauri";
 
 const H_PAD = 8;
 
@@ -94,7 +94,8 @@ const BrowserExtensionSetupScreen: React.FC<
   }, [assistantTarget, t]);
 
   const openExternalTarget = useCallback(async (value: string) => {
-    if (Platform.OS === "web") {
+    if (await detectTauriEnvironment()) {
+      const { open } = await import("@tauri-apps/plugin-shell");
       await open(value);
       return;
     }

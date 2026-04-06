@@ -5,9 +5,7 @@ import { Icon, IconButton, TextInput } from "react-native-paper";
 import URLModuleType from "../../model/modules/URLModuleType";
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
-import { Platform, View } from "react-native";
-
-import { open } from "@tauri-apps/plugin-shell";
+import { View } from "react-native";
 
 import * as Linking from "expo-linking";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
@@ -20,6 +18,7 @@ import {
   buildFaviconUrl,
   normalizeUrl,
 } from "../../utils/digitalCardTheme";
+import { detectTauriEnvironment } from "../../../../infrastructure/platform/isTauri";
 
 function URLModule(props: URLModuleType & Props) {
   const didMount = useRef(false);
@@ -105,10 +104,11 @@ function URLModule(props: URLModuleType & Props) {
           onPress={async () => {
             if (!normalizedUrl) return;
 
-            if (Platform.OS === "web") {
+            if (await detectTauriEnvironment()) {
+              const { open } = await import("@tauri-apps/plugin-shell");
               await open(normalizedUrl);
             } else {
-              Linking.openURL(normalizedUrl);
+              await Linking.openURL(normalizedUrl);
             }
           }}
         />

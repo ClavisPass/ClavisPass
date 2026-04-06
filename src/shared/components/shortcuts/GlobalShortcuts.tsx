@@ -1,14 +1,16 @@
 import React, { useEffect } from "react";
-import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
-import { Platform } from "react-native";
-import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { useAuth } from "../../../app/providers/AuthProvider";
+import {
+  detectTauriEnvironment,
+  useIsTauriEnvironment,
+} from "../../../infrastructure/platform/isTauri";
 
 function GlobalShortcuts() {
   const auth = useAuth();
+  const isTauri = useIsTauriEnvironment();
 
   useEffect(() => {
-    if (Platform.OS === "web") {
+    if (isTauri) {
       const isDev = process.env.NODE_ENV === "development";
       if (isDev) return;
 
@@ -64,9 +66,13 @@ function GlobalShortcuts() {
         window.removeEventListener("wheel", handleWheel, true);
       };
     }
-  }, []);
+  }, [isTauri]);
 
   const windowInstance = async () => {
+    if (!(await detectTauriEnvironment())) {
+      return;
+    }
+    const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
     const win = await WebviewWindow.getByLabel("main");
     if (!win) {
       return;
@@ -76,8 +82,14 @@ function GlobalShortcuts() {
 
   useEffect(() => {
     let lastTriggered = 0;
+    let active = true;
 
     const registerShortcut = async () => {
+      if (!(await detectTauriEnvironment())) {
+        return;
+      }
+
+      const { register } = await import("@tauri-apps/plugin-global-shortcut");
       await register("Alt+W", async () => {
         const now = Date.now();
         if (now - lastTriggered < 500) {
@@ -102,9 +114,16 @@ function GlobalShortcuts() {
       });
     };
 
-    registerShortcut();
+    void registerShortcut();
     return () => {
-      unregister("Alt+W");
+      active = false;
+      void (async () => {
+        if (!(await detectTauriEnvironment())) {
+          return;
+        }
+        const { unregister } = await import("@tauri-apps/plugin-global-shortcut");
+        await unregister("Alt+W");
+      })();
     };
   }, []);
 

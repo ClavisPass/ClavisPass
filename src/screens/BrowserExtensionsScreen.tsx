@@ -6,7 +6,6 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { Chip, Divider, Icon, Text } from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
 import { useTranslation } from "react-i18next";
-import { invoke } from "@tauri-apps/api/core";
 
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import Header from "../shared/components/Header";
@@ -20,6 +19,7 @@ import { formatAbsoluteLocal } from "../shared/utils/Timestamp";
 import {
   buildBrowserClientKey,
   listBrowserExtensionPairings,
+  actOnBrowserExtensionPairing,
   type PairedClient,
   type PendingPairing,
 } from "../features/settings/utils/browserExtensionPairings";
@@ -89,10 +89,7 @@ const BrowserExtensionsScreen: React.FC<BrowserExtensionsScreenProps> = ({
       );
       setActingKey(actionKey);
       try {
-        await invoke(action, {
-          extensionId: item.extensionId,
-          clientInstanceId: item.clientInstanceId ?? null,
-        });
+        await actOnBrowserExtensionPairing(action, item);
         await loadPairings();
       } finally {
         setActingKey(null);

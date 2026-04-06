@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { Platform } from "react-native";
 
 import { useAuth } from "../../../app/providers/AuthProvider";
 import { useVault } from "../../../app/providers/VaultProvider";
@@ -10,6 +9,7 @@ import getModuleData from "../../vault/utils/getModuleData";
 import createUniqueID from "../../../shared/utils/createUniqueID";
 import { getDateTime } from "../../../shared/utils/Timestamp";
 import { logger } from "../../../infrastructure/logging/logger";
+import { detectTauriEnvironment } from "../../../infrastructure/platform/isTauri";
 
 type BrowserWriteKind = "createEntryFromBrowser" | "updateEntryFromBrowser";
 
@@ -136,13 +136,13 @@ function BrowserBridgeWriteSync() {
   const processingRef = useRef(false);
 
   useEffect(() => {
-    if (Platform.OS !== "web") return;
-
     let cancelled = false;
+    let isTauriRuntime = false;
 
     const processPendingWrites = async () => {
       if (
         cancelled ||
+        !isTauriRuntime ||
         processingRef.current ||
         !auth.isLoggedIn ||
         !vault.isUnlocked
@@ -239,7 +239,13 @@ function BrowserBridgeWriteSync() {
       }
     };
 
-    void processPendingWrites();
+    void (async () => {
+      isTauriRuntime = await detectTauriEnvironment();
+      if (!isTauriRuntime || cancelled) {
+        return;
+      }
+      await processPendingWrites();
+    })();
     const timer = setInterval(() => {
       void processPendingWrites();
     }, 1200);
