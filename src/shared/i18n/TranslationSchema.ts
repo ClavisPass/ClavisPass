@@ -181,6 +181,26 @@ export type TranslationSchema = {
     browserApprovedAt: string;
     browserLastSeenAt: string;
     browserUnknownClient: string;
+    browserAssistantTitle: string;
+    browserAssistantDescription: string;
+    browserAssistantFirefox: string;
+    browserAssistantEdge: string;
+    browserAssistantChrome: string;
+    browserAssistantStepInstallTitle: string;
+    browserAssistantStepInstallFirefox: string;
+    browserAssistantStepInstallEdge: string;
+    browserAssistantStepInstallChrome: string;
+    browserAssistantOpenBrowserPage: string;
+    browserAssistantOpenGuide: string;
+    browserAssistantStepBridgeTitle: string;
+    browserAssistantStepBridgeDescription: string;
+    browserAssistantStepPairingTitle: string;
+    browserAssistantStepPairingWaiting: string;
+    browserAssistantStepPairingPending: string;
+    browserAssistantStepPairingReady: string;
+    browserAssistantReloadStatus: string;
+    browserAssistantOpenApprovals: string;
+    browserManageConnections: string;
   };
   analysis: {
     topFindings: string;

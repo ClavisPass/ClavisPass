@@ -134,6 +134,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const systemRef = useRef<View>(null);
   const designRef = useRef<View>(null);
   const authSettingsRef = useRef<View>(null);
+  const browserExtensionRef = useRef<View>(null);
   const cryptoRef = useRef<View>(null);
   const updatesRef = useRef<View>(null);
   const fastAccessRef = useRef<View>(null);
@@ -171,6 +172,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         icon: "shield",
         ref: authSettingsRef,
         plattform: null,
+      },
+      {
+        title: t("settings:browserExtensions"),
+        icon: "puzzle",
+        ref: browserExtensionRef,
+        plattform: "web",
       },
       {
         title: t("settings:cryptography"),
@@ -442,17 +449,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 {t("settings:manageDevices")}
               </SettingsItem>
               <SettingsDivider />
-              <WebSpecific>
-                <SettingsShortcutItem
-                  shortcut={String(browserExtensionsCount)}
-                  onPress={() => {
-                    navigation.navigate("BrowserExtensions");
-                  }}
-                >
-                  {t("settings:browserExtensions")}
-                </SettingsShortcutItem>
-                <SettingsDivider />
-              </WebSpecific>
               <SettingsDropdownItem
                 value={String(copyDurationSeconds ?? 0)}
                 setValue={(v) => setCopyDurationSeconds(Number(v))}
@@ -528,10 +524,34 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               />
             </SettingsContainer>
 
+            <WebSpecific>
+              <SettingsContainer
+                ref={browserExtensionRef}
+                icon="puzzle"
+                title={t("settings:browserExtensions")}
+              >
+                <SettingsShortcutItem
+                  onPress={() => {
+                    navigation.navigate("BrowserExtensionSetup");
+                  }}
+                >
+                  {t("settings:browserAssistantTitle")}
+                </SettingsShortcutItem>
+                <SettingsDivider />
+                <SettingsItem
+                  onPress={() => {
+                    navigation.navigate("BrowserExtensions");
+                  }}
+                >
+                  {t("settings:browserManageConnections")}
+                </SettingsItem>
+              </SettingsContainer>
+            </WebSpecific>
+
             <SettingsContainer
-              ref={quickSelectItems[5].ref}
-              icon={quickSelectItems[5].icon}
-              title={quickSelectItems[5].title}
+              ref={quickSelectItems[6].ref}
+              icon={quickSelectItems[6].icon}
+              title={quickSelectItems[6].title}
             >
               <SettingsShortcutItem shortcut="XChaCha20">
                 {t("settings:encryption")}
@@ -543,9 +563,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             </SettingsContainer>
 
             <SettingsContainer
-              ref={quickSelectItems[6].ref}
-              icon={quickSelectItems[6].icon}
-              title={quickSelectItems[6].title}
+              ref={quickSelectItems[7].ref}
+              icon={quickSelectItems[7].icon}
+              title={quickSelectItems[7].title}
             >
               <SettingsSwitch
                 label={t("settings:autoOpenFastAccess")}
@@ -557,9 +577,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             </SettingsContainer>
 
             <SettingsContainer
-              ref={quickSelectItems[7].ref}
-              icon={quickSelectItems[7].icon}
-              title={quickSelectItems[7].title}
+              ref={quickSelectItems[8].ref}
+              icon={quickSelectItems[8].icon}
+              title={quickSelectItems[8].title}
             >
               <BackupImportButton />
               <SettingsDivider />
@@ -567,9 +587,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             </SettingsContainer>
 
             <SettingsContainer
-              ref={quickSelectItems[8].ref}
-              icon={quickSelectItems[8].icon}
-              title={quickSelectItems[8].title}
+              ref={quickSelectItems[9].ref}
+              icon={quickSelectItems[9].icon}
+              title={quickSelectItems[9].title}
             >
               <Import
                 type={DocumentTypeEnum.FIREFOX}

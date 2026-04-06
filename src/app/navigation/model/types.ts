@@ -33,6 +33,7 @@ export type SettingsStackParamList = {
   Settings: undefined;
   Scan: undefined;
   Devices: undefined;
+  BrowserExtensionSetup: undefined;
   BrowserExtensions: undefined;
 };
 
