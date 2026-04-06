@@ -58,7 +58,7 @@ import AppearanceSettingsSection from "../features/settings/components/Appearanc
 import { checkForDesktopUpdate } from "../shared/utils/desktopUpdater";
 import { publishUpdateCheck } from "../infrastructure/events/updateBus";
 import { logger } from "../infrastructure/logging/logger";
-import BrowserExtensionPairingSection from "../features/settings/components/BrowserExtensionPairingSection";
+import { listBrowserExtensionPairings } from "../features/settings/utils/browserExtensionPairings";
 
 const styles = StyleSheet.create({
   surface: {
@@ -99,8 +99,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const [useAuthentication, setUseAuthentication] = React.useState(false);
   const [checkingUpdate, setCheckingUpdate] = useState(false);
   const [manualUpdateLabel, setManualUpdateLabel] = useState<string | null>(
-    null
+    null,
   );
+  const [browserExtensionsCount, setBrowserExtensionsCount] = useState(0);
 
   const [contentProtection, setContentProtection] = React.useState(true);
 
@@ -196,14 +197,21 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         plattform: null,
       },
     ],
-    [t, language]
+    [t, language],
   );
 
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(0);
       setHeaderWhite(false);
-    }, [setHeaderSpacing, setHeaderWhite])
+      if (Platform.OS === "web") {
+        void listBrowserExtensionPairings().then((result) => {
+          setBrowserExtensionsCount(
+            result.pending.length + result.paired.length,
+          );
+        });
+      }
+    }, [setHeaderSpacing, setHeaderWhite]),
   );
 
   const changeAuthentication = async (authentication: boolean) => {
@@ -277,7 +285,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
       const update = await checkForDesktopUpdate();
       publishUpdateCheck(update);
       setManualUpdateLabel(
-        update ? t("settings:updateAvailable") : t("settings:noUpdatesAvailable")
+        update
+          ? t("settings:updateAvailable")
+          : t("settings:noUpdatesAvailable"),
       );
     } catch (error) {
       logger.error("Manual update check failed:", error);
@@ -381,7 +391,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               <SettingsItem>
                 {checkingUpdate
                   ? t("settings:checkingForUpdates")
-                  : manualUpdateLabel ?? t("settings:noUpdatesAvailable")}
+                  : (manualUpdateLabel ?? t("settings:noUpdatesAvailable"))}
               </SettingsItem>
               <SettingsDivider />
               <SettingsItem
@@ -432,6 +442,17 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 {t("settings:manageDevices")}
               </SettingsItem>
               <SettingsDivider />
+              <WebSpecific>
+                <SettingsShortcutItem
+                  shortcut={String(browserExtensionsCount)}
+                  onPress={() => {
+                    navigation.navigate("BrowserExtensions");
+                  }}
+                >
+                  {t("settings:browserExtensions")}
+                </SettingsShortcutItem>
+                <SettingsDivider />
+              </WebSpecific>
               <SettingsDropdownItem
                 value={String(copyDurationSeconds ?? 0)}
                 setValue={(v) => setCopyDurationSeconds(Number(v))}
@@ -520,12 +541,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 {t("settings:keyDerivation")}
               </SettingsShortcutItem>
             </SettingsContainer>
-
-            <WebSpecific>
-              <SettingsContainer icon={"web"} title={t("settings:browserExtensions")}>
-                <BrowserExtensionPairingSection />
-              </SettingsContainer>
-            </WebSpecific>
 
             <SettingsContainer
               ref={quickSelectItems[6].ref}

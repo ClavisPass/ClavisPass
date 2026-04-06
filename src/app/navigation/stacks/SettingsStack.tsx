@@ -4,6 +4,7 @@ import SettingsScreen from "../../../screens/SettingsScreen";
 import ScanScreen from "../../../screens/ScanScreen";
 import { SettingsStackParamList } from "../model/types";
 import DevicesScreen from "../../../screens/DevicesScreen";
+import BrowserExtensionsScreen from "../../../screens/BrowserExtensionsScreen";
 
 const Stack = createNativeStackNavigator<SettingsStackParamList>();
 
@@ -13,6 +14,10 @@ export default function SettingsStack() {
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="Scan" component={ScanScreen} />
       <Stack.Screen name="Devices" component={DevicesScreen} />
+      <Stack.Screen
+        name="BrowserExtensions"
+        component={BrowserExtensionsScreen}
+      />
     </Stack.Navigator>
   );
 }

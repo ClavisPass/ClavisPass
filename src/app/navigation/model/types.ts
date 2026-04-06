@@ -6,7 +6,12 @@ import AnalysisRef from "../../../features/analysis/model/AnalysisRef";
 
 export type HomeStackParamList = {
   Home: { triggerAdd?: boolean } | undefined;
-  Edit: { value: ValuesType; favorite?: boolean; folder?: FolderType | null, searchstring?: string | null };
+  Edit: {
+    value: ValuesType;
+    favorite?: boolean;
+    folder?: FolderType | null;
+    searchstring?: string | null;
+  };
   DigitalCardScan: { setData: (data: string, type: string) => void };
   TotpScan: { setOtpauth: (uri: string) => void };
   CardDetails: {
@@ -28,6 +33,7 @@ export type SettingsStackParamList = {
   Settings: undefined;
   Scan: undefined;
   Devices: undefined;
+  BrowserExtensions: undefined;
 };
 
 export type LoginStackParamList = {

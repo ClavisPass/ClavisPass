@@ -1,16 +1,26 @@
 import { ReactNode } from "react";
 import { View } from "react-native";
-import { Icon, Text } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { useTheme } from "../../../app/providers/ThemeProvider";
+import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 
 type Props = {
   children: ReactNode;
   shortcut: string;
+  onPress?: () => void;
 };
 function SettingsItem(props: Props) {
   const { theme } = useTheme();
-  return (
-    <View style={{ height: 44, display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+  const content = (
+    <View
+      style={{
+        height: 44,
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
       <View
         style={{
           flex: 1,
@@ -23,7 +33,8 @@ function SettingsItem(props: Props) {
           alignItems: "center",
           gap: 6,
         }}
-      >{/*
+      >
+        {/*
         <Icon
           size={20}
           color={theme.colors.primary}
@@ -39,14 +50,26 @@ function SettingsItem(props: Props) {
         </Text>
       </View>
       <Text
-          variant="bodyLarge"
-          style={{ userSelect: "none", color: theme.colors.primary, marginRight: 10 }}
-          numberOfLines={1}
-        >
-          {props.shortcut}
-        </Text>
+        variant="bodyLarge"
+        style={{
+          userSelect: "none",
+          color: theme.colors.primary,
+          marginRight: 10,
+        }}
+        numberOfLines={1}
+      >
+        {props.shortcut}
+      </Text>
     </View>
   );
+
+  if (props.onPress) {
+    return (
+      <AnimatedPressable onPress={props.onPress}>{content}</AnimatedPressable>
+    );
+  }
+
+  return content;
 }
 
 export default SettingsItem;
