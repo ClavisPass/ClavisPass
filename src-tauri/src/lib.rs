@@ -112,6 +112,7 @@ pub fn run() {
             .inner_size(601.0, 400.0)
             .min_inner_size(350.0, 350.0)
             .decorations(false)
+            .transparent(true)
             .content_protected(true)
             .maximizable(false)
             .use_https_scheme(true)

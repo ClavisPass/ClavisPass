@@ -35,6 +35,7 @@ import FastAccessSessionBridge from "./src/features/fastaccess/components/FastAc
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import BrowserBridgeSessionSync from "./src/features/browserBridge/components/BrowserBridgeSessionSync";
 import BrowserBridgeWriteSync from "./src/features/browserBridge/components/BrowserBridgeWriteSync";
+import { useTheme } from "./src/app/providers/ThemeProvider";
 
 const Tab = createBottomTabNavigator();
 
@@ -68,47 +69,14 @@ export function AppWithNavigation() {
 
   return (
     <SafeAreaProvider>
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <GestureHandlerRootView
+        style={{ flex: 1, backgroundColor: "transparent" }}
+      >
         <AutocompleteDropdownContextProvider>
           <SettingsProvider>
             <ContentProtectionProvider defaultEnabled={true}>
               <ThemeProvider>
-                <DropdownLayer />
-                <I18nBridge />
-                <OnlineProvider>
-                  <AuthProvider>
-                    <FastAccessSessionBridge />
-                    <CloudProvider>
-                      <VaultProvider>
-                        <BrowserBridgeSessionSync />
-                        <BrowserBridgeWriteSync />
-                        <DevModeProvider>
-                          <BottomSheetModalProvider>
-                            <GlobalErrorSnackbar />
-                            <GlobalClipboardSnackbar />
-                            <MobileFastAccessOverlay />
-                            <View
-                              style={{
-                                borderRadius: Platform.OS === "web" ? 6 : 0,
-                                borderColor:
-                                  Platform.OS === "web"
-                                    ? theme.colors.primary
-                                    : undefined,
-                                borderWidth: Platform.OS === "web" ? 1 : 0,
-                                overflow: "hidden",
-                                flex: 1,
-                              }}
-                            >
-                              <GlobalShortcuts />
-                              <CustomTitlebar />
-                              <NavigationContainer />
-                            </View>
-                          </BottomSheetModalProvider>
-                        </DevModeProvider>
-                      </VaultProvider>
-                    </CloudProvider>
-                  </AuthProvider>
-                </OnlineProvider>
+                <AppShell />
               </ThemeProvider>
             </ContentProtectionProvider>
           </SettingsProvider>
@@ -171,5 +139,53 @@ export default function App() {
   }
 
   return <AppWithNavigation />;
+}
+
+function AppShell() {
+  const { theme } = useTheme();
+
+  return (
+    <>
+      <DropdownLayer />
+      <I18nBridge />
+      <OnlineProvider>
+        <AuthProvider>
+          <FastAccessSessionBridge />
+          <CloudProvider>
+            <VaultProvider>
+              <BrowserBridgeSessionSync />
+              <BrowserBridgeWriteSync />
+              <DevModeProvider>
+                <BottomSheetModalProvider>
+                  <GlobalErrorSnackbar />
+                  <GlobalClipboardSnackbar />
+                  <MobileFastAccessOverlay />
+                  <View style={{ flex: 1, backgroundColor: "transparent" }}>
+                    <View
+                      style={{
+                        borderRadius: Platform.OS === "web" ? 6 : 0,
+                        borderColor:
+                          Platform.OS === "web"
+                            ? theme.colors.primary
+                            : undefined,
+                        borderWidth: Platform.OS === "web" ? 1 : 0,
+                        backgroundColor: theme.colors.background,
+                        overflow: "hidden",
+                        flex: 1,
+                      }}
+                    >
+                      <GlobalShortcuts />
+                      <CustomTitlebar />
+                      <NavigationContainer />
+                    </View>
+                  </View>
+                </BottomSheetModalProvider>
+              </DevModeProvider>
+            </VaultProvider>
+          </CloudProvider>
+        </AuthProvider>
+      </OnlineProvider>
+    </>
+  );
 }
 
