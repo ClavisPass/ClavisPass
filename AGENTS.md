@@ -23,10 +23,12 @@ Use this file as the fast-start context for future work, then open [docs/project
 
 ## Important Reality Check
 
-- The README describes the intended modern vault format (`argon2id` + `xchacha20poly1305`), and that code exists under `src/infrastructure/crypto/vault/v1`.
-- Current application code still defaults to `"legacy"` encryption in [src/infrastructure/crypto/encryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/encryptVaultContent.ts).
-- Decryption only accepts V1 when callers explicitly pass `allowV1: true` in [src/infrastructure/crypto/decryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/decryptVaultContent.ts).
-- Treat README security statements as directionally important, but verify runtime behavior in code before changing crypto or migration logic.
+- The active vault format is now the V1 envelope under [src/infrastructure/crypto/vault/v1](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v1).
+- Vault encryption uses `argon2id` for key derivation and `xchacha20poly1305-ietf` for AEAD in [src/infrastructure/crypto/vault/v1/VaultV1.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v1/VaultV1.ts).
+- [src/infrastructure/crypto/encryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/encryptVaultContent.ts) now writes V1 only.
+- [src/infrastructure/crypto/decryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/decryptVaultContent.ts) now accepts V1 only.
+- The old vault legacy crypto path has been removed; remaining non-V1 crypto usage such as pCloud import is separate from the ClavisPass vault format.
+- Crypto changes are still security-sensitive, so verify provider parity and real runtime call paths before changing KDF, AEAD, or envelope behavior.
 
 ## Folder Guide
 

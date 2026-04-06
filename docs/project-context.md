@@ -108,17 +108,11 @@ If `MODULE_POLICY` is missed, you can create silent security or UX regressions.
 
 ## Crypto State Of The Repo
 
-The repo contains two encryption paths.
+The active vault encryption path is now the V1 format.
 
-### Legacy path
+### Active vault format
 
-The default encryption mode in [src/infrastructure/crypto/encryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/encryptVaultContent.ts) is still `"legacy"`.
-
-That means current app behavior is not yet exclusively driven by the newer V1 vault format.
-
-### V1 path
-
-The intended newer format lives in:
+The V1 implementation lives in:
 
 - [src/infrastructure/crypto/vault/v1/VaultV1.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v1/VaultV1.ts)
 - [src/infrastructure/crypto/vault/v1/VaultV1Schema.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v1/VaultV1Schema.ts)
@@ -129,12 +123,14 @@ The V1 design uses:
 - XChaCha20-Poly1305 AEAD
 - Structured vault envelope metadata
 
-Important nuance from actual code:
+Important runtime facts:
 
-- Decryption only accepts V1 if callers opt in with `allowV1: true` in [src/infrastructure/crypto/decryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/decryptVaultContent.ts).
-- So the README describes the architectural direction well, but not every path is fully switched over at runtime yet.
+- [src/infrastructure/crypto/encryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/encryptVaultContent.ts) writes V1 only.
+- [src/infrastructure/crypto/decryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/decryptVaultContent.ts) reads V1 only.
+- Web and native now use platform-specific crypto providers with the same V1 envelope contract, so cross-platform vaults are expected to roundtrip identically.
+- In development, provider loading runs a small V1 self-test to catch provider drift early.
 
-Future crypto work should start by verifying which format is currently written and which readers are enabled in the user flows being changed.
+Legacy vault crypto has been removed from the main ClavisPass vault flow. Any remaining separate crypto helpers, such as third-party importers, should not be confused with the vault format itself.
 
 ## Sync And Storage Model
 
@@ -280,7 +276,7 @@ Recommended guardrails:
 - Do not bypass `VaultSession` / `VaultProvider` boundaries casually.
 - Do not add a new module without updating `MODULE_POLICY`.
 - Do not assume desktop is a separate JS codebase; it is usually the Expo web bundle running inside Tauri.
-- Do not assume the V1 crypto path is fully active everywhere without checking the call sites.
+- Do not assume non-vault crypto helpers follow the same format as the main vault; verify whether a code path is part of the ClavisPass vault or only an import/export adapter.
 - Do not add new user-facing copy in only one place; update TranslationSchema.ts plus both de.ts and en.ts together so the typed i18n contract stays in sync.
 
 ## Good First Files For Orientation

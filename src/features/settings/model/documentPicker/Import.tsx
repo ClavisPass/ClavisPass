@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 import { ValuesListType } from "../../../vault/model/ValuesType";
 import importChrome from "./chrome";
 import importFirefox from "./firefox";
-import importpCloud from "./pcloud";
 import Modal from "../../../../shared/components/modals/Modal";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import SettingsItem from "../../components/SettingsItem";
@@ -89,6 +88,7 @@ function Import(props: Props) {
       }
 
       if (props.type === DocumentTypeEnum.PCLOUD) {
+        const { default: importpCloud } = await import("./pcloud");
         const imported = importpCloud(fileData, value);
         saveValues(imported);
         return;

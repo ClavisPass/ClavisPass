@@ -36,8 +36,7 @@ import {
 } from "../../../infrastructure/cloud/clients/CloudStorageClient";
 
 import { decryptVaultContent } from "../../../infrastructure/crypto/decryptVaultContent";
-import { getCryptoProvider } from "../../../infrastructure/crypto/provider";
-import { encryptVaultV1 } from "../../../infrastructure/crypto/vault/v1/VaultV1";
+import { encryptVaultContent } from "../../../infrastructure/crypto/encryptVaultContent";
 
 type Props = { userInfo: UserInfoType };
 
@@ -95,35 +94,31 @@ function Login(props: Props) {
   );
 
   const loginWithMasterPassword = useCallback(
-  async (masterPasswordToUse: string, content: string | null) => {
-    try {
-      if (!content) return;
+    async (masterPasswordToUse: string, content: string | null) => {
+      try {
+        if (!content) return;
 
-      const result = await decryptVaultContent(
-        content,
-        masterPasswordToUse,
-      );
+        const result = await decryptVaultContent(
+          content,
+          masterPasswordToUse,
+        );
 
-      if (!result.ok) {
-        throw result.error ?? new Error(result.reason);
+        if (!result.ok) {
+          const failure = result;
+          throw failure.error ?? new Error(failure.reason);
+        }
+        vault.unlockWithDecryptedVault(result.payload);
+        auth.login(masterPasswordToUse);
+      } catch (err) {
+        logger.error("[Login] Error decrypting vault:", err);
+        textInputRef.current?.focus?.();
+        setMasterPassword("");
+        setError(true);
+        setTimeout(() => setError(false), 1000);
       }
-      vault.unlockWithDecryptedVault(result.payload);
-      auth.login(masterPasswordToUse);
-
-      // 2) Migration/Writeback entfernt
-      // Wenn du später wieder migrieren willst:
-      // if (result.format === "legacy") { ...encryptVaultV1 + writeVaultJson... }
-
-    } catch (err) {
-      logger.error("[Login] Error decrypting vault:", err);
-      textInputRef.current?.focus?.();
-      setMasterPassword("");
-      setError(true);
-      setTimeout(() => setError(false), 1000);
-    }
-  },
-  [auth, vault, writeVaultJson]
-);
+    },
+    [auth, vault, writeVaultJson]
+  );
 
   const authenticate = useCallback(async () => {
     try {
@@ -211,11 +206,13 @@ function Login(props: Props) {
       // 1) create empty vault payload
       const empty = getEmptyData();
 
-      const cryptoProvider = await getCryptoProvider();
+      const encrypted = await encryptVaultContent(empty, masterPassword);
+      if (!encrypted.ok) {
+        const failure = encrypted;
+        throw failure.error;
+      }
 
-      // 2) encrypt as VaultV1 JSON string
-      //    encryptVaultV1(crypto, masterPassword, payload) -> Promise<string>
-      const vaultJson = await encryptVaultV1(cryptoProvider, masterPassword, empty);
+      const vaultJson = encrypted.content;
 
       // 3) write to provider
       if (provider) {

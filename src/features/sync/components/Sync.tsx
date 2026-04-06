@@ -110,13 +110,13 @@ const Sync = (props: Props) => {
         payload,
         master,
         {
-          mode: "legacy",
           lastUpdated: iso,
         },
       );
 
       if (!result.ok) {
-        throw result.error;
+        const failure = result;
+        throw failure.error;
       }
 
       const encryptedJson = result.content;

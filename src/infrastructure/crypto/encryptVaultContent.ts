@@ -1,13 +1,13 @@
 import VaultDataType from "../../features/vault/model/VaultDataType";
-import { encrypt as legacyEncrypt } from "./legacy/CryptoLayer";
-// V1 bleibt drin, aber ungenutzt
+import { getCryptoProvider } from "./provider";
 import { encryptVaultV1 } from "./vault/v1/VaultV1";
 
 export type EncryptVaultContentResult =
   | { ok: true; content: string }
   | { ok: false; error: unknown };
 
-export type EncryptMode = "legacy" | "v1";
+export type EncryptMode = "v1";
+export const DEFAULT_ENCRYPT_MODE: EncryptMode = "v1";
 
 export const encryptVaultContent = async (
   payload: VaultDataType,
@@ -18,37 +18,19 @@ export const encryptVaultContent = async (
   },
 ): Promise<EncryptVaultContentResult> => {
   try {
-    const mode: EncryptMode = options?.mode ?? "legacy";
+    const mode: EncryptMode = options?.mode ?? DEFAULT_ENCRYPT_MODE;
 
-    if (mode === "legacy") {
-      const encrypted = await legacyEncrypt(
-        payload,
-        masterPassword,
-        options?.lastUpdated,
-      );
-
-      return {
-        ok: true,
-        content: JSON.stringify(encrypted),
-      };
-    }
-
-    const { getCryptoProvider } = await import("./provider");
     const cryptoProvider = await getCryptoProvider();
-    if (mode === "v1") {
-      const json = await encryptVaultV1(
-        cryptoProvider,
-        masterPassword,
-        payload,
-      );
+    const json = await encryptVaultV1(
+      cryptoProvider,
+      masterPassword,
+      payload,
+    );
 
-      return {
-        ok: true,
-        content: json,
-      };
-    }
-
-    throw new Error("Unsupported encrypt mode");
+    return {
+      ok: true,
+      content: json,
+    };
   } catch (e) {
     return { ok: false, error: e };
   }

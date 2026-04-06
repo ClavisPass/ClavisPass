@@ -126,7 +126,6 @@ function UserInformation(props: Props) {
               width: "100%",
               borderRadius: 12,
               padding: 8,
-              //backgroundColor: paperTheme.colors.elevation.level1,
               flexDirection: "row",
               alignItems: "center",
               gap: 12,
@@ -210,6 +209,7 @@ function UserInformation(props: Props) {
             </View>
             <IconButton
               icon="logout"
+              iconColor={paperTheme.colors.primary}
               mode="contained-tonal"
               onPress={handleLogout}
               disabled={loading}

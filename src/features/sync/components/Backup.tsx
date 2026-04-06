@@ -10,11 +10,6 @@ import Animated, {
   LinearTransition,
 } from "react-native-reanimated";
 
-import CryptoType, {
-  CryptoTypeSchema,
-} from "../../../infrastructure/crypto/legacy/CryptoType";
-import { decrypt } from "../../../infrastructure/crypto/legacy/CryptoLayer";
-import { VaultDataTypeSchema } from "../../vault/model/VaultDataType";
 import { logger } from "../../../infrastructure/logging/logger";
 
 import PasswordTextbox from "../../../shared/components/PasswordTextbox";
@@ -22,17 +17,13 @@ import { useTheme } from "../../../app/providers/ThemeProvider";
 import { useAuth } from "../../../app/providers/AuthProvider";
 
 import * as DeviceStorageClient from "../../../infrastructure/cloud/clients/DeviceStorageClient";
-import { useSetting } from "../../../app/providers/SettingsProvider";
 import { useVault } from "../../../app/providers/VaultProvider";
-import { formatAbsoluteLocal } from "../../../shared/utils/Timestamp";
 import Button from "../../../shared/components/buttons/Button";
 import BackupStateType from "../model/BackupStateType";
+import { decryptVaultContent } from "../../../infrastructure/crypto/decryptVaultContent";
 
 function Backup() {
   const { t } = useTranslation();
-
-  const { value: dateFormat } = useSetting("DATE_FORMAT");
-  const { value: timeFormat } = useSetting("TIME_FORMAT");
 
   const auth = useAuth();
   const vault = useVault();
@@ -67,8 +58,7 @@ function Backup() {
         return;
       }
 
-      const parsed = CryptoTypeSchema.parse(JSON.parse(result.content));
-      setState({ status: "ready", crypto: parsed });
+      setState({ status: "ready", content: result.content });
     } catch (err) {
       logger.error("[Backup] Error loading local backup:", err);
       setState({
@@ -82,17 +72,15 @@ function Backup() {
     fetchBackup();
   }, [fetchBackup]);
 
-  const login = async (masterPassword: string, cryptoData: CryptoType) => {
+  const login = async (masterPassword: string, content: string) => {
     try {
-      const decryptedData = decrypt(cryptoData, masterPassword);
-      const jsonData = JSON.parse(decryptedData);
-
-      const parsedData = VaultDataTypeSchema.parse(jsonData);
-      if (!parsedData) {
-        throw new Error("[Backup] Parsed vault is null (unexpected).");
+      const decrypted = await decryptVaultContent(content, masterPassword);
+      if (!decrypted.ok) {
+        const failure = decrypted;
+        throw failure.error ?? new Error(failure.reason);
       }
 
-      vault.unlockWithDecryptedVault(parsedData);
+      vault.unlockWithDecryptedVault(decrypted.payload);
       vault.markSaved();
       auth.login(masterPassword);
     } catch (err) {
@@ -166,7 +154,7 @@ function Backup() {
       );
     }
 
-    const crypto = state.crypto;
+    const content = state.content;
 
     return (
       <Animated.View
@@ -187,7 +175,7 @@ function Backup() {
           variant="headlineSmall"
           style={{ color: theme.colors.primary, textAlign: "center" }}
         >
-          {formatAbsoluteLocal(crypto.lastUpdated, dateFormat, timeFormat)}
+          {t("login:backupTitle")}
         </Text>
 
         <Animated.View layout={contentTransition} style={{ width: "100%" }}>
@@ -199,11 +187,11 @@ function Backup() {
             setValue={setValue}
             value={value}
             placeholder={t("login:masterPassword")}
-            onSubmitEditing={() => login(value, crypto)}
+            onSubmitEditing={() => void login(value, content)}
           />
         </Animated.View>
 
-        <Button text={t("login:login")} onPress={() => login(value, crypto)} />
+        <Button text={t("login:login")} onPress={() => void login(value, content)} />
 
         {capsLock && (
           <Animated.View layout={contentTransition}>
