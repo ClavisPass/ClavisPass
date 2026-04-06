@@ -37,6 +37,18 @@ struct WindowSize {
     height: f64,
 }
 
+const DEFAULT_WINDOW_WIDTH: f64 = 601.0;
+const DEFAULT_WINDOW_HEIGHT: f64 = 400.0;
+const MIN_WINDOW_WIDTH: f64 = 350.0;
+const MIN_WINDOW_HEIGHT: f64 = 350.0;
+
+fn clamp_window_size(size: WindowSize) -> WindowSize {
+    WindowSize {
+        width: size.width.max(MIN_WINDOW_WIDTH),
+        height: size.height.max(MIN_WINDOW_HEIGHT),
+    }
+}
+
 fn get_window_size_file_path(app_handle: &AppHandle) -> PathBuf {
     let dir = app_handle.path().app_data_dir().unwrap();
     if !dir.exists() {
@@ -47,7 +59,7 @@ fn get_window_size_file_path(app_handle: &AppHandle) -> PathBuf {
 
 fn save_window_size(app_handle: &AppHandle, size: WindowSize) {
     let size_file = get_window_size_file_path(app_handle);
-    if let Ok(json) = serde_json::to_string(&size) {
+    if let Ok(json) = serde_json::to_string(&clamp_window_size(size)) {
         if let Err(e) = fs::write(size_file, json) {
             eprintln!("Fehler beim Speichern der Fenstergröße: {:?}", e);
         }
@@ -109,8 +121,8 @@ pub fn run() {
             .title("ClavisPass")
             .fullscreen(false)
             .resizable(true)
-            .inner_size(601.0, 400.0)
-            .min_inner_size(350.0, 350.0)
+            .inner_size(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT)
+            .min_inner_size(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
             .decorations(false)
             .transparent(true)
             .content_protected(true)
@@ -193,12 +205,18 @@ pub fn run() {
             let app_handle2 = app.handle();
             if let Some(main_window) = app.get_webview_window("main") {
                 if let Some(size) = load_window_size(&app_handle2) {
+                    let size = clamp_window_size(size);
                     if size.width > 0.0 && size.height > 0.0 {
                         let _ = main_window.set_size(Size::Logical(tauri::LogicalSize::new(
                             size.width,
                             size.height,
                         )));
                     }
+                } else {
+                    let _ = main_window.set_size(Size::Logical(tauri::LogicalSize::new(
+                        DEFAULT_WINDOW_WIDTH,
+                        DEFAULT_WINDOW_HEIGHT,
+                    )));
                 }
             }
 
@@ -244,4 +262,5 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+
 
