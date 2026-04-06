@@ -1,5 +1,6 @@
 import type { FillDataResult } from "../shared/bridge";
 import type {
+  PromptResolutionAppliedResult,
   PromptResolutionResult,
   SavePromptCandidate,
   SavePromptDecision,
@@ -188,6 +189,29 @@ export class ExtensionState {
 
     return {
       message: `Update confirmed for ${prompt.existingEntryTitle ?? prompt.suggestedTitle}. Desktop write commands are the next integration step.`
+    };
+  }
+
+  consumePendingPrompt(promptId: string): SavePromptDecision | undefined {
+    if (!this.pendingPrompt || this.pendingPrompt.id !== promptId) {
+      return undefined;
+    }
+
+    const prompt = this.pendingPrompt;
+    this.pendingPrompt = undefined;
+    return prompt;
+  }
+
+  buildPromptAppliedResult(
+    prompt: SavePromptDecision,
+    applied: PromptResolutionAppliedResult
+  ): PromptResolutionResult {
+    return {
+      message:
+        prompt.kind === "create"
+          ? `Saved ${applied.title ?? prompt.suggestedTitle} to ClavisPass.`
+          : `Updated ${applied.title ?? prompt.existingEntryTitle ?? prompt.suggestedTitle} in ClavisPass.`,
+      applied
     };
   }
 }

@@ -167,6 +167,14 @@ export interface SavePromptDecision {
   createdAt: number;
 }
 
+export interface PromptResolutionAppliedResult {
+  kind: SavePromptKind;
+  entryId: string;
+  title?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface PromptResolutionPayload {
   promptId: string;
   decision: SavePromptResolution;
@@ -175,6 +183,7 @@ export interface PromptResolutionPayload {
 export interface PromptResolutionResult {
   prompt?: SavePromptDecision;
   message: string;
+  applied?: PromptResolutionAppliedResult;
 }
 
 export interface PendingPromptResponse {

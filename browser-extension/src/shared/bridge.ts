@@ -61,7 +61,41 @@ export interface FillDataResult {
   totp?: string;
 }
 
-export type BridgeCommand = "getStatus" | "searchEntriesByDomain" | "getFillDataForEntry";
+export interface CreateEntryFromBrowserPayload {
+  title: string;
+  username?: string;
+  password: string;
+  url: string;
+  matchedHost: string;
+  email?: string;
+  folderId?: string;
+  totp?: string;
+}
+
+export interface UpdateEntryFromBrowserPayload {
+  entryId: string;
+  title?: string;
+  username?: string;
+  password: string;
+  url: string;
+  matchedHost: string;
+  email?: string;
+  totp?: string;
+}
+
+export interface BrowserWriteResult {
+  entryId: string;
+  title?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type BridgeCommand =
+  | "getStatus"
+  | "searchEntriesByDomain"
+  | "getFillDataForEntry"
+  | "createEntryFromBrowser"
+  | "updateEntryFromBrowser";
 
 export interface BridgePairingContext {
   status: PairingStatus;
@@ -71,12 +105,16 @@ export interface BridgeRequestPayloadMap {
   getStatus: undefined;
   searchEntriesByDomain: SearchEntriesByDomainPayload;
   getFillDataForEntry: GetFillDataForEntryPayload;
+  createEntryFromBrowser: CreateEntryFromBrowserPayload;
+  updateEntryFromBrowser: UpdateEntryFromBrowserPayload;
 }
 
 export interface BridgeResultMap {
   getStatus: GetStatusResult;
   searchEntriesByDomain: SearchEntrySuggestion[];
   getFillDataForEntry: FillDataResult;
+  createEntryFromBrowser: BrowserWriteResult;
+  updateEntryFromBrowser: BrowserWriteResult;
 }
 
 export interface BridgeRequest<T extends BridgeCommand = BridgeCommand> {

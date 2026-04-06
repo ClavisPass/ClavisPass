@@ -1,5 +1,12 @@
 import { NativeMessagingClient, NativeMessagingError } from "../native/client";
-import type { FillDataResult, GetStatusResult, SearchEntrySuggestion } from "../shared/bridge";
+import type {
+  BrowserWriteResult,
+  CreateEntryFromBrowserPayload,
+  FillDataResult,
+  GetStatusResult,
+  SearchEntrySuggestion,
+  UpdateEntryFromBrowserPayload
+} from "../shared/bridge";
 import type { DesktopBridgeStatusView } from "../shared/types";
 
 const PAIRING_STORAGE_KEY = "clavispass.desktop.pairingStatus";
@@ -139,5 +146,15 @@ export class DesktopBridgeService {
     const pairingStatus = await getStoredPairingStatus();
     const result = await this.client.request("getFillDataForEntry", { entryId }, { status: pairingStatus });
     return normalizeFillData(result);
+  }
+
+  async createEntryFromBrowser(payload: CreateEntryFromBrowserPayload): Promise<BrowserWriteResult> {
+    const pairingStatus = await getStoredPairingStatus();
+    return this.client.request("createEntryFromBrowser", payload, { status: pairingStatus });
+  }
+
+  async updateEntryFromBrowser(payload: UpdateEntryFromBrowserPayload): Promise<BrowserWriteResult> {
+    const pairingStatus = await getStoredPairingStatus();
+    return this.client.request("updateEntryFromBrowser", payload, { status: pairingStatus });
   }
 }

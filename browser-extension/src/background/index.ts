@@ -5,7 +5,8 @@ import { getActiveDomainContext } from "./tab-context";
 import { isExtensionMessage } from "../shared/messages";
 import type { ContentMessage } from "../shared/content-messages";
 import type { FillDataResult, SearchEntrySuggestion } from "../shared/bridge";
-import type { ContentDebugResponse, FillExecutionResult, SavePromptCandidate } from "../shared/types";
+import type { BrowserWriteResult, CreateEntryFromBrowserPayload, UpdateEntryFromBrowserPayload } from "../shared/bridge";
+import type { ContentDebugResponse, FillExecutionResult, PromptResolutionResult, SavePromptCandidate } from "../shared/types";
 import { getNormalizedDomainFromUrl } from "../shared/domain";
 
 const desktopBridge = new DesktopBridgeService();
@@ -323,6 +324,104 @@ async function evaluateSavePromptCandidate(candidate: SavePromptCandidate) {
   }
 }
 
+function buildCreatePayload(prompt: import("../shared/types").SavePromptDecision): CreateEntryFromBrowserPayload | null {
+  if (!prompt.candidate.password || !prompt.candidate.url || !prompt.matchedHostname) {
+    return null;
+  }
+
+  return {
+    title: prompt.suggestedTitle,
+    username: prompt.candidate.username,
+    password: prompt.candidate.password,
+    url: prompt.candidate.url,
+    matchedHost: prompt.matchedHostname
+  };
+}
+
+function buildUpdatePayload(prompt: import("../shared/types").SavePromptDecision): UpdateEntryFromBrowserPayload | null {
+  if (
+    prompt.kind !== "update" ||
+    !prompt.existingEntryId ||
+    !prompt.candidate.password ||
+    !prompt.candidate.url ||
+    !prompt.matchedHostname
+  ) {
+    return null;
+  }
+
+  return {
+    entryId: prompt.existingEntryId,
+    title: prompt.existingEntryTitle ?? prompt.suggestedTitle,
+    username: prompt.candidate.username,
+    password: prompt.candidate.password,
+    url: prompt.candidate.url,
+    matchedHost: prompt.matchedHostname
+  };
+}
+
+function toAppliedResult(
+  prompt: import("../shared/types").SavePromptDecision,
+  result: BrowserWriteResult
+) {
+  return {
+    kind: prompt.kind,
+    entryId: result.entryId,
+    title: result.title ?? prompt.existingEntryTitle ?? prompt.suggestedTitle,
+    createdAt: result.createdAt,
+    updatedAt: result.updatedAt
+  } as const;
+}
+
+async function resolvePromptWithDesktopWrite(
+  promptId: string,
+  decision: import("../shared/types").SavePromptResolution
+): Promise<PromptResolutionResult> {
+  if (decision === "dismiss") {
+    return state.resolvePendingPrompt(promptId, decision);
+  }
+
+  const prompt = state.consumePendingPrompt(promptId);
+  if (!prompt) {
+    return {
+      prompt: state.getPendingPrompt(),
+      message: "No matching save prompt is currently pending."
+    };
+  }
+
+  try {
+    if (prompt.kind === "create" && decision === "save") {
+      const payload = buildCreatePayload(prompt);
+      if (!payload) {
+        throw new Error("The captured login data was incomplete and could not be saved.");
+      }
+
+      const result = await desktopBridge.createEntryFromBrowser(payload);
+      return state.buildPromptAppliedResult(prompt, toAppliedResult(prompt, result));
+    }
+
+    if (prompt.kind === "update" && decision === "update") {
+      const payload = buildUpdatePayload(prompt);
+      if (!payload) {
+        throw new Error("The captured login data was incomplete and could not be updated.");
+      }
+
+      const result = await desktopBridge.updateEntryFromBrowser(payload);
+      return state.buildPromptAppliedResult(prompt, toAppliedResult(prompt, result));
+    }
+
+    return {
+      message: "The selected prompt action did not match the current save suggestion."
+    };
+  } catch (error) {
+    return {
+      message:
+        error instanceof Error
+          ? error.message
+          : "ClavisPass Desktop could not apply the browser save request."
+    };
+  }
+}
+
 const router = new BackgroundMessageRouter({
   "bridge:getStatus": async () => desktopBridge.getDesktopBridgeStatus(),
   "bridge:getSuggestions": async () => {
@@ -404,7 +503,7 @@ const router = new BackgroundMessageRouter({
   "prompt:getPending": async () => ({
     prompt: state.getPendingPrompt()
   }),
-  "prompt:resolve": async (payload) => state.resolvePendingPrompt(payload.promptId, payload.decision),
+  "prompt:resolve": async (payload) => resolvePromptWithDesktopWrite(payload.promptId, payload.decision),
   "content:savePromptCandidate": async (payload) => evaluateSavePromptCandidate(payload),
   "content:ready": async (payload, context) => {
     const tabId = context.sender.tab?.id;

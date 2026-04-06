@@ -237,6 +237,9 @@ export function App() {
       });
       setPendingPrompt(result.prompt);
       setPromptMessage(result.message);
+      if (result.applied) {
+        await refreshStatus();
+      }
     } finally {
       setIsResolvingPrompt(false);
     }

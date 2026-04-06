@@ -24,11 +24,12 @@ interface ClassifiedField {
 }
 
 interface FormCandidate {
-  form: HTMLFormElement;
+  form?: HTMLFormElement;
   detectedForm: DetectedForm;
   usernameField?: ClassifiedField;
   passwordField?: ClassifiedField;
   totpField?: ClassifiedField;
+  passwordFields: ClassifiedField[];
 }
 
 export interface AutofillPlan {
@@ -194,6 +195,14 @@ function getActionOrigin(form: HTMLFormElement): string {
   return action ? new URL(action, window.location.href).origin : window.location.origin;
 }
 
+function buildDetachedContainer(root: ParentNode): HTMLInputElement[] {
+  const inputs = [...root.querySelectorAll("input")].filter(
+    (input): input is HTMLInputElement => input instanceof HTMLInputElement
+  );
+
+  return inputs.filter((input) => !input.form);
+}
+
 function collectFormInputs(form: HTMLFormElement): ClassifiedField[] {
   return [...form.querySelectorAll("input")]
     .filter((input): input is HTMLInputElement => input instanceof HTMLInputElement)
@@ -212,12 +221,14 @@ function detectFormFields(form: HTMLFormElement, index: number): FormCandidate {
   const usernameField = chooseBestField(fields, "username");
   const passwordField = chooseBestField(fields, "password");
   const totpField = chooseBestField(fields, "totp");
+  const passwordFields = fields.filter((field) => field.classification.kind === "password");
 
   return {
     form,
     usernameField,
     passwordField,
     totpField,
+    passwordFields,
     detectedForm: {
       formId: buildFormId(form, index),
       actionOrigin: getActionOrigin(form),
@@ -232,6 +243,71 @@ function detectFormFields(form: HTMLFormElement, index: number): FormCandidate {
       totalRelevantFieldCount: fields.filter((field) => field.classification.kind).length
     }
   };
+}
+
+function detectDetachedFields(root: ParentNode): FormCandidate | null {
+  const inputs = buildDetachedContainer(root);
+  if (inputs.length === 0) {
+    return null;
+  }
+
+  const fields = inputs.map((input, index) => {
+    const snapshot = createFieldSnapshot(input, index);
+    return {
+      element: input,
+      snapshot,
+      classification: classifyFieldSnapshot(snapshot)
+    } satisfies ClassifiedField;
+  });
+
+  const usernameField = chooseBestField(fields, "username");
+  const passwordField = chooseBestField(fields, "password");
+  const totpField = chooseBestField(fields, "totp");
+  const passwordFields = fields.filter((field) => field.classification.kind === "password");
+
+  if (!passwordField && !totpField) {
+    return null;
+  }
+
+  return {
+    usernameField,
+    passwordField,
+    totpField,
+    passwordFields,
+    detectedForm: {
+      formId: "detached",
+      actionOrigin: window.location.origin,
+      fieldMap: {
+        username: usernameField?.snapshot.key,
+        password: passwordField?.snapshot.key,
+        totp: totpField?.snapshot.key
+      },
+      hasPasswordField: Boolean(passwordField),
+      hasVisibleUsernameCandidate: Boolean(usernameField?.snapshot.visible),
+      visibleFieldCount: fields.filter((field) => field.snapshot.visible && !field.snapshot.suspicious).length,
+      totalRelevantFieldCount: fields.filter((field) => field.classification.kind).length
+    }
+  };
+}
+
+function isLikelyPasswordChangeForm(candidate: FormCandidate): boolean {
+  const visiblePasswordFields = candidate.passwordFields.filter((field) => field.snapshot.visible);
+  if (visiblePasswordFields.length < 2) {
+    return false;
+  }
+
+  const passwordSignals = visiblePasswordFields.map((field) => buildFieldText(field.snapshot));
+  const hasCurrentPasswordSignal = visiblePasswordFields.some(
+    (field) => field.snapshot.autocomplete === "current-password" || buildFieldText(field.snapshot).includes("current")
+  );
+  const hasNewPasswordSignal = visiblePasswordFields.some(
+    (field) =>
+      field.snapshot.autocomplete === "new-password" ||
+      buildFieldText(field.snapshot).includes("new") ||
+      buildFieldText(field.snapshot).includes("confirm")
+  );
+
+  return hasCurrentPasswordSignal || hasNewPasswordSignal || passwordSignals.length >= 2;
 }
 
 export function detectLoginForms(root: ParentNode = document): DetectedForm[] {
@@ -267,9 +343,13 @@ function scoreFormCandidate(candidate: FormCandidate, entry: FillableCredentialD
 
 export function buildAutofillPlan(entry: FillableCredentialData, root: ParentNode = document): AutofillPlan | null {
   const forms = [...root.querySelectorAll("form")];
-  const candidates = forms
-    .map((form, index) => detectFormFields(form, index))
+  const detachedCandidate = detectDetachedFields(root);
+  const candidates = [
+    ...forms.map((form, index) => detectFormFields(form, index)),
+    ...(detachedCandidate ? [detachedCandidate] : [])
+  ]
     .filter((candidate) => candidate.passwordField || candidate.totpField)
+    .filter((candidate) => !isLikelyPasswordChangeForm(candidate))
     .map((candidate) => ({ candidate, score: scoreFormCandidate(candidate, entry) }))
     .filter((item) => item.score > 0)
     .sort((left, right) => right.score - left.score);
@@ -293,6 +373,11 @@ export function buildAutofillPlan(entry: FillableCredentialData, root: ParentNod
 }
 
 export function extractSavePromptCandidate(form: HTMLFormElement, pageUrl: string): SavePromptCandidate | null {
+  const detected = detectFormFields(form, 0);
+  if (isLikelyPasswordChangeForm(detected)) {
+    return null;
+  }
+
   const fields = collectFormInputs(form);
   const usernameField = chooseBestField(fields, "username");
   const passwordField = chooseBestField(fields, "password");
@@ -300,7 +385,7 @@ export function extractSavePromptCandidate(form: HTMLFormElement, pageUrl: strin
   const usernameValue = usernameField?.element.value.trim();
   const passwordValue = passwordField?.element.value;
 
-  if (!passwordValue) {
+  if (!passwordValue || !passwordField?.snapshot.visible) {
     return null;
   }
 
