@@ -661,6 +661,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           <ExpiryOverviewModal
             visible={expiryModalVisible}
             setVisible={setExpiryModalVisible}
+            positionY={
+              Constants.statusBarHeight +
+              TITLEBAR_HEIGHT +
+              (Platform.OS === "web" ? 48 : 90)
+            }
             items={expiryEntries.map((entry) => ({
               key: entry.key,
               title: entry.title,

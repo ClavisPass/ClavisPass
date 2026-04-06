@@ -65,7 +65,6 @@ function EditHistoryModal(props: Props) {
       <View
         style={{
           width: 320,
-          maxWidth: "92%",
           minHeight: 220,
           maxHeight: 440,
           display: "flex",

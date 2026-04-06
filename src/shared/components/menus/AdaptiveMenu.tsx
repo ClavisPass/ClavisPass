@@ -31,6 +31,7 @@ type Props = {
   offsetY?: number;
   items: AdaptiveMenuItem[];
   topContent?: React.ReactNode;
+  customContent?: React.ReactNode;
   nativeSnapPoints?: (string | number)[];
 };
 
@@ -57,10 +58,21 @@ function AdaptiveMenu(props: Props) {
     if (props.nativeSnapPoints?.length) return props.nativeSnapPoints;
 
     const topContentHeight = props.topContent ? 72 : 0;
-    const desired = topContentHeight + ITEM_HEIGHT * Math.max(props.items.length, 1) + 80;
+    const customContentHeight = props.customContent ? 260 : 0;
+    const desired =
+      topContentHeight +
+      customContentHeight +
+      ITEM_HEIGHT * Math.max(props.items.length, 1) +
+      80;
     const max = Math.min(winH * 0.7, 520);
     return [Math.min(desired, max)];
-  }, [props.items.length, props.nativeSnapPoints, props.topContent, winH]);
+  }, [
+    props.customContent,
+    props.items.length,
+    props.nativeSnapPoints,
+    props.topContent,
+    winH,
+  ]);
 
   const renderBackdrop = React.useCallback(
     (backdropProps: BottomSheetBackdropProps) => (
@@ -93,6 +105,8 @@ function AdaptiveMenu(props: Props) {
         <>
           {props.topContent}
           {props.topContent ? <Divider /> : null}
+          {props.customContent}
+          {props.customContent && props.items.length > 0 ? <Divider /> : null}
           {props.items.map((item, index) => (
             <View key={item.key}>
               <MenuItem
@@ -143,6 +157,10 @@ function AdaptiveMenu(props: Props) {
         <Divider style={{ backgroundColor: theme.colors.outlineVariant }} />
         {props.topContent}
         {props.topContent ? (
+          <Divider style={{ backgroundColor: theme.colors.outlineVariant }} />
+        ) : null}
+        {props.customContent}
+        {props.customContent && props.items.length > 0 ? (
           <Divider style={{ backgroundColor: theme.colors.outlineVariant }} />
         ) : null}
         {props.items.map((item, index) => (
