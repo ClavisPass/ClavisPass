@@ -12,6 +12,7 @@ type Props = {
   selected?: boolean;
   label?: string;
   rightText?: string;
+  rightIcon?: string;
 };
 export function MenuItem(props: Props) {
   const { theme } = useTheme();
@@ -73,16 +74,25 @@ export function MenuItem(props: Props) {
               </Text>
             )}
           </View>
-          {props.rightText && (
-            <Text
-              variant="bodyLarge"
-              style={{ userSelect: "none", color: theme.colors.primary }}
-              ellipsizeMode="tail"
-              numberOfLines={1}
-            >
-              {props.rightText}
-            </Text>
-          )}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            {props.rightText && (
+              <Text
+                variant="bodyLarge"
+                style={{ userSelect: "none", color: theme.colors.primary }}
+                ellipsizeMode="tail"
+                numberOfLines={1}
+              >
+                {props.rightText}
+              </Text>
+            )}
+            {props.rightIcon ? (
+              <Icon
+                size={20}
+                color={theme.colors.primary}
+                source={props.rightIcon}
+              />
+            ) : null}
+          </View>
         </View>
       </Ripple>
     </View>

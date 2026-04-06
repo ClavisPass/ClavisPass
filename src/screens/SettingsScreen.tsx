@@ -58,7 +58,6 @@ import AppearanceSettingsSection from "../features/settings/components/Appearanc
 import { checkForDesktopUpdate } from "../shared/utils/desktopUpdater";
 import { publishUpdateCheck } from "../infrastructure/events/updateBus";
 import { logger } from "../infrastructure/logging/logger";
-import { listBrowserExtensionPairings } from "../features/settings/utils/browserExtensionPairings";
 
 const styles = StyleSheet.create({
   surface: {
@@ -101,7 +100,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const [manualUpdateLabel, setManualUpdateLabel] = useState<string | null>(
     null,
   );
-  const [browserExtensionsCount, setBrowserExtensionsCount] = useState(0);
 
   const [contentProtection, setContentProtection] = React.useState(true);
 
@@ -211,13 +209,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     React.useCallback(() => {
       setHeaderSpacing(0);
       setHeaderWhite(false);
-      if (Platform.OS === "web") {
-        void listBrowserExtensionPairings().then((result) => {
-          setBrowserExtensionsCount(
-            result.pending.length + result.paired.length,
-          );
-        });
-      }
     }, [setHeaderSpacing, setHeaderWhite]),
   );
 
@@ -530,13 +521,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 icon="puzzle"
                 title={t("settings:browserExtensions")}
               >
-                <SettingsShortcutItem
+                <SettingsItem
                   onPress={() => {
                     navigation.navigate("BrowserExtensionSetup");
                   }}
                 >
                   {t("settings:browserAssistantTitle")}
-                </SettingsShortcutItem>
+                </SettingsItem>
                 <SettingsDivider />
                 <SettingsItem
                   onPress={() => {

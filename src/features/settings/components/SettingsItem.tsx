@@ -9,6 +9,7 @@ type Props = {
   leading?: ReactNode;
   selected?: boolean;
   label?: string;
+  rightIcon?: string | null;
 };
 function SettingsItem(props: Props) {
   return (
@@ -18,6 +19,7 @@ function SettingsItem(props: Props) {
       leading={props.leading}
       selected={props.selected}
       label={props.label}
+      rightIcon={props.rightIcon === undefined && props.onPress ? "chevron-right" : props.rightIcon ?? undefined}
     >
       {props.children}
     </MenuItem>
