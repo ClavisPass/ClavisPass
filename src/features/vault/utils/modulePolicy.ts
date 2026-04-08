@@ -38,9 +38,12 @@ export type ModulePolicy = {
 };
 
 type ManagedModules = Exclude<ModulesEnum, ModulesEnum.UNKNOWN>;
+const MANAGED_MODULE_VALUES = new Set(
+  Object.values(ModulesEnum).filter((value) => value !== ModulesEnum.UNKNOWN),
+);
 
-function isManagedModule(m: ModulesEnum): m is ManagedModules {
-  return m !== ModulesEnum.UNKNOWN;
+function isManagedModule(m: unknown): m is ManagedModules {
+  return typeof m === "string" && MANAGED_MODULE_VALUES.has(m as ManagedModules);
 }
 
 function firstModule(entry: ValuesType, moduleName: ModulesEnum): any | null {
