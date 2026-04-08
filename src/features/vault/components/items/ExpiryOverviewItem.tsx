@@ -16,24 +16,18 @@ export type ExpiryOverviewEntry = {
 
 const styles = StyleSheet.create({
   container: {
-    marginLeft: 4,
-    marginRight: 4,
-    marginBottom: 6,
-    borderRadius: 12,
-    overflow: "hidden",
+    width: "100%",
   },
   ripple: {
     paddingHorizontal: 8,
-    paddingVertical: 9,
+    paddingVertical: 7,
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    flex: 1,
-    overflow: "hidden",
+    gap: 8,
   },
   left: {
-    width: 32,
-    height: 32,
+    width: 28,
+    height: 28,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
@@ -51,8 +45,8 @@ const styles = StyleSheet.create({
   },
   statusChip: {
     borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
     flexShrink: 0,
   },
 });
@@ -76,17 +70,7 @@ export default function ExpiryOverviewItem(props: ExpiryOverviewEntry) {
   const statusIconColor = emphasisStatusChip ? "#ffffff" : statusColor;
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: theme.colors.background,
-          borderWidth: StyleSheet.hairlineWidth,
-          borderColor: darkmode ? theme.colors.outlineVariant : "white",
-          boxShadow: theme.colors.shadow,
-        },
-      ]}
-    >
+    <View style={styles.container}>
       <AnimatedPressable style={styles.ripple} onPress={props.onPress}>
         <View style={styles.ripple}>
           <View
@@ -97,14 +81,18 @@ export default function ExpiryOverviewItem(props: ExpiryOverviewEntry) {
               },
             ]}
           >
-            <Icon source="calendar-clock" size={18} color={statusIconColor} />
+            <Icon source="calendar-clock" size={16} color={statusIconColor} />
           </View>
 
           <View style={styles.content}>
             <View style={styles.row}>
               <Text
                 numberOfLines={1}
-                style={{ fontWeight: "700", flex: 1, minWidth: 0 }}
+                style={{
+                  fontWeight: "700",
+                  flex: 1,
+                  minWidth: 0,
+                }}
               >
                 {props.title}
               </Text>
@@ -116,7 +104,12 @@ export default function ExpiryOverviewItem(props: ExpiryOverviewEntry) {
                   },
                 ]}
               >
-                <Text style={{ color: statusChipTextColor, fontWeight: "700" }}>
+                <Text
+                  style={{
+                    color: statusChipTextColor,
+                    fontWeight: "700",
+                  }}
+                >
                   {props.statusLabel}
                 </Text>
               </View>
@@ -127,7 +120,7 @@ export default function ExpiryOverviewItem(props: ExpiryOverviewEntry) {
             </Text>
             <Text
               numberOfLines={1}
-              style={{ opacity: 0.72, marginTop: 2, color: theme.colors.onSurface }}
+              style={{ opacity: 0.72, marginTop: 1, color: theme.colors.onSurface }}
             >
               {props.relativeLabel}
             </Text>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Platform, ScrollView, StyleSheet, View } from "react-native";
-import { Text } from "react-native-paper";
+import { Divider, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
 import AdaptiveMenu from "../../../../shared/components/menus/AdaptiveMenu";
@@ -23,9 +23,7 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
   },
   scrollContent: {
-    padding: 4,
-    paddingTop: 6,
-    paddingBottom: 6,
+    paddingTop: 0,
   },
   empty: {
     paddingHorizontal: 16,
@@ -55,9 +53,16 @@ export default function ExpiryOverviewModal(props: Props) {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={Platform.OS !== "web"}
         >
-          {props.items.map((item) => {
+          {props.items.map((item, index) => {
             const { key, ...rest } = item;
-            return <ExpiryOverviewItem key={key} {...rest} />;
+            const showDivider =
+              index < props.items.length - 1 || Platform.OS !== "web";
+            return (
+              <View key={key}>
+                <ExpiryOverviewItem {...rest} />
+                {showDivider ? <Divider /> : null}
+              </View>
+            );
           })}
         </ScrollView>
       </View>
