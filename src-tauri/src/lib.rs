@@ -123,14 +123,18 @@ pub fn run() {
             .resizable(true)
             .inner_size(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT)
             .min_inner_size(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
-            .decorations(false)
-            .transparent(true)
-            .content_protected(true)
-            .maximizable(false)
-            .use_https_scheme(true)
-            .zoom_hotkeys_enabled(false)
-            .visible(false)
-            .devtools(cfg!(debug_assertions));
+            .decorations(false);
+
+            #[cfg(any(target_os = "windows", target_os = "linux"))]
+            let builder = builder.transparent(true);
+
+            let builder = builder
+                .content_protected(true)
+                .maximizable(false)
+                .use_https_scheme(true)
+                .zoom_hotkeys_enabled(false)
+                .visible(false)
+                .devtools(cfg!(debug_assertions));
 
             let app_handle_for_new_window = app.handle().clone();
 
