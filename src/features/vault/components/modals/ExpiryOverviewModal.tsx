@@ -19,7 +19,7 @@ type Props = {
 
 const styles = StyleSheet.create({
   listWrap: {
-    width: 360,
+    minWidth: 300,
     maxWidth: "100%",
   },
   scrollContent: {
@@ -58,8 +58,8 @@ export default function ExpiryOverviewModal(props: Props) {
             const showDivider =
               index < props.items.length - 1 || Platform.OS !== "web";
             return (
-              <View key={key}>
-                <ExpiryOverviewItem {...rest} />
+              <View style={{width: "100%"}} key={key}>
+                <ExpiryOverviewItem {...rest} key={key} />
                 {showDivider ? <Divider /> : null}
               </View>
             );

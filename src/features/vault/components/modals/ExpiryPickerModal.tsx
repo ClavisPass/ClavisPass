@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { Button, Portal, Text } from "react-native-paper";
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
@@ -23,14 +23,36 @@ export default function ExpiryPickerModal({
 }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const init = initialIso ? new Date(initialIso) : new Date();
-  const [date, setDate] = useState<Date | undefined>(init);
-  const [time, setTime] = useState<{ hours: number; minutes: number }>({
-    hours: init.getHours(),
-    minutes: init.getMinutes(),
-  });
+  const initialDate = useMemo(
+    () => (initialIso ? new Date(initialIso) : new Date()),
+    [initialIso],
+  );
+  const [selectedAt, setSelectedAt] = useState<Date>(initialDate);
   const [showDate, setShowDate] = useState(false);
   const [showTime, setShowTime] = useState(false);
+
+  useEffect(() => {
+    if (!visible) return;
+    setSelectedAt(initialDate);
+  }, [initialDate, visible]);
+
+  const date = selectedAt;
+  const time = {
+    hours: selectedAt.getHours(),
+    minutes: selectedAt.getMinutes(),
+  };
+
+  function updateSelectedAt(mutator: (base: Date) => void) {
+    setSelectedAt((current) => {
+      const next = new Date(current);
+      mutator(next);
+      return next;
+    });
+  }
+
+  function resetToNow() {
+    setSelectedAt(new Date());
+  }
 
   return (
     <Portal>
@@ -71,14 +93,18 @@ export default function ExpiryPickerModal({
               <Button
                 style={{ borderRadius: 12 }}
                 compact
-                onPress={() => setDate(new Date(Date.now()))}
+                onPress={resetToNow}
               >
                 {t("common:current")}
               </Button>
               <Button
                 style={{ borderRadius: 12 }}
                 compact
-                onPress={() => setDate(new Date(Date.now() + 24 * 3600 * 1000))}
+                onPress={() =>
+                  updateSelectedAt((next) => {
+                    next.setDate(next.getDate() + 1);
+                  })
+                }
               >
                 +1 T
               </Button>
@@ -86,7 +112,9 @@ export default function ExpiryPickerModal({
                 style={{ borderRadius: 12 }}
                 compact
                 onPress={() =>
-                  setDate(new Date(Date.now() + 7 * 24 * 3600 * 1000))
+                  updateSelectedAt((next) => {
+                    next.setDate(next.getDate() + 7);
+                  })
                 }
               >
                 +7 T
@@ -95,7 +123,9 @@ export default function ExpiryPickerModal({
                 style={{ borderRadius: 12 }}
                 compact
                 onPress={() =>
-                  setDate(new Date(Date.now() + 30 * 24 * 3600 * 1000))
+                  updateSelectedAt((next) => {
+                    next.setDate(next.getDate() + 30);
+                  })
                 }
               >
                 +30 T
@@ -118,10 +148,7 @@ export default function ExpiryPickerModal({
               <Button
                 style={{ borderRadius: 12 }}
                 compact
-                onPress={() => {
-                  const now = new Date();
-                  setTime({ hours: now.getHours(), minutes: now.getMinutes() });
-                }}
+                onPress={resetToNow}
               >
                 {t("common:current")}
               </Button>
@@ -129,12 +156,8 @@ export default function ExpiryPickerModal({
                 style={{ borderRadius: 12 }}
                 compact
                 onPress={() => {
-                  const base = new Date(date ?? new Date());
-                  base.setHours(time.hours, time.minutes, 0, 0);
-                  const next = new Date(base.getTime() + 30 * 60 * 1000);
-                  setTime({
-                    hours: next.getHours(),
-                    minutes: next.getMinutes(),
+                  updateSelectedAt((next) => {
+                    next.setMinutes(next.getMinutes() + 30);
                   });
                 }}
               >
@@ -144,12 +167,8 @@ export default function ExpiryPickerModal({
                 style={{ borderRadius: 12 }}
                 compact
                 onPress={() => {
-                  const base = new Date(date ?? new Date());
-                  base.setHours(time.hours, time.minutes, 0, 0);
-                  const next = new Date(base.getTime() + 60 * 60 * 1000);
-                  setTime({
-                    hours: next.getHours(),
-                    minutes: next.getMinutes(),
+                  updateSelectedAt((next) => {
+                    next.setHours(next.getHours() + 1);
                   });
                 }}
               >
@@ -159,12 +178,8 @@ export default function ExpiryPickerModal({
                 style={{ borderRadius: 12 }}
                 compact
                 onPress={() => {
-                  const base = new Date(date ?? new Date());
-                  base.setHours(time.hours, time.minutes, 0, 0);
-                  const next = new Date(base.getTime() + 12 * 60 * 60 * 1000);
-                  setTime({
-                    hours: next.getHours(),
-                    minutes: next.getMinutes(),
+                  updateSelectedAt((next) => {
+                    next.setHours(next.getHours() + 12);
                   });
                 }}
               >
@@ -192,7 +207,6 @@ export default function ExpiryPickerModal({
               style={{ borderRadius: 12 }}
               mode="contained"
               onPress={() => {
-                if (!date) return;
                 const iso = toIsoUtcFromLocal(date, time.hours, time.minutes);
                 onConfirm(iso);
                 setVisible(false);
@@ -210,7 +224,17 @@ export default function ExpiryPickerModal({
             onDismiss={() => setShowDate(false)}
             onConfirm={({ date }) => {
               setShowDate(false);
-              if (date) setDate(date);
+              if (date) {
+                setSelectedAt((current) => {
+                  const next = new Date(current);
+                  next.setFullYear(
+                    date.getFullYear(),
+                    date.getMonth(),
+                    date.getDate(),
+                  );
+                  return next;
+                });
+              }
             }}
           />
           <TimePickerModal
@@ -218,7 +242,11 @@ export default function ExpiryPickerModal({
             onDismiss={() => setShowTime(false)}
             onConfirm={({ hours, minutes }) => {
               setShowTime(false);
-              setTime({ hours, minutes });
+              setSelectedAt((current) => {
+                const next = new Date(current);
+                next.setHours(hours, minutes, 0, 0);
+                return next;
+              });
             }}
             hours={time.hours}
             minutes={time.minutes}
