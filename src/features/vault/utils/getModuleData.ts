@@ -7,6 +7,7 @@ import ExpiryModuleType from "../model/modules/ExpiryModuleType";
 import KeyModuleType from "../model/modules/KeyModuleType";
 import NoteModuleType from "../model/modules/NoteModuleType";
 import PasswordModuleType from "../model/modules/PasswordModuleType";
+import PinModuleType from "../model/modules/PinModuleType";
 import PhoneNumberModuleType from "../model/modules/PhoneNumberModuleType";
 import TaskModuleType from "../model/modules/TaskModuleType";
 import TitleModuleType from "../model/modules/TitleModuleType";
@@ -57,6 +58,13 @@ const MODULE_DEFAULTS = {
       module: ModulesEnum.PASSWORD,
       value: "",
     } satisfies PasswordModuleType),
+
+  [ModulesEnum.PIN]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.PIN,
+      value: "",
+    } satisfies PinModuleType),
 
   [ModulesEnum.TITLE]: (id: string): ModuleType =>
     ({

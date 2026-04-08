@@ -368,9 +368,10 @@ export type TranslationSchema = {
     email: string;
     expiry: string;
     key: string;
-    note: string;
-    password: string;
-    phoneNumber: string;
+      note: string;
+      password: string;
+      pin: string;
+      phoneNumber: string;
     task: string;
     title: string;
     totp: string;

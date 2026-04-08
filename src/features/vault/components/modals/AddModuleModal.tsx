@@ -197,6 +197,13 @@ export default function AddModuleModalCompactFav(props: Props) {
       keywords: ["passwort", "credential", "login"],
     },
     {
+      id: ModulesEnum.PIN,
+      label: t("modules:pin"),
+      icon: MODULE_ICON[ModulesEnum.PIN],
+      category: "Security",
+      keywords: ["pin", "code", "numeric", "device"],
+    },
+    {
       id: ModulesEnum.WIFI,
       label: t("modules:wifi"),
       icon: MODULE_ICON[ModulesEnum.WIFI],

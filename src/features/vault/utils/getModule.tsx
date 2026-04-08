@@ -16,6 +16,8 @@ import NoteModule from "../components/modules/NoteModule";
 
 import PasswordModuleType from "../model/modules/PasswordModuleType";
 import PasswordModule from "../components/modules/PasswordModule";
+import PinModuleType from "../model/modules/PinModuleType";
+import PinModule from "../components/modules/PinModule";
 
 import URLModuleType from "../model/modules/URLModuleType";
 import URLModule from "../components/modules/URLModule";
@@ -134,6 +136,21 @@ const MODULE_RENDERERS = {
     const m = module as PasswordModuleType;
     return (
       <PasswordModule
+        id={m.id}
+        module={m.module}
+        value={m.value}
+        onDragStart={args.onDragStart}
+        deleteModule={args.deleteModule}
+        changeModule={args.changeModule}
+        fastAccess={args.fastAccess}
+      />
+    );
+  },
+
+  [ModulesEnum.PIN]: (module, args) => {
+    const m = module as PinModuleType;
+    return (
+      <PinModule
         id={m.id}
         module={m.module}
         value={m.value}

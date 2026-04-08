@@ -4,6 +4,7 @@ enum ModulesEnum {
   KEY = "KEY",
   NOTE = "NOTE",
   PASSWORD = "PASSWORD",
+  PIN = "PIN",
   TITLE = "TITLE",
   URL = "URL",
   USERNAME = "USERNAME",

@@ -61,6 +61,7 @@ export const MODULE_POLICY: Record<ManagedModules, ModulePolicy> = {
   [ModulesEnum.PHONE_NUMBER]: { kind: "meta", metaKey: "phone" },
 
   [ModulesEnum.PASSWORD]: { kind: "secret" },
+  [ModulesEnum.PIN]: { kind: "secret" },
   [ModulesEnum.NOTE]: { kind: "secret" },
   [ModulesEnum.KEY]: { kind: "secret" },
   [ModulesEnum.TOTP]: { kind: "secret" },

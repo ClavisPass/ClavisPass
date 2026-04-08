@@ -8,6 +8,7 @@ export const MODULE_ICON = {
   [ModulesEnum.KEY]: "key-variant",
   [ModulesEnum.NOTE]: "note",
   [ModulesEnum.PASSWORD]: "form-textbox-password",
+  [ModulesEnum.PIN]: "dialpad",
   [ModulesEnum.URL]: "web",
   [ModulesEnum.USERNAME]: "account",
   [ModulesEnum.WIFI]: "wifi",
