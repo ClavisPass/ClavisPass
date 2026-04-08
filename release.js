@@ -50,6 +50,18 @@ function cargoTomlHasVersion(path, version) {
   );
 }
 
+function cargoLockHasVersion(path, packageName, version) {
+  if (!fs.existsSync(path)) return true;
+  const cargoLock = fs.readFileSync(path, "utf-8");
+  const escapedName = packageName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escapedVersion = version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const matcher = new RegExp(
+    `\\[\\[package\\]\\][\\s\\S]*?name\\s*=\\s*"${escapedName}"[\\s\\S]*?version\\s*=\\s*"${escapedVersion}"`,
+    "m",
+  );
+  return matcher.test(cargoLock);
+}
+
 function tauriConfigHasVersion(path, version) {
   if (!fs.existsSync(path)) return true;
   return readJson(path).version === version;
@@ -64,13 +76,24 @@ function versionTargetsMatch(version, runtimeVersion) {
     (appJson.expo?.version === version &&
       appJson.expo?.runtimeVersion === runtimeVersion);
   const cargoOk = cargoTomlHasVersion("src-tauri/Cargo.toml", version);
+  const cargoLockOk = cargoLockHasVersion("src-tauri/Cargo.lock", "ClavisPass", version);
   const tauriConfOk = tauriConfigHasVersion("src-tauri/tauri.conf.json", version);
   const tauriConfigOk = tauriConfigHasVersion(
     "src-tauri/tauri.config.json",
     version,
   );
 
-  return packageOk && appOk && cargoOk && tauriConfOk && tauriConfigOk;
+  return packageOk && appOk && cargoOk && cargoLockOk && tauriConfOk && tauriConfigOk;
+}
+
+function syncCargoLock() {
+  if (!fs.existsSync("src-tauri/Cargo.toml")) {
+    return;
+  }
+
+  execSync("cargo check --manifest-path src-tauri/Cargo.toml", {
+    stdio: "inherit",
+  });
 }
 
 function waitForVersionTargetsToSettle(version, runtimeVersion, paths, options = {}) {
@@ -177,11 +200,19 @@ try {
   process.exit(1);
 }
 
+try {
+  syncCargoLock();
+} catch (e) {
+  console.error("Aborting release because Cargo.lock could not be synchronized.");
+  process.exit(1);
+}
+
 waitForVersionTargetsToSettle(version, runtimeVersion, [
   "version.json",
   "package.json",
   "app.json",
   "src-tauri/Cargo.toml",
+  "src-tauri/Cargo.lock",
   "src-tauri/tauri.conf.json",
   "src-tauri/tauri.config.json",
 ]);
