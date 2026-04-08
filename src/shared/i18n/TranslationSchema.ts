@@ -377,10 +377,12 @@ export type TranslationSchema = {
     unknown: string;
     url: string;
     username: string;
-    wifi: string;
-    wifiOpen: string;
-    wifiHidden: string;
-    created: string;
+      wifi: string;
+      wifiOpen: string;
+      wifiHidden: string;
+      wifiSecurity: string;
+      wifiVisibility: string;
+      created: string;
     lastUpdated: string;
     unknownModule: string;
     recoveryCodes: string;

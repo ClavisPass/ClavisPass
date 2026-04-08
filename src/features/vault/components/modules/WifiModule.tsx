@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View, Keyboard } from "react-native";
-import { Button, TextInput } from "react-native-paper";
+import { Button, IconButton, Portal, Text, TextInput } from "react-native-paper";
 import { Dropdown, DropdownInputProps } from "react-native-paper-dropdown";
 
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
+import Modal from "../../../../shared/components/modals/Modal";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import Props from "../../model/ModuleProps";
 import ModulesEnum from "../../model/ModulesEnum";
@@ -53,7 +54,6 @@ function WifiModule(props: WifiModuleType & Props) {
   const [wifiType, setWifiType] = useState<"WPA" | "WEP" | "blank">(
     props.wifiType,
   );
-
   useEffect(() => {
     setName(props.wifiName);
   }, [props.wifiName]);
@@ -71,6 +71,7 @@ function WifiModule(props: WifiModuleType & Props) {
   }, [props.wifiType]);
 
   const [eyeIcon, setEyeIcon] = useState("eye");
+  const [settingsVisible, setSettingsVisible] = useState(false);
 
   useEffect(() => {
     if (secureTextEntry) {
@@ -109,7 +110,7 @@ function WifiModule(props: WifiModuleType & Props) {
           style={[
             globalStyles.moduleView,
             {
-              justifyContent: "flex-start",
+              justifyContent: "space-between",
               alignItems: "center",
               width: "100%",
               paddingLeft: 0,
@@ -119,70 +120,9 @@ function WifiModule(props: WifiModuleType & Props) {
           <View
             style={{
               height: 40,
-              width: 110,
-              borderRadius: 12,
-              overflow: "hidden",
-            }}
-          >
-            <Dropdown
-              CustomDropdownInput={CustomDropdownInput}
-              menuContentStyle={{
-                borderRadius: 12,
-                backgroundColor: theme.colors.background,
-                boxShadow: theme.colors.shadow,
-                overflow: "hidden",
-              }}
-              mode="flat"
-              hideMenuHeader
-              options={OPTIONS}
-              value={wifiType}
-              onSelect={(value?: string) => {
-                if (value === "WPA" || value === "WEP" || value === "blank") {
-                  setWifiType(value);
-                }
-              }}
-            />
-          </View>
-          <View style={{ width: 8 }} />
-          <View
-            style={{
-              height: 40,
-              width: 200,
-              borderRadius: 12,
-              overflow: "hidden",
-            }}
-          >
-            <Dropdown
-              CustomDropdownInput={CustomDropdownInput}
-              menuContentStyle={{
-                borderRadius: 12,
-                backgroundColor: theme.colors.background,
-                boxShadow: theme.colors.shadow,
-                overflow: "hidden",
-              }}
-              mode="flat"
-              hideMenuHeader
-              options={HIDDEN_OPTIONS}
-              value={hidden ? "hidden" : "visible"}
-              onSelect={(next?: string) => {
-                if (next === "hidden") {
-                  setHidden(true);
-                  return;
-                }
-                if (next === "visible") {
-                  setHidden(false);
-                }
-              }}
-            />
-          </View>
-          <View style={{ width: 8 }} />
-          <View
-            style={{
-              flex: 1,
-              height: 40,
+              width: 136,
               alignItems: "center",
               justifyContent: "center",
-              flexShrink: 0,
             }}
           >
             <Button
@@ -196,6 +136,13 @@ function WifiModule(props: WifiModuleType & Props) {
               QR Code
             </Button>
           </View>
+          <View style={{ width: 8 }} />
+          <IconButton
+            icon="tune-variant"
+            iconColor={theme.colors.primary}
+            size={20}
+            onPress={() => setSettingsVisible(true)}
+          />
         </View>
 
         <View style={globalStyles.moduleView}>
@@ -248,6 +195,88 @@ function WifiModule(props: WifiModuleType & Props) {
         wifipassword={value}
         hidden={hidden}
       />
+      <Portal>
+        <Modal
+          visible={settingsVisible}
+          onDismiss={() => setSettingsVisible(false)}
+        >
+          <View
+            style={{
+              width: 300,
+              padding: 14,
+              gap: 12,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: theme.colors.outlineVariant,
+              backgroundColor: theme.colors.background,
+            }}
+          >
+            <Text variant="titleMedium">{t("modules:wifi")}</Text>
+
+            <View style={{ gap: 8 }}>
+              <Text variant="bodyMedium" style={{ opacity: 0.72 }}>
+                {t("modules:wifiSecurity")}
+              </Text>
+              <Dropdown
+                CustomDropdownInput={CustomDropdownInput}
+                menuContentStyle={{
+                  borderRadius: 12,
+                  backgroundColor: theme.colors.background,
+                  boxShadow: theme.colors.shadow,
+                  overflow: "hidden",
+                }}
+                mode="flat"
+                hideMenuHeader
+                options={OPTIONS}
+                value={wifiType}
+                onSelect={(value?: string) => {
+                  if (value === "WPA" || value === "WEP" || value === "blank") {
+                    setWifiType(value);
+                  }
+                }}
+              />
+            </View>
+
+            <View style={{ gap: 8 }}>
+              <Text variant="bodyMedium" style={{ opacity: 0.72 }}>
+                {t("modules:wifiVisibility")}
+              </Text>
+              <Dropdown
+                CustomDropdownInput={CustomDropdownInput}
+                menuContentStyle={{
+                  borderRadius: 12,
+                  backgroundColor: theme.colors.background,
+                  boxShadow: theme.colors.shadow,
+                  overflow: "hidden",
+                }}
+                mode="flat"
+                hideMenuHeader
+                options={HIDDEN_OPTIONS}
+                value={hidden ? "hidden" : "visible"}
+                onSelect={(next?: string) => {
+                  if (next === "hidden") {
+                    setHidden(true);
+                    return;
+                  }
+                  if (next === "visible") {
+                    setHidden(false);
+                  }
+                }}
+              />
+            </View>
+
+            <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+              <Button
+                mode="contained"
+                style={{ borderRadius: 12 }}
+                onPress={() => setSettingsVisible(false)}
+              >
+                {t("common:done")}
+              </Button>
+            </View>
+          </View>
+        </Modal>
+      </Portal>
     </ModuleContainer>
   );
 }
