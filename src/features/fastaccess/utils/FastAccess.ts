@@ -32,6 +32,19 @@ function resolvePopupReady() {
   popupReadyResolvers = [];
 }
 
+async function isNotificationStillPresented(notificationId: string) {
+  try {
+    const presented = await Notifications.getPresentedNotificationsAsync();
+    return presented.some((item) => item.request.identifier === notificationId);
+  } catch (error) {
+    logger.warn(
+      "[FastAccess] Failed to inspect presented notifications:",
+      error,
+    );
+    return true;
+  }
+}
+
 async function ensurePopupReadyListener() {
   if (popupReadyListenerSet) {
     return;
@@ -206,6 +219,14 @@ export async function openFastAccess(
   }
 
   const nextKey = buildFastAccessKey(title, username, password);
+  if (lastNotificationId) {
+    const stillPresented = await isNotificationStillPresented(lastNotificationId);
+    if (!stillPresented) {
+      lastNotificationId = null;
+      activeFastAccessKey = null;
+    }
+  }
+
   if (lastNotificationId && activeFastAccessKey === nextKey) {
     return;
   }
