@@ -5,7 +5,10 @@ import { useTheme } from "../app/providers/ThemeProvider";
 import Header from "../shared/components/Header";
 import PasswordTextbox from "../shared/components/PasswordTextbox";
 import CopyToClipboard from "../shared/components/buttons/CopyToClipboard";
-import { hideFastAccess } from "../features/fastaccess/utils/FastAccess";
+import {
+  hideFastAccess,
+  snapPopupToNearestCorner,
+} from "../features/fastaccess/utils/FastAccess";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
 import {
   FAST_ACCESS_POPUP_LABEL,
@@ -13,12 +16,31 @@ import {
   FAST_ACCESS_UPDATE_EVENT,
 } from "../features/fastaccess/constants";
 import { detectTauriEnvironment } from "../infrastructure/platform/isTauri";
+import { logger } from "../infrastructure/logging/logger";
 
 export default function FastAccessScreen() {
   const [title, setTitle] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { theme, globalStyles } = useTheme();
+  const dragInProgressRef = React.useRef(false);
+  const snapTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const startHeaderDrag = async () => {
+    if (!(await detectTauriEnvironment())) {
+      return;
+    }
+
+    try {
+      const { getCurrentWindow } = await import("@tauri-apps/api/window");
+      const currentWindow = getCurrentWindow();
+      dragInProgressRef.current = true;
+      await currentWindow.startDragging();
+    } catch (error) {
+      dragInProgressRef.current = false;
+      logger.warn("[FastAccess] Dragging failed:", error);
+    }
+  };
 
   useEffect(() => {
     let unlisten: null | (() => void) = null;
@@ -44,6 +66,32 @@ export default function FastAccessScreen() {
         setPassword(payload.password);
       });
 
+      const unlistenMoved = await currentWindow.onMoved(() => {
+        if (!dragInProgressRef.current) {
+          return;
+        }
+
+        if (snapTimeoutRef.current) {
+          clearTimeout(snapTimeoutRef.current);
+        }
+
+        snapTimeoutRef.current = setTimeout(() => {
+          dragInProgressRef.current = false;
+          snapTimeoutRef.current = null;
+          void snapPopupToNearestCorner();
+        }, 140);
+      });
+
+      const previousUnlisten = unlisten;
+      unlisten = () => {
+        previousUnlisten?.();
+        unlistenMoved?.();
+        if (snapTimeoutRef.current) {
+          clearTimeout(snapTimeoutRef.current);
+          snapTimeoutRef.current = null;
+        }
+      };
+
       await emit(FAST_ACCESS_READY_EVENT, { label: FAST_ACCESS_POPUP_LABEL });
     };
 
@@ -66,27 +114,40 @@ export default function FastAccessScreen() {
     >
       <Header
         leftNode={
-          <View
+          <AnimatedPressable
+            onPressIn={() => {
+              void startHeaderDrag();
+            }}
             style={{
-              display: "flex",
-              flexDirection: "row",
-              marginLeft: 8,
-              gap: 4,
-              alignItems: "center",
+              flex: 1,
+              height: 40,
+              cursor: "move",
+              justifyContent: "center",
             }}
           >
-            <Icon
-              color={theme.colors.primary}
-              size={20}
-              source={"tooltip-account"}
-            />
-            <Text
-              variant="bodyLarge"
-              style={{ color: theme.colors.primary, userSelect: "none" }}
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 4,
+                alignItems: "center",
+                paddingLeft: 12,
+                paddingRight: 12,
+              }}
             >
-              {title}
-            </Text>
-          </View>
+              <Icon
+                color={theme.colors.primary}
+                size={20}
+                source={"tooltip-account"}
+              />
+              <Text
+                variant="bodyLarge"
+                style={{ color: theme.colors.primary, userSelect: "none" }}
+              >
+                {title}
+              </Text>
+            </View>
+          </AnimatedPressable>
         }
       >
         <View style={{ display: "flex", flexDirection: "row" }}>

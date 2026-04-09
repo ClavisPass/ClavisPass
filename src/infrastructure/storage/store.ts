@@ -162,6 +162,42 @@ export type StoreValueMap = {
           : never;
 };
 
+type StoreListener<K extends DataKey = DataKey> = (
+  value: StoreValueMap[K]
+) => void;
+
+const listeners = new Map<DataKey, Set<StoreListener<any>>>();
+
+function notifyListeners<K extends DataKey>(key: K, value: StoreValueMap[K]) {
+  const keyListeners = listeners.get(key);
+  if (!keyListeners) return;
+  keyListeners.forEach((listener) => {
+    try {
+      listener(value);
+    } catch (e) {
+      logger.warn(`Failed to notify listener for ${String(key)}`, e);
+    }
+  });
+}
+
+export function subscribe<K extends DataKey>(
+  key: K,
+  listener: StoreListener<K>
+): () => void {
+  const keyListeners = listeners.get(key) ?? new Set();
+  keyListeners.add(listener as StoreListener<any>);
+  listeners.set(key, keyListeners);
+
+  return () => {
+    const current = listeners.get(key);
+    if (!current) return;
+    current.delete(listener as StoreListener<any>);
+    if (current.size === 0) {
+      listeners.delete(key);
+    }
+  };
+}
+
 export async function get<K extends DataKey>(
   key: K
 ): Promise<StoreValueMap[K]> {
@@ -231,14 +267,17 @@ export async function set<K extends DataKey>(
           return;
         }
         await AsyncStorage.setItem(key as string, v);
+        notifyListeners(key, value);
         break;
       }
       case "number": {
         await AsyncStorage.setItem(key as string, String(value));
+        notifyListeners(key, value);
         break;
       }
       case "boolean": {
         await AsyncStorage.setItem(key as string, value ? "true" : "false");
+        notifyListeners(key, value);
         break;
       }
       case "json": {
@@ -252,6 +291,7 @@ export async function set<K extends DataKey>(
             return;
           }
           await AsyncStorage.setItem(key as string, JSON.stringify(norm));
+          notifyListeners(key, norm as StoreValueMap[K]);
           break;
         }
 
@@ -260,6 +300,7 @@ export async function set<K extends DataKey>(
           return;
         }
         await AsyncStorage.setItem(key as string, JSON.stringify(v));
+        notifyListeners(key, value);
         break;
       }
     }

@@ -53,6 +53,7 @@ import {
   detectTauriEnvironment,
   isTauriEnvironment,
 } from "../infrastructure/platform/isTauri";
+import { FAST_ACCESS_POSITION_CHANGED_EVENT } from "../features/fastaccess/constants";
 
 const styles = StyleSheet.create({
   surface: {
@@ -103,7 +104,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     useSetting("START_BEHAVIOR");
   const { value: fastAccessValue, setValue: setFastAccessValue } =
     useSetting("FAST_ACCESS");
-  const { value: fastAccessPosition, setValue: setFastAccessPosition } =
+  const {
+    value: fastAccessPosition,
+    setValue: setFastAccessPosition,
+    refresh: refreshFastAccessPosition,
+  } =
     useSetting("FAST_ACCESS_POSITION");
 
   const { value: language } = useSetting("LANGUAGE");
@@ -309,6 +314,27 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
       setUseAuthentication(isAuthenticated);
     });
   }, []);
+
+  useEffect(() => {
+    let unlisten: null | (() => void) = null;
+
+    const setup = async () => {
+      if (!(await detectTauriEnvironment())) {
+        return;
+      }
+
+      const { listen } = await import("@tauri-apps/api/event");
+      unlisten = await listen(FAST_ACCESS_POSITION_CHANGED_EVENT, () => {
+        void refreshFastAccessPosition();
+      });
+    };
+
+    void setup();
+
+    return () => {
+      unlisten?.();
+    };
+  }, [refreshFastAccessPosition]);
 
   const openURL = async (value: string) => {
     if (await detectTauriEnvironment()) {

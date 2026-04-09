@@ -54,6 +54,18 @@ export function SettingsProvider({
     };
   }, [preloadKeys]);
 
+  React.useEffect(() => {
+    const unsubs = preloadKeys.map((key) =>
+      store.subscribe(key, (value) => {
+        setState((prev) => ({ ...prev, [key]: value }));
+      })
+    );
+
+    return () => {
+      unsubs.forEach((unsub) => unsub());
+    };
+  }, [preloadKeys]);
+
   const peekSetting = React.useCallback(
     <K extends DataKey>(key: K): StoreValueMap[K] | undefined => {
       return state[key] as StoreValueMap[K] | undefined;

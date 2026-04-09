@@ -3,9 +3,10 @@ import * as Notifications from "expo-notifications";
 import * as Clipboard from "expo-clipboard";
 import { logger } from "../../../infrastructure/logging/logger";
 import { detectTauriEnvironment } from "../../../infrastructure/platform/isTauri";
-import { get as getSetting } from "../../../infrastructure/storage/store";
+import { get as getSetting, set as setSetting } from "../../../infrastructure/storage/store";
 import {
   FAST_ACCESS_NOTIFICATION_CATEGORY,
+  FAST_ACCESS_POSITION_CHANGED_EVENT,
   FAST_ACCESS_POPUP_LABEL,
   FAST_ACCESS_READY_EVENT,
   FAST_ACCESS_UPDATE_EVENT,
@@ -22,6 +23,16 @@ let activeSessionKey: string | null = null;
 let popupReady = false;
 let popupReadyListenerSet = false;
 let popupReadyResolvers: Array<() => void> = [];
+
+const FAST_ACCESS_WINDOW_WIDTH = 320;
+const FAST_ACCESS_WINDOW_HEIGHT = 150;
+const FAST_ACCESS_MARGIN_X = 20;
+const FAST_ACCESS_MARGIN_TOP = 20;
+const FAST_ACCESS_MARGIN_BOTTOM = 60;
+
+function sleepAsync(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 function buildFastAccessKey(title: string, username: string, password: string) {
   return `${activeSessionKey ?? "no-session"}::${title}::${username}::${password}`;
@@ -373,21 +384,132 @@ export async function positionPopup() {
 
   const { width, height } = monitor.size;
   const { x: screenX, y: screenY } = monitor.position;
-
-  const windowWidth = 320;
-  const windowHeight = 150;
-  const marginX = 20;
-  const marginY = 60;
   const position = await getSetting("FAST_ACCESS_POSITION");
 
   const x =
     position === "top-left" || position === "bottom-left"
-      ? screenX + marginX
-      : screenX + width - windowWidth - marginX;
+      ? screenX + FAST_ACCESS_MARGIN_X
+      : screenX + width - FAST_ACCESS_WINDOW_WIDTH - FAST_ACCESS_MARGIN_X;
   const y =
     position === "top-left" || position === "top-right"
-      ? screenY + marginX
-      : screenY + height - windowHeight - marginY;
+      ? screenY + FAST_ACCESS_MARGIN_TOP
+      : screenY + height - FAST_ACCESS_WINDOW_HEIGHT - FAST_ACCESS_MARGIN_BOTTOM;
 
   await win.setPosition(new LogicalPosition(x, y));
+}
+
+async function animatePopupToPosition(targetX: number, targetY: number) {
+  if (!(await detectTauriEnvironment())) {
+    return;
+  }
+
+  const [{ getCurrentWindow, LogicalPosition }] = await Promise.all([
+    import("@tauri-apps/api/window"),
+    import("@tauri-apps/api/window"),
+  ]);
+
+  const win = getCurrentWindow();
+  const current = await win.outerPosition();
+  const steps = 8;
+
+  for (let index = 1; index <= steps; index++) {
+    const progress = index / steps;
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const nextX = current.x + (targetX - current.x) * eased;
+    const nextY = current.y + (targetY - current.y) * eased;
+    await win.setPosition(new LogicalPosition(nextX, nextY));
+    await sleepAsync(10);
+  }
+}
+
+export async function snapPopupToNearestCorner() {
+  if (!(await detectTauriEnvironment())) {
+    return;
+  }
+
+  const [{ getCurrentWindow, LogicalPosition }, { currentMonitor }, { emit }] = await Promise.all([
+    import("@tauri-apps/api/window"),
+    import("@tauri-apps/api/window"),
+    import("@tauri-apps/api/event"),
+  ]);
+
+  const win = getCurrentWindow();
+  const monitor = await currentMonitor();
+  if (!monitor) {
+    logger.warn("Kein Monitor gefunden");
+    return;
+  }
+
+  const [position, size] = await Promise.all([
+    win.outerPosition(),
+    win.outerSize(),
+  ]);
+
+  const { width, height } = monitor.size;
+  const { x: screenX, y: screenY } = monitor.position;
+
+  const windowCenterX = position.x + size.width / 2;
+  const windowCenterY = position.y + size.height / 2;
+
+  const corners = [
+    {
+      value: "top-left",
+      x: screenX + FAST_ACCESS_MARGIN_X + FAST_ACCESS_WINDOW_WIDTH / 2,
+      y: screenY + FAST_ACCESS_MARGIN_TOP + FAST_ACCESS_WINDOW_HEIGHT / 2,
+    },
+    {
+      value: "top-right",
+      x:
+        screenX +
+        width -
+        FAST_ACCESS_MARGIN_X -
+        FAST_ACCESS_WINDOW_WIDTH / 2,
+      y: screenY + FAST_ACCESS_MARGIN_TOP + FAST_ACCESS_WINDOW_HEIGHT / 2,
+    },
+    {
+      value: "bottom-left",
+      x: screenX + FAST_ACCESS_MARGIN_X + FAST_ACCESS_WINDOW_WIDTH / 2,
+      y:
+        screenY +
+        height -
+        FAST_ACCESS_MARGIN_BOTTOM -
+        FAST_ACCESS_WINDOW_HEIGHT / 2,
+    },
+    {
+      value: "bottom-right",
+      x:
+        screenX +
+        width -
+        FAST_ACCESS_MARGIN_X -
+        FAST_ACCESS_WINDOW_WIDTH / 2,
+      y:
+        screenY +
+        height -
+        FAST_ACCESS_MARGIN_BOTTOM -
+        FAST_ACCESS_WINDOW_HEIGHT / 2,
+    },
+  ] as const;
+
+  const nearestCorner = corners.reduce((best, current) => {
+    const bestDistance = Math.hypot(best.x - windowCenterX, best.y - windowCenterY);
+    const currentDistance = Math.hypot(
+      current.x - windowCenterX,
+      current.y - windowCenterY,
+    );
+    return currentDistance < bestDistance ? current : best;
+  });
+
+  await setSetting("FAST_ACCESS_POSITION", nearestCorner.value);
+  const targetX =
+    nearestCorner.value === "top-left" || nearestCorner.value === "bottom-left"
+      ? screenX + FAST_ACCESS_MARGIN_X
+      : screenX + width - FAST_ACCESS_WINDOW_WIDTH - FAST_ACCESS_MARGIN_X;
+  const targetY =
+    nearestCorner.value === "top-left" || nearestCorner.value === "top-right"
+      ? screenY + FAST_ACCESS_MARGIN_TOP
+      : screenY + height - FAST_ACCESS_WINDOW_HEIGHT - FAST_ACCESS_MARGIN_BOTTOM;
+
+  await animatePopupToPosition(targetX, targetY);
+  await win.setPosition(new LogicalPosition(targetX, targetY));
+  await emit(FAST_ACCESS_POSITION_CHANGED_EVENT, { value: nearestCorner.value });
 }
