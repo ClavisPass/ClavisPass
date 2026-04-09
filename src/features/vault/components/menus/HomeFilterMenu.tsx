@@ -164,23 +164,33 @@ function HomeFilterMenu(props: Props) {
   const topContent = (
     <View
       style={{
-        paddingRight: 16,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
       }}
     >
       <MenuItem>{`${entryCount} ${t("home:entries")}`}</MenuItem>
-      <IconButton
-        disabled={!isOnline}
-        icon="refresh"
-        size={20}
-        iconColor={theme.colors.primary}
-        onPress={() => {
-          props.refreshData();
-          close();
-        }}
-      />
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <View
+          style={{
+            width: 1,
+            height: 24,
+            backgroundColor: theme.colors.outlineVariant,
+            opacity: 0.7,
+          }}
+        />
+        <IconButton
+        style={{ marginLeft: 20, marginRight: 20 }}
+          disabled={!isOnline}
+          icon="refresh"
+          size={20}
+          iconColor={theme.colors.primary}
+          onPress={() => {
+            props.refreshData();
+            close();
+          }}
+        />
+      </View>
     </View>
   );
 
