@@ -147,6 +147,12 @@ export type TranslationSchema = {
     changeMasterPassword: string;
     useSystemAuth: string;
     autoOpenFastAccess: string;
+    fastAccessPosition: string;
+    fastAccessPositionHint: string;
+    fastAccessPositionTopLeft: string;
+    fastAccessPositionTopRight: string;
+    fastAccessPositionBottomLeft: string;
+    fastAccessPositionBottomRight: string;
     importBackup: string;
     exportBackup: string;
     importPasswords: string;

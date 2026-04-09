@@ -3,6 +3,7 @@ import * as Notifications from "expo-notifications";
 import * as Clipboard from "expo-clipboard";
 import { logger } from "../../../infrastructure/logging/logger";
 import { detectTauriEnvironment } from "../../../infrastructure/platform/isTauri";
+import { get as getSetting } from "../../../infrastructure/storage/store";
 import {
   FAST_ACCESS_NOTIFICATION_CATEGORY,
   FAST_ACCESS_POPUP_LABEL,
@@ -182,7 +183,7 @@ async function ensurePopupWindow() {
 
   await new Promise<void>((resolve, reject) => {
     win.once("tauri://created", async () => {
-      await positionPopupBottomRight();
+      await positionPopup();
       await win.show();
       resolve();
     });
@@ -201,7 +202,7 @@ export async function openFastAccess(
     try {
       await prepareFastAccess();
       const win = await ensurePopupWindow();
-      await positionPopupBottomRight();
+      await positionPopup();
       await win.show();
       await waitForPopupReady();
       await win.emit(FAST_ACCESS_UPDATE_EVENT, { title, username, password });
@@ -349,7 +350,7 @@ export async function cleanupFastAccessOnStartup(hasActiveSession: boolean) {
   lastNotificationId = null;
 }
 
-export async function positionPopupBottomRight() {
+export async function positionPopup() {
   if (!(await detectTauriEnvironment())) {
     return;
   }
@@ -375,9 +376,18 @@ export async function positionPopupBottomRight() {
 
   const windowWidth = 320;
   const windowHeight = 150;
+  const marginX = 20;
+  const marginY = 60;
+  const position = await getSetting("FAST_ACCESS_POSITION");
 
-  const x = screenX + width - windowWidth - 20;
-  const y = screenY + height - windowHeight - 60;
+  const x =
+    position === "top-left" || position === "bottom-left"
+      ? screenX + marginX
+      : screenX + width - windowWidth - marginX;
+  const y =
+    position === "top-left" || position === "top-right"
+      ? screenY + marginX
+      : screenY + height - windowHeight - marginY;
 
   await win.setPosition(new LogicalPosition(x, y));
 }

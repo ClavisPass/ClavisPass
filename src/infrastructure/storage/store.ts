@@ -80,6 +80,16 @@ export const storeSchema = {
     values: ["disabled", "auto"] as const,
     default: "disabled",
   },
+  FAST_ACCESS_POSITION: {
+    type: "enum",
+    values: [
+      "top-left",
+      "top-right",
+      "bottom-left",
+      "bottom-right",
+    ] as const,
+    default: "bottom-right",
+  },
   SIDEBAR_WIDTH: {
     type: "number",
     default: 180,

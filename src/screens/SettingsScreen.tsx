@@ -45,6 +45,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { SettingsStackParamList } from "../app/navigation/model/types";
 import { ContentProtectionSettingsToggle } from "../features/settings/components/ContentProtectionSettingsToggle";
 import AppearanceSettingsSection from "../features/settings/components/AppearanceSettingsSection";
+import FastAccessPositionPicker from "../features/settings/components/FastAccessPositionPicker";
 import { checkForDesktopUpdate } from "../shared/utils/desktopUpdater";
 import { publishUpdateCheck } from "../infrastructure/events/updateBus";
 import { logger } from "../infrastructure/logging/logger";
@@ -102,6 +103,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     useSetting("START_BEHAVIOR");
   const { value: fastAccessValue, setValue: setFastAccessValue } =
     useSetting("FAST_ACCESS");
+  const { value: fastAccessPosition, setValue: setFastAccessPosition } =
+    useSetting("FAST_ACCESS_POSITION");
 
   const { value: language } = useSetting("LANGUAGE");
 
@@ -573,6 +576,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                   changeFastAccessBehavior(checked);
                 }}
               />
+              {isTauri ? (
+                <>
+                  <SettingsDivider />
+                  <FastAccessPositionPicker
+                    value={fastAccessPosition}
+                    setValue={setFastAccessPosition}
+                  />
+                </>
+              ) : null}
             </SettingsContainer>
 
             <SettingsContainer

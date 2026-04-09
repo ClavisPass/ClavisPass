@@ -149,6 +149,12 @@ const en: TranslationSchema = {
     changeMasterPassword: "Change Master Password",
     useSystemAuth: "System Authentication",
     autoOpenFastAccess: "Auto Open",
+    fastAccessPosition: "Popup Position",
+    fastAccessPositionHint: "Choose the corner where Fast Access should appear.",
+    fastAccessPositionTopLeft: "Top left",
+    fastAccessPositionTopRight: "Top right",
+    fastAccessPositionBottomLeft: "Bottom left",
+    fastAccessPositionBottomRight: "Bottom right",
     importBackup: "Import",
     exportBackup: "Export",
     importPasswords: "{{title}} Passwords",
@@ -423,3 +429,7 @@ const en: TranslationSchema = {
 };
 
 export default en;
+
+
+
+
