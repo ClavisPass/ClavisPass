@@ -14,7 +14,6 @@ use tauri::{
     AppHandle,
     Manager,
     Size,
-    Url,
     WebviewUrl,
     WebviewWindowBuilder,
     WindowEvent,
@@ -78,9 +77,24 @@ fn load_window_size(app_handle: &AppHandle) -> Option<WindowSize> {
     None
 }
 
+#[cfg(debug_assertions)]
+fn prevent_default_plugin() -> tauri::plugin::TauriPlugin<tauri::Wry> {
+    use tauri_plugin_prevent_default::Flags;
+
+    tauri_plugin_prevent_default::Builder::new()
+        .with_flags(Flags::all().difference(Flags::CONTEXT_MENU))
+        .build()
+}
+
+#[cfg(not(debug_assertions))]
+fn prevent_default_plugin() -> tauri::plugin::TauriPlugin<tauri::Wry> {
+    tauri_plugin_prevent_default::init()
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(prevent_default_plugin())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_oauth::init())
         .plugin(tauri_plugin_cli::init())
@@ -136,24 +150,10 @@ pub fn run() {
                 .visible(false)
                 .devtools(cfg!(debug_assertions));
 
-            let app_handle_for_new_window = app.handle().clone();
-
             let main_window = builder
-                .on_new_window(move |_url, features| {
-                    let popup_label = "oauth-popup";
-
-                    let popup = WebviewWindowBuilder::new(
-                        &app_handle_for_new_window,
-                        popup_label,
-                        WebviewUrl::External(Url::parse("about:blank").unwrap()),
-                    )
-                    .window_features(features)
-                    .zoom_hotkeys_enabled(false)
-                    .devtools(cfg!(debug_assertions))
-                    .build()
-                    .expect("failed to build popup window");
-
-                    NewWindowResponse::Create { window: popup }
+                .on_new_window(|url, _features| {
+                    eprintln!("Blocked webview new-window request: {url}");
+                    NewWindowResponse::Deny
                 })
                 .build()?;
 
