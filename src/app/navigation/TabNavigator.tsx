@@ -79,7 +79,7 @@ export default function TabNavigator() {
           tabBarLabel: "Settings",
           title: "Settings",
           tabBarIcon: ({ color, size }) => (
-            <Icon name="cog" size={size} color={color} />
+            <Icon name="tune-variant" size={size} color={color} />
           ),
         }}
       />

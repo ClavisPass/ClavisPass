@@ -54,6 +54,7 @@ import ExpiryOverviewModal from "../features/vault/components/modals/ExpiryOverv
 import type ExpiryModuleType from "../features/vault/model/modules/ExpiryModuleType";
 import { getRelativeInfo, getStatus } from "../features/vault/utils/expiry";
 import { formatAbsoluteLocal } from "../shared/utils/Timestamp";
+import { buildEntryMeta } from "../features/vault/utils/modulePolicy";
 import {
   subscribeOpenAddValue,
   unsubscribeOpenAddValue,
@@ -128,7 +129,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         setHeaderWhite(true);
       });
       return () => task?.cancel?.();
-    }, [])
+    }, []),
   );
 
   useEffect(() => {
@@ -153,8 +154,41 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         .normalize("NFD")
         .replace(/\p{Diacritic}/gu, "");
 
+    const scoreField = (
+      value: string | null | undefined,
+      query: string,
+      prefixWeight: number,
+      containsWeight: number,
+    ) => {
+      if (!value) return Infinity;
+
+      const normalizedValue = normalizeText(value);
+      if (!normalizedValue) return Infinity;
+
+      if (normalizedValue.startsWith(query)) return prefixWeight;
+
+      const index = normalizedValue.indexOf(query);
+      if (index === -1) return Infinity;
+
+      return containsWeight + index;
+    };
+
+    const getDomain = (value: string | null | undefined) => {
+      if (!value) return null;
+
+      try {
+        const withScheme = /^https?:\/\//i.test(value)
+          ? value
+          : `https://${value}`;
+        return new URL(withScheme).hostname.replace(/^www\./i, "");
+      } catch {
+        return value.replace(/^https?:\/\//i, "").replace(/^www\./i, "");
+      }
+    };
+
     const normalizedQuery = normalizeText(searchQuery.trim());
     const hasQuery = normalizedQuery.length > 0;
+    const includeMetaFields = normalizedQuery.length >= 2;
 
     const prefiltered = values.filter((item) => {
       if (hasQuery) return true;
@@ -168,17 +202,26 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     const withRelevance = prefiltered.map((item) => {
       if (!hasQuery) return { ...item, _relevance: 0 as number };
 
-      const title = normalizeText(item.title);
+      const meta = buildEntryMeta(item);
+      const domain = getDomain(meta.url);
 
-      let relevance = Infinity;
-      if (title.startsWith(normalizedQuery)) {
-        relevance = 0;
-      } else {
-        const index = title.indexOf(normalizedQuery);
-        if (index !== -1) {
-          relevance = index + 1;
-        }
-      }
+      const scores = [
+        scoreField(item.title, normalizedQuery, 0, 10),
+        ...(includeMetaFields
+          ? [
+              scoreField(domain, normalizedQuery, 30, 36),
+              scoreField(meta.username, normalizedQuery, 44, 50),
+              scoreField(meta.email, normalizedQuery, 44, 50),
+              scoreField(meta.url, normalizedQuery, 62, 68),
+              scoreField(meta.phone, normalizedQuery, 80, 86),
+              scoreField(meta.wifiName, normalizedQuery, 80, 86),
+              scoreField(meta.wifiType, normalizedQuery, 90, 96),
+              scoreField((item.folder as any)?.name, normalizedQuery, 92, 98),
+            ]
+          : []),
+      ];
+
+      const relevance = Math.min(...scores);
 
       return { ...item, _relevance: relevance };
     });
@@ -241,7 +284,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         const statusInfo = getStatus(
           iso,
           Date.now(),
-          expiryModule.warnBeforeMs ?? 24 * 60 * 60 * 1000
+          expiryModule.warnBeforeMs ?? 24 * 60 * 60 * 1000,
         );
 
         if (statusInfo.status === "empty") continue;
@@ -253,10 +296,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           relativeLabel:
             statusInfo.status === "expired"
               ? `${t("common:expiryExpiredPrefix")} ${formatRelativeLabel(
-                  statusInfo.remainingMs
+                  statusInfo.remainingMs,
                 )}`
               : `${t("common:expiryExpires")} ${formatRelativeLabel(
-                  statusInfo.remainingMs
+                  statusInfo.remainingMs,
                 )}`,
           statusLabel:
             statusInfo.status === "expired"
@@ -285,56 +328,64 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     setRefreshing(true);
 
     (async () => {
-    try {
-      let tokenToUse: string | null = null;
+      try {
+        let tokenToUse: string | null = null;
 
-      if (provider !== "device") {
-        tokenToUse = accessToken ?? (await ensureFreshAccessToken());
-        if (!tokenToUse) {
-          logger.warn("[Home] No access token available for refreshData.");
+        if (provider !== "device") {
+          tokenToUse = accessToken ?? (await ensureFreshAccessToken());
+          if (!tokenToUse) {
+            logger.warn("[Home] No access token available for refreshData.");
+            setRefreshing(false);
+            return;
+          }
+        }
+
+        const result = await fetchRemoteVaultFile({
+          provider,
+          accessToken: tokenToUse ?? "",
+          remotePath: "clavispass.lock",
+        });
+
+        if (result.status === "error") {
+          logger.warn(
+            "[Home] refreshData fetch error:",
+            result.message,
+            result.cause,
+          );
           setRefreshing(false);
           return;
         }
-      }
 
-      const result = await fetchRemoteVaultFile({
-        provider,
-        accessToken: tokenToUse ?? "",
-        remotePath: "clavispass.lock",
-      });
+        if (result.status === "not_found") {
+          logger.info("[Home] No vault found during refreshData.");
+          setRefreshing(false);
+          return;
+        }
 
-      if (result.status === "error") {
-        logger.warn("[Home] refreshData fetch error:", result.message, result.cause);
+        const decrypted = await decryptVaultContent(result.content, master);
+
+        if (!decrypted.ok) {
+          logger.warn(
+            "[Home] refreshData decrypt failed:",
+            decrypted.reason,
+            decrypted.error,
+          );
+          setRefreshing(false);
+          return;
+        }
+
+        vault.unlockWithDecryptedVault(decrypted.payload);
+        vault.markSaved();
+
+        setSelectedFolder(null);
+        saveSelectedFavState(false);
+        saveSelected2FAState(false);
+        saveSelectedCardState(false);
+      } catch (error) {
+        logger.error("[Home] Error during refreshData:", error);
+      } finally {
         setRefreshing(false);
-        return;
       }
-
-      if (result.status === "not_found") {
-        logger.info("[Home] No vault found during refreshData.");
-        setRefreshing(false);
-        return;
-      }
-
-      const decrypted = await decryptVaultContent(result.content, master);
-
-      if (!decrypted.ok) {
-        logger.warn("[Home] refreshData decrypt failed:", decrypted.reason, decrypted.error);
-        setRefreshing(false);
-        return;
-      }
-
-      vault.unlockWithDecryptedVault(decrypted.payload);
-      vault.markSaved();
-
-      setSelectedFolder(null);
-      saveSelectedFavState(false);
-      saveSelected2FAState(false);
-      saveSelectedCardState(false);
-    } catch (error) {
-      logger.error("[Home] Error during refreshData:", error);
-    } finally {
-      setRefreshing(false);
-    }
     })();
   };
 
@@ -367,7 +418,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         titleColor={theme.colors.primary}
       />
     ),
-    [refreshing, refreshData, theme.colors.primary, theme.colors.background, t]
+    [refreshing, refreshData, theme.colors.primary, theme.colors.background, t],
   );
 
   function renderFlashList() {
@@ -605,7 +656,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                       color: "white",
                     }}
                   >
-                    {expiryEntries.length > 99 ? "99+" : String(expiryEntries.length)}
+                    {expiryEntries.length > 99
+                      ? "99+"
+                      : String(expiryEntries.length)}
                   </Badge>
                 </View>
               ) : null}
@@ -687,7 +740,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             navigation={navigation}
             favorite={selectedFav}
             folder={selectedFolder}
-            searchstring={searchQuery !== "" && filteredValues.length === 0 ? searchQuery : null}
+            searchstring={
+              searchQuery !== "" && filteredValues.length === 0
+                ? searchQuery
+                : null
+            }
           />
         </View>
       </BottomSheetModalProvider>
