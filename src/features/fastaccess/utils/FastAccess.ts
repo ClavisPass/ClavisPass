@@ -1,9 +1,9 @@
 import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
-import * as Clipboard from "expo-clipboard";
 import { logger } from "../../../infrastructure/logging/logger";
 import { detectTauriEnvironment } from "../../../infrastructure/platform/isTauri";
 import { get as getSetting, set as setSetting } from "../../../infrastructure/storage/store";
+import { copyWithAutoClear } from "../../../infrastructure/clipboard/copyWithAutoClear";
 import {
   FAST_ACCESS_NOTIFICATION_CATEGORY,
   FAST_ACCESS_POSITION_CHANGED_EVENT,
@@ -132,10 +132,22 @@ async function configureMobileFastAccess() {
 
       switch (response.actionIdentifier) {
         case "COPY_USERNAME":
-          if (data.username) Clipboard.setStringAsync(data.username);
+          if (data.username) {
+            const copyDurationSeconds = Number(getSetting("COPY_DURATION") ?? 0);
+            const durationMs = Math.max(0, Math.floor(copyDurationSeconds * 1000));
+            void copyWithAutoClear(data.username, durationMs, {
+              kind: "username",
+            });
+          }
           break;
         case "COPY_PASSWORD":
-          if (data.password) Clipboard.setStringAsync(data.password);
+          if (data.password) {
+            const copyDurationSeconds = Number(getSetting("COPY_DURATION") ?? 0);
+            const durationMs = Math.max(0, Math.floor(copyDurationSeconds * 1000));
+            void copyWithAutoClear(data.password, durationMs, {
+              kind: "password",
+            });
+          }
           break;
         case Notifications.DEFAULT_ACTION_IDENTIFIER:
           showMobileFastAccess({

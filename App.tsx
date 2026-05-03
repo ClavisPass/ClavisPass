@@ -33,6 +33,7 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import BrowserBridgeSessionSync from "./src/features/browserBridge/components/BrowserBridgeSessionSync";
 import BrowserBridgeWriteSync from "./src/features/browserBridge/components/BrowserBridgeWriteSync";
 import { useTheme } from "./src/app/providers/ThemeProvider";
+import ClipboardLifecycleCleanup from "./src/shared/components/ClipboardLifecycleCleanup";
 import {
   detectTauriEnvironment,
   useIsTauriEnvironment,
@@ -164,6 +165,7 @@ function AppShell() {
       <I18nBridge />
       <OnlineProvider>
         <AuthProvider>
+          <ClipboardLifecycleCleanup />
           <FastAccessSessionBridge />
           <CloudProvider>
             <VaultProvider>

@@ -11,6 +11,7 @@ import React, {
 import { useSetting } from "./SettingsProvider";
 import { initScreenLockLogout } from "../../features/auth/utils/screenLockLogout";
 import ScreenLockLogoutController from "../../features/auth/model/ScreenLockLogoutController";
+import { clipboardClearScheduler } from "../../infrastructure/clipboard/clipboardClearScheduler";
 
 export interface AuthContextType {
   isLoggedIn: boolean;
@@ -77,6 +78,7 @@ export const AuthProvider = ({ children }: Props) => {
 
   const logout = useCallback(() => {
     masterRef.current = null;
+    void clipboardClearScheduler.forceClearSensitive();
 
     clearTimers();
     sessionStartRef.current = null;

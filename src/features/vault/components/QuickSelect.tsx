@@ -1,10 +1,10 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import * as Clipboard from "expo-clipboard";
 
 import { IconButton } from "react-native-paper";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import FastAccessType from "../../fastaccess/model/FastAccessType";
+import { useClipboardCopy } from "../../../shared/hooks/useClipboardCopy";
 
 const styles = StyleSheet.create({
   container: {
@@ -25,10 +25,7 @@ type Props = {
 
 function QuickSelect(props: Props) {
   const { theme } = useTheme();
-
-  const copyToClipboard = async (value: string) => {
-    await Clipboard.setStringAsync(value);
-  };
+  const { copy } = useClipboardCopy();
 
   return (
     <View style={styles.container}>
@@ -40,7 +37,7 @@ function QuickSelect(props: Props) {
         iconColor={"white"}
         size={26}
         onPress={() => {
-          copyToClipboard(props.fastAccess?.username ?? "");
+          void copy(props.fastAccess?.username ?? "", { kind: "username" });
         }}
       />
       <IconButton
@@ -51,7 +48,7 @@ function QuickSelect(props: Props) {
         iconColor={"white"}
         size={26}
         onPress={() => {
-          copyToClipboard(props.fastAccess?.password ?? "");
+          void copy(props.fastAccess?.password ?? "", { kind: "password" });
         }}
       />
       <IconButton

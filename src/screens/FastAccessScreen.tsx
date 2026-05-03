@@ -217,12 +217,12 @@ export default function FastAccessScreen() {
               mode="outlined"
             />
           </View>
-          <CopyToClipboard value={username} />
+          <CopyToClipboard value={username} kind="username" />
         </View>
 
         <View style={globalStyles.moduleView}>
           <PasswordTextbox value={password} placeholder="" />
-          <CopyToClipboard value={password} />
+          <CopyToClipboard value={password} kind="password" />
         </View>
       </View>
     </View>

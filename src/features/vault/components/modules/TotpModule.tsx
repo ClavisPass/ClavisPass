@@ -201,7 +201,7 @@ export function Totp(props: { value: string; variant?: "module" | "list" }) {
           <Text style={[styles.codeText, { color: theme.colors.primary }]}>
             {code ? `${code.slice(0, 3)} ${code.slice(3)}` : "--- ---"}
           </Text>
-          <CopyToClipboard value={code} margin={0} />
+          <CopyToClipboard value={code} margin={0} kind="totp" />
         </View>
       </View>
     </View>

@@ -78,7 +78,7 @@ function PinModule(props: PinModuleType & Props) {
             }
           />
         </View>
-        <CopyToClipboard value={value} />
+        <CopyToClipboard value={value} kind="pin" />
       </View>
     </ModuleContainer>
   );

@@ -58,7 +58,7 @@ function KeyModule(props: KeyModuleType & Props) {
             keyboardType="visible-password"
           />
         </View>
-        <CopyToClipboard value={value} />
+        <CopyToClipboard value={value} kind="key" />
       </View>
       {keyType !== "false" && (
         <Text style={{ marginLeft: 6, color: theme.colors.primary }}>

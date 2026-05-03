@@ -5,14 +5,23 @@ import { IconButton } from "react-native-paper";
 import theme from "../../ui/theme";
 import { useClipboardCopy } from "../../hooks/useClipboardCopy";
 import { emitClipboardCopied } from "../../../infrastructure/events/clipboardBus";
+import { ClipboardContentKind } from "../../../infrastructure/clipboard/clipboardOwnership";
 
 type Props = {
   value: string;
   disabled?: boolean;
   margin?: number;
+  kind?: ClipboardContentKind;
+  sensitive?: boolean;
 };
 
-function CopyToClipboard({ value, disabled, margin }: Props) {
+function CopyToClipboard({
+  value,
+  disabled,
+  margin,
+  kind,
+  sensitive,
+}: Props) {
   const [icon, setIcon] = React.useState<"content-copy" | "check">(
     "content-copy",
   );
@@ -29,7 +38,7 @@ function CopyToClipboard({ value, disabled, margin }: Props) {
   const copyToClipboard = async () => {
     if (iconTimerRef.current) clearTimeout(iconTimerRef.current);
 
-    const { durationMs } = await copy(value);
+    const { durationMs } = await copy(value, { kind, sensitive });
 
     setIcon("check");
     iconTimerRef.current = setTimeout(() => setIcon("content-copy"), 1000);

@@ -1,9 +1,12 @@
 import * as React from "react";
 import { copyWithAutoClear } from "../../infrastructure/clipboard/copyWithAutoClear";
 import { useSetting } from "../../app/providers/SettingsProvider";
+import { ClipboardContentKind } from "../../infrastructure/clipboard/clipboardOwnership";
 
 type CopyOptions = {
   durationMs?: number;
+  kind?: ClipboardContentKind;
+  sensitive?: boolean;
 };
 
 export function useClipboardCopy() {
@@ -15,7 +18,10 @@ export function useClipboardCopy() {
         options?.durationMs ??
         Math.max(0, Math.floor((copyDurationSeconds ?? 0) * 1000));
 
-      await copyWithAutoClear(value, durationMs);
+      await copyWithAutoClear(value, durationMs, {
+        kind: options?.kind,
+        sensitive: options?.sensitive,
+      });
 
       return { durationMs };
     },

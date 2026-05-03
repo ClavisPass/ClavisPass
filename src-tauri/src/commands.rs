@@ -3,6 +3,26 @@ use std::fs;
 use tauri;
 use tauri::{AppHandle, Manager, Size};
 
+#[cfg(target_os = "windows")]
+use windows::Win32::Foundation::HANDLE;
+#[cfg(target_os = "windows")]
+use windows::Win32::System::DataExchange::{
+    CloseClipboard,
+    EmptyClipboard,
+    OpenClipboard,
+    SetClipboardData,
+};
+#[cfg(target_os = "windows")]
+use windows::Win32::System::Memory::{
+    GlobalAlloc,
+    GlobalLock,
+    GlobalUnlock,
+    GMEM_MOVEABLE,
+};
+
+#[cfg(target_os = "windows")]
+const CF_UNICODETEXT_FORMAT: u32 = 13;
+
 #[tauri::command]
 pub fn save_key(key: &str, value: &str) {
     let service = "ClavisPass";
@@ -64,4 +84,46 @@ pub async fn reset_window_size(app: AppHandle) -> Result<(), String> {
     win.center().map_err(|e| e.to_string())?;
 
     Ok(())
+}
+
+#[tauri::command]
+pub async fn clear_clipboard_text() -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        let replacement = "Clipboard cleared";
+        let utf16: Vec<u16> = replacement.encode_utf16().chain(std::iter::once(0)).collect();
+        let size_in_bytes = utf16.len() * std::mem::size_of::<u16>();
+
+        unsafe {
+            OpenClipboard(None).map_err(|e| e.to_string())?;
+
+            let empty_result = EmptyClipboard().map_err(|e| e.to_string());
+            if empty_result.is_ok() {
+                let memory = GlobalAlloc(GMEM_MOVEABLE, size_in_bytes).map_err(|e| e.to_string())?;
+                let locked_ptr = GlobalLock(memory) as *mut u16;
+
+                if locked_ptr.is_null() {
+                    let _ = CloseClipboard();
+                    return Err("Failed to lock clipboard memory".to_string());
+                }
+
+                std::ptr::copy_nonoverlapping(utf16.as_ptr(), locked_ptr, utf16.len());
+                let _ = GlobalUnlock(memory);
+
+                SetClipboardData(CF_UNICODETEXT_FORMAT, HANDLE(memory.0))
+                    .map_err(|e| e.to_string())?;
+            }
+
+            let close_result = CloseClipboard().map_err(|e| e.to_string());
+            empty_result?;
+            close_result?;
+        }
+
+        return Ok(());
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        Err("Clipboard clear command not implemented for this platform".to_string())
+    }
 }

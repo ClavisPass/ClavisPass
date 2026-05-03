@@ -79,7 +79,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
         <View style={{ height: 40, flex: 1 }}>
           <PasswordTextbox autofocus={value === "" ? true : false} setValue={setValue} value={value} placeholder="" />
         </View>
-        <CopyToClipboard value={value} />
+        <CopyToClipboard value={value} kind="password" />
       </View>
 
       <View style={globalStyles.moduleView}>

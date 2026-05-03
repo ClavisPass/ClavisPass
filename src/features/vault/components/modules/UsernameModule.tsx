@@ -56,7 +56,7 @@ function UsernameModule(props: UsernameModuleType & Props) {
             textContentType="username"
           />
         </View>
-        <CopyToClipboard value={value} />
+        <CopyToClipboard value={value} kind="username" />
       </View>
     </ModuleContainer>
   );

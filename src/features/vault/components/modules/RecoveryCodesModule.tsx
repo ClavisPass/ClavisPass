@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { Chip, Text, TextInput } from "react-native-paper";
 import { useTranslation } from "react-i18next";
-import * as Clipboard from "expo-clipboard";
 
 import Animated, {
   FadeIn,
@@ -232,7 +231,7 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
                     showSelectedOverlay={true}
                     style={styles.chip}
                     textStyle={styles.chipText}
-                    onPress={() => copy(c.code)}
+                    onPress={() => copy(c.code, { kind: "recovery-code" })}
                     onClose={() => removeCode(c.code)}
                     closeIcon="close"
                     onLongPress={() => toggleUsed(c.code)}

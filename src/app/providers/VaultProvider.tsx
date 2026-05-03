@@ -21,6 +21,7 @@ import {
 
 import { VaultSession } from "../../features/vault/utils/VaultSession";
 import VaultDeviceType from "../../features/vault/model/VaultDeviceType";
+import { clipboardClearScheduler } from "../../infrastructure/clipboard/clipboardClearScheduler";
 
 type VaultData = NonNullable<VaultDataType>;
 
@@ -92,6 +93,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
   );
 
   const lock = useCallback(() => {
+    void clipboardClearScheduler.forceClearSensitive();
     VaultSession.lock();
     setIsUnlocked(false);
     setEntries([]);

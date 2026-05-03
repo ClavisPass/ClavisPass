@@ -242,7 +242,9 @@ function ListItem(props: Props) {
     if (type === "username") resetPasswordIcon();
     else resetUsernameIcon();
 
-    const { durationMs } = await copy(value);
+    const { durationMs } = await copy(value, {
+      kind: type,
+    });
 
     if (type === "username") {
       clearUsernameTimer();

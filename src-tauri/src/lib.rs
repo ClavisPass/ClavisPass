@@ -251,6 +251,7 @@ pub fn run() {
             commands::remove_key,
             commands::set_content_protection,
             commands::reset_window_size,
+            commands::clear_clipboard_text,
             device_identity::get_device_identity,
             bridge_commands::bridge_publish_session,
             bridge_commands::bridge_clear_session,

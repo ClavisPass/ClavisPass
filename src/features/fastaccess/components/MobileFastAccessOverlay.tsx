@@ -95,12 +95,20 @@ function MobileFastAccessOverlay() {
               mode="outlined"
             />
           </View>
-          <CopyToClipboard value={payload?.username ?? ""} disabled={!payload?.username} />
+          <CopyToClipboard
+            value={payload?.username ?? ""}
+            disabled={!payload?.username}
+            kind="username"
+          />
         </View>
 
         <View style={globalStyles.moduleView}>
           <PasswordTextbox value={payload?.password ?? ""} placeholder="" />
-          <CopyToClipboard value={payload?.password ?? ""} disabled={!payload?.password} />
+          <CopyToClipboard
+            value={payload?.password ?? ""}
+            disabled={!payload?.password}
+            kind="password"
+          />
         </View>
       </View>
     </Modal>
