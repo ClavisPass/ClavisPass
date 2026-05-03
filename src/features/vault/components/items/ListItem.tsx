@@ -11,6 +11,9 @@ import { useTranslation } from "react-i18next";
 import extractFastAccessObject from "../../../fastaccess/utils/extractFastAccessObject";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import ReanimatedSwipeable, {
+  type SwipeableMethods,
+} from "react-native-gesture-handler/ReanimatedSwipeable";
 import { emitClipboardCopied } from "../../../../infrastructure/events/clipboardBus";
 import { useClipboardCopy } from "../../../../shared/hooks/useClipboardCopy";
 import AdaptiveMenu, {
@@ -128,6 +131,26 @@ const styles = StyleSheet.create({
     width: StyleSheet.hairlineWidth,
     opacity: 0.5,
   },
+  swipeContainer: {
+    marginLeft: 4,
+    marginRight: 4,
+    marginBottom: 4,
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  swipeAction: {
+    width: 78,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  swipeActionLeft: {
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+  },
+  swipeActionRight: {
+    borderTopRightRadius: 12,
+    borderBottomRightRadius: 12,
+  },
 });
 
 const ellipsize = (s: string, max = 16) => {
@@ -159,6 +182,7 @@ function ListItem(props: Props) {
   const usernameTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const passwordTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const itemRef = useRef<any>(null);
+  const swipeableRef = useRef<SwipeableMethods | null>(null);
   const suppressNextPressRef = useRef(false);
 
   const [url, setUrl] = useState("");
@@ -311,6 +335,13 @@ function ListItem(props: Props) {
     });
   };
 
+  const toggleFavorite = () => {
+    updateListItem((entry) => ({
+      ...entry,
+      fav: !entry.fav,
+    }));
+  };
+
   const listItemMenuItems = useMemo<AdaptiveMenuItem[]>(
     () => [
       {
@@ -373,10 +404,7 @@ function ListItem(props: Props) {
         icon={props.item.fav ? "star" : "star-outline"}
         size={18}
         onPress={() => {
-          updateListItem((entry) => ({
-            ...entry,
-            fav: !entry.fav,
-          }));
+          toggleFavorite();
         }}
         style={styles.menuPreviewAction}
         iconColor={theme.colors.primary}
@@ -486,126 +514,193 @@ function ListItem(props: Props) {
     );
   };
 
-  return (
-    <>
-      <Animated.View
-        entering={FadeInDown.delay(props.index * 50).duration(250)}
-        key={props.key}
-        ref={itemRef}
-        style={[
-          styles.container,
-          {
-            backgroundColor: theme.colors?.background,
-            boxShadow: theme.colors?.shadow,
-            borderWidth: StyleSheet.hairlineWidth,
-            borderColor: darkmode ? theme.colors.outlineVariant : "white",
-          },
-        ]}
-        onPointerEnter={() => Platform.OS === "web" && setHovered(true)}
-        onPointerLeave={() => Platform.OS === "web" && setHovered(false)}
-        onPointerDown={(event: any) => {
-          if (Platform.OS !== "web") return;
-          const button = event?.nativeEvent?.button;
+  const renderFavoriteSwipeAction = () => (
+    <View
+      style={[
+        styles.swipeAction,
+        styles.swipeActionLeft,
+        {
+          backgroundColor: props.item.fav
+            ? theme.colors.secondaryContainer
+            : theme.colors.primary,
+        },
+      ]}
+    >
+      <Icon
+        color={props.item.fav ? theme.colors.primary : theme.colors.onPrimary}
+        source={props.item.fav ? "star-off" : "star"}
+        size={24}
+      />
+    </View>
+  );
 
-          if (button === 1) {
-            suppressNextPressRef.current = true;
-            event.preventDefault?.();
-            event.stopPropagation?.();
-            openItemFastAccess().catch(() => {});
-            return;
-          }
-        }}
-        onContextMenu={(event: any) => {
-          if (Platform.OS !== "web") return;
+  const renderDeleteSwipeAction = () => (
+    <View
+      style={[
+        styles.swipeAction,
+        styles.swipeActionRight,
+        { backgroundColor: theme.colors.error },
+      ]}
+    >
+      <Icon color={theme.colors.onError} source="trash-can" size={24} />
+    </View>
+  );
+
+  const listItemContent = (
+    <Animated.View
+      entering={FadeInDown.delay(props.index * 50).duration(250)}
+      key={props.key}
+      ref={itemRef}
+      style={[
+        styles.container,
+        Platform.OS !== "web"
+          ? { marginLeft: 0, marginRight: 0, marginBottom: 0 }
+          : null,
+        {
+          backgroundColor: theme.colors?.background,
+          boxShadow: theme.colors?.shadow,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: darkmode ? theme.colors.outlineVariant : "white",
+        },
+      ]}
+      onPointerEnter={() => Platform.OS === "web" && setHovered(true)}
+      onPointerLeave={() => Platform.OS === "web" && setHovered(false)}
+      onPointerDown={(event: any) => {
+        if (Platform.OS !== "web") return;
+        const button = event?.nativeEvent?.button;
+
+        if (button === 1) {
+          suppressNextPressRef.current = true;
           event.preventDefault?.();
           event.stopPropagation?.();
-          openMenuAtPointer(event);
+          openItemFastAccess().catch(() => {});
+          return;
+        }
+      }}
+      onContextMenu={(event: any) => {
+        if (Platform.OS !== "web") return;
+        event.preventDefault?.();
+        event.stopPropagation?.();
+        openMenuAtPointer(event);
+      }}
+    >
+      <AnimatedPressable
+        key={props.key}
+        style={styles.ripple}
+        onPress={() => {
+          if (suppressNextPressRef.current) {
+            suppressNextPressRef.current = false;
+            return;
+          }
+          props.onPress();
         }}
+        onLongPress={() => measureAndOpenMenu()}
       >
-        <AnimatedPressable
-          key={props.key}
-          style={styles.ripple}
-          onPress={() => {
-            if (suppressNextPressRef.current) {
-              suppressNextPressRef.current = false;
+        <>
+          <View style={styles.left}>
+            {url !== "" ? (
+              <Image
+                style={{ width: 30, height: 30, margin: 0, borderRadius: 8 }}
+                source={url}
+                contentFit="cover"
+                transition={250}
+                pointerEvents="none"
+              />
+            ) : (
+              <View style={styles.iconBox}>
+                <Icon color={"lightgray"} source={icon} size={26} />
+              </View>
+            )}
+
+            <Text
+              variant="bodyMedium"
+              style={styles.title}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {props.item.title}
+            </Text>
+          </View>
+
+          <View style={styles.right}>
+            {hovered && fastAccessObject && (
+              <View style={styles.chipRow}>
+                <Button
+                  mode="contained-tonal"
+                  compact
+                  icon={usernameIcon}
+                  onPress={() =>
+                    copyToClipboard(fastAccessObject.username, "username")
+                  }
+                  style={[styles.chip, styles.chipLeft, styles.chipUser]}
+                  contentStyle={styles.chipContent}
+                  textColor={theme.colors.primary}
+                >
+                  <Text numberOfLines={1} style={styles.chipText}>
+                    {ellipsize(fastAccessObject.username, 18)}
+                  </Text>
+                </Button>
+
+                <Button
+                  mode="contained-tonal"
+                  compact
+                  icon={passwordIcon}
+                  onPress={() =>
+                    copyToClipboard(fastAccessObject.password, "password")
+                  }
+                  style={[styles.chip, styles.chipRight, styles.chipPass]}
+                  contentStyle={styles.chipContent}
+                  textColor={theme.colors.primary}
+                >
+                  <Text numberOfLines={1} style={styles.chipText}>
+                    {maskPassword(fastAccessObject.password)}
+                  </Text>
+                </Button>
+              </View>
+            )}
+
+            <Icon
+              color={theme.colors?.primary}
+              source={"chevron-right"}
+              size={20}
+            />
+          </View>
+        </>
+      </AnimatedPressable>
+    </Animated.View>
+  );
+
+  return (
+    <>
+      {Platform.OS === "web" ? (
+        listItemContent
+      ) : (
+        <ReanimatedSwipeable
+          ref={swipeableRef}
+          friction={2}
+          leftThreshold={48}
+          rightThreshold={48}
+          dragOffsetFromLeftEdge={18}
+          dragOffsetFromRightEdge={18}
+          overshootLeft={false}
+          overshootRight={false}
+          containerStyle={styles.swipeContainer}
+          renderLeftActions={renderFavoriteSwipeAction}
+          renderRightActions={renderDeleteSwipeAction}
+          onSwipeableOpen={(direction) => {
+            swipeableRef.current?.close();
+
+            if (direction === "right") {
+              toggleFavorite();
               return;
             }
-            props.onPress();
+
+            setDeleteModalVisible(true);
           }}
-          onLongPress={() => measureAndOpenMenu()}
         >
-          <>
-            <View style={styles.left}>
-              {url !== "" ? (
-                <Image
-                  style={{ width: 30, height: 30, margin: 0, borderRadius: 8 }}
-                  source={url}
-                  contentFit="cover"
-                  transition={250}
-                  pointerEvents="none"
-                />
-              ) : (
-                <View style={styles.iconBox}>
-                  <Icon color={"lightgray"} source={icon} size={26} />
-                </View>
-              )}
-
-              <Text
-                variant="bodyMedium"
-                style={styles.title}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {props.item.title}
-              </Text>
-            </View>
-
-            <View style={styles.right}>
-              {hovered && fastAccessObject && (
-                <View style={styles.chipRow}>
-                  <Button
-                    mode="contained-tonal"
-                    compact
-                    icon={usernameIcon}
-                    onPress={() =>
-                      copyToClipboard(fastAccessObject.username, "username")
-                    }
-                    style={[styles.chip, styles.chipLeft, styles.chipUser]}
-                    contentStyle={styles.chipContent}
-                    textColor={theme.colors.primary}
-                  >
-                    <Text numberOfLines={1} style={styles.chipText}>
-                      {ellipsize(fastAccessObject.username, 18)}
-                    </Text>
-                  </Button>
-
-                  <Button
-                    mode="contained-tonal"
-                    compact
-                    icon={passwordIcon}
-                    onPress={() =>
-                      copyToClipboard(fastAccessObject.password, "password")
-                    }
-                    style={[styles.chip, styles.chipRight, styles.chipPass]}
-                    contentStyle={styles.chipContent}
-                    textColor={theme.colors.primary}
-                  >
-                    <Text numberOfLines={1} style={styles.chipText}>
-                      {maskPassword(fastAccessObject.password)}
-                    </Text>
-                  </Button>
-                </View>
-              )}
-
-              <Icon
-                color={theme.colors?.primary}
-                source={"chevron-right"}
-                size={20}
-              />
-            </View>
-          </>
-        </AnimatedPressable>
-      </Animated.View>
+          {listItemContent}
+        </ReanimatedSwipeable>
+      )}
       <AdaptiveMenu
         visible={menuVisible}
         setVisible={setMenuVisible}
