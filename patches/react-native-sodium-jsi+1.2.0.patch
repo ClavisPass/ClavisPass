@@ -76,7 +76,7 @@ index 762f913..e6b9a53 100644
    # JSI lib didn't exist on RN 0.65 and before. Simply omit it.
    set (JSI_LIB "")
 diff --git a/node_modules/react-native-sodium-jsi/android/build.gradle b/node_modules/react-native-sodium-jsi/android/build.gradle
-index 7adc99e..01d0b32 100644
+index 7adc99e..66db34f 100644
 --- a/node_modules/react-native-sodium-jsi/android/build.gradle
 +++ b/node_modules/react-native-sodium-jsi/android/build.gradle
 @@ -1,10 +1,11 @@
@@ -122,7 +122,7 @@ index 7adc99e..01d0b32 100644
  def reactNativeArchitectures() {
    def value = project.getProperties().get("reactNativeArchitectures")
    return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
-@@ -65,120 +54,193 @@ if (rootProject.ext.has('reactNativeAndroidRoot')) {
+@@ -65,120 +54,191 @@ if (rootProject.ext.has('reactNativeAndroidRoot')) {
    defaultDir = project(':ReactAndroid').projectDir
    androidSourcesDir = defaultDir.parentFile.toString()
  } else {
@@ -142,6 +142,11 @@ index 7adc99e..01d0b32 100644
 +// Resolve react-android AAR early so we can pass a REAL (non-wildcard)
 +// PREBUILT_DIR to CMake. CMake does NOT expand globs like 0*.
 +// ------------------------------------------------------------
++def reactProperties = new Properties()
++file("$nodeModules/react-native/ReactAndroid/gradle.properties").withInputStream { reactProperties.load(it) }
++def REACT_NATIVE_VERSION_NAME = reactProperties.getProperty("VERSION_NAME")
++def REACT_NATIVE_VERSION = REACT_NATIVE_VERSION_NAME.split("\\.")[1].toInteger()
++
 +def requestedBuildType =
 +  gradle.startParameter.taskNames.any { it.toLowerCase().contains("release") }
 +    ? "release"
@@ -149,7 +154,7 @@ index 7adc99e..01d0b32 100644
 +
 +def resolveReactAndroidAar = { String bt ->
 +  def c = configurations.detachedConfiguration(
-+    dependencies.create("com.facebook.react:react-android:+")
++    dependencies.create("com.facebook.react:react-android:${REACT_NATIVE_VERSION_NAME}")
 +  )
 +  c.setTransitive(false)
 +  c.attributes.attribute(
@@ -165,7 +170,7 @@ index 7adc99e..01d0b32 100644
 +      )
 +    }
 +  }.artifacts.artifactFiles.singleFile
- }
++}
 +
 +def rnAAR = null
 +if (!sourceBuild) {
@@ -174,7 +179,7 @@ index 7adc99e..01d0b32 100644
 +  } catch (Exception ignored) {
 +    rnAAR = resolveReactAndroidAar("debug")
 +  }
-+}
+ }
 +
 +// CMake expects libs under PREBUILT_DIR/jni/<abi>/libjsi.so etc.
 +// Our extractJNIFiles task extracts into: $buildDir/<aarFileName>/jni/...
@@ -182,12 +187,6 @@ index 7adc99e..01d0b32 100644
    ? "$nodeModules/react-native/ReactAndroid/src/main/jni/prebuilt/lib"
 -  : "$buildDir/react-native-0*/jni"
 +  : "$buildDir/${rnAAR.name}/jni"
-+
- 
-+// React Native version (minor)
- def reactProperties = new Properties()
- file("$nodeModules/react-native/ReactAndroid/gradle.properties").withInputStream { reactProperties.load(it) }
- def REACT_NATIVE_VERSION = reactProperties.getProperty("VERSION_NAME").split("\\.")[1].toInteger()
 +
 +def resolveIntExt(String name, Integer fallback = null) {
 +  if (rootProject.ext.has(name)) return (rootProject.ext.get(name) as Integer)
@@ -203,7 +202,10 @@ index 7adc99e..01d0b32 100644
 +}
 +
 +// -------------------- android config --------------------
-+
+ 
+-def reactProperties = new Properties()
+-file("$nodeModules/react-native/ReactAndroid/gradle.properties").withInputStream { reactProperties.load(it) }
+-def REACT_NATIVE_VERSION = reactProperties.getProperty("VERSION_NAME").split("\\.")[1].toInteger()
  android {
 -  compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
 -  buildToolsVersion getExtOrDefault('buildToolsVersion')
@@ -319,9 +321,9 @@ index 7adc99e..01d0b32 100644
 +// -------------------- deps --------------------
 +
  dependencies {
-   //noinspection GradleDynamicVersion
+-  //noinspection GradleDynamicVersion
 -  implementation "com.facebook.react:react-native:+"
-+  implementation "com.facebook.react:react-android:+"
++  implementation "com.facebook.react:react-android:${REACT_NATIVE_VERSION_NAME}"
    implementation 'de.undercouch:gradle-download-task:5.0.2'
 -  // From node_modules
 +
@@ -361,7 +363,7 @@ index 7adc99e..01d0b32 100644
  
  task createNativeDepsDirectories {
    doLast {
-@@ -187,115 +249,14 @@ task createNativeDepsDirectories {
+@@ -187,115 +247,14 @@ task createNativeDepsDirectories {
    }
  }
  
@@ -481,7 +483,7 @@ index 7adc99e..01d0b32 100644
  
  task extractAARHeaders {
    doLast {
-@@ -315,7 +276,6 @@ task extractJNIFiles {
+@@ -315,7 +274,6 @@ task extractJNIFiles {
    doLast {
      configurations.extractJNI.files.each {
        def file = it.absoluteFile
@@ -489,7 +491,7 @@ index 7adc99e..01d0b32 100644
        copy {
          from zipTree(file)
          into "$buildDir/$file.name"
-@@ -328,7 +288,8 @@ extractJNIFiles.mustRunAfter extractAARHeaders
+@@ -328,7 +286,8 @@ extractJNIFiles.mustRunAfter extractAARHeaders
  
  def nativeBuildDependsOn(dependsOnTask, variant) {
    def buildTasks = tasks.findAll({ task ->
