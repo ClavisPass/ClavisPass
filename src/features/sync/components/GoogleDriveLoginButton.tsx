@@ -2,7 +2,6 @@ import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Platform } from "react-native";
-import { GOOGLE_CLIENT_ID_DESKTOP } from "@env";
 import { cancel, onUrl, start } from "@fabianlars/tauri-plugin-oauth";
 import * as Random from "expo-random";
 import SettingsItem from "../../settings/components/SettingsItem";
@@ -10,7 +9,10 @@ import { useToken } from "../../../app/providers/CloudProvider";
 import { useVault } from "../../../app/providers/VaultProvider";
 import { logger } from "../../../infrastructure/logging/logger";
 import {
+  buildGoogleLoopbackRedirectUri,
   getGoogleClientIdForCurrentPlatform,
+  getGoogleDesktopClientId,
+  getGoogleDesktopClientSecret,
   getGoogleMobileRedirectUri,
 } from "../../../infrastructure/cloud/utils/googleOAuth";
 import {
@@ -27,6 +29,7 @@ const SCOPES = [
 
 const isMobile = Platform.OS === "ios" || Platform.OS === "android";
 const isWeb = Platform.OS === "web";
+const DESKTOP_OAUTH_PORTS = [57771, 57772, 57773];
 
 function getMobileRedirectUri() {
   const redirectUri = getGoogleMobileRedirectUri();
@@ -43,11 +46,26 @@ async function randState(len = 32) {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-function GoogleDriveLoginButton() {
+async function readTokenResponse(response: Response): Promise<any> {
+  const text = await response.text().catch(() => "");
+
+  if (!text) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
+}
+
+function GoogleDriveLoginButtonContent() {
   const { setSession } = useToken();
   const vault = useVault();
   const currentClientId = getGoogleClientIdForCurrentPlatform();
-  const desktopClientId = GOOGLE_CLIENT_ID_DESKTOP || currentClientId;
+  const desktopClientId = getGoogleDesktopClientId();
+  const desktopClientSecret = getGoogleDesktopClientSecret();
 
   const unsubscribeRef = useRef<null | (() => void)>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -56,7 +74,18 @@ function GoogleDriveLoginButton() {
   const stateRef = useRef<string | null>(null);
 
   const exchangeToken = useCallback(
-    async (code: string, redirectUri: string, codeVerifier?: string) => {
+    async (
+      code: string,
+      redirectUri: string,
+      clientId: string,
+      codeVerifier?: string,
+      clientSecret?: string
+    ) => {
+      if (!clientId) {
+        logger.error("[GoogleDrive] Missing Google OAuth client ID.");
+        return;
+      }
+
       try {
         const res = await fetch("https://oauth2.googleapis.com/token", {
           method: "POST",
@@ -64,15 +93,25 @@ function GoogleDriveLoginButton() {
           body: new URLSearchParams({
             code,
             grant_type: "authorization_code",
-            client_id: currentClientId,
+            client_id: clientId,
             redirect_uri: redirectUri,
             ...(codeVerifier ? { code_verifier: codeVerifier } : {}),
+            ...(clientSecret ? { client_secret: clientSecret } : {}),
           }).toString(),
         });
 
-        const data = await res.json();
+        const data = await readTokenResponse(res);
         if (!res.ok) {
-          logger.error("[GoogleDrive] Token exchange failed:", data);
+          logger.error("[GoogleDrive] Token exchange failed:", {
+            status: res.status,
+            statusText: res.statusText,
+            error: (data as any)?.error,
+            errorDescription: (data as any)?.error_description,
+            response: data,
+            redirectUri,
+            clientId,
+            hasClientSecret: !!clientSecret,
+          });
           return;
         }
 
@@ -93,7 +132,7 @@ function GoogleDriveLoginButton() {
         logger.error("[GoogleDrive] Token exchange error:", err);
       }
     },
-    [currentClientId, setSession, vault]
+    [setSession, vault]
   );
 
   const mobileRedirectUri = useMemo(
@@ -132,8 +171,14 @@ function GoogleDriveLoginButton() {
       return;
     }
 
-    exchangeToken(code, mobileRedirectUri, verifier);
-  }, [exchangeToken, mobileRedirectUri, request?.codeVerifier, response]);
+    exchangeToken(code, mobileRedirectUri, currentClientId, verifier);
+  }, [
+    currentClientId,
+    exchangeToken,
+    mobileRedirectUri,
+    request?.codeVerifier,
+    response,
+  ]);
 
   const closeAuthWindowIfAny = useCallback(async () => {
     try {
@@ -149,27 +194,68 @@ function GoogleDriveLoginButton() {
     busyRef.current = true;
 
     try {
-      const port = await start({ ports: [57771, 57772, 57773] });
+      if (!desktopClientId) {
+        logger.error(
+          "[GoogleDrive] Missing GOOGLE_CLIENT_ID_DESKTOP for desktop OAuth."
+        );
+        busyRef.current = false;
+        return;
+      }
+
+      if (!desktopClientSecret) {
+        logger.error(
+          "[GoogleDrive] Missing GOOGLE_CLIENT_SECRET_DESKTOP for desktop OAuth token exchange."
+        );
+        busyRef.current = false;
+        return;
+      }
+
+      const port = await start({ ports: DESKTOP_OAUTH_PORTS });
       portRef.current = port;
-      const redirectUri = `http://127.0.0.1:${port}`;
+      const redirectUri = buildGoogleLoopbackRedirectUri(port);
 
       const { createPkcePair } = require("../utils/pkce.web");
       const { codeVerifier, codeChallenge, method } = await createPkcePair();
       stateRef.current = await randState();
 
       const unsubscribe = await onUrl(async (url) => {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-          timeoutRef.current = null;
+        let parsedUrl: URL;
+        try {
+          parsedUrl = new URL(url);
+        } catch (error) {
+          logger.warn("[GoogleDrive] Invalid OAuth callback URL:", url, error);
+          return;
         }
 
-        const parsedUrl = new URL(url);
         const code = parsedUrl.searchParams.get("code");
         const state = parsedUrl.searchParams.get("state");
         const error = parsedUrl.searchParams.get("error");
+        const errorDescription = parsedUrl.searchParams.get("error_description");
 
         if (error) {
-          logger.warn("[GoogleDrive] OAuth error:", error);
+          logger.warn("[GoogleDrive] OAuth error:", error, errorDescription);
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+          }
+          stateRef.current = null;
+
+          try {
+            if (unsubscribeRef.current) {
+              unsubscribeRef.current();
+              unsubscribeRef.current = null;
+            }
+          } catch {}
+
+          await closeAuthWindowIfAny();
+          busyRef.current = false;
+
+          try {
+            if (portRef.current != null) {
+              await cancel(portRef.current);
+            }
+          } catch {}
+          portRef.current = null;
           return;
         }
 
@@ -180,6 +266,11 @@ function GoogleDriveLoginButton() {
         if (!state || state !== stateRef.current) {
           logger.warn("[GoogleDrive] State mismatch (tauri). Ignoring callback.");
           return;
+        }
+
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
         }
 
         stateRef.current = null;
@@ -196,7 +287,13 @@ function GoogleDriveLoginButton() {
 
         (async () => {
           try {
-            await exchangeToken(code, redirectUri, codeVerifier);
+            await exchangeToken(
+              code,
+              redirectUri,
+              desktopClientId,
+              codeVerifier,
+              desktopClientSecret
+            );
           } catch (error) {
             logger.error("[GoogleDrive] Token exchange (bg) failed:", error);
           } finally {
@@ -276,7 +373,12 @@ function GoogleDriveLoginButton() {
       await closeAuthWindowIfAny();
       busyRef.current = false;
     }
-  }, [closeAuthWindowIfAny, desktopClientId, exchangeToken]);
+  }, [
+    closeAuthWindowIfAny,
+    desktopClientId,
+    desktopClientSecret,
+    exchangeToken,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -340,6 +442,14 @@ function GoogleDriveLoginButton() {
       Sign in with Google Drive
     </SettingsItem>
   );
+}
+
+function GoogleDriveLoginButton() {
+  if (!isWeb) {
+    return null;
+  }
+
+  return <GoogleDriveLoginButtonContent />;
 }
 
 export default GoogleDriveLoginButton;

@@ -51,6 +51,23 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Create build env file
+        run: |
+          if [ -z "${{ vars.GOOGLE_CLIENT_ID_DESKTOP }}" ] || [ -z "${{ secrets.GOOGLE_CLIENT_SECRET_DESKTOP }}" ]; then
+            echo "Missing Google desktop OAuth credentials. Configure GOOGLE_CLIENT_ID_DESKTOP as a repository variable and GOOGLE_CLIENT_SECRET_DESKTOP as a repository secret."
+            exit 1
+          fi
+
+          cat > .env <<EOF
+          BROWSER=none
+          DROPBOX_CLIENT_ID=${{ vars.DROPBOX_CLIENT_ID }}
+          GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_ID_ANDROID=${{ vars.GOOGLE_CLIENT_ID_ANDROID }}
+          GOOGLE_CLIENT_ID_IOS=${{ vars.GOOGLE_CLIENT_ID_IOS }}
+          GOOGLE_CLIENT_ID_DESKTOP=${{ vars.GOOGLE_CLIENT_ID_DESKTOP }}
+          GOOGLE_CLIENT_SECRET_DESKTOP=${{ secrets.GOOGLE_CLIENT_SECRET_DESKTOP }}
+          EOF
+
       - name: Build Expo Web App for Tauri
         run: npm run web:build-tauri
 
@@ -101,6 +118,24 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Create build env file
+        shell: pwsh
+        run: |
+          if ([string]::IsNullOrWhiteSpace("${{ vars.GOOGLE_CLIENT_ID_DESKTOP }}") -or [string]::IsNullOrWhiteSpace("${{ secrets.GOOGLE_CLIENT_SECRET_DESKTOP }}")) {
+            Write-Error "Missing Google desktop OAuth credentials. Configure GOOGLE_CLIENT_ID_DESKTOP as a repository variable and GOOGLE_CLIENT_SECRET_DESKTOP as a repository secret."
+            exit 1
+          }
+
+          @"
+          BROWSER=none
+          DROPBOX_CLIENT_ID=${{ vars.DROPBOX_CLIENT_ID }}
+          GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_ID_ANDROID=${{ vars.GOOGLE_CLIENT_ID_ANDROID }}
+          GOOGLE_CLIENT_ID_IOS=${{ vars.GOOGLE_CLIENT_ID_IOS }}
+          GOOGLE_CLIENT_ID_DESKTOP=${{ vars.GOOGLE_CLIENT_ID_DESKTOP }}
+          GOOGLE_CLIENT_SECRET_DESKTOP=${{ secrets.GOOGLE_CLIENT_SECRET_DESKTOP }}
+          "@ | Set-Content -Path .env -Encoding UTF8
+
       - name: Build Expo Web App for Tauri
         run: npm run web:build-tauri
 
@@ -146,6 +181,23 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Create build env file
+        run: |
+          if [ -z "${{ vars.GOOGLE_CLIENT_ID_DESKTOP }}" ] || [ -z "${{ secrets.GOOGLE_CLIENT_SECRET_DESKTOP }}" ]; then
+            echo "Missing Google desktop OAuth credentials. Configure GOOGLE_CLIENT_ID_DESKTOP as a repository variable and GOOGLE_CLIENT_SECRET_DESKTOP as a repository secret."
+            exit 1
+          fi
+
+          cat > .env <<EOF
+          BROWSER=none
+          DROPBOX_CLIENT_ID=${{ vars.DROPBOX_CLIENT_ID }}
+          GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_ID_ANDROID=${{ vars.GOOGLE_CLIENT_ID_ANDROID }}
+          GOOGLE_CLIENT_ID_IOS=${{ vars.GOOGLE_CLIENT_ID_IOS }}
+          GOOGLE_CLIENT_ID_DESKTOP=${{ vars.GOOGLE_CLIENT_ID_DESKTOP }}
+          GOOGLE_CLIENT_SECRET_DESKTOP=${{ secrets.GOOGLE_CLIENT_SECRET_DESKTOP }}
+          EOF
 
       - name: Build Expo Web App for Tauri
         run: npm run web:build-tauri
@@ -195,6 +247,18 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Create update env file
+        run: |
+          cat > .env <<EOF
+          BROWSER=none
+          DROPBOX_CLIENT_ID=${{ vars.DROPBOX_CLIENT_ID }}
+          GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_ID_ANDROID=${{ vars.GOOGLE_CLIENT_ID_ANDROID }}
+          GOOGLE_CLIENT_ID_IOS=${{ vars.GOOGLE_CLIENT_ID_IOS }}
+          GOOGLE_CLIENT_ID_DESKTOP=${{ vars.GOOGLE_CLIENT_ID_DESKTOP }}
+          GOOGLE_CLIENT_SECRET_DESKTOP=
+          EOF
+
       - name: Install EAS CLI globally
         run: npm install -g eas-cli@latest
 
@@ -204,7 +268,7 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Trigger Expo OTA Update
-        run: eas update --branch production --message "Automated update from GitHub Actions for ${{ github.ref_name || github.sha }}"
+        run: eas update --branch production --environment production --message "Automated update from GitHub Actions for ${{ github.ref_name || github.sha }}"
 
   build-android-apk:
     runs-on: ubuntu-latest

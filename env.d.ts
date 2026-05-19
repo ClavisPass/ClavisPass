@@ -4,4 +4,5 @@ declare module '@env' {
     export const GOOGLE_CLIENT_ID_ANDROID: string | undefined;
     export const GOOGLE_CLIENT_ID_IOS: string | undefined;
     export const GOOGLE_CLIENT_ID_DESKTOP: string | undefined;
+    export const GOOGLE_CLIENT_SECRET_DESKTOP: string | undefined;
   }

@@ -4,14 +4,16 @@
 // Upsert: list -> (PATCH multipart) oder (POST multipart).
 
 import TokenRefreshResult from "../model/oauth/TokenRefreshResult";
-import CryptoType from "../../crypto/legacy/CryptoType";
 import { logger } from "../../logging/logger";
 import UserInfoType from "../../../features/sync/model/UserInfoType";
 import { triggerGlobalError } from "../../events/errorBus";
 import * as DeviceStorageClient from "./DeviceStorageClient";
 import { VaultFetchResult } from "../model/VaultFetchResult";
 import { UploadContent } from "../model/UploadFileParams";
-import { getGoogleClientIdForCurrentPlatform } from "../utils/googleOAuth";
+import {
+  getGoogleClientIdForCurrentPlatform,
+  getGoogleDesktopClientSecret,
+} from "../utils/googleOAuth";
 
 const DRIVE_API = "https://www.googleapis.com/drive/v3";
 const DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3";
@@ -261,12 +263,18 @@ export const refreshAccessToken = async (
 ): Promise<TokenRefreshResult> => {
   const tokenEndpoint = "https://oauth2.googleapis.com/token";
   const clientId = getGoogleClientIdForCurrentPlatform();
+  const clientSecret = getGoogleDesktopClientSecret();
 
   try {
+    if (!clientId) {
+      throw new Error("Missing Google OAuth client ID for token refresh");
+    }
+
     const body = new URLSearchParams({
       grant_type: "refresh_token",
       refresh_token: refreshToken,
       client_id: clientId,
+      ...(clientSecret ? { client_secret: clientSecret } : {}),
     });
 
     const response = await fetch(tokenEndpoint, {
