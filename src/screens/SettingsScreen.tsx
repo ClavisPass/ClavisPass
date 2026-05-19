@@ -178,7 +178,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ref: authSettingsRef,
         plattform: null,
       },
-      ...(isTauri
+      ...(isTauri && devMode
         ? ([
             {
               title: t("settings:browserExtensions"),
@@ -213,7 +213,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         plattform: null,
       },
     ],
-    [isTauri, t, language],
+    [devMode, isTauri, t, language],
   );
 
   useFocusEffect(
@@ -582,7 +582,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               />
             </SettingsContainer>
 
-            {isTauri ? (
+            {isTauri && devMode ? (
               <SettingsContainer
                 ref={browserExtensionRef}
                 icon="puzzle"

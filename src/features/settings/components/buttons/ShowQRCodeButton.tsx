@@ -4,11 +4,16 @@ import SettingsItem from "../SettingsItem";
 import { useToken } from "../../../../app/providers/CloudProvider";
 import { useTranslation } from "react-i18next";
 import SettingsDivider from "../SettingsDivider";
+import { useDevMode } from "../../../../app/providers/DevModeProvider";
 
 function ShowQRCodeButton() {
   const { refreshToken } = useToken();
+  const { devMode } = useDevMode();
   const [qrCodeVisible, setQrCodeVisible] = useState(false);
   const {t} = useTranslation();
+
+  if (!devMode) return null;
+
   return (
     <>
       {refreshToken && (

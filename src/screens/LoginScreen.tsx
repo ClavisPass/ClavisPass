@@ -47,6 +47,7 @@ import { LoginStackParamList } from "../app/navigation/model/types";
 import FirstOpened from "../features/onboarding/components/FirstOpened";
 import { useSetting } from "../app/providers/SettingsProvider";
 import Modal from "../shared/components/modals/Modal";
+import { useDevMode } from "../app/providers/DevModeProvider";
 
 type LoginScreenProps = NativeStackScreenProps<LoginStackParamList, "Login">;
 
@@ -55,6 +56,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { headerWhite, setHeaderWhite, darkmode, theme, setHeaderSpacing } =
     useTheme();
   const { t } = useTranslation();
+  const { devMode } = useDevMode();
   const { width } = useWindowDimensions();
   const { value: onboardingDone } =
     useSetting("ONBOARDING_DONE");
@@ -332,13 +334,17 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               <SettingsDivider />
               <ClavisPassHubLoginButton />
               <SettingsDivider />
-              <SettingsItem
-                leadingIcon={"qrcode-scan"}
-                onPress={() => navigation.navigate("Scan")}
-              >
-                {t("settings:scanqrcode")}
-              </SettingsItem>
-              <SettingsDivider />
+              {devMode ? (
+                <>
+                  <SettingsItem
+                    leadingIcon={"qrcode-scan"}
+                    onPress={() => navigation.navigate("Scan")}
+                  >
+                    {t("settings:scanqrcode")}
+                  </SettingsItem>
+                  <SettingsDivider />
+                </>
+              ) : null}
             </BottomSheetView>
           </BottomSheetModal>
         </View>

@@ -7,6 +7,7 @@ import { Button, Text } from "react-native-paper";
 
 import { LoginStackParamList } from "../../../app/navigation/model/types";
 import { useToken } from "../../../app/providers/CloudProvider";
+import { useDevMode } from "../../../app/providers/DevModeProvider";
 import { useOnline } from "../../../app/providers/OnlineProvider";
 import { useSetting } from "../../../app/providers/SettingsProvider";
 import { useTheme } from "../../../app/providers/ThemeProvider";
@@ -30,6 +31,7 @@ type Step = 0 | 1;
 const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const { devMode } = useDevMode();
   const { isOnline } = useOnline();
   const systemColorScheme = useColorScheme();
 
@@ -145,13 +147,17 @@ const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
           <GoogleDriveLoginButton />
           <SettingsDivider />
           <ClavisPassHubLoginButton />
-          <SettingsDivider />
-          <SettingsItem
-            leadingIcon="qrcode-scan"
-            onPress={() => navigation.navigate("Scan")}
-          >
-            {t("settings:scanqrcode")}
-          </SettingsItem>
+          {devMode ? (
+            <>
+              <SettingsDivider />
+              <SettingsItem
+                leadingIcon="qrcode-scan"
+                onPress={() => navigation.navigate("Scan")}
+              >
+                {t("settings:scanqrcode")}
+              </SettingsItem>
+            </>
+          ) : null}
           <SettingsDivider />
         </View>
 

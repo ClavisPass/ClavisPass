@@ -13,6 +13,7 @@ import AnimatedPressable from "../shared/components/AnimatedPressable";
 import HintCard from "../shared/components/HintCard";
 
 import { useTheme } from "../app/providers/ThemeProvider";
+import { useDevMode } from "../app/providers/DevModeProvider";
 import { SettingsStackParamList } from "../app/navigation/model/types";
 import { useSetting } from "../app/providers/SettingsProvider";
 import { formatAbsoluteLocal } from "../shared/utils/Timestamp";
@@ -49,6 +50,7 @@ const BrowserExtensionsScreen: React.FC<BrowserExtensionsScreenProps> = ({
     setHeaderWhite,
     setHeaderSpacing,
   } = useTheme();
+  const { devMode } = useDevMode();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const { value: dateFormat } = useSetting("DATE_FORMAT");
@@ -69,11 +71,18 @@ const BrowserExtensionsScreen: React.FC<BrowserExtensionsScreenProps> = ({
 
   useFocusEffect(
     React.useCallback(() => {
+      if (!devMode) {
+        navigation.replace("Settings");
+        return;
+      }
+
       setHeaderSpacing(40);
       setHeaderWhite(false);
       void loadPairings();
-    }, [loadPairings, setHeaderSpacing, setHeaderWhite]),
+    }, [devMode, loadPairings, navigation, setHeaderSpacing, setHeaderWhite]),
   );
+
+  if (!devMode) return null;
 
   const act = useCallback(
     async (
