@@ -8,15 +8,18 @@ async function showMainWindow(startBehavior?: StartBehavior) {
     return;
   }
 
-  const [{ WebviewWindow }, { getMatches }] = await Promise.all([
-    import("@tauri-apps/api/webviewWindow"),
-    import("@tauri-apps/plugin-cli"),
-  ]);
+  const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
 
   const stored = startBehavior ?? (await store.get("START_BEHAVIOR"));
 
-  const matches = await getMatches();
-  const startedHidden = matches.args.hidden?.value === true;
+  let startedHidden = false;
+  try {
+    const { getMatches } = await import("@tauri-apps/plugin-cli");
+    const matches = await getMatches();
+    startedHidden = matches.args.hidden?.value === true;
+  } catch {
+    startedHidden = false;
+  }
 
   if (stored === "hidden" && startedHidden) return;
 
@@ -24,6 +27,8 @@ async function showMainWindow(startBehavior?: StartBehavior) {
   if (!win) return;
 
   await win.show();
+  await win.unminimize();
+  await win.setFocus();
 }
 
 export default showMainWindow;

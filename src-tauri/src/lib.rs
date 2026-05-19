@@ -126,6 +126,7 @@ pub fn run() {
             }
 
             let app_handle = app.handle().clone();
+            let started_hidden = std::env::args().any(|arg| arg == "--hidden");
 
             let builder = WebviewWindowBuilder::new(
                 &app_handle,
@@ -147,7 +148,7 @@ pub fn run() {
                 .maximizable(false)
                 .use_https_scheme(true)
                 .zoom_hotkeys_enabled(false)
-                .visible(false)
+                .visible(!started_hidden)
                 .devtools(cfg!(debug_assertions));
 
             let main_window = builder
