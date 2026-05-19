@@ -207,6 +207,7 @@ function FolderModal(props: Props) {
               setSelectedFolder={props.setSelectedFolder}
               deleteFolder={deleteFolder}
               draggableDisabled={draggableDisabled}
+              persistFolderOrder={persistFolderOrder}
             />
           ) : (
             <DraggableFolderList

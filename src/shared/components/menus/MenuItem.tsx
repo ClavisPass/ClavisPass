@@ -16,6 +16,8 @@ type Props = {
 };
 export function MenuItem(props: Props) {
   const { theme } = useTheme();
+  const selectedBackgroundColor = "rgba(120, 127, 246, 0.18)";
+
   return (
     <View style={{ height: 44 }}>
       <Ripple onPress={props.onPress}>
@@ -32,8 +34,10 @@ export function MenuItem(props: Props) {
             gap: 6,
             justifyContent: "space-between",
             backgroundColor: props.selected
-              ? "rgba(0, 0, 0, 0.137)"
+              ? selectedBackgroundColor
               : "transparent",
+            borderLeftWidth: props.selected ? 3 : 0,
+            borderLeftColor: theme.colors.primary,
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>

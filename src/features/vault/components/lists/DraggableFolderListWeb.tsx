@@ -15,14 +15,13 @@ import { useTranslation } from "react-i18next";
 import FolderType from "../../model/FolderType";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
-import { useVault } from "../../../../app/providers/VaultProvider";
-
 
 type Props = {
   folder: FolderType[];
   setSelectedFolder?: (folder: FolderType | null) => void;
   deleteFolder: (folder: FolderType) => void;
   draggableDisabled?: boolean;
+  persistFolderOrder: (nextFolders: FolderType[]) => void;
 };
 
 const reorder = (list: FolderType[], startIndex: number, endIndex: number) => {
@@ -52,13 +51,6 @@ const getListStyle = () => ({
 function DraggableFolderListWeb(props: Props) {
   const { globalStyles, theme } = useTheme();
   const { t } = useTranslation();
-  const vault = useVault();
-
-  const persistFolderOrder = (nextFolders: FolderType[]) => {
-    vault.update((draft) => {
-      draft.folder = nextFolders;
-    });
-  };
 
   const onDragEnd = (result: DropResult) => {
     if (props.draggableDisabled) return;
@@ -70,7 +62,7 @@ function DraggableFolderListWeb(props: Props) {
       result.destination.index
     );
 
-    persistFolderOrder(reordered);
+    props.persistFolderOrder(reordered);
   };
 
   return (
