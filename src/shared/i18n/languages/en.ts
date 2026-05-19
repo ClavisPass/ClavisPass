@@ -165,6 +165,8 @@ const en: TranslationSchema = {
     seconds: "{{count}} seconds",
     copyDuration: "Copy Duration",
     copyDurationOff: "Off",
+    autosaveDelay: "Autosave",
+    autosaveOff: "Off",
     sessionDuration: "Session Duration",
     contentProtection: "Content Protection",
     scanqrcode: "Scan QR Code",

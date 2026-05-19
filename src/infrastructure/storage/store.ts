@@ -131,6 +131,10 @@ export const storeSchema = {
     type: "number",
     default: 20,
   },
+  AUTOSAVE_DELAY: {
+    type: "number",
+    default: 10,
+  },
   SESSION_DURATION: {
     type: "number",
     default: 30 * 60,

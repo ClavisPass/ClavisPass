@@ -115,6 +115,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 
   const { value: copyDurationSeconds, setValue: setCopyDurationSeconds } =
     useSetting("COPY_DURATION");
+  const { value: autosaveDelaySeconds, setValue: setAutosaveDelaySeconds } =
+    useSetting("AUTOSAVE_DELAY");
 
   const { value: sessionDurationSeconds, setValue: setSessionDurationSeconds } =
     useSetting("SESSION_DURATION");
@@ -500,6 +502,34 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                   {
                     label: t("settings:seconds", { count: 20 }),
                     value: "20",
+                  },
+                  {
+                    label: t("settings:seconds", { count: 30 }),
+                    value: "30",
+                  },
+                  {
+                    label: t("settings:seconds", { count: 60 }),
+                    value: "60",
+                  },
+                ]}
+              />
+              <SettingsDivider />
+
+              <SettingsDropdownItem
+                value={String(autosaveDelaySeconds ?? 10)}
+                setValue={(v) => setAutosaveDelaySeconds(Number(v))}
+                label={t("settings:autosaveDelay")}
+                dropdownMaxWidth={260}
+                dropdownMinWidth={200}
+                options={[
+                  { label: t("settings:autosaveOff"), value: "0" },
+                  {
+                    label: t("settings:seconds", { count: 5 }),
+                    value: "5",
+                  },
+                  {
+                    label: t("settings:seconds", { count: 10 }),
+                    value: "10",
                   },
                   {
                     label: t("settings:seconds", { count: 30 }),

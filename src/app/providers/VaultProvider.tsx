@@ -31,6 +31,7 @@ export type VaultContextType = {
   entries: EntryMeta[];
   folders: FolderType[];
   dirty: boolean;
+  revision: number;
 
   // Session control
   unlockWithDecryptedVault: (decrypted: VaultData) => void;
@@ -55,6 +56,7 @@ export type VaultContextType = {
 
   // Persistence helpers (encrypt+save+sync outside)
   exportFullData: () => VaultData;
+  getRevision: () => number;
   markSaved: () => void;
   devices: VaultDeviceType[];
 };
@@ -69,6 +71,13 @@ export function VaultProvider({ children }: { children: ReactNode }) {
   const [folders, setFoldersState] = useState<FolderType[]>([]);
   const [devices, setDevices] = useState<VaultDeviceType[]>([]);
   const [dirty, setDirty] = useState(false);
+  const revisionRef = React.useRef(0);
+  const [revision, setRevision] = useState(0);
+
+  const bumpRevision = useCallback(() => {
+    revisionRef.current += 1;
+    setRevision(revisionRef.current);
+  }, []);
 
   const refresh = useCallback(() => {
     const metas = VaultSession.getValues().map(buildEntryMeta);
@@ -122,20 +131,23 @@ export function VaultProvider({ children }: { children: ReactNode }) {
   const upsertEntry = useCallback(
     (entry: ValuesType) => {
       VaultSession.upsertEntry(entry);
+      bumpRevision();
       refresh();
     },
-    [refresh]
+    [bumpRevision, refresh]
   );
 
   const deleteEntry = useCallback(
     (id: string) => {
       VaultSession.deleteEntry(id);
+      bumpRevision();
       refresh();
     },
-    [refresh]
+    [bumpRevision, refresh]
   );
 
   const exportFullData = useCallback(() => VaultSession.exportFullData(), []);
+  const getRevision = useCallback(() => revisionRef.current, []);
 
   const markSaved = useCallback(() => {
     VaultSession.markSaved();
@@ -170,9 +182,10 @@ export function VaultProvider({ children }: { children: ReactNode }) {
         (VaultSession as any).markDirty();
       }
 
+      bumpRevision();
       refresh();
     },
-    [isUnlocked, refresh]
+    [bumpRevision, isUnlocked, refresh]
   );
 
   const setFolders = useCallback(
@@ -191,6 +204,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       folders,
       devices,
       dirty,
+      revision,
       unlockWithDecryptedVault,
       lock,
       refresh,
@@ -201,6 +215,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       update,
       setFolders,
       exportFullData,
+      getRevision,
       markSaved,
     }),
     [
@@ -209,6 +224,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       folders,
       devices,
       dirty,
+      revision,
       unlockWithDecryptedVault,
       lock,
       refresh,
@@ -219,6 +235,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       update,
       setFolders,
       exportFullData,
+      getRevision,
       markSaved,
     ]
   );

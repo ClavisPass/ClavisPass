@@ -163,6 +163,8 @@ export type TranslationSchema = {
     seconds: string;
     copyDuration: string;
     copyDurationOff: string;
+    autosaveDelay: string;
+    autosaveOff: string;
     sessionDuration: string;
     contentProtection: string;
     scanqrcode: string;

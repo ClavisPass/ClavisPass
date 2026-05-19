@@ -1,5 +1,5 @@
 import { Animated, View } from "react-native";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Icon, Text } from "react-native-paper";
 
@@ -20,6 +20,7 @@ import {
   getPlatformString,
 } from "../../vault/utils/deviceInfo";
 import { encryptVaultContent } from "../../../infrastructure/crypto/encryptVaultContent";
+import { useSetting } from "../../../app/providers/SettingsProvider";
 
 type Props = {
   refreshing: boolean;
@@ -30,17 +31,28 @@ type Props = {
 const Sync = (props: Props) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const { refreshing, setRefreshing, refreshData } = props;
 
   const auth = useAuth();
   const vault = useVault();
 
   const { isOnline } = useOnline();
   const { accessToken, provider, ensureFreshAccessToken } = useToken();
+  const { value: autosaveDelaySeconds } = useSetting("AUTOSAVE_DELAY");
 
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const saveInFlightRef = useRef(false);
+  const saveAgainAfterCurrentRef = useRef(false);
+  const requestSaveRef = useRef<() => Promise<void>>(async () => {});
+  const autosaveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null,
+  );
+  const [autosaveRemaining, setAutosaveRemaining] = useState<number | null>(
+    null,
+  );
 
-  const showSync = vault.dirty || props.refreshing;
+  const showSync = vault.dirty || refreshing;
 
   useEffect(() => {
     if (showSync) {
@@ -72,71 +84,152 @@ const Sync = (props: Props) => {
     }
   }, [showSync, fadeAnim, slideAnim]);
 
-  const save = async () => {
+  const cancelAutosaveCountdown = useCallback(() => {
+    if (autosaveIntervalRef.current) {
+      clearInterval(autosaveIntervalRef.current);
+      autosaveIntervalRef.current = null;
+    }
+    setAutosaveRemaining(null);
+  }, []);
+
+  const saveOnce = useCallback(async () => {
     if (!vault.isUnlocked) return;
 
-    props.setRefreshing(true);
+    if (!provider) throw new Error("[Sync] No provider configured");
+
+    let tokenToUse = accessToken ?? "";
+    if (provider !== "device") {
+      tokenToUse = accessToken ?? (await ensureFreshAccessToken()) ?? "";
+      if (!tokenToUse) {
+        throw new Error("[Sync] Missing access token");
+      }
+    }
+
+    const deviceId = await getOrCreateDeviceId();
+    const platform = await getPlatformString();
+    const name = await getDeviceDisplayName();
+    const iso = getDateTime();
+
+    vault.update((draft) => {
+      draft.devices = upsertVaultDevice(
+        draft.devices,
+        { id: deviceId, name, platform },
+        iso,
+      );
+    });
+
+    const payloadRevision = vault.getRevision();
+    const payload = vault.exportFullData();
+    const master = auth.getMaster();
+    if (!master)
+      throw new Error("[Sync] Missing master password in auth context");
+
+    const result = await encryptVaultContent(payload, master, {
+      lastUpdated: iso,
+    });
+
+    if (!result.ok) {
+      const failure = result;
+      throw failure.error;
+    }
+
+    await uploadRemoteVaultFile({
+      provider,
+      accessToken: tokenToUse,
+      remotePath: "clavispass.lock",
+      content: result.content,
+    });
+
+    logger.info("[Sync] Remote vault upload completed.");
+
+    return payloadRevision;
+  }, [accessToken, auth, ensureFreshAccessToken, provider, vault]);
+
+  const requestSave = useCallback(async () => {
+    if (!vault.isUnlocked) return;
+
+    if (saveInFlightRef.current) {
+      saveAgainAfterCurrentRef.current = true;
+      return;
+    }
+
+    saveInFlightRef.current = true;
+    setRefreshing(true);
+    cancelAutosaveCountdown();
 
     try {
-      if (!provider) throw new Error("[Sync] No provider configured");
+      do {
+        saveAgainAfterCurrentRef.current = false;
 
-      let tokenToUse = accessToken ?? "";
-      if (provider !== "device") {
-        tokenToUse = accessToken ?? (await ensureFreshAccessToken()) ?? "";
-        if (!tokenToUse) {
-          throw new Error("[Sync] Missing access token");
-        }
-      }
+        const savedRevision = await saveOnce();
+        const changedDuringSave = vault.getRevision() !== savedRevision;
 
-      const deviceId = await getOrCreateDeviceId();
-      const platform = await getPlatformString();
-      const name = await getDeviceDisplayName();
-      const iso = getDateTime();
-
-      vault.update((draft) => {
-        draft.devices = upsertVaultDevice(
-          draft.devices,
-          { id: deviceId, name, platform },
-          iso,
-        );
-      });
-
-      const payload = vault.exportFullData();
-      const master = auth.getMaster();
-      if (!master)
-        throw new Error("[Sync] Missing master password in auth context");
-
-      const result = await encryptVaultContent(
-        payload,
-        master,
-        {
-          lastUpdated: iso,
-        },
-      );
-
-      if (!result.ok) {
-        const failure = result;
-        throw failure.error;
-      }
-
-      const encryptedJson = result.content;
-
-      await uploadRemoteVaultFile({
-        provider,
-        accessToken: tokenToUse,
-        remotePath: "clavispass.lock",
-        content: encryptedJson,
-        onCompleted: () => {
-          logger.info("[Sync] Remote vault upload completed.");
+        if (changedDuringSave) {
+          saveAgainAfterCurrentRef.current = true;
+        } else {
           vault.markSaved();
-          props.setRefreshing(false);
-        },
-      });
+        }
+      } while (saveAgainAfterCurrentRef.current);
     } catch (err) {
       logger.error("[Sync] Save failed:", err);
-      props.setRefreshing(false);
+    } finally {
+      saveInFlightRef.current = false;
+      setRefreshing(false);
     }
-  };
+  }, [cancelAutosaveCountdown, saveOnce, setRefreshing, vault]);
+
+  useEffect(() => {
+    requestSaveRef.current = requestSave;
+  }, [requestSave]);
+
+  useEffect(() => {
+    const delay = Number(autosaveDelaySeconds ?? 0);
+
+    if (!vault.dirty || delay <= 0 || refreshing) {
+      cancelAutosaveCountdown();
+      return;
+    }
+
+    cancelAutosaveCountdown();
+    setAutosaveRemaining(delay);
+    const interval = setInterval(() => {
+      setAutosaveRemaining((current) => {
+        if (current === null) return current;
+        if (current <= 1) {
+          clearInterval(interval);
+          autosaveIntervalRef.current = null;
+          void requestSaveRef.current();
+          return null;
+        }
+
+        return current - 1;
+      });
+    }, 1000);
+    autosaveIntervalRef.current = interval;
+
+    return () => {
+      clearInterval(interval);
+      if (autosaveIntervalRef.current === interval) {
+        autosaveIntervalRef.current = null;
+      }
+    };
+  }, [
+    autosaveDelaySeconds,
+    cancelAutosaveCountdown,
+    refreshing,
+    vault.dirty,
+    vault.revision,
+  ]);
+
+  const handleRefreshData = useCallback(() => {
+    cancelAutosaveCountdown();
+    refreshData();
+  }, [cancelAutosaveCountdown, refreshData]);
+
+  const saveLabel =
+    autosaveRemaining !== null
+      ? `${t("common:save")} (${autosaveRemaining}s)`
+      : t("common:save");
 
   return (
     <Animated.View
@@ -170,7 +263,7 @@ const Sync = (props: Props) => {
               flexDirection: "row",
             }}
           >
-            {props.refreshing ? (
+            {refreshing ? (
               <ActivityIndicator color="white" />
             ) : (
               <>
@@ -178,10 +271,12 @@ const Sync = (props: Props) => {
                   <>
                     <View style={{ backgroundColor: "#00000017" }}>
                       <AnimatedPressable
-                        onPress={save}
+                        onPress={() => {
+                          void requestSave();
+                        }}
                         style={{
                           height: 40,
-                          width: 130,
+                          width: 150,
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -191,16 +286,16 @@ const Sync = (props: Props) => {
                           variant="bodyLarge"
                           style={{ color: "white", userSelect: "none" }}
                         >
-                          {t("common:save")}
+                          {saveLabel}
                         </Text>
                       </AnimatedPressable>
                     </View>
 
                     <AnimatedPressable
-                      onPress={props.refreshData}
+                      onPress={handleRefreshData}
                       style={{
                         height: 40,
-                        width: 130,
+                        width: 110,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
