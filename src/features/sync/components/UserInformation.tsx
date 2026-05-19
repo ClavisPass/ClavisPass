@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import * as WebBrowser from "expo-web-browser";
-import { Avatar, Icon, IconButton, Text, useTheme } from "react-native-paper";
+import { Icon, IconButton, Text, useTheme } from "react-native-paper";
 import { Skeleton } from "moti/skeleton";
-import { View } from "react-native";
+import { Image, View } from "react-native";
 import { MotiView } from "moti";
 
 import DropboxLoginButton from "./DropboxLoginButton";
@@ -41,6 +41,7 @@ function UserInformation(props: Props) {
 
   const [userInfo, setUserInfoState] = useState<UserInfoType | null>(null);
   const [loading, setLoading] = useState(false);
+  const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
 
   const hasCloudSession = useMemo(
     () => provider !== "device" && !!refreshToken,
@@ -68,6 +69,17 @@ function UserInformation(props: Props) {
         token,
         provider,
         (info) => {
+          if (!info) {
+            setUserInfoState(null);
+            props.setUserInfo?.(null);
+            return;
+          }
+
+          logger.info("[UserInformation] Loaded cloud user info:", {
+            provider,
+            username: info.username,
+            avatar: info.avatar,
+          });
           setUserInfoState(info);
           props.setUserInfo?.(info);
         },
@@ -83,6 +95,10 @@ function UserInformation(props: Props) {
     void loadUserInfo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasCloudSession, provider, isOnline]);
+
+  useEffect(() => {
+    setAvatarLoadFailed(false);
+  }, [userInfo?.avatar]);
 
   const handleLogout = async () => {
     try {
@@ -140,14 +156,55 @@ function UserInformation(props: Props) {
                 radius={999}
                 colorMode={darkmode ? "dark" : "light"}
               />
-            ) : userInfo.avatar ? (
-              <Avatar.Image size={48} source={{ uri: userInfo.avatar }} />
+            ) : userInfo.avatar && !avatarLoadFailed ? (
+              <View
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 999,
+                  overflow: "hidden",
+                  backgroundColor: paperTheme.colors.secondaryContainer,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Image
+                  source={{ uri: userInfo.avatar }}
+                  resizeMode="cover"
+                  onLoad={() => {
+                    logger.info("[UserInformation] Avatar image loaded:", {
+                      provider,
+                      avatar: userInfo.avatar,
+                    });
+                  }}
+                  onError={(error) => {
+                    logger.warn("[UserInformation] Avatar image failed:", {
+                      provider,
+                      avatar: userInfo.avatar,
+                      error: error.nativeEvent,
+                    });
+                    setAvatarLoadFailed(true);
+                  }}
+                  style={{ width: 48, height: 48 }}
+                />
+              </View>
             ) : (
-              <Avatar.Text
-              style={{ backgroundColor: paperTheme.colors.surfaceVariant }}
-                size={48}
-                label={(userInfo?.username?.charAt(0) ?? "?").toUpperCase()}
-              />
+              <View
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 999,
+                  backgroundColor: paperTheme.colors.secondaryContainer,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Icon
+                  source="account"
+                  size={25}
+                  color={paperTheme.colors.onSurfaceVariant}
+                />
+              </View>
             )}
 
             {/* Name + Provider */}
