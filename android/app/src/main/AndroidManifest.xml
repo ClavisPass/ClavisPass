@@ -30,6 +30,7 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="${appAuthScheme}"/>
+        <data android:scheme="${googleAuthScheme}"/>
         <data android:scheme="exp+clavispass"/>
       </intent-filter>
     </activity>

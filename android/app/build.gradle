@@ -8,6 +8,17 @@ def isDevVariant = appVariant == "development"
 def androidApplicationId = isDevVariant ? "com.clavispass.app.dev" : "com.clavispass.app"
 def appDisplayName = isDevVariant ? "ClavisPass (Dev)" : "ClavisPass"
 def appDeepLinkScheme = isDevVariant ? "clavispass-dev" : "clavispass"
+def googleAndroidClientId = System.getenv("GOOGLE_CLIENT_ID_ANDROID") ?: ""
+
+def googleReverseClientIdScheme = { String clientId ->
+    def suffix = ".apps.googleusercontent.com"
+    if (!clientId || !clientId.endsWith(suffix)) {
+        return appDeepLinkScheme
+    }
+
+    def prefix = clientId.substring(0, clientId.length() - suffix.length())
+    return prefix ? "com.googleusercontent.apps.${prefix}" : appDeepLinkScheme
+}
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -103,7 +114,8 @@ android {
         versionName "1.4.8"
         resValue "string", "app_name", appDisplayName
         manifestPlaceholders = [
-            appAuthScheme: appDeepLinkScheme
+            appAuthScheme: appDeepLinkScheme,
+            googleAuthScheme: googleReverseClientIdScheme(googleAndroidClientId)
         ]
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""

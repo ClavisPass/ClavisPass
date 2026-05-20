@@ -3,6 +3,7 @@
 export default ({ config }) => {
   const variant = process.env.APP_VARIANT ?? "production";
   const isDev = variant === "development";
+  const plugins = config.plugins ?? [];
 
   return {
     ...config,
@@ -27,5 +28,6 @@ export default ({ config }) => {
       ...(config.extra ?? {}),
       appVariant: variant,
     },
+    plugins: [...plugins, "./plugins/withIosGoogleOAuthScheme"],
   };
 };

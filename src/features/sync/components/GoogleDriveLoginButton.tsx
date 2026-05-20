@@ -445,7 +445,7 @@ function GoogleDriveLoginButtonContent() {
 }
 
 function GoogleDriveLoginButton() {
-  if (!isWeb) {
+  if (!isWeb && !isMobile) {
     return null;
   }
 
