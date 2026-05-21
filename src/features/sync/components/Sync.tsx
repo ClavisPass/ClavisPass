@@ -226,8 +226,10 @@ const Sync = (props: Props) => {
     refreshData();
   }, [cancelAutosaveCountdown, refreshData]);
 
+  const shouldShowAutosaveCountdown =
+    autosaveRemaining !== null && autosaveRemaining <= 5;
   const saveLabel =
-    autosaveRemaining !== null
+    shouldShowAutosaveCountdown
       ? `${t("common:save")} (${autosaveRemaining}s)`
       : t("common:save");
 
