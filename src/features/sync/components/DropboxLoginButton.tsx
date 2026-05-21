@@ -25,6 +25,10 @@ const SCOPES = [
 
 const isMobile = Platform.OS === "ios" || Platform.OS === "android";
 const isWeb = Platform.OS === "web";
+const ANDROID_AUTH_PROMPT_OPTIONS = {
+  createTask: true,
+  showInRecents: true,
+} as const;
 
 function getMobileRedirectUri() {
   return AuthSession.makeRedirectUri({ native: getAppRedirectUri() });
@@ -283,7 +287,9 @@ function DropboxLoginButton() {
     if (isWeb) {
       handleTauriAuth();
     } else if (isMobile) {
-      promptAsync();
+      promptAsync(
+        Platform.OS === "android" ? ANDROID_AUTH_PROMPT_OPTIONS : undefined
+      );
     } else {
       logger.error("Unsupported platform for this auth flow.");
     }

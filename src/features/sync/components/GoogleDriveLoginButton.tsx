@@ -30,6 +30,10 @@ const SCOPES = [
 const isMobile = Platform.OS === "ios" || Platform.OS === "android";
 const isWeb = Platform.OS === "web";
 const DESKTOP_OAUTH_PORTS = [57771, 57772, 57773];
+const ANDROID_AUTH_PROMPT_OPTIONS = {
+  createTask: true,
+  showInRecents: true,
+} as const;
 
 function getMobileRedirectUri() {
   const redirectUri = getGoogleMobileRedirectUri();
@@ -430,7 +434,9 @@ function GoogleDriveLoginButtonContent() {
         return;
       }
 
-      promptAsync();
+      promptAsync(
+        Platform.OS === "android" ? ANDROID_AUTH_PROMPT_OPTIONS : undefined
+      );
       return;
     }
 
