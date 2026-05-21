@@ -56,3 +56,6 @@ module.exports = function withIosGoogleOAuthScheme(config) {
     return cfg;
   });
 };
+
+module.exports.toReverseClientIdScheme = toReverseClientIdScheme;
+module.exports.ensureUrlScheme = ensureUrlScheme;

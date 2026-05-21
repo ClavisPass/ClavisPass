@@ -13,6 +13,9 @@
     "extension:typecheck": "npm run typecheck --prefix browser-extension",
     "extension:package:firefox": "npm run package:firefox --prefix browser-extension",
     "web:build-tauri": "npx expo export --platform web",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "upgrade": "npx expo install --fix",
     "release:prod": "node release.js",
     "release:dev": "eas build -p android --profile development --clear-cache",
@@ -132,13 +135,16 @@
     "@types/react-native-crypto-js": "^1.0.3",
     "@types/react-native-typewriter": "^0.7.4",
     "@types/react-native-vector-icons": "^6.4.18",
+    "@types/react-test-renderer": "^19.1.0",
     "@types/uuid": "^10.0.0",
     "@types/validator": "^13.12.0",
     "eslint": "^8.57.0",
     "eslint-config-universe": "^15.0.3",
     "patch-package": "^8.0.1",
     "prettier": "^3.2.5",
-    "typescript": "~5.9.2"
+    "react-test-renderer": "^19.1.0",
+    "typescript": "~5.9.2",
+    "vitest": "^4.1.7"
   },
   "private": true
 }

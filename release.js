@@ -96,6 +96,18 @@ function syncCargoLock() {
   });
 }
 
+function runReleaseChecks() {
+  const checks = [
+    { label: "tests", command: "npm run test" },
+    { label: "typecheck", command: "npm run typecheck" },
+  ];
+
+  for (const check of checks) {
+    console.log(`Running release check: ${check.label}...`);
+    execSync(check.command, { stdio: "inherit" });
+  }
+}
+
 function waitForVersionTargetsToSettle(version, runtimeVersion, paths, options = {}) {
   const timeoutMs = options.timeoutMs ?? 30000;
   const pollMs = options.pollMs ?? 250;
@@ -216,6 +228,13 @@ waitForVersionTargetsToSettle(version, runtimeVersion, [
   "src-tauri/tauri.conf.json",
   "src-tauri/tauri.config.json",
 ]);
+
+try {
+  runReleaseChecks();
+} catch (e) {
+  console.error("Aborting release because release checks failed.");
+  process.exit(1);
+}
 
 const existingTags = execSync("git tag")
   .toString()
