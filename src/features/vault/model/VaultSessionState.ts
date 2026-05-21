@@ -1,7 +1,7 @@
-import VaultData from "./VaultData";
+import VaultDataType from "./VaultDataType";
 
 type VaultSessionState = {
-  data: VaultData;
+  data: VaultDataType;
   dirty: boolean;
   unlockedAt: number;
 };

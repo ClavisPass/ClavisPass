@@ -123,7 +123,7 @@ export default function FastAccessScreen() {
               height: 40,
               cursor: "move",
               justifyContent: "center",
-            }}
+            } as any}
           >
             <View
               style={{

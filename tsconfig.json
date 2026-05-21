@@ -2,5 +2,12 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-  }
+  },
+  "exclude": [
+    "browser-extension",
+    "dist",
+    "node_modules",
+    "src-tauri/target",
+    "target"
+  ]
 }

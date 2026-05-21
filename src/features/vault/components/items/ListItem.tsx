@@ -514,6 +514,29 @@ function ListItem(props: Props) {
     );
   };
 
+  const webInteractionProps =
+    Platform.OS === "web"
+      ? ({
+          onPointerEnter: () => setHovered(true),
+          onPointerLeave: () => setHovered(false),
+          onPointerDown: (event: any) => {
+            const button = event?.nativeEvent?.button;
+
+            if (button === 1) {
+              suppressNextPressRef.current = true;
+              event.preventDefault?.();
+              event.stopPropagation?.();
+              openItemFastAccess().catch(() => {});
+            }
+          },
+          onContextMenu: (event: any) => {
+            event.preventDefault?.();
+            event.stopPropagation?.();
+            openMenuAtPointer(event);
+          },
+        } as any)
+      : {};
+
   const renderFavoriteSwipeAction = () => (
     <View
       style={[
@@ -563,26 +586,7 @@ function ListItem(props: Props) {
           borderColor: darkmode ? theme.colors.outlineVariant : "white",
         },
       ]}
-      onPointerEnter={() => Platform.OS === "web" && setHovered(true)}
-      onPointerLeave={() => Platform.OS === "web" && setHovered(false)}
-      onPointerDown={(event: any) => {
-        if (Platform.OS !== "web") return;
-        const button = event?.nativeEvent?.button;
-
-        if (button === 1) {
-          suppressNextPressRef.current = true;
-          event.preventDefault?.();
-          event.stopPropagation?.();
-          openItemFastAccess().catch(() => {});
-          return;
-        }
-      }}
-      onContextMenu={(event: any) => {
-        if (Platform.OS !== "web") return;
-        event.preventDefault?.();
-        event.stopPropagation?.();
-        openMenuAtPointer(event);
-      }}
+      {...webInteractionProps}
     >
       <AnimatedPressable
         key={props.key}

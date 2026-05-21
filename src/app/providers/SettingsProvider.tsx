@@ -19,6 +19,28 @@ type SettingsContextValue = {
 const SettingsContext = React.createContext<SettingsContextValue | null>(null);
 
 const DEFAULT_KEYS = Object.keys(store.storeSchema) as DataKey[];
+const SETTINGS_PRELOAD_TIMEOUT_MS = 2500;
+
+async function loadSettingWithTimeout<K extends DataKey>(
+  key: K
+): Promise<readonly [K, StoreValueMap[K]] | null> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  const timeout = new Promise<null>((resolve) => {
+    timeoutId = setTimeout(() => resolve(null), SETTINGS_PRELOAD_TIMEOUT_MS);
+  });
+
+  try {
+    const value = await Promise.race([store.get(key), timeout]);
+    return value === null ? null : ([key, value] as const);
+  } catch {
+    return null;
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  }
+}
 
 export function SettingsProvider({
   children,
@@ -34,18 +56,16 @@ export function SettingsProvider({
     let cancelled = false;
 
     (async () => {
-      try {
-        const entries = await Promise.all(
-          preloadKeys.map(async (k) => [k, await store.get(k)] as const)
-        );
+      const entries = await Promise.all(preloadKeys.map(loadSettingWithTimeout));
 
-        if (!cancelled) {
-          const next = Object.fromEntries(entries) as SettingsState;
-          setState(next);
-          setIsReady(true);
-        }
-      } catch {
-        if (!cancelled) setIsReady(true);
+      if (!cancelled) {
+        const loadedEntries = entries.filter(
+          (entry): entry is readonly [DataKey, StoreValueMap[DataKey]] =>
+            entry !== null
+        );
+        const next = Object.fromEntries(loadedEntries) as SettingsState;
+        setState(next);
+        setIsReady(true);
       }
     })();
 

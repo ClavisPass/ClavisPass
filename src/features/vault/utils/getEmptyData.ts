@@ -5,6 +5,7 @@ function getEmptyData() {
     version: "1",
     folder: [],
     values: [],
+    devices: [],
   };
   return data;
 }

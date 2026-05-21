@@ -1,7 +1,6 @@
-import CryptoType from "../../crypto/legacy/CryptoType";
 import Provider from "./Provider";
 
-export type UploadContent = CryptoType | string;
+export type UploadContent = string;
 
 export interface UploadFileParams {
   provider: Provider;
