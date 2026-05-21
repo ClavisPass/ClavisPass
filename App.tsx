@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "react-native-gesture-handler";
 import {
   useFonts,
@@ -107,37 +107,92 @@ const getCurrentWindowSafe = async () => {
 };
 
 export default function App() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     LexendExa_400Regular,
     LexendExa_700Bold,
   });
+  const [fontLoadTimedOut, setFontLoadTimedOut] = useState(false);
   const [view, setView] = useState<"main" | "popup" | null>(null);
+  const reportedFontFallback = useRef(false);
 
   useEffect(() => {
+    if (fontsLoaded || fontError) {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setFontLoadTimedOut(true);
+    }, 2500);
+
+    return () => clearTimeout(timeout);
+  }, [fontError, fontsLoaded]);
+
+  useEffect(() => {
+    if (
+      (fontError || fontLoadTimedOut) &&
+      !fontsLoaded &&
+      !reportedFontFallback.current
+    ) {
+      reportedFontFallback.current = true;
+      logger.warn(
+        "Fonts could not be confirmed during startup; rendering with fallback fonts.",
+        fontError,
+      );
+    }
+  }, [fontError, fontLoadTimedOut, fontsLoaded]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fallback = setTimeout(() => {
+      if (!cancelled) {
+        logger.warn("Tauri window detection timed out; falling back to main view.");
+        setView((current) => current ?? "main");
+      }
+    }, 3000);
+
     const detectWindow = async () => {
       if (!(await detectTauriEnvironment())) {
-        setView("main");
+        if (!cancelled) {
+          clearTimeout(fallback);
+          setView("main");
+        }
         return;
       }
 
       try {
         const windowInfo = await getCurrentWindowSafe();
         if (!windowInfo) {
-          setView("main");
+          if (!cancelled) {
+            clearTimeout(fallback);
+            setView("main");
+          }
           return;
         }
         const { label } = windowInfo;
-        setView(label === "popup" ? "popup" : "main");
+        if (!cancelled) {
+          clearTimeout(fallback);
+          setView(label === "popup" ? "popup" : "main");
+        }
       } catch (e) {
         logger.warn("Fehler beim Lesen des Fensters:", e);
-        setView("main");
+        if (!cancelled) {
+          clearTimeout(fallback);
+          setView("main");
+        }
       }
     };
 
     detectWindow();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(fallback);
+    };
   }, []);
 
-  if (!fontsLoaded || view === null) return <></>;
+  const canRenderWithFonts = fontsLoaded || fontError || fontLoadTimedOut;
+
+  if (!canRenderWithFonts || view === null) return <></>;
 
   if (view === "popup") {
     return (
