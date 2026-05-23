@@ -5,6 +5,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { Platform, StyleSheet } from "react-native";
+import { useSetting } from "../../app/providers/SettingsProvider";
 
 type Props = {
   children: ReactNode;
@@ -13,8 +14,14 @@ type Props = {
 function Blur(props: Props) {
   const blurValue = useSharedValue(0);
   const [isFocused, setIsFocused] = useState(true); // Initial angenommen: Fenster ist fokussiert
+  const { value: blurOnUnfocus } = useSetting("BLUR_ON_UNFOCUS");
 
   useEffect(() => {
+    if (Platform.OS !== "web" || !blurOnUnfocus) {
+      blurValue.value = withTiming(0, { duration: 120 });
+      return;
+    }
+
     const handleFocus = () => {
       setIsFocused(true);
       blurValue.value = withTiming(0, { duration: 200 });
@@ -50,7 +57,7 @@ function Blur(props: Props) {
       document.removeEventListener("mouseenter", handleMouseEnter);
       document.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [isFocused]);
+  }, [blurOnUnfocus, blurValue, isFocused]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {

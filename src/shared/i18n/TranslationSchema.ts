@@ -170,6 +170,7 @@ export type TranslationSchema = {
     autosaveOff: string;
     sessionDuration: string;
     contentProtection: string;
+    blurOnUnfocus: string;
     scanqrcode: string;
     showqrcode: string;
     manageDevices: string;

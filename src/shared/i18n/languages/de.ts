@@ -173,6 +173,7 @@ const de: TranslationSchema = {
     autosaveOff: "Aus",
     sessionDuration: "Sitzungsdauer",
     contentProtection: "Inhaltsschutz",
+    blurOnUnfocus: "Bei Fokusverlust verwischen",
     scanqrcode: "QR-Code scannen",
     showqrcode: "QR-Code anzeigen",
     manageDevices: "Geräte verwalten",

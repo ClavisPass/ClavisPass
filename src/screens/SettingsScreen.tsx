@@ -120,6 +120,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 
   const { value: sessionDurationSeconds, setValue: setSessionDurationSeconds } =
     useSetting("SESSION_DURATION");
+  const { value: blurOnUnfocus, setValue: setBlurOnUnfocus } =
+    useSetting("BLUR_ON_UNFOCUS");
 
   const closeBehavior = closeBehaviorValue === "hide";
   const hideOnStartup = startBehaviorValue === "hidden";
@@ -470,6 +472,18 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               />
               <SettingsDivider />
               <ContentProtectionSettingsToggle />
+              {isTauri ? (
+                <>
+                  <SettingsDivider />
+                  <SettingsSwitch
+                    label={t("settings:blurOnUnfocus")}
+                    value={blurOnUnfocus}
+                    onValueChange={(checked) => {
+                      void setBlurOnUnfocus(checked);
+                    }}
+                  />
+                </>
+              ) : null}
               <SettingsDivider />
               <SettingsItem
                 onPress={() => {

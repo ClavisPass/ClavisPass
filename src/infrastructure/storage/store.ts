@@ -70,6 +70,10 @@ export const storeSchema = {
     values: ["hide", "exit"] as const,
     default: "exit",
   },
+  BLUR_ON_UNFOCUS: {
+    type: "boolean",
+    default: true,
+  },
   START_BEHAVIOR: {
     type: "enum",
     values: ["shown", "hidden"] as const,
