@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useAuth } from "../../../app/providers/AuthProvider";
+import { logger } from "../../../infrastructure/logging/logger";
 import {
   detectTauriEnvironment,
   useIsTauriEnvironment,
@@ -8,6 +9,11 @@ import {
 function GlobalShortcuts() {
   const auth = useAuth();
   const isTauri = useIsTauriEnvironment();
+  const logoutRef = useRef(auth.logout);
+
+  useEffect(() => {
+    logoutRef.current = auth.logout;
+  }, [auth.logout]);
 
   useEffect(() => {
     if (isTauri) {
@@ -69,15 +75,20 @@ function GlobalShortcuts() {
   }, [isTauri]);
 
   const windowInstance = async () => {
-    if (!(await detectTauriEnvironment())) {
+    try {
+      if (!(await detectTauriEnvironment())) {
+        return;
+      }
+      const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
+      const win = await WebviewWindow.getByLabel("main");
+      if (!win) {
+        return;
+      }
+      return win;
+    } catch (error) {
+      logger.warn("[GlobalShortcuts] Failed to resolve main window:", error);
       return;
     }
-    const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
-    const win = await WebviewWindow.getByLabel("main");
-    if (!win) {
-      return;
-    }
-    return win;
   };
 
   useEffect(() => {
@@ -85,38 +96,52 @@ function GlobalShortcuts() {
     let active = true;
 
     const registerShortcut = async () => {
-      if (!(await detectTauriEnvironment())) {
-        return;
-      }
-
-      const { register } = await import("@tauri-apps/plugin-global-shortcut");
-      await register("Alt+W", async () => {
-        const now = Date.now();
-        if (now - lastTriggered < 500) {
+      try {
+        if (!(await detectTauriEnvironment()) || !active) {
           return;
         }
-        lastTriggered = now;
-        const appWindow = await windowInstance();
-        if (!appWindow) {
-          return;
-        }
-        const stateIsVisible = await appWindow.isVisible();
-        const stateIsFocused = await appWindow.isFocused();
 
-        if (stateIsVisible && stateIsFocused) {
-          auth.logout();
+        const { register } = await import("@tauri-apps/plugin-global-shortcut");
+        if (!active) return;
+
+        await register("Alt+W", async () => {
           try {
-            const { invoke } = await import("@tauri-apps/api/core");
-            await invoke("close_main_window", { behavior: "hide" });
-          } catch {
-            await appWindow.hide();
+            const now = Date.now();
+            if (now - lastTriggered < 500) {
+              return;
+            }
+            lastTriggered = now;
+            const appWindow = await windowInstance();
+            if (!appWindow) {
+              return;
+            }
+            const stateIsVisible = await appWindow.isVisible();
+            const stateIsFocused = await appWindow.isFocused();
+
+            if (stateIsVisible && stateIsFocused) {
+              logoutRef.current();
+              try {
+                const { invoke } = await import("@tauri-apps/api/core");
+                await invoke("close_main_window", { behavior: "hide" });
+              } catch (error) {
+                logger.warn(
+                  "[GlobalShortcuts] Native close command failed:",
+                  error,
+                );
+                await appWindow.hide();
+              }
+            } else {
+              await appWindow.show();
+              await appWindow.unminimize();
+              await appWindow.setFocus();
+            }
+          } catch (error) {
+            logger.warn("[GlobalShortcuts] Alt+W handler failed:", error);
           }
-        } else {
-          appWindow.show();
-          appWindow.unminimize();
-          appWindow.setFocus();
-        }
-      });
+        });
+      } catch (error) {
+        logger.warn("[GlobalShortcuts] Failed to register Alt+W:", error);
+      }
     };
 
     void registerShortcut();
@@ -126,8 +151,14 @@ function GlobalShortcuts() {
         if (!(await detectTauriEnvironment())) {
           return;
         }
-        const { unregister } = await import("@tauri-apps/plugin-global-shortcut");
-        await unregister("Alt+W");
+        try {
+          const { unregister } = await import(
+            "@tauri-apps/plugin-global-shortcut"
+          );
+          await unregister("Alt+W");
+        } catch (error) {
+          logger.warn("[GlobalShortcuts] Failed to unregister Alt+W:", error);
+        }
       })();
     };
   }, []);

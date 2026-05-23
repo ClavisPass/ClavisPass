@@ -1,6 +1,6 @@
 use keytar::{delete_password, get_password, set_password};
 use std::fs;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::time::Duration;
 use tauri;
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
@@ -15,12 +15,18 @@ pub enum CloseBehavior {
 
 pub struct CloseBehaviorState {
     exit_on_close: AtomicBool,
+    hide_watchdog_generation: AtomicU64,
+    resize_save_generation: AtomicU64,
+    pending_lock_request: AtomicBool,
 }
 
 impl CloseBehaviorState {
     pub fn new() -> Self {
         Self {
             exit_on_close: AtomicBool::new(true),
+            hide_watchdog_generation: AtomicU64::new(0),
+            resize_save_generation: AtomicU64::new(0),
+            pending_lock_request: AtomicBool::new(false),
         }
     }
 
@@ -32,6 +38,44 @@ impl CloseBehaviorState {
     pub fn should_exit_on_close(&self) -> bool {
         self.exit_on_close.load(Ordering::Relaxed)
     }
+
+    pub fn begin_hide_watchdog(&self) -> u64 {
+        self.hide_watchdog_generation
+            .fetch_add(1, Ordering::Relaxed)
+            .saturating_add(1)
+    }
+
+    pub fn cancel_hide_watchdog(&self) {
+        let _ = self
+            .hide_watchdog_generation
+            .fetch_add(1, Ordering::Relaxed);
+    }
+
+    pub fn is_current_hide_watchdog(&self, generation: u64) -> bool {
+        self.hide_watchdog_generation.load(Ordering::Relaxed) == generation
+    }
+
+    pub fn schedule_resize_save(&self) -> u64 {
+        self.resize_save_generation
+            .fetch_add(1, Ordering::Relaxed)
+            .saturating_add(1)
+    }
+
+    pub fn is_current_resize_save(&self, generation: u64) -> bool {
+        self.resize_save_generation.load(Ordering::Relaxed) == generation
+    }
+
+    pub fn mark_pending_lock_request(&self) {
+        self.pending_lock_request.store(true, Ordering::Relaxed);
+    }
+
+    pub fn claim_pending_lock_request(&self) -> bool {
+        self.pending_lock_request.swap(false, Ordering::Relaxed)
+    }
+}
+
+fn default_true() -> bool {
+    true
 }
 
 #[derive(serde::Deserialize)]
@@ -40,6 +84,8 @@ pub struct TrayMenuLabels {
     show: String,
     lock_vault: String,
     settings: String,
+    #[serde(default = "default_true")]
+    settings_enabled: bool,
     quit: String,
 }
 
@@ -63,10 +109,59 @@ use windows::Win32::System::Memory::{
 #[cfg(target_os = "windows")]
 const CF_UNICODETEXT_FORMAT: u32 = 13;
 
+fn schedule_exit_watchdog() {
+    std::thread::spawn(|| {
+        std::thread::sleep(Duration::from_secs(5));
+        std::process::exit(0);
+    });
+}
+
+fn schedule_hide_watchdog(app: AppHandle, generation: u64) {
+    std::thread::spawn(move || {
+        std::thread::sleep(Duration::from_millis(500));
+
+        let state = app.state::<CloseBehaviorState>();
+        if !state.is_current_hide_watchdog(generation) {
+            return;
+        }
+
+        let Some(win) = app.get_webview_window("main") else {
+            return;
+        };
+
+        match win.is_visible() {
+            Ok(true) => {
+                let _ = win.minimize();
+
+                std::thread::sleep(Duration::from_secs(5));
+
+                let state = app.state::<CloseBehaviorState>();
+                if !state.is_current_hide_watchdog(generation) {
+                    return;
+                }
+
+                let Some(win) = app.get_webview_window("main") else {
+                    return;
+                };
+
+                if win.is_visible().unwrap_or(false) {
+                    std::process::exit(0);
+                }
+            }
+            Ok(false) => {}
+            Err(error) => {
+                eprintln!("Failed to verify hidden main window: {error}");
+            }
+        }
+    });
+}
+
 #[tauri::command]
-pub fn save_key(key: &str, value: &str) {
+pub fn save_key(key: &str, value: &str) -> Result<(), String> {
     let service = "ClavisPass";
-    set_password(service, key, value).unwrap();
+    set_password(service, key, value)
+        .map(|_| ())
+        .map_err(|error| format!("Failed to save secure key: {error:?}"))
 }
 
 #[tauri::command]
@@ -82,17 +177,22 @@ pub fn get_key(key: &str) -> Option<String> {
 }
 
 #[tauri::command]
-pub fn remove_key(key: &str) {
+pub fn remove_key(key: &str) -> Result<(), String> {
     let service = "ClavisPass";
     match get_password(service, key) {
         Ok(_) => {
             if let Err(e) = delete_password(service, key) {
-                eprintln!("Fehler beim Entfernen des Schlüssels: {:?}", e);
+                eprintln!("Failed to remove secure key: {:?}", e);
+                Err(format!("Failed to remove secure key: {e:?}"))
             } else {
-                println!("Schlüssel erfolgreich entfernt");
+                println!("Secure key removed");
+                Ok(())
             }
         }
-        Err(e) => eprintln!("Schlüssel nicht gefunden: {:?}", e),
+        Err(e) => {
+            eprintln!("Secure key not found: {:?}", e);
+            Ok(())
+        }
     }
 }
 
@@ -106,11 +206,7 @@ pub async fn close_main_window(
 
     match behavior {
         CloseBehavior::Exit => {
-            std::thread::spawn(|| {
-                std::thread::sleep(Duration::from_secs(5));
-                std::process::exit(0);
-            });
-
+            schedule_exit_watchdog();
             app.exit(0);
             Ok(())
         }
@@ -119,37 +215,9 @@ pub async fn close_main_window(
                 .get_webview_window("main")
                 .ok_or("main window not found")?;
 
+            let generation = state.begin_hide_watchdog();
             win.hide().map_err(|e| e.to_string())?;
-
-            std::thread::spawn(move || {
-                std::thread::sleep(Duration::from_millis(500));
-
-                let Some(win) = app.get_webview_window("main") else {
-                    return;
-                };
-
-                match win.is_visible() {
-                    Ok(true) => {
-                        let _ = win.minimize();
-
-                        std::thread::spawn(move || {
-                            std::thread::sleep(Duration::from_secs(5));
-
-                            let Some(win) = app.get_webview_window("main") else {
-                                return;
-                            };
-
-                            if win.is_visible().unwrap_or(false) {
-                                std::process::exit(0);
-                            }
-                        });
-                    }
-                    Ok(false) => {}
-                    Err(error) => {
-                        eprintln!("Failed to verify hidden main window: {error}");
-                    }
-                }
-            });
+            schedule_hide_watchdog(app, generation);
 
             Ok(())
         }
@@ -166,13 +234,26 @@ pub async fn set_close_behavior(
 }
 
 #[tauri::command]
+pub async fn claim_pending_lock_request(
+    state: State<'_, CloseBehaviorState>,
+) -> Result<bool, String> {
+    Ok(state.claim_pending_lock_request())
+}
+
+#[tauri::command]
 pub async fn update_tray_menu(app: AppHandle, labels: TrayMenuLabels) -> Result<(), String> {
     let show_i = MenuItem::with_id(&app, "show", labels.show, true, None::<&str>)
         .map_err(|e| e.to_string())?;
     let lock_i = MenuItem::with_id(&app, "lock_vault", labels.lock_vault, true, None::<&str>)
         .map_err(|e| e.to_string())?;
-    let settings_i = MenuItem::with_id(&app, "settings", labels.settings, true, None::<&str>)
-        .map_err(|e| e.to_string())?;
+    let settings_i = MenuItem::with_id(
+        &app,
+        "settings",
+        labels.settings,
+        labels.settings_enabled,
+        None::<&str>,
+    )
+    .map_err(|e| e.to_string())?;
     let separator_i = PredefinedMenuItem::separator(&app).map_err(|e| e.to_string())?;
     let quit_i = MenuItem::with_id(&app, "quit", labels.quit, true, None::<&str>)
         .map_err(|e| e.to_string())?;

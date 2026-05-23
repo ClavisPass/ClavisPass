@@ -108,18 +108,43 @@ fn save_window_size(app_handle: &AppHandle, size: WindowSize) {
 fn load_window_size(app_handle: &AppHandle) -> Option<WindowSize> {
     let size_file = get_window_size_file_path(app_handle)?;
     if size_file.exists() {
-        if let Ok(data) = fs::read_to_string(size_file) {
+        if let Ok(data) = fs::read_to_string(&size_file) {
             if let Ok(size) = serde_json::from_str::<WindowSize>(&data) {
                 return Some(size);
             }
+            eprintln!("Invalid window-size.json; removing stored window size");
+            let _ = fs::remove_file(&size_file);
         }
     }
     None
 }
 
-fn schedule_hide_watchdog(app_handle: AppHandle) {
+fn schedule_exit_watchdog() {
+    std::thread::spawn(|| {
+        std::thread::sleep(Duration::from_secs(5));
+        std::process::exit(0);
+    });
+}
+
+fn show_main_window(app: &AppHandle<tauri::Wry>) {
+    app.state::<commands::CloseBehaviorState>()
+        .cancel_hide_watchdog();
+
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.show();
+        let _ = window.unminimize();
+        let _ = window.set_focus();
+    }
+}
+
+fn schedule_hide_watchdog(app_handle: AppHandle, generation: u64) {
     std::thread::spawn(move || {
         std::thread::sleep(Duration::from_millis(500));
+
+        let state = app_handle.state::<commands::CloseBehaviorState>();
+        if !state.is_current_hide_watchdog(generation) {
+            return;
+        }
 
         let Some(window) = app_handle.get_webview_window("main") else {
             return;
@@ -130,6 +155,11 @@ fn schedule_hide_watchdog(app_handle: AppHandle) {
 
             std::thread::sleep(Duration::from_secs(5));
 
+            let state = app_handle.state::<commands::CloseBehaviorState>();
+            if !state.is_current_hide_watchdog(generation) {
+                return;
+            }
+
             let Some(window) = app_handle.get_webview_window("main") else {
                 return;
             };
@@ -139,6 +169,12 @@ fn schedule_hide_watchdog(app_handle: AppHandle) {
             }
         }
     });
+}
+
+fn emit_lock_vault(app: &AppHandle<tauri::Wry>) {
+    app.state::<commands::CloseBehaviorState>()
+        .mark_pending_lock_request();
+    let _ = app.emit("tray://lock-vault", ());
 }
 
 #[cfg(debug_assertions)]
@@ -166,9 +202,8 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-            if let Some(window) = app.get_webview_window("main") {
-                let _ = window.set_focus();
-                let _ = window.show();
+            if app.get_webview_window("main").is_some() {
+                show_main_window(app);
             } else {
                 println!("main window not ready yet");
             }
@@ -249,32 +284,20 @@ pub fn run() {
                     if let TrayIconEvent::Click { button, .. } = event {
                         if button == tauri::tray::MouseButton::Left {
                             let app = tray.app_handle();
-                            if let Some(window) = app.get_webview_window("main") {
-                                let _ = window.show();
-                                let _ = window.unminimize();
-                                let _ = window.set_focus();
-                            }
+                            show_main_window(app);
                         }
                     }
                 })
                 .on_menu_event(
                     |app: &AppHandle<tauri::Wry>, event| match event.id.as_ref() {
                         "show" => {
-                            if let Some(window) = app.get_webview_window("main") {
-                                let _ = window.show();
-                                let _ = window.unminimize();
-                                let _ = window.set_focus();
-                            }
+                            show_main_window(app);
                         }
                         "lock_vault" => {
-                            let _ = app.emit("tray://lock-vault", ());
+                            emit_lock_vault(app);
                         }
                         "settings" => {
-                            if let Some(window) = app.get_webview_window("main") {
-                                let _ = window.show();
-                                let _ = window.unminimize();
-                                let _ = window.set_focus();
-                            }
+                            show_main_window(app);
                             let _ = app.emit("tray://open-settings", ());
                         }
                         "quit" => {
@@ -308,28 +331,36 @@ pub fn run() {
         .on_window_event(|window, event| {
             if window.label() == "main" {
                 if let WindowEvent::Resized(size) = event {
-                    let app_handle = window.app_handle();
+                    let app_handle = window.app_handle().clone();
+                    let state = app_handle.state::<commands::CloseBehaviorState>();
+                    let generation = state.schedule_resize_save();
                     let scale_factor = window.scale_factor().unwrap_or(1.0).max(0.1);
                     let size_data = WindowSize {
                         width: size.width as f64 / scale_factor,
                         height: size.height as f64 / scale_factor,
                     };
-                    save_window_size(&app_handle, size_data);
+                    std::thread::spawn(move || {
+                        std::thread::sleep(Duration::from_millis(300));
+
+                        let state = app_handle.state::<commands::CloseBehaviorState>();
+                        if state.is_current_resize_save(generation) {
+                            save_window_size(&app_handle, size_data);
+                        }
+                    });
                 }
                 if let WindowEvent::CloseRequested { api, .. } = event {
                     let app_handle = window.app_handle();
                     let close_behavior = app_handle.state::<commands::CloseBehaviorState>();
 
                     if close_behavior.should_exit_on_close() {
-                        std::thread::spawn(|| {
-                            std::thread::sleep(Duration::from_secs(5));
-                            std::process::exit(0);
-                        });
+                        schedule_exit_watchdog();
                         app_handle.exit(0);
                     } else {
+                        close_behavior.mark_pending_lock_request();
                         let _ = window.emit("tray://lock-vault", ());
+                        let generation = close_behavior.begin_hide_watchdog();
                         let _ = window.hide();
-                        schedule_hide_watchdog(app_handle.clone());
+                        schedule_hide_watchdog(app_handle.clone(), generation);
                     }
                     api.prevent_close();
                 }
@@ -341,6 +372,7 @@ pub fn run() {
             commands::remove_key,
             commands::close_main_window,
             commands::set_close_behavior,
+            commands::claim_pending_lock_request,
             commands::update_tray_menu,
             commands::set_content_protection,
             commands::reset_window_size,

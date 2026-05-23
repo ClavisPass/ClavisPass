@@ -39,10 +39,30 @@ export default function TrayMenuBridge({ navigationRef }: Props) {
       try {
         if (!(await detectTauriEnvironment()) || cancelled) return;
 
-        const { listen } = await import("@tauri-apps/api/event");
+        const [{ listen }, { invoke }] = await Promise.all([
+          import("@tauri-apps/api/event"),
+          import("@tauri-apps/api/core"),
+        ]);
+
+        const hadPendingLock = await invoke<boolean>(
+          "claim_pending_lock_request",
+        );
+        if (hadPendingLock && !cancelled) {
+          logoutRef.current();
+        }
 
         const unlistenLock = await listen<TauriEvent>("tray://lock-vault", () => {
           logoutRef.current();
+          void (async () => {
+            try {
+              await invoke("claim_pending_lock_request");
+            } catch (error) {
+              logger.warn(
+                "[TrayMenuBridge] Failed to clear pending lock request:",
+                error,
+              );
+            }
+          })();
         });
         if (cancelled) {
           unlistenLock();
@@ -90,6 +110,7 @@ export default function TrayMenuBridge({ navigationRef }: Props) {
             show: t("tray:show"),
             lockVault: t("tray:lockVault"),
             settings: t("tray:settings"),
+            settingsEnabled: auth.isLoggedIn,
             quit: t("tray:quit"),
           },
         });
@@ -101,7 +122,7 @@ export default function TrayMenuBridge({ navigationRef }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [i18n.language, i18nReady, t]);
+  }, [auth.isLoggedIn, i18n.language, i18nReady, t]);
 
   useEffect(() => {
     let cancelled = false;
