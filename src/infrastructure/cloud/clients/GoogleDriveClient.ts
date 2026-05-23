@@ -19,6 +19,11 @@ const DRIVE_API = "https://www.googleapis.com/drive/v3";
 const DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3";
 const SPACE = "appDataFolder";
 
+type GoogleTokenRefreshError = Error & {
+  oauthError?: string;
+  oauthErrorDescription?: string;
+};
+
 function escapeDriveQueryString(value: string) {
   return value.replace(/'/g, "\\'");
 }
@@ -164,7 +169,7 @@ export const fetchUserInfo = async (
     const user = data.user ?? {};
     const userData: UserInfoType = {
       username: user.displayName ?? user.emailAddress ?? "Google Drive User",
-      avatar: user.photoLink ?? null,
+      avatar: null,
     };
 
     setUserInfo(userData);
@@ -286,15 +291,18 @@ export const refreshAccessToken = async (
     const data = await readJsonSafe(response);
 
     if (!response.ok) {
+      const oauthError = (data as any)?.error;
+      const oauthErrorDescription = (data as any)?.error_description;
+
       logger.error("[GoogleDrive] Error refreshing token:", data);
-      triggerGlobalError({
-        title: "Google Drive",
-        message: "Error during token refresh.",
-        code: "TOKEN_REFRESH_FAILED",
-      });
-      throw new Error(
-        (data as any)?.error_description || "Failed to refresh Google token"
-      );
+
+      const error = new Error(
+        oauthErrorDescription || "Failed to refresh Google token"
+      ) as GoogleTokenRefreshError;
+      error.oauthError = oauthError;
+      error.oauthErrorDescription = oauthErrorDescription;
+
+      throw error;
     }
 
     return {
@@ -307,7 +315,10 @@ export const refreshAccessToken = async (
     logger.error("[GoogleDrive] Error during token refresh:", error);
     triggerGlobalError({
       title: "Google Drive",
-      message: "Error during token refresh.",
+      message:
+        (error as GoogleTokenRefreshError)?.oauthError === "invalid_grant"
+          ? "Google Drive session expired. Please sign in again."
+          : "Error during token refresh.",
       code: "TOKEN_REFRESH_FAILED",
     });
     throw error;

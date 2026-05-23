@@ -202,7 +202,7 @@ function UserInformation(props: Props) {
                 <Icon
                   source="account"
                   size={25}
-                  color={paperTheme.colors.onSurfaceVariant}
+                  color={paperTheme.colors.primary}
                 />
               </View>
             )}

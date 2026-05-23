@@ -21,6 +21,14 @@ type StoredAuth = {
 
 const STORAGE_KEY = "ClavisPass-Auth";
 
+type OAuthRefreshError = Error & {
+  oauthError?: string;
+};
+
+function isInvalidGrant(error: unknown): boolean {
+  return (error as OAuthRefreshError)?.oauthError === "invalid_grant";
+}
+
 interface TokenContextValue {
   provider: Provider;
   setProvider: (provider: Provider) => void;
@@ -221,7 +229,10 @@ export const CloudProvider = ({ children }: Props) => {
       return result.accessToken;
     } catch (error) {
       logger.error("[TokenContext] Fehler beim Token-Refresh:", error);
-      if (provider === "clavispassHub") {
+      if (
+        provider === "clavispassHub" ||
+        (provider === "googleDrive" && isInvalidGrant(error))
+      ) {
         await clearSession();
       }
       return null;

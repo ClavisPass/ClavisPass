@@ -5,7 +5,7 @@ pub mod bridge;
 mod bridge_commands;
 
 use serde::{Deserialize, Serialize};
-use std::{fs, path::PathBuf};
+use std::{fs, path::PathBuf, time::Duration};
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{TrayIconBuilder, TrayIconEvent},
@@ -75,6 +75,30 @@ fn load_window_size(app_handle: &AppHandle) -> Option<WindowSize> {
         }
     }
     None
+}
+
+fn schedule_hide_watchdog(app_handle: AppHandle) {
+    std::thread::spawn(move || {
+        std::thread::sleep(Duration::from_millis(500));
+
+        let Some(window) = app_handle.get_webview_window("main") else {
+            return;
+        };
+
+        if window.is_visible().unwrap_or(false) {
+            let _ = window.minimize();
+
+            std::thread::sleep(Duration::from_secs(5));
+
+            let Some(window) = app_handle.get_webview_window("main") else {
+                return;
+            };
+
+            if window.is_visible().unwrap_or(false) {
+                std::process::exit(0);
+            }
+        }
+    });
 }
 
 #[cfg(debug_assertions)]
@@ -230,7 +254,7 @@ pub fn run() {
         .on_window_event(|window, event| {
             if window.label() == "main" {
                 if let WindowEvent::Focused(true) = event {
-                    window.show().unwrap();
+                    let _ = window.show();
                 }
                 if let WindowEvent::Resized(size) = event {
                     let app_handle = window.app_handle();
@@ -242,6 +266,7 @@ pub fn run() {
                 }
                 if let WindowEvent::CloseRequested { api, .. } = event {
                     let _ = window.hide();
+                    schedule_hide_watchdog(window.app_handle().clone());
                     api.prevent_close();
                 }
             }
@@ -250,6 +275,7 @@ pub fn run() {
             commands::save_key,
             commands::get_key,
             commands::remove_key,
+            commands::close_main_window,
             commands::set_content_protection,
             commands::reset_window_size,
             commands::clear_clipboard_text,

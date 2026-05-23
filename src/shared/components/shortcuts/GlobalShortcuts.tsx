@@ -105,7 +105,12 @@ function GlobalShortcuts() {
 
         if (stateIsVisible && stateIsFocused) {
           auth.logout();
-          appWindow.hide();
+          try {
+            const { invoke } = await import("@tauri-apps/api/core");
+            await invoke("close_main_window", { behavior: "hide" });
+          } catch {
+            await appWindow.hide();
+          }
         } else {
           appWindow.show();
           appWindow.unminimize();

@@ -1,7 +1,15 @@
 use keytar::{delete_password, get_password, set_password};
 use std::fs;
+use std::time::Duration;
 use tauri;
 use tauri::{AppHandle, Manager, Size};
+
+#[derive(serde::Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum CloseBehavior {
+    Hide,
+    Exit,
+}
 
 #[cfg(target_os = "windows")]
 use windows::Win32::Foundation::HANDLE;
@@ -53,6 +61,60 @@ pub fn remove_key(key: &str) {
             }
         }
         Err(e) => eprintln!("Schlüssel nicht gefunden: {:?}", e),
+    }
+}
+
+#[tauri::command]
+pub async fn close_main_window(app: AppHandle, behavior: CloseBehavior) -> Result<(), String> {
+    match behavior {
+        CloseBehavior::Exit => {
+            std::thread::spawn(|| {
+                std::thread::sleep(Duration::from_secs(5));
+                std::process::exit(0);
+            });
+
+            app.exit(0);
+            Ok(())
+        }
+        CloseBehavior::Hide => {
+            let win = app
+                .get_webview_window("main")
+                .ok_or("main window not found")?;
+
+            win.hide().map_err(|e| e.to_string())?;
+
+            std::thread::spawn(move || {
+                std::thread::sleep(Duration::from_millis(500));
+
+                let Some(win) = app.get_webview_window("main") else {
+                    return;
+                };
+
+                match win.is_visible() {
+                    Ok(true) => {
+                        let _ = win.minimize();
+
+                        std::thread::spawn(move || {
+                            std::thread::sleep(Duration::from_secs(5));
+
+                            let Some(win) = app.get_webview_window("main") else {
+                                return;
+                            };
+
+                            if win.is_visible().unwrap_or(false) {
+                                std::process::exit(0);
+                            }
+                        });
+                    }
+                    Ok(false) => {}
+                    Err(error) => {
+                        eprintln!("Failed to verify hidden main window: {error}");
+                    }
+                }
+            });
+
+            Ok(())
+        }
     }
 }
 

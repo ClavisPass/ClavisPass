@@ -52,7 +52,7 @@ describe("GoogleDriveClient", () => {
         body: {
           access_token: "access-token",
           expires_in: 3599,
-          scope: "drive.file",
+          scope: "drive.appdata",
           token_type: "Bearer",
         },
       }),
@@ -62,7 +62,7 @@ describe("GoogleDriveClient", () => {
     await expect(refreshAccessToken("refresh-token")).resolves.toEqual({
       accessToken: "access-token",
       expiresIn: 3599,
-      scope: "drive.file",
+      scope: "drive.appdata",
       tokenType: "Bearer",
     });
 
@@ -73,6 +73,28 @@ describe("GoogleDriveClient", () => {
       "1234567890-androidabc.apps.googleusercontent.com",
     );
     expect(body.has("client_secret")).toBe(false);
+  });
+
+  it("preserves Google OAuth errors from failed token refreshes", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        response({
+          ok: false,
+          status: 400,
+          body: {
+            error: "invalid_grant",
+            error_description: "Token has been expired or revoked.",
+          },
+        }),
+      ),
+    );
+
+    await expect(refreshAccessToken("refresh-token")).rejects.toMatchObject({
+      message: "Token has been expired or revoked.",
+      oauthError: "invalid_grant",
+      oauthErrorDescription: "Token has been expired or revoked.",
+    });
   });
 
   it("returns not_found when the appDataFolder file does not exist", async () => {

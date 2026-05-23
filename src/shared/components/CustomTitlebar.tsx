@@ -87,20 +87,27 @@ function CustomTitlebar() {
 
   const closeWindow = async () => {
     if (!(await detectTauriEnvironment())) return;
-    const [{ getCurrentWindow }, { exit }] = await Promise.all([
-      import("@tauri-apps/api/window"),
-      import("@tauri-apps/plugin-process"),
-    ]);
-    const appWindow = getCurrentWindow();
-    if (!appWindow) return;
 
-    if (closeBehavior === "exit") {
-      await exit(0);
-      return;
+    if (closeBehavior === "hide") {
+      auth.logout();
     }
 
-    auth.logout();
-    appWindow.hide();
+    try {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("close_main_window", { behavior: closeBehavior });
+    } catch (error) {
+      console.warn("[CustomTitlebar] Native close command failed:", error);
+      const [{ getCurrentWindow }, { exit }] = await Promise.all([
+        import("@tauri-apps/api/window"),
+        import("@tauri-apps/plugin-process"),
+      ]);
+
+      if (closeBehavior === "exit") {
+        await exit(0);
+      } else {
+        await getCurrentWindow().hide();
+      }
+    }
   };
 
   return (

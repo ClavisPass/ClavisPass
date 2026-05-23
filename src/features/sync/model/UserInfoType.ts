@@ -1,6 +1,6 @@
 type UserInfoProps = {
   username: string;
-  avatar: string;
+  avatar: string | null;
 };
 
 type Props = UserInfoProps | null;
