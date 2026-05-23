@@ -14,7 +14,6 @@ type Corner = {
   bottom?: number;
   left?: number;
   right?: number;
-  label: string;
 };
 
 type Props = {
@@ -80,36 +79,28 @@ export default function FastAccessPositionPicker({ value, setValue }: Props) {
         value: "top-left",
         top: 10,
         left: 10,
-        label: t("settings:fastAccessPositionTopLeft"),
       },
       {
         value: "top-right",
         top: 10,
         right: 10,
-        label: t("settings:fastAccessPositionTopRight"),
       },
       {
         value: "bottom-left",
         bottom: 10,
         left: 10,
-        label: t("settings:fastAccessPositionBottomLeft"),
       },
       {
         value: "bottom-right",
         bottom: 10,
         right: 10,
-        label: t("settings:fastAccessPositionBottomRight"),
       },
     ],
-    [t],
+    [],
   );
 
-  const selectedLabel =
-    corners.find((corner) => corner.value === value)?.label ??
-    t("settings:fastAccessPositionBottomRight");
-
   return (
-    <View style={{ paddingHorizontal: 10, paddingTop: 10, paddingBottom: 4 }}>
+    <View style={{ paddingHorizontal: 10, paddingTop: 10, paddingBottom: 10 }}>
       <Text variant="bodyMedium">{t("settings:fastAccessPosition")}</Text>
       <Text
         variant="bodySmall"
@@ -128,32 +119,9 @@ export default function FastAccessPositionPicker({ value, setValue }: Props) {
             borderColor: theme.colors.outlineVariant,
             backgroundColor: theme.colors.elevation.level2,
             padding: 10,
+            paddingBottom: 20,
           }}
         >
-          <View
-            style={{
-              position: "absolute",
-              bottom: 10,
-              left: 10,
-              right: 10,
-              height: 10,
-              borderRadius: 999,
-              backgroundColor: theme.colors.elevation.level4,
-            }}
-          />
-          <View
-            style={{
-              position: "absolute",
-              top: 32,
-              left: 70,
-              width: 64,
-              height: 34,
-              borderRadius: 12,
-              backgroundColor: theme.colors.background,
-              borderWidth: 1.5,
-              borderColor: theme.colors.outlineVariant,
-            }}
-          />
           {corners.map((corner) => (
             <CornerOption
               key={corner.value}
@@ -164,9 +132,6 @@ export default function FastAccessPositionPicker({ value, setValue }: Props) {
           ))}
         </View>
 
-        <Text variant="bodySmall" style={{ color: theme.colors.primary }}>
-          {selectedLabel}
-        </Text>
       </View>
     </View>
   );
