@@ -110,7 +110,7 @@ export default function HotkeyRecorderItem({
       style={{
         minHeight: error ? 70 : 54,
         paddingLeft: 10,
-        paddingRight: 4,
+        paddingRight: 10,
         paddingVertical: 6,
         justifyContent: "center",
         overflow: "hidden",
