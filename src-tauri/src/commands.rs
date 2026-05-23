@@ -1,15 +1,37 @@
 use keytar::{delete_password, get_password, set_password};
 use std::fs;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 use tauri;
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
-use tauri::{AppHandle, Manager, Size};
+use tauri::{AppHandle, Manager, Size, State};
 
 #[derive(serde::Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum CloseBehavior {
     Hide,
     Exit,
+}
+
+pub struct CloseBehaviorState {
+    exit_on_close: AtomicBool,
+}
+
+impl CloseBehaviorState {
+    pub fn new() -> Self {
+        Self {
+            exit_on_close: AtomicBool::new(true),
+        }
+    }
+
+    pub fn set_behavior(&self, behavior: &CloseBehavior) {
+        self.exit_on_close
+            .store(matches!(behavior, CloseBehavior::Exit), Ordering::Relaxed);
+    }
+
+    pub fn should_exit_on_close(&self) -> bool {
+        self.exit_on_close.load(Ordering::Relaxed)
+    }
 }
 
 #[derive(serde::Deserialize)]
@@ -75,7 +97,13 @@ pub fn remove_key(key: &str) {
 }
 
 #[tauri::command]
-pub async fn close_main_window(app: AppHandle, behavior: CloseBehavior) -> Result<(), String> {
+pub async fn close_main_window(
+    app: AppHandle,
+    state: State<'_, CloseBehaviorState>,
+    behavior: CloseBehavior,
+) -> Result<(), String> {
+    state.set_behavior(&behavior);
+
     match behavior {
         CloseBehavior::Exit => {
             std::thread::spawn(|| {
@@ -126,6 +154,15 @@ pub async fn close_main_window(app: AppHandle, behavior: CloseBehavior) -> Resul
             Ok(())
         }
     }
+}
+
+#[tauri::command]
+pub async fn set_close_behavior(
+    state: State<'_, CloseBehaviorState>,
+    behavior: CloseBehavior,
+) -> Result<(), String> {
+    state.set_behavior(&behavior);
+    Ok(())
 }
 
 #[tauri::command]

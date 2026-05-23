@@ -15,8 +15,8 @@ function NavigationnContainer() {
 
   return (
     <ReactNavigationContainer ref={navigationRef} theme={navigationTheme}>
+      <TrayMenuBridge navigationRef={navigationRef} />
       <ProtectedRoute loginScreen={<LoginStack />}>
-        <TrayMenuBridge navigationRef={navigationRef} />
         <TabNavigator />
         <UpdateManager />
       </ProtectedRoute>

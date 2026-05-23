@@ -84,16 +84,20 @@ fn clamp_window_size_to_monitor(
     size
 }
 
-fn get_window_size_file_path(app_handle: &AppHandle) -> PathBuf {
-    let dir = app_handle.path().app_data_dir().unwrap();
+fn get_window_size_file_path(app_handle: &AppHandle) -> Option<PathBuf> {
+    let dir = app_handle.path().app_data_dir().ok()?;
     if !dir.exists() {
-        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::create_dir_all(&dir).ok()?;
     }
-    dir.join("window-size.json")
+    Some(dir.join("window-size.json"))
 }
 
 fn save_window_size(app_handle: &AppHandle, size: WindowSize) {
-    let size_file = get_window_size_file_path(app_handle);
+    let Some(size_file) = get_window_size_file_path(app_handle) else {
+        eprintln!("Failed to resolve app data directory for window size");
+        return;
+    };
+
     if let Ok(json) = serde_json::to_string(&clamp_window_size(size)) {
         if let Err(e) = fs::write(size_file, json) {
             eprintln!("Fehler beim Speichern der Fenstergröße: {:?}", e);
@@ -102,7 +106,7 @@ fn save_window_size(app_handle: &AppHandle, size: WindowSize) {
 }
 
 fn load_window_size(app_handle: &AppHandle) -> Option<WindowSize> {
-    let size_file = get_window_size_file_path(app_handle);
+    let size_file = get_window_size_file_path(app_handle)?;
     if size_file.exists() {
         if let Ok(data) = fs::read_to_string(size_file) {
             if let Ok(size) = serde_json::from_str::<WindowSize>(&data) {
@@ -154,6 +158,7 @@ fn prevent_default_plugin() -> tauri::plugin::TauriPlugin<tauri::Wry> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .manage(commands::CloseBehaviorState::new())
         .plugin(prevent_default_plugin())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_oauth::init())
@@ -302,9 +307,6 @@ pub fn run() {
         })
         .on_window_event(|window, event| {
             if window.label() == "main" {
-                if let WindowEvent::Focused(true) = event {
-                    let _ = window.show();
-                }
                 if let WindowEvent::Resized(size) = event {
                     let app_handle = window.app_handle();
                     let scale_factor = window.scale_factor().unwrap_or(1.0).max(0.1);
@@ -315,8 +317,20 @@ pub fn run() {
                     save_window_size(&app_handle, size_data);
                 }
                 if let WindowEvent::CloseRequested { api, .. } = event {
-                    let _ = window.hide();
-                    schedule_hide_watchdog(window.app_handle().clone());
+                    let app_handle = window.app_handle();
+                    let close_behavior = app_handle.state::<commands::CloseBehaviorState>();
+
+                    if close_behavior.should_exit_on_close() {
+                        std::thread::spawn(|| {
+                            std::thread::sleep(Duration::from_secs(5));
+                            std::process::exit(0);
+                        });
+                        app_handle.exit(0);
+                    } else {
+                        let _ = window.emit("tray://lock-vault", ());
+                        let _ = window.hide();
+                        schedule_hide_watchdog(app_handle.clone());
+                    }
                     api.prevent_close();
                 }
             }
@@ -326,6 +340,7 @@ pub fn run() {
             commands::get_key,
             commands::remove_key,
             commands::close_main_window,
+            commands::set_close_behavior,
             commands::update_tray_menu,
             commands::set_content_protection,
             commands::reset_window_size,
