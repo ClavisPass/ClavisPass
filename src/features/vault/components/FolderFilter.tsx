@@ -42,6 +42,7 @@ type Props = {
   setSelectedCard: (selectedCard: boolean) => void;
   selected2FA: boolean;
   setSelected2FA: (selected2FA: boolean) => void;
+  disabled?: boolean;
 };
 
 function FolderFilter(props: Props) {
@@ -140,7 +141,7 @@ function FolderFilter(props: Props) {
                   key={index}
                   leadingIcon={"folder"}
                   selected={props.selectedFolder?.id === item.id ? true : false}
-                  onPress={() => {
+                  onPress={props.disabled ? undefined : () => {
                     props.setSelected2FA(false);
                     props.setSelectedCard(false);
                     if (props.selectedFolder != item) {
@@ -159,7 +160,7 @@ function FolderFilter(props: Props) {
                 <MenuItem
                   leadingIcon={"two-factor-authentication"}
                   selected={props.selected2FA}
-                  onPress={() => {
+                onPress={props.disabled ? undefined : () => {
                     props.setSelected2FA(!props.selected2FA);
                     props.setSelectedCard(false);
                     props.setSelectedFav(false);
@@ -172,7 +173,7 @@ function FolderFilter(props: Props) {
                 <MenuItem
                   leadingIcon={"credit-card-multiple"}
                   selected={props.selectedCard}
-                  onPress={() => {
+                  onPress={props.disabled ? undefined : () => {
                     props.setSelectedCard(!props.selectedCard);
                     props.setSelected2FA(false);
                     props.setSelectedFav(false);
@@ -185,7 +186,7 @@ function FolderFilter(props: Props) {
                 <MenuItem
                   leadingIcon={"star"}
                   selected={props.selectedFav}
-                  onPress={() => {
+                  onPress={props.disabled ? undefined : () => {
                     props.setSelectedFav(!props.selectedFav);
                     props.setSelected2FA(false);
                     props.setSelectedCard(false);
@@ -209,7 +210,11 @@ function FolderFilter(props: Props) {
                     icon={"plus"}
                     iconColor={theme.colors.primary}
                     style={{ margin: 0 }}
-                    onPress={() => props.setFolderModalVisible(true)}
+                    onPress={
+                      props.disabled
+                        ? undefined
+                        : () => props.setFolderModalVisible(true)
+                    }
                     size={20}
                     selected={true}
                     mode="contained-tonal"
@@ -276,7 +281,7 @@ function FolderFilter(props: Props) {
                     icon={() => null}
                     selected={props.selected2FA}
                     showSelectedOverlay={true}
-                    onPress={() => {
+                    onPress={props.disabled ? undefined : () => {
                       props.setSelected2FA(!props.selected2FA);
                       props.setSelectedCard(false);
                       props.setSelectedFav(false);
@@ -294,7 +299,7 @@ function FolderFilter(props: Props) {
                     icon={() => null}
                     selected={props.selectedCard}
                     showSelectedOverlay={true}
-                    onPress={() => {
+                    onPress={props.disabled ? undefined : () => {
                       props.setSelectedCard(!props.selectedCard);
                       props.setSelected2FA(false);
                       props.setSelectedFav(false);
@@ -312,7 +317,7 @@ function FolderFilter(props: Props) {
                     icon={() => null}
                     selected={props.selectedFav}
                     showSelectedOverlay={true}
-                    onPress={() => {
+                    onPress={props.disabled ? undefined : () => {
                       props.setSelectedFav(!props.selectedFav);
                       props.setSelected2FA(false);
                       props.setSelectedCard(false);
@@ -334,7 +339,7 @@ function FolderFilter(props: Props) {
                     icon={"folder"}
                     selected={props.selectedFolder == item ? true : false}
                     showSelectedOverlay={true}
-                    onPress={() => {
+                    onPress={props.disabled ? undefined : () => {
                       props.setSelected2FA(false);
                       props.setSelectedCard(false);
                       if (props.selectedFolder != item) {
@@ -362,7 +367,11 @@ function FolderFilter(props: Props) {
                     icon={"plus"}
                     iconColor={theme.colors.primary}
                     style={{ marginLeft: 0, alignSelf: "center" }}
-                    onPress={() => props.setFolderModalVisible(true)}
+                    onPress={
+                      props.disabled
+                        ? undefined
+                        : () => props.setFolderModalVisible(true)
+                    }
                     size={12}
                     mode="contained-tonal"
                     selected={true}

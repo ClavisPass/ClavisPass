@@ -21,6 +21,8 @@ type Props = {
 
   openEditFolder: () => void; // aktuell nicht genutzt
   refreshData: () => void;
+  canStartReorder?: boolean;
+  onStartReorder?: () => void;
 
   // Native sizing
   nativeSnapPoints?: (string | number)[];
@@ -147,6 +149,16 @@ function HomeFilterMenu(props: Props) {
         icon: sortByLastUpdatedIcon,
         label: t("home:sortByLastUpdated"),
         onPress: () => sortByLastUpdated(sortByLastUpdatedMode),
+      },
+      {
+        key: "reorder",
+        icon: "drag",
+        label: t("home:reorderEntries"),
+        disabled: !props.canStartReorder,
+        onPress: () => {
+          props.onStartReorder?.();
+          close();
+        },
         withDivider: false,
       },
     ],
@@ -157,7 +169,10 @@ function HomeFilterMenu(props: Props) {
       sortByLastUpdatedMode,
       sortByTitleIcon,
       sortByTitleMode,
+      props.canStartReorder,
+      props.onStartReorder,
       t,
+      close,
     ]
   );
 

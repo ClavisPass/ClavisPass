@@ -170,6 +170,9 @@ type Props = {
   onPress: () => void;
   key?: React.Key;
   index: number;
+  reorderMode?: boolean;
+  onDragStart?: () => void;
+  dragHandleProps?: any;
 };
 
 function ListItem(props: Props) {
@@ -185,8 +188,6 @@ function ListItem(props: Props) {
   const swipeableRef = useRef<SwipeableMethods | null>(null);
   const suppressNextPressRef = useRef(false);
 
-  const [url, setUrl] = useState("");
-  const [icon, setIcon] = useState("lock");
   const [hovered, setHovered] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -228,24 +229,6 @@ function ListItem(props: Props) {
       clearPasswordTimer();
     };
   }, []);
-
-  useEffect(() => {
-    const urlResult = props.item.modules.filter(
-      (module) => module.module === ModulesEnum.URL,
-    );
-
-    if (urlResult.length > 0 && urlResult[0].value !== "") {
-      const string =
-        "https://www.google.com/s2/favicons?domain=" +
-        urlResult[0].value +
-        "&sz=64";
-      setUrl(string);
-    } else {
-      setUrl("");
-      determineIcon();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.item, props.item.modules]);
 
   // Optional aber sinnvoll: wenn hover weg ist, nie "check" hängen lassen
   useEffect(() => {
@@ -293,28 +276,35 @@ function ListItem(props: Props) {
     });
   };
 
-  const determineIcon = () => {
+  const url = useMemo(() => {
+    const urlModule = props.item.modules.find(
+      (module) => module.module === ModulesEnum.URL,
+    );
+    const value = String(urlModule?.value ?? "").trim();
+
+    return value
+      ? `https://www.google.com/s2/favicons?domain=${value}&sz=64`
+      : "";
+  }, [props.item.modules]);
+
+  const icon = useMemo(() => {
     const modules = props.item.modules;
 
     if (modules.some((m) => m.module === ModulesEnum.WIFI)) {
-      setIcon("wifi");
-      return;
+      return "wifi";
     }
     if (modules.some((m) => m.module === ModulesEnum.KEY)) {
-      setIcon("key-variant");
-      return;
+      return "key-variant";
     }
     if (modules.some((m) => m.module === ModulesEnum.TASK)) {
-      setIcon("checkbox-multiple-marked");
-      return;
+      return "checkbox-multiple-marked";
     }
     if (modules.some((m) => m.module === ModulesEnum.DIGITAL_CARD)) {
-      setIcon("credit-card-multiple");
-      return;
+      return "credit-card-multiple";
     }
 
-    setIcon("lock");
-  };
+    return "lock";
+  }, [props.item.modules]);
 
   const fastAccessObject = useMemo(() => {
     if (!hovered) return null;
@@ -413,6 +403,8 @@ function ListItem(props: Props) {
   );
 
   const measureAndOpenMenu = () => {
+    if (props.reorderMode) return;
+
     const estimatedMenuHeight = 228;
     const estimatedMenuWidth = 244;
     const viewportPadding = 8;
@@ -457,6 +449,8 @@ function ListItem(props: Props) {
   };
 
   const openMenuAtPointer = (event: any) => {
+    if (props.reorderMode) return;
+
     const estimatedMenuHeight = 228;
     const estimatedMenuWidth = 244;
     const viewportPadding = 8;
@@ -495,6 +489,8 @@ function ListItem(props: Props) {
   };
 
   const openItemFastAccess = async () => {
+    if (props.reorderMode) return;
+
     if (!fastAccessData) return;
 
     if (Platform.OS === "web") {
@@ -571,13 +567,20 @@ function ListItem(props: Props) {
 
   const listItemContent = (
     <Animated.View
-      entering={FadeInDown.delay(props.index * 50).duration(250)}
+      entering={
+        props.reorderMode || props.index >= 12
+          ? undefined
+          : FadeInDown.delay(props.index * 35).duration(220)
+      }
       key={props.key}
       ref={itemRef}
       style={[
         styles.container,
         Platform.OS !== "web"
           ? { marginLeft: 0, marginRight: 0, marginBottom: 0 }
+          : null,
+        props.reorderMode && Platform.OS !== "web"
+          ? { marginLeft: 4, marginRight: 4, marginBottom: 4 }
           : null,
         {
           backgroundColor: theme.colors?.background,
@@ -592,6 +595,9 @@ function ListItem(props: Props) {
         key={props.key}
         style={styles.ripple}
         onPress={() => {
+          if (props.reorderMode) {
+            return;
+          }
           if (suppressNextPressRef.current) {
             suppressNextPressRef.current = false;
             return;
@@ -602,6 +608,21 @@ function ListItem(props: Props) {
       >
         <>
           <View style={styles.left}>
+            {props.reorderMode ? (
+              <AnimatedPressable
+                onPressIn={props.onDragStart}
+                style={{
+                  width: 34,
+                  height: 38,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: Platform.OS === "web" ? "grab" : undefined,
+                }}
+                {...(props.dragHandleProps ?? {})}
+              >
+                <Icon color={theme.colors?.primary} source="drag" size={24} />
+              </AnimatedPressable>
+            ) : null}
             {url !== "" ? (
               <Image
                 style={{ width: 30, height: 30, margin: 0, borderRadius: 8 }}
@@ -627,7 +648,7 @@ function ListItem(props: Props) {
           </View>
 
           <View style={styles.right}>
-            {hovered && fastAccessObject && (
+            {!props.reorderMode && hovered && fastAccessObject && (
               <View style={styles.chipRow}>
                 <Button
                   mode="contained-tonal"
@@ -663,11 +684,13 @@ function ListItem(props: Props) {
               </View>
             )}
 
-            <Icon
-              color={theme.colors?.primary}
-              source={"chevron-right"}
-              size={20}
-            />
+            {props.reorderMode ? null : (
+              <Icon
+                color={theme.colors?.primary}
+                source={"chevron-right"}
+                size={20}
+              />
+            )}
           </View>
         </>
       </AnimatedPressable>
@@ -676,7 +699,7 @@ function ListItem(props: Props) {
 
   return (
     <>
-      {Platform.OS === "web" ? (
+      {Platform.OS === "web" || props.reorderMode ? (
         listItemContent
       ) : (
         <ReanimatedSwipeable
@@ -739,4 +762,4 @@ function ListItem(props: Props) {
   );
 }
 
-export default ListItem;
+export default React.memo(ListItem);

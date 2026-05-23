@@ -18,6 +18,7 @@ const de: TranslationSchema = {
     discardChangesTitle: "Änderungen verwerfen?",
     discard: "Verwerfen",
     change: "Ändern",
+    apply: "Übernehmen",
     save: "Speichern",
     setExpiry: "Ablauf festlegen",
     current: "Aktuell",
@@ -121,6 +122,8 @@ const de: TranslationSchema = {
     sortByTitle: "Nach Titel sortieren",
     sortByCreated: "Nach Erstellungsdatum sortieren",
     sortByLastUpdated: "Nach letztem Update sortieren",
+    reorderEntries: "Manuell anordnen",
+    reorderHint: "Ziehe Einträge, um sie neu anzuordnen.",
   },
   settings: {
     sync: "Synchronisation",

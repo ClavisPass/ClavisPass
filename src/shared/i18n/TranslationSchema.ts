@@ -18,6 +18,7 @@ export type TranslationSchema = {
     discardChangesTitle: string;
     discard: string;
     change: string;
+    apply: string;
     save: string;
     setExpiry: string;
     current: string;
@@ -118,6 +119,8 @@ export type TranslationSchema = {
     sortByTitle: string;
     sortByCreated: string;
     sortByLastUpdated: string;
+    reorderEntries: string;
+    reorderHint: string;
   };
   settings: {
     sync: string;

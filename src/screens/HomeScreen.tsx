@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Platform,
@@ -11,6 +11,7 @@ import { Searchbar, IconButton, Badge } from "react-native-paper";
 import { Text } from "react-native-paper";
 
 import { FlashList } from "@shopify/flash-list";
+import type { RenderItemParams } from "react-native-draggable-flatlist";
 
 import { LinearGradient } from "expo-linear-gradient";
 import ListItem from "../features/vault/components/items/ListItem";
@@ -59,6 +60,7 @@ import {
   subscribeOpenAddValue,
   unsubscribeOpenAddValue,
 } from "../infrastructure/events/openAddValueBus";
+import AnimatedPressable from "../shared/components/AnimatedPressable";
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
@@ -84,6 +86,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const { value: timeFormat } = useSetting("TIME_FORMAT");
 
   const [refreshing, setRefreshing] = useState(false);
+  const [reorderMode, setReorderMode] = useState(false);
+  const [pendingReorderValues, setPendingReorderValues] = useState<
+    ValuesType[]
+  >([]);
+  const pendingReorderMovesRef = useRef<
+    Array<{ movedId: string; previousVisibleId: string | null }>
+  >([]);
 
   const [showMenu, setShowMenu] = useState(false);
 
@@ -421,6 +430,240 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     [refreshing, refreshData, theme.colors.primary, theme.colors.background, t],
   );
 
+  const canReorderEntries =
+    searchQuery.trim() === "" && !selected2FA && !selectedCard;
+
+  useEffect(() => {
+    if (!canReorderEntries && reorderMode) {
+      cancelReorderMode();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canReorderEntries, reorderMode]);
+
+  const moveEntryAfterPreviousVisibleId = (
+    values: ValuesType[],
+    movedId: string,
+    previousVisibleId: string | null,
+  ): ValuesType[] => {
+    if (movedId === previousVisibleId) return values;
+
+    const moved = values.find((entry) => entry.id === movedId);
+    if (!moved) return values;
+
+    const valuesWithoutMoved = values.filter((entry) => entry.id !== movedId);
+
+    if (previousVisibleId === null) {
+      return [moved, ...valuesWithoutMoved];
+    }
+
+    const previousIndex = valuesWithoutMoved.findIndex(
+      (entry) => entry.id === previousVisibleId,
+    );
+
+    if (previousIndex < 0) return values;
+
+    return [
+      ...valuesWithoutMoved.slice(0, previousIndex + 1),
+      moved,
+      ...valuesWithoutMoved.slice(previousIndex + 1),
+    ];
+  };
+
+  const reorderVisibleValues = (
+    values: ValuesType[],
+    sourceIndex: number,
+    destinationIndex: number,
+  ) => {
+    const result = [...values];
+    const [removed] = result.splice(sourceIndex, 1);
+    if (!removed) return result;
+    result.splice(destinationIndex, 0, removed);
+    return result;
+  };
+
+  function startReorderMode() {
+    if (!canReorderEntries) return;
+    pendingReorderMovesRef.current = [];
+    setPendingReorderValues(filteredValues);
+    setReorderMode(true);
+  }
+
+  function cancelReorderMode() {
+    pendingReorderMovesRef.current = [];
+    setPendingReorderValues([]);
+    setReorderMode(false);
+  }
+
+  function applyReorderMode() {
+    const moves = pendingReorderMovesRef.current;
+
+    if (moves.length > 0) {
+      vault.update((draft) => {
+        let nextValues = draft.values ?? [];
+        for (const move of moves) {
+          nextValues = moveEntryAfterPreviousVisibleId(
+            nextValues,
+            move.movedId,
+            move.previousVisibleId,
+          );
+        }
+        draft.values = nextValues;
+      });
+    }
+
+    cancelReorderMode();
+  }
+
+  const updatePendingVisibleReorder = (
+    movedId: string | undefined,
+    reorderedVisibleValues: ValuesType[],
+    destinationIndex: number,
+  ) => {
+    if (!movedId) return;
+
+    const previousVisibleId =
+      destinationIndex <= 0
+        ? null
+        : (reorderedVisibleValues[destinationIndex - 1]?.id ?? null);
+
+    pendingReorderMovesRef.current = [
+      ...pendingReorderMovesRef.current,
+      { movedId, previousVisibleId },
+    ];
+    setPendingReorderValues(reorderedVisibleValues);
+  };
+
+  const noop = useCallback(() => {}, []);
+
+  const renderReorderListItem = useCallback(
+    (
+      item: ValuesType,
+      index: number,
+      onDragStart?: () => void,
+      dragHandleProps?: any,
+    ) => (
+      <ListItem
+        item={item}
+        index={index}
+        reorderMode
+        onDragStart={onDragStart}
+        dragHandleProps={dragHandleProps}
+        onPress={noop}
+      />
+    ),
+    [noop],
+  );
+
+  const renderWebReorderList = () => (
+    (() => {
+      const { DragDropContext, Droppable, Draggable } = require(
+        "@hello-pangea/dnd",
+      );
+
+      return (
+        <DragDropContext
+      onDragEnd={(result: any) => {
+        if (!result.destination) return;
+
+        const movedId = pendingReorderValues[result.source.index]?.id;
+        const reordered = reorderVisibleValues(
+          pendingReorderValues,
+          result.source.index,
+          result.destination.index,
+        );
+
+        updatePendingVisibleReorder(
+          movedId,
+          reordered,
+          result.destination.index,
+        );
+      }}
+    >
+      <Droppable droppableId="home-values-reorder">
+        {(provided: any) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            style={{
+              flex: 1,
+              width: "100%",
+              overflow: "auto",
+              paddingRight: 4,
+            }}
+          >
+            {pendingReorderValues.map((item, index) => (
+              <Draggable key={item.id} draggableId={item.id} index={index}>
+                {(draggableProvided: any) => (
+                  <div
+                    ref={draggableProvided.innerRef}
+                    {...draggableProvided.draggableProps}
+                    {...draggableProvided.dragHandleProps}
+                    style={{
+                      userSelect: "none",
+                      position: "static",
+                      top: "auto",
+                      left: "auto",
+                      ...draggableProvided.draggableProps.style,
+                      marginBottom: 4,
+                    }}
+                  >
+                    {renderReorderListItem(item, index)}
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
+      );
+    })()
+  );
+
+  const renderNativeReorderList = () => (
+    (() => {
+      const draggableFlatListModule = require("react-native-draggable-flatlist");
+      const DraggableFlatList =
+        draggableFlatListModule.default ?? draggableFlatListModule;
+
+      return (
+        <DraggableFlatList
+          ref={setActiveListRef}
+          refreshControl={refreshControl}
+          contentContainerStyle={{ paddingRight: 4 }}
+          data={pendingReorderValues}
+          keyExtractor={(item: ValuesType) => item.id}
+          activationDistance={8}
+          initialNumToRender={16}
+          maxToRenderPerBatch={10}
+          updateCellsBatchingPeriod={50}
+          windowSize={7}
+          removeClippedSubviews
+          renderItem={({
+            item,
+            getIndex,
+            drag,
+          }: RenderItemParams<ValuesType>) =>
+            renderReorderListItem(item, getIndex?.() ?? 0, drag)
+          }
+          onDragEnd={({
+            data,
+            from,
+            to,
+          }: {
+            data: ValuesType[];
+            from: number;
+            to: number;
+          }) => {
+            const movedId = pendingReorderValues[from]?.id;
+            updatePendingVisibleReorder(movedId, data, to);
+          }}
+        />
+      );
+    })()
+  );
+
   function renderFlashList() {
     if (selectedCard && searchQuery === "") {
       let cardEntries: any[] = [];
@@ -446,6 +689,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           ref={setActiveListRef}
           refreshControl={refreshControl}
           contentContainerStyle={{ paddingRight: 4 }}
+          drawDistance={600}
           data={cardEntries}
           renderItem={({ item, index }) => (
             <CardItem
@@ -495,6 +739,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           ref={setActiveListRef}
           refreshControl={refreshControl}
           contentContainerStyle={{ paddingRight: 4 }}
+          drawDistance={600}
           data={totpEntries}
           renderItem={({ item, index }) => (
             <TotpItem
@@ -511,11 +756,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         />
       );
     }
+    if (reorderMode && canReorderEntries) {
+      const reorderList =
+        Platform.OS === "web" ? renderWebReorderList() : renderNativeReorderList();
+
+      return reorderList;
+    }
     const flashList = (
       <FlashList
         ref={setActiveListRef}
         refreshControl={refreshControl}
         contentContainerStyle={{ paddingRight: 4 }}
+        drawDistance={600}
         data={filteredValues}
         renderItem={({ item, index }) => (
           <ListItem
@@ -669,6 +921,79 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             refreshing={refreshing}
             setRefreshing={setRefreshing}
           />
+          {reorderMode ? (
+            <View
+              style={{
+                height: 48,
+                width: "100%",
+                padding: 4,
+                paddingLeft: 8,
+                paddingRight: 8,
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: theme.colors.primary,
+                  borderRadius: 8,
+                  flex: 1,
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexDirection: "row",
+                  overflow: "hidden",
+                }}
+              >
+                <Text
+                  variant="bodyMedium"
+                  numberOfLines={1}
+                  style={{
+                    color: "white",
+                    flex: 1,
+                    paddingLeft: 14,
+                    paddingRight: 8,
+                    userSelect: "none",
+                  }}
+                >
+                  {t("home:reorderHint")}
+                </Text>
+                <AnimatedPressable
+                  onPress={cancelReorderMode}
+                  style={{
+                    height: 40,
+                    minWidth: 96,
+                    paddingHorizontal: 12,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    variant="bodyLarge"
+                    style={{ color: "white", userSelect: "none" }}
+                  >
+                    {t("common:cancel")}
+                  </Text>
+                </AnimatedPressable>
+                <View style={{ backgroundColor: "#00000017" }}>
+                  <AnimatedPressable
+                    onPress={applyReorderMode}
+                    style={{
+                      height: 40,
+                      minWidth: 112,
+                      paddingHorizontal: 12,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text
+                      variant="bodyLarge"
+                      style={{ color: "white", userSelect: "none" }}
+                    >
+                      {t("common:apply")}
+                    </Text>
+                  </AnimatedPressable>
+                </View>
+              </View>
+            </View>
+          ) : null}
           <View
             style={{
               flex: 1,
@@ -691,6 +1016,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               setSelected2FA={saveSelected2FAState}
               selectedCard={selectedCard}
               setSelectedCard={saveSelectedCardState}
+              disabled={reorderMode}
             />
           </View>
 
@@ -704,6 +1030,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             }
             openEditFolder={() => setFolderModalVisible(true)}
             refreshData={refreshData}
+            canStartReorder={canReorderEntries}
+            onStartReorder={startReorderMode}
           />
 
           <FolderModal
