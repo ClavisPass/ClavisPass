@@ -760,7 +760,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       const reorderList =
         Platform.OS === "web" ? renderWebReorderList() : renderNativeReorderList();
 
-      return reorderList;
+      return <View style={{ flex: 1, width: "100%" }}>{reorderList}</View>;
     }
     const flashList = (
       <FlashList

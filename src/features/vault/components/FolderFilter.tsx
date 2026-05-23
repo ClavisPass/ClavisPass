@@ -248,13 +248,14 @@ function FolderFilter(props: Props) {
         <View
           style={{
             padding: 4,
-            paddingTop: 8,
+            paddingTop: props.disabled ? 10 : 8,
             paddingBottom: 4,
             maxHeight: 50,
             width: "100%",
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
+            marginBottom: props.disabled ? 4 : 0,
           }}
         >
           <WebSpecific>
