@@ -2,6 +2,7 @@ use keytar::{delete_password, get_password, set_password};
 use std::fs;
 use std::time::Duration;
 use tauri;
+use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::{AppHandle, Manager, Size};
 
 #[derive(serde::Deserialize)]
@@ -9,6 +10,15 @@ use tauri::{AppHandle, Manager, Size};
 pub enum CloseBehavior {
     Hide,
     Exit,
+}
+
+#[derive(serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TrayMenuLabels {
+    show: String,
+    lock_vault: String,
+    settings: String,
+    quit: String,
 }
 
 #[cfg(target_os = "windows")]
@@ -116,6 +126,29 @@ pub async fn close_main_window(app: AppHandle, behavior: CloseBehavior) -> Resul
             Ok(())
         }
     }
+}
+
+#[tauri::command]
+pub async fn update_tray_menu(app: AppHandle, labels: TrayMenuLabels) -> Result<(), String> {
+    let show_i = MenuItem::with_id(&app, "show", labels.show, true, None::<&str>)
+        .map_err(|e| e.to_string())?;
+    let lock_i = MenuItem::with_id(&app, "lock_vault", labels.lock_vault, true, None::<&str>)
+        .map_err(|e| e.to_string())?;
+    let settings_i = MenuItem::with_id(&app, "settings", labels.settings, true, None::<&str>)
+        .map_err(|e| e.to_string())?;
+    let separator_i = PredefinedMenuItem::separator(&app).map_err(|e| e.to_string())?;
+    let quit_i = MenuItem::with_id(&app, "quit", labels.quit, true, None::<&str>)
+        .map_err(|e| e.to_string())?;
+    let menu = Menu::with_items(
+        &app,
+        &[&show_i, &lock_i, &settings_i, &separator_i, &quit_i],
+    )
+    .map_err(|e| e.to_string())?;
+
+    let tray = app.tray_by_id("main").ok_or("main tray not found")?;
+    tray.set_menu(Some(menu)).map_err(|e| e.to_string())?;
+
+    Ok(())
 }
 
 #[tauri::command]

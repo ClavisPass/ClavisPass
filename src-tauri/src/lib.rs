@@ -7,11 +7,12 @@ mod bridge_commands;
 use serde::{Deserialize, Serialize};
 use std::{fs, path::PathBuf, time::Duration};
 use tauri::{
-    menu::{Menu, MenuItem},
+    menu::{Menu, MenuItem, PredefinedMenuItem},
     tray::{TrayIconBuilder, TrayIconEvent},
     // Wichtig: diese Typen so importieren
     webview::NewWindowResponse,
     AppHandle,
+    Emitter,
     Manager,
     Size,
     WebviewUrl,
@@ -43,9 +44,44 @@ const MIN_WINDOW_HEIGHT: f64 = 350.0;
 
 fn clamp_window_size(size: WindowSize) -> WindowSize {
     WindowSize {
-        width: size.width.max(MIN_WINDOW_WIDTH),
-        height: size.height.max(MIN_WINDOW_HEIGHT),
+        width: if size.width.is_finite() {
+            size.width.max(MIN_WINDOW_WIDTH)
+        } else {
+            DEFAULT_WINDOW_WIDTH
+        },
+        height: if size.height.is_finite() {
+            size.height.max(MIN_WINDOW_HEIGHT)
+        } else {
+            DEFAULT_WINDOW_HEIGHT
+        },
     }
+}
+
+fn clamp_window_size_to_monitor(
+    window: &tauri::WebviewWindow,
+    requested_size: WindowSize,
+) -> WindowSize {
+    let mut size = clamp_window_size(requested_size);
+
+    let monitor = window
+        .current_monitor()
+        .ok()
+        .flatten()
+        .or_else(|| window.primary_monitor().ok().flatten());
+
+    let Some(monitor) = monitor else {
+        return size;
+    };
+
+    let scale_factor = monitor.scale_factor().max(0.1);
+    let work_area = monitor.work_area();
+    let max_width = (work_area.size.width as f64 / scale_factor - 32.0).max(MIN_WINDOW_WIDTH);
+    let max_height = (work_area.size.height as f64 / scale_factor - 32.0).max(MIN_WINDOW_HEIGHT);
+
+    size.width = size.width.min(max_width);
+    size.height = size.height.min(max_height);
+
+    size
 }
 
 fn get_window_size_file_path(app_handle: &AppHandle) -> PathBuf {
@@ -190,11 +226,17 @@ pub fn run() {
                 screen_lock::start(app_handle_for_lock);
             }
             // Tray setup
-            let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let show_i = MenuItem::with_id(app, "show", "Show", true, None::<&str>)?;
-            let menu = Menu::with_items(app, &[&show_i, &quit_i])?;
+            let lock_i = MenuItem::with_id(app, "lock_vault", "Lock Vault", true, None::<&str>)?;
+            let settings_i = MenuItem::with_id(app, "settings", "Settings", true, None::<&str>)?;
+            let separator_i = PredefinedMenuItem::separator(app)?;
+            let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+            let menu = Menu::with_items(
+                app,
+                &[&show_i, &lock_i, &settings_i, &separator_i, &quit_i],
+            )?;
 
-            TrayIconBuilder::<tauri::Wry>::new()
+            TrayIconBuilder::<tauri::Wry>::with_id("main")
                 .icon(app.default_window_icon().unwrap().clone())
                 .menu(&menu)
                 .show_menu_on_left_click(false)
@@ -219,6 +261,17 @@ pub fn run() {
                                 let _ = window.set_focus();
                             }
                         }
+                        "lock_vault" => {
+                            let _ = app.emit("tray://lock-vault", ());
+                        }
+                        "settings" => {
+                            if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.show();
+                                let _ = window.unminimize();
+                                let _ = window.set_focus();
+                            }
+                            let _ = app.emit("tray://open-settings", ());
+                        }
                         "quit" => {
                             println!("quit menu item was clicked");
                             app.exit(0);
@@ -231,22 +284,18 @@ pub fn run() {
                 .build(app)?;
 
             // Fenstergröße wiederherstellen
-            let app_handle2 = app.handle();
             if let Some(main_window) = app.get_webview_window("main") {
-                if let Some(size) = load_window_size(&app_handle2) {
-                    let size = clamp_window_size(size);
-                    if size.width > 0.0 && size.height > 0.0 {
-                        let _ = main_window.set_size(Size::Logical(tauri::LogicalSize::new(
-                            size.width,
-                            size.height,
-                        )));
-                    }
-                } else {
-                    let _ = main_window.set_size(Size::Logical(tauri::LogicalSize::new(
-                        DEFAULT_WINDOW_WIDTH,
-                        DEFAULT_WINDOW_HEIGHT,
-                    )));
-                }
+                let requested_size = load_window_size(app.handle()).unwrap_or(WindowSize {
+                    width: DEFAULT_WINDOW_WIDTH,
+                    height: DEFAULT_WINDOW_HEIGHT,
+                });
+                let size = clamp_window_size_to_monitor(&main_window, requested_size);
+
+                let _ = main_window.set_size(Size::Logical(tauri::LogicalSize::new(
+                    size.width,
+                    size.height,
+                )));
+                let _ = main_window.center();
             }
 
             Ok(())
@@ -258,9 +307,10 @@ pub fn run() {
                 }
                 if let WindowEvent::Resized(size) = event {
                     let app_handle = window.app_handle();
+                    let scale_factor = window.scale_factor().unwrap_or(1.0).max(0.1);
                     let size_data = WindowSize {
-                        width: size.width as f64,
-                        height: size.height as f64,
+                        width: size.width as f64 / scale_factor,
+                        height: size.height as f64 / scale_factor,
                     };
                     save_window_size(&app_handle, size_data);
                 }
@@ -276,6 +326,7 @@ pub fn run() {
             commands::get_key,
             commands::remove_key,
             commands::close_main_window,
+            commands::update_tray_menu,
             commands::set_content_protection,
             commands::reset_window_size,
             commands::clear_clipboard_text,

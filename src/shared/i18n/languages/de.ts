@@ -7,6 +7,12 @@ const de: TranslationSchema = {
     Settings: "Einstellungen",
     Logout: "Abmelden",
   },
+  tray: {
+    show: "ClavisPass öffnen",
+    lockVault: "Vault sperren",
+    settings: "Einstellungen",
+    quit: "Beenden",
+  },
   common: {
     none: "Keins",
     capslockOn: "Caps Lock ist aktiviert",

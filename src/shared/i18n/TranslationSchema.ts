@@ -8,6 +8,12 @@ export type TranslationSchema = {
     Settings: string;
     Logout: string;
   };
+  tray: {
+    show: string;
+    lockVault: string;
+    settings: string;
+    quit: string;
+  };
   common: {
     none: string;
     capslockOn: string;

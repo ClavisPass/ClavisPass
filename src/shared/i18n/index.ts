@@ -8,6 +8,7 @@ export const resources = {
   en: {
     [DEFAULT_NS]: en.common,
     bar: en.bar,
+    tray: en.tray,
     login: en.login,
     home: en.home,
     settings: en.settings,
@@ -21,6 +22,7 @@ export const resources = {
   de: {
     [DEFAULT_NS]: de.common,
     bar: de.bar,
+    tray: de.tray,
     login: de.login,
     home: de.home,
     settings: de.settings,
@@ -42,6 +44,7 @@ export async function initI18n(initialLng: keyof typeof resources) {
     ns: [
       DEFAULT_NS,
       "bar",
+      "tray",
       "login",
       "home",
       "settings",
