@@ -46,6 +46,7 @@ import { SettingsStackParamList } from "../app/navigation/model/types";
 import { ContentProtectionSettingsToggle } from "../features/settings/components/ContentProtectionSettingsToggle";
 import AppearanceSettingsSection from "../features/settings/components/AppearanceSettingsSection";
 import FastAccessPositionPicker from "../features/settings/components/FastAccessPositionPicker";
+import HotkeyRecorderItem from "../features/settings/components/HotkeyRecorderItem";
 import { checkForDesktopUpdate } from "../shared/utils/desktopUpdater";
 import { publishUpdateCheck } from "../infrastructure/events/updateBus";
 import { logger } from "../infrastructure/logging/logger";
@@ -54,6 +55,7 @@ import {
   isTauriEnvironment,
 } from "../infrastructure/platform/isTauri";
 import { FAST_ACCESS_POSITION_CHANGED_EVENT } from "../features/fastaccess/constants";
+import { HotkeySettings } from "../infrastructure/platform/hotkeys";
 
 const styles = StyleSheet.create({
   surface: {
@@ -122,6 +124,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     useSetting("SESSION_DURATION");
   const { value: blurOnUnfocus, setValue: setBlurOnUnfocus } =
     useSetting("BLUR_ON_UNFOCUS");
+  const { value: hotkeys, setValue: setHotkeys } = useSetting("HOTKEYS");
 
   const closeBehavior = closeBehaviorValue === "hide";
   const hideOnStartup = startBehaviorValue === "hidden";
@@ -140,6 +143,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const browserExtensionRef = useRef<View>(null);
   const cryptoRef = useRef<View>(null);
   const updatesRef = useRef<View>(null);
+  const hotkeysRef = useRef<View>(null);
   const fastAccessRef = useRef<View>(null);
   const backupRef = useRef<View>(null);
   const importRef = useRef<View>(null);
@@ -164,6 +168,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               title: t("settings:updates"),
               icon: "update",
               ref: updatesRef,
+              plattform: "web",
+            },
+            {
+              title: t("settings:hotkeys"),
+              icon: "keyboard",
+              ref: hotkeysRef,
               plattform: "web",
             },
           ] satisfies QuickSelectItem[])
@@ -413,10 +423,41 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                     void changeCloseBehavior(checked);
                   }}
                 />
+              </SettingsContainer>
+            ) : null}
+
+            {isTauri ? (
+              <SettingsContainer
+                ref={hotkeysRef}
+                icon="keyboard"
+                title={t("settings:hotkeys")}
+              >
+                <HotkeyRecorderItem
+                  action="toggleMainWindow"
+                  label={t("settings:hotkeyAction_toggleMainWindow")}
+                  hotkeys={hotkeys}
+                  onChange={(next: HotkeySettings) => {
+                    void setHotkeys(next);
+                  }}
+                />
                 <SettingsDivider />
-                <SettingsShortcutItem shortcut="ALT+W">
-                  {t("settings:showHide")}
-                </SettingsShortcutItem>
+                <HotkeyRecorderItem
+                  action="lockVault"
+                  label={t("settings:hotkeyAction_lockVault")}
+                  hotkeys={hotkeys}
+                  onChange={(next: HotkeySettings) => {
+                    void setHotkeys(next);
+                  }}
+                />
+                <SettingsDivider />
+                <HotkeyRecorderItem
+                  action="newEntry"
+                  label={t("settings:hotkeyAction_newEntry")}
+                  hotkeys={hotkeys}
+                  onChange={(next: HotkeySettings) => {
+                    void setHotkeys(next);
+                  }}
+                />
               </SettingsContainer>
             ) : null}
 

@@ -150,6 +150,14 @@ export type TranslationSchema = {
     updateNow: string;
     minimizeToTray: string;
     showHide: string;
+    hotkeys: string;
+    hotkeyAction_toggleMainWindow: string;
+    hotkeyAction_lockVault: string;
+    hotkeyAction_newEntry: string;
+    hotkeyRecording: string;
+    hotkeyDisabled: string;
+    hotkeyInvalid: string;
+    hotkeyConflict: string;
     language: string;
     dateFormat: string;
     timeFormat: string;

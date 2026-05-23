@@ -5,7 +5,7 @@ import ValuesType from "../../../features/vault/model/ValuesType";
 import AnalysisRef from "../../../features/analysis/model/AnalysisRef";
 
 export type HomeStackParamList = {
-  Home: { triggerAdd?: boolean } | undefined;
+  Home: { triggerAdd?: boolean | number } | undefined;
   Edit: {
     value: ValuesType;
     favorite?: boolean;

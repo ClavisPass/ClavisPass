@@ -1,5 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ModulesEnum from "../../features/vault/model/ModulesEnum";
+import {
+  DEFAULT_HOTKEYS,
+  HotkeySettings,
+  normalizeHotkeySettings,
+} from "../platform/hotkeys";
 import { logger } from "../logging/logger";
 
 type EnumDef<V extends readonly string[], D extends V[number]> = {
@@ -73,6 +78,12 @@ export const storeSchema = {
   BLUR_ON_UNFOCUS: {
     type: "boolean",
     default: true,
+  },
+  HOTKEYS: {
+    type: "json",
+    default: DEFAULT_HOTKEYS as HotkeySettings,
+    validate: (v: unknown): v is HotkeySettings =>
+      normalizeHotkeySettings(v) !== null,
   },
   START_BEHAVIOR: {
     type: "enum",
@@ -245,6 +256,13 @@ export async function get<K extends DataKey>(
               }
               break; // fallback auf default
             }
+            if (key === "HOTKEYS") {
+              const norm = normalizeHotkeySettings(parsed);
+              if (norm !== null) {
+                return norm as StoreValueMap[K];
+              }
+              break;
+            }
             if (!schema.validate || schema.validate(parsed)) {
               return parsed as StoreValueMap[K];
             }
@@ -294,6 +312,17 @@ export async function set<K extends DataKey>(
 
         if (key === "FAVORITE_MODULES") {
           const norm = normalizeFavoriteModules(v);
+          if (norm === null) {
+            logger.warn(`Invalid JSON value for key '${String(key)}'`, v);
+            return;
+          }
+          await AsyncStorage.setItem(key as string, JSON.stringify(norm));
+          notifyListeners(key, norm as StoreValueMap[K]);
+          break;
+        }
+
+        if (key === "HOTKEYS") {
+          const norm = normalizeHotkeySettings(v);
           if (norm === null) {
             logger.warn(`Invalid JSON value for key '${String(key)}'`, v);
             return;

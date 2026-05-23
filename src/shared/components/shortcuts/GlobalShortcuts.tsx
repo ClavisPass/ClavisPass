@@ -1,5 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../../app/providers/AuthProvider";
+import { useSetting } from "../../../app/providers/SettingsProvider";
+import { subscribeHotkeyRecording } from "../../../infrastructure/events/hotkeyRecordingBus";
+import { emitOpenAddValueRequest } from "../../../infrastructure/events/openAddValueBus";
+import { HotkeyAction } from "../../../infrastructure/platform/hotkeys";
 import { logger } from "../../../infrastructure/logging/logger";
 import {
   detectTauriEnvironment,
@@ -9,11 +13,17 @@ import {
 function GlobalShortcuts() {
   const auth = useAuth();
   const isTauri = useIsTauriEnvironment();
+  const { value: hotkeys } = useSetting("HOTKEYS");
+  const [hotkeyRecording, setHotkeyRecording] = useState(false);
   const logoutRef = useRef(auth.logout);
+  const isLoggedInRef = useRef(auth.isLoggedIn);
 
   useEffect(() => {
     logoutRef.current = auth.logout;
-  }, [auth.logout]);
+    isLoggedInRef.current = auth.isLoggedIn;
+  }, [auth.logout, auth.isLoggedIn]);
+
+  useEffect(() => subscribeHotkeyRecording(setHotkeyRecording), []);
 
   useEffect(() => {
     if (isTauri) {
@@ -91,56 +101,113 @@ function GlobalShortcuts() {
     }
   };
 
+  const toggleMainWindow = async () => {
+    const appWindow = await windowInstance();
+    if (!appWindow) {
+      return;
+    }
+    const stateIsVisible = await appWindow.isVisible();
+    const stateIsFocused = await appWindow.isFocused();
+
+    if (stateIsVisible && stateIsFocused) {
+      logoutRef.current();
+      try {
+        const { invoke } = await import("@tauri-apps/api/core");
+        await invoke("close_main_window", { behavior: "hide" });
+      } catch (error) {
+        logger.warn("[GlobalShortcuts] Native close command failed:", error);
+        await appWindow.hide();
+      }
+    } else {
+      await appWindow.show();
+      await appWindow.unminimize();
+      await appWindow.setFocus();
+    }
+  };
+
+  const lockVault = () => {
+    logoutRef.current();
+  };
+
+  const openNewEntry = async () => {
+    const appWindow = await windowInstance();
+    if (appWindow) {
+      await appWindow.show();
+      await appWindow.unminimize();
+      await appWindow.setFocus();
+    }
+
+    if (isLoggedInRef.current) {
+      emitOpenAddValueRequest();
+    }
+  };
+
+  const runHotkeyAction = async (action: HotkeyAction) => {
+    if (action === "toggleMainWindow") {
+      await toggleMainWindow();
+    } else if (action === "lockVault") {
+      lockVault();
+    } else if (action === "newEntry") {
+      await openNewEntry();
+    }
+  };
+
   useEffect(() => {
-    let lastTriggered = 0;
+    const lastTriggered = new Map<HotkeyAction, number>();
     let active = true;
+    const registeredHotkeys = Object.values(hotkeys).filter(
+      (hotkey): hotkey is string => typeof hotkey === "string" && hotkey.length > 0,
+    );
 
     const registerShortcut = async () => {
       try {
-        if (!(await detectTauriEnvironment()) || !active) {
+        if (
+          !(await detectTauriEnvironment()) ||
+          !active ||
+          hotkeyRecording
+        ) {
           return;
         }
 
-        const { register } = await import("@tauri-apps/plugin-global-shortcut");
+        const { register, unregister } = await import(
+          "@tauri-apps/plugin-global-shortcut"
+        );
         if (!active) return;
 
-        await register("Alt+W", async () => {
+        for (const hotkey of registeredHotkeys) {
           try {
-            const now = Date.now();
-            if (now - lastTriggered < 500) {
-              return;
-            }
-            lastTriggered = now;
-            const appWindow = await windowInstance();
-            if (!appWindow) {
-              return;
-            }
-            const stateIsVisible = await appWindow.isVisible();
-            const stateIsFocused = await appWindow.isFocused();
-
-            if (stateIsVisible && stateIsFocused) {
-              logoutRef.current();
-              try {
-                const { invoke } = await import("@tauri-apps/api/core");
-                await invoke("close_main_window", { behavior: "hide" });
-              } catch (error) {
-                logger.warn(
-                  "[GlobalShortcuts] Native close command failed:",
-                  error,
-                );
-                await appWindow.hide();
-              }
-            } else {
-              await appWindow.show();
-              await appWindow.unminimize();
-              await appWindow.setFocus();
-            }
-          } catch (error) {
-            logger.warn("[GlobalShortcuts] Alt+W handler failed:", error);
+            await unregister(hotkey);
+          } catch {
+            // It is fine if the shortcut was not registered before.
           }
-        });
+        }
+
+        const entries = Object.entries(hotkeys) as Array<
+          [HotkeyAction, string | null]
+        >;
+
+        for (const [action, hotkey] of entries) {
+          if (!hotkey) continue;
+
+          await register(hotkey, async () => {
+            try {
+              const now = Date.now();
+              const previous = lastTriggered.get(action) ?? 0;
+              if (now - previous < 500) {
+                return;
+              }
+              lastTriggered.set(action, now);
+              await runHotkeyAction(action);
+            } catch (error) {
+              logger.warn(
+                `[GlobalShortcuts] ${action} handler failed:`,
+                error,
+              );
+            }
+          });
+        }
       } catch (error) {
-        logger.warn("[GlobalShortcuts] Failed to register Alt+W:", error);
+        logger.warn("[GlobalShortcuts] Failed to register hotkeys:", error);
       }
     };
 
@@ -155,13 +222,15 @@ function GlobalShortcuts() {
           const { unregister } = await import(
             "@tauri-apps/plugin-global-shortcut"
           );
-          await unregister("Alt+W");
+          for (const hotkey of registeredHotkeys) {
+            await unregister(hotkey);
+          }
         } catch (error) {
-          logger.warn("[GlobalShortcuts] Failed to unregister Alt+W:", error);
+          logger.warn("[GlobalShortcuts] Failed to unregister hotkeys:", error);
         }
       })();
     };
-  }, []);
+  }, [hotkeyRecording, hotkeys]);
 
   return null;
 }
