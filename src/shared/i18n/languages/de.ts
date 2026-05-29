@@ -77,7 +77,8 @@ const de: TranslationSchema = {
     editHistoryOpened: "Editor geöffnet",
     selectFolder: "Ordner auswählen",
     selectFolderDescription: "Wähle aus, wo dieser Eintrag liegen soll.",
-    manageFoldersDescription: "Hier kannst du Ordner anlegen, sortieren und löschen.",
+    manageFoldersDescription:
+      "Hier kannst du Ordner anlegen, sortieren und löschen.",
     selectedItem: "Ausgewählter Eintrag",
     edit: "Bearbeiten",
     fastAccess: "Fast Access",
@@ -110,7 +111,8 @@ const de: TranslationSchema = {
     hubAccountDisabled: "Dein Account wurde deaktiviert.",
     hubMissingHostUrl: "Host URL fehlt. Bitte erneut anmelden.",
     hubNetworkError: "Netzwerkfehler beim Verbinden mit ClavisPass Hub.",
-    introCreateVault: "Erstelle deinen verschluesselten Vault und starte mit einer sauberen Einrichtung.",
+    introCreateVault:
+      "Erstelle deinen verschluesselten Vault und starte mit einer sauberen Einrichtung.",
     introUnlockVault: "Entsperre deinen Vault und arbeite direkt weiter.",
     deviceSaveConfirmTitle: "Lokale Speicherung aktivieren?",
     deviceSaveConfirmText:
@@ -168,7 +170,8 @@ const de: TranslationSchema = {
     useSystemAuth: "Systemauthentifizierung",
     autoOpenFastAccess: "Automatisch öffnen",
     fastAccessPosition: "Popup-Position",
-    fastAccessPositionHint: "Wähle die Ecke, in der Fast Access erscheinen soll.",
+    fastAccessPositionHint:
+      "Wähle die Ecke, in der Fast Access erscheinen soll.",
     fastAccessPositionTopLeft: "Oben links",
     fastAccessPositionTopRight: "Oben rechts",
     fastAccessPositionBottomLeft: "Unten links",
@@ -243,53 +246,53 @@ const de: TranslationSchema = {
     browserManageConnections: "Browser-Verbindungen",
   },
   analysis: {
-  topFindings: "Top-Funde",
-  noFindings: "Keine Funde.",
-  strengthDistribution: "Stärke-Verteilung",
+    topFindings: "Top-Funde",
+    noFindings: "Keine Funde.",
+    strengthDistribution: "Stärke-Verteilung",
 
-  securityScore: "Sicherheits-Score",
-  scoreHint: "Behebe die Punkte unten, um deinen Score zu verbessern.",
-  searchHint: "Suche in Qualitäts- und Risikolisten.",
-  loadingTitle: "Analyse wird vorbereitet",
-  loadingHint: "Passwörter werden gerade bewertet und auf Risiken geprüft.",
+    securityScore: "Sicherheits-Score",
+    scoreHint: "Behebe die Punkte unten, um deinen Score zu verbessern.",
+    searchHint: "Suche in Qualitäts- und Risikolisten.",
+    loadingTitle: "Analyse wird vorbereitet",
+    loadingHint: "Passwörter werden gerade bewertet und auf Risiken geprüft.",
 
-  qualityTitle: "Passwortqualität",
-  qualityHint: "Hier siehst du, wie schwer Passwörter zu erraten sind.",
-  riskTitle: "Sicherheitsrisiken",
-  riskHint: "Hier stehen Einträge mit konkretem Handlungsbedarf.",
-  noQualityMatches: "Keine passenden Qualitäts-Einträge gefunden.",
-  noRiskMatches: "Keine passenden Risiko-Einträge gefunden.",
+    qualityTitle: "Passwortqualität",
+    qualityHint: "Hier siehst du, wie schwer Passwörter zu erraten sind.",
+    riskTitle: "Sicherheitsrisiken",
+    riskHint: "Hier stehen Einträge mit konkretem Handlungsbedarf.",
+    noQualityMatches: "Keine passenden Qualitäts-Einträge gefunden.",
+    noRiskMatches: "Keine passenden Risiko-Einträge gefunden.",
 
-  strong: "Stark",
-  medium: "Mittel",
-  weak: "Schwach",
-  compromised: "Kompromittiert",
-
-  all: "Alle",
-  itemsToFix: "Zu beheben",
-  reused: "Wiederverwendet",
-  similar: "Ähnlich",
-  risky: "Riskant",
-
-  badge: {
+    strong: "Stark",
+    medium: "Mittel",
+    weak: "Schwach",
     compromised: "Kompromittiert",
+
+    all: "Alle",
+    itemsToFix: "Zu beheben",
     reused: "Wiederverwendet",
     similar: "Ähnlich",
-    short: "Zu kurz",
-    sequential: "Sequenziell",
-    repeated: "Wiederholt",
-    variant: "Variante",
-  },
+    risky: "Riskant",
 
-  finding: {
-    compromised: "Kompromittierte Passwörter",
-    reused: "Wiederverwendete Passwörter",
-    weak: "Schwache Passwörter",
-    short: "Zu kurz",
-    variants: "Passwort-Varianten",
-    sequential: "Sequenzielle Muster",
+    badge: {
+      compromised: "Kompromittiert",
+      reused: "Wiederverwendet",
+      similar: "Ähnlich",
+      short: "Zu kurz",
+      sequential: "Sequenziell",
+      repeated: "Wiederholt",
+      variant: "Variante",
+    },
+
+    finding: {
+      compromised: "Kompromittierte Passwörter",
+      reused: "Wiederverwendete Passwörter",
+      weak: "Schwache Passwörter",
+      short: "Zu kurz",
+      variants: "Passwort-Varianten",
+      sequential: "Sequenzielle Muster",
+    },
   },
-},
 
   analysisDetail: {
     // existing
@@ -365,37 +368,37 @@ const de: TranslationSchema = {
     countPercent: "{{count}} ({{percent}}%)",
   },
   devices: {
-  title: "Geräte",
-  you: "Du",
+    title: "Geräte",
+    you: "Du",
 
-  status: {
-    new: "Neu",
-    active: "Aktiv",
-    archived: "Archiviert",
+    status: {
+      new: "Neu",
+      active: "Aktiv",
+      archived: "Archiviert",
+    },
+
+    sections: {
+      new: "Neu",
+      active: "Aktiv",
+      archived: "Archiviert",
+    },
+    hintLine:
+      "Diese Liste zeigt nur Geräte/Installationen, die den Vault mindestens einmal gespeichert oder synchronisiert haben (also geschrieben haben). Geräte, die den Vault nur gelesen haben (z. B. heruntergeladen, entsperrt oder angezeigt), erscheinen hier nicht.",
+
+    toggleArchivedOn: "Archivierte anzeigen: An",
+    toggleArchivedOff: "Archivierte anzeigen: Aus",
+
+    empty:
+      "Noch keine Geräte registriert. Geräte erscheinen nach dem ersten Save/Sync.",
+    emptyNew: "Keine neuen Geräte.",
+    emptyActive: "Keine aktiven Geräte.",
+    emptyArchived: "Keine archivierten Geräte.",
+
+    lastShort: "Zuletzt",
+    lastWrite: "Zuletzt geschrieben",
+    firstWrite: "Erstes Schreiben",
+    id: "ID",
   },
-
-  sections: {
-    new: "Neu",
-    active: "Aktiv",
-    archived: "Archiviert",
-  },
-  hintLine:
-    "Diese Liste zeigt nur Geräte/Installationen, die den Vault mindestens einmal gespeichert oder synchronisiert haben (also geschrieben haben). Geräte, die den Vault nur gelesen haben (z. B. heruntergeladen, entsperrt oder angezeigt), erscheinen hier nicht.",
-
-  toggleArchivedOn: "Archivierte anzeigen: An",
-  toggleArchivedOff: "Archivierte anzeigen: Aus",
-
-  empty:
-    "Noch keine Geräte registriert. Geräte erscheinen nach dem ersten Save/Sync.",
-  emptyNew: "Keine neuen Geräte.",
-  emptyActive: "Keine aktiven Geräte.",
-  emptyArchived: "Keine archivierten Geräte.",
-
-  lastShort: "Zuletzt",
-  lastWrite: "Zuletzt geschrieben",
-  firstWrite: "Erstes Schreiben",
-  id: "ID",
-},
 
   greetings: {
     1: "Hi",
@@ -425,27 +428,56 @@ const de: TranslationSchema = {
     email: "E-Mail",
     expiry: "Ablauf",
     key: "Schlüssel",
-      note: "Notiz",
-      password: "Passwort",
-      pin: "PIN",
-      phoneNumber: "Telefonnummer",
+    note: "Notiz",
+    password: "Passwort",
+    pin: "PIN",
+    phoneNumber: "Telefonnummer",
     task: "Aufgabe",
     title: "Titel",
     totp: "TOTP",
     unknown: "Unbekannt",
     url: "URL",
     username: "Benutzername",
-      wifi: "WiFi",
-      wifiOpen: "Offen",
-      wifiHidden: "Verstecktes Netzwerk",
-      wifiSecurity: "Sicherheit",
-      wifiVisibility: "Sichtbarkeit",
-      created: "Erstellt",
+    wifi: "WiFi",
+    wifiOpen: "Offen",
+    wifiHidden: "Verstecktes Netzwerk",
+    wifiSecurity: "Sicherheit",
+    wifiVisibility: "Sichtbarkeit",
+    created: "Erstellt",
     lastUpdated: "Zuletzt aktualisiert",
     unknownModule: "Unbekanntes Modul",
     recoveryCodes: "Wiederherstellungscodes",
     recoveryCodesPlaceholder: "Codes einfügen…",
     recoveryCodesHelp: "Tippe auf einen Chip, um ihn zu kopieren.",
+    noteCompact: "Kompakt",
+    noteNormal: "Normal",
+    noteLarge: "Groß",
+    noteExpand: "Großen Editor öffnen",
+    noteCollapse: "Großen Editor schließen",
+    noteCharacters: "{{count}} Zeichen",
+    notePlain: "Text",
+    noteMarkdown: "Markdown",
+    noteSnippet: "Code",
+    noteLanguage: "Sprache",
+    noteLanguageText: "Text",
+    noteLanguageJson: "JSON",
+    noteLanguageYaml: "YAML",
+    noteLanguageEnv: "ENV",
+    noteLanguageShell: "Shell",
+    noteLineNumbers: "Zeilennummern",
+    noteWrapLines: "Umbruch",
+    notePreview: "Vorschau",
+    noteShowPreview: "Vorschau anzeigen",
+    noteHidePreview: "Vorschau ausblenden",
+    noteEdit: "Bearbeiten",
+    noteBold: "Fett",
+    noteItalic: "Kursiv",
+    noteInlineCode: "Inline-Code",
+    noteHeading: "Überschrift",
+    noteBulletList: "Liste",
+    noteNumberedList: "Nummerierte Liste",
+    noteCodeBlock: "Codeblock",
+    noteFormatJson: "JSON formatieren",
   },
   moduleTemplates: {
     password: "Passwort",
@@ -453,16 +485,10 @@ const de: TranslationSchema = {
     key: "Schlüssel",
     digitalCard: "Digitale Karte",
     tasklist: "Aufgabenliste",
+    note: "Notiz",
+    twoFactor: "2FA",
     empty: "Leer",
   },
 };
 
 export default de;
-
-
-
-
-
-
-
-

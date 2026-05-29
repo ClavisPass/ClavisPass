@@ -5,6 +5,8 @@ enum TemplateEnum {
   DIGITAL_CARD,
   BLANK,
   TASKLIST,
+  NOTE,
+  TWO_FACTOR,
 }
 
 export default TemplateEnum;

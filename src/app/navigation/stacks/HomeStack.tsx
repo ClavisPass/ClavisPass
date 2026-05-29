@@ -5,6 +5,7 @@ import EditScreen from "../../../screens/EditScreen";
 import DigitalCardScanScreen from "../../../screens/DigitalCardScanScreen";
 import TotpScanScreen from "../../../screens/TotpScanScreen";
 import CardDetailsScreen from "../../../screens/CardDetailsScreen";
+import NoteEditorScreen from "../../../screens/NoteEditorScreen";
 import { HomeStackParamList } from "../model/types";
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
@@ -16,6 +17,7 @@ export default function HomeStack() {
       <Stack.Screen name="Edit" component={EditScreen} />
       <Stack.Screen name="DigitalCardScan" component={DigitalCardScanScreen} />
       <Stack.Screen name="TotpScan" component={TotpScanScreen} />
+      <Stack.Screen name="NoteEditor" component={NoteEditorScreen} />
       <Stack.Screen name="CardDetails" component={CardDetailsScreen} />
     </Stack.Navigator>
   );

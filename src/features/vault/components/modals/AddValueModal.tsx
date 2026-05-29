@@ -36,7 +36,7 @@ function AddValueModal(props: Props) {
     <Modal visible={props.visible} onDismiss={hideModal}>
       <View
         style={{
-          height: 224,
+          height: 296,
           width: 280,
           display: "flex",
           flexDirection: "column",
@@ -97,6 +97,26 @@ function AddValueModal(props: Props) {
             }}
           >
             {t("moduleTemplates:tasklist")}
+          </CategoryItem>
+          <CategoryItem
+            leadingIcon={ValueIconsEnum.NOTE}
+            onPress={() => {
+              navigateToAddValue(TemplateEnum.NOTE);
+            }}
+          >
+            {t("moduleTemplates:note")}
+          </CategoryItem>
+        </View>
+        <View
+          style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
+        >
+          <CategoryItem
+            leadingIcon={ValueIconsEnum.TWO_FACTOR}
+            onPress={() => {
+              navigateToAddValue(TemplateEnum.TWO_FACTOR);
+            }}
+          >
+            {t("moduleTemplates:twoFactor")}
           </CategoryItem>
           <CategoryItem
             leadingIcon={ValueIconsEnum.BLANK}

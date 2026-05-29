@@ -302,6 +302,15 @@ function ListItem(props: Props) {
     if (modules.some((m) => m.module === ModulesEnum.DIGITAL_CARD)) {
       return "credit-card-multiple";
     }
+    if (modules.some((m) => m.module === ModulesEnum.PASSWORD)) {
+      return "form-textbox-password";
+    }
+    if (
+      modules.length > 0 &&
+      modules.every((m) => m.module === ModulesEnum.NOTE)
+    ) {
+      return "note";
+    }
 
     return "lock";
   }, [props.item.modules]);

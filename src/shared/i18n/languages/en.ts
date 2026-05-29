@@ -109,7 +109,8 @@ const en: TranslationSchema = {
     hubAccountDisabled: "Your account has been disabled.",
     hubMissingHostUrl: "Host URL is missing. Please sign in again.",
     hubNetworkError: "Network error while connecting to ClavisPass Hub.",
-    introCreateVault: "Create your encrypted vault and start with a clean setup.",
+    introCreateVault:
+      "Create your encrypted vault and start with a clean setup.",
     introUnlockVault: "Unlock your vault and continue where you left off.",
     deviceSaveConfirmTitle: "Enable Local Storage?",
     deviceSaveConfirmText:
@@ -167,7 +168,8 @@ const en: TranslationSchema = {
     useSystemAuth: "System Authentication",
     autoOpenFastAccess: "Auto Open",
     fastAccessPosition: "Popup Position",
-    fastAccessPositionHint: "Choose the corner where Fast Access should appear.",
+    fastAccessPositionHint:
+      "Choose the corner where Fast Access should appear.",
     fastAccessPositionTopLeft: "Top left",
     fastAccessPositionTopRight: "Top right",
     fastAccessPositionBottomLeft: "Bottom left",
@@ -252,7 +254,8 @@ const en: TranslationSchema = {
     scoreHint: "Fix the items below to improve your score.",
     searchHint: "Search across quality and risk lists.",
     loadingTitle: "Preparing analysis",
-    loadingHint: "Passwords are currently being evaluated for quality and risk.",
+    loadingHint:
+      "Passwords are currently being evaluated for quality and risk.",
 
     qualityTitle: "Password quality",
     qualityHint: "This shows how hard passwords are to guess.",
@@ -358,36 +361,37 @@ const en: TranslationSchema = {
     countPercent: "{{count}} ({{percent}}%)",
   },
   devices: {
-  title: "Devices",
-  you: "You",
+    title: "Devices",
+    you: "You",
 
-  status: {
-    new: "New",
-    active: "Active",
-    archived: "Archived",
+    status: {
+      new: "New",
+      active: "Active",
+      archived: "Archived",
+    },
+
+    sections: {
+      new: "New",
+      active: "Active",
+      archived: "Archived",
+    },
+    hintLine:
+      "This list only shows devices/installations that have saved or synced the vault at least once (i.e. wrote to it). Devices that only read the vault (downloaded, unlocked, viewed) do not appear here.",
+
+    toggleArchivedOn: "Show archived: On",
+    toggleArchivedOff: "Show archived: Off",
+
+    empty:
+      "No devices registered yet. Devices appear after the first save/sync.",
+    emptyNew: "No new devices.",
+    emptyActive: "No active devices.",
+    emptyArchived: "No archived devices.",
+
+    lastShort: "Last",
+    lastWrite: "Last write",
+    firstWrite: "First write",
+    id: "ID",
   },
-
-  sections: {
-    new: "New",
-    active: "Active",
-    archived: "Archived",
-  },
-  hintLine:
-    "This list only shows devices/installations that have saved or synced the vault at least once (i.e. wrote to it). Devices that only read the vault (downloaded, unlocked, viewed) do not appear here.",
-
-  toggleArchivedOn: "Show archived: On",
-  toggleArchivedOff: "Show archived: Off",
-
-  empty: "No devices registered yet. Devices appear after the first save/sync.",
-  emptyNew: "No new devices.",
-  emptyActive: "No active devices.",
-  emptyArchived: "No archived devices.",
-
-  lastShort: "Last",
-  lastWrite: "Last write",
-  firstWrite: "First write",
-  id: "ID",
-},
   greetings: {
     1: "Hi",
     2: "Hey",
@@ -416,27 +420,56 @@ const en: TranslationSchema = {
     email: "E-Mail",
     expiry: "Expiry",
     key: "Key",
-      note: "Note",
-      password: "Password",
-      pin: "PIN",
-      phoneNumber: "Phone Number",
+    note: "Note",
+    password: "Password",
+    pin: "PIN",
+    phoneNumber: "Phone Number",
     task: "Task",
     title: "Title",
     totp: "TOTP",
     unknown: "Unknown",
     url: "URL",
     username: "Username",
-      wifi: "WiFi",
-      wifiOpen: "Open",
-      wifiHidden: "Hidden network",
-      wifiSecurity: "Security",
-      wifiVisibility: "Visibility",
-      created: "Created",
+    wifi: "WiFi",
+    wifiOpen: "Open",
+    wifiHidden: "Hidden network",
+    wifiSecurity: "Security",
+    wifiVisibility: "Visibility",
+    created: "Created",
     lastUpdated: "Last Updated",
     unknownModule: "Unknown Module",
     recoveryCodes: "Recovery Codes",
     recoveryCodesPlaceholder: "Paste codes…",
     recoveryCodesHelp: "Tap a chip to copy.",
+    noteCompact: "Compact",
+    noteNormal: "Normal",
+    noteLarge: "Large",
+    noteExpand: "Open large editor",
+    noteCollapse: "Close large editor",
+    noteCharacters: "{{count}} characters",
+    notePlain: "Text",
+    noteMarkdown: "Markdown",
+    noteSnippet: "Code",
+    noteLanguage: "Language",
+    noteLanguageText: "Text",
+    noteLanguageJson: "JSON",
+    noteLanguageYaml: "YAML",
+    noteLanguageEnv: "ENV",
+    noteLanguageShell: "Shell",
+    noteLineNumbers: "Line numbers",
+    noteWrapLines: "Wrap",
+    notePreview: "Preview",
+    noteShowPreview: "Show preview",
+    noteHidePreview: "Hide preview",
+    noteEdit: "Edit",
+    noteBold: "Bold",
+    noteItalic: "Italic",
+    noteInlineCode: "Inline code",
+    noteHeading: "Heading",
+    noteBulletList: "Bullet list",
+    noteNumberedList: "Numbered list",
+    noteCodeBlock: "Code block",
+    noteFormatJson: "Format JSON",
   },
   moduleTemplates: {
     password: "Password",
@@ -444,12 +477,10 @@ const en: TranslationSchema = {
     key: "Key",
     digitalCard: "Digital Card",
     tasklist: "Tasklist",
+    note: "Note",
+    twoFactor: "2FA",
     empty: "Empty",
   },
 };
 
 export default en;
-
-
-
-

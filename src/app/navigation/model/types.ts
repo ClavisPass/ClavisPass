@@ -14,6 +14,23 @@ export type HomeStackParamList = {
   };
   DigitalCardScan: { setData: (data: string, type: string) => void };
   TotpScan: { setOtpauth: (uri: string) => void };
+  NoteEditor: {
+    value: string;
+    title: string;
+    setValue: (value: string) => void;
+    variant?: "plain" | "markdown" | "snippet";
+    setVariant?: (variant: "plain" | "markdown" | "snippet") => void;
+    displayMode?: "compact" | "normal" | "large";
+    setDisplayMode?: (mode: "compact" | "normal" | "large") => void;
+    language?: "text" | "json" | "yaml" | "env" | "shell";
+    setLanguage?: (
+      language: "text" | "json" | "yaml" | "env" | "shell",
+    ) => void;
+    showLineNumbers?: boolean;
+    setShowLineNumbers?: (show: boolean) => void;
+    wrapLines?: boolean;
+    setWrapLines?: (wrap: boolean) => void;
+  };
   CardDetails: {
     value: string;
     title: string;

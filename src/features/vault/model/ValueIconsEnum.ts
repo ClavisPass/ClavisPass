@@ -5,6 +5,8 @@ enum ValueIconsEnum {
   BLANK = "checkbox-blank",
   DIGITAL_CARD = "credit-card-multiple",
   TASKLIST = "checkbox-multiple-marked",
+  NOTE = "note",
+  TWO_FACTOR = "two-factor-authentication",
 }
 
 export default ValueIconsEnum;

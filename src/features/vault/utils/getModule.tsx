@@ -124,10 +124,17 @@ const MODULE_RENDERERS = {
         id={m.id}
         module={m.module}
         value={m.value}
+        displayMode={m.displayMode}
+        variant={m.variant}
+        language={m.language}
+        showLineNumbers={m.showLineNumbers}
+        wrapLines={m.wrapLines}
         onDragStart={args.onDragStart}
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        navigation={args.navigation}
+        title={args.title}
       />
     );
   },

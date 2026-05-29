@@ -54,6 +54,21 @@ function getTemplate(template: TemplateEnum) {
     }
     return value;
   }
+  if (template == TemplateEnum.NOTE) {
+    const note = getModuleData(ModulesEnum.NOTE);
+    if (note) {
+      value.modules = [note];
+    }
+    return value;
+  }
+  if (template == TemplateEnum.TWO_FACTOR) {
+    const totp = getModuleData(ModulesEnum.TOTP);
+    const recoveryCodes = getModuleData(ModulesEnum.RECOVERY_CODES);
+    if (totp && recoveryCodes) {
+      value.modules = [totp, recoveryCodes];
+    }
+    return value;
+  }
   return value;
 }
 
