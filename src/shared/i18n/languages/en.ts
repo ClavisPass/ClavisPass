@@ -194,6 +194,22 @@ const en: TranslationSchema = {
     sessionDuration: "Session Duration",
     contentProtection: "Content Protection",
     blurOnUnfocus: "Blur when unfocused",
+    dangerZone: "Danger Zone",
+    resetSettings: "Reset settings",
+    resetSettingsTitle: "Reset settings?",
+    resetSettingsText:
+      "Only your settings will be reset to factory defaults. Your vault and entries remain unchanged.",
+    resetSettingsAction: "Reset",
+    resetDevice: "Reset this device",
+    resetDeviceTitle: "Reset this device?",
+    resetDeviceText:
+      "All settings, local sessions, system authentication, and the local vault on this device will be removed. Your cloud vault remains unchanged.",
+    resetDeviceAction: "Reset device",
+    clearVault: "Delete vault content",
+    clearVaultTitle: "Delete vault content?",
+    clearVaultText:
+      "All entries and folders in the currently opened vault will be removed locally. The change only affects the cloud after you save or sync.",
+    clearVaultAction: "Empty vault",
     scanqrcode: "Scan QR Code",
     showqrcode: "Show QR Code",
     manageDevices: "Manage Devices",

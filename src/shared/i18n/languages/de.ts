@@ -196,6 +196,22 @@ const de: TranslationSchema = {
     sessionDuration: "Sitzungsdauer",
     contentProtection: "Inhaltsschutz",
     blurOnUnfocus: "Bei Fokusverlust verwischen",
+    dangerZone: "Danger Zone",
+    resetSettings: "Einstellungen zurücksetzen",
+    resetSettingsTitle: "Einstellungen zurücksetzen?",
+    resetSettingsText:
+      "Nur deine Einstellungen werden auf Werkseinstellungen gesetzt. Dein Vault und deine Einträge bleiben erhalten.",
+    resetSettingsAction: "Zurücksetzen",
+    resetDevice: "Dieses Gerät zurücksetzen",
+    resetDeviceTitle: "Dieses Gerät zurücksetzen?",
+    resetDeviceText:
+      "Alle Einstellungen, lokale Sitzungen, Systemauthentifizierung und der lokale Vault auf diesem Gerät werden entfernt. Dein Cloud-Vault bleibt erhalten.",
+    resetDeviceAction: "Gerät zurücksetzen",
+    clearVault: "Vault endgültig löschen",
+    clearVaultTitle: "Vault endgültig löschen?",
+    clearVaultText:
+      "Alle Einträge und Ordner im aktuell geöffneten Vault werden lokal entfernt. Die Änderung wird erst in der Cloud wirksam, wenn du speicherst bzw. synchronisierst.",
+    clearVaultAction: "Vault leeren",
     scanqrcode: "QR-Code scannen",
     showqrcode: "QR-Code anzeigen",
     manageDevices: "Geräte verwalten",

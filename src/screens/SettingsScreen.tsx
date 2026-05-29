@@ -37,8 +37,10 @@ import SettingsShortcutItem from "../features/settings/components/SettingsShortc
 import { useDevMode } from "../app/providers/DevModeProvider";
 import SettingsDropdownItem from "../features/settings/components/SettingsDropdownItem";
 import { useTranslation } from "react-i18next";
-import { Chip } from "react-native-paper";
+import { Button as PaperButton, Chip, Text } from "react-native-paper";
 import { useSetting } from "../app/providers/SettingsProvider";
+import { useToken } from "../app/providers/CloudProvider";
+import { useVault } from "../app/providers/VaultProvider";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import BackupImportButton from "../features/settings/components/buttons/BackupImportButton";
 import BackupExportButton from "../features/settings/components/buttons/BackupExportButton";
@@ -57,6 +59,12 @@ import {
 } from "../infrastructure/platform/isTauri";
 import { FAST_ACCESS_POSITION_CHANGED_EVENT } from "../features/fastaccess/constants";
 import { HotkeySettings } from "../infrastructure/platform/hotkeys";
+import Modal from "../shared/components/modals/Modal";
+import {
+  resetAppSettings,
+  resetDeviceSettings,
+} from "../infrastructure/storage/store";
+import { removeFile as removeLocalVaultFile } from "../infrastructure/cloud/clients/DeviceStorageClient";
 
 const styles = StyleSheet.create({
   surface: {
@@ -78,6 +86,20 @@ const styles = StyleSheet.create({
     gap: 8,
     margin: 6,
   },
+  resetModal: {
+    width: 320,
+    maxWidth: "100%",
+    padding: 16,
+  },
+  resetModalActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 8,
+    marginTop: 20,
+  },
+  resetModalButton: {
+    borderRadius: 12,
+  },
 });
 
 type SettingsScreenProps = NativeStackScreenProps<
@@ -85,10 +107,14 @@ type SettingsScreenProps = NativeStackScreenProps<
   "Settings"
 >;
 
+type ResetAction = "settings" | "device" | "vault";
+
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
-  const { headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
+  const { headerWhite, setHeaderWhite, darkmode, setHeaderSpacing, theme } =
     useTheme();
-  const { getMaster } = useAuth();
+  const { getMaster, logout } = useAuth();
+  const { clearSession } = useToken();
+  const vault = useVault();
   const { devMode } = useDevMode();
   const { t } = useTranslation();
 
@@ -134,6 +160,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 
   const [showChangeMasterPasswordModal, setShowChangeMasterPasswordModal] =
     useState(false);
+  const [resetAction, setResetAction] = useState<ResetAction | null>(null);
 
   const scrollRef = useRef<ScrollView>(null);
   useScrollToTop(scrollRef);
@@ -149,6 +176,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const fastAccessRef = useRef<View>(null);
   const backupRef = useRef<View>(null);
   const importRef = useRef<View>(null);
+  const dataResetRef = useRef<View>(null);
 
   const quickSelectItems: QuickSelectItem[] = useMemo(
     () => [
@@ -224,6 +252,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         title: t("settings:import"),
         icon: "import",
         ref: importRef,
+        plattform: null,
+      },
+      {
+        title: t("settings:dangerZone"),
+        icon: "alert",
+        ref: dataResetRef,
         plattform: null,
       },
     ],
@@ -318,6 +352,59 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
       setManualUpdateLabel(t("settings:updateCheckFailed"));
     } finally {
       setCheckingUpdate(false);
+    }
+  };
+
+  const resetModalConfig = useMemo(() => {
+    if (!resetAction) return null;
+
+    switch (resetAction) {
+      case "settings":
+        return {
+          title: t("settings:resetSettingsTitle"),
+          text: t("settings:resetSettingsText"),
+          action: t("settings:resetSettingsAction"),
+          destructive: false,
+        };
+      case "device":
+        return {
+          title: t("settings:resetDeviceTitle"),
+          text: t("settings:resetDeviceText"),
+          action: t("settings:resetDeviceAction"),
+          destructive: true,
+        };
+      case "vault":
+        return {
+          title: t("settings:clearVaultTitle"),
+          text: t("settings:clearVaultText"),
+          action: t("settings:clearVaultAction"),
+          destructive: true,
+        };
+    }
+  }, [resetAction, t]);
+
+  const confirmResetAction = async () => {
+    switch (resetAction) {
+      case "settings":
+        await resetAppSettings();
+        setResetAction(null);
+        return;
+      case "device":
+        await removeAuthentication();
+        await clearSession();
+        await removeLocalVaultFile();
+        await resetDeviceSettings();
+        vault.lock();
+        logout();
+        setResetAction(null);
+        return;
+      case "vault":
+        vault.update((draft) => {
+          draft.folder = [];
+          draft.values = [];
+        });
+        setResetAction(null);
+        return;
     }
   };
 
@@ -747,6 +834,24 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               )}
             </SettingsContainer>
 
+            <SettingsContainer
+              ref={dataResetRef}
+              icon="alert"
+              title={t("settings:dangerZone")}
+            >
+              <SettingsItem onPress={() => setResetAction("settings")}>
+                {t("settings:resetSettings")}
+              </SettingsItem>
+              <SettingsDivider />
+              <SettingsItem onPress={() => setResetAction("device")}>
+                {t("settings:resetDevice")}
+              </SettingsItem>
+              <SettingsDivider />
+              <SettingsItem onPress={() => setResetAction("vault")}>
+                {t("settings:clearVault")}
+              </SettingsItem>
+            </SettingsContainer>
+
             <SettingsFooter />
 
             <View
@@ -787,6 +892,52 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           visible={showChangeMasterPasswordModal}
           setVisible={setShowChangeMasterPasswordModal}
         />
+        <Modal
+          visible={resetAction !== null}
+          onDismiss={() => setResetAction(null)}
+        >
+          {resetModalConfig ? (
+            <View style={styles.resetModal}>
+              <Text variant="titleLarge">{resetModalConfig.title}</Text>
+              <Text
+                variant="bodyMedium"
+                style={{
+                  marginTop: 8,
+                  color: theme.colors.onSurfaceVariant,
+                }}
+              >
+                {resetModalConfig.text}
+              </Text>
+              <View style={styles.resetModalActions}>
+                <PaperButton
+                  style={styles.resetModalButton}
+                  onPress={() => setResetAction(null)}
+                >
+                  {t("common:cancel")}
+                </PaperButton>
+                <PaperButton
+                  mode="contained"
+                  style={styles.resetModalButton}
+                  buttonColor={
+                    resetModalConfig.destructive
+                      ? theme.colors.error
+                      : undefined
+                  }
+                  textColor={
+                    resetModalConfig.destructive
+                      ? theme.colors.onError
+                      : undefined
+                  }
+                  onPress={() => {
+                    void confirmResetAction();
+                  }}
+                >
+                  {resetModalConfig.action}
+                </PaperButton>
+              </View>
+            </View>
+          ) : null}
+        </Modal>
       </BottomSheetModalProvider>
     </AnimatedContainer>
   );

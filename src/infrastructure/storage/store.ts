@@ -216,6 +216,45 @@ export function subscribe<K extends DataKey>(
   };
 }
 
+const SETTINGS_RESET_KEYS = [
+  "THEME_PREFERENCE",
+  "CLOSE_BEHAVIOR",
+  "BLUR_ON_UNFOCUS",
+  "HOTKEYS",
+  "START_BEHAVIOR",
+  "FAST_ACCESS",
+  "FAST_ACCESS_POSITION",
+  "SIDEBAR_WIDTH",
+  "FAVORITE_FILTER",
+  "TWOFA_FILTER",
+  "CARD_FILTER",
+  "FAVORITE_MODULES",
+  "LANGUAGE",
+  "DATE_FORMAT",
+  "TIME_FORMAT",
+  "COPY_DURATION",
+  "AUTOSAVE_DELAY",
+  "SESSION_DURATION",
+  "SYSTEM_AUTH_PROMPT_DONE",
+] as const satisfies readonly DataKey[];
+
+const DEVICE_RESET_KEYS = Object.keys(storeSchema) as DataKey[];
+
+async function resetKeys(keys: readonly DataKey[]): Promise<void> {
+  for (const key of keys) {
+    await AsyncStorage.removeItem(key as string);
+    notifyListeners(key, storeSchema[key].default as StoreValueMap[typeof key]);
+  }
+}
+
+export async function resetAppSettings(): Promise<void> {
+  await resetKeys(SETTINGS_RESET_KEYS);
+}
+
+export async function resetDeviceSettings(): Promise<void> {
+  await resetKeys(DEVICE_RESET_KEYS);
+}
+
 export async function get<K extends DataKey>(
   key: K,
 ): Promise<StoreValueMap[K]> {

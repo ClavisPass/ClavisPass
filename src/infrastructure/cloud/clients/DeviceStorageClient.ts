@@ -65,3 +65,15 @@ export const uploadFile = async (
   }
 };
 
+export const removeFile = async (): Promise<void> => {
+  try {
+    await AsyncStorage.removeItem(LOCAL_SYNC_KEY);
+  } catch (error) {
+    logger.error(
+      `[LocalSync] Error removing file "${LOCAL_SYNC_KEY}" from local storage:`,
+      error
+    );
+    throw new Error("Error removing file from local device storage");
+  }
+};
+
