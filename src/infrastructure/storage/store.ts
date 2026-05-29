@@ -97,12 +97,7 @@ export const storeSchema = {
   },
   FAST_ACCESS_POSITION: {
     type: "enum",
-    values: [
-      "top-left",
-      "top-right",
-      "bottom-left",
-      "bottom-right",
-    ] as const,
+    values: ["top-left", "top-right", "bottom-left", "bottom-right"] as const,
     default: "bottom-right",
   },
   SIDEBAR_WIDTH: {
@@ -158,6 +153,10 @@ export const storeSchema = {
     type: "boolean",
     default: false,
   },
+  SYSTEM_AUTH_PROMPT_DONE: {
+    type: "boolean",
+    default: false,
+  },
 } as const satisfies Record<
   string,
   | EnumDef<readonly string[], string>
@@ -182,7 +181,7 @@ export type StoreValueMap = {
 };
 
 type StoreListener<K extends DataKey = DataKey> = (
-  value: StoreValueMap[K]
+  value: StoreValueMap[K],
 ) => void;
 
 const listeners = new Map<DataKey, Set<StoreListener<any>>>();
@@ -201,7 +200,7 @@ function notifyListeners<K extends DataKey>(key: K, value: StoreValueMap[K]) {
 
 export function subscribe<K extends DataKey>(
   key: K,
-  listener: StoreListener<K>
+  listener: StoreListener<K>,
 ): () => void {
   const keyListeners = listeners.get(key) ?? new Set();
   keyListeners.add(listener as StoreListener<any>);
@@ -218,7 +217,7 @@ export function subscribe<K extends DataKey>(
 }
 
 export async function get<K extends DataKey>(
-  key: K
+  key: K,
 ): Promise<StoreValueMap[K]> {
   const schema = storeSchema[key];
   try {
@@ -281,7 +280,7 @@ export async function get<K extends DataKey>(
 
 export async function set<K extends DataKey>(
   key: K,
-  value: StoreValueMap[K]
+  value: StoreValueMap[K],
 ): Promise<void> {
   const schema = storeSchema[key];
   try {

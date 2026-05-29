@@ -127,6 +127,10 @@ export type TranslationSchema = {
     sortByLastUpdated: string;
     reorderEntries: string;
     reorderHint: string;
+    systemAuthPromptTitle: string;
+    systemAuthPromptText: string;
+    systemAuthPromptEnable: string;
+    systemAuthPromptLater: string;
   };
   settings: {
     sync: string;

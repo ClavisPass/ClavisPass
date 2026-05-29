@@ -132,6 +132,11 @@ const de: TranslationSchema = {
     sortByLastUpdated: "Nach letztem Update sortieren",
     reorderEntries: "Manuell anordnen",
     reorderHint: "Ziehe Einträge, um sie neu anzuordnen.",
+    systemAuthPromptTitle: "Systemauthentifizierung nutzen?",
+    systemAuthPromptText:
+      "Du kannst ClavisPass künftig mit Fingerabdruck, Gesichtserkennung oder deiner Gerätesperre entsperren.",
+    systemAuthPromptEnable: "Aktivieren",
+    systemAuthPromptLater: "Nicht jetzt",
   },
   settings: {
     sync: "Synchronisation",

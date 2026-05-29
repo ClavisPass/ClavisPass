@@ -130,6 +130,11 @@ const en: TranslationSchema = {
     sortByLastUpdated: "Sort by Last Updated",
     reorderEntries: "Arrange manually",
     reorderHint: "Drag entries to arrange them.",
+    systemAuthPromptTitle: "Use system authentication?",
+    systemAuthPromptText:
+      "You can unlock ClavisPass with fingerprint, face recognition, or your device lock next time.",
+    systemAuthPromptEnable: "Enable",
+    systemAuthPromptLater: "Not now",
   },
   settings: {
     sync: "Sync",

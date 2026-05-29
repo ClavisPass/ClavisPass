@@ -1,6 +1,10 @@
 import { Platform } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
-import { getData, removeData, saveData } from "../../../infrastructure/storage/secureStore";
+import {
+  getData,
+  removeData,
+  saveData,
+} from "../../../infrastructure/storage/secureStore";
 import { logger } from "../../../infrastructure/logging/logger";
 
 const MASTER_KEY = "ClavisPass-Master";
@@ -39,10 +43,25 @@ export const authenticateUser = async () => {
   return false;
 };
 
+export const isSystemAuthenticationAvailable = async (): Promise<boolean> => {
+  if (Platform.OS === "web") {
+    return typeof window !== "undefined" && !!window.PublicKeyCredential;
+  }
+
+  if (Platform.OS === "ios" || Platform.OS === "android") {
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+    if (!hasHardware) return false;
+
+    return LocalAuthentication.isEnrolledAsync();
+  }
+
+  return false;
+};
+
 export const isUsingAuthentication = async (): Promise<boolean> => {
   try {
     const value = await loadAuthentication();
-    if(value !== null && value !== undefined && value !== "") return true;
+    if (value !== null && value !== undefined && value !== "") return true;
     return false;
   } catch (error) {
     logger.error("Fehler beim Überprüfen der Authentifizierung:", error);
@@ -69,10 +88,9 @@ export const loadAuthentication = async () => {
 };
 
 export const saveAuthentication = async (master: string) => {
-  saveData(MASTER_KEY, master)
-    .then(() => {
-    })
-    .catch((error) =>
-      logger.error("Fehler beim Speichern des Master Passworts:", error)
-    );
+  try {
+    await saveData(MASTER_KEY, master);
+  } catch (error) {
+    logger.error("Fehler beim Speichern des Master Passworts:", error);
+  }
 };

@@ -16,6 +16,7 @@ import Auth from "../features/auth/components/Auth";
 import { useTheme } from "../app/providers/ThemeProvider";
 import {
   authenticateUser,
+  isSystemAuthenticationAvailable,
   isUsingAuthentication,
   removeAuthentication,
   saveAuthentication,
@@ -94,6 +95,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const [startup, setStartup] = React.useState(false);
   const { width } = useWindowDimensions();
   const [useAuthentication, setUseAuthentication] = React.useState(false);
+  const [systemAuthenticationAvailable, setSystemAuthenticationAvailable] =
+    React.useState(false);
   const [checkingUpdate, setCheckingUpdate] = useState(false);
   const [manualUpdateLabel, setManualUpdateLabel] = useState<string | null>(
     null,
@@ -110,8 +113,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     value: fastAccessPosition,
     setValue: setFastAccessPosition,
     refresh: refreshFastAccessPosition,
-  } =
-    useSetting("FAST_ACCESS_POSITION");
+  } = useSetting("FAST_ACCESS_POSITION");
 
   const { value: language } = useSetting("LANGUAGE");
 
@@ -324,9 +326,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
       setIsTauri(await detectTauriEnvironment());
     })();
     getAutoStart();
-    isUsingAuthentication().then((isAuthenticated) => {
+    void (async () => {
+      const available = await isSystemAuthenticationAvailable();
+      setSystemAuthenticationAvailable(available);
+      if (!available) return;
+
+      const isAuthenticated = await isUsingAuthentication();
       setUseAuthentication(isAuthenticated);
-    });
+    })();
   }, []);
 
   useEffect(() => {
@@ -503,14 +510,18 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               >
                 {t("settings:changeMasterPassword")}
               </SettingsItem>
-              <SettingsDivider />
-              <SettingsSwitch
-                label={t("settings:useSystemAuth")}
-                value={useAuthentication}
-                onValueChange={(checked) => {
-                  changeAuthentication(checked);
-                }}
-              />
+              {systemAuthenticationAvailable ? (
+                <>
+                  <SettingsDivider />
+                  <SettingsSwitch
+                    label={t("settings:useSystemAuth")}
+                    value={useAuthentication}
+                    onValueChange={(checked) => {
+                      changeAuthentication(checked);
+                    }}
+                  />
+                </>
+              ) : null}
               <SettingsDivider />
               <ContentProtectionSettingsToggle />
               {isTauri ? (

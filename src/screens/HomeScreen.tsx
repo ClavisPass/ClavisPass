@@ -1,12 +1,19 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   View,
   Platform,
   useWindowDimensions,
   InteractionManager,
   RefreshControl,
+  StyleSheet,
 } from "react-native";
-import { Searchbar, IconButton, Badge } from "react-native-paper";
+import { Searchbar, IconButton, Badge, Button, Icon } from "react-native-paper";
 
 import { Text } from "react-native-paper";
 
@@ -61,6 +68,13 @@ import {
   unsubscribeOpenAddValue,
 } from "../infrastructure/events/openAddValueBus";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
+import Modal from "../shared/components/modals/Modal";
+import {
+  authenticateUser,
+  isSystemAuthenticationAvailable,
+  isUsingAuthentication,
+  saveAuthentication,
+} from "../features/auth/utils/authenticateUser";
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
@@ -84,6 +98,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     useSetting("CARD_FILTER");
   const { value: dateFormat } = useSetting("DATE_FORMAT");
   const { value: timeFormat } = useSetting("TIME_FORMAT");
+  const { value: systemAuthPromptDone, setValue: setSystemAuthPromptDone } =
+    useSetting("SYSTEM_AUTH_PROMPT_DONE");
 
   const [refreshing, setRefreshing] = useState(false);
   const [reorderMode, setReorderMode] = useState(false);
@@ -99,6 +115,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [valueModalVisible, setValueModalVisible] = useState(false);
   const [expiryModalVisible, setExpiryModalVisible] = useState(false);
+  const [systemAuthPromptVisible, setSystemAuthPromptVisible] = useState(false);
   const { provider, accessToken, ensureFreshAccessToken } = useToken();
 
   const saveSelectedFavState = (fav: boolean) => {
@@ -130,6 +147,53 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     subscribeOpenAddValue(openAddValue);
     return () => unsubscribeOpenAddValue(openAddValue);
   }, []);
+
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+    if (systemAuthPromptDone) return;
+    if (!auth.isLoggedIn) return;
+
+    let cancelled = false;
+
+    (async () => {
+      const master = auth.getMaster();
+      if (!master) return;
+
+      const alreadyEnabled = await isUsingAuthentication();
+      if (alreadyEnabled) {
+        await setSystemAuthPromptDone(true);
+        return;
+      }
+
+      const available = await isSystemAuthenticationAvailable();
+      if (!cancelled && available) {
+        setSystemAuthPromptVisible(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [auth, auth.isLoggedIn, setSystemAuthPromptDone, systemAuthPromptDone]);
+
+  const dismissSystemAuthPrompt = async () => {
+    setSystemAuthPromptVisible(false);
+    await setSystemAuthPromptDone(true);
+  };
+
+  const enableSystemAuth = async () => {
+    const master = auth.getMaster();
+    if (!master) {
+      await dismissSystemAuthPrompt();
+      return;
+    }
+
+    const isAuthenticated = await authenticateUser();
+    if (!isAuthenticated) return;
+
+    await saveAuthentication(master);
+    await dismissSystemAuthPrompt();
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -554,74 +618,75 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     [noop],
   );
 
-  const renderWebReorderList = () => (
+  const renderWebReorderList = () =>
     (() => {
-      const { DragDropContext, Droppable, Draggable } = require(
-        "@hello-pangea/dnd",
-      );
+      const {
+        DragDropContext,
+        Droppable,
+        Draggable,
+      } = require("@hello-pangea/dnd");
 
       return (
         <DragDropContext
-      onDragEnd={(result: any) => {
-        if (!result.destination) return;
+          onDragEnd={(result: any) => {
+            if (!result.destination) return;
 
-        const movedId = pendingReorderValues[result.source.index]?.id;
-        const reordered = reorderVisibleValues(
-          pendingReorderValues,
-          result.source.index,
-          result.destination.index,
-        );
+            const movedId = pendingReorderValues[result.source.index]?.id;
+            const reordered = reorderVisibleValues(
+              pendingReorderValues,
+              result.source.index,
+              result.destination.index,
+            );
 
-        updatePendingVisibleReorder(
-          movedId,
-          reordered,
-          result.destination.index,
-        );
-      }}
-    >
-      <Droppable droppableId="home-values-reorder">
-        {(provided: any) => (
-          <div
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-            style={{
-              flex: 1,
-              width: "100%",
-              overflow: "auto",
-              paddingRight: 4,
-            }}
-          >
-            {pendingReorderValues.map((item, index) => (
-              <Draggable key={item.id} draggableId={item.id} index={index}>
-                {(draggableProvided: any) => (
-                  <div
-                    ref={draggableProvided.innerRef}
-                    {...draggableProvided.draggableProps}
-                    {...draggableProvided.dragHandleProps}
-                    style={{
-                      userSelect: "none",
-                      position: "static",
-                      top: "auto",
-                      left: "auto",
-                      ...draggableProvided.draggableProps.style,
-                      marginBottom: 4,
-                    }}
-                  >
-                    {renderReorderListItem(item, index)}
-                  </div>
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+            updatePendingVisibleReorder(
+              movedId,
+              reordered,
+              result.destination.index,
+            );
+          }}
+        >
+          <Droppable droppableId="home-values-reorder">
+            {(provided: any) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                style={{
+                  flex: 1,
+                  width: "100%",
+                  overflow: "auto",
+                  paddingRight: 4,
+                }}
+              >
+                {pendingReorderValues.map((item, index) => (
+                  <Draggable key={item.id} draggableId={item.id} index={index}>
+                    {(draggableProvided: any) => (
+                      <div
+                        ref={draggableProvided.innerRef}
+                        {...draggableProvided.draggableProps}
+                        {...draggableProvided.dragHandleProps}
+                        style={{
+                          userSelect: "none",
+                          position: "static",
+                          top: "auto",
+                          left: "auto",
+                          ...draggableProvided.draggableProps.style,
+                          marginBottom: 4,
+                        }}
+                      >
+                        {renderReorderListItem(item, index)}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       );
-    })()
-  );
+    })();
 
-  const renderNativeReorderList = () => (
+  const renderNativeReorderList = () =>
     (() => {
       const draggableFlatListModule = require("react-native-draggable-flatlist");
       const DraggableFlatList =
@@ -661,8 +726,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           }}
         />
       );
-    })()
-  );
+    })();
 
   function renderFlashList() {
     if (selectedCard && searchQuery === "") {
@@ -758,7 +822,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     }
     if (reorderMode && canReorderEntries) {
       const reorderList =
-        Platform.OS === "web" ? renderWebReorderList() : renderNativeReorderList();
+        Platform.OS === "web"
+          ? renderWebReorderList()
+          : renderNativeReorderList();
 
       return <View style={{ flex: 1, width: "100%" }}>{reorderList}</View>;
     }
@@ -1062,6 +1128,65 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               },
             }))}
           />
+          <Modal
+            visible={systemAuthPromptVisible}
+            onDismiss={dismissSystemAuthPrompt}
+          >
+            <View
+              style={{
+                width: 300,
+                minHeight: 190,
+                padding: 14,
+                borderRadius: 12,
+                borderWidth: StyleSheet.hairlineWidth,
+                borderColor: theme.colors.outlineVariant,
+                backgroundColor: theme.colors.background,
+                justifyContent: "space-between",
+                gap: 16,
+              }}
+            >
+              <View style={{ gap: 8, alignItems: "center" }}>
+                <View style={{ marginTop: 8, marginBottom: 10 }}>
+                  <Icon
+                    source="fingerprint"
+                    size={56}
+                    color={theme.colors.primary}
+                  />
+                </View>
+                <Text variant="headlineSmall" style={{ userSelect: "none" }}>
+                  {t("home:systemAuthPromptTitle")}
+                </Text>
+                <Text
+                  variant="bodyMedium"
+                  style={{ userSelect: "none", alignSelf: "stretch" }}
+                >
+                  {t("home:systemAuthPromptText")}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  gap: 6,
+                }}
+              >
+                <Button
+                  style={{ borderRadius: 12 }}
+                  mode="contained-tonal"
+                  onPress={dismissSystemAuthPrompt}
+                >
+                  {t("home:systemAuthPromptLater")}
+                </Button>
+                <Button
+                  style={{ borderRadius: 12 }}
+                  mode="contained"
+                  onPress={enableSystemAuth}
+                >
+                  {t("home:systemAuthPromptEnable")}
+                </Button>
+              </View>
+            </View>
+          </Modal>
           <AddValueModal
             visible={valueModalVisible}
             setVisible={setValueModalVisible}
