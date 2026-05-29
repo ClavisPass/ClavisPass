@@ -173,6 +173,8 @@ type Props = {
   reorderMode?: boolean;
   onDragStart?: () => void;
   dragHandleProps?: any;
+  canStartReorder?: boolean;
+  onStartReorder?: () => void;
 };
 
 function ListItem(props: Props) {
@@ -343,15 +345,18 @@ function ListItem(props: Props) {
 
   const listItemMenuItems = useMemo<AdaptiveMenuItem[]>(
     () => [
-      {
-        key: "fast-access",
-        icon: "tooltip-account",
-        label: t("common:fastAccess"),
-        onPress: () => {
-          openItemFastAccess().catch(() => {});
-        },
-        disabled: !fastAccessData,
-      },
+      ...(fastAccessData
+        ? [
+            {
+              key: "fast-access",
+              icon: "tooltip-account",
+              label: t("common:fastAccess"),
+              onPress: () => {
+                openItemFastAccess().catch(() => {});
+              },
+            },
+          ]
+        : []),
       {
         key: "move-folder",
         icon: "folder",
@@ -360,6 +365,16 @@ function ListItem(props: Props) {
           setFolderSelectVisible(true);
         },
       },
+      ...(props.canStartReorder && props.onStartReorder
+        ? [
+            {
+              key: "reorder",
+              icon: "sort-variant",
+              label: t("home:reorderEntries"),
+              onPress: props.onStartReorder,
+            },
+          ]
+        : []),
       {
         key: "delete",
         icon: "trash-can",
@@ -368,7 +383,7 @@ function ListItem(props: Props) {
         withDivider: false,
       },
     ],
-    [fastAccessData, t],
+    [fastAccessData, props.canStartReorder, props.onStartReorder, t],
   );
 
   const menuTopContent = (

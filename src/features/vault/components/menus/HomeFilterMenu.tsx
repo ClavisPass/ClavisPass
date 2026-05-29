@@ -134,25 +134,21 @@ function HomeFilterMenu(props: Props) {
     () => [
       {
         key: "sort-title",
-        icon: sortByTitleIcon,
         label: t("home:sortByTitle"),
         onPress: () => sortByTitle(sortByTitleMode),
       },
       {
         key: "sort-created",
-        icon: sortByCreatedIcon,
         label: t("home:sortByCreated"),
         onPress: () => sortByCreated(sortByCreatedMode),
       },
       {
         key: "sort-updated",
-        icon: sortByLastUpdatedIcon,
         label: t("home:sortByLastUpdated"),
         onPress: () => sortByLastUpdated(sortByLastUpdatedMode),
       },
       {
         key: "reorder",
-        icon: "drag",
         label: t("home:reorderEntries"),
         disabled: !props.canStartReorder,
         onPress: () => {

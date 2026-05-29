@@ -839,6 +839,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           <ListItem
             item={item}
             index={index}
+            canStartReorder={canReorderEntries}
+            onStartReorder={startReorderMode}
             onPress={() => {
               navigation.navigate("Edit", {
                 value: item,
