@@ -212,6 +212,11 @@ const de: TranslationSchema = {
     clearVaultText:
       "Alle Einträge und Ordner im aktuell geöffneten Vault werden lokal entfernt. Die Änderung wird erst in der Cloud wirksam, wenn du speicherst bzw. synchronisierst.",
     clearVaultAction: "Vault leeren",
+    clearSyncDevices: "Synchronisierte Geräte leeren",
+    clearSyncDevicesTitle: "Synchronisierte Geräte leeren?",
+    clearSyncDevicesText:
+      "Die im Vault gespeicherte Geräteliste wird geleert. Beim nächsten Speichern oder Synchronisieren wird dieses Gerät wieder neu eingetragen.",
+    clearSyncDevicesAction: "Geräte leeren",
     scanqrcode: "QR-Code scannen",
     showqrcode: "QR-Code anzeigen",
     manageDevices: "Geräte verwalten",

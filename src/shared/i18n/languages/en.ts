@@ -210,6 +210,11 @@ const en: TranslationSchema = {
     clearVaultText:
       "All entries and folders in the currently opened vault will be removed locally. The change only affects the cloud after you save or sync.",
     clearVaultAction: "Empty vault",
+    clearSyncDevices: "Clear synced devices",
+    clearSyncDevicesTitle: "Clear synced devices?",
+    clearSyncDevicesText:
+      "The device list stored in the vault will be cleared. The next save or sync will add this device again.",
+    clearSyncDevicesAction: "Clear devices",
     scanqrcode: "Scan QR Code",
     showqrcode: "Show QR Code",
     manageDevices: "Manage Devices",

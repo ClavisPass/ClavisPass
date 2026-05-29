@@ -107,7 +107,7 @@ type SettingsScreenProps = NativeStackScreenProps<
   "Settings"
 >;
 
-type ResetAction = "settings" | "device" | "vault";
+type ResetAction = "settings" | "device" | "vault" | "syncDevices";
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const { headerWhite, setHeaderWhite, darkmode, setHeaderSpacing, theme } =
@@ -380,6 +380,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           action: t("settings:clearVaultAction"),
           destructive: true,
         };
+      case "syncDevices":
+        return {
+          title: t("settings:clearSyncDevicesTitle"),
+          text: t("settings:clearSyncDevicesText"),
+          action: t("settings:clearSyncDevicesAction"),
+          destructive: true,
+        };
     }
   }, [resetAction, t]);
 
@@ -402,6 +409,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         vault.update((draft) => {
           draft.folder = [];
           draft.values = [];
+        });
+        setResetAction(null);
+        return;
+      case "syncDevices":
+        vault.update((draft) => {
+          draft.devices = [];
         });
         setResetAction(null);
         return;
@@ -850,6 +863,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               <SettingsItem onPress={() => setResetAction("vault")}>
                 {t("settings:clearVault")}
               </SettingsItem>
+              {devMode ? (
+                <>
+                  <SettingsDivider />
+                  <SettingsItem onPress={() => setResetAction("syncDevices")}>
+                    {t("settings:clearSyncDevices")}
+                  </SettingsItem>
+                </>
+              ) : null}
             </SettingsContainer>
 
             <SettingsFooter />

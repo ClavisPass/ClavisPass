@@ -202,6 +202,10 @@ export type TranslationSchema = {
     clearVaultTitle: string;
     clearVaultText: string;
     clearVaultAction: string;
+    clearSyncDevices: string;
+    clearSyncDevicesTitle: string;
+    clearSyncDevicesText: string;
+    clearSyncDevicesAction: string;
     scanqrcode: string;
     showqrcode: string;
     manageDevices: string;
