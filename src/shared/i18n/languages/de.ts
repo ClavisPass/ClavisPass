@@ -455,6 +455,8 @@ const de: TranslationSchema = {
     noteExpand: "Großen Editor öffnen",
     noteCollapse: "Großen Editor schließen",
     noteCharacters: "{{count}} Zeichen",
+    noteWords: "{{count}} Wörter",
+    noteLines: "{{count}} Zeilen",
     notePlain: "Text",
     noteMarkdown: "Markdown",
     noteSnippet: "Code",

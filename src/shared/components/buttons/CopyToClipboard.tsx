@@ -13,6 +13,7 @@ type Props = {
   margin?: number;
   kind?: ClipboardContentKind;
   sensitive?: boolean;
+  compact?: boolean;
 };
 
 function CopyToClipboard({
@@ -21,6 +22,7 @@ function CopyToClipboard({
   margin,
   kind,
   sensitive,
+  compact,
 }: Props) {
   const [icon, setIcon] = React.useState<"content-copy" | "check">(
     "content-copy",
@@ -50,7 +52,7 @@ function CopyToClipboard({
   };
 
   return (
-    <View style={{ width: 48 }}>
+    <View style={{ width: compact ? 32 : 48 }}>
       <IconButton
         animated
         icon={icon}
@@ -58,7 +60,10 @@ function CopyToClipboard({
         size={20}
         onPress={copyToClipboard}
         disabled={disabled}
-        style={{ margin: margin ?? 6 }}
+        style={{
+          margin: margin ?? 6,
+          ...(compact ? { width: 32, height: 32 } : null),
+        }}
       />
     </View>
   );

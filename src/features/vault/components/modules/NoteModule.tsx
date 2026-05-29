@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import { IconButton, TextInput } from "react-native-paper";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -61,8 +61,11 @@ function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
-function noteModuleEquals(
-  current: NoteModuleType & Props & NoteModuleNavigationProps,
+function noteModuleDataEquals(
+  current: Pick<
+    NoteModuleType,
+    "value" | "displayMode" | "variant" | "language" | "wrapLines"
+  >,
   next: NoteModuleType,
 ) {
   return (
@@ -75,7 +78,6 @@ function noteModuleEquals(
 }
 
 function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
-  const didMount = useRef(false);
   const { t } = useTranslation();
   const { globalStyles, theme } = useTheme();
   const [value, setValue] = useState(props.value);
@@ -90,6 +92,16 @@ function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
   const [inputHeight, setInputHeight] = useState(
     DISPLAY_MODE_HEIGHTS[props.displayMode ?? "normal"].min,
   );
+
+  const moduleRef = useRef<NoteModuleType>({
+    id: props.id,
+    module: props.module,
+    value: props.value,
+    displayMode: props.displayMode ?? "normal",
+    variant: props.variant ?? "plain",
+    language: props.language ?? "text",
+    wrapLines: props.wrapLines ?? true,
+  });
 
   const sizing = DISPLAY_MODE_HEIGHTS[displayMode];
 
@@ -109,47 +121,110 @@ function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
   );
 
   useEffect(() => {
-    setValue(props.value);
-  }, [props.value]);
-
-  useEffect(() => {
-    setDisplayMode(props.displayMode ?? "normal");
-  }, [props.displayMode]);
-
-  useEffect(() => {
-    setVariant(props.variant ?? "plain");
-  }, [props.variant]);
-
-  useEffect(() => {
-    setLanguage(props.language ?? "text");
-  }, [props.language]);
-
-  useEffect(() => {
-    setWrapLines(props.wrapLines ?? true);
-  }, [props.wrapLines]);
+    const nextModule: NoteModuleType = {
+      id: props.id,
+      module: props.module,
+      value: props.value,
+      displayMode: props.displayMode ?? "normal",
+      variant: props.variant ?? "plain",
+      language: props.language ?? "text",
+      wrapLines: props.wrapLines ?? true,
+    };
+    moduleRef.current = nextModule;
+    setValue((current) =>
+      current === nextModule.value ? current : nextModule.value,
+    );
+    setDisplayMode((current) =>
+      current === nextModule.displayMode ? current : nextModule.displayMode!,
+    );
+    setVariant((current) =>
+      current === nextModule.variant ? current : nextModule.variant!,
+    );
+    setLanguage((current) =>
+      current === nextModule.language ? current : nextModule.language!,
+    );
+    setWrapLines((current) =>
+      current === nextModule.wrapLines ? current : nextModule.wrapLines!,
+    );
+  }, [
+    props.displayMode,
+    props.id,
+    props.language,
+    props.module,
+    props.value,
+    props.variant,
+    props.wrapLines,
+  ]);
 
   useEffect(() => {
     setInputHeight((current) => clamp(current, sizing.min, sizing.max));
   }, [sizing.max, sizing.min]);
 
-  useEffect(() => {
-    if (didMount.current) {
-      const newModule: NoteModuleType = {
-        id: props.id,
-        module: props.module,
-        value,
-        displayMode,
-        variant,
-        language,
-        wrapLines,
+  const patchModule = useCallback(
+    (
+      patch: Partial<
+        Pick<
+          NoteModuleType,
+          "value" | "displayMode" | "variant" | "language" | "wrapLines"
+        >
+      >,
+    ) => {
+      const current = moduleRef.current;
+      const nextModule: NoteModuleType = {
+        ...current,
+        ...patch,
       };
-      if (!noteModuleEquals(props, newModule)) {
-        props.changeModule(newModule);
-      }
-    } else {
-      didMount.current = true;
-    }
-  }, [value, displayMode, variant, language, wrapLines]);
+
+      if (noteModuleDataEquals(current, nextModule)) return;
+
+      moduleRef.current = nextModule;
+      if (patch.value !== undefined) setValue(patch.value);
+      if (patch.displayMode !== undefined) setDisplayMode(patch.displayMode);
+      if (patch.variant !== undefined) setVariant(patch.variant);
+      if (patch.language !== undefined) setLanguage(patch.language);
+      if (patch.wrapLines !== undefined) setWrapLines(patch.wrapLines);
+      props.changeModule(nextModule);
+    },
+    [props],
+  );
+
+  const changeValue = useCallback(
+    (nextValue: string) => {
+      patchModule({ value: nextValue });
+    },
+    [patchModule],
+  );
+
+  const changeDisplayMode = useCallback(
+    (nextDisplayMode: NoteDisplayMode) => {
+      patchModule({ displayMode: nextDisplayMode });
+    },
+    [patchModule],
+  );
+
+  const changeVariant = useCallback(
+    (nextVariant: NoteVariant) => {
+      patchModule({
+        variant: nextVariant,
+        ...(nextVariant === "snippet" ? { wrapLines: true } : null),
+      });
+    },
+    [patchModule],
+  );
+
+  const changeLanguage = useCallback(
+    (nextLanguage: NoteLanguage) => {
+      patchModule({ language: nextLanguage });
+    },
+    [patchModule],
+  );
+
+  const changeWrapLines = useCallback(
+    (nextWrapLines: boolean) => {
+      patchModule({ wrapLines: nextWrapLines });
+    },
+    [patchModule],
+  );
 
   const isSnippet = variant === "snippet";
   const isMarkdown = variant === "markdown";
@@ -158,16 +233,16 @@ function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
     props.navigation.navigate("NoteEditor", {
       value,
       title: props.title,
-      setValue,
+      setValue: changeValue,
       variant,
-      setVariant,
+      setVariant: changeVariant,
       displayMode,
-      setDisplayMode,
+      setDisplayMode: changeDisplayMode,
       language,
-      setLanguage,
+      setLanguage: changeLanguage,
       showLineNumbers: true,
       wrapLines,
-      setWrapLines,
+      setWrapLines: changeWrapLines,
     });
   };
 
@@ -188,7 +263,7 @@ function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
       ]}
       value={value}
       mode="outlined"
-      onChangeText={setValue}
+      onChangeText={changeValue}
       autoCapitalize={isSnippet ? "none" : "sentences"}
       autoCorrect={!isSnippet}
       multiline
@@ -221,35 +296,29 @@ function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
             <NoteSelector
               value={displayMode}
               options={displayModeOptions}
-              onSelect={setDisplayMode}
+              onSelect={changeDisplayMode}
             />
             <NoteSelector
               value={variant}
               options={variantOptions}
-              onSelect={(next) => {
-                setVariant(next);
-                if (next === "snippet") {
-                  setWrapLines(true);
-                }
-              }}
+              onSelect={changeVariant}
             />
-            {!isMarkdown && !isSnippet ? (
-              <IconButton
-                icon="arrow-expand"
-                size={18}
-                iconColor={theme.colors.primary}
-                onPress={openEditor}
-                accessibilityLabel={t("modules:noteExpand")}
-                style={styles.iconButton}
-              />
-            ) : null}
           </View>
           <View style={styles.toolbarActions}>
+            <IconButton
+              icon="arrow-expand"
+              size={18}
+              iconColor={theme.colors.primary}
+              onPress={openEditor}
+              accessibilityLabel={t("modules:noteExpand")}
+              style={styles.iconButton}
+            />
             <CopyToClipboard
               value={value}
               disabled={value.length === 0}
               margin={0}
               sensitive
+              compact
             />
           </View>
         </View>
@@ -264,7 +333,6 @@ function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
                 height: inputHeight,
                 maxHeight: sizing.max,
                 backgroundColor: theme.colors.tertiary,
-                borderColor: theme.colors.outline,
               },
             ]}
           >
@@ -280,7 +348,6 @@ function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
                 height: inputHeight,
                 maxHeight: sizing.max,
                 backgroundColor: theme.colors.tertiary,
-                borderColor: theme.colors.outline,
               },
             ]}
           >
@@ -335,7 +402,6 @@ const styles = StyleSheet.create({
   },
   preview: {
     borderRadius: 8,
-    borderWidth: 1,
     overflow: "hidden",
   },
 });

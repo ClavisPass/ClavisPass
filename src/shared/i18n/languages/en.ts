@@ -447,6 +447,8 @@ const en: TranslationSchema = {
     noteExpand: "Open large editor",
     noteCollapse: "Close large editor",
     noteCharacters: "{{count}} characters",
+    noteWords: "{{count}} words",
+    noteLines: "{{count}} lines",
     notePlain: "Text",
     noteMarkdown: "Markdown",
     noteSnippet: "Code",

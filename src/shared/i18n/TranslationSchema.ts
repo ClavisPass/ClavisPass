@@ -421,6 +421,8 @@ export type TranslationSchema = {
     noteExpand: string;
     noteCollapse: string;
     noteCharacters: string;
+    noteWords: string;
+    noteLines: string;
     notePlain: string;
     noteMarkdown: string;
     noteSnippet: string;

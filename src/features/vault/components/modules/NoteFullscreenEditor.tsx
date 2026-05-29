@@ -63,8 +63,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bodyContent: {
-    padding: 12,
-    paddingTop: 0,
+    padding: 0,
   },
   input: {
     height: undefined,
@@ -77,7 +76,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   outline: {
-    borderRadius: 8,
+    borderRadius: 0,
     borderWidth: 1,
   },
 });

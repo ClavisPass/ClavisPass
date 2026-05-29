@@ -1,8 +1,7 @@
 import React, { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Button, Divider } from "react-native-paper";
+import { Chip, Divider } from "react-native-paper";
 
-import { useTheme } from "../../../../app/providers/ThemeProvider";
 import AdaptiveMenu from "../../../../shared/components/menus/AdaptiveMenu";
 import { MenuItem } from "../../../../shared/components/menus/MenuItem";
 
@@ -23,7 +22,6 @@ function NoteSelector<T extends string>({
   options,
   onSelect,
 }: Props<T>) {
-  const { theme } = useTheme();
   const triggerRef = useRef<View>(null);
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -47,18 +45,14 @@ function NoteSelector<T extends string>({
 
   return (
     <View ref={triggerRef} collapsable={false} style={styles.selectorWrap}>
-      <Button
-        compact
-        mode="contained-tonal"
+      <Chip
+        mode="flat"
         icon={selected?.icon}
-        textColor={theme.colors.primary}
         onPress={open}
-        contentStyle={styles.selectorButtonContent}
-        labelStyle={styles.selectorButtonLabel}
-        style={styles.selectorButton}
+        style={styles.selectorChip}
       >
         {selected?.label}
-      </Button>
+      </Chip>
       <AdaptiveMenu
         visible={visible}
         setVisible={setVisible}
@@ -94,28 +88,11 @@ function NoteSelector<T extends string>({
 const styles = StyleSheet.create({
   selectorWrap: {
     minWidth: 92,
-    height: 34,
     justifyContent: "center",
   },
-  selectorButton: {
+  selectorChip: {
     margin: 0,
-    width: "100%",
-    borderRadius: 8,
-  },
-  selectorButtonContent: {
-    height: 34,
-    minHeight: 34,
-    paddingLeft: 2,
-    paddingRight: 0,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  selectorButtonLabel: {
-    marginLeft: 7,
-    marginRight: 1,
-    marginVertical: 0,
-    fontSize: 12,
-    lineHeight: 14,
+    borderRadius: 12,
   },
 });
 

@@ -45,7 +45,6 @@ export default function NoteFullscreenEditor({
         styles.container,
         {
           backgroundColor: theme.colors.tertiary,
-          borderColor: theme.colors.outline,
         },
       ]}
     >
@@ -76,6 +75,8 @@ export default function NoteFullscreenEditor({
         }}
         options={{
           automaticLayout: true,
+          folding: isSnippet,
+          showFoldingControls: isSnippet ? "mouseover" : "never",
           fontFamily:
             "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
           fontSize: 14,
@@ -101,10 +102,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: "100%",
-    margin: 4,
-    marginTop: 0,
-    borderRadius: 8,
-    borderWidth: 1,
     overflow: "hidden",
   },
 });
