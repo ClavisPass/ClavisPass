@@ -322,7 +322,7 @@ jobs:
         run: |
           curl -L -o ClavisPass.apk "$APK_URL"
           ls -l ClavisPass.apk
-      
+
       - name: Set version without 'v'
         run: echo "VERSION_NO_V=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
 
@@ -337,7 +337,14 @@ jobs:
 
   build-updater:
     runs-on: ubuntu-24.04
-    needs: [build-linux, build-windows, build-macos, expo-ota-update, build-android-apk]
+    needs:
+      [
+        build-linux,
+        build-windows,
+        build-macos,
+        expo-ota-update,
+        build-android-apk,
+      ]
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -406,6 +413,12 @@ jobs:
             --password "${TAURI_SIGNING_PRIVATE_KEY_PASSWORD}" \
             updater.json > updater.json.sig
 
+      - name: Generate mobile version manifest
+        run: |
+          RELEASE_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}"
+          ANDROID_APK_FILENAME="ClavisPass_${{ env.VERSION_NO_V }}_android.apk"
+          RELEASE_URL="$RELEASE_URL" ANDROID_APK_FILENAME="$ANDROID_APK_FILENAME" node scripts/generate-mobile-version-manifest.js
+
       - name: Upload updater.json and signature to release
         uses: softprops/action-gh-release@v1
         with:
@@ -422,4 +435,5 @@ jobs:
           files: |
             updater.json
             updater.json.sig
+            mobile-version.json
             artifacts/android/ClavisPass_${{ env.VERSION_NO_V }}_android.apk

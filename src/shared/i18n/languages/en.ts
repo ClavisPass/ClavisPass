@@ -156,6 +156,11 @@ const en: TranslationSchema = {
     updateCheckFailed: "Error while checking for updates",
     updateInstallFailed: "Error while installing update",
     updateNow: "Update",
+    mobileUpdateAvailable: "New app version available",
+    mobileUpdateRequiredTitle: "App update required",
+    mobileUpdateRequiredText:
+      "This version is no longer supported. Please download and install the latest app version.",
+    mobileUpdateDownload: "Download",
     minimizeToTray: "Minimize to Tray",
     showHide: "Show/Hide",
     hotkeys: "Keyboard Shortcuts",

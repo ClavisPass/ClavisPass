@@ -20,9 +20,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "runtimeVersion": "1.7.0",
     "ios": {
       "supportsTablet": true,
@@ -34,9 +32,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.clavispass.app",
-      "permissions": [
-        "android.permission.CAMERA"
-      ]
+      "permissions": ["android.permission.CAMERA"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -56,6 +52,7 @@
       "expo-localization"
     ],
     "extra": {
+      "mobileUpdateManifestUrl": "https://github.com/ClavisPass/ClavisPass/releases/latest/download/mobile-version.json",
       "eas": {
         "projectId": "85aa75f5-f93e-499b-b999-03a921001dab"
       }

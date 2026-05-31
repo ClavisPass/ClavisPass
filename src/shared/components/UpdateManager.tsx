@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Platform, View } from "react-native";
+import { Linking, Platform, View } from "react-native";
 import * as Updates from "expo-updates";
 import type { Update as UpdateProp } from "@tauri-apps/plugin-updater";
 import { Button, Icon, Text } from "react-native-paper";
@@ -15,23 +15,29 @@ import {
   checkForDesktopUpdate,
   installDesktopUpdate,
 } from "../utils/desktopUpdater";
+import {
+  checkMobileBinaryUpdate,
+  type MobileBinaryUpdate,
+} from "../utils/mobileUpdater";
 
 const UpdateManager = () => {
   const { theme } = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [updateMessage, setUpdateMessage] = useState("");
   const [getContentLength, setContentlength] = useState<number | undefined>(
-    undefined
+    undefined,
   );
   const [downloaded, setDownloaded] = useState<number | undefined>(undefined);
   const [update, setUpdate] = useState<UpdateProp | null>(null);
+  const [mobileBinaryUpdate, setMobileBinaryUpdate] =
+    useState<MobileBinaryUpdate | null>(null);
 
   useEffect(() => {
     if (Platform.OS === "web") {
       checkTauriUpdate();
     } else {
-      checkExpoUpdate();
+      checkMobileUpdates();
     }
   }, []);
 
@@ -67,11 +73,46 @@ const UpdateManager = () => {
     }
   };
 
+  const checkMobileUpdates = async () => {
+    try {
+      const nextMobileBinaryUpdate = await checkMobileBinaryUpdate(
+        i18n.language,
+      );
+
+      if (nextMobileBinaryUpdate) {
+        setMobileBinaryUpdate(nextMobileBinaryUpdate);
+        setUpdateAvailable(true);
+        setUpdateMessage(
+          nextMobileBinaryUpdate.required
+            ? t("settings:mobileUpdateRequiredTitle")
+            : t("settings:mobileUpdateAvailable"),
+        );
+
+        return;
+      }
+    } catch (error) {
+      logger.warn("Mobile binary update check failed:", error);
+    }
+
+    await checkExpoUpdate();
+  };
+
   const applyExpoUpdate = async () => {
     try {
       await Updates.fetchUpdateAsync();
       await Updates.reloadAsync();
     } catch (error) {
+      setUpdateMessage(t("settings:updateInstallFailed"));
+    }
+  };
+
+  const applyMobileBinaryUpdate = async () => {
+    if (!mobileBinaryUpdate) return;
+
+    try {
+      await Linking.openURL(mobileBinaryUpdate.downloadUrl);
+    } catch (error) {
+      logger.error("Error while opening mobile update URL:", error);
       setUpdateMessage(t("settings:updateInstallFailed"));
     }
   };
@@ -100,19 +141,23 @@ const UpdateManager = () => {
       }
 
       logger.info(
-        `found update ${update.version} from ${update.date} with notes ${update.body}`
+        `found update ${update.version} from ${update.date} with notes ${update.body}`,
       );
       let downloadedBytes = 0;
       await installDesktopUpdate(update, (event) => {
         switch (event.event) {
           case "Started":
             setContentlength(event.data.contentLength);
-            logger.info(`started downloading ${event.data.contentLength} bytes`);
+            logger.info(
+              `started downloading ${event.data.contentLength} bytes`,
+            );
             break;
           case "Progress":
             downloadedBytes += event.data.chunkLength;
             setDownloaded(downloadedBytes);
-            logger.info(`downloaded ${downloadedBytes} from ${getContentLength}`);
+            logger.info(
+              `downloaded ${downloadedBytes} from ${getContentLength}`,
+            );
             break;
           case "Finished":
             logger.info("download finished");
@@ -128,6 +173,11 @@ const UpdateManager = () => {
   };
 
   const applyUpdate = async () => {
+    if (mobileBinaryUpdate) {
+      await applyMobileBinaryUpdate();
+      return;
+    }
+
     if (Platform.OS === "web") {
       await applyTauriUpdate();
     } else {
@@ -164,11 +214,24 @@ const UpdateManager = () => {
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <Icon
-            source={"tray-arrow-down"}
+            source={
+              mobileBinaryUpdate?.required ? "alert-circle" : "tray-arrow-down"
+            }
             size={24}
-            color={theme.colors.primary}
+            color={
+              mobileBinaryUpdate?.required
+                ? theme.colors.error
+                : theme.colors.primary
+            }
           />
-          <Text ellipsizeMode="clip" style={{ color: theme.colors.primary }}>
+          <Text
+            ellipsizeMode="clip"
+            style={{
+              color: mobileBinaryUpdate?.required
+                ? theme.colors.error
+                : theme.colors.primary,
+            }}
+          >
             {updateMessage}
           </Text>
         </View>
@@ -183,7 +246,9 @@ const UpdateManager = () => {
           }}
           onPress={applyUpdate}
         >
-          {t("settings:updateNow")}
+          {mobileBinaryUpdate
+            ? t("settings:mobileUpdateDownload")
+            : t("settings:updateNow")}
         </Button>
       </View>
     </View>

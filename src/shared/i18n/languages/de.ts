@@ -158,6 +158,11 @@ const de: TranslationSchema = {
     updateCheckFailed: "Fehler beim Suchen nach Updates",
     updateInstallFailed: "Fehler beim Installieren des Updates",
     updateNow: "Update",
+    mobileUpdateAvailable: "Neue App-Version verfügbar",
+    mobileUpdateRequiredTitle: "App-Update erforderlich",
+    mobileUpdateRequiredText:
+      "Diese Version wird nicht mehr unterstützt. Bitte lade die neueste App-Version herunter und installiere sie.",
+    mobileUpdateDownload: "Herunterladen",
     minimizeToTray: "In Tray minimieren",
     showHide: "Anzeigen/Verbergen",
     hotkeys: "Tastenkürzel",

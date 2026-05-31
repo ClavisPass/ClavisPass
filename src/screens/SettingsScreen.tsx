@@ -6,6 +6,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import * as Updates from "expo-updates";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
 import Import, {
@@ -51,6 +52,7 @@ import AppearanceSettingsSection from "../features/settings/components/Appearanc
 import FastAccessPositionPicker from "../features/settings/components/FastAccessPositionPicker";
 import HotkeyRecorderItem from "../features/settings/components/HotkeyRecorderItem";
 import { checkForDesktopUpdate } from "../shared/utils/desktopUpdater";
+import { checkMobileBinaryUpdate } from "../shared/utils/mobileUpdater";
 import { publishUpdateCheck } from "../infrastructure/events/updateBus";
 import { logger } from "../infrastructure/logging/logger";
 import {
@@ -127,6 +129,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const [manualUpdateLabel, setManualUpdateLabel] = useState<string | null>(
     null,
   );
+  const [manualMobileUpdateUrl, setManualMobileUpdateUrl] = useState<
+    string | null
+  >(null);
   const [isTauri, setIsTauri] = useState(isTauriEnvironment());
 
   const { value: closeBehaviorValue, setValue: setCloseBehaviorValue } =
@@ -195,12 +200,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               plattform: "web",
             },
             {
-              title: t("settings:updates"),
-              icon: "update",
-              ref: updatesRef,
-              plattform: "web",
-            },
-            {
               title: t("settings:hotkeys"),
               icon: "keyboard",
               ref: hotkeysRef,
@@ -208,6 +207,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             },
           ] satisfies QuickSelectItem[])
         : []),
+      {
+        title: t("settings:updates"),
+        icon: "update",
+        ref: updatesRef,
+        plattform: null,
+      },
       {
         title: t("settings:appearance"),
         icon: "theme-light-dark",
@@ -332,18 +337,40 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   };
 
   const checkForUpdates = async () => {
-    if (!(await detectTauriEnvironment()) || checkingUpdate) {
+    if (checkingUpdate) {
       return;
     }
 
     setCheckingUpdate(true);
     setManualUpdateLabel(t("settings:checkingForUpdates"));
+    setManualMobileUpdateUrl(null);
 
     try {
-      const update = await checkForDesktopUpdate();
-      publishUpdateCheck(update);
+      if (await detectTauriEnvironment()) {
+        const update = await checkForDesktopUpdate();
+        publishUpdateCheck(update);
+        setManualUpdateLabel(
+          update
+            ? t("settings:updateAvailable")
+            : t("settings:noUpdatesAvailable"),
+        );
+        return;
+      }
+
+      const mobileUpdate = await checkMobileBinaryUpdate(language);
+      if (mobileUpdate) {
+        setManualMobileUpdateUrl(mobileUpdate.downloadUrl);
+        setManualUpdateLabel(
+          mobileUpdate.required
+            ? t("settings:mobileUpdateRequiredTitle")
+            : t("settings:mobileUpdateAvailable"),
+        );
+        return;
+      }
+
+      const updateResult = await Updates.checkForUpdateAsync();
       setManualUpdateLabel(
-        update
+        updateResult.isAvailable
           ? t("settings:updateAvailable")
           : t("settings:noUpdatesAvailable"),
       );
@@ -568,27 +595,37 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               </SettingsContainer>
             ) : null}
 
-            {isTauri ? (
-              <SettingsContainer
-                ref={updatesRef}
-                icon="update"
-                title={t("settings:updates")}
+            <SettingsContainer
+              ref={updatesRef}
+              icon="update"
+              title={t("settings:updates")}
+            >
+              <SettingsItem>
+                {checkingUpdate
+                  ? t("settings:checkingForUpdates")
+                  : (manualUpdateLabel ?? t("settings:noUpdatesAvailable"))}
+              </SettingsItem>
+              {manualMobileUpdateUrl ? (
+                <>
+                  <SettingsDivider />
+                  <SettingsItem
+                    onPress={() => {
+                      void Linking.openURL(manualMobileUpdateUrl);
+                    }}
+                  >
+                    {t("settings:mobileUpdateDownload")}
+                  </SettingsItem>
+                </>
+              ) : null}
+              <SettingsDivider />
+              <SettingsItem
+                onPress={() => {
+                  void checkForUpdates();
+                }}
               >
-                <SettingsItem>
-                  {checkingUpdate
-                    ? t("settings:checkingForUpdates")
-                    : (manualUpdateLabel ?? t("settings:noUpdatesAvailable"))}
-                </SettingsItem>
-                <SettingsDivider />
-                <SettingsItem
-                  onPress={() => {
-                    void checkForUpdates();
-                  }}
-                >
-                  {t("settings:checkForUpdates")}
-                </SettingsItem>
-              </SettingsContainer>
-            ) : null}
+                {t("settings:checkForUpdates")}
+              </SettingsItem>
+            </SettingsContainer>
 
             <SettingsContainer
               ref={designRef}

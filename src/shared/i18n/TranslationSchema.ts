@@ -152,6 +152,10 @@ export type TranslationSchema = {
     updateCheckFailed: string;
     updateInstallFailed: string;
     updateNow: string;
+    mobileUpdateAvailable: string;
+    mobileUpdateRequiredTitle: string;
+    mobileUpdateRequiredText: string;
+    mobileUpdateDownload: string;
     minimizeToTray: string;
     showHide: string;
     hotkeys: string;
