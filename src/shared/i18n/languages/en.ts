@@ -442,6 +442,12 @@ const en: TranslationSchema = {
   },
   modules: {
     customField: "Custom Field",
+    customFieldTitle: "Title",
+    customFieldType: "Type",
+    customFieldTypeText: "Text",
+    customFieldTypeSecret: "Secret",
+    customFieldTypeNumber: "Number",
+    customFieldNumberOnly: "The current value may only contain numbers.",
     digitalCard: "Digital Card",
     email: "E-Mail",
     expiry: "Expiry",

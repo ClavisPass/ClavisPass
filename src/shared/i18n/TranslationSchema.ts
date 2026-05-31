@@ -411,6 +411,12 @@ export type TranslationSchema = {
   };
   modules: {
     customField: string;
+    customFieldTitle: string;
+    customFieldType: string;
+    customFieldTypeText: string;
+    customFieldTypeSecret: string;
+    customFieldTypeNumber: string;
+    customFieldNumberOnly: string;
     digitalCard: string;
     email: string;
     expiry: string;

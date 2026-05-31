@@ -43,7 +43,9 @@ const MANAGED_MODULE_VALUES = new Set(
 );
 
 function isManagedModule(m: unknown): m is ManagedModules {
-  return typeof m === "string" && MANAGED_MODULE_VALUES.has(m as ManagedModules);
+  return (
+    typeof m === "string" && MANAGED_MODULE_VALUES.has(m as ManagedModules)
+  );
 }
 
 function firstModule(entry: ValuesType, moduleName: ModulesEnum): any | null {
@@ -80,6 +82,7 @@ export const MODULE_POLICY: Record<ManagedModules, ModulePolicy> = {
           id: (m as any).id,
           title: (m as any).title,
           value: (m as any).value,
+          inputType: (m as any).inputType,
         })),
   },
 
@@ -145,7 +148,7 @@ export function buildEntryMeta(entry: ValuesType): EntryMeta {
  */
 export function getSecretFor(
   entry: ValuesType,
-  moduleName: ModulesEnum
+  moduleName: ModulesEnum,
 ): unknown {
   if (!isManagedModule(moduleName)) return null;
 

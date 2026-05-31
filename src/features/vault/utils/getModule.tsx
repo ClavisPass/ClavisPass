@@ -79,6 +79,7 @@ const MODULE_RENDERERS = {
         module={m.module}
         title={m.title}
         value={m.value}
+        inputType={m.inputType}
         onDragStart={args.onDragStart}
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
@@ -322,7 +323,7 @@ function getModule(
   changeModule: (module: ModuleType) => void,
   fastAccess: FastAccessType | null,
   navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>,
-  title: string
+  title: string,
 ): ReactNode {
   const args: GetModuleArgs = {
     onDragStart,

@@ -450,6 +450,12 @@ const de: TranslationSchema = {
   },
   modules: {
     customField: "Benutzerdefiniert",
+    customFieldTitle: "Titel",
+    customFieldType: "Typ",
+    customFieldTypeText: "Text",
+    customFieldTypeSecret: "Secret",
+    customFieldTypeNumber: "Nummer",
+    customFieldNumberOnly: "Der aktuelle Wert darf nur Zahlen enthalten.",
     digitalCard: "Digitale Karte",
     email: "E-Mail",
     expiry: "Ablauf",
