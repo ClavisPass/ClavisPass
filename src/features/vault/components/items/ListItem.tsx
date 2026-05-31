@@ -24,6 +24,7 @@ import { useVault } from "../../../../app/providers/VaultProvider";
 import { openFastAccess } from "../../../fastaccess/utils/FastAccess";
 import FolderSelectModal from "../modals/FolderSelectModal";
 import FolderType from "../../model/FolderType";
+import { getValueIcon } from "../../utils/getValueIcon";
 
 const styles = StyleSheet.create({
   container: {
@@ -196,6 +197,7 @@ function ListItem(props: Props) {
   const [folderSelectVisible, setFolderSelectVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [menuOffsetY, setMenuOffsetY] = useState(6);
+  const [faviconFailed, setFaviconFailed] = useState(false);
 
   const [usernameIcon, setUsernameIcon] = useState("account");
   const [passwordIcon, setPasswordIcon] = useState("form-textbox-password");
@@ -289,30 +291,15 @@ function ListItem(props: Props) {
       : "";
   }, [props.item.modules]);
 
-  const icon = useMemo(() => {
-    const modules = props.item.modules;
+  useEffect(() => {
+    setFaviconFailed(false);
+  }, [url]);
 
-    if (modules.some((m) => m.module === ModulesEnum.WIFI)) {
-      return "wifi";
-    }
-    if (modules.some((m) => m.module === ModulesEnum.KEY)) {
-      return "key-variant";
-    }
-    if (modules.some((m) => m.module === ModulesEnum.TASK)) {
-      return "checkbox-multiple-marked";
-    }
-    if (modules.some((m) => m.module === ModulesEnum.DIGITAL_CARD)) {
-      return "credit-card-multiple";
-    }
-    if (
-      modules.length > 0 &&
-      modules.every((m) => m.module === ModulesEnum.NOTE)
-    ) {
-      return "note";
-    }
-
-    return "lock";
-  }, [props.item.modules]);
+  const icon = useMemo(
+    () => getValueIcon({ modules: props.item.modules }),
+    [props.item.modules],
+  );
+  const showFavicon = url !== "" && !faviconFailed;
 
   const fastAccessObject = useMemo(() => {
     if (!hovered) return null;
@@ -323,7 +310,7 @@ function ListItem(props: Props) {
     () => extractFastAccessObject(props.item.modules, props.item.title),
     [props.item.modules, props.item.title],
   );
-  const menuPreviewIcon = url !== "" ? null : icon;
+  const menuPreviewIcon = showFavicon ? null : icon;
 
   const updateListItem = (recipe: (entry: ValuesType) => ValuesType) => {
     vault.update((draft) => {
@@ -385,12 +372,13 @@ function ListItem(props: Props) {
 
   const menuTopContent = (
     <View style={styles.menuPreview}>
-      {url !== "" ? (
+      {showFavicon ? (
         <Image
           style={{ width: 28, height: 28, borderRadius: 8 }}
           source={url}
           contentFit="cover"
           transition={250}
+          onError={() => setFaviconFailed(true)}
         />
       ) : (
         <View style={styles.iconBox}>
@@ -644,13 +632,14 @@ function ListItem(props: Props) {
                 <Icon color={theme.colors?.primary} source="drag" size={24} />
               </AnimatedPressable>
             ) : null}
-            {url !== "" ? (
+            {showFavicon ? (
               <Image
                 style={{ width: 30, height: 30, margin: 0, borderRadius: 8 }}
                 source={url}
                 contentFit="cover"
                 transition={250}
                 pointerEvents="none"
+                onError={() => setFaviconFailed(true)}
               />
             ) : (
               <View style={styles.iconBox}>
