@@ -1,8 +1,8 @@
 #![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
 
-mod screen_lock;
 pub mod bridge;
 mod bridge_commands;
+mod screen_lock;
 
 use serde::{Deserialize, Serialize};
 use std::{fs, path::PathBuf, time::Duration};
@@ -23,10 +23,10 @@ use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_deep_link;
 use tauri_plugin_global_shortcut;
 use tauri_plugin_oauth;
+use tauri_plugin_os;
 use tauri_plugin_shell;
 use tauri_plugin_single_instance;
 use tauri_plugin_updater;
-use tauri_plugin_os;
 
 mod commands;
 mod device_identity;
@@ -227,6 +227,11 @@ pub fn run() {
 
             let app_handle = app.handle().clone();
             let started_hidden = std::env::args().any(|arg| arg == "--hidden");
+            let requested_size = load_window_size(app.handle()).unwrap_or(WindowSize {
+                width: DEFAULT_WINDOW_WIDTH,
+                height: DEFAULT_WINDOW_HEIGHT,
+            });
+            let initial_size = clamp_window_size(requested_size);
 
             let builder = WebviewWindowBuilder::new(
                 &app_handle,
@@ -236,7 +241,7 @@ pub fn run() {
             .title("ClavisPass")
             .fullscreen(false)
             .resizable(true)
-            .inner_size(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT)
+            .inner_size(initial_size.width, initial_size.height)
             .min_inner_size(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
             .decorations(false);
 
@@ -248,7 +253,7 @@ pub fn run() {
                 .maximizable(false)
                 .use_https_scheme(true)
                 .zoom_hotkeys_enabled(false)
-                .visible(!started_hidden)
+                .visible(false)
                 .devtools(cfg!(debug_assertions));
 
             let main_window = builder
@@ -258,7 +263,16 @@ pub fn run() {
                 })
                 .build()?;
 
+            let size = clamp_window_size_to_monitor(&main_window, initial_size);
+            let _ = main_window.set_size(Size::Logical(tauri::LogicalSize::new(
+                size.width,
+                size.height,
+            )));
             let _ = main_window.center();
+            if !started_hidden {
+                let _ = main_window.show();
+                let _ = main_window.set_focus();
+            }
 
             #[cfg(desktop)]
             {
@@ -271,10 +285,8 @@ pub fn run() {
             let settings_i = MenuItem::with_id(app, "settings", "Settings", true, None::<&str>)?;
             let separator_i = PredefinedMenuItem::separator(app)?;
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-            let menu = Menu::with_items(
-                app,
-                &[&show_i, &lock_i, &settings_i, &separator_i, &quit_i],
-            )?;
+            let menu =
+                Menu::with_items(app, &[&show_i, &lock_i, &settings_i, &separator_i, &quit_i])?;
 
             TrayIconBuilder::<tauri::Wry>::with_id("main")
                 .icon(app.default_window_icon().unwrap().clone())
@@ -312,20 +324,6 @@ pub fn run() {
                 .build(app)?;
 
             // Fenstergröße wiederherstellen
-            if let Some(main_window) = app.get_webview_window("main") {
-                let requested_size = load_window_size(app.handle()).unwrap_or(WindowSize {
-                    width: DEFAULT_WINDOW_WIDTH,
-                    height: DEFAULT_WINDOW_HEIGHT,
-                });
-                let size = clamp_window_size_to_monitor(&main_window, requested_size);
-
-                let _ = main_window.set_size(Size::Logical(tauri::LogicalSize::new(
-                    size.width,
-                    size.height,
-                )));
-                let _ = main_window.center();
-            }
-
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -392,5 +390,3 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-
-
