@@ -193,7 +193,7 @@ const de: TranslationSchema = {
     copyDurationOff: "Aus",
     autosaveDelay: "Autospeichern",
     autosaveOff: "Aus",
-    sessionDuration: "Sitzungsdauer",
+    sessionDuration: "Sperren bei Inaktivität",
     contentProtection: "Inhaltsschutz",
     blurOnUnfocus: "Bei Fokusverlust verwischen",
     dangerZone: "Danger Zone",

@@ -8,6 +8,7 @@ import React, {
   useState,
   ReactNode,
 } from "react";
+import { AppState, Platform, View } from "react-native";
 import { useSetting } from "./SettingsProvider";
 import { initScreenLockLogout } from "../../features/auth/utils/screenLockLogout";
 import ScreenLockLogoutController from "../../features/auth/model/ScreenLockLogoutController";
@@ -21,6 +22,7 @@ export interface AuthContextType {
 
   login: (master: string) => void;
   logout: () => void;
+  recordActivity: () => void;
 
   getMaster: () => string | null;
   requireMaster: () => string;
@@ -56,20 +58,20 @@ export const AuthProvider = ({ children }: Props) => {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [sessionStart, setSessionStart] = useState<number | null>(null);
-  const [sessionRemaining, setSessionRemaining] = useState<number>(
-    sessionLimitSeconds
-  );
+  const [sessionRemaining, setSessionRemaining] =
+    useState<number>(sessionLimitSeconds);
 
-  const logoutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tickIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isLoggedInRef = useRef(false);
+  const lastActivityAtRef = useRef<number | null>(null);
+  const lastRecordedActivityRef = useRef(0);
+  const sessionLimitMsRef = useRef(sessionLimitMs);
 
-  const sessionStartRef = useRef<number | null>(null);
+  useEffect(() => {
+    sessionLimitMsRef.current = sessionLimitMs;
+  }, [sessionLimitMs]);
 
   const clearTimers = useCallback(() => {
-    if (logoutTimerRef.current) {
-      clearTimeout(logoutTimerRef.current);
-      logoutTimerRef.current = null;
-    }
     if (tickIntervalRef.current) {
       clearInterval(tickIntervalRef.current);
       tickIntervalRef.current = null;
@@ -81,19 +83,34 @@ export const AuthProvider = ({ children }: Props) => {
     void clipboardClearScheduler.forceClearSensitive();
 
     clearTimers();
-    sessionStartRef.current = null;
+    isLoggedInRef.current = false;
+    lastActivityAtRef.current = null;
+    lastRecordedActivityRef.current = 0;
 
     setIsLoggedIn(false);
     setSessionStart(null);
     setSessionRemaining(sessionLimitSeconds);
   }, [clearTimers, sessionLimitSeconds]);
 
+  const recordActivity = useCallback(() => {
+    if (!isLoggedInRef.current) return;
+
+    const now = Date.now();
+    if (now - lastRecordedActivityRef.current < 1000) return;
+
+    lastRecordedActivityRef.current = now;
+    lastActivityAtRef.current = now;
+    setSessionRemaining(sessionLimitSeconds);
+  }, [sessionLimitSeconds]);
+
   const login = useCallback(
     (master: string) => {
       masterRef.current = master;
 
       const now = Date.now();
-      sessionStartRef.current = now;
+      isLoggedInRef.current = true;
+      lastActivityAtRef.current = now;
+      lastRecordedActivityRef.current = now;
 
       setIsLoggedIn(true);
       setSessionStart(now);
@@ -101,22 +118,18 @@ export const AuthProvider = ({ children }: Props) => {
 
       clearTimers();
 
-      logoutTimerRef.current = setTimeout(() => {
-        logout();
-      }, sessionLimitMs);
-
       tickIntervalRef.current = setInterval(() => {
-        const start = sessionStartRef.current;
-        if (!start) return;
+        const lastActivity = lastActivityAtRef.current;
+        if (!lastActivity) return;
 
-        const elapsed = Date.now() - start;
-        const remainingMs = Math.max(0, sessionLimitMs - elapsed);
+        const elapsed = Date.now() - lastActivity;
+        const remainingMs = Math.max(0, sessionLimitMsRef.current - elapsed);
         setSessionRemaining(Math.floor(remainingMs / 1000));
 
         if (remainingMs <= 0) logout();
       }, 1000);
     },
-    [clearTimers, logout, sessionLimitMs, sessionLimitSeconds]
+    [clearTimers, logout, sessionLimitSeconds],
   );
 
   const getMaster = useCallback(() => masterRef.current, []);
@@ -127,8 +140,59 @@ export const AuthProvider = ({ children }: Props) => {
   }, []);
 
   useEffect(() => {
-    if (!isLoggedIn) setSessionRemaining(sessionLimitSeconds);
-  }, [isLoggedIn, sessionLimitSeconds]);
+    if (!isLoggedIn) {
+      setSessionRemaining(sessionLimitSeconds);
+      return;
+    }
+
+    recordActivity();
+  }, [isLoggedIn, recordActivity, sessionLimitSeconds]);
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    if (Platform.OS !== "web") {
+      return;
+    }
+
+    const activityEvents = [
+      "pointerdown",
+      "keydown",
+      "wheel",
+      "touchstart",
+    ] as const;
+
+    activityEvents.forEach((eventName) => {
+      window.addEventListener(eventName, recordActivity, { passive: true });
+    });
+
+    return () => {
+      activityEvents.forEach((eventName) => {
+        window.removeEventListener(eventName, recordActivity);
+      });
+    };
+  }, [isLoggedIn, recordActivity]);
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      if (nextState !== "active") return;
+
+      const lastActivity = lastActivityAtRef.current;
+      if (
+        lastActivity &&
+        Date.now() - lastActivity >= sessionLimitMsRef.current
+      ) {
+        logout();
+        return;
+      }
+
+      recordActivity();
+    });
+
+    return () => subscription.remove();
+  }, [isLoggedIn, logout, recordActivity]);
 
   useEffect(() => {
     return () => {
@@ -138,26 +202,26 @@ export const AuthProvider = ({ children }: Props) => {
   }, [clearTimers]);
 
   useEffect(() => {
-  let controller: ScreenLockLogoutController | null = null;
-  let cancelled = false;
+    let controller: ScreenLockLogoutController | null = null;
+    let cancelled = false;
 
-  (async () => {
-    controller = await initScreenLockLogout({
-      onLock: () => {
-        if (isLoggedIn) logout();
-      },
-      oncePerLockCycle: true,
-    });
+    (async () => {
+      controller = await initScreenLockLogout({
+        onLock: () => {
+          if (isLoggedIn) logout();
+        },
+        oncePerLockCycle: true,
+      });
 
-    if (cancelled) controller.dispose();
-  })();
+      if (cancelled) controller.dispose();
+    })();
 
-  return () => {
-    cancelled = true;
-    controller?.dispose();
-    controller = null;
-  };
-}, [isLoggedIn, logout]);
+    return () => {
+      cancelled = true;
+      controller?.dispose();
+      controller = null;
+    };
+  }, [isLoggedIn, logout]);
 
   const value = useMemo<AuthContextType>(
     () => ({
@@ -166,6 +230,7 @@ export const AuthProvider = ({ children }: Props) => {
       sessionRemaining,
       login,
       logout,
+      recordActivity,
       getMaster,
       requireMaster,
       sessionLimitSeconds,
@@ -176,10 +241,11 @@ export const AuthProvider = ({ children }: Props) => {
       sessionRemaining,
       login,
       logout,
+      recordActivity,
       getMaster,
       requireMaster,
       sessionLimitSeconds,
-    ]
+    ],
   );
 
   const masterValue = useMemo<AuthMasterContextType>(
@@ -188,12 +254,26 @@ export const AuthProvider = ({ children }: Props) => {
       getMaster,
       requireMaster,
     }),
-    [isLoggedIn, getMaster, requireMaster]
+    [isLoggedIn, getMaster, requireMaster],
   );
 
   return (
     <AuthMasterContext.Provider value={masterValue}>
-      <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+      <AuthContext.Provider value={value}>
+        <View
+          style={{ flex: 1 }}
+          onStartShouldSetResponderCapture={() => {
+            recordActivity();
+            return false;
+          }}
+          onMoveShouldSetResponderCapture={() => {
+            recordActivity();
+            return false;
+          }}
+        >
+          {children}
+        </View>
+      </AuthContext.Provider>
     </AuthMasterContext.Provider>
   );
 };
