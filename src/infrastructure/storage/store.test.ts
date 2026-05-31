@@ -14,7 +14,7 @@ describe("store", () => {
 
   it("returns schema defaults when nothing is stored", async () => {
     await expect(get("THEME_PREFERENCE")).resolves.toBe("light");
-    await expect(get("AUTOSAVE_DELAY")).resolves.toBe(10);
+    await expect(get("AUTOSAVE_DELAY")).resolves.toBe(30);
     await expect(get("ONBOARDING_DONE")).resolves.toBe(false);
   });
 

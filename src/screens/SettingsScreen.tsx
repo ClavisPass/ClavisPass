@@ -682,7 +682,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               <SettingsDivider />
 
               <SettingsDropdownItem
-                value={String(autosaveDelaySeconds ?? 10)}
+                value={String(autosaveDelaySeconds ?? 30)}
                 setValue={(v) => setAutosaveDelaySeconds(Number(v))}
                 label={t("settings:autosaveDelay")}
                 dropdownMaxWidth={260}
