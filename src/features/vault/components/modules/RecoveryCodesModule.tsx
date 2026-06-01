@@ -21,6 +21,7 @@ import RecoveryCodesModuleType from "../../model/modules/RecoveryCodesModuleType
 import ModulesEnum from "../../model/ModulesEnum";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import { useClipboardCopy } from "../../../../shared/hooks/useClipboardCopy";
+import { emitClipboardCopied } from "../../../../infrastructure/events/clipboardBus";
 
 function tokenize(input: string): string[] {
   return input
@@ -171,10 +172,10 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
     const borderColor = interpolateColor(
       focusSv.value,
       [0, 1],
-      [theme.colors.outline, theme.colors.primary],
+      [theme.colors.outlineVariant, theme.colors.primary],
     );
     return { borderColor, borderWidth: 1 };
-  }, [theme.colors.outline, theme.colors.primary]);
+  }, [theme.colors.outlineVariant, theme.colors.primary]);
 
   const handleWrapperPress = () => {
     // 1) Input anzeigen
@@ -193,6 +194,15 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
     setCodes((prev) =>
       prev.map((c) => (c.code === code ? { ...c, used: !c.used } : c)),
     );
+  };
+
+  const copyRecoveryCode = async (code: string) => {
+    const { durationMs } = await copy(code, { kind: "recovery-code" });
+    if (!durationMs || durationMs <= 0) return;
+    emitClipboardCopied({
+      durationMs,
+      createdAt: Date.now(),
+    });
   };
 
   return (
@@ -231,7 +241,9 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
                     showSelectedOverlay={true}
                     style={styles.chip}
                     textStyle={styles.chipText}
-                    onPress={() => copy(c.code, { kind: "recovery-code" })}
+                    onPress={() => {
+                      void copyRecoveryCode(c.code);
+                    }}
                     onClose={() => removeCode(c.code)}
                     closeIcon="close"
                     onLongPress={() => toggleUsed(c.code)}

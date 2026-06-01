@@ -485,7 +485,8 @@ const de: TranslationSchema = {
     unknownModule: "Unbekanntes Modul",
     recoveryCodes: "Wiederherstellungscodes",
     recoveryCodesPlaceholder: "Codes einfügen…",
-    recoveryCodesHelp: "Tippe auf einen Chip, um ihn zu kopieren.",
+    recoveryCodesHelp:
+      "Tippe auf einen Chip, um ihn zu kopieren. Halte ihn gedrückt, um ihn als verwendet zu markieren.",
     noteCompact: "Kompakt",
     noteNormal: "Normal",
     noteLarge: "Groß",

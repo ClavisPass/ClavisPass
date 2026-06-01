@@ -477,7 +477,8 @@ const en: TranslationSchema = {
     unknownModule: "Unknown Module",
     recoveryCodes: "Recovery Codes",
     recoveryCodesPlaceholder: "Paste codes…",
-    recoveryCodesHelp: "Tap a chip to copy.",
+    recoveryCodesHelp:
+      "Tap a chip to copy. Press and hold to mark it as used.",
     noteCompact: "Compact",
     noteNormal: "Normal",
     noteLarge: "Large",
