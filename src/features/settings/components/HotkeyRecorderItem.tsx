@@ -108,10 +108,10 @@ export default function HotkeyRecorderItem({
   return (
     <View
       style={{
-        minHeight: error ? 70 : 54,
+        height: error ? undefined : 44,
+        minHeight: error ? 62 : 44,
         paddingLeft: 10,
         paddingRight: 10,
-        paddingVertical: 6,
         justifyContent: "center",
         overflow: "hidden",
       }}
@@ -130,7 +130,7 @@ export default function HotkeyRecorderItem({
         >
           {label}
         </Text>
-        <View style={{ width: 28, height: 34, justifyContent: "center" }}>
+        <View style={{ width: 28, height: 30, justifyContent: "center" }}>
           {value !== DEFAULT_HOTKEYS[action] ? (
             <AnimatedPressable
               borderless={false}
@@ -160,7 +160,7 @@ export default function HotkeyRecorderItem({
           <View
             style={{
               minWidth: 108,
-              minHeight: 34,
+              minHeight: 30,
               borderRadius: 8,
               borderWidth: 1,
               borderColor: recording
