@@ -3,7 +3,7 @@ import { StyleSheet, View, useWindowDimensions } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import { Button, IconButton, Text } from "react-native-paper";
+import { Button, Chip, IconButton, Text } from "react-native-paper";
 import Animated, {
   FadeIn,
   FadeOut,
@@ -376,14 +376,16 @@ const NoteEditorScreen: React.FC<NoteEditorScreenProps> = ({
               </>
             ) : null}
             {isSnippet && languageLocal === "json" ? (
-              <IconButton
+              <Chip
+                compact
                 icon="format-align-left"
-                size={20}
-                iconColor={theme.colors.primary}
                 onPress={formatJson}
                 accessibilityLabel={t("modules:noteFormatJson")}
-                style={styles.iconButton}
-              />
+                style={styles.formatJsonChip}
+                textStyle={styles.formatJsonChipText}
+              >
+                {t("modules:noteFormatJson")}
+              </Chip>
             ) : null}
           </View>
           <View style={styles.toolbarActions}>
@@ -553,6 +555,17 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     margin: 0,
+  },
+  formatJsonChip: {
+    height: 32,
+    margin: 0,
+    borderRadius: 12,
+    justifyContent: "center",
+  },
+  formatJsonChipText: {
+    fontSize: 12,
+    lineHeight: 14,
+    marginVertical: 0,
   },
   previewButton: {
     margin: 0,
