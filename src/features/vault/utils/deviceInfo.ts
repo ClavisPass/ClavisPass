@@ -1,4 +1,5 @@
 import { Platform } from "react-native";
+import * as Crypto from "expo-crypto";
 import { detectTauriEnvironment } from "../../../infrastructure/platform/isTauri";
 
 // Optional: Expo native info (iOS/Android)
@@ -14,6 +15,33 @@ type DeviceIdentity = {
   hostname: string;
   platform: string;
 };
+
+function normalizeDeviceIdentityPart(value: string): string {
+  const normalized = value.trim().toLowerCase().replace(/\s+/g, " ");
+  return normalized || "unknown";
+}
+
+export async function createVaultDeviceId(
+  name: string,
+  platform: string
+): Promise<string> {
+  const input = [
+    "clavispass-device-v1",
+    normalizeDeviceIdentityPart(platform),
+    normalizeDeviceIdentityPart(name),
+  ].join("|");
+  const digest = await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    input
+  );
+  return `device_${digest.slice(0, 32)}`;
+}
+
+export async function getCurrentVaultDeviceId(): Promise<string> {
+  const platform = await getPlatformString();
+  const name = await getDeviceDisplayName();
+  return createVaultDeviceId(name, platform);
+}
 
 async function tryGetTauriDeviceIdentity(): Promise<DeviceIdentity | null> {
   if (!(await detectTauriEnvironment())) return null;

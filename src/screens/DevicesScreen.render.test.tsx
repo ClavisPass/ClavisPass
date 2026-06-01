@@ -5,8 +5,8 @@ import DevicesScreen from "./DevicesScreen";
 
 let devices: any[] = [];
 
-vi.mock("../infrastructure/device/deviceId", () => ({
-  getOrCreateDeviceId: async () => "device-self",
+vi.mock("../features/vault/utils/deviceInfo", () => ({
+  getCurrentVaultDeviceId: async () => "device-self",
 }));
 
 vi.mock("../app/providers/VaultProvider", () => ({

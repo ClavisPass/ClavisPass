@@ -14,8 +14,8 @@ import { logger } from "../../../infrastructure/logging/logger";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 import { useVault } from "../../../app/providers/VaultProvider";
 import { upsertVaultDevice } from "../../vault/utils/vaultDevices";
-import { getOrCreateDeviceId } from "../../../infrastructure/device/deviceId";
 import {
+  createVaultDeviceId,
   getDeviceDisplayName,
   getPlatformString,
 } from "../../vault/utils/deviceInfo";
@@ -105,9 +105,9 @@ const Sync = (props: Props) => {
       }
     }
 
-    const deviceId = await getOrCreateDeviceId();
     const platform = await getPlatformString();
     const name = await getDeviceDisplayName();
+    const deviceId = await createVaultDeviceId(name, platform);
     const iso = getDateTime();
 
     vault.update((draft) => {

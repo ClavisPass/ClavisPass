@@ -30,7 +30,7 @@ import {
   type DeviceUiStatus,
 } from "../features/vault/utils/vaultDevices";
 
-import { getOrCreateDeviceId } from "../infrastructure/device/deviceId";
+import { getCurrentVaultDeviceId } from "../features/vault/utils/deviceInfo";
 import HintCard from "../shared/components/HintCard";
 
 const GAP = 8;
@@ -87,13 +87,13 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
   const nowIso = useMemo(() => getDateTime(), []);
   const policy = DEFAULT_DEVICE_UI_POLICY;
 
-  // Determine "self" device id once
+  // Determine the stable vault device id once
   const [selfId, setSelfId] = useState<string | null>(null);
   React.useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const id = await getOrCreateDeviceId();
+        const id = await getCurrentVaultDeviceId();
         if (!cancelled) setSelfId(id);
       } catch {
         if (!cancelled) setSelfId(null);

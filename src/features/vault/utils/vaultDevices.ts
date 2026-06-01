@@ -25,6 +25,32 @@ function daysBetween(nowIso: string, pastIso: string): number {
   return (now - past) / (1000 * 60 * 60 * 24);
 }
 
+function normalizeDeviceIdentityPart(value: string): string {
+  return value.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function hasSameDeviceIdentity(
+  left: Pick<VaultDeviceType, "name" | "platform">,
+  right: Pick<VaultDeviceType, "name" | "platform">
+): boolean {
+  return (
+    normalizeDeviceIdentityPart(left.name) ===
+      normalizeDeviceIdentityPart(right.name) &&
+    normalizeDeviceIdentityPart(left.platform) ===
+      normalizeDeviceIdentityPart(right.platform)
+  );
+}
+
+function earliestIso(values: string[]): string {
+  return values.reduce((earliest, value) => {
+    const currentTime = Date.parse(value);
+    const earliestTime = Date.parse(earliest);
+    if (!Number.isFinite(currentTime)) return earliest;
+    if (!Number.isFinite(earliestTime)) return value;
+    return currentTime < earliestTime ? value : earliest;
+  });
+}
+
 /**
  * UI-only derived status based on timestamps.
  * - archived: lastSeenAt older than archiveAfterDays
@@ -60,9 +86,11 @@ export function upsertVaultDevice(
   nowIso: string = getDateTime()
 ): VaultDeviceType[] {
   const list = devices ?? [];
-  const idx = list.findIndex((d) => d.id === device.id);
+  const matchingDevices = list.filter(
+    (d) => d.id === device.id || hasSameDeviceIdentity(d, device)
+  );
 
-  if (idx === -1) {
+  if (matchingDevices.length === 0) {
     return [
       ...list,
       {
@@ -75,15 +103,20 @@ export function upsertVaultDevice(
     ];
   }
 
-  const existing = list[idx];
-  const next = list.slice();
-  next[idx] = {
+  const existing = matchingDevices[0];
+  const merged: VaultDeviceType = {
     ...existing,
+    id: device.id,
     name: device.name,
     platform: device.platform,
+    firstSeenAt: earliestIso(matchingDevices.map((d) => d.firstSeenAt)),
     lastSeenAt: nowIso,
   };
-  return next;
+
+  const next = list.filter(
+    (d) => d.id !== device.id && !hasSameDeviceIdentity(d, device)
+  );
+  return [...next, merged];
 }
 
 export function sortByLastSeenDesc(list: VaultDeviceType[]) {
