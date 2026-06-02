@@ -20,6 +20,7 @@ import {
   getFooterButtonShift,
   reorderModules,
 } from "./DraggableModulesList.shared";
+import { WebDragHandlePropsProvider } from "../EditRowControlsContainer";
 
 const getItemStyle = (draggableStyle: any) => ({
   userSelect: "none",
@@ -101,21 +102,24 @@ function DraggableModulesListWeb(props: DraggableModulesListProps) {
                   <div
                     ref={draggableProvided.innerRef}
                     {...draggableProvided.draggableProps}
-                    {...draggableProvided.dragHandleProps}
                     style={{
                       ...getItemStyle(draggableProvided.draggableProps.style),
                       marginBottom: 8,
                     }}
                   >
-                    {getModule(
-                      item,
-                      () => {},
-                      props.deleteModule,
-                      props.changeModule,
-                      props.fastAccess,
-                      props.navigation,
-                      props.value.title
-                    )}
+                    <WebDragHandlePropsProvider
+                      dragHandleProps={draggableProvided.dragHandleProps}
+                    >
+                      {getModule(
+                        item,
+                        () => {},
+                        props.deleteModule,
+                        props.changeModule,
+                        props.fastAccess,
+                        props.navigation,
+                        props.value.title
+                      )}
+                    </WebDragHandlePropsProvider>
                   </div>
                 )}
               </Draggable>
