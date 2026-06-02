@@ -67,7 +67,6 @@ import {
   subscribeOpenAddValue,
   unsubscribeOpenAddValue,
 } from "../infrastructure/events/openAddValueBus";
-import AnimatedPressable from "../shared/components/AnimatedPressable";
 import Modal from "../shared/components/modals/Modal";
 import {
   authenticateUser,
@@ -102,13 +101,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     useSetting("SYSTEM_AUTH_PROMPT_DONE");
 
   const [refreshing, setRefreshing] = useState(false);
-  const [reorderMode, setReorderMode] = useState(false);
-  const [pendingReorderValues, setPendingReorderValues] = useState<
-    ValuesType[]
-  >([]);
-  const pendingReorderMovesRef = useRef<
-    Array<{ movedId: string; previousVisibleId: string | null }>
-  >([]);
 
   const [showMenu, setShowMenu] = useState(false);
 
@@ -497,13 +489,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const canReorderEntries =
     searchQuery.trim() === "" && !selected2FA && !selectedCard;
 
-  useEffect(() => {
-    if (!canReorderEntries && reorderMode) {
-      cancelReorderMode();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canReorderEntries, reorderMode]);
-
   const moveEntryAfterPreviousVisibleId = (
     values: ValuesType[],
     movedId: string,
@@ -545,40 +530,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     return result;
   };
 
-  function startReorderMode() {
-    if (!canReorderEntries) return;
-    pendingReorderMovesRef.current = [];
-    setPendingReorderValues(filteredValues);
-    setReorderMode(true);
-  }
-
-  function cancelReorderMode() {
-    pendingReorderMovesRef.current = [];
-    setPendingReorderValues([]);
-    setReorderMode(false);
-  }
-
-  function applyReorderMode() {
-    const moves = pendingReorderMovesRef.current;
-
-    if (moves.length > 0) {
-      vault.update((draft) => {
-        let nextValues = draft.values ?? [];
-        for (const move of moves) {
-          nextValues = moveEntryAfterPreviousVisibleId(
-            nextValues,
-            move.movedId,
-            move.previousVisibleId,
-          );
-        }
-        draft.values = nextValues;
-      });
-    }
-
-    cancelReorderMode();
-  }
-
-  const updatePendingVisibleReorder = (
+  const applyVisibleReorder = (
     movedId: string | undefined,
     reorderedVisibleValues: ValuesType[],
     destinationIndex: number,
@@ -590,14 +542,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         ? null
         : (reorderedVisibleValues[destinationIndex - 1]?.id ?? null);
 
-    pendingReorderMovesRef.current = [
-      ...pendingReorderMovesRef.current,
-      { movedId, previousVisibleId },
-    ];
-    setPendingReorderValues(reorderedVisibleValues);
+    vault.update((draft) => {
+      draft.values = moveEntryAfterPreviousVisibleId(
+        draft.values ?? [],
+        movedId,
+        previousVisibleId,
+      );
+    });
   };
-
-  const noop = useCallback(() => {}, []);
 
   const renderReorderListItem = useCallback(
     (
@@ -612,10 +564,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         reorderMode
         onDragStart={onDragStart}
         dragHandleProps={dragHandleProps}
-        onPress={noop}
+        onPress={() => {
+          navigation.navigate("Edit", {
+            value: item,
+          });
+        }}
       />
     ),
-    [noop],
+    [navigation],
   );
 
   const renderWebReorderList = () =>
@@ -630,15 +586,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         <DragDropContext
           onDragEnd={(result: any) => {
             if (!result.destination) return;
+            if (result.source.index === result.destination.index) return;
 
-            const movedId = pendingReorderValues[result.source.index]?.id;
+            const movedId = filteredValues[result.source.index]?.id;
             const reordered = reorderVisibleValues(
-              pendingReorderValues,
+              filteredValues,
               result.source.index,
               result.destination.index,
             );
 
-            updatePendingVisibleReorder(
+            applyVisibleReorder(
               movedId,
               reordered,
               result.destination.index,
@@ -657,13 +614,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                   paddingRight: 4,
                 }}
               >
-                {pendingReorderValues.map((item, index) => (
+                {filteredValues.map((item, index) => (
                   <Draggable key={item.id} draggableId={item.id} index={index}>
                     {(draggableProvided: any) => (
                       <div
                         ref={draggableProvided.innerRef}
                         {...draggableProvided.draggableProps}
-                        {...draggableProvided.dragHandleProps}
                         style={{
                           userSelect: "none",
                           position: "static",
@@ -673,7 +629,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                           marginBottom: 4,
                         }}
                       >
-                        {renderReorderListItem(item, index)}
+                        {renderReorderListItem(
+                          item,
+                          index,
+                          undefined,
+                          draggableProvided.dragHandleProps,
+                        )}
                       </div>
                     )}
                   </Draggable>
@@ -697,7 +658,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           ref={setActiveListRef}
           refreshControl={refreshControl}
           contentContainerStyle={{ paddingRight: 4 }}
-          data={pendingReorderValues}
+          data={filteredValues}
           keyExtractor={(item: ValuesType) => item.id}
           activationDistance={8}
           initialNumToRender={16}
@@ -721,8 +682,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             from: number;
             to: number;
           }) => {
-            const movedId = pendingReorderValues[from]?.id;
-            updatePendingVisibleReorder(movedId, data, to);
+            if (from === to) return;
+
+            const movedId = filteredValues[from]?.id;
+            applyVisibleReorder(movedId, data, to);
           }}
         />
       );
@@ -820,7 +783,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         />
       );
     }
-    if (reorderMode && canReorderEntries) {
+    if (canReorderEntries && filteredValues.length > 1) {
       const reorderList =
         Platform.OS === "web"
           ? renderWebReorderList()
@@ -839,8 +802,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           <ListItem
             item={item}
             index={index}
-            canStartReorder={canReorderEntries}
-            onStartReorder={startReorderMode}
             onPress={() => {
               navigation.navigate("Edit", {
                 value: item,
@@ -989,79 +950,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             refreshing={refreshing}
             setRefreshing={setRefreshing}
           />
-          {reorderMode ? (
-            <View
-              style={{
-                height: 48,
-                width: "100%",
-                padding: 4,
-                paddingLeft: 8,
-                paddingRight: 8,
-              }}
-            >
-              <View
-                style={{
-                  backgroundColor: theme.colors.primary,
-                  borderRadius: 8,
-                  flex: 1,
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  flexDirection: "row",
-                  overflow: "hidden",
-                }}
-              >
-                <Text
-                  variant="bodyMedium"
-                  numberOfLines={1}
-                  style={{
-                    color: "white",
-                    flex: 1,
-                    paddingLeft: 14,
-                    paddingRight: 8,
-                    userSelect: "none",
-                  }}
-                >
-                  {t("home:reorderHint")}
-                </Text>
-                <AnimatedPressable
-                  onPress={cancelReorderMode}
-                  style={{
-                    height: 40,
-                    minWidth: 96,
-                    paddingHorizontal: 12,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Text
-                    variant="bodyLarge"
-                    style={{ color: "white", userSelect: "none" }}
-                  >
-                    {t("common:cancel")}
-                  </Text>
-                </AnimatedPressable>
-                <View style={{ backgroundColor: "#00000017" }}>
-                  <AnimatedPressable
-                    onPress={applyReorderMode}
-                    style={{
-                      height: 40,
-                      minWidth: 112,
-                      paddingHorizontal: 12,
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text
-                      variant="bodyLarge"
-                      style={{ color: "white", userSelect: "none" }}
-                    >
-                      {t("common:apply")}
-                    </Text>
-                  </AnimatedPressable>
-                </View>
-              </View>
-            </View>
-          ) : null}
           <View
             style={{
               flex: 1,
@@ -1084,7 +972,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               setSelected2FA={saveSelected2FAState}
               selectedCard={selectedCard}
               setSelectedCard={saveSelectedCardState}
-              disabled={reorderMode}
             />
           </View>
 
@@ -1098,8 +985,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             }
             openEditFolder={() => setFolderModalVisible(true)}
             refreshData={refreshData}
-            canStartReorder={canReorderEntries}
-            onStartReorder={startReorderMode}
           />
 
           <FolderModal

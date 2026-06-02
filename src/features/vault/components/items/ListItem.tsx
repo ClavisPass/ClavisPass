@@ -34,6 +34,19 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
     height: 44,
+    flexDirection: "row",
+  },
+  dragHandle: {
+    width: 32,
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+  },
+  dragDivider: {
+    width: StyleSheet.hairlineWidth,
+    height: "100%",
   },
   ripple: {
     padding: 0,
@@ -174,8 +187,6 @@ type Props = {
   reorderMode?: boolean;
   onDragStart?: () => void;
   dragHandleProps?: any;
-  canStartReorder?: boolean;
-  onStartReorder?: () => void;
 };
 
 function ListItem(props: Props) {
@@ -192,6 +203,8 @@ function ListItem(props: Props) {
   const suppressNextPressRef = useRef(false);
 
   const [hovered, setHovered] = useState(false);
+  const [dragHandleHovered, setDragHandleHovered] = useState(false);
+  const [dragHandlePressed, setDragHandlePressed] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [folderSelectVisible, setFolderSelectVisible] = useState(false);
@@ -349,16 +362,6 @@ function ListItem(props: Props) {
           setFolderSelectVisible(true);
         },
       },
-      ...(props.canStartReorder && props.onStartReorder
-        ? [
-            {
-              key: "reorder",
-              icon: "sort-variant",
-              label: t("home:reorderEntries"),
-              onPress: props.onStartReorder,
-            },
-          ]
-        : []),
       {
         key: "delete",
         icon: "trash-can",
@@ -367,7 +370,7 @@ function ListItem(props: Props) {
         withDivider: false,
       },
     ],
-    [fastAccessData, props.canStartReorder, props.onStartReorder, t],
+    [fastAccessData, t],
   );
 
   const menuTopContent = (
@@ -412,8 +415,6 @@ function ListItem(props: Props) {
   );
 
   const measureAndOpenMenu = () => {
-    if (props.reorderMode) return;
-
     const estimatedMenuHeight = 228;
     const estimatedMenuWidth = 244;
     const viewportPadding = 8;
@@ -458,8 +459,6 @@ function ListItem(props: Props) {
   };
 
   const openMenuAtPointer = (event: any) => {
-    if (props.reorderMode) return;
-
     const estimatedMenuHeight = 228;
     const estimatedMenuWidth = 244;
     const viewportPadding = 8;
@@ -498,8 +497,6 @@ function ListItem(props: Props) {
   };
 
   const openItemFastAccess = async () => {
-    if (props.reorderMode) return;
-
     if (!fastAccessData) return;
 
     if (Platform.OS === "web") {
@@ -574,6 +571,121 @@ function ListItem(props: Props) {
     </View>
   );
 
+  const dragHandleIcon = (
+    <Icon
+      color={darkmode ? theme.colors?.outline : theme.colors?.outlineVariant}
+      source="drag"
+      size={20}
+    />
+  );
+
+  const webDragHandleProps = props.dragHandleProps ?? {};
+
+  const dragHandle = props.reorderMode ? (
+    Platform.OS === "web" ? (
+      <div
+        {...webDragHandleProps}
+        onMouseEnter={(event) => {
+          setDragHandleHovered(true);
+          webDragHandleProps.onMouseEnter?.(event);
+        }}
+        onMouseLeave={(event) => {
+          setDragHandleHovered(false);
+          setDragHandlePressed(false);
+          webDragHandleProps.onMouseLeave?.(event);
+        }}
+        onMouseDown={(event) => {
+          setDragHandlePressed(true);
+          webDragHandleProps.onMouseDown?.(event);
+        }}
+        onMouseUp={(event) => {
+          setDragHandlePressed(false);
+          webDragHandleProps.onMouseUp?.(event);
+        }}
+        onTouchStart={(event) => {
+          setDragHandlePressed(true);
+          webDragHandleProps.onTouchStart?.(event);
+        }}
+        onTouchEnd={(event) => {
+          setDragHandlePressed(false);
+          webDragHandleProps.onTouchEnd?.(event);
+        }}
+        style={{
+          width: 32,
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "grab",
+          touchAction: "none",
+          userSelect: "none",
+        }}
+      >
+        <AnimatedPressable
+          borderless={false}
+          rippleColor="rgba(0, 0, 0, .12)"
+          style={[
+            styles.dragHandle,
+            { pointerEvents: "none" as any },
+            dragHandleHovered
+              ? {
+                  backgroundColor: darkmode
+                    ? "rgba(255, 255, 255, .04)"
+                    : "rgba(0, 0, 0, .035)",
+                }
+              : null,
+            dragHandlePressed
+              ? {
+                  backgroundColor: darkmode
+                    ? "rgba(255, 255, 255, .08)"
+                    : "rgba(0, 0, 0, .07)",
+                }
+              : null,
+          ]}
+        >
+          {dragHandleIcon}
+        </AnimatedPressable>
+      </div>
+    ) : (
+      <AnimatedPressable
+        borderless={false}
+        rippleColor="rgba(0, 0, 0, .12)"
+        onPressIn={() => {
+          setDragHandlePressed(true);
+          props.onDragStart?.();
+        }}
+        onPressOut={() => setDragHandlePressed(false)}
+        onPress={() => {}}
+        style={[
+          styles.dragHandle,
+          dragHandlePressed
+            ? {
+                backgroundColor: darkmode
+                  ? "rgba(255, 255, 255, .08)"
+                  : "rgba(0, 0, 0, .07)",
+              }
+            : null,
+        ]}
+      >
+        {dragHandleIcon}
+      </AnimatedPressable>
+    )
+  ) : null;
+
+  const dragDivider = props.reorderMode ? (
+    <View
+      style={[
+        styles.dragDivider,
+        {
+          backgroundColor: darkmode
+            ? theme.colors.outlineVariant
+            : theme.colors.outline,
+          opacity: darkmode ? 1 : 0.28,
+        },
+      ]}
+    />
+  ) : null;
+
   const listItemContent = (
     <Animated.View
       entering={
@@ -600,13 +712,12 @@ function ListItem(props: Props) {
       ]}
       {...webInteractionProps}
     >
+      {dragHandle}
+      {dragDivider}
       <AnimatedPressable
         key={props.key}
         style={styles.ripple}
         onPress={() => {
-          if (props.reorderMode) {
-            return;
-          }
           if (suppressNextPressRef.current) {
             suppressNextPressRef.current = false;
             return;
@@ -617,21 +728,6 @@ function ListItem(props: Props) {
       >
         <>
           <View style={styles.left}>
-            {props.reorderMode ? (
-              <AnimatedPressable
-                onPressIn={props.onDragStart}
-                style={{
-                  width: 34,
-                  height: 38,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: Platform.OS === "web" ? "grab" : undefined,
-                }}
-                {...(props.dragHandleProps ?? {})}
-              >
-                <Icon color={theme.colors?.primary} source="drag" size={24} />
-              </AnimatedPressable>
-            ) : null}
             {showFavicon ? (
               <Image
                 style={{ width: 30, height: 30, margin: 0, borderRadius: 8 }}
@@ -658,7 +754,7 @@ function ListItem(props: Props) {
           </View>
 
           <View style={styles.right}>
-            {!props.reorderMode && hovered && fastAccessObject && (
+            {hovered && fastAccessObject && (
               <View style={styles.chipRow}>
                 <Button
                   mode="contained-tonal"
@@ -694,13 +790,11 @@ function ListItem(props: Props) {
               </View>
             )}
 
-            {props.reorderMode ? null : (
-              <Icon
-                color={theme.colors?.primary}
-                source={"chevron-right"}
-                size={20}
-              />
-            )}
+            <Icon
+              color={theme.colors?.primary}
+              source={"chevron-right"}
+              size={20}
+            />
           </View>
         </>
       </AnimatedPressable>
