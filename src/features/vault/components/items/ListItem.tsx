@@ -723,7 +723,7 @@ function ListItem(props: Props) {
           ? { marginLeft: 0, marginRight: 0, marginBottom: 0 }
           : null,
         props.reorderMode && Platform.OS !== "web"
-          ? { marginLeft: 4, marginRight: 4, marginBottom: 4 }
+          ? { marginBottom: 4 }
           : null,
         {
           backgroundColor: theme.colors?.background,
@@ -846,7 +846,7 @@ function ListItem(props: Props) {
           containerStyle={[
             styles.swipeContainer,
             props.reorderMode
-              ? { marginLeft: 4, marginRight: 4, marginBottom: 4, height: 44 }
+              ? { marginBottom: 4, height: 44 }
               : null,
           ]}
           renderLeftActions={renderFavoriteSwipeAction}
