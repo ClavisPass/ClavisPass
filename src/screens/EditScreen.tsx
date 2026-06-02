@@ -53,6 +53,11 @@ import { useEditHistory } from "../features/vault/utils/editHistory";
 import AdaptiveMenu, {
   AdaptiveMenuItem,
 } from "../shared/components/menus/AdaptiveMenu";
+import {
+  DEFAULT_FOLDER_ICON,
+  getFolderColor,
+  getFolderIcon,
+} from "../features/vault/utils/folderAppearance";
 
 type EditScreenProps = NativeStackScreenProps<HomeStackParamList, "Edit">;
 
@@ -588,7 +593,17 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
               gap: 4,
             }}
           >
-            <Icon source="folder" size={20} color={theme.colors?.primary} />
+            <Icon
+              source={
+                value.folder ? getFolderIcon(value.folder) : DEFAULT_FOLDER_ICON
+              }
+              size={20}
+              color={
+                value.folder
+                  ? (getFolderColor(value.folder) ?? theme.colors?.primary)
+                  : theme.colors?.primary
+              }
+            />
             <Text style={{ userSelect: "none" }}>
               {value.folder === null ||
               value.folder.name === "" ||

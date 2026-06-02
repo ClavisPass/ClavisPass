@@ -25,6 +25,7 @@ import { openFastAccess } from "../../../fastaccess/utils/FastAccess";
 import FolderSelectModal from "../modals/FolderSelectModal";
 import FolderType from "../../model/FolderType";
 import { getValueIcon } from "../../utils/getValueIcon";
+import { getFolderColor } from "../../utils/folderAppearance";
 
 const styles = StyleSheet.create({
   container: {
@@ -35,6 +36,14 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     height: 44,
     flexDirection: "row",
+  },
+  folderColorStrip: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 3,
+    zIndex: 2,
   },
   dragHandle: {
     width: 32,
@@ -580,6 +589,7 @@ function ListItem(props: Props) {
   );
 
   const webDragHandleProps = props.dragHandleProps ?? {};
+  const folderColor = getFolderColor(props.item.folder);
 
   const dragHandle = props.reorderMode ? (
     Platform.OS === "web" ? (
@@ -712,6 +722,12 @@ function ListItem(props: Props) {
       ]}
       {...webInteractionProps}
     >
+      {folderColor ? (
+        <View
+          pointerEvents="none"
+          style={[styles.folderColorStrip, { backgroundColor: folderColor }]}
+        />
+      ) : null}
       {dragHandle}
       {dragDivider}
       <AnimatedPressable

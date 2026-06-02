@@ -8,11 +8,15 @@ import { useTheme } from "../../../../app/providers/ThemeProvider";
 import FolderType from "../../model/FolderType";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import { useTranslation } from "react-i18next";
+import {
+  getFolderIcon,
+} from "../../utils/folderAppearance";
 
 type Props = {
   folder: FolderType[];
   setSelectedFolder?: (folder: FolderType | null) => void;
   deleteFolder: (folder: FolderType) => void;
+  openAppearance: (folder: FolderType) => void;
   draggableDisabled?: boolean;
   persistFolderOrder: (nextFolders: FolderType[]) => void;
 };
@@ -39,6 +43,24 @@ function DraggableFolderList(props: Props) {
             </Pressable>
 
             <AnimatedPressable
+              borderless={false}
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 8,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onPress={() => props.openAppearance(item)}
+            >
+              <Icon
+                source={getFolderIcon(item)}
+                color={item.color ?? theme.colors.primary}
+                size={20}
+              />
+            </AnimatedPressable>
+
+            <AnimatedPressable
               style={{
                 borderRadius: 12,
                 padding: 10,
@@ -55,7 +77,6 @@ function DraggableFolderList(props: Props) {
               }
             >
               <>
-                <Icon source="folder" color={theme.colors.primary} size={20} />
                 <Text
                   style={{
                     userSelect: "none",
@@ -83,6 +104,7 @@ function DraggableFolderList(props: Props) {
       globalStyles.folderContainer,
       props.deleteFolder,
       props.draggableDisabled,
+      props.openAppearance,
       props.setSelectedFolder,
       theme.colors.background,
       theme.colors.primary,

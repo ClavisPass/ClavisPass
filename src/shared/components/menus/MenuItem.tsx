@@ -8,8 +8,10 @@ type Props = {
   children: ReactNode;
   onPress?: () => void;
   leadingIcon?: string;
+  leadingIconColor?: string;
   leading?: ReactNode;
   selected?: boolean;
+  selectedColor?: string;
   label?: string;
   rightText?: string;
   rightIcon?: string;
@@ -37,14 +39,14 @@ export function MenuItem(props: Props) {
               ? selectedBackgroundColor
               : "transparent",
             borderLeftWidth: props.selected ? 3 : 0,
-            borderLeftColor: theme.colors.primary,
+            borderLeftColor: props.selectedColor ?? theme.colors.primary,
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
             {props.leading ?? (props.leadingIcon && (
               <Icon
                 size={20}
-                color={theme.colors.primary}
+                color={props.leadingIconColor ?? theme.colors.primary}
                 source={props.leadingIcon}
               />
             ))}

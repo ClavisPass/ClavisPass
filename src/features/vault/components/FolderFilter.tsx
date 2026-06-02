@@ -21,6 +21,10 @@ import { DraggableHandle } from "../../../shared/components/DraggableHandle";
 import { get, set } from "../../../infrastructure/storage/store";
 import { useTranslation } from "react-i18next";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import {
+  getFolderColor,
+  getFolderIcon,
+} from "../utils/folderAppearance";
 
 const styles = StyleSheet.create({
   chip: {
@@ -237,7 +241,9 @@ function FolderFilter(props: Props) {
                 <Divider />
                 <MenuItem
                   key={index}
-                  leadingIcon={"folder"}
+                  leadingIcon={getFolderIcon(item)}
+                  leadingIconColor={getFolderColor(item) ?? theme.colors.primary}
+                  selectedColor={getFolderColor(item) ?? undefined}
                   selected={props.selectedFolder?.id === item.id ? true : false}
                   onPress={props.disabled ? undefined : () => {
                     props.setSelected2FA(false);
@@ -445,7 +451,13 @@ function FolderFilter(props: Props) {
                 <Animated.View layout={LinearTransition.duration(120)}>
                   <Chip
                     key={index}
-                    icon={"folder"}
+                    icon={() => (
+                      <MaterialCommunityIcons
+                        name={getFolderIcon(item)}
+                        size={18}
+                        color={getFolderColor(item) ?? theme.colors.primary}
+                      />
+                    )}
                     selected={props.selectedFolder == item ? true : false}
                     showSelectedOverlay={true}
                     onPress={props.disabled ? undefined : () => {

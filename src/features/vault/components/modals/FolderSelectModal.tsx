@@ -12,6 +12,11 @@ import { useTheme } from "../../../../app/providers/ThemeProvider";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import Modal from "../../../../shared/components/modals/Modal";
 import FolderType from "../../model/FolderType";
+import {
+  DEFAULT_FOLDER_ICON,
+  getFolderColor,
+  getFolderIcon,
+} from "../../utils/folderAppearance";
 
 type Props = {
   visible: boolean;
@@ -36,7 +41,8 @@ function FolderSelectModal(props: Props) {
   const renderFolderItem = (
     label: string,
     onPress: () => void,
-    selected: boolean
+    selected: boolean,
+    folder?: FolderType | null
   ) => (
     <AnimatedPressable
       onPress={() => {
@@ -59,7 +65,11 @@ function FolderSelectModal(props: Props) {
     >
       <View style={styles.itemContent}>
         <View style={styles.itemLabelWrap}>
-          <Icon source="folder" size={20} color={theme.colors.primary} />
+          <Icon
+            source={folder ? getFolderIcon(folder) : DEFAULT_FOLDER_ICON}
+            size={20}
+            color={folder ? getFolderColor(folder) ?? theme.colors.primary : theme.colors.primary}
+          />
           <Text variant="bodyLarge" numberOfLines={1}>
             {label}
           </Text>
@@ -101,13 +111,15 @@ function FolderSelectModal(props: Props) {
           {renderFolderItem(
             t("common:none"),
             () => props.onSelectFolder(null),
-            !hasMatchingSelectedFolder
+            !hasMatchingSelectedFolder,
+            null
           )}
           {props.folders.map((folder) =>
             renderFolderItem(
               folder.name,
               () => props.onSelectFolder(folder),
-              props.selectedFolder?.id === folder.id
+              props.selectedFolder?.id === folder.id,
+              folder
             )
           )}
         </ScrollView>

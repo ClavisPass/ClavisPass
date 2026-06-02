@@ -1,6 +1,13 @@
-import { useCallback, useMemo, useState } from "react";
-import { Platform, Pressable, View, StyleSheet, useWindowDimensions } from "react-native";
-import { Icon, Text, TextInput } from "react-native-paper";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Platform,
+  Pressable,
+  ScrollView,
+  View,
+  StyleSheet,
+  useWindowDimensions,
+} from "react-native";
+import { Divider, Icon, Text, TextInput } from "react-native-paper";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import FolderType from "../../model/FolderType";
 import createUniqueID from "../../../../shared/utils/createUniqueID";
@@ -9,6 +16,12 @@ import DraggableFolderListWeb from "../lists/DraggableFolderListWeb";
 import DraggableFolderList from "../lists/DraggableFolderList";
 import Modal from "../../../../shared/components/modals/Modal";
 import { useVault } from "../../../../app/providers/VaultProvider";
+import {
+  DEFAULT_FOLDER_ICON,
+  FOLDER_COLOR_OPTIONS,
+  FOLDER_ICON_OPTIONS,
+} from "../../utils/folderAppearance";
+import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 
 type Props = {
   visible: boolean;
@@ -24,7 +37,18 @@ function FolderModal(props: Props) {
   const { height } = useWindowDimensions();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const modalHeight = height > 760 ? 460 : 360;
+  const [newFolderIcon, setNewFolderIcon] = useState<string | undefined>();
+  const [newFolderColor, setNewFolderColor] = useState<string | undefined>();
+  const [appearanceTarget, setAppearanceTarget] = useState<
+    | { kind: "new" }
+    | { kind: "existing"; folder: FolderType }
+    | null
+  >(null);
+  const availableModalHeight = Math.max(
+    320,
+    height - (Platform.OS === "web" ? 48 : 80)
+  );
+  const modalHeight = Math.min(height > 760 ? 560 : 460, availableModalHeight);
 
   const normalizedQuery = searchQuery.trim();
   const hasExactMatch = useMemo(() => {
@@ -35,6 +59,14 @@ function FolderModal(props: Props) {
   const draggableDisabled = normalizedQuery !== "";
 
   const hideModal = () => props.setVisible(false);
+
+  useEffect(() => {
+    if (!props.visible) return;
+
+    setNewFolderIcon(undefined);
+    setNewFolderColor(undefined);
+    setAppearanceTarget(null);
+  }, [props.visible]);
 
   const applyFolders = (nextFolders: FolderType[]) => {
     vault.update((draft) => {
@@ -53,9 +85,60 @@ function FolderModal(props: Props) {
     const name = searchQuery.trim();
     if (!name) return;
 
-    const next = [...props.folder, { id: createUniqueID(), name }];
+    const next = [
+      ...props.folder,
+      {
+        id: createUniqueID(),
+        name,
+        ...(newFolderIcon ? { icon: newFolderIcon } : {}),
+        ...(newFolderColor ? { color: newFolderColor } : {}),
+      },
+    ];
     applyFolders(next);
     setSearchQuery("");
+    setNewFolderIcon(undefined);
+    setNewFolderColor(undefined);
+  };
+
+  const updateFolder = (folder: FolderType) => {
+    vault.update((draft) => {
+      draft.folder = props.folder.map((item) =>
+        item.id === folder.id ? folder : item
+      );
+      draft.values = (draft.values ?? []).map((entry) =>
+        entry.folder?.id === folder.id ? { ...entry, folder } : entry
+      );
+    });
+  };
+
+  const appearanceIcon =
+    appearanceTarget?.kind === "existing"
+      ? appearanceTarget.folder.icon
+      : newFolderIcon;
+  const appearanceColor =
+    appearanceTarget?.kind === "existing"
+      ? appearanceTarget.folder.color
+      : newFolderColor;
+
+  const updateAppearance = (next: {
+    icon?: string | undefined;
+    color?: string | undefined;
+  }) => {
+    if (!appearanceTarget) return;
+
+    if (appearanceTarget.kind === "new") {
+      setNewFolderIcon(next.icon);
+      setNewFolderColor(next.color);
+      return;
+    }
+
+    const folder = {
+      ...appearanceTarget.folder,
+      icon: next.icon,
+      color: next.color,
+    };
+    setAppearanceTarget({ kind: "existing", folder });
+    updateFolder(folder);
   };
 
   const persistFolderOrder = useCallback(
@@ -77,7 +160,7 @@ function FolderModal(props: Props) {
           justifyContent: "center",
           flexDirection: "column",
           height: modalHeight,
-          width: 340,
+          width: 380,
           gap: 12,
           borderRadius: 12,
           borderWidth: StyleSheet.hairlineWidth,
@@ -104,7 +187,7 @@ function FolderModal(props: Props) {
         <View
           style={{
             alignSelf: "stretch",
-            paddingHorizontal: 10,
+            paddingHorizontal: 8,
             paddingVertical: 8,
             borderRadius: 12,
             borderWidth: StyleSheet.hairlineWidth,
@@ -121,23 +204,27 @@ function FolderModal(props: Props) {
               opacity: draggableDisabled ? 0.98 : 1,
               borderRadius: 12,
               paddingHorizontal: 0,
-              minHeight: 52,
+              minHeight: 36,
               gap: 8,
             }}
           >
-            <View
+            <AnimatedPressable
+              borderless={false}
+              onPress={() => setAppearanceTarget({ kind: "new" })}
               style={{
                 width: 32,
+                height: 32,
+                borderRadius: 8,
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
               <Icon
-                source="folder-plus-outline"
+                source={newFolderIcon ?? DEFAULT_FOLDER_ICON}
                 size={20}
-                color={theme.colors.onSurfaceVariant}
+                color={newFolderColor ?? theme.colors.primary}
               />
-            </View>
+            </AnimatedPressable>
 
             <View style={{ flex: 1, minWidth: 0 }}>
               <TextInput
@@ -148,6 +235,7 @@ function FolderModal(props: Props) {
                   backgroundColor: "transparent",
                   paddingHorizontal: 0,
                   margin: 0,
+                  height: 36,
                 }}
                 value={searchQuery}
                 mode="outlined"
@@ -157,7 +245,13 @@ function FolderModal(props: Props) {
                 onSubmitEditing={addFolder}
                 outlineColor="transparent"
                 activeOutlineColor="transparent"
-                contentStyle={{ paddingLeft: 0, paddingRight: 0, minHeight: 36 }}
+                contentStyle={{
+                  paddingLeft: 0,
+                  paddingRight: 0,
+                  paddingTop: 0,
+                  paddingBottom: 0,
+                  minHeight: 32,
+                }}
               />
             </View>
 
@@ -185,6 +279,7 @@ function FolderModal(props: Props) {
               />
             </Pressable>
           </View>
+
         </View>
 
         <View
@@ -206,6 +301,9 @@ function FolderModal(props: Props) {
               folder={props.folder}
               setSelectedFolder={props.setSelectedFolder}
               deleteFolder={deleteFolder}
+              openAppearance={(folder) =>
+                setAppearanceTarget({ kind: "existing", folder })
+              }
               draggableDisabled={draggableDisabled}
               persistFolderOrder={persistFolderOrder}
             />
@@ -214,12 +312,151 @@ function FolderModal(props: Props) {
               folder={props.folder}
               setSelectedFolder={props.setSelectedFolder}
               deleteFolder={deleteFolder}
+              openAppearance={(folder) =>
+                setAppearanceTarget({ kind: "existing", folder })
+              }
               draggableDisabled={draggableDisabled}
               persistFolderOrder={persistFolderOrder}
             />
           )}
         </View>
       </View>
+      <Modal
+        visible={appearanceTarget !== null}
+        onDismiss={() => setAppearanceTarget(null)}
+      >
+        <View
+          style={{
+            width: 340,
+            padding: 16,
+            borderRadius: 12,
+            borderWidth: StyleSheet.hairlineWidth,
+            borderColor: theme.colors.outlineVariant,
+            backgroundColor: theme.colors.elevation.level2,
+            boxShadow: theme.colors.shadow,
+            gap: 14,
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+            <View
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 10,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: theme.colors.secondaryContainer,
+              }}
+            >
+              <Icon
+                source={appearanceIcon ?? DEFAULT_FOLDER_ICON}
+                size={22}
+                color={appearanceColor ?? theme.colors.primary}
+              />
+            </View>
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text variant="titleMedium" style={{ userSelect: "none" }}>
+                {appearanceTarget?.kind === "existing"
+                  ? appearanceTarget.folder.name
+                  : searchQuery.trim() || t("common:addFolder")}
+              </Text>
+            </View>
+          </View>
+
+          <Divider style={{ backgroundColor: theme.colors.outlineVariant }} />
+
+          <ScrollView style={{ maxHeight: 148 }}>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+              {FOLDER_ICON_OPTIONS.map((icon) => {
+                const selected =
+                  (appearanceIcon ?? DEFAULT_FOLDER_ICON) === icon;
+                return (
+                  <AnimatedPressable
+                    key={icon}
+                    borderless={false}
+                    onPress={() =>
+                      updateAppearance({
+                        icon: icon === DEFAULT_FOLDER_ICON ? undefined : icon,
+                        color: appearanceColor,
+                      })
+                    }
+                    style={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: 8,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: selected
+                        ? theme.colors.secondaryContainer
+                        : "transparent",
+                    }}
+                  >
+                    <Icon
+                      source={icon}
+                      size={20}
+                      color={
+                        selected
+                          ? theme.colors.primary
+                          : theme.colors.onSurfaceVariant
+                      }
+                    />
+                  </AnimatedPressable>
+                );
+              })}
+            </View>
+          </ScrollView>
+
+          <Divider style={{ backgroundColor: theme.colors.outlineVariant }} />
+
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+            <AnimatedPressable
+              borderless={false}
+              onPress={() =>
+                updateAppearance({ icon: appearanceIcon, color: undefined })
+              }
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: 999,
+                borderWidth: StyleSheet.hairlineWidth,
+                borderColor: theme.colors.outlineVariant,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: theme.colors.background,
+              }}
+            >
+              <Icon
+                source="minus"
+                size={16}
+                color={
+                  appearanceColor
+                    ? theme.colors.onSurfaceVariant
+                    : theme.colors.primary
+                }
+              />
+            </AnimatedPressable>
+            {FOLDER_COLOR_OPTIONS.map((color) => (
+              <AnimatedPressable
+                key={color}
+                borderless={false}
+                onPress={() => updateAppearance({ icon: appearanceIcon, color })}
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 999,
+                  backgroundColor: color,
+                  borderWidth:
+                    appearanceColor === color ? 2 : StyleSheet.hairlineWidth,
+                  borderColor:
+                    appearanceColor === color
+                      ? theme.colors.onSurface
+                      : theme.colors.outlineVariant,
+                }}
+              />
+            ))}
+          </View>
+        </View>
+      </Modal>
     </Modal>
   );
 }

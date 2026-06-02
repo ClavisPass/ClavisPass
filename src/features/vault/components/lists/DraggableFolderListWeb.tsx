@@ -15,11 +15,15 @@ import { useTranslation } from "react-i18next";
 import FolderType from "../../model/FolderType";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
+import {
+  getFolderIcon,
+} from "../../utils/folderAppearance";
 
 type Props = {
   folder: FolderType[];
   setSelectedFolder?: (folder: FolderType | null) => void;
   deleteFolder: (folder: FolderType) => void;
+  openAppearance: (folder: FolderType) => void;
   draggableDisabled?: boolean;
   persistFolderOrder: (nextFolders: FolderType[]) => void;
 };
@@ -150,6 +154,24 @@ function DraggableFolderListWeb(props: Props) {
                         <Icon source="drag" size={20} />
 
                         <AnimatedPressable
+                          borderless={false}
+                          style={{
+                            width: 30,
+                            height: 30,
+                            borderRadius: 8,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                          onPress={() => props.openAppearance(item)}
+                        >
+                          <Icon
+                            source={getFolderIcon(item)}
+                            size={20}
+                            color={item.color ?? theme.colors.primary}
+                          />
+                        </AnimatedPressable>
+
+                        <AnimatedPressable
                           style={{
                             borderRadius: 12,
                             padding: 10,
@@ -166,11 +188,6 @@ function DraggableFolderListWeb(props: Props) {
                           }
                         >
                           <>
-                            <Icon
-                              source="folder"
-                              size={20}
-                              color={theme.colors.primary}
-                            />
                             <Text
                               style={{
                                 userSelect: "none",
