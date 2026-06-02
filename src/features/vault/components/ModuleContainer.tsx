@@ -47,6 +47,7 @@ export default function ModuleContainer({
   fastAccess,
 }: ModuleContainerProps) {
   const { theme } = useTheme();
+  const headerColor = theme.colors.onSurfaceDisabled;
 
   return (
     <EditRowControlsContainer
@@ -99,10 +100,10 @@ export default function ModuleContainer({
               }}
             >
               {icon ? (
-                <Icon source={icon} size={18} color={theme.colors?.primary} />
+                <Icon source={icon} size={18} color={headerColor} />
               ) : null}
 
-              <Text>{title}</Text>
+              <Text style={{ color: headerColor }}>{title}</Text>
 
               {id === fastAccess?.usernameId ||
               id === fastAccess?.passwordId ? (

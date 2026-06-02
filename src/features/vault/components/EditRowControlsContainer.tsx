@@ -81,7 +81,11 @@ export function EditRowControlsContainer({
       ]}
       onPressIn={Platform.OS === "web" ? undefined : onDragStart}
     >
-      <Icon source="drag" size={20} />
+      <Icon
+        source="drag"
+        size={20}
+        color={darkmode ? theme.colors?.outline : theme.colors?.outlineVariant}
+      />
     </AnimatedPressable>
   );
 
