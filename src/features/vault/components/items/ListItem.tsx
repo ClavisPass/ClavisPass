@@ -163,7 +163,12 @@ const styles = StyleSheet.create({
   },
   swipeAction: {
     width: 78,
+    height: 44,
     alignItems: "center",
+    justifyContent: "center",
+  },
+  swipeActionBackground: {
+    height: 44,
     justifyContent: "center",
   },
   swipeActionLeft: {
@@ -551,32 +556,39 @@ function ListItem(props: Props) {
   const renderFavoriteSwipeAction = () => (
     <View
       style={[
-        styles.swipeAction,
-        styles.swipeActionLeft,
+        styles.swipeActionBackground,
         {
+          width: 156,
           backgroundColor: props.item.fav
             ? theme.colors.secondaryContainer
             : theme.colors.primary,
         },
       ]}
     >
-      <Icon
-        color={props.item.fav ? theme.colors.primary : theme.colors.onPrimary}
-        source={props.item.fav ? "star-off" : "star"}
-        size={24}
-      />
+      <View style={[styles.swipeAction, styles.swipeActionLeft]}>
+        <Icon
+          color={props.item.fav ? theme.colors.primary : theme.colors.onPrimary}
+          source={props.item.fav ? "star-off" : "star"}
+          size={24}
+        />
+      </View>
     </View>
   );
 
   const renderDeleteSwipeAction = () => (
     <View
       style={[
-        styles.swipeAction,
-        styles.swipeActionRight,
-        { backgroundColor: theme.colors.error },
+        styles.swipeActionBackground,
+        {
+          width: 156,
+          backgroundColor: theme.colors.error,
+          alignItems: "flex-end",
+        },
       ]}
     >
-      <Icon color={theme.colors.onError} source="trash-can" size={24} />
+      <View style={[styles.swipeAction, styles.swipeActionRight]}>
+        <Icon color={theme.colors.onError} source="trash-can" size={24} />
+      </View>
     </View>
   );
 
@@ -819,7 +831,7 @@ function ListItem(props: Props) {
 
   return (
     <>
-      {Platform.OS === "web" || props.reorderMode ? (
+      {Platform.OS === "web" ? (
         listItemContent
       ) : (
         <ReanimatedSwipeable
@@ -831,7 +843,12 @@ function ListItem(props: Props) {
           dragOffsetFromRightEdge={18}
           overshootLeft={false}
           overshootRight={false}
-          containerStyle={styles.swipeContainer}
+          containerStyle={[
+            styles.swipeContainer,
+            props.reorderMode
+              ? { marginLeft: 4, marginRight: 4, marginBottom: 4, height: 44 }
+              : null,
+          ]}
           renderLeftActions={renderFavoriteSwipeAction}
           renderRightActions={renderDeleteSwipeAction}
           onSwipeableOpen={(direction) => {
