@@ -446,6 +446,48 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     );
   };
 
+  const taskModuleCount = value.modules.filter(
+    (module) => module.module === ModulesEnum.TASK
+  ).length;
+
+  const sortCompletedTasksDown = () => {
+    if (taskModuleCount <= 1) return;
+
+    const sortTaskBlock = (modules: ModulesType): ModulesType => [
+      ...modules.filter(
+        (module) => !("completed" in module) || !module.completed
+      ),
+      ...modules.filter((module) => "completed" in module && module.completed),
+    ] as ModulesType;
+
+    const newModules: ModuleType[] = [];
+    let taskBlock: ModuleType[] = [];
+
+    value.modules.forEach((module) => {
+      if (module.module === ModulesEnum.TASK) {
+        taskBlock.push(module);
+        return;
+      }
+
+      if (taskBlock.length > 0) {
+        newModules.push(...sortTaskBlock(taskBlock as ModulesType));
+        taskBlock = [];
+      }
+      newModules.push(module);
+    });
+
+    if (taskBlock.length > 0) {
+      newModules.push(...sortTaskBlock(taskBlock as ModulesType));
+    }
+
+    const changed = newModules.some(
+      (module, index) => module.id !== value.modules[index].id
+    );
+    if (changed) {
+      reorderModules(newModules as ModulesType);
+    }
+  };
+
   const deleteValue = (id: string) => {
     vault.deleteEntry(id);
     setDeleteModalVisible(false);
@@ -462,6 +504,16 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   const editOverflowItems = React.useMemo<AdaptiveMenuItem[]>(
     () => [
+      ...(taskModuleCount > 1
+        ? [
+            {
+              key: "sortCompletedTasksDown",
+              icon: "sort-descending",
+              label: t("common:sortCompletedTasksDown"),
+              onPress: sortCompletedTasksDown,
+            },
+          ]
+        : []),
       {
         key: "history",
         icon: "history",
@@ -476,7 +528,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         withDivider: false,
       },
     ],
-    [sessionLog.length, t]
+    [sessionLog.length, sortCompletedTasksDown, t, taskModuleCount]
   );
 
   return (

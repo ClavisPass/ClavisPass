@@ -74,6 +74,7 @@ export type TranslationSchema = {
     editHistoryRedo: string;
     editHistorySaved: string;
     editHistoryOpened: string;
+    sortCompletedTasksDown: string;
     selectFolder: string;
     selectFolderDescription: string;
     manageFoldersDescription: string;

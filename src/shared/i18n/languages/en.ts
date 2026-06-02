@@ -75,6 +75,7 @@ const en: TranslationSchema = {
     editHistoryRedo: "Restored change",
     editHistorySaved: "Saved changes",
     editHistoryOpened: "Editor opened",
+    sortCompletedTasksDown: "Move completed tasks down",
     selectFolder: "Select Folder",
     selectFolderDescription: "Choose where this entry should live.",
     manageFoldersDescription: "Create, reorder, and remove folders here.",
