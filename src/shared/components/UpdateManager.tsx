@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Linking, Platform, View } from "react-native";
 import * as Updates from "expo-updates";
 import type { Update as UpdateProp } from "@tauri-apps/plugin-updater";
-import { Button, Icon, Text } from "react-native-paper";
+import { ActivityIndicator, Button, Icon, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../app/providers/ThemeProvider";
 import {
@@ -32,6 +32,7 @@ const UpdateManager = () => {
   const [update, setUpdate] = useState<UpdateProp | null>(null);
   const [mobileBinaryUpdate, setMobileBinaryUpdate] =
     useState<MobileBinaryUpdate | null>(null);
+  const [isApplyingUpdate, setIsApplyingUpdate] = useState(false);
 
   useEffect(() => {
     if (Platform.OS === "web") {
@@ -173,15 +174,24 @@ const UpdateManager = () => {
   };
 
   const applyUpdate = async () => {
-    if (mobileBinaryUpdate) {
-      await applyMobileBinaryUpdate();
-      return;
-    }
+    if (isApplyingUpdate) return;
 
-    if (Platform.OS === "web") {
-      await applyTauriUpdate();
-    } else {
-      await applyExpoUpdate();
+    setIsApplyingUpdate(true);
+    setUpdateMessage(t("settings:installingUpdate"));
+
+    try {
+      if (mobileBinaryUpdate) {
+        await applyMobileBinaryUpdate();
+        return;
+      }
+
+      if (Platform.OS === "web") {
+        await applyTauriUpdate();
+      } else {
+        await applyExpoUpdate();
+      }
+    } finally {
+      setIsApplyingUpdate(false);
     }
   };
 
@@ -213,17 +223,23 @@ const UpdateManager = () => {
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <Icon
-            source={
-              mobileBinaryUpdate?.required ? "alert-circle" : "tray-arrow-down"
-            }
-            size={24}
-            color={
-              mobileBinaryUpdate?.required
-                ? theme.colors.error
-                : theme.colors.primary
-            }
-          />
+          {isApplyingUpdate ? (
+            <ActivityIndicator animating color={theme.colors.primary} />
+          ) : (
+            <Icon
+              source={
+                mobileBinaryUpdate?.required
+                  ? "alert-circle"
+                  : "tray-arrow-down"
+              }
+              size={24}
+              color={
+                mobileBinaryUpdate?.required
+                  ? theme.colors.error
+                  : theme.colors.primary
+              }
+            />
+          )}
           <Text
             ellipsizeMode="clip"
             style={{
@@ -242,9 +258,11 @@ const UpdateManager = () => {
             borderRadius: 12,
             borderBottomRightRadius: 0,
             borderTopRightRadius: 0,
-            width: 110,
+            minWidth: 150,
           }}
           onPress={applyUpdate}
+          disabled={isApplyingUpdate}
+          loading={isApplyingUpdate}
         >
           {mobileBinaryUpdate
             ? t("settings:mobileUpdateDownload")

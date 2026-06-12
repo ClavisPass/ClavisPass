@@ -158,6 +158,7 @@ const de: TranslationSchema = {
     updateAvailable: "Update verfügbar",
     updateCheckFailed: "Fehler beim Suchen nach Updates",
     updateInstallFailed: "Fehler beim Installieren des Updates",
+    installingUpdate: "Update wird vorbereitet...",
     updateNow: "Update",
     mobileUpdateAvailable: "Neue App-Version verfügbar",
     mobileUpdateRequiredTitle: "App-Update erforderlich",

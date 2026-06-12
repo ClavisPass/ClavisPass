@@ -37,8 +37,8 @@ function NavigationnContainer() {
       <TrayMenuBridge navigationRef={navigationRef} />
       <ProtectedRoute loginScreen={<LoginStack />}>
         <TabNavigator />
-        <UpdateManager />
       </ProtectedRoute>
+      <UpdateManager />
     </ReactNavigationContainer>
   );
 }

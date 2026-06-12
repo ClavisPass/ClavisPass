@@ -152,6 +152,7 @@ export type TranslationSchema = {
     updateAvailable: string;
     updateCheckFailed: string;
     updateInstallFailed: string;
+    installingUpdate: string;
     updateNow: string;
     mobileUpdateAvailable: string;
     mobileUpdateRequiredTitle: string;
