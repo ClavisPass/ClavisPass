@@ -7,16 +7,17 @@ import React, {
 } from "react";
 import {
   View,
+  Pressable,
   StyleSheet,
   ImageBackground,
   useWindowDimensions,
+  Platform,
 } from "react-native";
 import Animated, { Easing, FadeIn, FadeOut } from "react-native-reanimated";
 import { StatusBar } from "expo-status-bar";
 import { BlurView } from "expo-blur";
 
-import { Text } from "react-native-paper";
-import { Button } from "react-native-paper";
+import { Icon, Text } from "react-native-paper";
 
 import Login from "../features/auth/components/Login";
 import Backup from "../features/sync/components/Backup";
@@ -46,7 +47,7 @@ import SettingsItem from "../features/settings/components/SettingsItem";
 import { LoginStackParamList } from "../app/navigation/model/types";
 import FirstOpened from "../features/onboarding/components/FirstOpened";
 import { useSetting } from "../app/providers/SettingsProvider";
-import Modal from "../shared/components/modals/Modal";
+import AnimatedPressable from "../shared/components/AnimatedPressable";
 
 type LoginScreenProps = NativeStackScreenProps<LoginStackParamList, "Login">;
 
@@ -73,7 +74,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
   const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
   const [loadingUserInfo, setLoadingUserInfo] = useState(true);
-  const [deviceSaveModalVisible, setDeviceSaveModalVisible] = useState(false);
+  const [cloudProviderModalVisible, setCloudProviderModalVisible] =
+    useState(false);
   const [backgroundReady, setBackgroundReady] = useState(false);
 
   useFocusEffect(
@@ -143,10 +145,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   const handlePresentModalPress = useCallback(() => {
+    if (Platform.OS === "web") {
+      setCloudProviderModalVisible(true);
+      return;
+    }
+
     bottomSheetModalRef.current?.present();
   }, []);
 
   const handleDismissModalPress = useCallback(() => {
+    setCloudProviderModalVisible(false);
     bottomSheetModalRef.current?.dismiss();
   }, []);
 
@@ -165,6 +173,44 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       setUserInfo(null);
     }
   };
+
+  const renderCloudProviderOptions = () => (
+    <>
+      <DropboxLoginButton />
+      <SettingsDivider />
+      <GoogleDriveLoginButton />
+      <SettingsDivider />
+      <ClavisPassHubLoginButton />
+      <SettingsDivider />
+      <SettingsItem
+        leadingIcon={"qrcode-scan"}
+        onPress={() => {
+          handleDismissModalPress();
+          navigation.navigate("Scan");
+        }}
+      >
+        {t("settings:scanqrcode")}
+      </SettingsItem>
+    </>
+  );
+
+  const connectedProviderLabel =
+    provider === "dropbox"
+      ? `Dropbox ${t("common:connected")}`
+      : provider === "googleDrive"
+        ? `Google Drive ${t("common:connected")}`
+        : provider === "clavispassHub"
+          ? `ClavisPass Hub ${t("common:connected")}`
+          : t("common:notConnected");
+
+  const connectedProviderIcon =
+    provider === "dropbox"
+      ? "dropbox"
+      : provider === "googleDrive"
+        ? "google-drive"
+        : provider === "clavispassHub"
+          ? "server-network"
+          : "cloud-off-outline";
 
   return (
     <BottomSheetModalProvider>
@@ -257,99 +303,122 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               {t("login:cloudSave")}
             </Text>
           ) : (
-            <Text
-              style={{ marginTop: 8, textDecorationLine: "underline" }}
-              onPress={() => setDeviceSaveModalVisible(true)}
-            >
-              {t("login:deviceSave")}
-            </Text>
-          )}
-
-          <Modal
-            visible={deviceSaveModalVisible}
-            onDismiss={() => setDeviceSaveModalVisible(false)}
-          >
             <View
               style={{
-                width: 280,
-                minHeight: 170,
-                display: "flex",
-                flexDirection: "column",
-                padding: 14,
-                justifyContent: "space-between",
-                borderRadius: 12,
-                borderWidth: StyleSheet.hairlineWidth,
-                borderColor: theme.colors.outlineVariant,
+                marginTop: 8,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 0,
               }}
             >
-              <View style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                <Text variant="headlineSmall" style={{ userSelect: "none" }}>
-                  {t("login:deviceSaveConfirmTitle")}
-                </Text>
-                <Text variant="bodyMedium" style={{ userSelect: "none" }}>
-                  {t("login:deviceSaveConfirmText")}
-                </Text>
-              </View>
               <View
                 style={{
-                  display: "flex",
+                  minHeight: 36,
                   flexDirection: "row",
-                  gap: 6,
-                  alignSelf: "flex-end",
-                  marginTop: 16,
+                  alignItems: "stretch",
+                  overflow: "hidden",
+                  borderRadius: 12,
+                  backgroundColor: theme.colors.secondaryContainer,
                 }}
               >
-                <Button
-                  style={{ borderRadius: 12 }}
-                  mode="contained-tonal"
-                  onPress={() => setDeviceSaveModalVisible(false)}
-                >
-                  {t("common:cancel")}
-                </Button>
-                <Button
-                  style={{ borderRadius: 12 }}
-                  mode="contained"
-                  onPress={async () => {
-                    setDeviceSaveModalVisible(false);
-                    await handleLogout();
+                <View
+                  style={{
+                    minHeight: 36,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 8,
+                    paddingLeft: 12,
+                    paddingRight: 14,
                   }}
                 >
-                  {t("login:deviceSaveConfirmAction")}
-                </Button>
+                  <Icon
+                    source={connectedProviderIcon}
+                    size={18}
+                    color={theme.colors.primary}
+                  />
+                  <Text style={{ color: theme.colors.primary }}>
+                    {connectedProviderLabel}
+                  </Text>
+                </View>
+                <AnimatedPressable
+                  onPress={handleLogout}
+                  accessibilityLabel="Logout"
+                  style={{
+                    width: 42,
+                    minHeight: 36,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderLeftWidth: StyleSheet.hairlineWidth,
+                    borderLeftColor: theme.colors.outlineVariant,
+                  }}
+                >
+                  <Icon source="logout" size={18} color={theme.colors.primary} />
+                </AnimatedPressable>
               </View>
             </View>
-          </Modal>
+          )}
 
-          <BottomSheetModal
-            ref={bottomSheetModalRef}
-            style={{
-              borderColor: theme.colors.outlineVariant,
-              borderTopWidth: StyleSheet.hairlineWidth,
-              borderRadius: 0,
-            }}
-            handleIndicatorStyle={{ backgroundColor: theme.colors.primary }}
-            backgroundStyle={{
-              backgroundColor: theme.colors.background,
-              borderRadius: 0,
-            }}
-          >
-            <BottomSheetView style={{ borderRadius: 0, paddingBottom: 60 }}>
-              <SettingsDivider />
-              <DropboxLoginButton />
-              <SettingsDivider />
-              <GoogleDriveLoginButton />
-              <SettingsDivider />
-              <ClavisPassHubLoginButton />
-              <SettingsDivider />
-              <SettingsItem
-                leadingIcon={"qrcode-scan"}
-                onPress={() => navigation.navigate("Scan")}
+          {Platform.OS === "web" && cloudProviderModalVisible ? (
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 1000,
+              }}
+            >
+              <Pressable
+                onPress={handleDismissModalPress}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                }}
+              />
+              <View
+                style={{
+                  width: 340,
+                  maxWidth: "100%",
+                  borderRadius: 12,
+                  borderWidth: StyleSheet.hairlineWidth,
+                  borderColor: theme.colors.outlineVariant,
+                  backgroundColor: theme.colors.background,
+                  boxShadow: theme.colors.shadow,
+                  overflow: "hidden",
+                  zIndex: 1001,
+                }}
               >
-                {t("settings:scanqrcode")}
-              </SettingsItem>
-              <SettingsDivider />
-            </BottomSheetView>
-          </BottomSheetModal>
+                {renderCloudProviderOptions()}
+              </View>
+            </View>
+          ) : (
+            <BottomSheetModal
+              ref={bottomSheetModalRef}
+              style={{
+                borderColor: theme.colors.outlineVariant,
+                borderTopWidth: StyleSheet.hairlineWidth,
+                borderRadius: 0,
+              }}
+              handleIndicatorStyle={{ backgroundColor: theme.colors.primary }}
+              backgroundStyle={{
+                backgroundColor: theme.colors.background,
+                borderRadius: 0,
+              }}
+            >
+              <BottomSheetView style={{ borderRadius: 0, paddingBottom: 60 }}>
+                <SettingsDivider />
+                {renderCloudProviderOptions()}
+                <SettingsDivider />
+              </BottomSheetView>
+            </BottomSheetModal>
+          )}
         </View>
       </ImageBackground>
     </BottomSheetModalProvider>
