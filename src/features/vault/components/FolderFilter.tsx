@@ -311,7 +311,7 @@ function FolderFilter(props: Props) {
               >
                 <AnimatedOpacityContainer visible={showAddButton}>
                   <IconButton
-                    icon={"plus"}
+                    icon={"pencil"}
                     iconColor={theme.colors.primary}
                     style={{ margin: 0 }}
                     onPress={
@@ -485,7 +485,7 @@ function FolderFilter(props: Props) {
                   }}
                 >
                   <IconButton
-                    icon={"plus"}
+                    icon={"pencil"}
                     iconColor={theme.colors.primary}
                     style={{ marginLeft: 0, alignSelf: "center" }}
                     onPress={
