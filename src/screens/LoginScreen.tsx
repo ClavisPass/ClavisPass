@@ -47,7 +47,6 @@ import { LoginStackParamList } from "../app/navigation/model/types";
 import FirstOpened from "../features/onboarding/components/FirstOpened";
 import { useSetting } from "../app/providers/SettingsProvider";
 import Modal from "../shared/components/modals/Modal";
-import { useDevMode } from "../app/providers/DevModeProvider";
 
 type LoginScreenProps = NativeStackScreenProps<LoginStackParamList, "Login">;
 
@@ -56,7 +55,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { headerWhite, setHeaderWhite, darkmode, theme, setHeaderSpacing } =
     useTheme();
   const { t } = useTranslation();
-  const { devMode } = useDevMode();
   const { width } = useWindowDimensions();
   const { value: onboardingDone } =
     useSetting("ONBOARDING_DONE");
@@ -76,6 +74,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
   const [loadingUserInfo, setLoadingUserInfo] = useState(true);
   const [deviceSaveModalVisible, setDeviceSaveModalVisible] = useState(false);
+  const [backgroundReady, setBackgroundReady] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -155,6 +154,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     handleDismissModalPress();
   }, [provider]);
 
+  useEffect(() => {
+    setBackgroundReady(false);
+  }, [darkmode]);
+
   const handleLogout = async () => {
     try {
       await clearSession();
@@ -166,11 +169,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   return (
     <BottomSheetModalProvider>
       <ImageBackground
+        key={darkmode ? "login-bg-dark" : "login-bg-light"}
         source={
           darkmode
             ? require("../../assets/blurred-bg-dark.png")
             : require("../../assets/blurred-bg.png")
         }
+        onLoadEnd={() => setBackgroundReady(true)}
         resizeMode="cover"
         style={{
           flex: 1,
@@ -181,6 +186,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         }}
       >
         <View
+          pointerEvents={backgroundReady ? "auto" : "none"}
           style={{
             padding: 20,
             flex: 1,
@@ -188,6 +194,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            opacity: backgroundReady ? 1 : 0,
           }}
         >
           <StatusBar
@@ -334,17 +341,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               <SettingsDivider />
               <ClavisPassHubLoginButton />
               <SettingsDivider />
-              {devMode ? (
-                <>
-                  <SettingsItem
-                    leadingIcon={"qrcode-scan"}
-                    onPress={() => navigation.navigate("Scan")}
-                  >
-                    {t("settings:scanqrcode")}
-                  </SettingsItem>
-                  <SettingsDivider />
-                </>
-              ) : null}
+              <SettingsItem
+                leadingIcon={"qrcode-scan"}
+                onPress={() => navigation.navigate("Scan")}
+              >
+                {t("settings:scanqrcode")}
+              </SettingsItem>
+              <SettingsDivider />
             </BottomSheetView>
           </BottomSheetModal>
         </View>

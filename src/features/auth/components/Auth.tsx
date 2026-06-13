@@ -11,7 +11,7 @@ import { View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { SettingsStackParamList } from "../../../app/navigation/model/types";
-import { useDevMode } from "../../../app/providers/DevModeProvider";
+import { useToken } from "../../../app/providers/CloudProvider";
 
 type Props = {
   navigation: NativeStackNavigationProp<
@@ -24,11 +24,13 @@ type Props = {
 
 function Auth(props: Props) {
   const { t } = useTranslation();
-  const { devMode } = useDevMode();
+  const { provider } = useToken();
+  const canScanSessionQr = !provider || provider === "device";
+
   return (
     <View>
       <UserInformation setUserInfo={props.setUserInfo} />
-      {devMode ? (
+      {canScanSessionQr ? (
         <>
           <Divider />
           <SettingsItem
