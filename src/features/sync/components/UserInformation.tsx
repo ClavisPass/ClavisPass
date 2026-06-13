@@ -100,6 +100,11 @@ function UserInformation(props: Props) {
     setAvatarLoadFailed(false);
   }, [userInfo?.avatar]);
 
+  const avatarSource = useMemo(
+    () => (userInfo?.avatar ? { uri: userInfo.avatar } : undefined),
+    [userInfo?.avatar]
+  );
+
   const handleLogout = async () => {
     try {
       await clearSession();
@@ -156,7 +161,7 @@ function UserInformation(props: Props) {
                 radius={999}
                 colorMode={darkmode ? "dark" : "light"}
               />
-            ) : userInfo.avatar && !avatarLoadFailed ? (
+            ) : avatarSource && !avatarLoadFailed ? (
               <View
                 style={{
                   width: 48,
@@ -169,14 +174,8 @@ function UserInformation(props: Props) {
                 }}
               >
                 <Image
-                  source={{ uri: userInfo.avatar }}
+                  source={avatarSource}
                   resizeMode="cover"
-                  onLoad={() => {
-                    logger.info("[UserInformation] Avatar image loaded:", {
-                      provider,
-                      avatar: userInfo.avatar,
-                    });
-                  }}
                   onError={(error) => {
                     logger.warn("[UserInformation] Avatar image failed:", {
                       provider,

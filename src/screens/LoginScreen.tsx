@@ -18,6 +18,7 @@ import { StatusBar } from "expo-status-bar";
 import { BlurView } from "expo-blur";
 
 import { Icon, Text } from "react-native-paper";
+import { Button } from "react-native-paper";
 
 import Login from "../features/auth/components/Login";
 import Backup from "../features/sync/components/Backup";
@@ -47,6 +48,7 @@ import SettingsItem from "../features/settings/components/SettingsItem";
 import { LoginStackParamList } from "../app/navigation/model/types";
 import FirstOpened from "../features/onboarding/components/FirstOpened";
 import { useSetting } from "../app/providers/SettingsProvider";
+import Modal from "../shared/components/modals/Modal";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
 
 type LoginScreenProps = NativeStackScreenProps<LoginStackParamList, "Login">;
@@ -74,6 +76,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
   const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
   const [loadingUserInfo, setLoadingUserInfo] = useState(true);
+  const [deviceSaveModalVisible, setDeviceSaveModalVisible] = useState(false);
   const [cloudProviderModalVisible, setCloudProviderModalVisible] =
     useState(false);
   const [backgroundReady, setBackgroundReady] = useState(false);
@@ -296,12 +299,37 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             </Animated.View>
           </BlurView>
           {provider === "device" ? (
-            <Text
-              style={{ marginTop: 8, textDecorationLine: "underline" }}
+            <AnimatedPressable
               onPress={handlePresentModalPress}
+              style={{
+                marginTop: 8,
+                minHeight: 36,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
+                paddingLeft: 12,
+                paddingRight: 14,
+                borderRadius: 12,
+                backgroundColor: theme.colors.secondaryContainer,
+              }}
             >
-              {t("login:cloudSave")}
-            </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <Icon
+                  source="cloud-outline"
+                  size={18}
+                  color={theme.colors.primary}
+                />
+                <Text style={{ color: theme.colors.primary }}>
+                  {t("login:cloudSave")}
+                </Text>
+              </View>
+            </AnimatedPressable>
           ) : (
             <View
               style={{
@@ -342,7 +370,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                   </Text>
                 </View>
                 <AnimatedPressable
-                  onPress={handleLogout}
+                  onPress={() => setDeviceSaveModalVisible(true)}
                   accessibilityLabel="Logout"
                   style={{
                     width: 42,
@@ -358,6 +386,61 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               </View>
             </View>
           )}
+
+          <Modal
+            visible={deviceSaveModalVisible}
+            onDismiss={() => setDeviceSaveModalVisible(false)}
+          >
+            <View
+              style={{
+                width: 280,
+                minHeight: 170,
+                display: "flex",
+                flexDirection: "column",
+                padding: 14,
+                justifyContent: "space-between",
+                borderRadius: 12,
+                borderWidth: StyleSheet.hairlineWidth,
+                borderColor: theme.colors.outlineVariant,
+              }}
+            >
+              <View style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <Text variant="headlineSmall" style={{ userSelect: "none" }}>
+                  {t("login:deviceSaveConfirmTitle")}
+                </Text>
+                <Text variant="bodyMedium" style={{ userSelect: "none" }}>
+                  {t("login:deviceSaveConfirmText")}
+                </Text>
+              </View>
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 6,
+                  alignSelf: "flex-end",
+                  marginTop: 16,
+                }}
+              >
+                <Button
+                  style={{ borderRadius: 12 }}
+                  mode="contained-tonal"
+                  onPress={() => setDeviceSaveModalVisible(false)}
+                >
+                  {t("common:cancel")}
+                </Button>
+                <Button
+                  style={{ borderRadius: 12 }}
+                  mode="contained"
+                  onPress={async () => {
+                    setDeviceSaveModalVisible(false);
+                    await handleLogout();
+                  }}
+                >
+                  {t("login:deviceSaveConfirmAction")}
+                </Button>
+              </View>
+            </View>
+          </Modal>
 
           {Platform.OS === "web" && cloudProviderModalVisible ? (
             <View
