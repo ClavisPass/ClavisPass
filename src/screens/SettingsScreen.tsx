@@ -417,6 +417,56 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     }
   }, [resetAction, t]);
 
+  const settingInfo = useMemo(
+    () => ({
+      systemAuth: {
+        title: t("settings:infoSystemAuthTitle"),
+        body: t("settings:infoSystemAuthBody"),
+        bullets: [
+          t("settings:infoSystemAuthBullet1"),
+          t("settings:infoSystemAuthBullet2"),
+        ],
+      },
+      contentProtection: {
+        title: t("settings:infoContentProtectionTitle"),
+        body: t("settings:infoContentProtectionBody"),
+        bullets: [
+          t("settings:infoContentProtectionBullet1"),
+          t("settings:infoContentProtectionBullet2"),
+        ],
+      },
+      blurOnUnfocus: {
+        title: t("settings:infoBlurOnUnfocusTitle"),
+        body: t("settings:infoBlurOnUnfocusBody"),
+      },
+      copyDuration: {
+        title: t("settings:infoCopyDurationTitle"),
+        body: t("settings:infoCopyDurationBody"),
+        bullets: [
+          t("settings:infoCopyDurationBullet1"),
+          t("settings:infoCopyDurationBullet2"),
+        ],
+      },
+      autosaveDelay: {
+        title: t("settings:infoAutosaveDelayTitle"),
+        body: t("settings:infoAutosaveDelayBody"),
+        bullets: [
+          t("settings:infoAutosaveDelayBullet1"),
+          t("settings:infoAutosaveDelayBullet2"),
+        ],
+      },
+      fastAccess: {
+        title: t("settings:infoFastAccessTitle"),
+        body: t("settings:infoFastAccessBody"),
+        bullets: [
+          t("settings:infoFastAccessBullet1"),
+          t("settings:infoFastAccessBullet2"),
+        ],
+      },
+    }),
+    [t],
+  );
+
   const confirmResetAction = async () => {
     switch (resetAction) {
       case "settings":
@@ -653,6 +703,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                   <SettingsSwitch
                     label={t("settings:useSystemAuth")}
                     value={useAuthentication}
+                    info={settingInfo.systemAuth}
                     onValueChange={(checked) => {
                       changeAuthentication(checked);
                     }}
@@ -660,13 +711,16 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 </>
               ) : null}
               <SettingsDivider />
-              <ContentProtectionSettingsToggle />
+              <ContentProtectionSettingsToggle
+                info={settingInfo.contentProtection}
+              />
               {isTauri ? (
                 <>
                   <SettingsDivider />
                   <SettingsSwitch
                     label={t("settings:blurOnUnfocus")}
                     value={blurOnUnfocus}
+                    info={settingInfo.blurOnUnfocus}
                     onValueChange={(checked) => {
                       void setBlurOnUnfocus(checked);
                     }}
@@ -686,6 +740,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 value={String(copyDurationSeconds ?? 0)}
                 setValue={(v) => setCopyDurationSeconds(Number(v))}
                 label={t("settings:copyDuration")}
+                info={settingInfo.copyDuration}
                 dropdownMaxWidth={260}
                 dropdownMinWidth={200}
                 options={[
@@ -722,6 +777,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 value={String(autosaveDelaySeconds ?? 30)}
                 setValue={(v) => setAutosaveDelaySeconds(Number(v))}
                 label={t("settings:autosaveDelay")}
+                info={settingInfo.autosaveDelay}
                 dropdownMaxWidth={260}
                 dropdownMinWidth={200}
                 options={[
@@ -831,6 +887,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               <SettingsSwitch
                 label={t("settings:autoOpenFastAccess")}
                 value={fastAccess}
+                info={settingInfo.fastAccess}
                 onValueChange={(checked) => {
                   changeFastAccessBehavior(checked);
                 }}

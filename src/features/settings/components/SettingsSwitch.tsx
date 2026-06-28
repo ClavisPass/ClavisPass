@@ -1,6 +1,7 @@
 import { Pressable, View } from "react-native";
 import { Switch } from "react-native-paper";
 import SettingsItem from "./SettingsItem";
+import SettingInfoButton, { SettingInfo } from "./SettingInfoButton";
 
 type Props = {
   label: string;
@@ -8,6 +9,7 @@ type Props = {
   onValueChange: (checked: boolean) => void;
   leadingIcon?: string;
   disabled?: boolean;
+  info?: SettingInfo;
 };
 
 const SettingsSwitch = (props: Props) => {
@@ -26,12 +28,27 @@ const SettingsSwitch = (props: Props) => {
         justifyContent: "space-between",
       }}
     >
-      <Pressable disabled={props.disabled} onPress={() => props.onValueChange(!props.value)}>
-        <SettingsItem leadingIcon={props.leadingIcon} onPress={undefined}>
-          {props.label}
-        </SettingsItem>
-      </Pressable>
-      <Switch value={props.value} onValueChange={props.onValueChange} disabled={props.disabled} />
+      <View style={{ flex: 1, minWidth: 0, flexDirection: "row" }}>
+        <Pressable
+          disabled={props.disabled}
+          onPress={() => props.onValueChange(!props.value)}
+          style={{ minWidth: 0 }}
+        >
+          <SettingsItem
+            leadingIcon={props.leadingIcon}
+            minWidth={0}
+            onPress={undefined}
+          >
+            {props.label}
+          </SettingsItem>
+        </Pressable>
+        {props.info ? <SettingInfoButton {...props.info} compact /> : null}
+      </View>
+      <Switch
+        value={props.value}
+        onValueChange={props.onValueChange}
+        disabled={props.disabled}
+      />
     </View>
   );
 };

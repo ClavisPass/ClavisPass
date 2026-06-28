@@ -32,6 +32,7 @@ const de: TranslationSchema = {
     undo: "Rückgängig",
     redo: "Wiederholen",
     more: "Mehr",
+    moreInfo: "Mehr erfahren",
     setExpiry: "Ablauf festlegen",
     current: "Aktuell",
     addFolder: "Ordner hinzufügen",
@@ -292,6 +293,44 @@ const de: TranslationSchema = {
     browserAssistantReloadStatus: "Status neu laden",
     browserAssistantOpenApprovals: "Freigaben öffnen",
     browserManageConnections: "Browser-Verbindungen",
+    infoSystemAuthTitle: "Systemauthentifizierung",
+    infoSystemAuthBody:
+      "Nutzt deine Geräteentsperrung, um das aktuelle Master-Passwort nach der Aktivierung wiederherzustellen.",
+    infoSystemAuthBullet1:
+      "Der Vault bleibt weiterhin mit deinem Master-Passwort verschlüsselt.",
+    infoSystemAuthBullet2:
+      "Die Verfügbarkeit hängt von deinem Gerät und Betriebssystem ab.",
+    infoContentProtectionTitle: "Inhaltsschutz",
+    infoContentProtectionBody:
+      "Hilft, Vault-Inhalte in App-Vorschauen, Bildschirmaufnahmen oder ähnlichen Systemflächen weniger sichtbar zu machen.",
+    infoContentProtectionBullet1:
+      "Der Schutz hängt davon ab, was die Plattform zulässt.",
+    infoContentProtectionBullet2:
+      "Es ist eine zusätzliche Datenschutzschicht und ersetzt nicht das Sperren des Vaults.",
+    infoBlurOnUnfocusTitle: "Bei Fokusverlust verwischen",
+    infoBlurOnUnfocusBody:
+      "Verwischt das App-Fenster, wenn es den Fokus verliert, damit sensible Inhalte weniger leicht sichtbar sind.",
+    infoCopyDurationTitle: "Kopierdauer",
+    infoCopyDurationBody:
+      "Legt fest, wie lange ClavisPass kopierte Geheimnisse verfügbar lässt, bevor die Zwischenablage geleert wird.",
+    infoCopyDurationBullet1:
+      "Bei 'Aus' übernimmt das System die Zwischenablage vollständig.",
+    infoCopyDurationBullet2:
+      "Manche Plattformen oder andere Apps können das Leeren der Zwischenablage einschränken.",
+    infoAutosaveDelayTitle: "Autospeichern",
+    infoAutosaveDelayBody:
+      "Legt fest, wie lange ClavisPass nach Änderungen wartet, bevor gespeichert und synchronisiert wird.",
+    infoAutosaveDelayBullet1:
+      "Kürzere Zeiten speichern früher, können aber häufiger synchronisieren.",
+    infoAutosaveDelayBullet2:
+      "Bei 'Aus' bleiben Änderungen ausstehend, bis du manuell speicherst oder synchronisierst.",
+    infoFastAccessTitle: "Fast Access",
+    infoFastAccessBody:
+      "Erlaubt ClavisPass, ein kleines Schnellzugriffsfenster für Einträge mit Benutzername und Passwort vorzubereiten.",
+    infoFastAccessBullet1:
+      "Nur der ausgewählte Eintrag wird beim Verwenden von Fast Access an das Popup übergeben.",
+    infoFastAccessBullet2:
+      "Es ist für schnellere Autofill-ähnliche Workflows auf Desktop und Mobile gedacht.",
   },
   analysis: {
     topFindings: "Top-Funde",

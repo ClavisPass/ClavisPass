@@ -32,6 +32,7 @@ export type TranslationSchema = {
     undo: string;
     redo: string;
     more: string;
+    moreInfo: string;
     setExpiry: string;
     current: string;
     addFolder: string;
@@ -269,6 +270,28 @@ export type TranslationSchema = {
     browserAssistantReloadStatus: string;
     browserAssistantOpenApprovals: string;
     browserManageConnections: string;
+    infoSystemAuthTitle: string;
+    infoSystemAuthBody: string;
+    infoSystemAuthBullet1: string;
+    infoSystemAuthBullet2: string;
+    infoContentProtectionTitle: string;
+    infoContentProtectionBody: string;
+    infoContentProtectionBullet1: string;
+    infoContentProtectionBullet2: string;
+    infoBlurOnUnfocusTitle: string;
+    infoBlurOnUnfocusBody: string;
+    infoCopyDurationTitle: string;
+    infoCopyDurationBody: string;
+    infoCopyDurationBullet1: string;
+    infoCopyDurationBullet2: string;
+    infoAutosaveDelayTitle: string;
+    infoAutosaveDelayBody: string;
+    infoAutosaveDelayBullet1: string;
+    infoAutosaveDelayBullet2: string;
+    infoFastAccessTitle: string;
+    infoFastAccessBody: string;
+    infoFastAccessBullet1: string;
+    infoFastAccessBullet2: string;
   };
   analysis: {
     topFindings: string;

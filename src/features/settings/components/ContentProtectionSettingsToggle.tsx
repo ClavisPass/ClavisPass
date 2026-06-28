@@ -4,8 +4,13 @@ import React, {
 import SettingsSwitch from "./SettingsSwitch";
 import { useTranslation } from "react-i18next";
 import { useContentProtection } from "../../../app/providers/ContentProtectionProvider";
+import type { SettingInfo } from "./SettingInfoButton";
 
-export function ContentProtectionSettingsToggle() {
+type Props = {
+  info?: SettingInfo;
+};
+
+export function ContentProtectionSettingsToggle(props: Props) {
   const { enabled, setEnabled } = useContentProtection();
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
@@ -16,6 +21,7 @@ export function ContentProtectionSettingsToggle() {
         label={t("settings:contentProtection")}
         value={enabled}
         disabled={busy}
+        info={props.info}
          onValueChange={async (next) => {
               setBusy(true);
               setError(null);

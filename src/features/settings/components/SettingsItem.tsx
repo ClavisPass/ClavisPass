@@ -9,6 +9,8 @@ type Props = {
   leading?: ReactNode;
   selected?: boolean;
   label?: string;
+  afterLabel?: ReactNode;
+  minWidth?: number;
   rightIcon?: string | null;
 };
 function SettingsItem(props: Props) {
@@ -19,6 +21,8 @@ function SettingsItem(props: Props) {
       leading={props.leading}
       selected={props.selected}
       label={props.label}
+      afterLabel={props.afterLabel}
+      minWidth={props.minWidth}
       rightIcon={props.rightIcon === undefined && props.onPress ? "chevron-right" : props.rightIcon ?? undefined}
     >
       {props.children}

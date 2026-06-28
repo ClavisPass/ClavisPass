@@ -13,6 +13,8 @@ type Props = {
   selected?: boolean;
   selectedColor?: string;
   label?: string;
+  afterLabel?: ReactNode;
+  minWidth?: number;
   rightText?: string;
   rightIcon?: string;
 };
@@ -28,7 +30,7 @@ export function MenuItem(props: Props) {
             flex: 1,
             display: "flex",
             padding: 10,
-            minWidth: 140,
+            minWidth: props.minWidth ?? 140,
             minHeight: 30,
             height: 30,
             flexDirection: "row",
@@ -42,7 +44,15 @@ export function MenuItem(props: Props) {
             borderLeftColor: props.selectedColor ?? theme.colors.primary,
           }}
         >
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+              flex: 1,
+              minWidth: 0,
+            }}
+          >
             {props.leading ?? (props.leadingIcon && (
               <Icon
                 size={20}
@@ -72,15 +82,23 @@ export function MenuItem(props: Props) {
             ) : (
               <Text
                 variant="bodyLarge"
-                style={{ userSelect: "none" }}
+                style={{ userSelect: "none", flexShrink: 1 }}
                 ellipsizeMode="tail"
                 numberOfLines={1}
               >
                 {props.children}
               </Text>
             )}
+            {props.afterLabel}
           </View>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+              flexShrink: 0,
+            }}
+          >
             {props.rightText && (
               <Text
                 variant="bodyLarge"

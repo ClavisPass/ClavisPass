@@ -6,6 +6,7 @@ import { useTheme } from "../../../app/providers/ThemeProvider";
 import { MenuItem } from "../../../shared/components/menus/MenuItem";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 import SettingsDivider from "./SettingsDivider";
+import SettingInfoButton, { SettingInfo } from "./SettingInfoButton";
 
 // Native (iOS/Android)
 import {
@@ -24,6 +25,7 @@ type Props = {
   options: DropdownOption[];
   label?: string;
   leadingIcon?: string;
+  info?: SettingInfo;
 
   // Web sizing
   dropdownMaxWidth?: number;
@@ -42,6 +44,7 @@ export default function SettingsDropdownItem({
   options,
   label,
   leadingIcon,
+  info,
   dropdownMaxWidth = 260,
   dropdownMinWidth = 200,
   yOffset = 6,
@@ -125,7 +128,13 @@ export default function SettingsDropdownItem({
   const TriggerUI = (
     <View collapsable={false}>
       <AnimatedPressable onPress={onPressTrigger}>
-        <MenuItem leadingIcon={leadingIcon} rightText={String(selectedLabel)}>
+        <MenuItem
+          leadingIcon={leadingIcon}
+          rightText={String(selectedLabel)}
+          afterLabel={
+            info ? <SettingInfoButton {...info} compact /> : undefined
+          }
+        >
           {label}
         </MenuItem>
       </AnimatedPressable>

@@ -32,6 +32,7 @@ const en: TranslationSchema = {
     undo: "Undo",
     redo: "Redo",
     more: "More",
+    moreInfo: "More info",
     setExpiry: "Set Expiry",
     current: "Current",
     addFolder: "Add Folder",
@@ -290,6 +291,44 @@ const en: TranslationSchema = {
     browserAssistantReloadStatus: "Reload status",
     browserAssistantOpenApprovals: "Open approvals",
     browserManageConnections: "Browser connections",
+    infoSystemAuthTitle: "System Authentication",
+    infoSystemAuthBody:
+      "Uses your device unlock method to restore the current master password after you have enabled it.",
+    infoSystemAuthBullet1:
+      "The vault is still encrypted with your master password.",
+    infoSystemAuthBullet2:
+      "Availability depends on your device and operating system.",
+    infoContentProtectionTitle: "Content Protection",
+    infoContentProtectionBody:
+      "Helps reduce accidental exposure of vault contents in app previews, screen capture, or similar system surfaces.",
+    infoContentProtectionBullet1:
+      "Protection depends on what the platform allows.",
+    infoContentProtectionBullet2:
+      "It is an extra privacy layer, not a replacement for locking the vault.",
+    infoBlurOnUnfocusTitle: "Blur when unfocused",
+    infoBlurOnUnfocusBody:
+      "Blurs the app window when it loses focus so nearby people are less likely to see sensitive content.",
+    infoCopyDurationTitle: "Copy Duration",
+    infoCopyDurationBody:
+      "Controls how long ClavisPass keeps copied secrets available before trying to clear the clipboard.",
+    infoCopyDurationBullet1:
+      "Setting this to off leaves clipboard handling to the system.",
+    infoCopyDurationBullet2:
+      "Some platforms or other apps may restrict clipboard clearing.",
+    infoAutosaveDelayTitle: "Autosave",
+    infoAutosaveDelayBody:
+      "Controls how long ClavisPass waits after changes before saving and syncing them.",
+    infoAutosaveDelayBullet1:
+      "Shorter delays save sooner but can sync more often.",
+    infoAutosaveDelayBullet2:
+      "When off, changes stay pending until you save or sync manually.",
+    infoFastAccessTitle: "Fast Access",
+    infoFastAccessBody:
+      "Lets ClavisPass prepare a small quick-access popup for entries that contain username and password data.",
+    infoFastAccessBullet1:
+      "Only the selected entry is handed to the popup when you use Fast Access.",
+    infoFastAccessBullet2:
+      "It is meant for faster autofill-like workflows on desktop and mobile.",
   },
   analysis: {
     // headline blocks (optional – falls du später "Top findings" wieder einblendest)
