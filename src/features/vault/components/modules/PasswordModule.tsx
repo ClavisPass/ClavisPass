@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import { Keyboard, View } from "react-native";
 import * as Progress from "react-native-progress";
 import { useTranslation } from "react-i18next";
 
@@ -100,7 +100,10 @@ function PasswordModule(props: PasswordModuleType & Props) {
           iconColor={theme.colors.primary}
           icon="lock-check"
           size={16}
-          onPress={() => setVisible(true)}
+          onPress={() => {
+            Keyboard.dismiss();
+            setVisible(true);
+          }}
         />
 
         <PasswordGeneratorModal

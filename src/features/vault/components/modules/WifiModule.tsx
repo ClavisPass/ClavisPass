@@ -45,7 +45,10 @@ function WifiModule(props: WifiModuleType & Props) {
 
   const [visible, setVisible] = useState(false);
 
-  const showModal = () => setVisible(true);
+  const showModal = () => {
+    Keyboard.dismiss();
+    setVisible(true);
+  };
 
   const [name, setName] = useState(props.wifiName);
   const [value, setValue] = useState(props.value);
@@ -141,7 +144,10 @@ function WifiModule(props: WifiModuleType & Props) {
             icon="tune-variant"
             iconColor={theme.colors.primary}
             size={20}
-            onPress={() => setSettingsVisible(true)}
+            onPress={() => {
+              Keyboard.dismiss();
+              setSettingsVisible(true);
+            }}
           />
         </View>
 

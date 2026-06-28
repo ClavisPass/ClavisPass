@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Keyboard, StyleSheet, View } from "react-native";
 import { Chip, Divider } from "react-native-paper";
 
 import AdaptiveMenu from "../../../../shared/components/menus/AdaptiveMenu";
@@ -29,6 +29,8 @@ function NoteSelector<T extends string>({
     options.find((option) => option.value === value) ?? options[0];
 
   const open = () => {
+    Keyboard.dismiss();
+
     const node = triggerRef.current as any;
     if (node?.measureInWindow) {
       node.measureInWindow(

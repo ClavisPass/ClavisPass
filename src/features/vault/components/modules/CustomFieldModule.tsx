@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { View } from "react-native";
+import { Keyboard, View } from "react-native";
 
 import { TextInput } from "react-native-paper";
 
@@ -56,6 +56,7 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
       deleteModule={props.deleteModule}
       icon={MODULE_ICON[ModulesEnum.CUSTOM_FIELD]}
       titlePress={() => {
+        Keyboard.dismiss();
         setVisible(true);
       }}
       fastAccess={props.fastAccess}

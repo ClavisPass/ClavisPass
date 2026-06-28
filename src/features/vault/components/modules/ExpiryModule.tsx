@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, View } from "react-native";
+import { Keyboard, StyleSheet, View } from "react-native";
 import { Button, IconButton, ProgressBar, Text } from "react-native-paper";
 
 import { useSetting } from "../../../../app/providers/SettingsProvider";
@@ -201,7 +201,10 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
                     iconColor={theme.colors.primary}
                     icon="pencil"
                     size={18}
-                    onPress={() => setPickerVisible(true)}
+                    onPress={() => {
+                      Keyboard.dismiss();
+                      setPickerVisible(true);
+                    }}
                   />
                 </View>
               </View>
@@ -239,7 +242,10 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
           <Button
             style={styles.emptyButton}
             mode="contained-tonal"
-            onPress={() => setPickerVisible(true)}
+            onPress={() => {
+              Keyboard.dismiss();
+              setPickerVisible(true);
+            }}
             icon="calendar"
             textColor={theme.colors.primary}
           >

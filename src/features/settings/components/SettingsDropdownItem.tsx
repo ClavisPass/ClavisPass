@@ -1,5 +1,11 @@
 import React, { useMemo, useRef, useState, useCallback, useEffect } from "react";
-import { View, Platform, useWindowDimensions, StyleSheet } from "react-native";
+import {
+  Keyboard,
+  View,
+  Platform,
+  useWindowDimensions,
+  StyleSheet,
+} from "react-native";
 import { Divider, Text } from "react-native-paper";
 import type { Option as DropdownOption } from "react-native-paper-dropdown";
 import { useTheme } from "../../../app/providers/ThemeProvider";
@@ -118,6 +124,8 @@ export default function SettingsDropdownItem({
    * Trigger handler
    */
   const onPressTrigger = () => {
+    Keyboard.dismiss();
+
     if (Platform.OS === "web") setOpenWeb((v) => !v);
     else openNativeSheet();
   };
