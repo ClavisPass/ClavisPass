@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, StyleSheet, Platform, useWindowDimensions } from "react-native";
-import { Button, Divider, Icon, IconButton, Text } from "react-native-paper";
+import { Button, Divider, Icon, Text } from "react-native-paper";
 import ValuesType from "../../model/ValuesType";
 import ModulesEnum from "../../model/ModulesEnum";
 
@@ -26,6 +26,7 @@ import FolderSelectModal from "../modals/FolderSelectModal";
 import FolderType from "../../model/FolderType";
 import { getValueIcon } from "../../utils/getValueIcon";
 import { getFolderColor } from "../../utils/folderAppearance";
+import TooltipIconButton from "../../../../shared/components/buttons/TooltipIconButton";
 
 const styles = StyleSheet.create({
   container: {
@@ -431,7 +432,12 @@ function ListItem(props: Props) {
           { backgroundColor: theme.colors.outlineVariant },
         ]}
       />
-      <IconButton
+      <TooltipIconButton
+        tooltip={
+          props.item.fav
+            ? t("common:removeFavorite")
+            : t("common:addFavorite")
+        }
         icon={props.item.fav ? "star" : "star-outline"}
         size={18}
         onPress={() => {
@@ -440,7 +446,10 @@ function ListItem(props: Props) {
         style={styles.menuPreviewAction}
         iconColor={theme.colors.primary}
       />
-      <IconButton
+      <TooltipIconButton
+        tooltip={
+          props.item.pinnedAt ? t("common:removePin") : t("common:addPin")
+        }
         icon={props.item.pinnedAt ? "pin" : "pin-outline"}
         size={18}
         onPress={() => {

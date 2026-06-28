@@ -6,10 +6,12 @@ import {
   StyleProp,
   StyleSheet,
 } from "react-native";
-import { Divider, Icon, IconButton } from "react-native-paper";
+import { Divider, Icon } from "react-native-paper";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import Animated, { FadeOutUp } from "react-native-reanimated";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
+import TooltipIconButton from "../../../shared/components/buttons/TooltipIconButton";
 
 export type EditRowControlsContainerProps = {
   id: string;
@@ -48,6 +50,7 @@ export function EditRowControlsContainer({
   contentStyle,
   topRightInset = 0,
 }: EditRowControlsContainerProps) {
+  const { t } = useTranslation();
   const { theme, darkmode } = useTheme();
   const webDragHandleProps = React.useContext(WebDragHandlePropsContext);
   const [dragHovered, setDragHovered] = React.useState(false);
@@ -183,7 +186,8 @@ export function EditRowControlsContainer({
           justifyContent: "flex-start",
         }}
       >
-        <IconButton
+        <TooltipIconButton
+          tooltip={t("common:removeModule")}
           style={{ margin: 0, width: 24, height: 24 }}
           selected
           mode="contained-tonal"

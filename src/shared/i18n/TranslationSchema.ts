@@ -18,6 +18,7 @@ export type TranslationSchema = {
     none: string;
     capslockOn: string;
     cancel: string;
+    copy: string;
     delete: string;
     deleteEntryText: string;
     discardChangesText: string;
@@ -26,6 +27,9 @@ export type TranslationSchema = {
     change: string;
     apply: string;
     save: string;
+    undo: string;
+    redo: string;
+    more: string;
     setExpiry: string;
     current: string;
     addFolder: string;
@@ -42,6 +46,12 @@ export type TranslationSchema = {
     done: string;
     offline: string;
     deleteModuleText: string;
+    removeModule: string;
+    showPassword: string;
+    hidePassword: string;
+    generatePassword: string;
+    openUrl: string;
+    callPhoneNumber: string;
     copiedFor: string;
     connected: string;
     notConnected: string;
@@ -125,6 +135,7 @@ export type TranslationSchema = {
     expiries: string;
     noExpiries: string;
     entries: string;
+    sort: string;
     sortByTitle: string;
     sortByCreated: string;
     sortByLastUpdated: string;

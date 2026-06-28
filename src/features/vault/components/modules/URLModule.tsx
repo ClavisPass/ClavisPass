@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { Icon, IconButton, TextInput } from "react-native-paper";
+import { Icon, TextInput } from "react-native-paper";
 
 import URLModuleType from "../../model/modules/URLModuleType";
 import ModuleContainer from "../ModuleContainer";
@@ -19,6 +19,7 @@ import {
   normalizeUrl,
 } from "../../utils/digitalCardTheme";
 import { detectTauriEnvironment } from "../../../../infrastructure/platform/isTauri";
+import TooltipIconButton from "../../../../shared/components/buttons/TooltipIconButton";
 
 function URLModule(props: URLModuleType & Props) {
   const didMount = useRef(false);
@@ -96,7 +97,8 @@ function URLModule(props: URLModuleType & Props) {
             keyboardType="url"
           />
         </View>
-        <IconButton
+        <TooltipIconButton
+          tooltip={t("common:openUrl")}
           icon="open-in-new"
           iconColor={theme.colors.primary}
           size={20}

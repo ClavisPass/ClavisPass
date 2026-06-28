@@ -2,6 +2,8 @@ import { TextInput } from "react-native-paper";
 import { useTheme } from "../../app/providers/ThemeProvider";
 import { useEffect, useRef, useState } from "react";
 import { Platform, View } from "react-native";
+import { useTranslation } from "react-i18next";
+import AppTooltip from "./tooltips/AppTooltip";
 type Props = {
   placeholder?: string;
   value: string;
@@ -13,6 +15,7 @@ type Props = {
   setCapsLock?: (capsLock: boolean) => void;
 };
 function PasswordTextbox(props: Props) {
+  const { t } = useTranslation();
   const { globalStyles, theme } = useTheme();
   const [eyeIcon, setEyeIcon] = useState("eye");
   const [secureTextEntry, setSecureTextEntry] = useState(true);
@@ -70,12 +73,20 @@ function PasswordTextbox(props: Props) {
         onSubmitEditing={props.onSubmitEditing}
         onKeyPress={(e) => handleKeyPress(e)}
         right={
-          <TextInput.Icon
-            animated
-            icon={eyeIcon}
-            color={theme.colors.primary}
-            onPress={() => setSecureTextEntry(!secureTextEntry)}
-          />
+          <AppTooltip
+            title={
+              secureTextEntry
+                ? t("common:showPassword")
+                : t("common:hidePassword")
+            }
+          >
+            <TextInput.Icon
+              animated
+              icon={eyeIcon}
+              color={theme.colors.primary}
+              onPress={() => setSecureTextEntry(!secureTextEntry)}
+            />
+          </AppTooltip>
         }
       />
     </View>

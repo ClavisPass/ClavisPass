@@ -13,7 +13,12 @@ import {
   RefreshControl,
   StyleSheet,
 } from "react-native";
-import { Searchbar, IconButton, Badge, Button, Icon } from "react-native-paper";
+import {
+  Searchbar,
+  Badge,
+  Button,
+  Icon,
+} from "react-native-paper";
 
 import { Text } from "react-native-paper";
 
@@ -79,6 +84,7 @@ import {
   isUsingAuthentication,
   saveAuthentication,
 } from "../features/auth/utils/authenticateUser";
+import TooltipIconButton from "../shared/components/buttons/TooltipIconButton";
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
@@ -917,16 +923,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 iconColor={"#ffffff80"}
                 placeholderTextColor={"#ffffff80"}
               />
-              <IconButton
+              <TooltipIconButton
+                tooltip={t("common:reload")}
                 icon="refresh"
                 size={24}
                 disabled={!isOnline || refreshing}
                 onPress={refreshData}
                 iconColor="white"
-                accessibilityLabel={t("common:reload")}
                 style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
               />
-              <IconButton
+              <TooltipIconButton
+                tooltip={t("home:sort")}
                 icon="sort-variant"
                 size={25}
                 onPress={() => {
@@ -937,7 +944,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               />
               {expiryEntries.length > 0 ? (
                 <View style={{ position: "relative" }}>
-                  <IconButton
+                  <TooltipIconButton
+                    tooltip={t("home:expiries")}
                     icon="calendar-clock"
                     size={24}
                     onPress={() => {

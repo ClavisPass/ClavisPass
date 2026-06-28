@@ -53,6 +53,7 @@ import { useEditHistory } from "../features/vault/utils/editHistory";
 import AdaptiveMenu, {
   AdaptiveMenuItem,
 } from "../shared/components/menus/AdaptiveMenu";
+import AppTooltip from "../shared/components/tooltips/AppTooltip";
 import {
   DEFAULT_FOLDER_ICON,
   getFolderColor,
@@ -577,60 +578,74 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           </View>
         )}
         {width > 600 && (
-          <SquaredContainerButton onPress={undo} disabled={!canUndo}>
-            <Icon
-              source="undo-variant"
-              color={
-                canUndo
-                  ? theme.colors?.primary
-                  : theme.colors.onSurfaceDisabled
-              }
-              size={20}
-            />
-          </SquaredContainerButton>
+          <AppTooltip title={t("common:undo")}>
+            <SquaredContainerButton onPress={undo} disabled={!canUndo}>
+              <Icon
+                source="undo-variant"
+                color={
+                  canUndo
+                    ? theme.colors?.primary
+                    : theme.colors.onSurfaceDisabled
+                }
+                size={20}
+              />
+            </SquaredContainerButton>
+          </AppTooltip>
         )}
         {width > 600 && (
-          <SquaredContainerButton onPress={redo} disabled={!canRedo}>
-            <Icon
-              source="redo-variant"
-              color={
-                canRedo
-                  ? theme.colors?.primary
-                  : theme.colors.onSurfaceDisabled
-              }
-              size={20}
-            />
-          </SquaredContainerButton>
+          <AppTooltip title={t("common:redo")}>
+            <SquaredContainerButton onPress={redo} disabled={!canRedo}>
+              <Icon
+                source="redo-variant"
+                color={
+                  canRedo
+                    ? theme.colors?.primary
+                    : theme.colors.onSurfaceDisabled
+                }
+                size={20}
+              />
+            </SquaredContainerButton>
+          </AppTooltip>
         )}
         {!(width > 600) && (
-          <SquaredContainerButton onPress={undo} disabled={!canUndo}>
-            <Icon
-              source="undo-variant"
-              color={
-                canUndo
-                  ? theme.colors?.primary
-                  : theme.colors.onSurfaceDisabled
-              }
-              size={20}
-            />
-          </SquaredContainerButton>
+          <AppTooltip title={t("common:undo")}>
+            <SquaredContainerButton onPress={undo} disabled={!canUndo}>
+              <Icon
+                source="undo-variant"
+                color={
+                  canUndo
+                    ? theme.colors?.primary
+                    : theme.colors.onSurfaceDisabled
+                }
+                size={20}
+              />
+            </SquaredContainerButton>
+          </AppTooltip>
         )}
         {!(width > 600) && (
-          <SquaredContainerButton onPress={redo} disabled={!canRedo}>
-            <Icon
-              source="redo-variant"
-              color={
-                canRedo
-                  ? theme.colors?.primary
-                  : theme.colors.onSurfaceDisabled
-              }
-              size={20}
-            />
-          </SquaredContainerButton>
+          <AppTooltip title={t("common:redo")}>
+            <SquaredContainerButton onPress={redo} disabled={!canRedo}>
+              <Icon
+                source="redo-variant"
+                color={
+                  canRedo
+                    ? theme.colors?.primary
+                    : theme.colors.onSurfaceDisabled
+                }
+                size={20}
+              />
+            </SquaredContainerButton>
+          </AppTooltip>
         )}
-        <SquaredContainerButton onPress={() => changeFav(!value.fav)}>
-          <Icon source={favIcon} color={theme.colors?.primary} size={20} />
-        </SquaredContainerButton>
+        <AppTooltip
+          title={
+            value.fav ? t("common:removeFavorite") : t("common:addFavorite")
+          }
+        >
+          <SquaredContainerButton onPress={() => changeFav(!value.fav)}>
+            <Icon source={favIcon} color={theme.colors?.primary} size={20} />
+          </SquaredContainerButton>
+        </AppTooltip>
         <ContainerButton
           flexGrow={5}
           onPress={() => {
@@ -668,21 +683,25 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         {fastAccessObject === null ||
         fastAccessObject.username === "" ||
         fastAccessObject.password === "" ? null : (
-          <SquaredContainerButton onPress={openFastAccessFeature}>
+          <AppTooltip title={t("common:fastAccess")}>
+            <SquaredContainerButton onPress={openFastAccessFeature}>
+              <Icon
+                source={"tooltip-account"}
+                color={theme.colors.primary}
+                size={20}
+              />
+            </SquaredContainerButton>
+          </AppTooltip>
+        )}
+        <AppTooltip title={t("common:more")}>
+          <SquaredContainerButton onPress={() => setOverflowMenuVisible(true)}>
             <Icon
-              source={"tooltip-account"}
-              color={theme.colors.primary}
+              source="dots-vertical"
               size={20}
+              color={theme.colors?.primary}
             />
           </SquaredContainerButton>
-        )}
-        <SquaredContainerButton onPress={() => setOverflowMenuVisible(true)}>
-          <Icon
-            source="dots-vertical"
-            size={20}
-            color={theme.colors?.primary}
-          />
-        </SquaredContainerButton>
+        </AppTooltip>
       </View>
       <AdaptiveMenu
         visible={overflowMenuVisible}

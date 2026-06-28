@@ -1,11 +1,12 @@
 import React from "react";
 import { View } from "react-native";
-import { IconButton } from "react-native-paper";
+import { useTranslation } from "react-i18next";
 
 import theme from "../../ui/theme";
 import { useClipboardCopy } from "../../hooks/useClipboardCopy";
 import { emitClipboardCopied } from "../../../infrastructure/events/clipboardBus";
 import { ClipboardContentKind } from "../../../infrastructure/clipboard/clipboardOwnership";
+import TooltipIconButton from "./TooltipIconButton";
 
 type Props = {
   value: string;
@@ -24,6 +25,7 @@ function CopyToClipboard({
   sensitive,
   compact,
 }: Props) {
+  const { t } = useTranslation();
   const [icon, setIcon] = React.useState<"content-copy" | "check">(
     "content-copy",
   );
@@ -53,7 +55,8 @@ function CopyToClipboard({
 
   return (
     <View style={{ width: compact ? 32 : 48 }}>
-      <IconButton
+      <TooltipIconButton
+        tooltip={t("common:copy")}
         animated
         icon={icon}
         iconColor={theme.colors.primary}

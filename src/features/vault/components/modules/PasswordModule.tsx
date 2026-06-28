@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
-import { IconButton } from "react-native-paper";
 import * as Progress from "react-native-progress";
 import { useTranslation } from "react-i18next";
 
@@ -21,6 +20,7 @@ import {
 } from "../../utils/entropyUi";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import ModulesEnum from "../../model/ModulesEnum";
+import TooltipIconButton from "../../../../shared/components/buttons/TooltipIconButton";
 
 function PasswordModule(props: PasswordModuleType & Props) {
   const didMount = useRef(false);
@@ -94,7 +94,8 @@ function PasswordModule(props: PasswordModuleType & Props) {
           />
         </View>
 
-        <IconButton
+        <TooltipIconButton
+          tooltip={t("common:generatePassword")}
           style={{ margin: 0, marginLeft: 8, marginRight: 8 }}
           iconColor={theme.colors.primary}
           icon="lock-check"

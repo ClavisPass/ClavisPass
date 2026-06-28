@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
-import { IconButton, TextInput } from "react-native-paper";
+import { TextInput } from "react-native-paper";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import NoteModuleType from "../../model/modules/NoteModuleType";
 import ModuleContainer from "../ModuleContainer";
@@ -14,6 +14,7 @@ import { HomeStackParamList } from "../../../../app/navigation/model/types";
 import NoteMarkdownPreview from "./NoteMarkdownPreview";
 import NoteCodePreview from "./NoteCodePreview";
 import NoteSelector, { NoteSelectorOption } from "./NoteSelector";
+import TooltipIconButton from "../../../../shared/components/buttons/TooltipIconButton";
 
 type NoteModuleNavigationProps = {
   navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>;
@@ -305,7 +306,8 @@ function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
             />
           </View>
           <View style={styles.toolbarActions}>
-            <IconButton
+            <TooltipIconButton
+              tooltip={t("modules:noteExpand")}
               icon="arrow-expand"
               size={18}
               iconColor={theme.colors.primary}

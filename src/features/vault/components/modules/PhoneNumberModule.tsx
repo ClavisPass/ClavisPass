@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
-import { TextInput, IconButton } from "react-native-paper";
+import { TextInput } from "react-native-paper";
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
@@ -11,6 +11,7 @@ import * as Linking from "expo-linking";
 import { useTranslation } from "react-i18next";
 import ModulesEnum from "../../model/ModulesEnum";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
+import TooltipIconButton from "../../../../shared/components/buttons/TooltipIconButton";
 
 function PhoneNumberModule(props: PhoneNumberModuleType & Props) {
   const didMount = useRef(false);
@@ -91,7 +92,8 @@ function PhoneNumberModule(props: PhoneNumberModuleType & Props) {
         </View>
         <CopyToClipboard value={value} />
         <View style={{ width: 48 }}>
-          <IconButton
+          <TooltipIconButton
+            tooltip={t("common:callPhoneNumber")}
             icon={"phone"}
             iconColor={theme.colors.primary}
             size={20}
