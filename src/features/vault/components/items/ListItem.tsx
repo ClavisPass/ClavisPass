@@ -27,6 +27,7 @@ import FolderType from "../../model/FolderType";
 import { getValueIcon } from "../../utils/getValueIcon";
 import { getFolderColor } from "../../utils/folderAppearance";
 import TooltipIconButton from "../../../../shared/components/buttons/TooltipIconButton";
+import AppTooltip from "../../../../shared/components/tooltips/AppTooltip";
 
 const styles = StyleSheet.create({
   container: {
@@ -817,37 +818,41 @@ function ListItem(props: Props) {
           <View style={styles.right}>
             {hovered && fastAccessObject && (
               <View style={styles.chipRow}>
-                <Button
-                  mode="contained-tonal"
-                  compact
-                  icon={usernameIcon}
-                  onPress={() =>
-                    copyToClipboard(fastAccessObject.username, "username")
-                  }
-                  style={[styles.chip, styles.chipLeft, styles.chipUser]}
-                  contentStyle={styles.chipContent}
-                  textColor={theme.colors.primary}
-                >
-                  <Text numberOfLines={1} style={styles.chipText}>
-                    {ellipsize(fastAccessObject.username, 18)}
-                  </Text>
-                </Button>
+                <AppTooltip title={t("common:copyUsername")}>
+                  <Button
+                    mode="contained-tonal"
+                    compact
+                    icon={usernameIcon}
+                    onPress={() =>
+                      copyToClipboard(fastAccessObject.username, "username")
+                    }
+                    style={[styles.chip, styles.chipLeft, styles.chipUser]}
+                    contentStyle={styles.chipContent}
+                    textColor={theme.colors.primary}
+                  >
+                    <Text numberOfLines={1} style={styles.chipText}>
+                      {ellipsize(fastAccessObject.username, 18)}
+                    </Text>
+                  </Button>
+                </AppTooltip>
 
-                <Button
-                  mode="contained-tonal"
-                  compact
-                  icon={passwordIcon}
-                  onPress={() =>
-                    copyToClipboard(fastAccessObject.password, "password")
-                  }
-                  style={[styles.chip, styles.chipRight, styles.chipPass]}
-                  contentStyle={styles.chipContent}
-                  textColor={theme.colors.primary}
-                >
-                  <Text numberOfLines={1} style={styles.chipText}>
-                    {maskPassword(fastAccessObject.password)}
-                  </Text>
-                </Button>
+                <AppTooltip title={t("common:copyPassword")}>
+                  <Button
+                    mode="contained-tonal"
+                    compact
+                    icon={passwordIcon}
+                    onPress={() =>
+                      copyToClipboard(fastAccessObject.password, "password")
+                    }
+                    style={[styles.chip, styles.chipRight, styles.chipPass]}
+                    contentStyle={styles.chipContent}
+                    textColor={theme.colors.primary}
+                  >
+                    <Text numberOfLines={1} style={styles.chipText}>
+                      {maskPassword(fastAccessObject.password)}
+                    </Text>
+                  </Button>
+                </AppTooltip>
               </View>
             )}
 

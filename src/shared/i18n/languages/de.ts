@@ -18,6 +18,8 @@ const de: TranslationSchema = {
     capslockOn: "Caps Lock ist aktiviert",
     cancel: "Abbrechen",
     copy: "Kopieren",
+    copyUsername: "Benutzername kopieren",
+    copyPassword: "Passwort kopieren",
     delete: "Löschen",
     deleteEntryText: "Möchtest du diesen Eintrag löschen?",
     discardChangesText:

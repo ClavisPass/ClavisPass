@@ -19,6 +19,8 @@ export type TranslationSchema = {
     capslockOn: string;
     cancel: string;
     copy: string;
+    copyUsername: string;
+    copyPassword: string;
     delete: string;
     deleteEntryText: string;
     discardChangesText: string;
