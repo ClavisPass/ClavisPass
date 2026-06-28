@@ -1,10 +1,7 @@
 import React from "react";
 import { View } from "react-native";
-import { IconButton } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
-import { useOnline } from "../../../../app/providers/OnlineProvider";
-import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { useVault } from "../../../../app/providers/VaultProvider";
 
 import AdaptiveMenu, {
@@ -21,16 +18,13 @@ type Props = {
   positionY: number;
 
   openEditFolder: () => void; // aktuell nicht genutzt
-  refreshData: () => void;
 
   // Native sizing
   nativeSnapPoints?: (string | number)[];
 };
 
 function HomeFilterMenu(props: Props) {
-  const { theme } = useTheme();
   const vault = useVault();
-  const { isOnline } = useOnline();
   const { t } = useTranslation();
 
   // -----------------------------
@@ -161,32 +155,11 @@ function HomeFilterMenu(props: Props) {
     <View
       style={{
         flexDirection: "row",
-        justifyContent: "space-between",
+        justifyContent: "flex-start",
         alignItems: "center",
       }}
     >
       <MenuItem>{`${entryCount} ${t("home:entries")}`}</MenuItem>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <View
-          style={{
-            width: 1,
-            height: 24,
-            backgroundColor: theme.colors.outlineVariant,
-            opacity: 0.7,
-          }}
-        />
-        <IconButton
-        style={{ marginLeft: 20, marginRight: 20 }}
-          disabled={!isOnline}
-          icon="refresh"
-          size={20}
-          iconColor={theme.colors.primary}
-          onPress={() => {
-            props.refreshData();
-            close();
-          }}
-        />
-      </View>
     </View>
   );
 

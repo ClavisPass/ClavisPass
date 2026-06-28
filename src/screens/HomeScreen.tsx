@@ -49,6 +49,7 @@ import ModulesEnum from "../features/vault/model/ModulesEnum";
 import CardItem from "../features/vault/components/items/CardItem";
 import DigitalCardModuleType from "../features/vault/model/modules/DigitalCardModuleType";
 import { useToken } from "../app/providers/CloudProvider";
+import { useOnline } from "../app/providers/OnlineProvider";
 import { logger } from "../infrastructure/logging/logger";
 import { fetchRemoteVaultFile } from "../infrastructure/cloud/clients/CloudStorageClient";
 import { useSetting } from "../app/providers/SettingsProvider";
@@ -90,6 +91,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const { width } = useWindowDimensions();
   const auth = useAuth();
   const vault = useVault();
+  const { isOnline } = useOnline();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
@@ -916,6 +918,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 placeholderTextColor={"#ffffff80"}
               />
               <IconButton
+                icon="refresh"
+                size={24}
+                disabled={!isOnline || refreshing}
+                onPress={refreshData}
+                iconColor="white"
+                accessibilityLabel={t("common:reload")}
+                style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
+              />
+              <IconButton
                 icon="sort-variant"
                 size={25}
                 onPress={() => {
@@ -992,7 +1003,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               (Platform.OS === "web" ? 48 : 90)
             }
             openEditFolder={() => setFolderModalVisible(true)}
-            refreshData={refreshData}
           />
 
           <FolderModal
