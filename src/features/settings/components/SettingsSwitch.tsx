@@ -19,8 +19,6 @@ const SettingsSwitch = (props: Props) => {
         height: 44,
         minHeight: 44,
         maxHeight: 44,
-        padding: 10,
-        paddingLeft: 0,
         flex: 1,
         display: "flex",
         flexDirection: "row",
@@ -28,7 +26,7 @@ const SettingsSwitch = (props: Props) => {
         justifyContent: "space-between",
       }}
     >
-      <View style={{ flex: 1, minWidth: 0, flexDirection: "row" }}>
+      <View style={{ flex: 1, minWidth: 0 }}>
         <Pressable
           disabled={props.disabled}
           onPress={() => props.onValueChange(!props.value)}
@@ -38,17 +36,21 @@ const SettingsSwitch = (props: Props) => {
             leadingIcon={props.leadingIcon}
             minWidth={0}
             onPress={undefined}
+            afterLabel={
+              props.info ? <SettingInfoButton {...props.info} compact /> : null
+            }
           >
             {props.label}
           </SettingsItem>
         </Pressable>
-        {props.info ? <SettingInfoButton {...props.info} compact /> : null}
       </View>
-      <Switch
-        value={props.value}
-        onValueChange={props.onValueChange}
-        disabled={props.disabled}
-      />
+      <View style={{ paddingRight: 10 }}>
+        <Switch
+          value={props.value}
+          onValueChange={props.onValueChange}
+          disabled={props.disabled}
+        />
+      </View>
     </View>
   );
 };

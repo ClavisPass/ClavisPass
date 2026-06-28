@@ -62,6 +62,10 @@ function SettingInfoButton({ title, body, bullets, compact }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const [visible, setVisible] = React.useState(false);
+  const openInfo = (event?: any) => {
+    event?.stopPropagation?.();
+    setVisible(true);
+  };
 
   return (
     <>
@@ -70,7 +74,7 @@ function SettingInfoButton({ title, body, bullets, compact }: Props) {
         icon="information-outline"
         size={compact ? 15 : 20}
         iconColor={theme.colors.primary}
-        onPress={() => setVisible(true)}
+        onPress={openInfo}
         style={compact ? styles.compactButton : { margin: 0 }}
       />
       <Modal visible={visible} onDismiss={() => setVisible(false)}>
