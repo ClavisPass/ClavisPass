@@ -31,6 +31,7 @@ describe("modulePolicy", () => {
       id: "entry-1",
       title: "Example",
       fav: true,
+      pinnedAt: null,
       created: "2026-05-21T10:00:00.000Z",
       lastUpdated: "2026-05-21T10:05:00.000Z",
       folderId: "folder-1",

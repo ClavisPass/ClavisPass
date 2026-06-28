@@ -11,6 +11,7 @@ import AdaptiveMenu, {
   AdaptiveMenuItem,
 } from "../../../../shared/components/menus/AdaptiveMenu";
 import { MenuItem } from "../../../../shared/components/menus/MenuItem";
+import { sortPinnedFirst } from "../../utils/pinnedEntries";
 
 type Props = {
   visible: boolean;
@@ -64,8 +65,7 @@ function HomeFilterMenu(props: Props) {
     if (!vault.isUnlocked) return;
 
     vault.update((draft) => {
-      const values = [...(draft.values ?? [])];
-      values.sort((a, b) =>
+      const values = sortPinnedFirst(draft.values ?? [], (a, b) =>
         sort === "asc"
           ? a.title.localeCompare(b.title)
           : b.title.localeCompare(a.title)
@@ -86,8 +86,7 @@ function HomeFilterMenu(props: Props) {
     if (!vault.isUnlocked) return;
 
     vault.update((draft) => {
-      const values = [...(draft.values ?? [])];
-      values.sort((a, b) => {
+      const values = sortPinnedFirst(draft.values ?? [], (a, b) => {
         const aDate = new Date(a.created).getTime();
         const bDate = new Date(b.created).getTime();
         return sort === "asc" ? aDate - bDate : bDate - aDate;
@@ -108,8 +107,7 @@ function HomeFilterMenu(props: Props) {
     if (!vault.isUnlocked) return;
 
     vault.update((draft) => {
-      const values = [...(draft.values ?? [])];
-      values.sort((a, b) => {
+      const values = sortPinnedFirst(draft.values ?? [], (a, b) => {
         const aDate = new Date(a.lastUpdated).getTime();
         const bDate = new Date(b.lastUpdated).getTime();
         return sort === "asc" ? aDate - bDate : bDate - aDate;

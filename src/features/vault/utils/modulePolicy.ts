@@ -8,6 +8,7 @@ export type EntryMeta = {
   id: string;
   title: string;
   fav: boolean;
+  pinnedAt?: string | null;
   created: string;
   lastUpdated: string;
   folderId?: string | null;
@@ -114,6 +115,7 @@ export function buildEntryMeta(entry: ValuesType): EntryMeta {
     id: entry.id,
     title: entry.title,
     fav: entry.fav,
+    pinnedAt: entry.pinnedAt ?? null,
     created: entry.created,
     lastUpdated: entry.lastUpdated,
     folderId: (entry.folder as any)?.id ?? null,

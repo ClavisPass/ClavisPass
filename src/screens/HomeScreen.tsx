@@ -64,6 +64,10 @@ import { getRelativeInfo, getStatus } from "../features/vault/utils/expiry";
 import { formatAbsoluteLocal } from "../shared/utils/Timestamp";
 import { buildEntryMeta } from "../features/vault/utils/modulePolicy";
 import {
+  comparePinnedFirst,
+  orderPinnedFirst,
+} from "../features/vault/utils/pinnedEntries";
+import {
   subscribeOpenAddValue,
   unsubscribeOpenAddValue,
 } from "../infrastructure/events/openAddValueBus";
@@ -294,10 +298,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     const result = hasQuery
       ? withRelevance
           .filter((item) => item._relevance !== Infinity)
-          .sort((a, b) => a._relevance - b._relevance)
+          .sort((a, b) => {
+            const pinned = comparePinnedFirst(a, b);
+            if (pinned !== 0) return pinned;
+            return a._relevance - b._relevance;
+          })
       : withRelevance;
 
-    return result;
+    return hasQuery ? result : orderPinnedFirst(result);
   }, [vaultData, searchQuery, selectedFolder, selectedFav]);
 
   const expiryEntries = useMemo(() => {

@@ -83,6 +83,8 @@ export type TranslationSchema = {
     fastAccess: string;
     addFavorite: string;
     removeFavorite: string;
+    addPin: string;
+    removePin: string;
     moveToFolder: string;
   };
   login: {

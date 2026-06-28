@@ -354,6 +354,13 @@ function ListItem(props: Props) {
     }));
   };
 
+  const togglePinned = () => {
+    updateListItem((entry) => ({
+      ...entry,
+      pinnedAt: entry.pinnedAt ? null : new Date().toISOString(),
+    }));
+  };
+
   const listItemMenuItems = useMemo<AdaptiveMenuItem[]>(
     () => [
       ...(fastAccessData
@@ -368,6 +375,14 @@ function ListItem(props: Props) {
             },
           ]
         : []),
+      {
+        key: "pin",
+        icon: props.item.pinnedAt ? "pin-off" : "pin",
+        label: props.item.pinnedAt
+          ? t("common:removePin")
+          : t("common:addPin"),
+        onPress: togglePinned,
+      },
       {
         key: "move-folder",
         icon: "folder",
@@ -384,7 +399,7 @@ function ListItem(props: Props) {
         withDivider: false,
       },
     ],
-    [fastAccessData, t],
+    [fastAccessData, props.item.pinnedAt, t],
   );
 
   const menuTopContent = (
@@ -425,11 +440,20 @@ function ListItem(props: Props) {
         style={styles.menuPreviewAction}
         iconColor={theme.colors.primary}
       />
+      <IconButton
+        icon={props.item.pinnedAt ? "pin" : "pin-outline"}
+        size={18}
+        onPress={() => {
+          togglePinned();
+        }}
+        style={styles.menuPreviewAction}
+        iconColor={theme.colors.primary}
+      />
     </View>
   );
 
   const measureAndOpenMenu = () => {
-    const estimatedMenuHeight = 228;
+    const estimatedMenuHeight = 276;
     const estimatedMenuWidth = 244;
     const viewportPadding = 8;
     const downwardGap = 8;
@@ -473,7 +497,7 @@ function ListItem(props: Props) {
   };
 
   const openMenuAtPointer = (event: any) => {
-    const estimatedMenuHeight = 228;
+    const estimatedMenuHeight = 276;
     const estimatedMenuWidth = 244;
     const viewportPadding = 8;
     const nativeEvent = event?.nativeEvent;
@@ -817,6 +841,10 @@ function ListItem(props: Props) {
                 </Button>
               </View>
             )}
+
+            {props.item.pinnedAt ? (
+              <Icon color={theme.colors.primary} source="pin" size={16} />
+            ) : null}
 
             <Icon
               color={theme.colors?.primary}

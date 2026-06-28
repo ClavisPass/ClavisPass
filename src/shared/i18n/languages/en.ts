@@ -84,6 +84,8 @@ const en: TranslationSchema = {
     fastAccess: "Fast Access",
     addFavorite: "Add to favorites",
     removeFavorite: "Remove from favorites",
+    addPin: "Pin entry",
+    removePin: "Unpin entry",
     moveToFolder: "Move to folder",
   },
   login: {
