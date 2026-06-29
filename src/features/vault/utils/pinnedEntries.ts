@@ -12,9 +12,7 @@ export function comparePinnedFirst<T extends Pick<ValuesType, "pinnedAt">>(
   const bPinned = isPinnedEntry(b);
 
   if (aPinned !== bPinned) return aPinned ? -1 : 1;
-  if (!aPinned || !bPinned) return 0;
-
-  return Date.parse(b.pinnedAt ?? "") - Date.parse(a.pinnedAt ?? "");
+  return 0;
 }
 
 export function orderPinnedFirst<T extends Pick<ValuesType, "pinnedAt">>(
