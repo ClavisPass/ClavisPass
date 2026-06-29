@@ -351,6 +351,19 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     );
   };
 
+  const changePin = () => {
+    applyChange(
+      (current) => ({
+        ...current,
+        pinnedAt: current.pinnedAt ? null : new Date().toISOString(),
+      }),
+      {
+        action: "pin",
+        label: t("common:editHistoryPinUpdated"),
+      }
+    );
+  };
+
   const deleteModule = (id: string) => {
     const newModules: ModulesType = [
       ...value.modules.filter((item: ModuleType) => item.id !== id),
@@ -516,6 +529,14 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           ]
         : []),
       {
+        key: "pin",
+        icon: value.pinnedAt ? "pin-off" : "pin",
+        label: value.pinnedAt
+          ? t("common:removePin")
+          : t("common:addPin"),
+        onPress: changePin,
+      },
+      {
         key: "history",
         icon: "history",
         label: t("common:editHistory"),
@@ -529,7 +550,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         withDivider: false,
       },
     ],
-    [sessionLog.length, sortCompletedTasksDown, t, taskModuleCount]
+    [sessionLog.length, sortCompletedTasksDown, t, taskModuleCount, value.pinnedAt]
   );
 
   return (

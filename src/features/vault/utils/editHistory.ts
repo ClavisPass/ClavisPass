@@ -8,6 +8,7 @@ export type EditHistoryActionType =
   | "init"
   | "title"
   | "favorite"
+  | "pin"
   | "folder"
   | "modules"
   | "module"

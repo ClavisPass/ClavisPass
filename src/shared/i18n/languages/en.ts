@@ -82,6 +82,7 @@ const en: TranslationSchema = {
     editHistoryModulesUpdated: "Updated modules",
     editHistoryModulesReordered: "Reordered modules",
     editHistoryFavoriteUpdated: "Updated favorite",
+    editHistoryPinUpdated: "Updated pin",
     editHistoryFolderUpdated: "Updated folder",
     editHistoryFolderFavoriteUpdated: "Updated folder and favorite",
     editHistoryUndo: "Undid latest change",

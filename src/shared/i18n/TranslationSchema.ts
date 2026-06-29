@@ -81,6 +81,7 @@ export type TranslationSchema = {
     editHistoryModulesUpdated: string;
     editHistoryModulesReordered: string;
     editHistoryFavoriteUpdated: string;
+    editHistoryPinUpdated: string;
     editHistoryFolderUpdated: string;
     editHistoryFolderFavoriteUpdated: string;
     editHistoryUndo: string;
