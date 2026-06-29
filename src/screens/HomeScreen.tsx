@@ -66,6 +66,7 @@ import { HomeStackParamList } from "../app/navigation/model/types";
 import { decryptVaultContent } from "../infrastructure/crypto/decryptVaultContent";
 import { extractUrlFromEntry } from "../features/vault/utils/digitalCardTheme";
 import ExpiryOverviewModal from "../features/vault/components/modals/ExpiryOverviewModal";
+import ModuleFilterModal from "../features/vault/components/modals/ModuleFilterModal";
 import type ExpiryModuleType from "../features/vault/model/modules/ExpiryModuleType";
 import { getRelativeInfo, getStatus } from "../features/vault/utils/expiry";
 import { formatAbsoluteLocal } from "../shared/utils/Timestamp";
@@ -136,24 +137,72 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const [showMenu, setShowMenu] = useState(false);
 
   const [folderModalVisible, setFolderModalVisible] = useState(false);
+  const [moduleFilterModalVisible, setModuleFilterModalVisible] =
+    useState(false);
+  const [moduleFilters, setModuleFilters] = useState<ModulesEnum[]>([]);
+  const [selectedModuleFilters, setSelectedModuleFilters] = useState<
+    ModulesEnum[]
+  >([]);
   const [valueModalVisible, setValueModalVisible] = useState(false);
   const [expiryModalVisible, setExpiryModalVisible] = useState(false);
   const [systemAuthPromptVisible, setSystemAuthPromptVisible] = useState(false);
   const { provider, accessToken, ensureFreshAccessToken } = useToken();
 
   const saveSelectedFavState = (fav: boolean) => {
+    if (fav) setSelectedModuleFilters([]);
     setSelectedFav(fav);
   };
 
   const saveSelected2FAState = (twoFA: boolean) => {
     setSearchQuery("");
+    if (twoFA) setSelectedModuleFilters([]);
     setSelected2FA(twoFA);
   };
 
   const saveSelectedCardState = (card: boolean) => {
     setSearchQuery("");
+    if (card) setSelectedModuleFilters([]);
     setSelectedCard(card);
   };
+
+  const saveSelectedFolderState = (folder: FolderType | null) => {
+    if (folder) setSelectedModuleFilters([]);
+    setSelectedFolder(folder);
+  };
+
+  const toggleModuleFilter = useCallback(
+    (module: ModulesEnum) => {
+      const isSelected = selectedModuleFilters.includes(module);
+
+      setSelectedFolder(null);
+      setSelectedFav(false);
+      setSelected2FA(false);
+      setSelectedCard(false);
+      setSearchQuery("");
+
+      setModuleFilters((current) =>
+        current.includes(module) ? current : [...current, module],
+      );
+      setSelectedModuleFilters((current) =>
+        isSelected
+          ? current.filter((item) => item !== module)
+          : [...current, module],
+      );
+    },
+    [
+      selectedModuleFilters,
+      setSelectedCard,
+      setSelected2FA,
+      setSelectedFav,
+    ],
+  );
+
+  const removeModuleFilter = useCallback((module: ModulesEnum) => {
+    setModuleFilters((current) => current.filter((item) => item !== module));
+    setSelectedModuleFilters((current) =>
+      current.filter((item) => item !== module),
+    );
+  }, []);
 
   useEffect(() => {
     if (triggerAdd) {
@@ -285,8 +334,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     const normalizedQuery = normalizeText(searchQuery.trim());
     const hasQuery = normalizedQuery.length > 0;
     const includeMetaFields = normalizedQuery.length >= 2;
+    const activeModuleFilters = new Set(selectedModuleFilters);
 
     const prefiltered = values.filter((item) => {
+      const moduleMatch =
+        activeModuleFilters.size === 0 ||
+        item.modules.some((module) => activeModuleFilters.has(module.module));
+      if (!moduleMatch) return false;
+
       if (hasQuery) return true;
 
       const folderMatch =
@@ -333,7 +388,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       : withRelevance;
 
     return hasQuery ? result : orderPinnedFirst(result);
-  }, [vaultData, searchQuery, selectedFolder, selectedFav]);
+  }, [vaultData, searchQuery, selectedFolder, selectedFav, selectedModuleFilters]);
 
   const expiryEntries = useMemo(() => {
     const entries: Array<{
@@ -500,6 +555,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         saveSelectedFavState(false);
         saveSelected2FAState(false);
         saveSelectedCardState(false);
+        setModuleFilters([]);
+        setSelectedModuleFilters([]);
       } catch (error) {
         logger.error("[Home] Error during refreshData:", error);
       } finally {
@@ -1044,12 +1101,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               selectedFav={selectedFav}
               setSelectedFav={saveSelectedFavState}
               selectedFolder={selectedFolder}
-              setSelectedFolder={setSelectedFolder}
+              setSelectedFolder={saveSelectedFolderState}
               setFolderModalVisible={setFolderModalVisible}
               selected2FA={selected2FA}
               setSelected2FA={saveSelected2FAState}
               selectedCard={selectedCard}
               setSelectedCard={saveSelectedCardState}
+              moduleFilters={moduleFilters}
+              selectedModuleFilters={selectedModuleFilters}
+              toggleModuleFilter={toggleModuleFilter}
+              removeModuleFilter={removeModuleFilter}
+              openModuleFilterModal={() => setModuleFilterModalVisible(true)}
             />
           </View>
 
@@ -1068,6 +1130,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             visible={folderModalVisible}
             setVisible={setFolderModalVisible}
             folder={vaultData?.folder ?? []}
+          />
+          <ModuleFilterModal
+            visible={moduleFilterModalVisible}
+            selectedModules={selectedModuleFilters}
+            onToggleModule={toggleModuleFilter}
+            onDismiss={() => setModuleFilterModalVisible(false)}
           />
           <ExpiryOverviewModal
             visible={expiryModalVisible}

@@ -151,6 +151,9 @@ const en: TranslationSchema = {
     sortByLastUpdated: "Sort by Last Updated",
     reorderEntries: "Arrange manually",
     reorderHint: "Drag entries to arrange them.",
+    moduleFilterTitle: "Module filters",
+    moduleFilterText: "Select module types that should be visible in the list.",
+    editFolders: "Edit folders",
     systemAuthPromptTitle: "Use system authentication?",
     systemAuthPromptText:
       "You can unlock ClavisPass with fingerprint, face recognition, or your device lock next time.",

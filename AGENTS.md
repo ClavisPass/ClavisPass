@@ -51,6 +51,7 @@ Use this file as the fast-start context for future work, then open [docs/project
 - Desktop-only behavior often hides behind `Platform.OS === "web"` because Expo web is used inside Tauri.
 - When adding or changing user-facing text, update the typed i18n contract in src/shared/i18n/TranslationSchema.ts and add matching entries in both src/shared/i18n/languages/de.ts and src/shared/i18n/languages/en.ts.
 - Prefer real translation keys over local hardcoded fallbacks; use defaultValue only as a temporary bridge when needed during a change.
+- For icon-only buttons that are not immediately self-explanatory, consider using the shared tooltip components, especially [AppTooltip](/e:/Projects/ClavisPass/src/shared/components/tooltips/AppTooltip.tsx) or [TooltipIconButton](/e:/Projects/ClavisPass/src/shared/components/buttons/TooltipIconButton.tsx), when it improves discoverability without adding visual noise.
 
 ## Suggested First Files To Read
 

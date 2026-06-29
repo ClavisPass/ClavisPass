@@ -148,6 +148,9 @@ export type TranslationSchema = {
     sortByLastUpdated: string;
     reorderEntries: string;
     reorderHint: string;
+    moduleFilterTitle: string;
+    moduleFilterText: string;
+    editFolders: string;
     systemAuthPromptTitle: string;
     systemAuthPromptText: string;
     systemAuthPromptEnable: string;

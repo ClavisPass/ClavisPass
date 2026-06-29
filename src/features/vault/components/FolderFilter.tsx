@@ -6,11 +6,16 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { Chip, Divider, IconButton } from "react-native-paper";
+import { Chip, Divider, IconButton, Text } from "react-native-paper";
 import AnimatedOpacityContainer from "../../../shared/components/container/AnimatedOpacityContainer";
 import { MenuItem } from "../../../shared/components/menus/MenuItem";
+import AnimatedPressable from "../../../shared/components/AnimatedPressable";
+import AppTooltip from "../../../shared/components/tooltips/AppTooltip";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import FolderType from "../model/FolderType";
+import ModulesEnum from "../model/ModulesEnum";
+import { MODULE_ICON } from "../model/ModuleIconsEnum";
+import getModuleNameByEnum from "../utils/getModuleNameByEnum";
 import Animated, {
   clamp,
   FadeIn,
@@ -66,6 +71,11 @@ type Props = {
   setSelectedCard: (selectedCard: boolean) => void;
   selected2FA: boolean;
   setSelected2FA: (selected2FA: boolean) => void;
+  moduleFilters: ModulesEnum[];
+  selectedModuleFilters: ModulesEnum[];
+  toggleModuleFilter: (module: ModulesEnum) => void;
+  removeModuleFilter: (module: ModulesEnum) => void;
+  openModuleFilterModal: () => void;
   disabled?: boolean;
 };
 
@@ -175,6 +185,36 @@ function FolderFilter(props: Props) {
   const horizontalWheelProps =
     Platform.OS === "web" ? ({ onWheel: handleHorizontalWheel } as any) : {};
 
+  const moduleFilterButton = (size: number, style?: any) => (
+    <AppTooltip title={t("home:moduleFilterTitle")}>
+      <IconButton
+        icon={"filter-variant-plus"}
+        iconColor={theme.colors.primary}
+        style={style}
+        onPress={props.disabled ? undefined : props.openModuleFilterModal}
+        size={size}
+        selected={true}
+        mode="contained-tonal"
+      />
+    </AppTooltip>
+  );
+
+  const editFolderButton = (size: number, style?: any) => (
+    <AppTooltip title={t("home:editFolders")}>
+      <IconButton
+        icon={"pencil"}
+        iconColor={theme.colors.primary}
+        style={style}
+        onPress={
+          props.disabled ? undefined : () => props.setFolderModalVisible(true)
+        }
+        size={size}
+        selected={true}
+        mode="contained-tonal"
+      />
+    </AppTooltip>
+  );
+
   useEffect(() => {
     let isMounted = true;
     (async () => {
@@ -215,6 +255,79 @@ function FolderFilter(props: Props) {
     },
     []
   );
+
+  const renderDesktopModuleFilter = (module: ModulesEnum) => {
+    const selected = props.selectedModuleFilters.includes(module);
+
+    return (
+      <Animated.View key={module} layout={LinearTransition.duration(120)}>
+        <Divider />
+        <View style={{ height: 44 }}>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: selected
+                ? "rgba(120, 127, 246, 0.18)"
+                : "transparent",
+              borderLeftWidth: selected ? 3 : 0,
+              borderLeftColor: theme.colors.primary,
+            }}
+          >
+            <AnimatedPressable
+              onPress={
+                props.disabled
+                  ? undefined
+                  : () => props.toggleModuleFilter(module)
+              }
+              style={{
+                flex: 1,
+                height: "100%",
+                cursor: "pointer",
+              }}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 6,
+                  paddingLeft: 10,
+                  minWidth: 0,
+                }}
+              >
+                <MaterialCommunityIcons
+                  name={MODULE_ICON[module]}
+                  size={20}
+                  color={theme.colors.primary}
+                />
+                <Text
+                  variant="bodyLarge"
+                  style={{ userSelect: "none", flexShrink: 1 }}
+                  ellipsizeMode="tail"
+                  numberOfLines={1}
+                >
+                  {getModuleNameByEnum(module, t)}
+                </Text>
+              </View>
+            </AnimatedPressable>
+            <IconButton
+              icon="close"
+              size={16}
+              iconColor={theme.colors.primary}
+              style={{ margin: 0 }}
+              onPress={
+                props.disabled
+                  ? undefined
+                  : () => props.removeModuleFilter(module)
+              }
+            />
+          </View>
+        </View>
+      </Animated.View>
+    );
+  };
 
   return (
     <>
@@ -298,6 +411,7 @@ function FolderFilter(props: Props) {
                 >
                   {t("home:favorite")}
                 </MenuItem>
+                {props.moduleFilters.map(renderDesktopModuleFilter)}
               </>
             }
             ListFooterComponent={
@@ -307,22 +421,14 @@ function FolderFilter(props: Props) {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
+                  flexDirection: "row",
                 }}
               >
                 <AnimatedOpacityContainer visible={showAddButton}>
-                  <IconButton
-                    icon={"pencil"}
-                    iconColor={theme.colors.primary}
-                    style={{ margin: 0 }}
-                    onPress={
-                      props.disabled
-                        ? undefined
-                        : () => props.setFolderModalVisible(true)
-                    }
-                    size={20}
-                    selected={true}
-                    mode="contained-tonal"
-                  />
+                  <View style={{ flexDirection: "row", gap: 4 }}>
+                    {moduleFilterButton(20, { margin: 0 })}
+                    {editFolderButton(20, { margin: 0 })}
+                  </View>
                 </AnimatedOpacityContainer>
               </View>
             }
@@ -445,6 +551,33 @@ function FolderFilter(props: Props) {
                       color={theme.colors.primary}
                     />
                   </Chip>
+                  {props.moduleFilters.map((module) => (
+                    <Chip
+                      key={module}
+                      icon={() => (
+                        <MaterialCommunityIcons
+                          name={MODULE_ICON[module]}
+                          size={18}
+                          color={theme.colors.primary}
+                        />
+                      )}
+                      selected={props.selectedModuleFilters.includes(module)}
+                      showSelectedOverlay={true}
+                      onPress={
+                        props.disabled
+                          ? undefined
+                          : () => props.toggleModuleFilter(module)
+                      }
+                      onClose={
+                        props.disabled
+                          ? undefined
+                          : () => props.removeModuleFilter(module)
+                      }
+                      style={styles.chip}
+                    >
+                      {getModuleNameByEnum(module, t)}
+                    </Chip>
+                  ))}
                 </View>
               }
               renderItem={({ item, index }) => (
@@ -480,23 +613,14 @@ function FolderFilter(props: Props) {
                   style={{
                     flex: 1,
                     display: "flex",
+                    flexDirection: "row",
                     justifyContent: "center",
                     alignItems: "center",
+                    gap: 4,
                   }}
                 >
-                  <IconButton
-                    icon={"pencil"}
-                    iconColor={theme.colors.primary}
-                    style={{ marginLeft: 0, alignSelf: "center" }}
-                    onPress={
-                      props.disabled
-                        ? undefined
-                        : () => props.setFolderModalVisible(true)
-                    }
-                    size={12}
-                    mode="contained-tonal"
-                    selected={true}
-                  />
+                  {moduleFilterButton(12, { margin: 0, alignSelf: "center" })}
+                  {editFolderButton(12, { margin: 0, alignSelf: "center" })}
                 </View>
               }
             />
