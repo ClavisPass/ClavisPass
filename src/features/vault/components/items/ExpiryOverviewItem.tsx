@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function ExpiryOverviewItem(props: ExpiryOverviewEntry) {
+function ExpiryOverviewItem(props: ExpiryOverviewEntry) {
   const { theme, darkmode } = useTheme();
 
   const statusColor =
@@ -71,7 +71,7 @@ export default function ExpiryOverviewItem(props: ExpiryOverviewEntry) {
 
   return (
     <View style={styles.container}>
-      <AnimatedPressable style={styles.ripple} onPress={props.onPress}>
+      <AnimatedPressable onPress={props.onPress}>
         <View style={styles.ripple}>
           <View
             style={[
@@ -120,7 +120,11 @@ export default function ExpiryOverviewItem(props: ExpiryOverviewEntry) {
             </Text>
             <Text
               numberOfLines={1}
-              style={{ opacity: 0.72, marginTop: 1, color: theme.colors.onSurface }}
+              style={{
+                opacity: 0.72,
+                marginTop: 1,
+                color: theme.colors.onSurface,
+              }}
             >
               {props.relativeLabel}
             </Text>
@@ -130,3 +134,5 @@ export default function ExpiryOverviewItem(props: ExpiryOverviewEntry) {
     </View>
   );
 }
+
+export default React.memo(ExpiryOverviewItem);

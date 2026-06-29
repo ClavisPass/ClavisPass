@@ -18,6 +18,7 @@ import {
   Badge,
   Button,
   Icon,
+  IconButton,
 } from "react-native-paper";
 
 import { Text } from "react-native-paper";
@@ -87,6 +88,24 @@ import {
 import TooltipIconButton from "../shared/components/buttons/TooltipIconButton";
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
+
+const HomeValueListItem = React.memo(function HomeValueListItem({
+  item,
+  index,
+  navigation,
+}: {
+  item: ValuesType;
+  index: number;
+  navigation: HomeScreenProps["navigation"];
+}) {
+  const handlePress = useCallback(() => {
+    navigation.navigate("Edit", {
+      value: item,
+    });
+  }, [item, navigation]);
+
+  return <ListItem item={item} index={index} onPress={handlePress} />;
+});
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const triggerAdd = route.params?.triggerAdd ?? false;
@@ -397,6 +416,25 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
     return entries.sort((a, b) => a.timestamp - b.timestamp);
   }, [vaultData, dateFormat, timeFormat, t]);
+
+  const expiryOverviewItems = useMemo(
+    () =>
+      expiryEntries.map((entry) => ({
+        key: entry.key,
+        title: entry.title,
+        absoluteLabel: entry.absoluteLabel,
+        relativeLabel: entry.relativeLabel,
+        statusLabel: entry.statusLabel,
+        status: entry.status,
+        onPress: () => {
+          setExpiryModalVisible(false);
+          navigation.navigate("Edit", {
+            value: entry.item,
+          });
+        },
+      })),
+    [expiryEntries, navigation],
+  );
 
   const refreshData = () => {
     const master = auth.getMaster();
@@ -815,14 +853,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         drawDistance={600}
         data={filteredValues}
         renderItem={({ item, index }) => (
-          <ListItem
+          <HomeValueListItem
             item={item}
             index={index}
-            onPress={() => {
-              navigation.navigate("Edit", {
-                value: item,
-              });
-            }}
+            navigation={navigation}
           />
         )}
       />
@@ -922,6 +956,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 loading={false}
                 iconColor={"#ffffff80"}
                 placeholderTextColor={"#ffffff80"}
+                right={() =>
+                  searchQuery ? (
+                    <IconButton
+                      accessibilityLabel={t("common:reset")}
+                      icon="close"
+                      iconColor="#ffffff80"
+                      size={20}
+                      onPress={() => {
+                        setSearchQuery("");
+                        searchRef.current?.focus?.();
+                      }}
+                      style={{ marginVertical: 0, marginLeft: 0, marginRight: 2 }}
+                    />
+                  ) : null
+                }
               />
               <TooltipIconButton
                 tooltip={t("common:reload")}
@@ -948,6 +997,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                     tooltip={t("home:expiries")}
                     icon="calendar-clock"
                     size={24}
+                    hitSlop={8}
                     onPress={() => {
                       setExpiryModalVisible(true);
                     }}
@@ -955,6 +1005,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                     style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
                   />
                   <Badge
+                    pointerEvents="none"
                     size={18}
                     style={{
                       position: "absolute",
@@ -1026,20 +1077,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               TITLEBAR_HEIGHT +
               (Platform.OS === "web" ? 48 : 90)
             }
-            items={expiryEntries.map((entry) => ({
-              key: entry.key,
-              title: entry.title,
-              absoluteLabel: entry.absoluteLabel,
-              relativeLabel: entry.relativeLabel,
-              statusLabel: entry.statusLabel,
-              status: entry.status,
-              onPress: () => {
-                setExpiryModalVisible(false);
-                navigation.navigate("Edit", {
-                  value: entry.item,
-                });
-              },
-            }))}
+            items={expiryOverviewItems}
           />
           <Modal
             visible={systemAuthPromptVisible}
