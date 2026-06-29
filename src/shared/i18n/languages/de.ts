@@ -109,7 +109,10 @@ const de: TranslationSchema = {
     login: "Anmelden",
     setNewPassword: "Neues Passwort festlegen",
     noBackupFound: "Keine lokale Sicherung gefunden",
-    backupTitle: "Sicherung gefunden vom:",
+    loadBackup: "Backup laden",
+    backupTitle: "Sicherung gefunden",
+    backupDateLabel: "Backup vom:",
+    backupDateUnknown: "Datum unbekannt",
     backupLoadFailed: "Sicherung konnte nicht geladen werden.",
     enterMasterPassword:
       "Geben Sie Ihr aktuelles Master-Passwort ein, um es zu ändern.",

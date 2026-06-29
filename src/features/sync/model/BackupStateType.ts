@@ -1,6 +1,6 @@
 type BackupStateType =
   | { status: "loading" }
-  | { status: "ready"; content: string }
+  | { status: "ready"; content: string; updatedAt?: string }
   | { status: "empty" }
   | { status: "error"; message: string };
 

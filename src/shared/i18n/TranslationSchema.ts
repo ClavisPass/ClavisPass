@@ -107,7 +107,10 @@ export type TranslationSchema = {
     login: string;
     setNewPassword: string;
     noBackupFound: string;
+    loadBackup: string;
     backupTitle: string;
+    backupDateLabel: string;
+    backupDateUnknown: string;
     backupLoadFailed: string;
     enterMasterPassword: string;
     cloudSave: string;

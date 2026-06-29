@@ -4,8 +4,26 @@ import { triggerGlobalError } from "../../events/errorBus";
 import UserInfoType from "../../../features/sync/model/UserInfoType";
 import { VaultFetchResult } from "../model/VaultFetchResult";
 import type { UploadContent } from "../model/UploadFileParams";
+import { getDateTime } from "../../../shared/utils/Timestamp";
 
 const LOCAL_SYNC_KEY = "LOCAL_SYNC";
+const LOCAL_SYNC_METADATA_KEY = "LOCAL_SYNC_METADATA";
+
+type LocalSyncMetadata = {
+  updatedAt?: string;
+};
+
+const readLocalSyncMetadata = async (): Promise<LocalSyncMetadata | null> => {
+  const raw = await AsyncStorage.getItem(LOCAL_SYNC_METADATA_KEY);
+  if (!raw) return null;
+
+  try {
+    const parsed = JSON.parse(raw) as LocalSyncMetadata;
+    return typeof parsed?.updatedAt === "string" ? parsed : null;
+  } catch {
+    return null;
+  }
+};
 
 export const fetchUserInfo = async (
   _token: string,
@@ -25,7 +43,13 @@ export const fetchFile = async (): Promise<VaultFetchResult> => {
       return { status: "not_found" };
     }
 
-    return { status: "ok", content: data };
+    const metadata = await readLocalSyncMetadata();
+
+    return {
+      status: "ok",
+      content: data,
+      updatedAt: metadata?.updatedAt,
+    };
   } catch (error) {
     logger.error("[LocalSync] Error reading file from local storage:", error);
 
@@ -50,6 +74,14 @@ export const uploadFile = async (
   try {
     const toStore = typeof content === "string" ? content : JSON.stringify(content);
     await AsyncStorage.setItem(LOCAL_SYNC_KEY, toStore);
+    try {
+      await AsyncStorage.setItem(
+        LOCAL_SYNC_METADATA_KEY,
+        JSON.stringify({ updatedAt: getDateTime() } satisfies LocalSyncMetadata),
+      );
+    } catch (metadataError) {
+      logger.warn("[LocalSync] Error writing local sync metadata:", metadataError);
+    }
     onCompleted?.();
   } catch (error) {
     logger.error(
@@ -68,6 +100,7 @@ export const uploadFile = async (
 export const removeFile = async (): Promise<void> => {
   try {
     await AsyncStorage.removeItem(LOCAL_SYNC_KEY);
+    await AsyncStorage.removeItem(LOCAL_SYNC_METADATA_KEY);
   } catch (error) {
     logger.error(
       `[LocalSync] Error removing file "${LOCAL_SYNC_KEY}" from local storage:`,

@@ -21,6 +21,8 @@ import { useVault } from "../../../app/providers/VaultProvider";
 import Button from "../../../shared/components/buttons/Button";
 import BackupStateType from "../model/BackupStateType";
 import { decryptVaultContent } from "../../../infrastructure/crypto/decryptVaultContent";
+import { formatAbsoluteLocal } from "../../../shared/utils/Timestamp";
+import { useSetting } from "../../../app/providers/SettingsProvider";
 
 function Backup() {
   const { t } = useTranslation();
@@ -28,6 +30,8 @@ function Backup() {
   const auth = useAuth();
   const vault = useVault();
   const { theme } = useTheme();
+  const { value: dateFormat } = useSetting("DATE_FORMAT");
+  const { value: timeFormat } = useSetting("TIME_FORMAT");
 
   const [capsLock, setCapsLock] = useState(false);
   const [error, setError] = useState(false);
@@ -58,7 +62,11 @@ function Backup() {
         return;
       }
 
-      setState({ status: "ready", content: result.content });
+      setState({
+        status: "ready",
+        content: result.content,
+        updatedAt: result.updatedAt,
+      });
     } catch (err) {
       logger.error("[Backup] Error loading local backup:", err);
       setState({
@@ -155,6 +163,9 @@ function Backup() {
     }
 
     const content = state.content;
+    const backupDateLabel = state.updatedAt
+      ? formatAbsoluteLocal(state.updatedAt, dateFormat, timeFormat)
+      : t("login:backupDateUnknown");
 
     return (
       <Animated.View
@@ -177,6 +188,14 @@ function Backup() {
         >
           {t("login:backupTitle")}
         </Text>
+        <View style={{ alignItems: "center", gap: 2 }}>
+          <Text style={{ opacity: 0.7, textAlign: "center" }}>
+            {t("login:backupDateLabel")}
+          </Text>
+          <Text style={{ textAlign: "center", fontWeight: "600" }}>
+            {backupDateLabel}
+          </Text>
+        </View>
 
         <Animated.View layout={contentTransition} style={{ width: "100%" }}>
           <PasswordTextbox
@@ -246,7 +265,7 @@ function Backup() {
             variant="titleMedium"
             style={{ textAlign: "center", marginTop: 1 }}
           >
-            {t("login:backupTitle")}
+            {t("login:loadBackup")}
           </Text>
         </View>
       </Animated.View>
