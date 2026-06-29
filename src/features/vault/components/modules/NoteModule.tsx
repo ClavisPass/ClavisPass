@@ -93,6 +93,7 @@ function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
   const [inputHeight, setInputHeight] = useState(
     DISPLAY_MODE_HEIGHTS[props.displayMode ?? "normal"].min,
   );
+  const selectionRef = useRef({ start: 0, end: 0 });
 
   const moduleRef = useRef<NoteModuleType>({
     id: props.id,
@@ -235,6 +236,7 @@ function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
       value,
       title: props.title,
       setValue: changeValue,
+      initialSelection: selectionRef.current,
       variant,
       setVariant: changeVariant,
       displayMode,
@@ -269,6 +271,9 @@ function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
       autoCorrect={!isSnippet}
       multiline
       scrollEnabled={inputHeight >= sizing.max}
+      onSelectionChange={(event) => {
+        selectionRef.current = event.nativeEvent.selection;
+      }}
       onContentSizeChange={(event) => {
         const nextHeight = clamp(
           Math.ceil(event.nativeEvent.contentSize.height) + 24,

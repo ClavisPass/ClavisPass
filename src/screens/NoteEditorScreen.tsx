@@ -34,6 +34,7 @@ const NoteEditorScreen: React.FC<NoteEditorScreenProps> = ({
     value: initialValue,
     title,
     setValue,
+    initialSelection,
     variant: initialVariant = "plain",
     setVariant,
     language: initialLanguage = "text",
@@ -53,7 +54,9 @@ const NoteEditorScreen: React.FC<NoteEditorScreenProps> = ({
   const [value, setLocalValue] = useState(initialValue);
   const [variantLocal, setVariantLocal] = useState(initialVariant);
   const [languageLocal, setLanguageLocal] = useState(initialLanguage);
-  const [selection, setSelection] = useState({ start: 0, end: 0 });
+  const [selection, setSelection] = useState(
+    initialSelection ?? { start: 0, end: 0 },
+  );
   const [markdownPreview, setMarkdownPreview] = useState(false);
 
   useEffect(() => {
@@ -453,6 +456,7 @@ const NoteEditorScreen: React.FC<NoteEditorScreenProps> = ({
                 language={languageLocal}
                 showLineNumbers={variantLocal !== "plain"}
                 wrapLines
+                initialSelection={initialSelection}
                 onSelectionChange={changeSelection}
               />
             </Animated.View>

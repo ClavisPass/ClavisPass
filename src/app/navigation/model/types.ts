@@ -18,6 +18,7 @@ export type HomeStackParamList = {
     value: string;
     title: string;
     setValue: (value: string) => void;
+    initialSelection?: { start: number; end: number };
     variant?: "plain" | "markdown" | "snippet";
     setVariant?: (variant: "plain" | "markdown" | "snippet") => void;
     displayMode?: "compact" | "normal" | "large";

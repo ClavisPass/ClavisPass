@@ -12,6 +12,7 @@ type Props = {
   language?: "text" | "json" | "yaml" | "env" | "shell";
   showLineNumbers?: boolean;
   wrapLines?: boolean;
+  initialSelection?: { start: number; end: number };
   onSelectionChange?: (selection: { start: number; end: number }) => void;
 };
 
@@ -34,6 +35,7 @@ export default function NoteFullscreenEditor({
   language = "text",
   showLineNumbers = false,
   wrapLines = true,
+  initialSelection,
   onSelectionChange,
 }: Props) {
   const { darkmode, theme } = useTheme();
@@ -61,6 +63,17 @@ export default function NoteFullscreenEditor({
         theme={darkmode ? "vs-dark" : "vs"}
         onChange={(nextValue) => onChangeText(nextValue ?? "")}
         onMount={(editor) => {
+          const model = editor.getModel();
+          if (model && initialSelection) {
+            const cursor = Math.max(
+              0,
+              Math.min(initialSelection.start, value.length),
+            );
+            const position = model.getPositionAt(cursor);
+            editor.setPosition(position);
+            editor.revealPositionInCenterIfOutsideViewport(position);
+          }
+
           const updateSelection = () => {
             const model = editor.getModel();
             const selection = editor.getSelection();
@@ -72,6 +85,7 @@ export default function NoteFullscreenEditor({
           };
           updateSelection();
           editor.onDidChangeCursorSelection(updateSelection);
+          editor.focus();
         }}
         options={{
           automaticLayout: true,
@@ -84,6 +98,7 @@ export default function NoteFullscreenEditor({
           lineNumbers: showLineNumbers ? "on" : "off",
           minimap: { enabled: false },
           overviewRulerBorder: false,
+          padding: { top: 10, bottom: 8 },
           renderLineHighlight: "line",
           scrollBeyondLastLine: false,
           scrollbar: {
