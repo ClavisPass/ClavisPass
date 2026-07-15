@@ -3,7 +3,6 @@ import { useTheme } from "../../app/providers/ThemeProvider";
 import { useEffect, useRef, useState } from "react";
 import { Platform, View } from "react-native";
 import { useTranslation } from "react-i18next";
-import AppTooltip from "./tooltips/AppTooltip";
 type Props = {
   placeholder?: string;
   value: string;
@@ -73,20 +72,17 @@ function PasswordTextbox(props: Props) {
         onSubmitEditing={props.onSubmitEditing}
         onKeyPress={(e) => handleKeyPress(e)}
         right={
-          <AppTooltip
-            title={
+          <TextInput.Icon
+            animated
+            icon={eyeIcon}
+            color={theme.colors.primary}
+            accessibilityLabel={
               secureTextEntry
                 ? t("common:showPassword")
                 : t("common:hidePassword")
             }
-          >
-            <TextInput.Icon
-              animated
-              icon={eyeIcon}
-              color={theme.colors.primary}
-              onPress={() => setSecureTextEntry(!secureTextEntry)}
-            />
-          </AppTooltip>
+            onPress={() => setSecureTextEntry(!secureTextEntry)}
+          />
         }
       />
     </View>
