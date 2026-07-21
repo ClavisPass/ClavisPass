@@ -30,6 +30,7 @@ import SquaredContainerButton from "../shared/components/buttons/SquaredContaine
 import DeleteModal from "../features/vault/components/modals/DeleteModal";
 import Button from "../shared/components/buttons/Button";
 import DeleteModuleModal from "../features/vault/components/modals/DeleteModuleModal";
+import ClearModulesModal from "../features/vault/components/modals/ClearModulesModal";
 import EditHistoryModal from "../features/vault/components/modals/EditHistoryModal";
 
 import useAppLifecycle from "../shared/hooks/useAppLifecycle";
@@ -44,8 +45,7 @@ import FolderType from "../features/vault/model/FolderType";
 import MetaInformationModule from "../features/vault/components/modules/MetaInformationModule";
 import { useTranslation } from "react-i18next";
 import { useSetting } from "../app/providers/SettingsProvider";
-import DraggableModulesListWeb from "../features/vault/components/lists/DraggableModulesListWeb";
-import DraggableModulesList from "../features/vault/components/lists/DraggableModulesList";
+import ModulesList from "../features/vault/components/lists/ModulesList";
 import { useVault } from "../app/providers/VaultProvider";
 import { HomeStackParamList } from "../app/navigation/model/types";
 import { logger } from "../infrastructure/logging/logger";
@@ -103,6 +103,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deleteModuleModalVisible, setDeleteModuleModalVisible] =
+    useState(false);
+  const [clearModulesModalVisible, setClearModulesModalVisible] =
     useState(false);
   const [historyModalVisible, setHistoryModalVisible] = useState(false);
   const [overflowMenuVisible, setOverflowMenuVisible] = useState(false);
@@ -461,6 +463,29 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     );
   };
 
+  const clearModules = () => {
+    applyChange(
+      (current) => ({
+        ...current,
+        modules: [] as ModulesType,
+      }),
+      {
+        action: "modules",
+        label: t("common:editHistoryModulesCleared"),
+      }
+    );
+    setClearModulesModalVisible(false);
+  };
+
+  const openModuleReorderScreen = () => {
+    if (value.modules.length < 2) return;
+
+    navigation.navigate("ModuleReorder", {
+      modules: [...value.modules] as ModulesType,
+      onApply: reorderModules,
+    });
+  };
+
   const taskModuleCount = value.modules.filter(
     (module) => module.module === ModulesEnum.TASK
   ).length;
@@ -543,6 +568,16 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         label: t("common:editHistory"),
         onPress: () => setHistoryModalVisible(true),
       },
+      ...(value.modules.length > 0
+        ? [
+            {
+              key: "clearModules",
+              icon: "delete-sweep",
+              label: t("common:clearModules"),
+              onPress: () => setClearModulesModalVisible(true),
+            },
+          ]
+        : []),
       {
         key: "delete",
         icon: "trash-can",
@@ -551,7 +586,14 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         withDivider: false,
       },
     ],
-    [sessionLog.length, sortCompletedTasksDown, t, taskModuleCount, value.pinnedAt]
+    [
+      sessionLog.length,
+      sortCompletedTasksDown,
+      t,
+      taskModuleCount,
+      value.modules.length,
+      value.pinnedAt,
+    ]
   );
 
   return (
@@ -732,29 +774,16 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         items={editOverflowItems}
       />
       <PerfProfiler id="EditScreen.ModulesList">
-        {Platform.OS === "web" ? (
-          <DraggableModulesListWeb
-            value={value}
-            changeModules={reorderModules}
-            deleteModule={requestDeleteModule}
-            changeModule={changeModule}
-            addModule={addModule}
-            fastAccess={fastAccessObject}
-            navigation={navigation}
-            showAddModuleModal={() => setAddModuleModalVisible(true)}
-          />
-        ) : (
-          <DraggableModulesList
-            value={value}
-            changeModules={reorderModules}
-            deleteModule={requestDeleteModule}
-            changeModule={changeModule}
-            addModule={addModule}
-            fastAccess={fastAccessObject}
-            navigation={navigation}
-            showAddModuleModal={() => setAddModuleModalVisible(true)}
-          />
-        )}
+        <ModulesList
+          value={value}
+          deleteModule={requestDeleteModule}
+          changeModule={changeModule}
+          addModule={addModule}
+          fastAccess={fastAccessObject}
+          navigation={navigation}
+          showAddModuleModal={() => setAddModuleModalVisible(true)}
+          openReorderScreen={openModuleReorderScreen}
+        />
       </PerfProfiler>
       {!(width > 600) && (
         <View style={{ padding: 8, width: "100%" }}>
@@ -803,6 +832,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           if (!visible) setPendingModuleDeleteId(null);
         }}
         onDelete={confirmDeleteModule}
+      />
+      <ClearModulesModal
+        visible={clearModulesModalVisible}
+        setVisible={setClearModulesModalVisible}
+        onClear={clearModules}
       />
       <EditHistoryModal
         visible={historyModalVisible}

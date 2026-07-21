@@ -51,6 +51,9 @@ const en: TranslationSchema = {
     deleteModuleText:
       "This module already contains data. Do you really want to delete it?",
     removeModule: "Remove module",
+    clearModules: "Remove all modules",
+    clearModulesText:
+      "Do you want to remove all modules from this entry? The title, folder, and favorite status will stay unchanged.",
     showPassword: "Show password",
     hidePassword: "Hide password",
     generatePassword: "Generate password",
@@ -81,6 +84,7 @@ const en: TranslationSchema = {
     editHistoryModuleUpdated: "Updated module",
     editHistoryModulesUpdated: "Updated modules",
     editHistoryModulesReordered: "Reordered modules",
+    editHistoryModulesCleared: "Removed all modules",
     editHistoryFavoriteUpdated: "Updated favorite",
     editHistoryPinUpdated: "Updated pin",
     editHistoryFolderUpdated: "Updated folder",

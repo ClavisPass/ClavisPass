@@ -60,7 +60,7 @@ type RenderableModules = Exclude<
 >;
 
 type GetModuleArgs = {
-  onDragStart: () => void;
+  onDragStart?: () => void;
   deleteModule: (id: string) => void;
   changeModule: (module: ModuleType) => void;
   fastAccess: FastAccessType | null;
@@ -318,7 +318,7 @@ const MODULE_RENDERERS = {
 
 function getModule(
   module: ModuleType,
-  onDragStart: () => void,
+  onDragStart: (() => void) | undefined,
   deleteModule: (id: string) => void,
   changeModule: (module: ModuleType) => void,
   fastAccess: FastAccessType | null,

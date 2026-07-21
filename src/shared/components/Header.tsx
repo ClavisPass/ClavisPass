@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import Constants from "expo-constants";
@@ -13,7 +13,18 @@ type Props = {
 };
 
 function Header(props: Props) {
-  const { theme, darkmode } = useTheme();
+  const {
+    theme,
+    darkmode,
+    setTitlebarCenterGap,
+    setTitlebarOverlayDragEnabled,
+  } = useTheme();
+
+  useEffect(() => {
+    setTitlebarCenterGap(0);
+    setTitlebarOverlayDragEnabled(true);
+  }, [setTitlebarCenterGap, setTitlebarOverlayDragEnabled]);
+
   return (
     <View
       style={{

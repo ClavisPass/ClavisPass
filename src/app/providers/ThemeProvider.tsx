@@ -22,6 +22,10 @@ interface ThemeContextType {
   setHeaderWhite: (headerWhite: boolean) => void;
   headerSpacing: number;
   setHeaderSpacing: (headerSpacing: number) => void;
+  titlebarCenterGap: number;
+  setTitlebarCenterGap: (titlebarCenterGap: number) => void;
+  titlebarOverlayDragEnabled: boolean;
+  setTitlebarOverlayDragEnabled: (enabled: boolean) => void;
 }
 
 export const ThemeContext = createContext<ThemeContextType | null>(null);
@@ -39,6 +43,9 @@ export const ThemeProvider = ({ children }: Props) => {
 
   const [headerWhite, setHeaderWhite] = useState(false);
   const [headerSpacing, setHeaderSpacing] = useState(0);
+  const [titlebarCenterGap, setTitlebarCenterGap] = useState(0);
+  const [titlebarOverlayDragEnabled, setTitlebarOverlayDragEnabled] =
+    useState(true);
 
   const darkmode = themePref === "dark";
   const theme = darkmode ? darkTheme : lightTheme;
@@ -80,6 +87,10 @@ export const ThemeProvider = ({ children }: Props) => {
         setHeaderWhite,
         headerSpacing,
         setHeaderSpacing,
+        titlebarCenterGap,
+        setTitlebarCenterGap,
+        titlebarOverlayDragEnabled,
+        setTitlebarOverlayDragEnabled,
       }}
     >
       <PaperProvider theme={theme}>{children}</PaperProvider>

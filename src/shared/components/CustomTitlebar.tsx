@@ -47,7 +47,12 @@ export function TitlebarHeight(props: Props) {
 
 function CustomTitlebar() {
   const auth = useAuth();
-  const { headerWhite, headerSpacing } = useTheme();
+  const {
+    headerWhite,
+    headerSpacing,
+    titlebarCenterGap,
+    titlebarOverlayDragEnabled,
+  } = useTheme();
   const { width } = useWindowDimensions();
 
   const { value: closeBehavior } = useSetting("CLOSE_BEHAVIOR");
@@ -70,7 +75,7 @@ function CustomTitlebar() {
         document.adoptedStyleSheets = [sheet];
       }
     }
-  }, [isTauri, width]);
+  }, [isTauri, titlebarOverlayDragEnabled, width]);
 
   useEffect(() => {
     if (isTauri) {
@@ -139,7 +144,7 @@ function CustomTitlebar() {
           }}
           pointerEvents="box-none"
         >
-          {width > 600 ? (
+          {titlebarOverlayDragEnabled ? (
             <View
               id={"titlebar-drag-left"}
               style={{
@@ -150,16 +155,16 @@ function CustomTitlebar() {
           ) : (
             <View style={{ flex: 1 }} pointerEvents="none" />
           )}
-          {width > 600 ? (
+          {titlebarOverlayDragEnabled && width > 600 && titlebarCenterGap > 0 ? (
             <View
               style={{
-                width: Math.min(340, Math.max(200, width * 0.32)),
+                width: titlebarCenterGap,
                 height: 40,
               }}
               pointerEvents="none"
             />
           ) : null}
-          {width > 600 ? (
+          {titlebarOverlayDragEnabled && width > 600 ? (
             <View
               id={"titlebar-drag-right"}
               style={{

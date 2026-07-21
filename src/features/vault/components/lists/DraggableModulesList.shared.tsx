@@ -1,7 +1,7 @@
 import React from "react";
 import { LayoutChangeEvent, StyleSheet, View } from "react-native";
 import { MD3Theme } from "react-native-paper";
-import { Chip, IconButton, Text } from "react-native-paper";
+import { Chip, Icon, IconButton, Text } from "react-native-paper";
 import { TFunction } from "i18next";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -23,6 +23,30 @@ export type DraggableModulesListProps = {
   navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>;
 };
 
+const VerticalReorderIcon = ({
+  color,
+  size = 20,
+}: {
+  color?: string;
+  size?: number;
+}) => (
+  <View
+    style={{
+      width: size,
+      height: size,
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    <View style={{ height: size / 2, marginBottom: -2 }}>
+      <Icon source="chevron-up" size={size * 0.72} color={color} />
+    </View>
+    <View style={{ height: size / 2, marginTop: -2 }}>
+      <Icon source="chevron-down" size={size * 0.72} color={color} />
+    </View>
+  </View>
+);
+
 export const draggableModulesListStyles = StyleSheet.create({
   footer: {
     display: "flex",
@@ -35,6 +59,12 @@ export const draggableModulesListStyles = StyleSheet.create({
     position: "absolute",
     left: 8,
     maxWidth: "60%",
+    borderRadius: 12,
+  },
+  reorderChip: {
+    position: "absolute",
+    right: 8,
+    maxWidth: "40%",
     borderRadius: 12,
   },
   predictionChipContent: {
@@ -73,6 +103,8 @@ type FooterProps = {
   modulePrediction: ModulesEnum | null;
   onAddPredictedModule: () => void;
   onOpenAddModuleModal: () => void;
+  onOpenReorderScreen?: () => void;
+  canReorder?: boolean;
   onFooterLayout: (event: LayoutChangeEvent) => void;
   onPredictionChipLayout: (event: LayoutChangeEvent) => void;
   requiredShift: number;
@@ -84,6 +116,8 @@ export function DraggableModulesFooter({
   modulePrediction,
   onAddPredictedModule,
   onOpenAddModuleModal,
+  onOpenReorderScreen,
+  canReorder = true,
   onFooterLayout,
   onPredictionChipLayout,
   requiredShift,
@@ -121,6 +155,25 @@ export function DraggableModulesFooter({
         selected={true}
         mode="contained-tonal"
       />
+      {onOpenReorderScreen ? (
+        <Chip
+          icon={({ color, size }) => (
+            <VerticalReorderIcon color={color} size={size} />
+          )}
+          disabled={!canReorder}
+          onPress={onOpenReorderScreen}
+          style={draggableModulesListStyles.reorderChip}
+          compact
+        >
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={draggableModulesListStyles.predictionChipContent}
+          >
+            {t("home:reorderChip")}
+          </Text>
+        </Chip>
+      ) : null}
     </View>
   );
 }

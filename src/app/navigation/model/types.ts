@@ -2,6 +2,7 @@ import type { NavigatorScreenParams } from "@react-navigation/native";
 import FolderType from "../../../features/vault/model/FolderType";
 import DigitalCardType from "../../../features/vault/model/DigitalCardType";
 import ValuesType from "../../../features/vault/model/ValuesType";
+import ModulesType from "../../../features/vault/model/ModulesType";
 import AnalysisRef from "../../../features/analysis/model/AnalysisRef";
 
 export type HomeStackParamList = {
@@ -14,6 +15,10 @@ export type HomeStackParamList = {
   };
   Reorder: {
     values: ValuesType[];
+  };
+  ModuleReorder: {
+    modules: ModulesType;
+    onApply: (modules: ModulesType) => void;
   };
   DigitalCardScan: { setData: (data: string, type: string) => void };
   TotpScan: { setOtpauth: (uri: string) => void };

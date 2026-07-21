@@ -1,25 +1,54 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Platform, View, useWindowDimensions } from "react-native";
+import { Platform, StyleSheet, View, useWindowDimensions } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import type { RenderItemParams } from "react-native-draggable-flatlist";
 import { Icon, IconButton, Text } from "react-native-paper";
 import Constants from "expo-constants";
-import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
+import { useTranslation } from "react-i18next";
 
 import { useTheme } from "../app/providers/ThemeProvider";
-import { useVault } from "../app/providers/VaultProvider";
 import { HomeStackParamList } from "../app/navigation/model/types";
-import ValuesType from "../features/vault/model/ValuesType";
-import ListItem from "../features/vault/components/items/ListItem";
+import ModulesType, { ModuleType } from "../features/vault/model/ModulesType";
+import { MODULE_ICON } from "../features/vault/model/ModuleIconsEnum";
+import ModulesEnum from "../features/vault/model/ModulesEnum";
+import getModuleNameByEnum from "../features/vault/utils/getModuleNameByEnum";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import { TITLEBAR_HEIGHT } from "../shared/components/CustomTitlebar";
 import getColors from "../shared/ui/linearGradient";
+import AnimatedPressable from "../shared/components/AnimatedPressable";
 
-type ReorderScreenProps = NativeStackScreenProps<HomeStackParamList, "Reorder">;
+type ModuleReorderScreenProps = NativeStackScreenProps<
+  HomeStackParamList,
+  "ModuleReorder"
+>;
 
-const noop = () => {};
+const styles = StyleSheet.create({
+  item: {
+    height: 44,
+    marginHorizontal: 8,
+    marginBottom: 4,
+    borderRadius: 12,
+    overflow: "hidden",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  dragHandle: {
+    width: 32,
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  content: {
+    flex: 1,
+    minWidth: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 10,
+  },
+});
 const webNoDragStyle =
   Platform.OS === "web"
     ? ({
@@ -52,46 +81,25 @@ const VerticalReorderIcon = ({
   </View>
 );
 
-function moveEntryAfterPreviousVisibleId(
-  values: ValuesType[],
-  movedId: string,
-  previousVisibleId: string | null,
+function moveModule(
+  modules: ModulesType,
+  sourceIndex: number,
+  destinationIndex: number,
 ) {
-  if (movedId === previousVisibleId) return values;
-
-  const moved = values.find((entry) => entry.id === movedId);
-  if (!moved) return values;
-
-  const valuesWithoutMoved = values.filter((entry) => entry.id !== movedId);
-  if (!previousVisibleId) return [moved, ...valuesWithoutMoved];
-
-  const previousIndex = valuesWithoutMoved.findIndex(
-    (entry) => entry.id === previousVisibleId,
-  );
-  if (previousIndex < 0) return values;
-
-  return [
-    ...valuesWithoutMoved.slice(0, previousIndex + 1),
-    moved,
-    ...valuesWithoutMoved.slice(previousIndex + 1),
-  ];
+  const next = [...modules];
+  const [removed] = next.splice(sourceIndex, 1);
+  if (!removed) return modules;
+  next.splice(destinationIndex, 0, removed);
+  return next as ModulesType;
 }
 
-function applyVisibleOrder(values: ValuesType[], orderedVisible: ValuesType[]) {
-  let next = values;
-
-  orderedVisible.forEach((entry, index) => {
-    const previousVisibleId =
-      index <= 0 ? null : (orderedVisible[index - 1]?.id ?? null);
-    next = moveEntryAfterPreviousVisibleId(next, entry.id, previousVisibleId);
-  });
-
-  return next;
-}
-
-export default function ReorderScreen({ route, navigation }: ReorderScreenProps) {
+export default function ModuleReorderScreen({
+  route,
+  navigation,
+}: ModuleReorderScreenProps) {
   const {
     theme,
+    darkmode,
     globalStyles,
     setHeaderSpacing,
     setHeaderWhite,
@@ -100,8 +108,7 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
   } = useTheme();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
-  const vault = useVault();
-  const [items, setItems] = useState<ValuesType[]>(route.params.values ?? []);
+  const [items, setItems] = useState<ModulesType>(route.params.modules);
 
   const headerTop =
     Constants.statusBarHeight + (TITLEBAR_HEIGHT > 0 ? 4 : 6);
@@ -126,30 +133,94 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
     if (Platform.OS !== "web") return;
 
     document
-      .getElementById("reorder-header-drag-region")
+      .getElementById("module-reorder-header-drag-region")
       ?.setAttribute("data-tauri-drag-region", "");
   }, []);
 
-  const renderReorderItem = useCallback(
+  const renderModuleItem = useCallback(
     (
-      item: ValuesType,
+      item: ModuleType,
       index: number,
       onDragStart?: () => void,
       dragHandleProps?: any,
-    ) => (
-      <ListItem
-        item={item}
-        index={index}
-        reorderMode
-        disableFastAccessPreview
-        hideChevron
-        pressDisabled
-        onDragStart={onDragStart}
-        dragHandleProps={dragHandleProps}
-        onPress={noop}
-      />
-    ),
-    [],
+    ) => {
+      const moduleKind = (item.module ?? ModulesEnum.UNKNOWN) as ModulesEnum;
+      const icon = MODULE_ICON[moduleKind] ?? MODULE_ICON[ModulesEnum.UNKNOWN];
+      const label = getModuleNameByEnum(moduleKind, t);
+      const dragIconColor = darkmode
+        ? theme.colors.outline
+        : theme.colors.outlineVariant;
+
+      const dragHandle = Platform.OS === "web" ? (
+        <div
+          {...(dragHandleProps ?? {})}
+          style={{
+            width: 32,
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "grab",
+            touchAction: "none",
+            userSelect: "none",
+          }}
+        >
+          <Icon source="drag" size={20} color={dragIconColor} />
+        </div>
+      ) : (
+        <AnimatedPressable
+          borderless={false}
+          rippleColor="rgba(0, 0, 0, .12)"
+          onPressIn={onDragStart}
+          style={styles.dragHandle}
+        >
+          <Icon source="drag" size={20} color={dragIconColor} />
+        </AnimatedPressable>
+      );
+
+      return (
+        <View
+          style={[
+            styles.item,
+            {
+              backgroundColor: theme.colors.background,
+              boxShadow: theme.colors.shadow,
+              borderColor: darkmode ? theme.colors.outlineVariant : "white",
+              borderWidth: StyleSheet.hairlineWidth,
+            },
+          ]}
+        >
+          {dragHandle}
+          <View
+            style={{
+              width: StyleSheet.hairlineWidth,
+              height: "100%",
+              backgroundColor: darkmode
+                ? theme.colors.outlineVariant
+                : theme.colors.outline,
+              opacity: darkmode ? 1 : 0.28,
+            }}
+          />
+          <View style={styles.content}>
+            <Icon source={icon} size={20} color={theme.colors.primary} />
+            <Text
+              variant="bodyMedium"
+              numberOfLines={1}
+              style={{ flex: 1, userSelect: "none" }}
+            >
+              {label}
+            </Text>
+            <Text
+              variant="labelSmall"
+              style={{ opacity: 0.55, userSelect: "none" }}
+            >
+              {index + 1}
+            </Text>
+          </View>
+        </View>
+      );
+    },
+    [darkmode, t, theme.colors],
   );
 
   const webList = useMemo(() => {
@@ -162,17 +233,12 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
         onDragEnd={(result: any) => {
           if (!result.destination) return;
           if (result.source.index === result.destination.index) return;
-
-          setItems((current) => {
-            const next = [...current];
-            const [removed] = next.splice(result.source.index, 1);
-            if (!removed) return current;
-            next.splice(result.destination.index, 0, removed);
-            return next;
-          });
+          setItems((current) =>
+            moveModule(current, result.source.index, result.destination.index),
+          );
         }}
       >
-        <Droppable droppableId="home-values-reorder-screen">
+        <Droppable droppableId="edit-modules-reorder-screen">
           {(provided: any) => (
             <div
               {...provided.droppableProps}
@@ -181,7 +247,8 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
                 flex: 1,
                 width: "100%",
                 overflow: "auto",
-                paddingRight: 4,
+                paddingTop: 4,
+                paddingRight: 0,
               }}
             >
               {items.map((item, index) => (
@@ -196,10 +263,9 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
                         top: "auto",
                         left: "auto",
                         ...draggableProvided.draggableProps.style,
-                        marginBottom: 4,
                       }}
                     >
-                      {renderReorderItem(
+                      {renderModuleItem(
                         item,
                         index,
                         undefined,
@@ -215,7 +281,7 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
         </Droppable>
       </DragDropContext>
     );
-  }, [items, renderReorderItem]);
+  }, [items, renderModuleItem]);
 
   const nativeList = useMemo(() => {
     if (Platform.OS === "web") return null;
@@ -227,25 +293,24 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
     return (
       <DraggableFlatList
         data={items}
-        keyExtractor={(item: ValuesType) => item.id}
+        keyExtractor={(item: ModuleType) => item.id}
         activationDistance={8}
         initialNumToRender={16}
         maxToRenderPerBatch={10}
         updateCellsBatchingPeriod={50}
         windowSize={7}
         removeClippedSubviews
-        renderItem={({ item, getIndex, drag }: RenderItemParams<ValuesType>) =>
-          renderReorderItem(item, getIndex?.() ?? 0, drag)
+        contentContainerStyle={{ paddingTop: 4 }}
+        renderItem={({ item, getIndex, drag }: RenderItemParams<ModuleType>) =>
+          renderModuleItem(item, getIndex?.() ?? 0, drag)
         }
-        onDragEnd={({ data }: { data: ValuesType[] }) => setItems(data)}
+        onDragEnd={({ data }: { data: ModulesType }) => setItems(data)}
       />
     );
-  }, [items, renderReorderItem]);
+  }, [items, renderModuleItem]);
 
   const applyChanges = () => {
-    vault.update((draft) => {
-      draft.values = applyVisibleOrder(draft.values ?? [], items);
-    });
+    route.params.onApply(items);
     navigation.goBack();
   };
 
@@ -279,7 +344,7 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
           }}
         >
           <View
-            id="reorder-header-drag-region"
+            id="module-reorder-header-drag-region"
             style={{
               flex: 1,
               minWidth: 0,
@@ -321,7 +386,6 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
               </Text>
             </View>
           </View>
-
           <View
             style={[
               {
@@ -368,7 +432,6 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
         style={{
           flex: 1,
           width: "100%",
-          padding: 4,
           paddingLeft: width > 600 ? 0 : 4,
           paddingRight: 0,
         }}

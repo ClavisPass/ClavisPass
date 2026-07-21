@@ -191,8 +191,15 @@ const HomeValueListItem = React.memo(function HomeValueListItem({
 const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const triggerAdd = route.params?.triggerAdd ?? false;
 
-  const { headerWhite, setHeaderWhite, darkmode, setHeaderSpacing, theme } =
-    useTheme();
+  const {
+    headerWhite,
+    setHeaderWhite,
+    darkmode,
+    setHeaderSpacing,
+    setTitlebarCenterGap,
+    setTitlebarOverlayDragEnabled,
+    theme,
+  } = useTheme();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const isFocused = useIsFocused();
@@ -267,6 +274,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   }, []);
 
   const isCompactHeader = width < 600;
+  const wideSearchWidth = Math.min(340, Math.max(200, width * 0.32));
 
   useEffect(() => {
     if (!isCompactHeader) {
@@ -276,6 +284,27 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
     if (searchQuery.trim() !== "") setSearchHeaderVisible(true);
   }, [isCompactHeader, searchQuery]);
+
+  useEffect(() => {
+    if (Platform.OS !== "web" || TITLEBAR_HEIGHT <= 0) return;
+
+    if (!isFocused) {
+      setTitlebarCenterGap(0);
+      return;
+    }
+
+    setTitlebarCenterGap(!isCompactHeader ? wideSearchWidth : 0);
+    setTitlebarOverlayDragEnabled(!isCompactHeader);
+    return () => {
+      setTitlebarCenterGap(0);
+    };
+  }, [
+    isCompactHeader,
+    isFocused,
+    setTitlebarCenterGap,
+    setTitlebarOverlayDragEnabled,
+    wideSearchWidth,
+  ]);
 
   useEffect(() => {
     if (Platform.OS !== "web") return;
@@ -1197,7 +1226,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                   }}
                   style={{
                     height: 34,
-                    width: Math.min(340, Math.max(200, width * 0.32)),
+                    width: wideSearchWidth,
                     borderRadius: 12,
                     backgroundColor: "rgba(217, 217, 217, 0.18)",
                     borderWidth: 1,

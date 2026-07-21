@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../../../screens/HomeScreen";
 import EditScreen from "../../../screens/EditScreen";
 import ReorderScreen from "../../../screens/ReorderScreen";
+import ModuleReorderScreen from "../../../screens/ModuleReorderScreen";
 import DigitalCardScanScreen from "../../../screens/DigitalCardScanScreen";
 import TotpScanScreen from "../../../screens/TotpScanScreen";
 import CardDetailsScreen from "../../../screens/CardDetailsScreen";
@@ -23,6 +24,7 @@ export default function HomeStack() {
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Edit" component={EditScreen} />
       <Stack.Screen name="Reorder" component={ReorderScreen} />
+      <Stack.Screen name="ModuleReorder" component={ModuleReorderScreen} />
       <Stack.Screen name="DigitalCardScan" component={DigitalCardScanScreen} />
       <Stack.Screen name="TotpScan" component={TotpScanScreen} />
       <Stack.Screen name="NoteEditor" component={NoteEditorScreen} />

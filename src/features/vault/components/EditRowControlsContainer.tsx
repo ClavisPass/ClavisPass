@@ -55,6 +55,7 @@ export function EditRowControlsContainer({
   const webDragHandleProps = React.useContext(WebDragHandlePropsContext);
   const [dragHovered, setDragHovered] = React.useState(false);
   const [dragPressed, setDragPressed] = React.useState(false);
+  const showDragHandle = Boolean(onDragStart) || Boolean(webDragHandleProps);
   const dragHandleContent = (
     <AnimatedPressable
       borderless={false}
@@ -108,68 +109,70 @@ export function EditRowControlsContainer({
         style,
       ]}
     >
-      <View
-        style={{
-          width: DRAG_RAIL_WIDTH,
-          justifyContent: "center",
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          flexShrink: 0,
-        }}
-      >
-        {Platform.OS === "web" ? (
-          <div
-            {...(webDragHandleProps ?? {})}
-            onMouseEnter={(event) => {
-              setDragHovered(true);
-              webDragHandleProps?.onMouseEnter?.(event);
-            }}
-            onMouseLeave={(event) => {
-              setDragHovered(false);
-              setDragPressed(false);
-              webDragHandleProps?.onMouseLeave?.(event);
-            }}
-            onMouseDown={(event) => {
-              setDragPressed(true);
-              webDragHandleProps?.onMouseDown?.(event);
-            }}
-            onMouseUp={(event) => {
-              setDragPressed(false);
-              webDragHandleProps?.onMouseUp?.(event);
-            }}
-            onTouchStart={(event) => {
-              setDragPressed(true);
-              webDragHandleProps?.onTouchStart?.(event);
-            }}
-            onTouchEnd={(event) => {
-              setDragPressed(false);
-              webDragHandleProps?.onTouchEnd?.(event);
-            }}
-            style={{
-              width: DRAG_RAIL_WIDTH,
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "grab",
-              touchAction: "none",
-              userSelect: "none",
-            }}
-          >
-            {dragHandleContent}
-          </div>
-        ) : (
-          dragHandleContent
-        )}
-        <Divider
+      {showDragHandle ? (
+        <View
           style={{
-            width: StyleSheet.hairlineWidth,
-            alignSelf: "stretch",
-            height: "100%",
+            width: DRAG_RAIL_WIDTH,
+            justifyContent: "center",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            flexShrink: 0,
           }}
-        />
-      </View>
+        >
+          {Platform.OS === "web" ? (
+            <div
+              {...(webDragHandleProps ?? {})}
+              onMouseEnter={(event) => {
+                setDragHovered(true);
+                webDragHandleProps?.onMouseEnter?.(event);
+              }}
+              onMouseLeave={(event) => {
+                setDragHovered(false);
+                setDragPressed(false);
+                webDragHandleProps?.onMouseLeave?.(event);
+              }}
+              onMouseDown={(event) => {
+                setDragPressed(true);
+                webDragHandleProps?.onMouseDown?.(event);
+              }}
+              onMouseUp={(event) => {
+                setDragPressed(false);
+                webDragHandleProps?.onMouseUp?.(event);
+              }}
+              onTouchStart={(event) => {
+                setDragPressed(true);
+                webDragHandleProps?.onTouchStart?.(event);
+              }}
+              onTouchEnd={(event) => {
+                setDragPressed(false);
+                webDragHandleProps?.onTouchEnd?.(event);
+              }}
+              style={{
+                width: DRAG_RAIL_WIDTH,
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "grab",
+                touchAction: "none",
+                userSelect: "none",
+              }}
+            >
+              {dragHandleContent}
+            </div>
+          ) : (
+            dragHandleContent
+          )}
+          <Divider
+            style={{
+              width: StyleSheet.hairlineWidth,
+              alignSelf: "stretch",
+              height: "100%",
+            }}
+          />
+        </View>
+      ) : null}
 
       <View style={[{ flex: 1, paddingRight: topRightInset }, contentStyle]}>
         {children}

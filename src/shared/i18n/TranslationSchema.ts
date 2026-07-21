@@ -50,6 +50,8 @@ export type TranslationSchema = {
     offline: string;
     deleteModuleText: string;
     removeModule: string;
+    clearModules: string;
+    clearModulesText: string;
     showPassword: string;
     hidePassword: string;
     generatePassword: string;
@@ -80,6 +82,7 @@ export type TranslationSchema = {
     editHistoryModuleUpdated: string;
     editHistoryModulesUpdated: string;
     editHistoryModulesReordered: string;
+    editHistoryModulesCleared: string;
     editHistoryFavoriteUpdated: string;
     editHistoryPinUpdated: string;
     editHistoryFolderUpdated: string;

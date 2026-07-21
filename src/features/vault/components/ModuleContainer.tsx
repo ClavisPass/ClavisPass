@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { View, StyleSheet, Platform } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Divider, Icon, Text } from "react-native-paper";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import FastAccessType from "../../fastaccess/model/FastAccessType";
@@ -60,7 +60,7 @@ export default function ModuleContainer({
         {
           backgroundColor: theme.colors?.background,
           boxShadow: (theme.colors as any)?.shadow,
-          ...(Platform.OS !== "web" ? { marginBottom: 8 } : {}),
+          marginBottom: 8,
           borderRadius: 12,
           overflow: "hidden",
         },
