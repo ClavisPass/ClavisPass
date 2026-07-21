@@ -16,8 +16,13 @@ import { logger } from "../../../infrastructure/logging/logger";
 
 const styles = StyleSheet.create({
   chip: {
+    height: 30,
     marginRight: 4,
     borderRadius: 12,
+  },
+  chipText: {
+    fontSize: 12,
+    lineHeight: 16,
   },
   narrowScrollContainer: {
     flexBasis: "auto",
@@ -26,7 +31,7 @@ const styles = StyleSheet.create({
   },
   narrowScrollContainerWeb: {
     flex: 1,
-    height: 32,
+    height: 30,
     minWidth: 0,
   },
   narrowList: {
@@ -34,7 +39,7 @@ const styles = StyleSheet.create({
   },
   narrowListWeb: {
     flex: 1,
-    height: 32,
+    height: 30,
     minWidth: 0,
   },
   narrowListContentWeb: {
@@ -285,6 +290,7 @@ function SettingsQuickSelect(props: Props) {
                       scrollToRef(item.ref);
                     }}
                     style={styles.chip}
+                    textStyle={styles.chipText}
                   >
                     {item.title}
                   </Chip>

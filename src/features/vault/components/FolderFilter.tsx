@@ -33,9 +33,14 @@ import {
 
 const styles = StyleSheet.create({
   chip: {
+    height: 30,
     marginRight: 4,
     borderRadius: 12,
     overflow: "hidden",
+  },
+  chipText: {
+    fontSize: 12,
+    lineHeight: 16,
   },
   narrowScrollContainer: {
     flexBasis: "auto",
@@ -44,7 +49,7 @@ const styles = StyleSheet.create({
   },
   narrowScrollContainerWeb: {
     flex: 1,
-    height: 32,
+    height: 30,
     minWidth: 0,
   },
   narrowList: {
@@ -52,7 +57,7 @@ const styles = StyleSheet.create({
   },
   narrowListWeb: {
     flex: 1,
-    height: 32,
+    height: 30,
     minWidth: 0,
   },
   narrowListContentWeb: {
@@ -458,9 +463,9 @@ function FolderFilter(props: Props) {
         <View
           style={{
             padding: 4,
-            paddingTop: props.disabled ? 10 : 8,
-            paddingBottom: 4,
-            maxHeight: 50,
+            paddingTop: 4,
+            paddingBottom: 0,
+            maxHeight: 34,
             width: "100%",
             display: "flex",
             flexDirection: "row",
@@ -509,6 +514,7 @@ function FolderFilter(props: Props) {
                       props.setSelectedFolder(null);
                     }}
                     style={styles.chip}
+                    textStyle={styles.chipText}
                   >
                     <MaterialCommunityIcons
                       name="two-factor-authentication"
@@ -527,6 +533,7 @@ function FolderFilter(props: Props) {
                       props.setSelectedFolder(null);
                     }}
                     style={styles.chip}
+                    textStyle={styles.chipText}
                   >
                     <MaterialCommunityIcons
                       name="credit-card-multiple"
@@ -544,6 +551,7 @@ function FolderFilter(props: Props) {
                       props.setSelectedCard(false);
                     }}
                     style={styles.chip}
+                    textStyle={styles.chipText}
                   >
                     <MaterialCommunityIcons
                       name="star"
@@ -574,6 +582,7 @@ function FolderFilter(props: Props) {
                           : () => props.removeModuleFilter(module)
                       }
                       style={styles.chip}
+                      textStyle={styles.chipText}
                     >
                       {getModuleNameByEnum(module, t)}
                     </Chip>
@@ -603,6 +612,7 @@ function FolderFilter(props: Props) {
                       }
                     }}
                     style={styles.chip}
+                    textStyle={styles.chipText}
                   >
                     {item.name}
                   </Chip>
@@ -631,4 +641,4 @@ function FolderFilter(props: Props) {
   );
 }
 
-export default FolderFilter;
+export default React.memo(FolderFilter);

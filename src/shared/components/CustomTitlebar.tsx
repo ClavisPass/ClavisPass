@@ -57,9 +57,11 @@ function CustomTitlebar() {
   useEffect(() => {
     if (isTauri) {
       if (document) {
-        document
-          .getElementById("titlebar")
-          ?.setAttribute("data-tauri-drag-region", "");
+        const dragLeft = document.getElementById("titlebar-drag-left");
+        const dragRight = document.getElementById("titlebar-drag-right");
+
+        dragLeft?.setAttribute("data-tauri-drag-region", "");
+        dragRight?.setAttribute("data-tauri-drag-region", "");
 
         const sheet = new CSSStyleSheet();
         sheet.replaceSync(
@@ -68,7 +70,7 @@ function CustomTitlebar() {
         document.adoptedStyleSheets = [sheet];
       }
     }
-  }, [isTauri]);
+  }, [isTauri, width]);
 
   useEffect(() => {
     if (isTauri) {
@@ -124,17 +126,48 @@ function CustomTitlebar() {
           alignItems: "center",
           marginLeft: headerSpacing + (width > 600 ? 88 : 0),
         }}
+        pointerEvents="box-none"
       >
         <View
           id={"titlebar"}
           style={{
             width: "100%",
+            height: 40,
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
           }}
+          pointerEvents="box-none"
         >
-          <View />
+          {width > 600 ? (
+            <View
+              id={"titlebar-drag-left"}
+              style={{
+                flex: 1,
+                height: 40,
+              }}
+            />
+          ) : (
+            <View style={{ flex: 1 }} pointerEvents="none" />
+          )}
+          {width > 600 ? (
+            <View
+              style={{
+                width: Math.min(340, Math.max(200, width * 0.32)),
+                height: 40,
+              }}
+              pointerEvents="none"
+            />
+          ) : null}
+          {width > 600 ? (
+            <View
+              id={"titlebar-drag-right"}
+              style={{
+                flex: 1,
+                height: 40,
+              }}
+            />
+          ) : null}
           <View
             style={{
               display: "flex",

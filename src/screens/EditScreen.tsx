@@ -54,6 +54,7 @@ import AdaptiveMenu, {
   AdaptiveMenuItem,
 } from "../shared/components/menus/AdaptiveMenu";
 import AppTooltip from "../shared/components/tooltips/AppTooltip";
+import PerfProfiler from "../shared/performance/PerfProfiler";
 import {
   DEFAULT_FOLDER_ICON,
   getFolderColor,
@@ -730,29 +731,31 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         positionY={Constants.statusBarHeight + (width > 600 ? 92 : 86)}
         items={editOverflowItems}
       />
-      {Platform.OS === "web" ? (
-        <DraggableModulesListWeb
-          value={value}
-          changeModules={reorderModules}
-          deleteModule={requestDeleteModule}
-          changeModule={changeModule}
-          addModule={addModule}
-          fastAccess={fastAccessObject}
-          navigation={navigation}
-          showAddModuleModal={() => setAddModuleModalVisible(true)}
-        />
-      ) : (
-        <DraggableModulesList
-          value={value}
-          changeModules={reorderModules}
-          deleteModule={requestDeleteModule}
-          changeModule={changeModule}
-          addModule={addModule}
-          fastAccess={fastAccessObject}
-          navigation={navigation}
-          showAddModuleModal={() => setAddModuleModalVisible(true)}
-        />
-      )}
+      <PerfProfiler id="EditScreen.ModulesList">
+        {Platform.OS === "web" ? (
+          <DraggableModulesListWeb
+            value={value}
+            changeModules={reorderModules}
+            deleteModule={requestDeleteModule}
+            changeModule={changeModule}
+            addModule={addModule}
+            fastAccess={fastAccessObject}
+            navigation={navigation}
+            showAddModuleModal={() => setAddModuleModalVisible(true)}
+          />
+        ) : (
+          <DraggableModulesList
+            value={value}
+            changeModules={reorderModules}
+            deleteModule={requestDeleteModule}
+            changeModule={changeModule}
+            addModule={addModule}
+            fastAccess={fastAccessObject}
+            navigation={navigation}
+            showAddModuleModal={() => setAddModuleModalVisible(true)}
+          />
+        )}
+      </PerfProfiler>
       {!(width > 600) && (
         <View style={{ padding: 8, width: "100%" }}>
           <Button

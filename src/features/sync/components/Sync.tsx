@@ -58,7 +58,7 @@ const Sync = (props: Props) => {
     if (showSync) {
       Animated.parallel([
         Animated.timing(slideAnim, {
-          toValue: 48,
+          toValue: 44,
           duration: 250,
           useNativeDriver: false,
         }),
@@ -247,9 +247,10 @@ const Sync = (props: Props) => {
       {showSync && (
         <View
           style={{
-            height: 48,
+            height: 44,
             width: "100%",
-            padding: 4,
+            paddingTop: 0,
+            paddingBottom: 4,
             paddingLeft: 8,
             paddingRight: 8,
           }}

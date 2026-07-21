@@ -717,7 +717,9 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
                 <View key={w.key}>
                   {idx !== 0 ? <Divider /> : null}
                   <View style={{ paddingVertical: 10, flexDirection: "row", gap: 10, alignItems: "flex-start" }}>
-                    <Chip compact>{t(severityLabelKey(w.severity), { defaultValue: w.severity })}</Chip>
+                    <Chip compact style={{ borderRadius: 12 }}>
+                      {t(severityLabelKey(w.severity), { defaultValue: w.severity })}
+                    </Chip>
                     <Text style={{ flex: 1, opacity: 0.85 }}>{w.text}</Text>
                   </View>
                 </View>

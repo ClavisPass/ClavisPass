@@ -136,6 +136,7 @@ export type TranslationSchema = {
   };
   home: {
     search: string;
+    closeSearch: string;
     favorite: string;
     card: string;
     twofa: string;
@@ -146,6 +147,7 @@ export type TranslationSchema = {
     sortByTitle: string;
     sortByCreated: string;
     sortByLastUpdated: string;
+    reorderChip: string;
     reorderEntries: string;
     reorderHint: string;
     moduleFilterTitle: string;

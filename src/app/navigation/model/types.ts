@@ -12,6 +12,9 @@ export type HomeStackParamList = {
     folder?: FolderType | null;
     searchstring?: string | null;
   };
+  Reorder: {
+    values: ValuesType[];
+  };
   DigitalCardScan: { setData: (data: string, type: string) => void };
   TotpScan: { setOtpauth: (uri: string) => void };
   NoteEditor: {

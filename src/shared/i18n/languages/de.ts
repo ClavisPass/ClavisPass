@@ -141,6 +141,7 @@ const de: TranslationSchema = {
   },
   home: {
     search: "Suche",
+    closeSearch: "Suche schließen",
     favorite: "Favorit",
     card: "Karten",
     twofa: "Zwei-Faktor",
@@ -151,6 +152,7 @@ const de: TranslationSchema = {
     sortByTitle: "Nach Titel sortieren",
     sortByCreated: "Nach Erstellungsdatum sortieren",
     sortByLastUpdated: "Nach letztem Update sortieren",
+    reorderChip: "Anordnen",
     reorderEntries: "Manuell anordnen",
     reorderHint: "Ziehe Einträge, um sie neu anzuordnen.",
     moduleFilterTitle: "Modulfilter",

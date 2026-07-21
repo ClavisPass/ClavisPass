@@ -410,6 +410,7 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
                 selected={showArchived}
                 compact
                 onPress={() => setShowArchived((v) => !v)}
+                style={styles.chip}
               >
                 {showArchived ? toggleOn : toggleOff}
               </Chip>

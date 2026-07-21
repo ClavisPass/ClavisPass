@@ -314,6 +314,7 @@ const styles = StyleSheet.create({
     margin: 0,
     height: 26,
     paddingHorizontal: 0,
+    borderRadius: 12,
   },
   chipText: {
     fontSize: 12,

@@ -102,6 +102,14 @@ const styles = StyleSheet.create({
   resetModalButton: {
     borderRadius: 12,
   },
+  chip: {
+    height: 30,
+    borderRadius: 12,
+  },
+  chipText: {
+    fontSize: 12,
+    lineHeight: 16,
+  },
 });
 
 type SettingsScreenProps = NativeStackScreenProps<
@@ -985,7 +993,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 onPress={() => {
                   openURL("https://clavispass.github.io/ClavisPass/");
                 }}
-                style={{ borderRadius: 12 }}
+                style={styles.chip}
+                textStyle={styles.chipText}
               >
                 {t("settings:website")}
               </Chip>
@@ -995,7 +1004,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 onPress={() => {
                   openURL("https://github.com/ClavisPass/ClavisPass");
                 }}
-                style={{ borderRadius: 12 }}
+                style={styles.chip}
+                textStyle={styles.chipText}
               >
                 Github
               </Chip>

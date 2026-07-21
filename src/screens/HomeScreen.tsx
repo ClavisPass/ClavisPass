@@ -11,35 +11,45 @@ import {
   useWindowDimensions,
   InteractionManager,
   RefreshControl,
+  ScrollView,
   StyleSheet,
 } from "react-native";
 import {
-  Searchbar,
-  Badge,
   Button,
+  Chip,
   Icon,
   IconButton,
+  Searchbar,
 } from "react-native-paper";
 
 import { Text } from "react-native-paper";
 
 import { FlashList } from "@shopify/flash-list";
-import type { RenderItemParams } from "react-native-draggable-flatlist";
+import Animated, {
+  Easing,
+  FadeInLeft,
+  FadeInRight,
+  FadeOutLeft,
+  FadeOutRight,
+  Layout,
+} from "react-native-reanimated";
 
 import { LinearGradient } from "expo-linear-gradient";
 import ListItem from "../features/vault/components/items/ListItem";
 import { StatusBar } from "expo-status-bar";
 import Constants from "expo-constants";
 import getColors from "../shared/ui/linearGradient";
-import WebSpecific from "../infrastructure/platform/WebSpecific";
 import HomeFilterMenu from "../features/vault/components/menus/HomeFilterMenu";
 import Blur from "../shared/components/Blur";
 import FolderFilter from "../features/vault/components/FolderFilter";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
-import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useIsFocused,
+  useScrollToTop,
+} from "@react-navigation/native";
 import { TITLEBAR_HEIGHT } from "../shared/components/CustomTitlebar";
 import FolderModal from "../features/vault/components/modals/FolderModal";
-import SearchShortcut from "../shared/components/shortcuts/SearchShortcut";
 import AddValueModal from "../features/vault/components/modals/AddValueModal";
 import { useAuth } from "../app/providers/AuthProvider";
 import { useTheme } from "../app/providers/ThemeProvider";
@@ -86,27 +96,97 @@ import {
   isUsingAuthentication,
   saveAuthentication,
 } from "../features/auth/utils/authenticateUser";
-import TooltipIconButton from "../shared/components/buttons/TooltipIconButton";
+import PerfProfiler from "../shared/performance/PerfProfiler";
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
+
+const listContentContainerStyle = { paddingRight: 4 };
+const homeListDrawDistance = Platform.OS === "web" ? 120 : 600;
+const headerSearchTransition = Easing.out(Easing.cubic);
+const webNoDragStyle =
+  Platform.OS === "web"
+    ? ({
+        WebkitAppRegion: "no-drag",
+        appRegion: "no-drag",
+      } as any)
+    : null;
+const webDragStyle =
+  Platform.OS === "web"
+    ? ({
+        WebkitAppRegion: "drag",
+        appRegion: "drag",
+        cursor: "grab",
+      } as any)
+    : null;
+
+const VerticalReorderIcon = ({
+  color,
+  size = 18,
+}: {
+  color?: string;
+  size?: number;
+}) => (
+  <View
+    style={{
+      width: size,
+      height: size,
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    <View style={{ height: size / 2, marginBottom: -2 }}>
+      <Icon source="chevron-up" size={size * 0.72} color={color} />
+    </View>
+    <View style={{ height: size / 2, marginTop: -2 }}>
+      <Icon source="chevron-down" size={size * 0.72} color={color} />
+    </View>
+  </View>
+);
+
+type HomeValueListItemProps = {
+  item: ValuesType;
+  index: number;
+  onPress: (item: ValuesType) => void;
+};
+
+const areHomeValueListItemPropsEqual = (
+  prev: HomeValueListItemProps,
+  next: HomeValueListItemProps,
+) => {
+  const prevFolder = prev.item.folder;
+  const nextFolder = next.item.folder;
+
+  return (
+    prev.index === next.index &&
+    prev.onPress === next.onPress &&
+    prev.item.id === next.item.id &&
+    prev.item.title === next.item.title &&
+    prev.item.fav === next.item.fav &&
+    prev.item.pinnedAt === next.item.pinnedAt &&
+    prev.item.created === next.item.created &&
+    prev.item.lastUpdated === next.item.lastUpdated &&
+    (prevFolder?.id ?? null) === (nextFolder?.id ?? null) &&
+    (prevFolder?.name ?? null) === (nextFolder?.name ?? null) &&
+    (prevFolder?.color ?? null) === (nextFolder?.color ?? null) &&
+    (prevFolder?.icon ?? null) === (nextFolder?.icon ?? null)
+  );
+};
 
 const HomeValueListItem = React.memo(function HomeValueListItem({
   item,
   index,
-  navigation,
-}: {
-  item: ValuesType;
-  index: number;
-  navigation: HomeScreenProps["navigation"];
-}) {
+  onPress,
+}: HomeValueListItemProps) {
   const handlePress = useCallback(() => {
-    navigation.navigate("Edit", {
-      value: item,
-    });
-  }, [item, navigation]);
+    onPress(item);
+  }, [item, onPress]);
 
-  return <ListItem item={item} index={index} onPress={handlePress} />;
-});
+  return (
+    <PerfProfiler id="HomeScreen.ValueListItem" minDurationMs={20}>
+      <ListItem item={item} index={index} onPress={handlePress} />
+    </PerfProfiler>
+  );
+}, areHomeValueListItemPropsEqual);
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const triggerAdd = route.params?.triggerAdd ?? false;
@@ -115,11 +195,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     useTheme();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
+  const isFocused = useIsFocused();
   const auth = useAuth();
   const vault = useVault();
   const { isOnline } = useOnline();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchHeaderVisible, setSearchHeaderVisible] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
   const { value: selectedFav, setValue: setSelectedFav } =
     useSetting("FAVORITE_FILTER");
@@ -146,29 +228,70 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const [valueModalVisible, setValueModalVisible] = useState(false);
   const [expiryModalVisible, setExpiryModalVisible] = useState(false);
   const [systemAuthPromptVisible, setSystemAuthPromptVisible] = useState(false);
+  const [homeContentVisible, setHomeContentVisible] = useState(true);
   const { provider, accessToken, ensureFreshAccessToken } = useToken();
 
-  const saveSelectedFavState = (fav: boolean) => {
-    if (fav) setSelectedModuleFilters([]);
-    setSelectedFav(fav);
-  };
+  const saveSelectedFavState = useCallback(
+    (fav: boolean) => {
+      if (fav) setSelectedModuleFilters([]);
+      setSelectedFav(fav);
+    },
+    [setSelectedFav],
+  );
 
-  const saveSelected2FAState = (twoFA: boolean) => {
-    setSearchQuery("");
-    if (twoFA) setSelectedModuleFilters([]);
-    setSelected2FA(twoFA);
-  };
+  const saveSelected2FAState = useCallback(
+    (twoFA: boolean) => {
+      setSearchQuery("");
+      if (twoFA) setSelectedModuleFilters([]);
+      setSelected2FA(twoFA);
+    },
+    [setSelected2FA],
+  );
 
-  const saveSelectedCardState = (card: boolean) => {
-    setSearchQuery("");
-    if (card) setSelectedModuleFilters([]);
-    setSelectedCard(card);
-  };
+  const saveSelectedCardState = useCallback(
+    (card: boolean) => {
+      setSearchQuery("");
+      if (card) setSelectedModuleFilters([]);
+      setSelectedCard(card);
+    },
+    [setSelectedCard],
+  );
 
-  const saveSelectedFolderState = (folder: FolderType | null) => {
+  const saveSelectedFolderState = useCallback((folder: FolderType | null) => {
     if (folder) setSelectedModuleFilters([]);
     setSelectedFolder(folder);
-  };
+  }, []);
+
+  const openModuleFilterModal = useCallback(() => {
+    setModuleFilterModalVisible(true);
+  }, []);
+
+  const isCompactHeader = width < 600;
+
+  useEffect(() => {
+    if (!isCompactHeader) {
+      setSearchHeaderVisible(false);
+      return;
+    }
+
+    if (searchQuery.trim() !== "") setSearchHeaderVisible(true);
+  }, [isCompactHeader, searchQuery]);
+
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+
+    const compactDragRegion = document.getElementById(
+      "home-header-brand-drag-region",
+    );
+    if (!compactDragRegion) return;
+
+    if (!searchHeaderVisible) {
+      compactDragRegion.setAttribute("data-tauri-drag-region", "");
+      return;
+    }
+
+    compactDragRegion.removeAttribute("data-tauri-drag-region");
+  }, [isCompactHeader, searchHeaderVisible]);
 
   const toggleModuleFilter = useCallback(
     (module: ModulesEnum) => {
@@ -269,12 +392,67 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
+      setHomeContentVisible(true);
       let task = InteractionManager.runAfterInteractions(() => {
         setHeaderSpacing(0);
         setHeaderWhite(true);
       });
-      return () => task?.cancel?.();
+      return () => {
+        task?.cancel?.();
+        setHomeContentVisible(false);
+      };
     }, []),
+  );
+
+  const openEditScreen = useCallback(
+    (item: ValuesType) => {
+      setHomeContentVisible(false);
+      const navigate = () => {
+        navigation.navigate("Edit", {
+          value: item,
+        });
+      };
+
+      if (Platform.OS === "web") {
+        requestAnimationFrame(navigate);
+        return;
+      }
+
+      navigate();
+    },
+    [navigation],
+  );
+
+  const openCardDetailsScreen = useCallback(
+    (params: {
+      accentColor?: string | null;
+      faviconUrl?: string | null;
+      item: ValuesType;
+      sourceUrl?: string | null;
+      title: string;
+      type: HomeStackParamList["CardDetails"]["type"];
+      value: string;
+    }) => {
+      setHomeContentVisible(false);
+      const navigate = () => {
+        navigation.navigate("CardDetails", {
+          value: params.value,
+          title: params.title,
+          type: params.type,
+          sourceUrl: params.sourceUrl ?? extractUrlFromEntry(params.item),
+          faviconUrl: params.faviconUrl ?? null,
+          accentColor: params.accentColor ?? null,
+        });
+      };
+
+      if (Platform.OS === "web") {
+        requestAnimationFrame(navigate);
+        return;
+      }
+
+      navigate();
+    },
+    [navigation],
   );
 
   useEffect(() => {
@@ -350,9 +528,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       return folderMatch && favMatch;
     });
 
-    const withRelevance = prefiltered.map((item) => {
-      if (!hasQuery) return { ...item, _relevance: 0 as number };
+    if (!hasQuery) return orderPinnedFirst(prefiltered);
 
+    const withRelevance = prefiltered.map((item) => {
       const meta = buildEntryMeta(item);
       const domain = getDomain(meta.url);
 
@@ -377,18 +555,57 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       return { ...item, _relevance: relevance };
     });
 
-    const result = hasQuery
-      ? withRelevance
-          .filter((item) => item._relevance !== Infinity)
-          .sort((a, b) => {
-            const pinned = comparePinnedFirst(a, b);
-            if (pinned !== 0) return pinned;
-            return a._relevance - b._relevance;
-          })
-      : withRelevance;
-
-    return hasQuery ? result : orderPinnedFirst(result);
+    return withRelevance
+      .filter((item) => item._relevance !== Infinity)
+      .sort((a, b) => {
+        const pinned = comparePinnedFirst(a, b);
+        if (pinned !== 0) return pinned;
+        return a._relevance - b._relevance;
+      });
   }, [vaultData, searchQuery, selectedFolder, selectedFav, selectedModuleFilters]);
+
+  const reorderValues = useMemo(() => {
+    const values = vaultData?.values ?? [];
+
+    if (searchQuery.trim() !== "") return filteredValues;
+
+    if (selectedCard) {
+      return orderPinnedFirst(
+        values.filter((item) =>
+          item.modules.some((module) => module.module === ModulesEnum.DIGITAL_CARD),
+        ),
+      );
+    }
+
+    if (selected2FA) {
+      return orderPinnedFirst(
+        values.filter((item) =>
+          item.modules.some((module) => module.module === ModulesEnum.TOTP),
+        ),
+      );
+    }
+
+    return filteredValues;
+  }, [filteredValues, searchQuery, selected2FA, selectedCard, vaultData]);
+
+  const openReorderScreen = useCallback(() => {
+    setHomeContentVisible(false);
+    const values = reorderValues.map((item) => ({
+      ...item,
+      modules: [...item.modules],
+    }));
+
+    const navigate = () => {
+      navigation.navigate("Reorder", { values });
+    };
+
+    if (Platform.OS === "web") {
+      requestAnimationFrame(navigate);
+      return;
+    }
+
+    navigate();
+  }, [navigation, reorderValues]);
 
   const expiryEntries = useMemo(() => {
     const entries: Array<{
@@ -483,15 +700,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         status: entry.status,
         onPress: () => {
           setExpiryModalVisible(false);
-          navigation.navigate("Edit", {
-            value: entry.item,
-          });
+          openEditScreen(entry.item);
         },
       })),
-    [expiryEntries, navigation],
+    [expiryEntries, openEditScreen],
   );
 
-  const refreshData = () => {
+  const refreshData = useCallback(() => {
     const master = auth.getMaster();
 
     if (!master || !provider) {
@@ -563,7 +778,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         setRefreshing(false);
       }
     })();
-  };
+  }, [
+    accessToken,
+    auth,
+    ensureFreshAccessToken,
+    provider,
+    saveSelected2FAState,
+    saveSelectedCardState,
+    saveSelectedFavState,
+    vault,
+  ]);
 
   const searchRef = useRef<any>(null);
   const activeListRef = useRef<any>(null);
@@ -585,7 +809,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const refreshControl = useMemo(
     () => (
       <RefreshControl
-        refreshing={false}
+        refreshing={refreshing}
         onRefresh={refreshData}
         colors={[theme.colors.primary]}
         progressBackgroundColor={theme.colors.background}
@@ -597,210 +821,101 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     [refreshing, refreshData, theme.colors.primary, theme.colors.background, t],
   );
 
-  const canReorderEntries =
-    searchQuery.trim() === "" && !selected2FA && !selectedCard;
+  const keyExtractor = useCallback((item: ValuesType) => item.id, []);
 
-  const moveEntryAfterPreviousVisibleId = (
-    values: ValuesType[],
-    movedId: string,
-    previousVisibleId: string | null,
-  ): ValuesType[] => {
-    if (movedId === previousVisibleId) return values;
-
-    const moved = values.find((entry) => entry.id === movedId);
-    if (!moved) return values;
-
-    const valuesWithoutMoved = values.filter((entry) => entry.id !== movedId);
-
-    if (previousVisibleId === null) {
-      return [moved, ...valuesWithoutMoved];
-    }
-
-    const previousIndex = valuesWithoutMoved.findIndex(
-      (entry) => entry.id === previousVisibleId,
-    );
-
-    if (previousIndex < 0) return values;
-
-    return [
-      ...valuesWithoutMoved.slice(0, previousIndex + 1),
-      moved,
-      ...valuesWithoutMoved.slice(previousIndex + 1),
-    ];
-  };
-
-  const reorderVisibleValues = (
-    values: ValuesType[],
-    sourceIndex: number,
-    destinationIndex: number,
-  ) => {
-    const result = [...values];
-    const [removed] = result.splice(sourceIndex, 1);
-    if (!removed) return result;
-    result.splice(destinationIndex, 0, removed);
-    return result;
-  };
-
-  const applyVisibleReorder = (
-    movedId: string | undefined,
-    reorderedVisibleValues: ValuesType[],
-    destinationIndex: number,
-  ) => {
-    if (!movedId) return;
-
-    const previousVisibleId =
-      destinationIndex <= 0
-        ? null
-        : (reorderedVisibleValues[destinationIndex - 1]?.id ?? null);
-
-    vault.update((draft) => {
-      draft.values = moveEntryAfterPreviousVisibleId(
-        draft.values ?? [],
-        movedId,
-        previousVisibleId,
-      );
-    });
-  };
-
-  const renderReorderListItem = useCallback(
-    (
-      item: ValuesType,
-      index: number,
-      onDragStart?: () => void,
-      dragHandleProps?: any,
-    ) => (
-      <ListItem
+  const renderValueItem = useCallback(
+    ({ item, index }: { item: ValuesType; index: number }) => (
+      <HomeValueListItem
         item={item}
         index={index}
-        reorderMode
-        onDragStart={onDragStart}
-        dragHandleProps={dragHandleProps}
-        onPress={() => {
-          navigation.navigate("Edit", {
-            value: item,
-          });
-        }}
+        onPress={openEditScreen}
       />
     ),
-    [navigation],
+    [openEditScreen],
   );
 
-  const renderWebReorderList = () =>
-    (() => {
-      const {
-        DragDropContext,
-        Droppable,
-        Draggable,
-      } = require("@hello-pangea/dnd");
+  const actionChipStyle = {
+    height: 30,
+    borderRadius: 12,
+    margin: 0,
+  };
 
-      return (
-        <DragDropContext
-          onDragEnd={(result: any) => {
-            if (!result.destination) return;
-            if (result.source.index === result.destination.index) return;
+  const actionChipTextStyle = {
+    fontSize: 12,
+    lineHeight: 16,
+  };
 
-            const movedId = filteredValues[result.source.index]?.id;
-            const reordered = reorderVisibleValues(
-              filteredValues,
-              result.source.index,
-              result.destination.index,
-            );
-
-            applyVisibleReorder(
-              movedId,
-              reordered,
-              result.destination.index,
-            );
-          }}
+  const renderHomeActionChips = () => (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{
+        alignItems: "center",
+        flexDirection: "row-reverse",
+        flexGrow: 1,
+        gap: 4,
+        justifyContent: "flex-start",
+        paddingHorizontal: 8,
+        paddingBottom: 4,
+      }}
+      style={{ flexGrow: 0, width: "100%" }}
+    >
+      <Chip
+        compact
+        icon="sort-variant"
+        onPress={() => setShowMenu(true)}
+        style={actionChipStyle}
+        textStyle={actionChipTextStyle}
+      >
+        {t("home:sort")}
+      </Chip>
+      {expiryEntries.length > 0 ? (
+        <Chip
+          compact
+          icon="calendar-clock"
+          onPress={() => setExpiryModalVisible(true)}
+          style={actionChipStyle}
+          textStyle={actionChipTextStyle}
         >
-          <Droppable droppableId="home-values-reorder">
-            {(provided: any) => (
-              <div
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                style={{
-                  flex: 1,
-                  width: "100%",
-                  overflow: "auto",
-                  paddingRight: 4,
-                }}
-              >
-                {filteredValues.map((item, index) => (
-                  <Draggable key={item.id} draggableId={item.id} index={index}>
-                    {(draggableProvided: any) => (
-                      <div
-                        ref={draggableProvided.innerRef}
-                        {...draggableProvided.draggableProps}
-                        style={{
-                          userSelect: "none",
-                          position: "static",
-                          top: "auto",
-                          left: "auto",
-                          ...draggableProvided.draggableProps.style,
-                          marginBottom: 4,
-                        }}
-                      >
-                        {renderReorderListItem(
-                          item,
-                          index,
-                          undefined,
-                          draggableProvided.dragHandleProps,
-                        )}
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-      );
-    })();
+          {`${t("home:expiries")} ${expiryEntries.length}`}
+        </Chip>
+      ) : null}
+      <Chip
+        compact
+        icon={({ color, size }) => (
+          <VerticalReorderIcon color={color} size={size} />
+        )}
+        disabled={reorderValues.length < 2}
+        onPress={openReorderScreen}
+        style={actionChipStyle}
+        textStyle={actionChipTextStyle}
+      >
+        {t("home:reorderChip")}
+      </Chip>
+      <Chip
+        compact
+        icon="refresh"
+        disabled={!isOnline || refreshing}
+        onPress={refreshData}
+        style={actionChipStyle}
+        textStyle={actionChipTextStyle}
+      >
+        {t("common:reload")}
+      </Chip>
+    </ScrollView>
+  );
 
-  const renderNativeReorderList = () =>
-    (() => {
-      const draggableFlatListModule = require("react-native-draggable-flatlist");
-      const DraggableFlatList =
-        draggableFlatListModule.default ?? draggableFlatListModule;
+  const openHeaderSearch = useCallback(() => {
+    setSearchHeaderVisible(true);
+    requestAnimationFrame(() => {
+      searchRef.current?.focus?.();
+    });
+  }, []);
 
-      return (
-        <DraggableFlatList
-          ref={setActiveListRef}
-          refreshControl={refreshControl}
-          contentContainerStyle={{ paddingRight: 4 }}
-          data={filteredValues}
-          keyExtractor={(item: ValuesType) => item.id}
-          activationDistance={8}
-          initialNumToRender={16}
-          maxToRenderPerBatch={10}
-          updateCellsBatchingPeriod={50}
-          windowSize={7}
-          removeClippedSubviews
-          renderItem={({
-            item,
-            getIndex,
-            drag,
-          }: RenderItemParams<ValuesType>) =>
-            renderReorderListItem(item, getIndex?.() ?? 0, drag)
-          }
-          onDragEnd={({
-            data,
-            from,
-            to,
-          }: {
-            data: ValuesType[];
-            from: number;
-            to: number;
-          }) => {
-            if (from === to) return;
-
-            const movedId = filteredValues[from]?.id;
-            applyVisibleReorder(movedId, data, to);
-          }}
-        />
-      );
-    })();
+  const closeHeaderSearch = useCallback(() => {
+    setSearchHeaderVisible(false);
+    setSearchQuery("");
+  }, []);
 
   function renderFlashList() {
     if (selectedCard && searchQuery === "") {
@@ -823,38 +938,41 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         }
       }
       return (
-        <FlashList
-          ref={setActiveListRef}
-          refreshControl={refreshControl}
-          contentContainerStyle={{ paddingRight: 4 }}
-          drawDistance={600}
-          data={cardEntries}
-          renderItem={({ item, index }) => (
-            <CardItem
-              title={item.title}
-              value={item.value}
-              type={item.type}
-              item={item.item}
-              sourceUrl={item.sourceUrl}
-              index={index}
-              onPressEdit={() => {
-                navigation.navigate("Edit", {
-                  value: item.item,
-                });
-              }}
-              onPress={({ accentColor, sourceUrl, faviconUrl }) => {
-                navigation.navigate("CardDetails", {
-                  value: item.value,
-                  title: item.title,
-                  type: item.type,
-                  sourceUrl: sourceUrl ?? item.sourceUrl,
-                  faviconUrl: faviconUrl ?? null,
-                  accentColor: accentColor ?? null,
-                });
-              }}
-            />
-          )}
-        />
+        <PerfProfiler id="HomeScreen.CardList">
+          <FlashList
+            ref={setActiveListRef}
+            refreshControl={refreshControl}
+            contentContainerStyle={{ paddingRight: 4 }}
+            drawDistance={homeListDrawDistance}
+            data={cardEntries}
+            keyExtractor={(item) => item.key}
+            getItemType={(item) => item.type}
+            renderItem={({ item, index }) => (
+              <CardItem
+                title={item.title}
+                value={item.value}
+                type={item.type}
+                item={item.item}
+                sourceUrl={item.sourceUrl}
+                index={index}
+                onPressEdit={() => {
+                  openEditScreen(item.item);
+                }}
+                onPress={({ accentColor, sourceUrl, faviconUrl }) => {
+                  openCardDetailsScreen({
+                    accentColor,
+                    faviconUrl,
+                    item: item.item,
+                    sourceUrl: sourceUrl ?? item.sourceUrl,
+                    title: item.title,
+                    type: item.type,
+                    value: item.value,
+                  });
+                }}
+              />
+            )}
+          />
+        </PerfProfiler>
       );
     }
     if (selected2FA && searchQuery === "") {
@@ -873,50 +991,40 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         }
       }
       return (
+        <PerfProfiler id="HomeScreen.TotpList">
+          <FlashList
+            ref={setActiveListRef}
+            refreshControl={refreshControl}
+            contentContainerStyle={{ paddingRight: 4 }}
+            drawDistance={homeListDrawDistance}
+            data={totpEntries}
+            keyExtractor={(item) => item.key}
+            renderItem={({ item, index }) => (
+              <TotpItem
+                value={item.value}
+                item={item.item}
+                index={index}
+                onPress={() => {
+                  openEditScreen(item.item);
+                }}
+              />
+            )}
+          />
+        </PerfProfiler>
+      );
+    }
+    const flashList = (
+      <PerfProfiler id="HomeScreen.ValueList">
         <FlashList
           ref={setActiveListRef}
           refreshControl={refreshControl}
-          contentContainerStyle={{ paddingRight: 4 }}
-          drawDistance={600}
-          data={totpEntries}
-          renderItem={({ item, index }) => (
-            <TotpItem
-              value={item.value}
-              item={item.item}
-              index={index}
-              onPress={() => {
-                navigation.navigate("Edit", {
-                  value: item.item,
-                });
-              }}
-            />
-          )}
+          contentContainerStyle={listContentContainerStyle}
+          drawDistance={homeListDrawDistance}
+          data={filteredValues}
+          keyExtractor={keyExtractor}
+          renderItem={renderValueItem}
         />
-      );
-    }
-    if (canReorderEntries && filteredValues.length > 1) {
-      const reorderList =
-        Platform.OS === "web"
-          ? renderWebReorderList()
-          : renderNativeReorderList();
-
-      return <View style={{ flex: 1, width: "100%" }}>{reorderList}</View>;
-    }
-    const flashList = (
-      <FlashList
-        ref={setActiveListRef}
-        refreshControl={refreshControl}
-        contentContainerStyle={{ paddingRight: 4 }}
-        drawDistance={600}
-        data={filteredValues}
-        renderItem={({ item, index }) => (
-          <HomeValueListItem
-            item={item}
-            index={index}
-            navigation={navigation}
-          />
-        )}
-      />
+      </PerfProfiler>
     );
     if (Platform.OS === "web") return <Blur>{flashList}</Blur>;
     else return flashList;
@@ -931,9 +1039,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             style={headerWhite ? "light" : darkmode ? "light" : "dark"}
             translucent={true}
           />
-          <WebSpecific>
-            <SearchShortcut searchRef={searchRef} />
-          </WebSpecific>
           <LinearGradient
             colors={getColors()}
             dither={true}
@@ -942,9 +1047,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
-              padding: 10,
+              paddingHorizontal: 10,
+              paddingTop:
+                Constants.statusBarHeight + (TITLEBAR_HEIGHT > 0 ? 4 : 6),
+              paddingBottom: TITLEBAR_HEIGHT > 0 ? 4 : 6,
               marginBottom: 4,
-              paddingTop: Constants.statusBarHeight,
               borderBottomLeftRadius: 12,
               borderBottomRightRadius: 12,
               shadowColor: "#000",
@@ -955,130 +1062,202 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             }}
             end={{ x: 0.1, y: 0.2 }}
           >
-            <View
+            <Animated.View
+              layout={Layout.duration(180).easing(headerSearchTransition)}
               style={{
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
-                marginTop: 12,
-                marginBottom: 8,
-                marginLeft: 4,
+                marginTop: 0,
+                marginBottom: 0,
                 width: "100%",
+                gap: 8,
+                position: "relative",
+                zIndex: 4,
+                paddingRight:
+                  Platform.OS === "web" && TITLEBAR_HEIGHT > 0 && isCompactHeader
+                    ? 104
+                    : 0,
               }}
             >
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
-                <LogoColored width={20} height={20} />
-                <Text
-                  style={{
-                    fontFamily: "LexendExa_400Regular",
-                    fontSize: 16,
-                    lineHeight: 22,
-                    color: "white",
-                    userSelect: "none",
-                    includeFontPadding: false,
-                    paddingRight: 6,
-                  }}
+              {isCompactHeader && searchHeaderVisible ? (
+                <Animated.View
+                  entering={FadeInRight.duration(180).easing(
+                    headerSearchTransition,
+                  )}
+                  exiting={FadeOutRight.duration(120).easing(
+                    headerSearchTransition,
+                  )}
+                  layout={Layout.duration(180).easing(headerSearchTransition)}
+                  style={[
+                    {
+                      flex: 1,
+                      height: 36,
+                      overflow: "hidden",
+                      position: "relative",
+                      zIndex: 5,
+                    },
+                    webNoDragStyle,
+                  ]}
                 >
-                  ClavisPass
-                </Text>
-              </View>
-            </View>
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <Searchbar
-                ref={searchRef}
-                inputStyle={{ height: 40, minHeight: 40, color: "white" }}
-                style={{
-                  height: 40,
-                  flex: 1,
-                  borderRadius: 10,
-                  backgroundColor: "rgba(217, 217, 217, 0.21)",
-                }}
-                placeholder={t("home:search")}
-                onChangeText={setSearchQuery}
-                value={searchQuery}
-                loading={false}
-                iconColor={"#ffffff80"}
-                placeholderTextColor={"#ffffff80"}
-                right={() =>
-                  searchQuery ? (
-                    <IconButton
-                      accessibilityLabel={t("common:reset")}
-                      icon="close"
-                      iconColor="#ffffff80"
-                      size={20}
-                      onPress={() => {
-                        setSearchQuery("");
-                        searchRef.current?.focus?.();
-                      }}
-                      style={{ marginVertical: 0, marginLeft: 0, marginRight: 2 }}
-                    />
-                  ) : null
-                }
-              />
-              <TooltipIconButton
-                tooltip={t("common:reload")}
-                icon="refresh"
-                size={24}
-                disabled={!isOnline || refreshing}
-                onPress={refreshData}
-                iconColor="white"
-                style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
-              />
-              <TooltipIconButton
-                tooltip={t("home:sort")}
-                icon="sort-variant"
-                size={25}
-                onPress={() => {
-                  setShowMenu(true);
-                }}
-                iconColor="white"
-                style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
-              />
-              {expiryEntries.length > 0 ? (
-                <View style={{ position: "relative" }}>
-                  <TooltipIconButton
-                    tooltip={t("home:expiries")}
-                    icon="calendar-clock"
-                    size={24}
-                    hitSlop={8}
-                    onPress={() => {
-                      setExpiryModalVisible(true);
-                    }}
-                    iconColor="white"
-                    style={{ marginTop: 0, marginBottom: 0, marginRight: 0 }}
-                  />
-                  <Badge
-                    pointerEvents="none"
-                    size={18}
-                    style={{
-                      position: "absolute",
-                      top: 2,
-                      right: 2,
-                      backgroundColor: theme.colors.primary,
+                  <Searchbar
+                    ref={searchRef}
+                    inputStyle={{
+                      height: 36,
+                      minHeight: 36,
+                      lineHeight: 18,
                       color: "white",
                     }}
+                    style={{
+                      height: 36,
+                      maxHeight: 36,
+                      flex: 1,
+                      borderRadius: 10,
+                      backgroundColor: "rgba(217, 217, 217, 0.21)",
+                      ...webNoDragStyle,
+                    }}
+                    placeholder={t("home:search")}
+                    onChangeText={setSearchQuery}
+                    value={searchQuery}
+                    loading={false}
+                    iconColor={"#ffffff80"}
+                    placeholderTextColor={"#ffffff80"}
+                    right={() =>
+                      searchQuery ? (
+                        <IconButton
+                          accessibilityLabel={t("common:reset")}
+                          icon="close"
+                          iconColor="#ffffff80"
+                          size={20}
+                          onPress={() => {
+                            setSearchQuery("");
+                            searchRef.current?.focus?.();
+                          }}
+                          style={{
+                            marginVertical: 0,
+                            marginLeft: 0,
+                            marginRight: 1,
+                            ...webNoDragStyle,
+                          }}
+                        />
+                      ) : null
+                    }
+                  />
+                </Animated.View>
+              ) : (
+                <Animated.View
+                  id="home-header-brand-drag-region"
+                  entering={FadeInLeft.duration(180).easing(
+                    headerSearchTransition,
+                  )}
+                  exiting={FadeOutLeft.duration(120).easing(
+                    headerSearchTransition,
+                  )}
+                  layout={Layout.duration(180).easing(headerSearchTransition)}
+                  style={[
+                    {
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 8,
+                      flex: 1,
+                      minWidth: 0,
+                      position: "relative",
+                      zIndex: 5,
+                    },
+                    !searchHeaderVisible ? webDragStyle : null,
+                  ]}
+                >
+                  <LogoColored width={20} height={20} />
+                  <Text
+                    style={{
+                      fontFamily: "LexendExa_400Regular",
+                      fontSize: 16,
+                      lineHeight: 16,
+                      color: "white",
+                      userSelect: "none",
+                      includeFontPadding: false,
+                      paddingRight: 6,
+                    }}
+                    numberOfLines={1}
                   >
-                    {expiryEntries.length > 99
-                      ? "99+"
-                      : String(expiryEntries.length)}
-                  </Badge>
-                </View>
+                    ClavisPass
+                  </Text>
+                </Animated.View>
+              )}
+              {!isCompactHeader ? (
+                <Searchbar
+                  ref={searchRef}
+                  inputStyle={{
+                    height: 34,
+                    minHeight: 34,
+                    fontSize: 13,
+                    color: "white",
+                  }}
+                  style={{
+                    height: 34,
+                    width: Math.min(340, Math.max(200, width * 0.32)),
+                    borderRadius: 12,
+                    backgroundColor: "rgba(217, 217, 217, 0.18)",
+                    borderWidth: 1,
+                    borderColor: "rgba(255, 255, 255, 0.14)",
+                    position: "relative",
+                    zIndex: 5,
+                    ...webNoDragStyle,
+                  }}
+                  placeholder={t("home:search")}
+                  onChangeText={setSearchQuery}
+                  value={searchQuery}
+                  loading={false}
+                  iconColor={"#ffffff80"}
+                  placeholderTextColor={"#ffffff80"}
+                  right={() =>
+                    searchQuery ? (
+                      <IconButton
+                        accessibilityLabel={t("common:reset")}
+                        icon="close"
+                        iconColor="#ffffff80"
+                        size={18}
+                        onPress={() => {
+                          setSearchQuery("");
+                          searchRef.current?.focus?.();
+                        }}
+                        style={{
+                          marginVertical: 0,
+                          marginLeft: 0,
+                          marginRight: 1,
+                          ...webNoDragStyle,
+                        }}
+                      />
+                    ) : null
+                  }
+                />
               ) : null}
-            </View>
+              {isCompactHeader ? (
+                <IconButton
+                  accessibilityLabel={
+                    searchHeaderVisible ? t("home:closeSearch") : t("home:search")
+                  }
+                  icon={searchHeaderVisible ? "close" : "magnify"}
+                  iconColor="white"
+                  size={22}
+                  onPress={
+                    searchHeaderVisible ? closeHeaderSearch : openHeaderSearch
+                  }
+                  style={{
+                    margin: 0,
+                    width: 36,
+                    height: 36,
+                    position: "relative",
+                    zIndex: 5,
+                    ...webNoDragStyle,
+                  }}
+                />
+              ) : (
+                <View style={{ flex: 1 }} />
+              )}
+            </Animated.View>
           </LinearGradient>
           <Sync
             refreshData={refreshData}
@@ -1089,30 +1268,42 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             style={{
               flex: 1,
               width: "100%",
-              padding: 4,
+              paddingTop: 0,
+              paddingBottom: 4,
               paddingRight: 0,
               paddingLeft: width > 600 ? 0 : 4,
               flexDirection: width > 600 ? "row-reverse" : "column",
             }}
           >
-            {renderFlashList()}
-            <FolderFilter
-              folder={vaultData?.folder}
-              selectedFav={selectedFav}
-              setSelectedFav={saveSelectedFavState}
-              selectedFolder={selectedFolder}
-              setSelectedFolder={saveSelectedFolderState}
-              setFolderModalVisible={setFolderModalVisible}
-              selected2FA={selected2FA}
-              setSelected2FA={saveSelected2FAState}
-              selectedCard={selectedCard}
-              setSelectedCard={saveSelectedCardState}
-              moduleFilters={moduleFilters}
-              selectedModuleFilters={selectedModuleFilters}
-              toggleModuleFilter={toggleModuleFilter}
-              removeModuleFilter={removeModuleFilter}
-              openModuleFilterModal={() => setModuleFilterModalVisible(true)}
-            />
+            {isFocused && homeContentVisible ? (
+              <>
+                <View style={{ flex: 1, width: "100%" }}>
+                  {renderHomeActionChips()}
+                  {renderFlashList()}
+                </View>
+                <PerfProfiler id="HomeScreen.FolderFilter" minDurationMs={8}>
+                  <FolderFilter
+                    folder={vaultData?.folder}
+                    selectedFav={selectedFav}
+                    setSelectedFav={saveSelectedFavState}
+                    selectedFolder={selectedFolder}
+                    setSelectedFolder={saveSelectedFolderState}
+                    setFolderModalVisible={setFolderModalVisible}
+                    selected2FA={selected2FA}
+                    setSelected2FA={saveSelected2FAState}
+                    selectedCard={selectedCard}
+                    setSelectedCard={saveSelectedCardState}
+                    moduleFilters={moduleFilters}
+                    selectedModuleFilters={selectedModuleFilters}
+                    toggleModuleFilter={toggleModuleFilter}
+                    removeModuleFilter={removeModuleFilter}
+                    openModuleFilterModal={openModuleFilterModal}
+                  />
+                </PerfProfiler>
+              </>
+            ) : (
+              <View style={{ flex: 1, width: "100%" }} />
+            )}
           </View>
 
           <HomeFilterMenu

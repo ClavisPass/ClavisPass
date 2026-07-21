@@ -1,6 +1,6 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { useWindowDimensions } from "react-native";
+import { Platform, useWindowDimensions } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 import HomeStack from "./stacks/HomeStack";
@@ -23,7 +23,8 @@ export default function TabNavigator() {
       screenOptions={{
         headerShown: false,
         animation: "fade",
-        freezeOnBlur: false,
+        freezeOnBlur: Platform.OS !== "web",
+        lazy: true,
         sceneStyle: width > 600 ? { marginLeft: 88 } : undefined,
       }}
       tabBar={(props) =>
@@ -34,7 +35,7 @@ export default function TabNavigator() {
         )
       }
       initialRouteName="HomeStack"
-      detachInactiveScreens={false}
+      detachInactiveScreens={Platform.OS !== "web"}
     >
       <Tab.Screen
         name="HomeStack"

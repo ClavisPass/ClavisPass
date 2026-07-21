@@ -35,6 +35,7 @@ export const draggableModulesListStyles = StyleSheet.create({
     position: "absolute",
     left: 8,
     maxWidth: "60%",
+    borderRadius: 12,
   },
   predictionChipContent: {
     flexShrink: 1,

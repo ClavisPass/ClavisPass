@@ -28,6 +28,12 @@ import { getValueIcon } from "../../utils/getValueIcon";
 import { getFolderColor } from "../../utils/folderAppearance";
 import TooltipIconButton from "../../../../shared/components/buttons/TooltipIconButton";
 import AppTooltip from "../../../../shared/components/tooltips/AppTooltip";
+import {
+  buildFaviconUrl,
+  normalizeUrl,
+} from "../../utils/digitalCardTheme";
+
+const failedFaviconUrls = new Set<string>();
 
 const styles = StyleSheet.create({
   container: {
@@ -201,6 +207,9 @@ type Props = {
   key?: React.Key;
   index: number;
   reorderMode?: boolean;
+  disableFastAccessPreview?: boolean;
+  hideChevron?: boolean;
+  pressDisabled?: boolean;
   onDragStart?: () => void;
   dragHandleProps?: any;
 };
@@ -315,14 +324,17 @@ function ListItem(props: Props) {
     );
     const value = String(urlModule?.value ?? "").trim();
 
-    return value
-      ? `https://www.google.com/s2/favicons?domain=${value}&sz=64`
-      : "";
+    return buildFaviconUrl(normalizeUrl(value)) ?? "";
   }, [props.item.modules]);
 
   useEffect(() => {
-    setFaviconFailed(false);
+    setFaviconFailed(url !== "" && failedFaviconUrls.has(url));
   }, [url]);
+
+  const handleFaviconError = () => {
+    if (url) failedFaviconUrls.add(url);
+    setFaviconFailed(true);
+  };
 
   const icon = useMemo(
     () => getValueIcon({ modules: props.item.modules }),
@@ -331,9 +343,15 @@ function ListItem(props: Props) {
   const showFavicon = url !== "" && !faviconFailed;
 
   const fastAccessObject = useMemo(() => {
+    if (props.disableFastAccessPreview) return null;
     if (!hovered) return null;
     return extractFastAccessObject(props.item.modules, props.item.title);
-  }, [hovered, props.item.modules, props.item.title]);
+  }, [
+    hovered,
+    props.disableFastAccessPreview,
+    props.item.modules,
+    props.item.title,
+  ]);
 
   const fastAccessData = useMemo(
     () => extractFastAccessObject(props.item.modules, props.item.title),
@@ -412,7 +430,7 @@ function ListItem(props: Props) {
           source={url}
           contentFit="cover"
           transition={250}
-          onError={() => setFaviconFailed(true)}
+          onError={handleFaviconError}
         />
       ) : (
         <View style={styles.iconBox}>
@@ -565,7 +583,7 @@ function ListItem(props: Props) {
   };
 
   const webInteractionProps =
-    Platform.OS === "web"
+    Platform.OS === "web" && !props.pressDisabled
       ? ({
           onPointerEnter: () => setHovered(true),
           onPointerLeave: () => setHovered(false),
@@ -778,15 +796,25 @@ function ListItem(props: Props) {
       {dragDivider}
       <AnimatedPressable
         key={props.key}
-        style={styles.ripple}
+        disabled={props.pressDisabled}
+        rippleColor={props.pressDisabled ? "transparent" : undefined}
+        style={[
+          styles.ripple,
+          props.pressDisabled && Platform.OS === "web"
+            ? ({ cursor: "default" } as any)
+            : null,
+        ]}
         onPress={() => {
+          if (props.pressDisabled) return;
           if (suppressNextPressRef.current) {
             suppressNextPressRef.current = false;
             return;
           }
           props.onPress();
         }}
-        onLongPress={() => measureAndOpenMenu()}
+        onLongPress={
+          props.pressDisabled ? undefined : () => measureAndOpenMenu()
+        }
       >
         <>
           <View style={styles.left}>
@@ -797,7 +825,7 @@ function ListItem(props: Props) {
                 contentFit="cover"
                 transition={250}
                 pointerEvents="none"
-                onError={() => setFaviconFailed(true)}
+                onError={handleFaviconError}
               />
             ) : (
               <View style={styles.iconBox}>
@@ -860,11 +888,13 @@ function ListItem(props: Props) {
               <Icon color={theme.colors.primary} source="pin" size={16} />
             ) : null}
 
-            <Icon
-              color={theme.colors?.primary}
-              source={"chevron-right"}
-              size={20}
-            />
+            {!props.hideChevron ? (
+              <Icon
+                color={theme.colors?.primary}
+                source={"chevron-right"}
+                size={20}
+              />
+            ) : null}
           </View>
         </>
       </AnimatedPressable>
@@ -873,7 +903,7 @@ function ListItem(props: Props) {
 
   return (
     <>
-      {Platform.OS === "web" ? (
+      {Platform.OS === "web" || props.reorderMode ? (
         listItemContent
       ) : (
         <ReanimatedSwipeable
@@ -941,4 +971,30 @@ function ListItem(props: Props) {
   );
 }
 
-export default React.memo(ListItem);
+function areListItemPropsEqual(prev: Props, next: Props) {
+  const prevFolder = prev.item.folder;
+  const nextFolder = next.item.folder;
+
+  return (
+    prev.index === next.index &&
+    prev.reorderMode === next.reorderMode &&
+    prev.disableFastAccessPreview === next.disableFastAccessPreview &&
+    prev.hideChevron === next.hideChevron &&
+    prev.pressDisabled === next.pressDisabled &&
+    prev.onPress === next.onPress &&
+    prev.onDragStart === next.onDragStart &&
+    prev.dragHandleProps === next.dragHandleProps &&
+    prev.item.id === next.item.id &&
+    prev.item.title === next.item.title &&
+    prev.item.fav === next.item.fav &&
+    prev.item.pinnedAt === next.item.pinnedAt &&
+    prev.item.created === next.item.created &&
+    prev.item.lastUpdated === next.item.lastUpdated &&
+    (prevFolder?.id ?? null) === (nextFolder?.id ?? null) &&
+    (prevFolder?.name ?? null) === (nextFolder?.name ?? null) &&
+    (prevFolder?.color ?? null) === (nextFolder?.color ?? null) &&
+    (prevFolder?.icon ?? null) === (nextFolder?.icon ?? null)
+  );
+}
+
+export default React.memo(ListItem, areListItemPropsEqual);
