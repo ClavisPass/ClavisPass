@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import {
   View,
+  TextInput,
   Platform,
   useWindowDimensions,
   InteractionManager,
@@ -222,6 +223,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     useSetting("SYSTEM_AUTH_PROMPT_DONE");
 
   const [refreshing, setRefreshing] = useState(false);
+  const [pullRefreshing, setPullRefreshing] = useState(false);
 
   const [showMenu, setShowMenu] = useState(false);
 
@@ -735,7 +737,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     [expiryEntries, openEditScreen],
   );
 
-  const refreshData = useCallback(() => {
+  const refreshData = useCallback(async () => {
     const master = auth.getMaster();
 
     if (!master || !provider) {
@@ -745,68 +747,62 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
     setRefreshing(true);
 
-    (async () => {
-      try {
-        let tokenToUse: string | null = null;
+    try {
+      let tokenToUse: string | null = null;
 
-        if (provider !== "device") {
-          tokenToUse = accessToken ?? (await ensureFreshAccessToken());
-          if (!tokenToUse) {
-            logger.warn("[Home] No access token available for refreshData.");
-            setRefreshing(false);
-            return;
-          }
-        }
-
-        const result = await fetchRemoteVaultFile({
-          provider,
-          accessToken: tokenToUse ?? "",
-          remotePath: "clavispass.lock",
-        });
-
-        if (result.status === "error") {
-          logger.warn(
-            "[Home] refreshData fetch error:",
-            result.message,
-            result.cause,
-          );
-          setRefreshing(false);
+      if (provider !== "device") {
+        tokenToUse = accessToken ?? (await ensureFreshAccessToken());
+        if (!tokenToUse) {
+          logger.warn("[Home] No access token available for refreshData.");
           return;
         }
-
-        if (result.status === "not_found") {
-          logger.info("[Home] No vault found during refreshData.");
-          setRefreshing(false);
-          return;
-        }
-
-        const decrypted = await decryptVaultContent(result.content, master);
-
-        if (!decrypted.ok) {
-          logger.warn(
-            "[Home] refreshData decrypt failed:",
-            decrypted.reason,
-            decrypted.error,
-          );
-          setRefreshing(false);
-          return;
-        }
-
-        vault.unlockWithDecryptedVault(decrypted.payload);
-        vault.markSaved();
-
-        setSelectedFolder(null);
-        saveSelectedFavState(false);
-        saveSelected2FAState(false);
-        saveSelectedCardState(false);
-        setModuleFilters([]);
-        setSelectedModuleFilters([]);
-      } catch (error) {
-        logger.error("[Home] Error during refreshData:", error);
-      } finally {
-        setRefreshing(false);
       }
-    })();
+
+      const result = await fetchRemoteVaultFile({
+        provider,
+        accessToken: tokenToUse ?? "",
+        remotePath: "clavispass.lock",
+      });
+
+      if (result.status === "error") {
+        logger.warn(
+          "[Home] refreshData fetch error:",
+          result.message,
+          result.cause,
+        );
+        return;
+      }
+
+      if (result.status === "not_found") {
+        logger.info("[Home] No vault found during refreshData.");
+        return;
+      }
+
+      const decrypted = await decryptVaultContent(result.content, master);
+
+      if (!decrypted.ok) {
+        logger.warn(
+          "[Home] refreshData decrypt failed:",
+          decrypted.reason,
+          decrypted.error,
+        );
+        return;
+      }
+
+      vault.unlockWithDecryptedVault(decrypted.payload);
+      vault.markSaved();
+
+      setSelectedFolder(null);
+      saveSelectedFavState(false);
+      saveSelected2FAState(false);
+      saveSelectedCardState(false);
+      setModuleFilters([]);
+      setSelectedModuleFilters([]);
+    } catch (error) {
+      logger.error("[Home] Error during refreshData:", error);
+    } finally {
+      setRefreshing(false);
+    }
   }, [
     accessToken,
     auth,
@@ -817,6 +813,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     saveSelectedFavState,
     vault,
   ]);
+
+  const pullRefreshData = useCallback(async () => {
+    setPullRefreshing(true);
+    try {
+      await refreshData();
+    } finally {
+      setPullRefreshing(false);
+    }
+  }, [refreshData]);
 
   const searchRef = useRef<any>(null);
   const activeListRef = useRef<any>(null);
@@ -838,8 +843,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const refreshControl = useMemo(
     () => (
       <RefreshControl
-        refreshing={refreshing}
-        onRefresh={refreshData}
+        refreshing={false}
+        onRefresh={pullRefreshData}
         colors={[theme.colors.primary]}
         progressBackgroundColor={theme.colors.background}
         tintColor={theme.colors.primary}
@@ -847,7 +852,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         titleColor={theme.colors.primary}
       />
     ),
-    [refreshing, refreshData, theme.colors.primary, theme.colors.background, t],
+    [
+      pullRefreshing,
+      pullRefreshData,
+      theme.colors.primary,
+      theme.colors.background,
+      t,
+    ],
   );
 
   const keyExtractor = useCallback((item: ValuesType) => item.id, []);
@@ -945,6 +956,34 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     setSearchHeaderVisible(false);
     setSearchQuery("");
   }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+
+    const handleSearchShortcut = (event: KeyboardEvent) => {
+      if (!isFocused) return;
+      if (!(event.ctrlKey || event.metaKey)) return;
+      if (event.altKey) return;
+      if (event.key.toLowerCase() !== "f") return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (isCompactHeader) {
+        openHeaderSearch();
+        return;
+      }
+
+      requestAnimationFrame(() => {
+        searchRef.current?.focus?.();
+      });
+    };
+
+    document.addEventListener("keydown", handleSearchShortcut, true);
+    return () => {
+      document.removeEventListener("keydown", handleSearchShortcut, true);
+    };
+  }, [isCompactHeader, isFocused, openHeaderSearch]);
 
   function renderFlashList() {
     if (selectedCard && searchQuery === "") {
@@ -1130,49 +1169,60 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                     webNoDragStyle,
                   ]}
                 >
-                  <Searchbar
-                    ref={searchRef}
-                    inputStyle={{
-                      height: 36,
-                      minHeight: 36,
-                      lineHeight: 18,
-                      color: "white",
-                    }}
+                  <View
                     style={{
                       height: 36,
                       maxHeight: 36,
                       flex: 1,
                       borderRadius: 10,
                       backgroundColor: "rgba(217, 217, 217, 0.21)",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      overflow: "hidden",
                       ...webNoDragStyle,
                     }}
-                    placeholder={t("home:search")}
-                    onChangeText={setSearchQuery}
-                    value={searchQuery}
-                    loading={false}
-                    iconColor={"#ffffff80"}
-                    placeholderTextColor={"#ffffff80"}
-                    right={() =>
-                      searchQuery ? (
-                        <IconButton
-                          accessibilityLabel={t("common:reset")}
-                          icon="close"
-                          iconColor="#ffffff80"
-                          size={20}
-                          onPress={() => {
-                            setSearchQuery("");
-                            searchRef.current?.focus?.();
-                          }}
-                          style={{
-                            marginVertical: 0,
-                            marginLeft: 0,
-                            marginRight: 1,
-                            ...webNoDragStyle,
-                          }}
-                        />
-                      ) : null
-                    }
-                  />
+                  >
+                    <TextInput
+                      ref={searchRef}
+                      placeholder={t("home:search")}
+                      placeholderTextColor="#ffffff80"
+                      value={searchQuery}
+                      onChangeText={setSearchQuery}
+                      returnKeyType="search"
+                      selectionColor={theme.colors.primary}
+                      style={{
+                        flex: 1,
+                        height: 36,
+                        minHeight: 36,
+                        padding: 0,
+                        paddingHorizontal: 4,
+                        color: "white",
+                        fontSize: 16,
+                        lineHeight: 18,
+                        textAlignVertical: "center",
+                        includeFontPadding: false,
+                        outlineStyle: "none",
+                      } as any}
+                    />
+                    {searchQuery ? (
+                      <IconButton
+                        accessibilityLabel={t("common:reset")}
+                        icon="close"
+                        iconColor="#ffffff80"
+                        size={20}
+                        onPress={() => {
+                          setSearchQuery("");
+                          searchRef.current?.focus?.();
+                        }}
+                        style={{
+                          margin: 0,
+                          width: 34,
+                          height: 34,
+                          ...webNoDragStyle,
+                        }}
+                      />
+                    ) : null}
+                  </View>
                 </Animated.View>
               ) : (
                 <Animated.View
