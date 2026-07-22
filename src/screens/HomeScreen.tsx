@@ -11,6 +11,7 @@ import {
   Platform,
   useWindowDimensions,
   InteractionManager,
+  Keyboard,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -33,6 +34,7 @@ import Animated, {
   FadeOutLeft,
   FadeOutRight,
   Layout,
+  withTiming,
 } from "react-native-reanimated";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -104,6 +106,58 @@ type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 const listContentContainerStyle = { paddingRight: 4 };
 const homeListDrawDistance = Platform.OS === "web" ? 120 : 600;
 const headerSearchTransition = Easing.out(Easing.cubic);
+const compactSearchEnter = () => {
+  "worklet";
+  return {
+    initialValues: {
+      opacity: 0,
+      transform: [{ translateX: 96 }, { scaleX: 0.72 }],
+    },
+    animations: {
+      opacity: withTiming(1, { duration: 190, easing: headerSearchTransition }),
+      transform: [
+        {
+          translateX: withTiming(0, {
+            duration: 190,
+            easing: headerSearchTransition,
+          }),
+        },
+        {
+          scaleX: withTiming(1, {
+            duration: 190,
+            easing: headerSearchTransition,
+          }),
+        },
+      ],
+    },
+  };
+};
+const compactSearchExit = () => {
+  "worklet";
+  return {
+    initialValues: {
+      opacity: 1,
+      transform: [{ translateX: 0 }, { scaleX: 1 }],
+    },
+    animations: {
+      opacity: withTiming(0, { duration: 140, easing: headerSearchTransition }),
+      transform: [
+        {
+          translateX: withTiming(96, {
+            duration: 140,
+            easing: headerSearchTransition,
+          }),
+        },
+        {
+          scaleX: withTiming(0.72, {
+            duration: 140,
+            easing: headerSearchTransition,
+          }),
+        },
+      ],
+    },
+  };
+};
 const webNoDragStyle =
   Platform.OS === "web"
     ? ({
@@ -471,8 +525,25 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     }, []),
   );
 
+  const searchRef = useRef<any>(null);
+  const skipNextSearchBlurCloseRef = useRef(false);
+
+  const closeCompactSearchIfEmpty = useCallback(() => {
+    if (!isCompactHeader) return;
+    if (searchQuery.trim() !== "") return;
+    searchRef.current?.blur?.();
+    Keyboard.dismiss();
+    setSearchHeaderVisible(false);
+  }, [isCompactHeader, searchQuery]);
+
+  const handleHomeContentResponderCapture = useCallback(() => {
+    closeCompactSearchIfEmpty();
+    return false;
+  }, [closeCompactSearchIfEmpty]);
+
   const openEditScreen = useCallback(
     (item: ValuesType) => {
+      closeCompactSearchIfEmpty();
       setHomeContentVisible(false);
       const navigate = () => {
         navigation.navigate("Edit", {
@@ -487,7 +558,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
       navigate();
     },
-    [navigation],
+    [closeCompactSearchIfEmpty, navigation],
   );
 
   const openCardDetailsScreen = useCallback(
@@ -500,6 +571,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       type: HomeStackParamList["CardDetails"]["type"];
       value: string;
     }) => {
+      closeCompactSearchIfEmpty();
       setHomeContentVisible(false);
       const navigate = () => {
         navigation.navigate("CardDetails", {
@@ -519,7 +591,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
       navigate();
     },
-    [navigation],
+    [closeCompactSearchIfEmpty, navigation],
   );
 
   useEffect(() => {
@@ -859,7 +931,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     }
   }, [refreshData]);
 
-  const searchRef = useRef<any>(null);
   const activeListRef = useRef<any>(null);
   const setActiveListRef = React.useCallback((instance: any | null) => {
     activeListRef.current = instance;
@@ -989,15 +1060,40 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   }, []);
 
   const closeHeaderSearch = useCallback(() => {
+    skipNextSearchBlurCloseRef.current = false;
     setSearchHeaderVisible(false);
     setSearchQuery("");
   }, []);
+
+  const handleCompactSearchBlur = useCallback(() => {
+    if (skipNextSearchBlurCloseRef.current) {
+      return;
+    }
+
+    closeCompactSearchIfEmpty();
+  }, [closeCompactSearchIfEmpty]);
 
   useEffect(() => {
     if (Platform.OS !== "web") return;
 
     const handleSearchShortcut = (event: KeyboardEvent) => {
       if (!isFocused) return;
+      if (event.key === "Escape" && isCompactHeader && searchHeaderVisible) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (searchQuery.trim() === "") {
+          setSearchHeaderVisible(false);
+          return;
+        }
+
+        setSearchQuery("");
+        requestAnimationFrame(() => {
+          searchRef.current?.focus?.();
+        });
+        return;
+      }
+
       if (!(event.ctrlKey || event.metaKey)) return;
       if (event.altKey) return;
       if (event.key.toLowerCase() !== "f") return;
@@ -1019,7 +1115,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     return () => {
       document.removeEventListener("keydown", handleSearchShortcut, true);
     };
-  }, [isCompactHeader, isFocused, openHeaderSearch]);
+  }, [
+    isCompactHeader,
+    isFocused,
+    openHeaderSearch,
+    searchHeaderVisible,
+    searchQuery,
+  ]);
 
   function renderFlashList() {
     if (selectedCard && searchQuery === "") {
@@ -1188,17 +1290,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               {isCompactHeader && searchHeaderVisible ? (
                 <Animated.View
                   id="home-compact-search"
-                  entering={FadeInRight.duration(180).easing(
-                    headerSearchTransition,
-                  )}
-                  exiting={FadeOutRight.duration(120).easing(
-                    headerSearchTransition,
-                  )}
+                  entering={compactSearchEnter}
+                  exiting={compactSearchExit}
                   layout={Layout.duration(180).easing(headerSearchTransition)}
                   style={[
                     {
                       flex: 1,
-                      height: 36,
+                      height: 32,
+                      marginLeft: 2,
                       overflow: "hidden",
                       position: "relative",
                       zIndex: 5,
@@ -1208,8 +1307,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 >
                   <View
                     style={{
-                      height: 36,
-                      maxHeight: 36,
+                      height: 32,
+                      maxHeight: 32,
                       flex: 1,
                       borderRadius: 10,
                       backgroundColor: "rgba(217, 217, 217, 0.21)",
@@ -1225,14 +1324,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                       placeholderTextColor="#ffffff80"
                       value={searchQuery}
                       onChangeText={setSearchQuery}
+                      onBlur={handleCompactSearchBlur}
                       returnKeyType="search"
                       selectionColor={theme.colors.primary}
                       style={{
                         flex: 1,
-                        height: 36,
-                        minHeight: 36,
+                        height: 32,
+                        minHeight: 32,
                         padding: 0,
-                        paddingHorizontal: 4,
+                        paddingHorizontal: 8,
                         color: "white",
                         fontSize: 16,
                         lineHeight: 18,
@@ -1253,8 +1353,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                         }}
                         style={{
                           margin: 0,
-                          width: 34,
-                          height: 34,
+                          width: 32,
+                          height: 32,
                           ...webNoDragStyle,
                         }}
                       />
@@ -1367,13 +1467,19 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                   icon={searchHeaderVisible ? "close" : "magnify"}
                   iconColor="white"
                   size={22}
+                  onPressIn={() => {
+                    if (searchHeaderVisible) {
+                      skipNextSearchBlurCloseRef.current = true;
+                    }
+                  }}
                   onPress={
                     searchHeaderVisible ? closeHeaderSearch : openHeaderSearch
                   }
                   style={{
                     margin: 0,
+                    marginRight: 2,
                     width: 36,
-                    height: 36,
+                    height: 32,
                     position: "relative",
                     zIndex: 5,
                     ...webNoDragStyle,
@@ -1390,6 +1496,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             setRefreshing={setRefreshing}
           />
           <View
+            onStartShouldSetResponderCapture={handleHomeContentResponderCapture}
             style={{
               flex: 1,
               width: "100%",
