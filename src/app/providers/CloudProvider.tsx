@@ -103,6 +103,9 @@ export const CloudProvider = ({ children }: Props) => {
       if (parsed && parsed.refreshToken && parsed.provider) {
         setProvider(parsed.provider);
         setRefreshToken(parsed.refreshToken);
+        if (parsed.provider === "localFile") {
+          setAccessToken(parsed.refreshToken);
+        }
       } else {
         setRefreshToken(raw);
       }
@@ -248,6 +251,10 @@ export const CloudProvider = ({ children }: Props) => {
   const ensureFreshAccessToken = useCallback(async (): Promise<
     string | null
   > => {
+    if (provider === "localFile") {
+      return accessToken ?? refreshToken;
+    }
+
     if (!refreshToken || !provider) {
       return accessToken;
     }

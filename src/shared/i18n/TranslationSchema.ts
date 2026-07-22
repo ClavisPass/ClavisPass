@@ -116,6 +116,8 @@ export type TranslationSchema = {
     backupDateLabel: string;
     backupDateUnknown: string;
     backupLoadFailed: string;
+    loadVault: string;
+    localVaultConnected: string;
     enterMasterPassword: string;
     cloudSave: string;
     deviceSave: string;

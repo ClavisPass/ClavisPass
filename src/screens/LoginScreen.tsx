@@ -42,6 +42,7 @@ import {
 import DropboxLoginButton from "../features/sync/components/DropboxLoginButton";
 import GoogleDriveLoginButton from "../features/sync/components/GoogleDriveLoginButton";
 import ClavisPassHubLoginButton from "../features/sync/components/ClavisPassHubLoginButton";
+import LocalFileLoginButton from "../features/sync/components/LocalFileLoginButton";
 import SettingsDivider from "../features/settings/components/SettingsDivider";
 import { useTranslation } from "react-i18next";
 import SettingsItem from "../features/settings/components/SettingsItem";
@@ -207,8 +208,22 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     }
   };
 
+  const localVaultFileName = useMemo(() => {
+    if (provider !== "localFile") return null;
+
+    const path = accessToken ?? "";
+    const normalized = path.replace(/\\/g, "/");
+    return normalized.split("/").filter(Boolean).pop() ?? null;
+  }, [accessToken, provider]);
+
   const renderCloudProviderOptions = () => (
     <>
+      {Platform.OS === "web" ? (
+        <>
+          <LocalFileLoginButton />
+          <SettingsDivider />
+        </>
+      ) : null}
       <DropboxLoginButton />
       <SettingsDivider />
       <GoogleDriveLoginButton />
@@ -234,7 +249,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         ? `Google Drive ${t("common:connected")}`
         : provider === "clavispassHub"
           ? `ClavisPass Hub ${t("common:connected")}`
-          : t("common:notConnected");
+          : provider === "localFile"
+            ? `${localVaultFileName ?? t("login:loadVault")} ${t("common:connected")}`
+            : t("common:notConnected");
 
   const connectedProviderIcon =
     provider === "dropbox"
@@ -242,7 +259,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       : provider === "googleDrive"
         ? "google-drive"
         : provider === "clavispassHub"
-          ? "server-network"
+        ? "server-network"
+        : provider === "localFile"
+          ? "folder"
           : "cloud-off-outline";
 
   return (
@@ -352,7 +371,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 }}
               >
                 <Icon
-                  source="cloud-outline"
+                  source="folder"
                   size={18}
                   color={theme.colors.primary}
                 />

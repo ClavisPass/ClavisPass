@@ -126,7 +126,7 @@ export interface UseOnlineResult {
   /**
    * Effective online status for the app:
    *
-   * - If provider === "device": always true
+   * - If provider === "device" or "localFile": always true
    * - Otherwise: equals isCloudOnline
    */
   isOnline: boolean;
@@ -157,7 +157,8 @@ export const useOnline = (): UseOnlineResult => {
   const { provider } = useToken();
 
   const isCloudOnline = ctx.isCloudOnline;
-  const isOnline = provider === "device" ? true : isCloudOnline;
+  const isOnline =
+    provider === "device" || provider === "localFile" ? true : isCloudOnline;
 
   return { isOnline, isCloudOnline };
 };

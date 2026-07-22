@@ -119,9 +119,11 @@ const de: TranslationSchema = {
     backupDateLabel: "Backup vom:",
     backupDateUnknown: "Datum unbekannt",
     backupLoadFailed: "Sicherung konnte nicht geladen werden.",
+    loadVault: "Vault laden",
+    localVaultConnected: "Vault-Datei verbunden",
     enterMasterPassword:
       "Geben Sie Ihr aktuelles Master-Passwort ein, um es zu ändern.",
-    cloudSave: "Cloud-Speicherung aktivieren",
+    cloudSave: "Speicherort auswählen",
     deviceSave: "Lokale Speicherung aktivieren",
     cloudAuthMissing: "Kein Access Token verfÃ¼gbar.",
     hubConnect: "ClavisPass Hub verbinden",

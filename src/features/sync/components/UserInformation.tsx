@@ -2,13 +2,15 @@ import React, { useState, useEffect, useMemo } from "react";
 import * as WebBrowser from "expo-web-browser";
 import { Icon, IconButton, Text, useTheme } from "react-native-paper";
 import { Skeleton } from "moti/skeleton";
-import { Image, View } from "react-native";
+import { Image, Platform, View } from "react-native";
 import { MotiView } from "moti";
 
 import DropboxLoginButton from "./DropboxLoginButton";
 import GoogleDriveLoginButton from "./GoogleDriveLoginButton";
 import ClavisPassHubLoginButton from "./ClavisPassHubLoginButton";
+import LocalFileLoginButton from "./LocalFileLoginButton";
 import SettingsDivider from "../../settings/components/SettingsDivider";
+import TooltipIconButton from "../../../shared/components/buttons/TooltipIconButton";
 
 import UserInfoType from "../model/UserInfoType";
 import { useToken } from "../../../app/providers/CloudProvider";
@@ -114,6 +116,19 @@ function UserInformation(props: Props) {
     }
   };
 
+  const localVaultFileName = useMemo(() => {
+    if (provider !== "localFile") return null;
+
+    const path = accessToken ?? refreshToken ?? "";
+    const normalized = path.replace(/\\/g, "/");
+    return normalized.split("/").filter(Boolean).pop() ?? null;
+  }, [accessToken, provider, refreshToken]);
+  const localVaultPath = useMemo(() => {
+    if (provider !== "localFile") return null;
+    return accessToken ?? refreshToken ?? null;
+  }, [accessToken, provider, refreshToken]);
+  const isLocalFileProvider = provider === "localFile";
+
   const providerLabel =
     provider === "dropbox"
       ? "Dropbox " + t("common:connected")
@@ -121,6 +136,8 @@ function UserInformation(props: Props) {
       ? "Google Drive " + t("common:connected")
       : provider === "clavispassHub"
       ? "ClavisPass Hub " + t("common:connected")
+      : provider === "localFile"
+      ? t("login:localVaultConnected")
       : t("common:notConnected");
 
   const providerIcon =
@@ -130,6 +147,8 @@ function UserInformation(props: Props) {
       ? "google-drive"
       : provider === "clavispassHub"
       ? "server-network"
+      : provider === "localFile"
+      ? "folder"
       : "cloud-off-outline";
 
   return (
@@ -152,63 +171,116 @@ function UserInformation(props: Props) {
               gap: 12,
             }}
           >
-            {/* Avatar */}
-            {loading || !userInfo ? (
-              <Skeleton
-                show
-                height={48}
-                width={48}
-                radius={999}
-                colorMode={darkmode ? "dark" : "light"}
-              />
-            ) : avatarSource && !avatarLoadFailed ? (
-              <View
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 999,
-                  overflow: "hidden",
-                  backgroundColor: paperTheme.colors.secondaryContainer,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Image
-                  source={avatarSource}
-                  resizeMode="cover"
-                  onError={(error) => {
-                    logger.warn("[UserInformation] Avatar image failed:", {
-                      provider,
-                      avatar: userInfo.avatar,
-                      error: error.nativeEvent,
-                    });
-                    setAvatarLoadFailed(true);
-                  }}
-                  style={{ width: 48, height: 48 }}
-                />
-              </View>
-            ) : (
-              <View
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 999,
-                  backgroundColor: paperTheme.colors.secondaryContainer,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Icon
-                  source="account"
-                  size={25}
-                  color={paperTheme.colors.primary}
-                />
-              </View>
-            )}
+            {!isLocalFileProvider ? (
+              <>
+                {/* Avatar */}
+                {loading || !userInfo ? (
+                  <Skeleton
+                    show
+                    height={48}
+                    width={48}
+                    radius={999}
+                    colorMode={darkmode ? "dark" : "light"}
+                  />
+                ) : avatarSource && !avatarLoadFailed ? (
+                  <View
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 999,
+                      overflow: "hidden",
+                      backgroundColor: paperTheme.colors.secondaryContainer,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Image
+                      source={avatarSource}
+                      resizeMode="cover"
+                      onError={(error) => {
+                        logger.warn("[UserInformation] Avatar image failed:", {
+                          provider,
+                          avatar: userInfo.avatar,
+                          error: error.nativeEvent,
+                        });
+                        setAvatarLoadFailed(true);
+                      }}
+                      style={{ width: 48, height: 48 }}
+                    />
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 999,
+                      backgroundColor: paperTheme.colors.secondaryContainer,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Icon
+                      source="account"
+                      size={25}
+                      color={paperTheme.colors.primary}
+                    />
+                  </View>
+                )}
+              </>
+            ) : null}
 
             {/* Name + Provider */}
             <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
-              {loading || !userInfo ? (
+              {isLocalFileProvider ? (
+                <>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 2,
+                      minWidth: 0,
+                    }}
+                  >
+                    <Text
+                      variant="titleMedium"
+                      numberOfLines={1}
+                      style={{ flexShrink: 1 }}
+                    >
+                      {localVaultFileName ?? t("login:loadVault")}
+                    </Text>
+                    {localVaultPath ? (
+                      <TooltipIconButton
+                        tooltip={localVaultPath}
+                        icon="information-outline"
+                        iconColor={paperTheme.colors.primary}
+                        size={16}
+                        style={{ margin: 0, width: 28, height: 28 }}
+                      />
+                    ) : null}
+                  </View>
+
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 6,
+                    }}
+                  >
+                    <Icon
+                      source={providerIcon}
+                      size={18}
+                      color={paperTheme.colors.primary}
+                    />
+                    <Text
+                      variant="bodySmall"
+                      style={{ color: paperTheme.colors.onSurfaceVariant }}
+                      numberOfLines={1}
+                    >
+                      {providerLabel}
+                    </Text>
+                  </View>
+                </>
+              ) : loading || !userInfo ? (
                 <>
                   <Skeleton
                     show
@@ -268,7 +340,7 @@ function UserInformation(props: Props) {
               iconColor={paperTheme.colors.primary}
               mode="contained-tonal"
               onPress={handleLogout}
-              disabled={loading}
+              disabled={loading && !isLocalFileProvider}
               accessibilityLabel="Logout"
             />
           </View>
@@ -279,6 +351,12 @@ function UserInformation(props: Props) {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: "timing", duration: 220 }}
         >
+          {Platform.OS === "web" ? (
+            <>
+              <LocalFileLoginButton />
+              <SettingsDivider />
+            </>
+          ) : null}
           <DropboxLoginButton />
           <SettingsDivider />
           <GoogleDriveLoginButton />

@@ -2,7 +2,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import * as Localization from "expo-localization";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ScrollView, View, useColorScheme } from "react-native";
+import { Platform, ScrollView, View, useColorScheme } from "react-native";
 import { Button, Text } from "react-native-paper";
 
 import { LoginStackParamList } from "../../../app/navigation/model/types";
@@ -16,6 +16,7 @@ import SettingsItem from "../../settings/components/SettingsItem";
 import ClavisPassHubLoginButton from "../../sync/components/ClavisPassHubLoginButton";
 import DropboxLoginButton from "../../sync/components/DropboxLoginButton";
 import GoogleDriveLoginButton from "../../sync/components/GoogleDriveLoginButton";
+import LocalFileLoginButton from "../../sync/components/LocalFileLoginButton";
 
 type Props = {
   onFinish?: () => void;
@@ -139,6 +140,12 @@ const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
     <View style={{ width: "100%", gap: 8 }}>
       <View style={{ marginTop: 8, width: "100%" }}>
         <SettingsDivider />
+        {Platform.OS === "web" ? (
+          <>
+            <LocalFileLoginButton />
+            <SettingsDivider />
+          </>
+        ) : null}
         <View style={{ opacity: isOnline ? 1 : 0.5 }}>
           <DropboxLoginButton />
           <SettingsDivider />
