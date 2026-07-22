@@ -6,6 +6,7 @@ import type { RenderItemParams } from "react-native-draggable-flatlist";
 import { Icon, IconButton, Text } from "react-native-paper";
 import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
+import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import { useTranslation } from "react-i18next";
 
 import { useTheme } from "../app/providers/ThemeProvider";
@@ -316,6 +317,7 @@ export default function ModuleReorderScreen({
 
   return (
     <AnimatedContainer style={globalStyles.container}>
+      <FocusAwareStatusBar animated={true} style="light" translucent={true} />
       <LinearGradient
         colors={getColors()}
         dither

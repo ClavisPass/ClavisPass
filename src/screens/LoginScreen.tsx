@@ -14,7 +14,7 @@ import {
   Platform,
 } from "react-native";
 import Animated, { Easing, FadeIn, FadeOut } from "react-native-reanimated";
-import { StatusBar } from "expo-status-bar";
+import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import { BlurView } from "expo-blur";
 
 import { Icon, Text } from "react-native-paper";
@@ -277,7 +277,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             opacity: backgroundReady ? 1 : 0,
           }}
         >
-          <StatusBar
+          <FocusAwareStatusBar
             animated={true}
             style={headerWhite ? "light" : darkmode ? "light" : "dark"}
             translucent={true}

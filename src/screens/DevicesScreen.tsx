@@ -8,7 +8,7 @@ import {
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Chip, Divider, Text, Icon } from "react-native-paper";
-import { StatusBar } from "expo-status-bar";
+import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 
@@ -358,7 +358,7 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
 
   return (
     <AnimatedContainer style={globalStyles.container}>
-      <StatusBar
+      <FocusAwareStatusBar
         animated
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
         translucent

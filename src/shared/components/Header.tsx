@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import Constants from "expo-constants";
-import { StatusBar } from "expo-status-bar";
+import FocusAwareStatusBar from "./FocusAwareStatusBar";
 import { useTheme } from "../../app/providers/ThemeProvider";
 
 type Props = {
@@ -55,7 +55,11 @@ function Header(props: Props) {
           paddingTop: Constants.statusBarHeight,
         }}
       >
-        <StatusBar animated={true} style="dark" translucent={true} />
+        <FocusAwareStatusBar
+          animated={true}
+          style={darkmode ? "light" : "dark"}
+          translucent={true}
+        />
         <View
           style={{
             display: "flex",

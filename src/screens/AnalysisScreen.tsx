@@ -15,7 +15,7 @@ import {
   ViewStyle,
   useWindowDimensions,
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
+import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -737,7 +737,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
 
   return (
     <AnimatedContainer>
-      <StatusBar
+      <FocusAwareStatusBar
         animated
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
         translucent

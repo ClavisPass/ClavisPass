@@ -23,7 +23,7 @@ import FolderSelectModal from "../features/vault/components/modals/FolderSelectM
 import { useTheme } from "../app/providers/ThemeProvider";
 import DiscardChangesModal from "../features/vault/components/modals/DiscardChangesModal";
 import { useFocusEffect } from "@react-navigation/native";
-import { StatusBar } from "expo-status-bar";
+import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import Constants from "expo-constants";
 import ContainerButton from "../shared/components/buttons/ContainerButton";
 import SquaredContainerButton from "../shared/components/buttons/SquaredContainerButton";
@@ -598,7 +598,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   return (
     <AnimatedContainer style={globalStyles.container}>
-      <StatusBar
+      <FocusAwareStatusBar
         animated={true}
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
         translucent={true}

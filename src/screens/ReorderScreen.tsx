@@ -7,6 +7,7 @@ import { Icon, IconButton, Text } from "react-native-paper";
 import Constants from "expo-constants";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
+import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 
 import { useTheme } from "../app/providers/ThemeProvider";
 import { useVault } from "../app/providers/VaultProvider";
@@ -251,6 +252,7 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
 
   return (
     <AnimatedContainer style={globalStyles.container}>
+      <FocusAwareStatusBar animated={true} style="light" translucent={true} />
       <LinearGradient
         colors={getColors()}
         dither

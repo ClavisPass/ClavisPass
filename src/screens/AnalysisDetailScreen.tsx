@@ -5,7 +5,7 @@ import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { useNavigation, CommonActions } from "@react-navigation/native";
 
 import { ScrollView, View, StyleSheet } from "react-native";
-import { StatusBar } from "expo-status-bar";
+import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import {
   ActivityIndicator,
   Button,
@@ -546,7 +546,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
 
   return (
     <AnimatedContainer style={globalStyles.container}>
-      <StatusBar animated style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent />
+      <FocusAwareStatusBar animated style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent />
 
       <Header
         onPress={() => navigation.goBack()}

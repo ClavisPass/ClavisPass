@@ -39,7 +39,7 @@ import Animated, {
 
 import { LinearGradient } from "expo-linear-gradient";
 import ListItem from "../features/vault/components/items/ListItem";
-import { StatusBar } from "expo-status-bar";
+import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import Constants from "expo-constants";
 import getColors from "../shared/ui/linearGradient";
 import HomeFilterMenu from "../features/vault/components/menus/HomeFilterMenu";
@@ -247,9 +247,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const triggerAdd = route.params?.triggerAdd ?? false;
 
   const {
-    headerWhite,
     setHeaderWhite,
-    darkmode,
     setHeaderSpacing,
     setTitlebarCenterGap,
     setTitlebarOverlayDragEnabled,
@@ -1286,9 +1284,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     <AnimatedContainer style={{ display: "flex", justifyContent: "center" }}>
       <BottomSheetModalProvider>
         <View style={{ flex: 1 }}>
-          <StatusBar
+          <FocusAwareStatusBar
             animated={true}
-            style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+            style="light"
             translucent={true}
           />
           <LinearGradient

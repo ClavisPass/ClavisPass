@@ -5,7 +5,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
+import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import * as Updates from "expo-updates";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
@@ -554,7 +554,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   return (
     <AnimatedContainer>
       <BottomSheetModalProvider>
-        <StatusBar
+        <FocusAwareStatusBar
           animated={true}
           style={headerWhite ? "light" : darkmode ? "light" : "dark"}
           translucent={true}

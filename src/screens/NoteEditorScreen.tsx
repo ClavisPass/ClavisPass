@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { StyleSheet, View, useWindowDimensions } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
-import { StatusBar } from "expo-status-bar";
+import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import { Button, Chip, IconButton, Text } from "react-native-paper";
 import Animated, {
   FadeIn,
@@ -290,7 +290,7 @@ const NoteEditorScreen: React.FC<NoteEditorScreenProps> = ({
 
   return (
     <AnimatedContainer style={globalStyles.container}>
-      <StatusBar
+      <FocusAwareStatusBar
         animated={true}
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
         translucent={true}

@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import { StatusBar } from "expo-status-bar";
+import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import { useFocusEffect } from "@react-navigation/native";
 import { Button, Icon, IconButton, Text } from "react-native-paper";
@@ -143,7 +143,7 @@ const TotpScanScreen: React.FC<TotpScanScreenProps> = ({
 
   return (
     <AnimatedContainer style={globalStyles.container}>
-      <StatusBar
+      <FocusAwareStatusBar
         animated
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
         translucent

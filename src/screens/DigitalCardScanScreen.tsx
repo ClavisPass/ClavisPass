@@ -7,7 +7,7 @@ import { useTheme } from "../app/providers/ThemeProvider";
 import { Button, Icon, IconButton, Text } from "react-native-paper";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import { useFocusEffect } from "@react-navigation/native";
-import { StatusBar } from "expo-status-bar";
+import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import DigitalCardType from "../features/vault/model/DigitalCardType";
 import { logger } from "../infrastructure/logging/logger";
 import { HomeStackParamList } from "../app/navigation/model/types";
@@ -129,7 +129,7 @@ const DigitalCardScanScreen: React.FC<DigitalCardScanScreenProps> = ({
 
   return (
     <AnimatedContainer style={globalStyles.container}>
-      <StatusBar
+      <FocusAwareStatusBar
         animated={true}
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
         translucent={true}

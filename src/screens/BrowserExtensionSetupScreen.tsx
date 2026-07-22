@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import { Chip, Icon, Text } from "react-native-paper";
-import { StatusBar } from "expo-status-bar";
+import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import { useTranslation } from "react-i18next";
 import * as Linking from "expo-linking";
 
@@ -123,7 +123,7 @@ const BrowserExtensionSetupScreen: React.FC<
 
   return (
     <AnimatedContainer style={globalStyles.container}>
-      <StatusBar
+      <FocusAwareStatusBar
         animated
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
         translucent

@@ -4,7 +4,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Chip, Divider, Icon, Text } from "react-native-paper";
-import { StatusBar } from "expo-status-bar";
+import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import { useTranslation } from "react-i18next";
 
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
@@ -328,7 +328,7 @@ const BrowserExtensionsScreen: React.FC<BrowserExtensionsScreenProps> = ({
 
   return (
     <AnimatedContainer style={globalStyles.container}>
-      <StatusBar
+      <FocusAwareStatusBar
         animated
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
         translucent

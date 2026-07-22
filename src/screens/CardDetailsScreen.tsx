@@ -6,7 +6,7 @@ import Header from "../shared/components/Header";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import { useTheme } from "../app/providers/ThemeProvider";
 import { useFocusEffect } from "@react-navigation/native";
-import { StatusBar } from "expo-status-bar";
+import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import QRCode from "react-qr-code";
 import Barcode from "@kichiyaki/react-native-barcode-generator";
 import { HomeStackParamList } from "../app/navigation/model/types";
@@ -94,7 +94,7 @@ const CardDetailsScreen: React.FC<CardDetailsScreenProps> = ({
 
   return (
     <AnimatedContainer style={globalStyles.container}>
-      <StatusBar
+      <FocusAwareStatusBar
         animated={true}
         style={headerWhite ? "light" : darkmode ? "light" : "dark"}
         translucent={true}
