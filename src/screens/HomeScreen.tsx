@@ -349,17 +349,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       return;
     }
 
-    setTitlebarCenterGap(!isCompactHeader ? wideSearchWidth : 0);
-    setTitlebarOverlayDragEnabled(!isCompactHeader);
+    setTitlebarCenterGap(0);
+    setTitlebarOverlayDragEnabled(false);
     return () => {
       setTitlebarCenterGap(0);
     };
   }, [
-    isCompactHeader,
     isFocused,
     setTitlebarCenterGap,
     setTitlebarOverlayDragEnabled,
-    wideSearchWidth,
   ]);
 
   useEffect(() => {
@@ -401,18 +399,24 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   useEffect(() => {
     if (Platform.OS !== "web") return;
 
-    const compactDragRegion = document.getElementById(
+    const brandDragRegion = document.getElementById(
       "home-header-brand-drag-region",
     );
-    if (!compactDragRegion) return;
+    const rightDragRegion = document.getElementById(
+      "home-header-right-drag-region",
+    );
 
-    if (!searchHeaderVisible) {
-      compactDragRegion.setAttribute("data-tauri-drag-region", "");
+    rightDragRegion?.setAttribute("data-tauri-drag-region", "");
+
+    if (!brandDragRegion) return;
+
+    if (searchHeaderVisible) {
+      brandDragRegion.removeAttribute("data-tauri-drag-region");
       return;
     }
 
-    compactDragRegion.removeAttribute("data-tauri-drag-region");
-  }, [isCompactHeader, searchHeaderVisible]);
+    brandDragRegion.setAttribute("data-tauri-drag-region", "");
+  }, [searchHeaderVisible]);
 
   const toggleModuleFilter = useCallback(
     (module: ModulesEnum) => {
@@ -527,14 +531,23 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   const searchRef = useRef<any>(null);
   const skipNextSearchBlurCloseRef = useRef(false);
+  const suppressNextCompactSearchOpenRef = useRef(false);
 
   const closeCompactSearchIfEmpty = useCallback(() => {
     if (!isCompactHeader) return;
     if (searchQuery.trim() !== "") return;
+
+    if (Platform.OS === "web" && searchHeaderVisible) {
+      suppressNextCompactSearchOpenRef.current = true;
+      window.setTimeout(() => {
+        suppressNextCompactSearchOpenRef.current = false;
+      }, 250);
+    }
+
     searchRef.current?.blur?.();
     Keyboard.dismiss();
     setSearchHeaderVisible(false);
-  }, [isCompactHeader, searchQuery]);
+  }, [isCompactHeader, searchHeaderVisible, searchQuery]);
 
   const handleHomeContentResponderCapture = useCallback(() => {
     closeCompactSearchIfEmpty();
@@ -1053,6 +1066,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   );
 
   const openHeaderSearch = useCallback(() => {
+    if (suppressNextCompactSearchOpenRef.current) {
+      suppressNextCompactSearchOpenRef.current = false;
+      return;
+    }
+
     setSearchHeaderVisible(true);
     requestAnimationFrame(() => {
       searchRef.current?.focus?.();
@@ -1072,6 +1090,25 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
     closeCompactSearchIfEmpty();
   }, [closeCompactSearchIfEmpty]);
+
+  const compactSearchHasQuery = searchQuery.trim() !== "";
+  const compactSearchButtonPress = searchHeaderVisible
+    ? Platform.OS === "web" && !compactSearchHasQuery
+      ? undefined
+      : closeHeaderSearch
+    : openHeaderSearch;
+
+  const compactSearchButtonWebProps =
+    Platform.OS === "web" && searchHeaderVisible && compactSearchHasQuery
+      ? ({
+          onMouseDown: (event: any) => {
+            event.preventDefault?.();
+            event.stopPropagation?.();
+            skipNextSearchBlurCloseRef.current = true;
+            closeHeaderSearch();
+          },
+        } as any)
+      : null;
 
   useEffect(() => {
     if (Platform.OS !== "web") return;
@@ -1467,14 +1504,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                   icon={searchHeaderVisible ? "close" : "magnify"}
                   iconColor="white"
                   size={22}
+                  {...compactSearchButtonWebProps}
                   onPressIn={() => {
+                    if (Platform.OS === "web") return;
                     if (searchHeaderVisible) {
                       skipNextSearchBlurCloseRef.current = true;
                     }
                   }}
-                  onPress={
-                    searchHeaderVisible ? closeHeaderSearch : openHeaderSearch
-                  }
+                  onPress={compactSearchButtonPress}
                   style={{
                     margin: 0,
                     marginRight: 2,
@@ -1486,7 +1523,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                   }}
                 />
               ) : (
-                <View style={{ flex: 1 }} />
+                <View
+                  id="home-header-right-drag-region"
+                  style={[
+                    {
+                      flex: 1,
+                      alignSelf: "stretch",
+                      minHeight: 34,
+                    },
+                    webDragStyle,
+                  ]}
+                />
               )}
             </Animated.View>
           </LinearGradient>
