@@ -2,6 +2,9 @@ import { ReactNode } from "react";
 import ModulesEnum from "../model/ModulesEnum";
 import { ModuleType } from "../model/ModulesType";
 
+import AttachmentModuleType from "../model/modules/AttachmentModuleType";
+import AttachmentModule from "../components/modules/AttachmentModule";
+
 import CustomFieldModuleType from "../model/modules/CustomFieldModuleType";
 import CustomFieldModule from "../components/modules/CustomFieldModule";
 
@@ -71,6 +74,21 @@ type GetModuleArgs = {
 type Renderer = (module: ModuleType, args: GetModuleArgs) => ReactNode;
 
 const MODULE_RENDERERS = {
+  [ModulesEnum.ATTACHMENT]: (module, args) => {
+    const m = module as AttachmentModuleType;
+    return (
+      <AttachmentModule
+        id={m.id}
+        module={m.module}
+        files={m.files}
+        onDragStart={args.onDragStart}
+        deleteModule={args.deleteModule}
+        changeModule={args.changeModule}
+        fastAccess={args.fastAccess}
+      />
+    );
+  },
+
   [ModulesEnum.CUSTOM_FIELD]: (module, args) => {
     const m = module as CustomFieldModuleType;
     return (

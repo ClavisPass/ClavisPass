@@ -1,4 +1,5 @@
 enum ModulesEnum {
+  ATTACHMENT = "ATTACHMENT",
   CUSTOM_FIELD = "CUSTOM_FIELD",
   E_MAIL = "E_MAIL",
   KEY = "KEY",

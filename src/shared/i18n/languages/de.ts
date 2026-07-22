@@ -533,6 +533,19 @@ const de: TranslationSchema = {
     20: "Hey",
   },
   modules: {
+    attachment: "Anhänge",
+    attachmentAdd: "Datei hinzufügen",
+    attachmentEmpty: "Noch keine Dateien angehängt.",
+    attachmentHelp:
+      "Anhänge werden im Vault gespeichert und synchronisiert. Limit: {{fileLimit}} pro Datei, {{entryLimit}} pro Eintrag.",
+    attachmentSave: "Datei speichern",
+    attachmentRemove: "Datei entfernen",
+    attachmentReadFailed: "Datei konnte nicht gelesen werden.",
+    attachmentSaveFailed: "Datei konnte nicht gespeichert werden.",
+    attachmentFileTooLarge: "Diese Datei ist größer als {{limit}}.",
+    attachmentEntryTooLarge:
+      "Die Anhänge dieses Eintrags dürfen zusammen maximal {{limit}} groß sein.",
+    attachmentTooMany: "Maximal {{count}} Dateien pro Anhang-Modul.",
     customField: "Benutzerdefiniert",
     customFieldTitle: "Titel",
     customFieldType: "Typ",

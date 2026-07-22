@@ -62,6 +62,17 @@ function firstValue(entry: ValuesType, moduleName: ModulesEnum): string | null {
 }
 
 export const MODULE_POLICY: Record<ManagedModules, ModulePolicy> = {
+  [ModulesEnum.ATTACHMENT]: {
+    kind: "structured",
+    getSecret: (entry) =>
+      entry.modules
+        .filter((m) => (m as any).module === ModulesEnum.ATTACHMENT)
+        .map((m) => ({
+          id: (m as any).id,
+          files: (m as any).files ?? [],
+        })),
+  },
+
   [ModulesEnum.USERNAME]: { kind: "meta", metaKey: "username" },
   [ModulesEnum.E_MAIL]: { kind: "meta", metaKey: "email" },
   [ModulesEnum.URL]: { kind: "meta", metaKey: "url" },

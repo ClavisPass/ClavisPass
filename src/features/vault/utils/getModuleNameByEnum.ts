@@ -6,6 +6,8 @@ function assertNever(x: never): never {
 
 const getModuleNameByEnum = (moduleEnum: ModulesEnum, t: any): string => {
   switch (moduleEnum) {
+    case ModulesEnum.ATTACHMENT:
+      return t("modules:attachment");
     case ModulesEnum.CUSTOM_FIELD:
       return t("modules:customField");
     case ModulesEnum.E_MAIL:

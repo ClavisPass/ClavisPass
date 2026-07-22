@@ -525,6 +525,19 @@ const en: TranslationSchema = {
     20: "Yo chief",
   },
   modules: {
+    attachment: "Attachments",
+    attachmentAdd: "Add file",
+    attachmentEmpty: "No files attached yet.",
+    attachmentHelp:
+      "Attachments are stored in the vault and synced. Limit: {{fileLimit}} per file, {{entryLimit}} per entry.",
+    attachmentSave: "Save file",
+    attachmentRemove: "Remove file",
+    attachmentReadFailed: "Could not read file.",
+    attachmentSaveFailed: "Could not save file.",
+    attachmentFileTooLarge: "This file is larger than {{limit}}.",
+    attachmentEntryTooLarge:
+      "This entry's attachments may be {{limit}} in total.",
+    attachmentTooMany: "Maximum {{count}} files per attachment module.",
     customField: "Custom Field",
     customFieldTitle: "Title",
     customFieldType: "Type",

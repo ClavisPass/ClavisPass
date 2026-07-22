@@ -12,11 +12,11 @@ This note captures the agreed direction for future KeePass/KDBX work. The goal i
 
 ## Implementation Order
 
-1. Add `tags?: string[]` to entries.
+1. [x] Add `tags?: string[]` to entries.
    - Tags should live on `ValuesType`, not as a module.
    - Reason: Tags are searchable/filterable metadata like folder, favorite, and pin state.
 
-2. Add an `ATTACHMENT` module.
+2. [x] Add an `ATTACHMENT` module.
    - Suggested shape:
      ```ts
      {
@@ -36,7 +36,7 @@ This note captures the agreed direction for future KeePass/KDBX work. The goal i
    - Keep practical limits conservative, e.g. 10-25 MB per file at first.
    - Warn users that attachments increase vault size, memory use, and sync cost.
 
-3. Extend custom fields.
+3. [ ] Extend custom fields.
    - Existing `CUSTOM_FIELD` already maps well to KeePass custom string fields.
    - Add:
      ```ts
@@ -45,7 +45,7 @@ This note captures the agreed direction for future KeePass/KDBX work. The goal i
      ```
    - `protected` matters for KeePass fields that are secret but are not the standard password field.
 
-4. Add KeePass compatibility metadata.
+4. [ ] Add KeePass compatibility metadata.
    - Suggested hidden entry metadata:
      ```ts
      externalRefs?: {
@@ -59,7 +59,7 @@ This note captures the agreed direction for future KeePass/KDBX work. The goal i
    - Keep this out of visible modules.
    - Purpose: preserve IDs/group/icon references for later export or better round-tripping.
 
-5. Decide how to normalize expiry and access timestamps.
+5. [ ] Decide how to normalize expiry and access timestamps.
    - ClavisPass already has `created`, `lastUpdated`, and an `EXPIRY` module.
    - KeePass has several time fields such as creation, modification, last access, and expiry.
    - Consider entry-level metadata:
@@ -69,7 +69,7 @@ This note captures the agreed direction for future KeePass/KDBX work. The goal i
      ```
    - The existing `EXPIRY` module can remain the user-facing UI feature if that still fits best.
 
-6. Build KDBX import.
+6. [ ] Build KDBX import.
    - Map KeePass standard fields to existing ClavisPass modules:
      - Title -> entry title
      - UserName -> `USERNAME`
@@ -82,12 +82,12 @@ This note captures the agreed direction for future KeePass/KDBX work. The goal i
    - Map tags and attachments once the model supports them.
    - Warn or report unsupported data instead of silently dropping it.
 
-7. Add KDBX export.
+7. [ ] Add KDBX export.
    - Export only after import mapping and compatibility metadata are stable.
    - Preserve KeePass UUIDs and group paths when available.
    - Be careful with custom fields, protected fields, tags, expiry, and attachments.
 
-8. Consider additional compatibility features later.
+8. [ ] Consider additional compatibility features later.
    - Auto-Type module:
      ```ts
      {

@@ -476,6 +476,17 @@ export type TranslationSchema = {
     20: string;
   };
   modules: {
+    attachment: string;
+    attachmentAdd: string;
+    attachmentEmpty: string;
+    attachmentHelp: string;
+    attachmentSave: string;
+    attachmentRemove: string;
+    attachmentReadFailed: string;
+    attachmentSaveFailed: string;
+    attachmentFileTooLarge: string;
+    attachmentEntryTooLarge: string;
+    attachmentTooMany: string;
     customField: string;
     customFieldTitle: string;
     customFieldType: string;

@@ -267,6 +267,13 @@ export default function AddModuleModalCompactFav(props: Props) {
       keywords: ["2fa", "otp", "totp", "mfa", "recovery", "codes"],
     },
     {
+      id: ModulesEnum.ATTACHMENT,
+      label: t("modules:attachment"),
+      icon: MODULE_ICON[ModulesEnum.ATTACHMENT],
+      category: "Utility",
+      keywords: ["file", "datei", "anhang", "attachment", "document"],
+    },
+    {
       id: ModulesEnum.NOTE,
       label: t("modules:note"),
       icon: MODULE_ICON[ModulesEnum.NOTE],

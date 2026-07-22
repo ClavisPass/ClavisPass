@@ -1,6 +1,7 @@
 import { z } from "zod";
 import ModulesEnum from "../model/ModulesEnum";
 
+import { AttachmentModuleTypeSchema } from "./modules/AttachmentModuleType";
 import { CustomFieldModuleTypeSchema } from "./modules/CustomFieldModuleType";
 import { EmnailModuleTypeSchema } from "./modules/EmailModuleType";
 import { KeyModuleTypeSchema } from "./modules/KeyModuleType";
@@ -20,6 +21,7 @@ import { ExpiryModuleTypeSchema } from "./modules/ExpiryModuleType";
 import { RecoveryCodesModuleTypeSchema } from "./modules/RecoveryCodesModuleType";
 
 const MODULE_SCHEMA_BY_ENUM = {
+  [ModulesEnum.ATTACHMENT]: AttachmentModuleTypeSchema,
   [ModulesEnum.CUSTOM_FIELD]: CustomFieldModuleTypeSchema,
   [ModulesEnum.E_MAIL]: EmnailModuleTypeSchema,
   [ModulesEnum.KEY]: KeyModuleTypeSchema,

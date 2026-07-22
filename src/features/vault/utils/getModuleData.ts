@@ -1,5 +1,6 @@
 import ModulesEnum from "../model/ModulesEnum";
 import { ModuleType } from "../model/ModulesType";
+import AttachmentModuleType from "../model/modules/AttachmentModuleType";
 import CustomFieldModuleType from "../model/modules/CustomFieldModuleType";
 import DigitalCardModuleType from "../model/modules/DigitalCardModuleType";
 import EmailModuleType from "../model/modules/EmailModuleType";
@@ -23,6 +24,13 @@ type AddableModules = Exclude<ModulesEnum, ModulesEnum.UNKNOWN>;
 type ModuleFactory = (id: string) => ModuleType;
 
 const MODULE_DEFAULTS = {
+  [ModulesEnum.ATTACHMENT]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.ATTACHMENT,
+      files: [],
+    }) satisfies AttachmentModuleType,
+
   [ModulesEnum.CUSTOM_FIELD]: (id: string): ModuleType =>
     ({
       id,

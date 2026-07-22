@@ -28,6 +28,7 @@ export const FILTERABLE_MODULES: ModulesEnum[] = [
   ModulesEnum.NOTE,
   ModulesEnum.TASK,
   ModulesEnum.EXPIRY,
+  ModulesEnum.ATTACHMENT,
   ModulesEnum.PIN,
   ModulesEnum.KEY,
   ModulesEnum.WIFI,

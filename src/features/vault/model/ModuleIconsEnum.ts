@@ -3,6 +3,7 @@ import ModulesEnum from "./ModulesEnum";
 export type IconName = string;
 
 export const MODULE_ICON = {
+  [ModulesEnum.ATTACHMENT]: "paperclip",
   [ModulesEnum.CUSTOM_FIELD]: "card-text",
   [ModulesEnum.E_MAIL]: "email",
   [ModulesEnum.KEY]: "key-variant",
