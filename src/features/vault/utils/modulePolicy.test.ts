@@ -36,6 +36,8 @@ describe("modulePolicy", () => {
       lastUpdated: "2026-05-21T10:05:00.000Z",
       folderId: "folder-1",
       username: "alice",
+      tags: [],
+      externalRefs: undefined,
     });
   });
 

@@ -1,3 +1,5 @@
+import React from "react";
+
 export const DefaultTheme = {
   dark: false,
   colors: {
@@ -19,6 +21,10 @@ export function useFocusEffect(callback: () => void | (() => void)) {
   React.useEffect(() => callback(), [callback]);
 }
 
+export function useIsFocused() {
+  return true;
+}
+
 export function useScrollToTop() {}
 
 export function useNavigation() {
@@ -32,4 +38,3 @@ export function useNavigation() {
 export function useRoute() {
   return { params: {} };
 }
-import React from "react";
