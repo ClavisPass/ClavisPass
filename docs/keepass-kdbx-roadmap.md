@@ -73,7 +73,7 @@ This note captures the agreed direction for future KeePass/KDBX work. The goal i
    - Do not add entry-level `expiresAt` for now; the existing `EXPIRY` module stays the single user-facing source for expiry.
    - If KDBX export requires last access values later, write a neutral/default value and mention the limitation in import/export notes.
 
-6. [ ] Build KDBX import.
+6. [x] Build initial KDBX import.
    - Map KeePass standard fields to existing ClavisPass modules:
      - Title -> entry title
      - UserName -> `USERNAME`
@@ -85,6 +85,8 @@ This note captures the agreed direction for future KeePass/KDBX work. The goal i
    - Map TOTP when recognized.
    - Map tags and attachments once the model supports them.
    - Warn or report unsupported data instead of silently dropping it.
+   - Initial implementation uses `kdbxweb`, keeps parsing separate from `mapKdbxToClavisPass`, and imports entries, folders, tags, standard fields, custom fields, TOTP fields when recognized, expiry, attachments, and KeePass compatibility metadata.
+   - Unsupported data such as entry history, auto-type, override URL, and custom icons is not user-visible yet and can be added to an import summary later.
 
 7. [ ] Add KDBX export.
    - Export only after import mapping and compatibility metadata are stable.

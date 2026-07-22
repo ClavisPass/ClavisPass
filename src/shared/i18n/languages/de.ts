@@ -230,6 +230,12 @@ const de: TranslationSchema = {
     importBackup: "Importieren",
     exportBackup: "Exportieren",
     importPasswords: "{{title}} Passwörter",
+    keepassMasterPassword: "Master-Passwort der KeePass-Datei",
+    keepassPasswordTitle: "KeePass-Vault öffnen",
+    keepassPasswordText:
+      "Gib das Master-Passwort deiner KeePass-Datei ein, damit ClavisPass den Vault einmalig öffnen und importieren kann.",
+    keepassImportAction: "Importieren",
+    pcloudMasterPassword: "Master-Passwort von pCloud",
     cryptography: "Kryptografie",
     website: "Webseite",
     hours: "{{count}} Stunden",

@@ -87,6 +87,7 @@
     "expo-updates": "~29.0.16",
     "expo-web-browser": "~15.0.10",
     "i18next": "^25.6.0",
+    "kdbxweb": "^2.1.1",
     "libphonenumber-js": "^1.12.17",
     "libsodium-wrappers-sumo": "^0.8.2",
     "monaco-editor": "^0.55.1",

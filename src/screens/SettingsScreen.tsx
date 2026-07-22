@@ -927,6 +927,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               title={t("settings:import")}
             >
               <Import
+                type={DocumentTypeEnum.KDBX}
+                title={"KeePass"}
+                icon={"key-chain"}
+              />
+              <SettingsDivider />
+              <Import
                 type={DocumentTypeEnum.FIREFOX}
                 title={"Firefox"}
                 icon={"firefox"}

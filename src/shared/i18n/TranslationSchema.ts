@@ -221,6 +221,11 @@ export type TranslationSchema = {
     importBackup: string;
     exportBackup: string;
     importPasswords: string;
+    keepassMasterPassword: string;
+    keepassPasswordTitle: string;
+    keepassPasswordText: string;
+    keepassImportAction: string;
+    pcloudMasterPassword: string;
     cryptography: string;
     website: string;
     hours: string;
