@@ -106,6 +106,8 @@ When adding or changing a vault module:
 
 If `MODULE_POLICY` is missed, you can create silent security or UX regressions.
 
+For planned KeePass/KDBX compatibility work, including tags, attachments, custom field metadata, and import/export order, see [docs/keepass-kdbx-roadmap.md](/e:/Projects/ClavisPass/docs/keepass-kdbx-roadmap.md).
+
 ## Crypto State Of The Repo
 
 The active vault encryption path is now the V1 format.

@@ -34,6 +34,14 @@ import {
 } from "../../utils/digitalCardTheme";
 
 const failedFaviconUrls = new Set<string>();
+const nonSelectableImageStyle =
+  Platform.OS === "web"
+    ? ({
+        userSelect: "none",
+        WebkitUserSelect: "none",
+        WebkitUserDrag: "none",
+      } as any)
+    : null;
 
 const styles = StyleSheet.create({
   container: {
@@ -426,7 +434,10 @@ function ListItem(props: Props) {
     <View style={styles.menuPreview}>
       {showFavicon ? (
         <Image
-          style={{ width: 28, height: 28, borderRadius: 8 }}
+          style={[
+            { width: 28, height: 28, borderRadius: 8 },
+            nonSelectableImageStyle,
+          ]}
           source={url}
           contentFit="cover"
           transition={250}
@@ -760,13 +771,15 @@ function ListItem(props: Props) {
     />
   ) : null;
 
+  const enterAnimation =
+    props.index >= 12
+      ? undefined
+      : FadeInDown.delay(props.index * 50).duration(250);
+  const animateContentDirectly = Platform.OS === "web" || props.reorderMode;
+
   const listItemContent = (
     <Animated.View
-      entering={
-        props.reorderMode || props.index >= 12
-          ? undefined
-          : FadeInDown.delay(props.index * 35).duration(220)
-      }
+      entering={animateContentDirectly ? enterAnimation : undefined}
       key={props.key}
       ref={itemRef}
       style={[
@@ -820,7 +833,10 @@ function ListItem(props: Props) {
           <View style={styles.left}>
             {showFavicon ? (
               <Image
-                style={{ width: 30, height: 30, margin: 0, borderRadius: 8 }}
+                style={[
+                  { width: 30, height: 30, margin: 0, borderRadius: 8 },
+                  nonSelectableImageStyle,
+                ]}
                 source={url}
                 contentFit="cover"
                 transition={250}
@@ -906,36 +922,38 @@ function ListItem(props: Props) {
       {Platform.OS === "web" || props.reorderMode ? (
         listItemContent
       ) : (
-        <ReanimatedSwipeable
-          ref={swipeableRef}
-          friction={2}
-          leftThreshold={48}
-          rightThreshold={48}
-          dragOffsetFromLeftEdge={18}
-          dragOffsetFromRightEdge={18}
-          overshootLeft={false}
-          overshootRight={false}
-          containerStyle={[
-            styles.swipeContainer,
-            props.reorderMode
-              ? { marginBottom: 4, height: 44 }
-              : null,
-          ]}
-          renderLeftActions={renderFavoriteSwipeAction}
-          renderRightActions={renderDeleteSwipeAction}
-          onSwipeableOpen={(direction) => {
-            swipeableRef.current?.close();
+        <Animated.View entering={enterAnimation}>
+          <ReanimatedSwipeable
+            ref={swipeableRef}
+            friction={2}
+            leftThreshold={48}
+            rightThreshold={48}
+            dragOffsetFromLeftEdge={18}
+            dragOffsetFromRightEdge={18}
+            overshootLeft={false}
+            overshootRight={false}
+            containerStyle={[
+              styles.swipeContainer,
+              props.reorderMode
+                ? { marginBottom: 4, height: 44 }
+                : null,
+            ]}
+            renderLeftActions={renderFavoriteSwipeAction}
+            renderRightActions={renderDeleteSwipeAction}
+            onSwipeableOpen={(direction) => {
+              swipeableRef.current?.close();
 
-            if (direction === "right") {
-              toggleFavorite();
-              return;
-            }
+              if (direction === "right") {
+                toggleFavorite();
+                return;
+              }
 
-            setDeleteModalVisible(true);
-          }}
-        >
-          {listItemContent}
-        </ReanimatedSwipeable>
+              setDeleteModalVisible(true);
+            }}
+          >
+            {listItemContent}
+          </ReanimatedSwipeable>
+        </Animated.View>
       )}
       <AdaptiveMenu
         visible={menuVisible}

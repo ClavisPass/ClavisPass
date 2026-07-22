@@ -311,6 +311,42 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   useEffect(() => {
     if (Platform.OS !== "web") return;
 
+    const styleId = "clavispass-home-search-selection-style";
+    if (document.getElementById(styleId)) return;
+
+    const style = document.createElement("style");
+    style.id = styleId;
+    style.textContent = `
+      #home-compact-search,
+      #home-compact-search *,
+      #home-wide-search,
+      #home-wide-search * {
+        -webkit-user-select: none;
+        user-select: none;
+      }
+
+      #home-compact-search input,
+      #home-compact-search textarea,
+      #home-wide-search input,
+      #home-wide-search textarea {
+        -webkit-user-select: text;
+        user-select: text;
+      }
+
+      #home-compact-search input::placeholder,
+      #home-compact-search textarea::placeholder,
+      #home-wide-search input::placeholder,
+      #home-wide-search textarea::placeholder {
+        -webkit-user-select: none;
+        user-select: none;
+      }
+    `;
+    document.head.appendChild(style);
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+
     const compactDragRegion = document.getElementById(
       "home-header-brand-drag-region",
     );
@@ -900,15 +936,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       }}
       style={{ flexGrow: 0, width: "100%" }}
     >
-      <Chip
-        compact
-        icon="sort-variant"
-        onPress={() => setShowMenu(true)}
-        style={actionChipStyle}
-        textStyle={actionChipTextStyle}
-      >
-        {t("home:sort")}
-      </Chip>
       {expiryEntries.length > 0 ? (
         <Chip
           compact
@@ -920,6 +947,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           {`${t("home:expiries")} ${expiryEntries.length}`}
         </Chip>
       ) : null}
+      <Chip
+        compact
+        icon="sort-variant"
+        onPress={() => setShowMenu(true)}
+        style={actionChipStyle}
+        textStyle={actionChipTextStyle}
+      >
+        {t("home:sort")}
+      </Chip>
       <Chip
         compact
         icon={({ color, size }) => (
@@ -1151,6 +1187,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             >
               {isCompactHeader && searchHeaderVisible ? (
                 <Animated.View
+                  id="home-compact-search"
                   entering={FadeInRight.duration(180).easing(
                     headerSearchTransition,
                   )}
@@ -1266,52 +1303,61 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 </Animated.View>
               )}
               {!isCompactHeader ? (
-                <Searchbar
-                  ref={searchRef}
-                  inputStyle={{
-                    height: 34,
-                    minHeight: 34,
-                    fontSize: 13,
-                    color: "white",
-                  }}
+                <View
+                  id="home-wide-search"
                   style={{
                     height: 34,
                     width: wideSearchWidth,
-                    borderRadius: 12,
-                    backgroundColor: "rgba(217, 217, 217, 0.18)",
-                    borderWidth: 1,
-                    borderColor: "rgba(255, 255, 255, 0.14)",
                     position: "relative",
                     zIndex: 5,
                     ...webNoDragStyle,
                   }}
-                  placeholder={t("home:search")}
-                  onChangeText={setSearchQuery}
-                  value={searchQuery}
-                  loading={false}
-                  iconColor={"#ffffff80"}
-                  placeholderTextColor={"#ffffff80"}
-                  right={() =>
-                    searchQuery ? (
-                      <IconButton
-                        accessibilityLabel={t("common:reset")}
-                        icon="close"
-                        iconColor="#ffffff80"
-                        size={18}
-                        onPress={() => {
-                          setSearchQuery("");
-                          searchRef.current?.focus?.();
-                        }}
-                        style={{
-                          marginVertical: 0,
-                          marginLeft: 0,
-                          marginRight: 1,
-                          ...webNoDragStyle,
-                        }}
-                      />
-                    ) : null
-                  }
-                />
+                >
+                  <Searchbar
+                    ref={searchRef}
+                    inputStyle={{
+                      height: 34,
+                      minHeight: 34,
+                      fontSize: 13,
+                      color: "white",
+                    }}
+                    style={{
+                      height: 34,
+                      width: "100%",
+                      borderRadius: 12,
+                      backgroundColor: "rgba(217, 217, 217, 0.18)",
+                      borderWidth: 1,
+                      borderColor: "rgba(255, 255, 255, 0.14)",
+                      ...webNoDragStyle,
+                    }}
+                    placeholder={t("home:search")}
+                    onChangeText={setSearchQuery}
+                    value={searchQuery}
+                    loading={false}
+                    iconColor={"#ffffff80"}
+                    placeholderTextColor={"#ffffff80"}
+                    right={() =>
+                      searchQuery ? (
+                        <IconButton
+                          accessibilityLabel={t("common:reset")}
+                          icon="close"
+                          iconColor="#ffffff80"
+                          size={18}
+                          onPress={() => {
+                            setSearchQuery("");
+                            searchRef.current?.focus?.();
+                          }}
+                          style={{
+                            marginVertical: 0,
+                            marginLeft: 0,
+                            marginRight: 1,
+                            ...webNoDragStyle,
+                          }}
+                        />
+                      ) : null
+                    }
+                  />
+                </View>
               ) : null}
               {isCompactHeader ? (
                 <IconButton

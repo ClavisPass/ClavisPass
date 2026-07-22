@@ -53,7 +53,12 @@ function PasswordTextbox(props: Props) {
   };
 
   return (
-    <View style={{ height: 40, flexGrow: 1 }}>
+    <View
+      style={[
+        { height: 40, flexGrow: 1 },
+        Platform.OS === "web" ? ({ userSelect: "none" } as any) : null,
+      ]}
+    >
       <TextInput
         ref={getTextInputRef()}
         placeholder={props.placeholder}
@@ -61,7 +66,10 @@ function PasswordTextbox(props: Props) {
           globalStyles.outlineStyle,
           props.errorColor ? { borderColor: theme.colors.error } : null,
         ]}
-        style={globalStyles.textInputStyle}
+        style={[
+          globalStyles.textInputStyle,
+          Platform.OS === "web" ? ({ userSelect: "text" } as any) : null,
+        ]}
         value={props.value}
         mode="outlined"
         onChangeText={(text) => props.setValue?.(text)}

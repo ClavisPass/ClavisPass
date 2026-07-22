@@ -169,6 +169,36 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     setBackgroundReady(false);
   }, [darkmode]);
 
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+
+    const styleId = "clavispass-login-selection-style";
+    if (document.getElementById(styleId)) return;
+
+    const style = document.createElement("style");
+    style.id = styleId;
+    style.textContent = `
+      #clavispass-login-page,
+      #clavispass-login-page * {
+        -webkit-user-select: none;
+        user-select: none;
+      }
+
+      #clavispass-login-page input,
+      #clavispass-login-page textarea {
+        -webkit-user-select: text;
+        user-select: text;
+      }
+
+      #clavispass-login-page input::placeholder,
+      #clavispass-login-page textarea::placeholder {
+        -webkit-user-select: none;
+        user-select: none;
+      }
+    `;
+    document.head.appendChild(style);
+  }, []);
+
   const handleLogout = async () => {
     try {
       await clearSession();
@@ -235,6 +265,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         }}
       >
         <View
+          id="clavispass-login-page"
           pointerEvents={backgroundReady ? "auto" : "none"}
           style={{
             padding: 20,
