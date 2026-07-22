@@ -13,6 +13,7 @@ export type EntryMeta = {
   created: string;
   lastUpdated: string;
   folderId?: string | null;
+  externalRefs?: ValuesType["externalRefs"];
 
   username?: string | null;
   email?: string | null;
@@ -132,6 +133,7 @@ export function buildEntryMeta(entry: ValuesType): EntryMeta {
     created: entry.created,
     lastUpdated: entry.lastUpdated,
     folderId: (entry.folder as any)?.id ?? null,
+    externalRefs: entry.externalRefs,
   };
 
   for (const mod of entry.modules as ModuleType[]) {

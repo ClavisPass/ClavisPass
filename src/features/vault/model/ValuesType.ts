@@ -2,6 +2,16 @@ import { z } from "zod";
 import { ModulesTypeSchema } from "./ModulesType";
 import { FolderSchema } from "./FolderType";
 
+export const EntryExternalRefsSchema = z.object({
+  keepass: z
+    .object({
+      uuid: z.string().optional(),
+      originalGroupPath: z.array(z.string()).optional(),
+      originalIconId: z.string().nullable().optional(),
+    })
+    .optional(),
+});
+
 export const ValuesTypeSchema = z.object({
   id: z.string(),
   modules: ModulesTypeSchema.default([]),
@@ -12,6 +22,7 @@ export const ValuesTypeSchema = z.object({
   created: z.string().datetime(),
   lastUpdated: z.string().datetime(),
   folder: FolderSchema.nullable().default(null),
+  externalRefs: EntryExternalRefsSchema.optional(),
 });
 
 export const ValuesListTypeSchema = z.array(ValuesTypeSchema);

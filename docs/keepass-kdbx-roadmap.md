@@ -36,16 +36,17 @@ This note captures the agreed direction for future KeePass/KDBX work. The goal i
    - Keep practical limits conservative, e.g. 10-25 MB per file at first.
    - Warn users that attachments increase vault size, memory use, and sync cost.
 
-3. [ ] Extend custom fields.
+3. [x] Extend custom fields.
    - Existing `CUSTOM_FIELD` already maps well to KeePass custom string fields.
-   - Add:
+   - ClavisPass already has typed custom fields via:
      ```ts
-     protected?: boolean;
-     sourceFieldName?: string;
+     inputType: "text" | "secret" | "number";
      ```
-   - `protected` matters for KeePass fields that are secret but are not the standard password field.
+   - KeePass protected custom strings map to `inputType: "secret"`.
+   - Normal KeePass custom strings map to `inputType: "text"` or `"number"` when numeric intent is detected.
+   - No extra visible `protected` or `sourceFieldName` field is planned for now; if round-trip metadata becomes necessary, keep it in hidden compatibility metadata instead of the user-facing custom field UI.
 
-4. [ ] Add KeePass compatibility metadata.
+4. [x] Add KeePass compatibility metadata.
    - Suggested hidden entry metadata:
      ```ts
      externalRefs?: {
@@ -58,16 +59,19 @@ This note captures the agreed direction for future KeePass/KDBX work. The goal i
      ```
    - Keep this out of visible modules.
    - Purpose: preserve IDs/group/icon references for later export or better round-tripping.
+   - Implemented as optional entry-level `externalRefs`, so existing ClavisPass entries and vaults remain valid without it.
 
-5. [ ] Decide how to normalize expiry and access timestamps.
+5. [x] Decide how to normalize expiry and access timestamps.
    - ClavisPass already has `created`, `lastUpdated`, and an `EXPIRY` module.
    - KeePass has several time fields such as creation, modification, last access, and expiry.
-   - Consider entry-level metadata:
-     ```ts
-     lastAccessed?: string | null;
-     expiresAt?: string | null;
-     ```
-   - The existing `EXPIRY` module can remain the user-facing UI feature if that still fits best.
+   - Mapping decision:
+     - KeePass creation time maps to ClavisPass `created`.
+     - KeePass modification time maps to ClavisPass `lastUpdated`.
+     - KeePass expiry maps to the existing ClavisPass `EXPIRY` module.
+     - KeePass last access time is intentionally not imported or tracked.
+   - Do not add entry-level `lastAccessed` for now; it would add usage metadata without a clear ClavisPass product benefit.
+   - Do not add entry-level `expiresAt` for now; the existing `EXPIRY` module stays the single user-facing source for expiry.
+   - If KDBX export requires last access values later, write a neutral/default value and mention the limitation in import/export notes.
 
 6. [ ] Build KDBX import.
    - Map KeePass standard fields to existing ClavisPass modules:
