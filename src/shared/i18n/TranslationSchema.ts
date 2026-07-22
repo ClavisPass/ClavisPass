@@ -498,6 +498,8 @@ export type TranslationSchema = {
     recoveryCodes: string;
     recoveryCodesPlaceholder: string;
     recoveryCodesHelp: string;
+    recoveryCodesShowMore: string;
+    recoveryCodesShowLess: string;
     noteCompact: string;
     noteNormal: string;
     noteLarge: string;

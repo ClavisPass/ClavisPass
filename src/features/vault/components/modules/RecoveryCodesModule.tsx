@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { Chip, Text, TextInput } from "react-native-paper";
+import { Button, Chip, Text, TextInput } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
 import Animated, {
@@ -22,6 +22,8 @@ import ModulesEnum from "../../model/ModulesEnum";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import { useClipboardCopy } from "../../../../shared/hooks/useClipboardCopy";
 import { emitClipboardCopied } from "../../../../infrastructure/events/clipboardBus";
+
+const COLLAPSED_CODES_LIMIT = 8;
 
 function tokenize(input: string): string[] {
   return input
@@ -51,6 +53,7 @@ function splitKeepingRemainder(text: string): {
 function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
   const didMount = useRef(false);
   const inputRef = useRef<any>(null);
+  const moduleIdRef = useRef(props.id);
 
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -60,6 +63,7 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
   const [input, setInput] = useState("");
   const [codes, setCodes] = useState(props.codes ?? []);
   const [isFocused, setIsFocused] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   // steuert, ob das Input überhaupt gerendert wird (gegen "leere Zeile")
   const [showInput, setShowInput] = useState(codes.length === 0);
@@ -74,10 +78,16 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
 
   useEffect(() => {
     const nextCodes = props.codes ?? [];
+    const moduleChanged = moduleIdRef.current !== props.id;
+
+    moduleIdRef.current = props.id;
     setCodes(nextCodes);
     setInput("");
     setShowInput(nextCodes.length === 0);
-  }, [props.codes]);
+    if (moduleChanged || nextCodes.length <= COLLAPSED_CODES_LIMIT) {
+      setExpanded(false);
+    }
+  }, [props.codes, props.id]);
 
   useEffect(() => {
     if (!didMount.current) {
@@ -189,6 +199,12 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
 
   const shouldRenderInput =
     showInput || isFocused || input.length > 0 || codes.length === 0;
+  const shouldCollapseCodes =
+    !expanded && !shouldRenderInput && codes.length > COLLAPSED_CODES_LIMIT;
+  const visibleCodes = shouldCollapseCodes
+    ? codes.slice(0, COLLAPSED_CODES_LIMIT)
+    : codes;
+  const hiddenCodesCount = codes.length - visibleCodes.length;
 
   const toggleUsed = (code: string) => {
     setCodes((prev) =>
@@ -227,7 +243,7 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
               style={styles.inlineWrap}
               layout={LinearTransition.duration(160)}
             >
-              {codes.map((c) => (
+              {visibleCodes.map((c) => (
                 <Animated.View
                   key={c.code}
                   entering={FadeIn.duration(140)}
@@ -253,6 +269,26 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
                   </Chip>
                 </Animated.View>
               ))}
+
+              {hiddenCodesCount > 0 ? (
+                <Animated.View
+                  entering={FadeIn.duration(140)}
+                  exiting={FadeOut.duration(120)}
+                  layout={LinearTransition.duration(160)}
+                >
+                  <Chip
+                    compact
+                    icon="chevron-down"
+                    style={[styles.chip, styles.moreChip]}
+                    textStyle={styles.chipText}
+                    onPress={() => setExpanded(true)}
+                  >
+                    {t("modules:recoveryCodesShowMore", {
+                      count: hiddenCodesCount,
+                    })}
+                  </Chip>
+                </Animated.View>
+              ) : null}
 
               {shouldRenderInput ? (
                 <Animated.View
@@ -289,6 +325,26 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
           </Animated.View>
         </Pressable>
 
+        {expanded && codes.length > COLLAPSED_CODES_LIMIT ? (
+          <Animated.View
+            entering={FadeIn.duration(140)}
+            exiting={FadeOut.duration(120)}
+            layout={LinearTransition.duration(160)}
+            style={styles.showLessRow}
+          >
+            <Button
+              compact
+              icon="chevron-up"
+              mode="text"
+              onPress={() => setExpanded(false)}
+              labelStyle={styles.showLessText}
+              style={styles.showLessButton}
+            >
+              {t("modules:recoveryCodesShowLess")}
+            </Button>
+          </Animated.View>
+        ) : null}
+
         <Text variant="bodySmall" style={{ opacity: 0.7 }}>
           {t("modules:recoveryCodesHelp")}
         </Text>
@@ -312,13 +368,30 @@ const styles = StyleSheet.create({
   },
   chip: {
     margin: 0,
-    height: 26,
+    minHeight: 28,
     paddingHorizontal: 0,
     borderRadius: 12,
   },
   chipText: {
     fontSize: 12,
-    lineHeight: 14,
+    lineHeight: 16,
+  },
+  moreChip: {
+    backgroundColor: "transparent",
+  },
+  showLessRow: {
+    alignItems: "center",
+    marginTop: -2,
+    marginBottom: -2,
+  },
+  showLessButton: {
+    minWidth: 0,
+    borderRadius: 12,
+  },
+  showLessText: {
+    fontSize: 12,
+    lineHeight: 16,
+    marginVertical: 0,
   },
   inlineInput: {
     minWidth: 110,

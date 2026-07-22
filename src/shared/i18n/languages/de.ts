@@ -556,6 +556,8 @@ const de: TranslationSchema = {
     recoveryCodesPlaceholder: "Codes einfügen…",
     recoveryCodesHelp:
       "Tippe auf einen Chip, um ihn zu kopieren. Halte ihn gedrückt, um ihn als verwendet zu markieren.",
+    recoveryCodesShowMore: "+{{count}} anzeigen",
+    recoveryCodesShowLess: "Weniger anzeigen",
     noteCompact: "Kompakt",
     noteNormal: "Normal",
     noteLarge: "Groß",

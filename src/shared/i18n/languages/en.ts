@@ -548,6 +548,8 @@ const en: TranslationSchema = {
     recoveryCodesPlaceholder: "Paste codes…",
     recoveryCodesHelp:
       "Tap a chip to copy. Press and hold to mark it as used.",
+    recoveryCodesShowMore: "Show {{count}} more",
+    recoveryCodesShowLess: "Show less",
     noteCompact: "Compact",
     noteNormal: "Normal",
     noteLarge: "Large",
