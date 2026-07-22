@@ -106,6 +106,14 @@ const de: TranslationSchema = {
     addPin: "Eintrag anpinnen",
     removePin: "Pin entfernen",
     moveToFolder: "In Ordner verschieben",
+    tags: "Tags",
+    manageTags: "Tags verwalten",
+    addTag: "Tag hinzufügen",
+    tagPlaceholder: "Tag eingeben",
+    selectedTags: "Ausgewählt",
+    tagSuggestions: "Vorschläge",
+    noTags: "Noch keine Tags.",
+    editHistoryTagsUpdated: "Tags geändert",
   },
   login: {
     masterPassword: "Master Passwort",
@@ -138,7 +146,7 @@ const de: TranslationSchema = {
     hubMissingHostUrl: "Host URL fehlt. Bitte erneut anmelden.",
     hubNetworkError: "Netzwerkfehler beim Verbinden mit ClavisPass Hub.",
     introCreateVault:
-      "Erstelle deinen verschluesselten Vault und starte mit einer sauberen Einrichtung.",
+      "Erstelle deinen verschlüsselten Vault und starte mit einer sauberen Einrichtung.",
     introUnlockVault: "Entsperre deinen Vault und arbeite direkt weiter.",
     deviceSaveConfirmTitle: "Lokale Speicherung aktivieren?",
     deviceSaveConfirmText:

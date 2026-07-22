@@ -8,6 +8,7 @@ export const ValuesTypeSchema = z.object({
   title: z.string(),
   fav: z.boolean(),
   pinnedAt: z.string().datetime().nullable().optional(),
+  tags: z.array(z.string()).optional(),
   created: z.string().datetime(),
   lastUpdated: z.string().datetime(),
   folder: FolderSchema.nullable().default(null),

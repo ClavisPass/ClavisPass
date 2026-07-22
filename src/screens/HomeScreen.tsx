@@ -683,12 +683,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     const withRelevance = prefiltered.map((item) => {
       const meta = buildEntryMeta(item);
       const domain = getDomain(meta.url);
+      const tagScores =
+        meta.tags?.map((tag) => scoreField(tag, normalizedQuery, 38, 42)) ??
+        [];
 
       const scores = [
         scoreField(item.title, normalizedQuery, 0, 10),
         ...(includeMetaFields
           ? [
               scoreField(domain, normalizedQuery, 30, 36),
+              ...tagScores,
               scoreField(meta.username, normalizedQuery, 44, 50),
               scoreField(meta.email, normalizedQuery, 44, 50),
               scoreField(meta.url, normalizedQuery, 62, 68),

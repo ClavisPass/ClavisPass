@@ -21,6 +21,7 @@ const ACTION_ICON: Record<EditHistoryActionType, string> = {
   title: "format-title",
   favorite: "star",
   pin: "pin",
+  tags: "tag",
   folder: "folder",
   modules: "view-list",
   module: "puzzle",
@@ -48,6 +49,8 @@ function EditHistoryModal(props: Props) {
         return t("common:editHistoryFavoriteUpdated");
       case "pin":
         return t("common:editHistoryPinUpdated");
+      case "tags":
+        return t("common:editHistoryTagsUpdated");
       case "folder":
         return entry.label;
       case "undo":

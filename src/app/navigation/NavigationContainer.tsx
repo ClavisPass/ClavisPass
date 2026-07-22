@@ -19,6 +19,7 @@ import {
 } from "../../infrastructure/events/openAddValueBus";
 
 const titlebarLightRoutes = new Set(["Home", "Reorder", "ModuleReorder"]);
+const titlebarContentDragRoutes = new Set(["Home", "Reorder", "ModuleReorder"]);
 
 function getFocusedRouteName(
   state?: NavigationState | PartialState<NavigationState>,
@@ -35,15 +36,29 @@ function getFocusedRouteName(
 }
 
 function NavigationnContainer() {
-  const { navigationTheme, setHeaderWhite } = useTheme();
+  const {
+    navigationTheme,
+    setHeaderWhite,
+    setTitlebarCenterGap,
+    setTitlebarOverlayDragEnabled,
+  } = useTheme();
   const navigationRef = useNavigationContainerRef<AppTabsParamList>();
 
-  const syncTitlebarColor = React.useCallback(() => {
+  const syncTitlebarState = React.useCallback(() => {
     if (!navigationRef.isReady()) return;
 
     const routeName = getFocusedRouteName(navigationRef.getRootState());
     setHeaderWhite(titlebarLightRoutes.has(routeName ?? ""));
-  }, [navigationRef, setHeaderWhite]);
+    setTitlebarCenterGap(0);
+    setTitlebarOverlayDragEnabled(
+      !titlebarContentDragRoutes.has(routeName ?? ""),
+    );
+  }, [
+    navigationRef,
+    setHeaderWhite,
+    setTitlebarCenterGap,
+    setTitlebarOverlayDragEnabled,
+  ]);
 
   React.useEffect(() => {
     const openAddValue = () => {
@@ -63,8 +78,8 @@ function NavigationnContainer() {
     <ReactNavigationContainer
       ref={navigationRef}
       theme={navigationTheme}
-      onReady={syncTitlebarColor}
-      onStateChange={syncTitlebarColor}
+      onReady={syncTitlebarState}
+      onStateChange={syncTitlebarState}
     >
       <TrayMenuBridge navigationRef={navigationRef} />
       <ProtectedRoute loginScreen={<LoginStack />}>

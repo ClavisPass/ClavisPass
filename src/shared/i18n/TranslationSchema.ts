@@ -103,6 +103,14 @@ export type TranslationSchema = {
     addPin: string;
     removePin: string;
     moveToFolder: string;
+    tags: string;
+    manageTags: string;
+    addTag: string;
+    tagPlaceholder: string;
+    selectedTags: string;
+    tagSuggestions: string;
+    noTags: string;
+    editHistoryTagsUpdated: string;
   };
   login: {
     masterPassword: string;

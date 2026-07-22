@@ -32,6 +32,9 @@ import Button from "../shared/components/buttons/Button";
 import DeleteModuleModal from "../features/vault/components/modals/DeleteModuleModal";
 import ClearModulesModal from "../features/vault/components/modals/ClearModulesModal";
 import EditHistoryModal from "../features/vault/components/modals/EditHistoryModal";
+import EntryTagsModal, {
+  normalizeTags,
+} from "../features/vault/components/modals/EntryTagsModal";
 
 import useAppLifecycle from "../shared/hooks/useAppLifecycle";
 import {
@@ -55,6 +58,7 @@ import AdaptiveMenu, {
 } from "../shared/components/menus/AdaptiveMenu";
 import AppTooltip from "../shared/components/tooltips/AppTooltip";
 import PerfProfiler from "../shared/performance/PerfProfiler";
+import TooltipIconButton from "../shared/components/buttons/TooltipIconButton";
 import {
   DEFAULT_FOLDER_ICON,
   getFolderColor,
@@ -107,6 +111,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const [clearModulesModalVisible, setClearModulesModalVisible] =
     useState(false);
   const [historyModalVisible, setHistoryModalVisible] = useState(false);
+  const [tagsModalVisible, setTagsModalVisible] = useState(false);
   const [overflowMenuVisible, setOverflowMenuVisible] = useState(false);
   const [pendingModuleDeleteId, setPendingModuleDeleteId] = useState<
     string | null
@@ -125,7 +130,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       let task = InteractionManager.runAfterInteractions(() => {
-        setHeaderSpacing(220);
+        setHeaderSpacing(260);
         setHeaderWhite(false);
       });
       return () => task?.cancel?.();
@@ -367,6 +372,21 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     );
   };
 
+  const changeTags = (tags: string[]) => {
+    const nextTags = normalizeTags(tags);
+
+    applyChange(
+      (current) => ({
+        ...current,
+        tags: nextTags.length > 0 ? nextTags : undefined,
+      }),
+      {
+        action: "tags",
+        label: t("common:editHistoryTagsUpdated"),
+      }
+    );
+  };
+
   const deleteModule = (id: string) => {
     const newModules: ModulesType = [
       ...value.modules.filter((item: ModuleType) => item.id !== id),
@@ -490,6 +510,15 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     (module) => module.module === ModulesEnum.TASK
   ).length;
 
+  const tagSuggestions = React.useMemo(
+    () =>
+      normalizeTags([
+        ...vault.entries.flatMap((entry) => entry.tags ?? []),
+        ...(value.tags ?? []),
+      ]).sort((a, b) => a.localeCompare(b)),
+    [value.tags, vault.entries]
+  );
+
   const sortCompletedTasksDown = () => {
     if (taskModuleCount <= 1) return;
 
@@ -612,13 +641,33 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           }
         }}
         leftNode={
-          <TitleModule
-            value={value}
-            changeTitle={changeTitle}
-            initialTitle={routeSearchstring ?? null}
-          />
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            <TitleModule
+              value={value}
+              changeTitle={changeTitle}
+              initialTitle={routeSearchstring ?? null}
+            />
+            <TooltipIconButton
+              tooltip={t("common:manageTags")}
+              icon={(value.tags?.length ?? 0) > 0 ? "tag" : "tag-outline"}
+              iconColor={
+                (value.tags?.length ?? 0) > 0
+                  ? theme.colors.primary
+                  : theme.colors.onSurfaceVariant
+              }
+              size={20}
+              onPress={() => setTagsModalVisible(true)}
+              style={{ margin: 0 }}
+            />
+          </View>
         }
-      ></Header>
+      />
       <View
         style={{
           width: "100%",
@@ -842,6 +891,13 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         visible={historyModalVisible}
         setVisible={setHistoryModalVisible}
         entries={sessionLog}
+      />
+      <EntryTagsModal
+        visible={tagsModalVisible}
+        setVisible={setTagsModalVisible}
+        tags={value.tags ?? []}
+        suggestions={tagSuggestions}
+        onChangeTags={changeTags}
       />
     </AnimatedContainer>
   );
