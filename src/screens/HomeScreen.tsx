@@ -1110,6 +1110,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         } as any)
       : null;
 
+  const syncBar = (
+    <Sync
+      bottomPadding={isCompactHeader ? 0 : undefined}
+      refreshData={refreshData}
+      refreshing={refreshing}
+      setRefreshing={setRefreshing}
+    />
+  );
+
   useEffect(() => {
     if (Platform.OS !== "web") return;
 
@@ -1537,11 +1546,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               )}
             </Animated.View>
           </LinearGradient>
-          <Sync
-            refreshData={refreshData}
-            refreshing={refreshing}
-            setRefreshing={setRefreshing}
-          />
+          {!isCompactHeader ? syncBar : null}
           <View
             onStartShouldSetResponderCapture={handleHomeContentResponderCapture}
             style={{
@@ -1558,7 +1563,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               <>
                 <View style={{ flex: 1, width: "100%" }}>
                   {renderHomeActionChips()}
-                  {renderFlashList()}
+                  <View style={{ flex: 1, width: "100%" }}>
+                    {renderFlashList()}
+                  </View>
+                  {isCompactHeader ? syncBar : null}
                 </View>
                 <PerfProfiler id="HomeScreen.FolderFilter" minDurationMs={8}>
                   <FolderFilter

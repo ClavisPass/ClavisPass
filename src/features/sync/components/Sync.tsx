@@ -26,12 +26,13 @@ type Props = {
   refreshing: boolean;
   setRefreshing: (refreshing: boolean) => void;
   refreshData: () => void;
+  bottomPadding?: number;
 };
 
 const Sync = (props: Props) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const { refreshing, setRefreshing, refreshData } = props;
+  const { refreshing, setRefreshing, refreshData, bottomPadding = 4 } = props;
 
   const auth = useAuth();
   const vault = useVault();
@@ -40,8 +41,10 @@ const Sync = (props: Props) => {
   const { accessToken, provider, ensureFreshAccessToken } = useToken();
   const { value: autosaveDelaySeconds } = useSetting("AUTOSAVE_DELAY");
 
-  const slideAnim = useRef(new Animated.Value(0)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const showSync = vault.dirty || refreshing;
+  const syncHeight = 40 + bottomPadding;
+  const slideAnim = useRef(new Animated.Value(showSync ? syncHeight : 0)).current;
+  const fadeAnim = useRef(new Animated.Value(showSync ? 1 : 0)).current;
   const saveInFlightRef = useRef(false);
   const saveAgainAfterCurrentRef = useRef(false);
   const requestSaveRef = useRef<() => Promise<void>>(async () => {});
@@ -51,38 +54,32 @@ const Sync = (props: Props) => {
   const [autosaveRemaining, setAutosaveRemaining] = useState<number | null>(
     null,
   );
-
-  const showSync = vault.dirty || refreshing;
+  const [renderSync, setRenderSync] = useState(showSync);
 
   useEffect(() => {
-    if (showSync) {
-      Animated.parallel([
-        Animated.timing(slideAnim, {
-          toValue: 44,
-          duration: 250,
-          useNativeDriver: false,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 250,
-          useNativeDriver: false,
-        }),
-      ]).start();
-    } else {
-      Animated.parallel([
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 250,
-          useNativeDriver: false,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: false,
-        }),
-      ]).start();
-    }
-  }, [showSync, fadeAnim, slideAnim]);
+    if (showSync) setRenderSync(true);
+
+    const animation = Animated.parallel([
+      Animated.timing(slideAnim, {
+        toValue: showSync ? syncHeight : 0,
+        duration: showSync ? 250 : 220,
+        useNativeDriver: false,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: showSync ? 1 : 0,
+        duration: showSync ? 250 : 160,
+        useNativeDriver: false,
+      }),
+    ]);
+
+    animation.start(({ finished }) => {
+      if (finished && !showSync) setRenderSync(false);
+    });
+
+    return () => {
+      animation.stop();
+    };
+  }, [showSync, fadeAnim, slideAnim, syncHeight]);
 
   const cancelAutosaveCountdown = useCallback(() => {
     if (autosaveIntervalRef.current) {
@@ -244,13 +241,13 @@ const Sync = (props: Props) => {
         overflow: "hidden",
       }}
     >
-      {showSync && (
+      {renderSync && (
         <View
           style={{
-            height: 44,
+            height: syncHeight,
             width: "100%",
             paddingTop: 0,
-            paddingBottom: 4,
+            paddingBottom: bottomPadding,
             paddingLeft: 8,
             paddingRight: 8,
           }}
