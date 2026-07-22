@@ -188,12 +188,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   swipeActionLeft: {
-    borderTopLeftRadius: 12,
-    borderBottomLeftRadius: 12,
+    borderTopLeftRadius: 11,
+    borderBottomLeftRadius: 11,
   },
   swipeActionRight: {
-    borderTopRightRadius: 12,
-    borderBottomRightRadius: 12,
+    borderTopRightRadius: 11,
+    borderBottomRightRadius: 11,
   },
 });
 
@@ -628,7 +628,12 @@ function ListItem(props: Props) {
         },
       ]}
     >
-      <View style={[styles.swipeAction, styles.swipeActionLeft]}>
+      <View
+        style={[
+          styles.swipeAction,
+          styles.swipeActionLeft,
+        ]}
+      >
         <Icon
           color={props.item.fav ? theme.colors.primary : theme.colors.onPrimary}
           source={props.item.fav ? "star-off" : "star"}
@@ -649,7 +654,12 @@ function ListItem(props: Props) {
         },
       ]}
     >
-      <View style={[styles.swipeAction, styles.swipeActionRight]}>
+      <View
+        style={[
+          styles.swipeAction,
+          styles.swipeActionRight,
+        ]}
+      >
         <Icon color={theme.colors.onError} source="trash-can" size={24} />
       </View>
     </View>
@@ -776,6 +786,7 @@ function ListItem(props: Props) {
       ? undefined
       : FadeInDown.delay(props.index * 50).duration(250);
   const animateContentDirectly = Platform.OS === "web" || props.reorderMode;
+  const isNativeSwipeItem = Platform.OS !== "web" && !props.reorderMode;
 
   const listItemContent = (
     <Animated.View
@@ -787,6 +798,7 @@ function ListItem(props: Props) {
         Platform.OS !== "web"
           ? { marginLeft: 0, marginRight: 0, marginBottom: 0 }
           : null,
+        isNativeSwipeItem ? { borderRadius: 0, borderWidth: 0 } : null,
         props.reorderMode && Platform.OS !== "web"
           ? { marginBottom: 4 }
           : null,

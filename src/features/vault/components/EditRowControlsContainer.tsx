@@ -7,6 +7,9 @@ import {
   StyleSheet,
 } from "react-native";
 import { Divider, Icon } from "react-native-paper";
+import ReanimatedSwipeable, {
+  type SwipeableMethods,
+} from "react-native-gesture-handler/ReanimatedSwipeable";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import Animated, { FadeOutUp } from "react-native-reanimated";
@@ -21,10 +24,14 @@ export type EditRowControlsContainerProps = {
   style?: StyleProp<ViewStyle>;
   contentStyle?: StyleProp<ViewStyle>;
   topRightInset?: number;
+  swipeActionRightInset?: number;
+  swipeActionBottomInset?: number;
 };
 
 const DRAG_RAIL_WIDTH = 29;
 const DELETE_BUTTON_ZONE = 36;
+const SWIPE_DELETE_WIDTH = 78;
+const SWIPE_DELETE_OVERSCAN = 48;
 const WebDragHandlePropsContext = React.createContext<any>(null);
 
 export function WebDragHandlePropsProvider({
@@ -49,13 +56,17 @@ export function EditRowControlsContainer({
   style,
   contentStyle,
   topRightInset = 0,
+  swipeActionRightInset = 0,
+  swipeActionBottomInset = 0,
 }: EditRowControlsContainerProps) {
   const { t } = useTranslation();
   const { theme, darkmode } = useTheme();
   const webDragHandleProps = React.useContext(WebDragHandlePropsContext);
+  const swipeableRef = React.useRef<SwipeableMethods | null>(null);
   const [dragHovered, setDragHovered] = React.useState(false);
   const [dragPressed, setDragPressed] = React.useState(false);
   const showDragHandle = Boolean(onDragStart) || Boolean(webDragHandleProps);
+  const canSwipeDelete = Platform.OS !== "web" && Boolean(onDelete);
   const dragHandleContent = (
     <AnimatedPressable
       borderless={false}
@@ -93,7 +104,36 @@ export function EditRowControlsContainer({
     </AnimatedPressable>
   );
 
-  return (
+  const renderDeleteSwipeAction = () => (
+    <View
+      style={{
+        width: SWIPE_DELETE_WIDTH + swipeActionRightInset,
+        marginBottom: swipeActionBottomInset,
+        alignItems: "flex-start",
+        justifyContent: "center",
+      }}
+    >
+      <View
+        style={{
+          position: "absolute",
+          left: -SWIPE_DELETE_OVERSCAN,
+          right: swipeActionRightInset + 1,
+          top: 1,
+          bottom: 1,
+          borderTopRightRadius: 12,
+          borderBottomRightRadius: 12,
+          overflow: "hidden",
+          backgroundColor: theme.colors.error,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Icon source="trash-can" size={22} color={theme.colors.onError} />
+      </View>
+    </View>
+  );
+
+  const content = (
     <Animated.View
       exiting={FadeOutUp.duration(150)}
       style={[
@@ -201,5 +241,24 @@ export function EditRowControlsContainer({
         />
       </View>
     </Animated.View>
+  );
+
+  if (!canSwipeDelete) return content;
+
+  return (
+    <ReanimatedSwipeable
+      ref={swipeableRef}
+      friction={2}
+      rightThreshold={52}
+      dragOffsetFromRightEdge={24}
+      overshootRight={false}
+      renderRightActions={renderDeleteSwipeAction}
+      onSwipeableOpen={() => {
+        swipeableRef.current?.close();
+        onDelete?.(id);
+      }}
+    >
+      {content}
+    </ReanimatedSwipeable>
   );
 }

@@ -54,6 +54,8 @@ export default function ModuleContainer({
       id={id}
       onDragStart={onDragStart}
       onDelete={deleteModule}
+      swipeActionRightInset={8}
+      swipeActionBottomInset={8}
       style={[
         moduleStyles.container,
         moduleStyles.inner,
