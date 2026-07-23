@@ -933,6 +933,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               />
               <SettingsDivider />
               <Import
+                type={DocumentTypeEnum.BITWARDEN}
+                title={"Bitwarden"}
+                icon={"shield-key"}
+              />
+              <SettingsDivider />
+              <Import
                 type={DocumentTypeEnum.FIREFOX}
                 title={"Firefox"}
                 icon={"firefox"}

@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { ValuesListType } from "../../../vault/model/ValuesType";
 import importChrome from "./chrome";
 import importFirefox from "./firefox";
+import importBitwarden from "./bitwarden";
 import Modal from "../../../../shared/components/modals/Modal";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import SettingsItem from "../../components/SettingsItem";
@@ -54,6 +55,7 @@ export enum DocumentTypeEnum {
   CHROME,
   PCLOUD,
   KDBX,
+  BITWARDEN,
 }
 
 type Props = {
@@ -276,6 +278,12 @@ function Import(props: Props) {
       if (props.type === DocumentTypeEnum.FIREFOX) {
         const imported = importFirefox(fileData);
         if (imported) saveValues(imported);
+        return;
+      }
+
+      if (props.type === DocumentTypeEnum.BITWARDEN) {
+        const imported = importBitwarden(fileData);
+        saveKdbxValues(imported.values, imported.folders);
         return;
       }
 

@@ -162,53 +162,34 @@ This note captures the planned direction for Bitwarden import support. The goal 
    - Treat card number and security code as secret data.
    - Fast access can later offer copy actions for card number, security code, and expiry.
 
-10. [ ] Support multiple login URLs.
+10. [x] Support multiple login URLs.
    - Bitwarden login items can contain multiple URIs and match behavior metadata.
-   - Preferred ClavisPass direction:
-     - either extend the existing URL module to support multiple URLs,
-     - or map extra URLs to additional URL modules while preserving match metadata in hidden compatibility data.
-   - Decide before final Bitwarden JSON import.
+   - Decision: do not extend the existing `URL` module into a list for now.
+   - Instead, create one normal `URL` module per imported Bitwarden URI.
+   - This matches the existing modular ClavisPass model and avoids a breaking data-model change.
+   - Preserve Bitwarden URI match metadata in hidden compatibility metadata later if export or better round-tripping needs it.
 
-11. [ ] Add an `SSH_KEY` module.
-   - Suggested fields:
-     ```ts
-     {
-       id: string;
-       module: "SSH_KEY";
-       name?: string;
-       publicKey?: string;
-       privateKey?: string;
-       fingerprint?: string;
-       passphrase?: string;
-     }
-     ```
-   - Bitwarden JSON can include SSH keys.
-   - Treat private keys and passphrases as secret data.
+11. [x] Map SSH keys to the existing `KEY` module.
+   - Decision: do not add a separate `SSH_KEY` module for now.
+   - Do not import an extra visible key type field for Bitwarden SSH keys.
+   - Bitwarden SSH key values should map to normal `KEY` modules.
+   - The existing `KEY` module should identify SSH keys by regex/pattern detection where needed.
+   - Treat imported private keys and passphrases as secret data through the existing `KEY` policy.
 
-12. [ ] Add Bitwarden compatibility metadata.
-   - Suggested hidden entry metadata:
-     ```ts
-     externalRefs?: {
-       bitwarden?: {
-         id?: string;
-         organizationId?: string | null;
-         collectionIds?: string[];
-         folderId?: string | null;
-         type?: number;
-         reprompt?: number;
-       };
-     };
-     ```
-   - Keep this out of visible modules.
-   - Purpose: preserve IDs, folder/collection references, item type, and reprompt behavior for import notes or future export.
+12. [x] Ignore Bitwarden compatibility metadata.
+   - Decision: ClavisPass does not plan to export entries back into a Bitwarden vault.
+   - Do not add `externalRefs.bitwarden`.
+   - Do not preserve Bitwarden IDs, collection IDs, folder IDs, item type numbers, or reprompt metadata.
+   - Import only the data that maps cleanly to normal ClavisPass modules and entry metadata.
+   - Unsupported Bitwarden-only metadata can be ignored.
 
-13. [ ] Build initial Bitwarden JSON import.
+13. [x] Build initial Bitwarden JSON import.
     - Map Bitwarden item types:
       - login -> title, username, password, TOTP, URL(s), notes, custom fields
       - secure note -> note module
       - card -> digital card module
       - identity -> person, address, company, phone, email, document, custom fields
-      - ssh key -> SSH key module
+      - ssh key -> `KEY` module
     - Map folders to ClavisPass folders.
     - Map favorites to `fav`.
     - Map custom fields to `CUSTOM_FIELD`.
