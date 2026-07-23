@@ -3,6 +3,7 @@ import { ModuleType } from "../model/ModulesType";
 import AddressModuleType from "../model/modules/AddressModuleType";
 import AttachmentModuleType from "../model/modules/AttachmentModuleType";
 import CompanyModuleType from "../model/modules/CompanyModuleType";
+import CreditCardModuleType from "../model/modules/CreditCardModuleType";
 import CustomFieldModuleType from "../model/modules/CustomFieldModuleType";
 import DocumentModuleType from "../model/modules/DocumentModuleType";
 import DigitalCardModuleType from "../model/modules/DigitalCardModuleType";
@@ -55,6 +56,20 @@ const MODULE_DEFAULTS = {
       department: "",
       jobTitle: "",
     }) satisfies CompanyModuleType,
+
+  [ModulesEnum.CREDIT_CARD]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.CREDIT_CARD,
+      cardholderName: "",
+      number: "",
+      brand: "",
+      expiryMonth: "",
+      expiryYear: "",
+      securityCode: "",
+      bankName: "",
+      note: "",
+    }) satisfies CreditCardModuleType,
 
   [ModulesEnum.CUSTOM_FIELD]: (id: string): ModuleType =>
     ({

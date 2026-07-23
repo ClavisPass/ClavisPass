@@ -12,6 +12,8 @@ const getModuleNameByEnum = (moduleEnum: ModulesEnum, t: any): string => {
       return t("modules:attachment");
     case ModulesEnum.COMPANY:
       return t("modules:company");
+    case ModulesEnum.CREDIT_CARD:
+      return t("modules:creditCard");
     case ModulesEnum.CUSTOM_FIELD:
       return t("modules:customField");
     case ModulesEnum.DOCUMENT:

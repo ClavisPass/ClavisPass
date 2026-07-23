@@ -515,6 +515,18 @@ export type TranslationSchema = {
     companyJobTitle: string;
     companyShowMore: string;
     companyShowLess: string;
+    creditCard: string;
+    creditCardHolder: string;
+    creditCardNumber: string;
+    creditCardNumberInvalid: string;
+    creditCardBrand: string;
+    creditCardExpiryMonth: string;
+    creditCardExpiryYear: string;
+    creditCardSecurityCode: string;
+    creditCardBank: string;
+    creditCardNote: string;
+    creditCardShowMore: string;
+    creditCardShowLess: string;
     customField: string;
     customFieldTitle: string;
     customFieldType: string;

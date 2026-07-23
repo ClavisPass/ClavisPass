@@ -4,6 +4,7 @@ import ModulesEnum from "../model/ModulesEnum";
 import { AddressModuleTypeSchema } from "./modules/AddressModuleType";
 import { AttachmentModuleTypeSchema } from "./modules/AttachmentModuleType";
 import { CompanyModuleTypeSchema } from "./modules/CompanyModuleType";
+import { CreditCardModuleTypeSchema } from "./modules/CreditCardModuleType";
 import { CustomFieldModuleTypeSchema } from "./modules/CustomFieldModuleType";
 import { DocumentModuleTypeSchema } from "./modules/DocumentModuleType";
 import { EmnailModuleTypeSchema } from "./modules/EmailModuleType";
@@ -28,6 +29,7 @@ const MODULE_SCHEMA_BY_ENUM = {
   [ModulesEnum.ADDRESS]: AddressModuleTypeSchema,
   [ModulesEnum.ATTACHMENT]: AttachmentModuleTypeSchema,
   [ModulesEnum.COMPANY]: CompanyModuleTypeSchema,
+  [ModulesEnum.CREDIT_CARD]: CreditCardModuleTypeSchema,
   [ModulesEnum.CUSTOM_FIELD]: CustomFieldModuleTypeSchema,
   [ModulesEnum.DOCUMENT]: DocumentModuleTypeSchema,
   [ModulesEnum.E_MAIL]: EmnailModuleTypeSchema,

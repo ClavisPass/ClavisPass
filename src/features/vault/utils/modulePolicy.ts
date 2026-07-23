@@ -22,6 +22,7 @@ export type EntryMeta = {
   personName?: string | null;
   address?: string | null;
   company?: string | null;
+  creditCard?: string | null;
   document?: string | null;
 
   wifiName?: string | null;
@@ -116,6 +117,36 @@ export const MODULE_POLICY: Record<ManagedModules, ModulePolicy> = {
         company: value || null,
       };
     },
+  },
+
+  [ModulesEnum.CREDIT_CARD]: {
+    kind: "hybrid",
+    extractMeta: (entry, meta) => {
+      const card = firstModule(entry, ModulesEnum.CREDIT_CARD);
+      if (!card) return meta;
+      const value = [card.cardholderName, card.brand, card.bankName]
+        .map((part) => (typeof part === "string" ? part.trim() : ""))
+        .filter(Boolean)
+        .join("\n");
+      return {
+        ...meta,
+        creditCard: value || null,
+      };
+    },
+    getSecret: (entry) =>
+      entry.modules
+        .filter((m) => (m as any).module === ModulesEnum.CREDIT_CARD)
+        .map((m) => ({
+          id: (m as any).id,
+          cardholderName: (m as any).cardholderName,
+          number: (m as any).number,
+          brand: (m as any).brand,
+          expiryMonth: (m as any).expiryMonth,
+          expiryYear: (m as any).expiryYear,
+          securityCode: (m as any).securityCode,
+          bankName: (m as any).bankName,
+          note: (m as any).note,
+        })),
   },
 
   [ModulesEnum.USERNAME]: { kind: "meta", metaKey: "username" },

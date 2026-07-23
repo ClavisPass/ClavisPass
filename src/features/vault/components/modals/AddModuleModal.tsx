@@ -258,6 +258,23 @@ export default function AddModuleModalCompactFav(props: Props) {
       ],
     },
     {
+      id: ModulesEnum.CREDIT_CARD,
+      label: t("modules:creditCard"),
+      icon: MODULE_ICON[ModulesEnum.CREDIT_CARD],
+      category: "PaymentDocuments",
+      keywords: [
+        "credit",
+        "kreditkarte",
+        "card",
+        "karte",
+        "payment",
+        "zahlung",
+        "bank",
+        "cvv",
+        "cvc",
+      ],
+    },
+    {
       id: ModulesEnum.PASSWORD,
       label: t("modules:password"),
       icon: MODULE_ICON[ModulesEnum.PASSWORD],

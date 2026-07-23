@@ -124,7 +124,23 @@ This note captures the planned direction for Bitwarden import support. The goal 
    - Keep the existing context-based suggested modules, but make search and grouping feel fast enough when suggestions are not enough.
    - Prefer a central module catalog/registry so labels, icons, groups, aliases, compatibility hints, and add-module behavior do not drift across the app.
 
-8. [ ] Add a separate `CREDIT_CARD` module.
+8. [ ] Improve Add Value templates.
+   - Add better templates now that identity modules exist.
+   - Suggested templates:
+     - Contact: `PERSON`, `PHONE_NUMBER`, `E_MAIL`, `ADDRESS`
+     - Person: `PERSON`, optional `PHONE_NUMBER`, `E_MAIL`
+     - Company: `COMPANY`, `ADDRESS`, `PHONE_NUMBER`, `E_MAIL`, `URL`
+     - Document: `DOCUMENT`, `EXPIRY`, optional `ATTACHMENT`
+     - License / key: `KEY`, `CUSTOM_FIELD`, `EXPIRY`, optional `ATTACHMENT`
+     - Account with 2FA: `USERNAME`, `PASSWORD`, `URL`, `TOTP`, `RECOVERY_CODES`
+   - Consider grouping Add Value templates by intent:
+     - Login
+     - Identity
+     - Cards & documents
+     - Technical
+   - Keep this separate from Add Module discovery, because templates create full entries rather than adding one module.
+
+9. [x] Add a separate `CREDIT_CARD` module.
    - Do not merge credit cards into `DIGITAL_CARD`.
    - `DIGITAL_CARD` should stay focused on scannable/member cards such as loyalty cards, customer cards, barcode cards, and similar use cases.
    - Suggested fields:
@@ -146,14 +162,14 @@ This note captures the planned direction for Bitwarden import support. The goal 
    - Treat card number and security code as secret data.
    - Fast access can later offer copy actions for card number, security code, and expiry.
 
-9. [ ] Support multiple login URLs.
+10. [ ] Support multiple login URLs.
    - Bitwarden login items can contain multiple URIs and match behavior metadata.
    - Preferred ClavisPass direction:
      - either extend the existing URL module to support multiple URLs,
      - or map extra URLs to additional URL modules while preserving match metadata in hidden compatibility data.
    - Decide before final Bitwarden JSON import.
 
-10. [ ] Add an `SSH_KEY` module.
+11. [ ] Add an `SSH_KEY` module.
    - Suggested fields:
      ```ts
      {
@@ -169,7 +185,7 @@ This note captures the planned direction for Bitwarden import support. The goal 
    - Bitwarden JSON can include SSH keys.
    - Treat private keys and passphrases as secret data.
 
-11. [ ] Add Bitwarden compatibility metadata.
+12. [ ] Add Bitwarden compatibility metadata.
    - Suggested hidden entry metadata:
      ```ts
      externalRefs?: {
@@ -186,7 +202,7 @@ This note captures the planned direction for Bitwarden import support. The goal 
    - Keep this out of visible modules.
    - Purpose: preserve IDs, folder/collection references, item type, and reprompt behavior for import notes or future export.
 
-12. [ ] Build initial Bitwarden JSON import.
+13. [ ] Build initial Bitwarden JSON import.
     - Map Bitwarden item types:
       - login -> title, username, password, TOTP, URL(s), notes, custom fields
       - secure note -> note module
@@ -198,17 +214,17 @@ This note captures the planned direction for Bitwarden import support. The goal 
     - Map custom fields to `CUSTOM_FIELD`.
     - Report unsupported data instead of silently dropping it.
 
-13. [ ] Add Bitwarden CSV import.
+14. [ ] Add Bitwarden CSV import.
     - CSV should be treated as a simpler import format.
     - It mainly covers logins and secure notes.
     - If a user needs cards, identities, passkeys, SSH keys, or attachments, recommend JSON/ZIP.
 
-14. [ ] Add Bitwarden ZIP import with attachments.
+15. [ ] Add Bitwarden ZIP import with attachments.
     - Bitwarden ZIP exports include JSON plus attachment files.
     - Map attachments to the existing `ATTACHMENT` module.
     - Keep the same practical ClavisPass attachment limits and show warnings for skipped files.
 
-15. [ ] Decide passkey handling.
+16. [ ] Decide passkey handling.
     - Bitwarden JSON can include stored passkeys.
     - Real passkey support is a larger feature because it touches browser/app integration and credential flows.
     - For the first import, either:

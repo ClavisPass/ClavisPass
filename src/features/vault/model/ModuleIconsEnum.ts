@@ -6,6 +6,7 @@ export const MODULE_ICON = {
   [ModulesEnum.ADDRESS]: "map-marker",
   [ModulesEnum.ATTACHMENT]: "paperclip",
   [ModulesEnum.COMPANY]: "office-building",
+  [ModulesEnum.CREDIT_CARD]: "credit-card-chip",
   [ModulesEnum.CUSTOM_FIELD]: "card-text",
   [ModulesEnum.DOCUMENT]: "card-account-details",
   [ModulesEnum.E_MAIL]: "email",

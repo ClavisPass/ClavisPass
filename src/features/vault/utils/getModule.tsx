@@ -11,6 +11,9 @@ import AttachmentModule from "../components/modules/AttachmentModule";
 import CompanyModuleType from "../model/modules/CompanyModuleType";
 import CompanyModule from "../components/modules/CompanyModule";
 
+import CreditCardModuleType from "../model/modules/CreditCardModuleType";
+import CreditCardModule from "../components/modules/CreditCardModule";
+
 import CustomFieldModuleType from "../model/modules/CustomFieldModuleType";
 import CustomFieldModule from "../components/modules/CustomFieldModule";
 
@@ -129,6 +132,28 @@ const MODULE_RENDERERS = {
         name={m.name}
         department={m.department}
         jobTitle={m.jobTitle}
+        onDragStart={args.onDragStart}
+        deleteModule={args.deleteModule}
+        changeModule={args.changeModule}
+        fastAccess={args.fastAccess}
+      />
+    );
+  },
+
+  [ModulesEnum.CREDIT_CARD]: (module, args) => {
+    const m = module as CreditCardModuleType;
+    return (
+      <CreditCardModule
+        id={m.id}
+        module={m.module}
+        cardholderName={m.cardholderName}
+        number={m.number}
+        brand={m.brand}
+        expiryMonth={m.expiryMonth}
+        expiryYear={m.expiryYear}
+        securityCode={m.securityCode}
+        bankName={m.bankName}
+        note={m.note}
         onDragStart={args.onDragStart}
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
