@@ -18,8 +18,12 @@ type Props = {
 };
 
 export const FILTERABLE_MODULES: ModulesEnum[] = [
+  ModulesEnum.ADDRESS,
+  ModulesEnum.COMPANY,
+  ModulesEnum.DOCUMENT,
   ModulesEnum.USERNAME,
   ModulesEnum.PASSWORD,
+  ModulesEnum.PERSON,
   ModulesEnum.URL,
   ModulesEnum.E_MAIL,
   ModulesEnum.PHONE_NUMBER,

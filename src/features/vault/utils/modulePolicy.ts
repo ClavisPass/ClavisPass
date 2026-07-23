@@ -19,6 +19,10 @@ export type EntryMeta = {
   email?: string | null;
   url?: string | null;
   phone?: string | null;
+  personName?: string | null;
+  address?: string | null;
+  company?: string | null;
+  document?: string | null;
 
   wifiName?: string | null;
   wifiType?: "WEP" | "WPA" | "blank" | null;
@@ -63,6 +67,30 @@ function firstValue(entry: ValuesType, moduleName: ModulesEnum): string | null {
 }
 
 export const MODULE_POLICY: Record<ManagedModules, ModulePolicy> = {
+  [ModulesEnum.ADDRESS]: {
+    kind: "meta",
+    extractMeta: (entry, meta) => {
+      const address = firstModule(entry, ModulesEnum.ADDRESS);
+      if (!address) return meta;
+      const line1 = [address.street1, address.street2]
+        .map((part) => (typeof part === "string" ? part.trim() : ""))
+        .filter(Boolean)
+        .join(" ");
+      const line2 = [address.postalCode, address.city]
+        .map((part) => (typeof part === "string" ? part.trim() : ""))
+        .filter(Boolean)
+        .join(" ");
+      const value = [line1, line2, address.state, address.country]
+        .map((part) => (typeof part === "string" ? part.trim() : ""))
+        .filter(Boolean)
+        .join("\n");
+      return {
+        ...meta,
+        address: value || null,
+      };
+    },
+  },
+
   [ModulesEnum.ATTACHMENT]: {
     kind: "structured",
     getSecret: (entry) =>
@@ -74,12 +102,46 @@ export const MODULE_POLICY: Record<ManagedModules, ModulePolicy> = {
         })),
   },
 
+  [ModulesEnum.COMPANY]: {
+    kind: "meta",
+    extractMeta: (entry, meta) => {
+      const company = firstModule(entry, ModulesEnum.COMPANY);
+      if (!company) return meta;
+      const value = [company.name, company.department, company.jobTitle]
+        .map((part) => (typeof part === "string" ? part.trim() : ""))
+        .filter(Boolean)
+        .join("\n");
+      return {
+        ...meta,
+        company: value || null,
+      };
+    },
+  },
+
   [ModulesEnum.USERNAME]: { kind: "meta", metaKey: "username" },
   [ModulesEnum.E_MAIL]: { kind: "meta", metaKey: "email" },
   [ModulesEnum.URL]: { kind: "meta", metaKey: "url" },
   [ModulesEnum.PHONE_NUMBER]: { kind: "meta", metaKey: "phone" },
 
   [ModulesEnum.PASSWORD]: { kind: "secret" },
+  [ModulesEnum.PERSON]: {
+    kind: "meta",
+    extractMeta: (entry, meta) => {
+      const person = firstModule(entry, ModulesEnum.PERSON);
+      if (!person) return meta;
+      const personName =
+        person.displayName ??
+        [person.title, person.firstName, person.middleName, person.lastName]
+          .map((part) => (typeof part === "string" ? part.trim() : ""))
+          .filter(Boolean)
+          .join(" ") ??
+        null;
+      return {
+        ...meta,
+        personName: personName || null,
+      };
+    },
+  },
   [ModulesEnum.PIN]: { kind: "secret" },
   [ModulesEnum.NOTE]: { kind: "secret" },
   [ModulesEnum.KEY]: { kind: "secret" },
@@ -97,6 +159,32 @@ export const MODULE_POLICY: Record<ManagedModules, ModulePolicy> = {
           title: (m as any).title,
           value: (m as any).value,
           inputType: (m as any).inputType,
+        })),
+  },
+
+  [ModulesEnum.DOCUMENT]: {
+    kind: "hybrid",
+    extractMeta: (entry, meta) => {
+      const document = firstModule(entry, ModulesEnum.DOCUMENT);
+      if (!document) return meta;
+      const value = [document.documentType, document.issuer, document.expiryDate]
+        .map((part) => (typeof part === "string" ? part.trim() : ""))
+        .filter(Boolean)
+        .join("\n");
+      return {
+        ...meta,
+        document: value || null,
+      };
+    },
+    getSecret: (entry) =>
+      entry.modules
+        .filter((m) => (m as any).module === ModulesEnum.DOCUMENT)
+        .map((m) => ({
+          id: (m as any).id,
+          documentType: (m as any).documentType,
+          number: (m as any).number,
+          issuer: (m as any).issuer,
+          expiryDate: (m as any).expiryDate,
         })),
   },
 

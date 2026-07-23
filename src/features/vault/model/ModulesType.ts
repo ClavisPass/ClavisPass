@@ -1,12 +1,16 @@
 import { z } from "zod";
 import ModulesEnum from "../model/ModulesEnum";
 
+import { AddressModuleTypeSchema } from "./modules/AddressModuleType";
 import { AttachmentModuleTypeSchema } from "./modules/AttachmentModuleType";
+import { CompanyModuleTypeSchema } from "./modules/CompanyModuleType";
 import { CustomFieldModuleTypeSchema } from "./modules/CustomFieldModuleType";
+import { DocumentModuleTypeSchema } from "./modules/DocumentModuleType";
 import { EmnailModuleTypeSchema } from "./modules/EmailModuleType";
 import { KeyModuleTypeSchema } from "./modules/KeyModuleType";
 import { NoteModuleTypeSchema } from "./modules/NoteModuleType";
 import { PasswordModuleTypeSchema } from "./modules/PasswordModuleType";
+import { PersonModuleTypeSchema } from "./modules/PersonModuleType";
 import { PinModuleTypeSchema } from "./modules/PinModuleType";
 import { TitleModuleTypeSchema } from "./modules/TitleModuleType";
 import { URLModuleTypeSchema } from "./modules/URLModuleType";
@@ -21,12 +25,16 @@ import { ExpiryModuleTypeSchema } from "./modules/ExpiryModuleType";
 import { RecoveryCodesModuleTypeSchema } from "./modules/RecoveryCodesModuleType";
 
 const MODULE_SCHEMA_BY_ENUM = {
+  [ModulesEnum.ADDRESS]: AddressModuleTypeSchema,
   [ModulesEnum.ATTACHMENT]: AttachmentModuleTypeSchema,
+  [ModulesEnum.COMPANY]: CompanyModuleTypeSchema,
   [ModulesEnum.CUSTOM_FIELD]: CustomFieldModuleTypeSchema,
+  [ModulesEnum.DOCUMENT]: DocumentModuleTypeSchema,
   [ModulesEnum.E_MAIL]: EmnailModuleTypeSchema,
   [ModulesEnum.KEY]: KeyModuleTypeSchema,
   [ModulesEnum.NOTE]: NoteModuleTypeSchema,
   [ModulesEnum.PASSWORD]: PasswordModuleTypeSchema,
+  [ModulesEnum.PERSON]: PersonModuleTypeSchema,
   [ModulesEnum.PIN]: PinModuleTypeSchema,
   [ModulesEnum.TITLE]: TitleModuleTypeSchema,
   [ModulesEnum.URL]: URLModuleTypeSchema,

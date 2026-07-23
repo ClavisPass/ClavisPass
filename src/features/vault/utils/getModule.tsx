@@ -2,11 +2,20 @@ import { ReactNode } from "react";
 import ModulesEnum from "../model/ModulesEnum";
 import { ModuleType } from "../model/ModulesType";
 
+import AddressModuleType from "../model/modules/AddressModuleType";
+import AddressModule from "../components/modules/AddressModule";
+
 import AttachmentModuleType from "../model/modules/AttachmentModuleType";
 import AttachmentModule from "../components/modules/AttachmentModule";
 
+import CompanyModuleType from "../model/modules/CompanyModuleType";
+import CompanyModule from "../components/modules/CompanyModule";
+
 import CustomFieldModuleType from "../model/modules/CustomFieldModuleType";
 import CustomFieldModule from "../components/modules/CustomFieldModule";
+
+import DocumentModuleType from "../model/modules/DocumentModuleType";
+import DocumentModule from "../components/modules/DocumentModule";
 
 import EmailModuleType from "../model/modules/EmailModuleType";
 import EmailModule from "../components/modules/EmailModule";
@@ -19,6 +28,8 @@ import NoteModule from "../components/modules/NoteModule";
 
 import PasswordModuleType from "../model/modules/PasswordModuleType";
 import PasswordModule from "../components/modules/PasswordModule";
+import PersonModuleType from "../model/modules/PersonModuleType";
+import PersonModule from "../components/modules/PersonModule";
 import PinModuleType from "../model/modules/PinModuleType";
 import PinModule from "../components/modules/PinModule";
 
@@ -74,6 +85,26 @@ type GetModuleArgs = {
 type Renderer = (module: ModuleType, args: GetModuleArgs) => ReactNode;
 
 const MODULE_RENDERERS = {
+  [ModulesEnum.ADDRESS]: (module, args) => {
+    const m = module as AddressModuleType;
+    return (
+      <AddressModule
+        id={m.id}
+        module={m.module}
+        street1={m.street1}
+        street2={m.street2}
+        postalCode={m.postalCode}
+        city={m.city}
+        state={m.state}
+        country={m.country}
+        onDragStart={args.onDragStart}
+        deleteModule={args.deleteModule}
+        changeModule={args.changeModule}
+        fastAccess={args.fastAccess}
+      />
+    );
+  },
+
   [ModulesEnum.ATTACHMENT]: (module, args) => {
     const m = module as AttachmentModuleType;
     return (
@@ -81,6 +112,23 @@ const MODULE_RENDERERS = {
         id={m.id}
         module={m.module}
         files={m.files}
+        onDragStart={args.onDragStart}
+        deleteModule={args.deleteModule}
+        changeModule={args.changeModule}
+        fastAccess={args.fastAccess}
+      />
+    );
+  },
+
+  [ModulesEnum.COMPANY]: (module, args) => {
+    const m = module as CompanyModuleType;
+    return (
+      <CompanyModule
+        id={m.id}
+        module={m.module}
+        name={m.name}
+        department={m.department}
+        jobTitle={m.jobTitle}
         onDragStart={args.onDragStart}
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
@@ -98,6 +146,24 @@ const MODULE_RENDERERS = {
         title={m.title}
         value={m.value}
         inputType={m.inputType}
+        onDragStart={args.onDragStart}
+        deleteModule={args.deleteModule}
+        changeModule={args.changeModule}
+        fastAccess={args.fastAccess}
+      />
+    );
+  },
+
+  [ModulesEnum.DOCUMENT]: (module, args) => {
+    const m = module as DocumentModuleType;
+    return (
+      <DocumentModule
+        id={m.id}
+        module={m.module}
+        documentType={m.documentType}
+        number={m.number}
+        issuer={m.issuer}
+        expiryDate={m.expiryDate}
         onDragStart={args.onDragStart}
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
@@ -165,6 +231,26 @@ const MODULE_RENDERERS = {
         id={m.id}
         module={m.module}
         value={m.value}
+        onDragStart={args.onDragStart}
+        deleteModule={args.deleteModule}
+        changeModule={args.changeModule}
+        fastAccess={args.fastAccess}
+      />
+    );
+  },
+
+  [ModulesEnum.PERSON]: (module, args) => {
+    const m = module as PersonModuleType;
+    return (
+      <PersonModule
+        id={m.id}
+        module={m.module}
+        firstName={m.firstName}
+        middleName={m.middleName}
+        lastName={m.lastName}
+        displayName={m.displayName}
+        username={m.username}
+        title={m.title}
         onDragStart={args.onDragStart}
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}

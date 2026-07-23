@@ -3,12 +3,16 @@ import ModulesEnum from "./ModulesEnum";
 export type IconName = string;
 
 export const MODULE_ICON = {
+  [ModulesEnum.ADDRESS]: "map-marker",
   [ModulesEnum.ATTACHMENT]: "paperclip",
+  [ModulesEnum.COMPANY]: "office-building",
   [ModulesEnum.CUSTOM_FIELD]: "card-text",
+  [ModulesEnum.DOCUMENT]: "card-account-details",
   [ModulesEnum.E_MAIL]: "email",
   [ModulesEnum.KEY]: "key-variant",
   [ModulesEnum.NOTE]: "note",
   [ModulesEnum.PASSWORD]: "form-textbox-password",
+  [ModulesEnum.PERSON]: "account-details",
   [ModulesEnum.PIN]: "dialpad",
   [ModulesEnum.URL]: "web",
   [ModulesEnum.USERNAME]: "account",

@@ -1,13 +1,17 @@
 import ModulesEnum from "../model/ModulesEnum";
 import { ModuleType } from "../model/ModulesType";
+import AddressModuleType from "../model/modules/AddressModuleType";
 import AttachmentModuleType from "../model/modules/AttachmentModuleType";
+import CompanyModuleType from "../model/modules/CompanyModuleType";
 import CustomFieldModuleType from "../model/modules/CustomFieldModuleType";
+import DocumentModuleType from "../model/modules/DocumentModuleType";
 import DigitalCardModuleType from "../model/modules/DigitalCardModuleType";
 import EmailModuleType from "../model/modules/EmailModuleType";
 import ExpiryModuleType from "../model/modules/ExpiryModuleType";
 import KeyModuleType from "../model/modules/KeyModuleType";
 import NoteModuleType from "../model/modules/NoteModuleType";
 import PasswordModuleType from "../model/modules/PasswordModuleType";
+import PersonModuleType from "../model/modules/PersonModuleType";
 import PinModuleType from "../model/modules/PinModuleType";
 import PhoneNumberModuleType from "../model/modules/PhoneNumberModuleType";
 import TaskModuleType from "../model/modules/TaskModuleType";
@@ -24,12 +28,33 @@ type AddableModules = Exclude<ModulesEnum, ModulesEnum.UNKNOWN>;
 type ModuleFactory = (id: string) => ModuleType;
 
 const MODULE_DEFAULTS = {
+  [ModulesEnum.ADDRESS]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.ADDRESS,
+      street1: "",
+      street2: "",
+      postalCode: "",
+      city: "",
+      state: "",
+      country: "",
+    }) satisfies AddressModuleType,
+
   [ModulesEnum.ATTACHMENT]: (id: string): ModuleType =>
     ({
       id,
       module: ModulesEnum.ATTACHMENT,
       files: [],
     }) satisfies AttachmentModuleType,
+
+  [ModulesEnum.COMPANY]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.COMPANY,
+      name: "",
+      department: "",
+      jobTitle: "",
+    }) satisfies CompanyModuleType,
 
   [ModulesEnum.CUSTOM_FIELD]: (id: string): ModuleType =>
     ({
@@ -39,6 +64,16 @@ const MODULE_DEFAULTS = {
       value: "",
       inputType: "text",
     }) satisfies CustomFieldModuleType,
+
+  [ModulesEnum.DOCUMENT]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.DOCUMENT,
+      documentType: "",
+      number: "",
+      issuer: "",
+      expiryDate: "",
+    }) satisfies DocumentModuleType,
 
   [ModulesEnum.E_MAIL]: (id: string): ModuleType =>
     ({
@@ -67,6 +102,18 @@ const MODULE_DEFAULTS = {
       module: ModulesEnum.PASSWORD,
       value: "",
     }) satisfies PasswordModuleType,
+
+  [ModulesEnum.PERSON]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.PERSON,
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      displayName: "",
+      username: "",
+      title: "",
+    }) satisfies PersonModuleType,
 
   [ModulesEnum.PIN]: (id: string): ModuleType =>
     ({
