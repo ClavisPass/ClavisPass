@@ -69,11 +69,11 @@ This note captures the planned direction for Bitwarden import support. The goal 
        documentType?: string;
        number?: string;
        issuer?: string;
-       expiryDate?: string;
      }
      ```
    - Use this for passport, license, SSN-like, and identity-number fields where a dedicated ClavisPass module is useful.
    - Sensitive document numbers should be treated as secret policy data where appropriate.
+   - Document expiry should not live inside this module. Use the normal `EXPIRY` module for expiry behavior.
 
 5. [x] Extend `CUSTOM_FIELD` with a date input type.
    - Current custom fields support:

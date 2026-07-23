@@ -591,7 +591,6 @@ const en: TranslationSchema = {
     documentType: "Document type",
     documentNumber: "Number",
     documentIssuer: "Issuer",
-    documentExpiryDate: "Expiry date",
     documentShowMore: "Show more",
     documentShowLess: "Show less",
     digitalCard: "Digital Card",
@@ -671,6 +670,10 @@ const en: TranslationSchema = {
     tasklist: "Tasklist",
     note: "Note",
     twoFactor: "2FA",
+    identity: "Identity",
+    document: "Document",
+    creditCard: "Card",
+    bankAccount: "Bank Account",
     empty: "Empty",
   },
 };

@@ -87,7 +87,6 @@ const MODULE_DEFAULTS = {
       documentType: "",
       number: "",
       issuer: "",
-      expiryDate: "",
     }) satisfies DocumentModuleType,
 
   [ModulesEnum.E_MAIL]: (id: string): ModuleType =>

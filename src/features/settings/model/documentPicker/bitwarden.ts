@@ -62,7 +62,11 @@ type BitwardenItem = {
     phone?: string | null;
     username?: string | null;
     passportNumber?: string | null;
+    passportExpirationDate?: string | null;
+    passportExpiryDate?: string | null;
     licenseNumber?: string | null;
+    licenseExpirationDate?: string | null;
+    licenseExpiryDate?: string | null;
     ssn?: string | null;
   } | null;
   sshKey?: {
@@ -150,6 +154,20 @@ function addTotp(modules: ModuleType[], value: unknown) {
     value: /^otpauth:\/\//i.test(text)
       ? text
       : `otpauth://totp/Bitwarden?secret=${encodeURIComponent(text)}`,
+  } as ModuleType);
+}
+
+function addExpiryModule(modules: ModuleType[], value: unknown) {
+  const text = clean(value);
+  if (!text) return;
+
+  const date = new Date(text);
+  if (Number.isNaN(date.getTime())) return;
+
+  modules.push({
+    id: createUniqueID(),
+    module: ModulesEnum.EXPIRY,
+    value: date.toISOString(),
   } as ModuleType);
 }
 
@@ -273,10 +291,18 @@ function addIdentityModules(modules: ModuleType[], item: BitwardenItem) {
   addValueModule(modules, ModulesEnum.PHONE_NUMBER, identity.phone);
 
   [
-    ["Passport", identity.passportNumber],
-    ["License", identity.licenseNumber],
-    ["SSN", identity.ssn],
-  ].forEach(([documentType, number]) => {
+    [
+      "Passport",
+      identity.passportNumber,
+      identity.passportExpirationDate ?? identity.passportExpiryDate,
+    ],
+    [
+      "License",
+      identity.licenseNumber,
+      identity.licenseExpirationDate ?? identity.licenseExpiryDate,
+    ],
+    ["SSN", identity.ssn, null],
+  ].forEach(([documentType, number, expiry]) => {
     if (!clean(number)) return;
     modules.push({
       id: createUniqueID(),
@@ -284,8 +310,8 @@ function addIdentityModules(modules: ModuleType[], item: BitwardenItem) {
       documentType,
       number: clean(number),
       issuer: "",
-      expiryDate: "",
     } as ModuleType);
+    addExpiryModule(modules, expiry);
   });
 }
 

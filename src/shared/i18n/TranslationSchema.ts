@@ -539,7 +539,6 @@ export type TranslationSchema = {
     documentType: string;
     documentNumber: string;
     documentIssuer: string;
-    documentExpiryDate: string;
     documentShowMore: string;
     documentShowLess: string;
     digitalCard: string;
@@ -618,6 +617,10 @@ export type TranslationSchema = {
     tasklist: string;
     note: string;
     twoFactor: string;
+    identity: string;
+    document: string;
+    creditCard: string;
+    bankAccount: string;
     empty: string;
   };
 };

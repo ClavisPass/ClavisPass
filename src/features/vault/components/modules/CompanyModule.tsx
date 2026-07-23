@@ -10,6 +10,7 @@ import Props from "../../model/ModuleProps";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import ModulesEnum from "../../model/ModulesEnum";
 import CompanyModuleType from "../../model/modules/CompanyModuleType";
+import moduleFormStyles from "./moduleFormStyles";
 
 type CompanyState = Pick<CompanyModuleType, "name" | "department" | "jobTitle">;
 
@@ -31,7 +32,8 @@ function CompanyModule(props: CompanyModuleType & Props) {
       department: props.department ?? "",
       jobTitle: props.jobTitle ?? "",
     });
-  }, [props.name, props.department, props.jobTitle]);
+    didMount.current = false;
+  }, [props.id]);
 
   useEffect(() => {
     if (didMount.current) {
@@ -66,11 +68,11 @@ function CompanyModule(props: CompanyModuleType & Props) {
     label: string,
     autoFocus = false,
   ) => (
-    <View style={{ height: 40, flex: 1 }}>
+    <View style={moduleFormStyles.inputShell}>
       <TextInput
         autoFocus={autoFocus}
         outlineStyle={globalStyles.outlineStyle}
-        style={globalStyles.textInputStyle}
+        style={[globalStyles.textInputStyle, moduleFormStyles.input]}
         contentStyle={{ textAlignVertical: "center", paddingVertical: 0 }}
         value={company[field] ?? ""}
         placeholder={label}
@@ -101,7 +103,7 @@ function CompanyModule(props: CompanyModuleType & Props) {
         </View>
 
         {expanded ? (
-          <View style={[globalStyles.moduleView, { gap: 8 }]}>
+          <View style={[globalStyles.moduleView, moduleFormStyles.row]}>
             {input("department", t("modules:companyDepartment"))}
             {input("jobTitle", t("modules:companyJobTitle"))}
           </View>

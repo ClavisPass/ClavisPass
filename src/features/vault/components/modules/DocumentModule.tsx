@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Keyboard, View } from "react-native";
+import { View } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
@@ -10,25 +10,23 @@ import Props from "../../model/ModuleProps";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import ModulesEnum from "../../model/ModulesEnum";
 import DocumentModuleType from "../../model/modules/DocumentModuleType";
-import ExpiryPickerModal from "../modals/ExpiryPickerModal";
+import moduleFormStyles from "./moduleFormStyles";
 
 type DocumentState = Pick<
   DocumentModuleType,
-  "documentType" | "number" | "issuer" | "expiryDate"
+  "documentType" | "number" | "issuer"
 >;
 
 function DocumentModule(props: DocumentModuleType & Props) {
   const didMount = useRef(false);
   const { globalStyles } = useTheme();
   const { t } = useTranslation();
-  const hasAdditionalValues = Boolean(props.issuer || props.expiryDate);
+  const hasAdditionalValues = Boolean(props.issuer);
   const [expanded, setExpanded] = useState(hasAdditionalValues);
-  const [pickerVisible, setPickerVisible] = useState(false);
   const [document, setDocument] = useState<DocumentState>({
     documentType: props.documentType ?? "",
     number: props.number ?? "",
     issuer: props.issuer ?? "",
-    expiryDate: props.expiryDate ?? "",
   });
 
   useEffect(() => {
@@ -36,9 +34,9 @@ function DocumentModule(props: DocumentModuleType & Props) {
       documentType: props.documentType ?? "",
       number: props.number ?? "",
       issuer: props.issuer ?? "",
-      expiryDate: props.expiryDate ?? "",
     });
-  }, [props.documentType, props.number, props.issuer, props.expiryDate]);
+    didMount.current = false;
+  }, [props.id]);
 
   useEffect(() => {
     if (didMount.current) {
@@ -55,7 +53,7 @@ function DocumentModule(props: DocumentModuleType & Props) {
 
   const copyValue = useMemo(
     () =>
-      [document.documentType, document.number, document.issuer, document.expiryDate]
+      [document.documentType, document.number, document.issuer]
         .map((part) => part?.trim())
         .filter(Boolean)
         .join("\n"),
@@ -72,20 +70,22 @@ function DocumentModule(props: DocumentModuleType & Props) {
     field: keyof DocumentState,
     label: string,
     autoFocus = false,
-    right?: React.ReactNode,
+    numeric = false,
   ) => (
-    <View style={{ height: 40, flex: 1 }}>
+    <View style={moduleFormStyles.inputShell}>
       <TextInput
         autoFocus={autoFocus}
         outlineStyle={globalStyles.outlineStyle}
-        style={globalStyles.textInputStyle}
+        style={[globalStyles.textInputStyle, moduleFormStyles.input]}
         contentStyle={{ textAlignVertical: "center", paddingVertical: 0 }}
         value={document[field] ?? ""}
         placeholder={label}
         mode="outlined"
-        onChangeText={changeField(field)}
+        onChangeText={(text) =>
+          changeField(field)(numeric ? text.replace(/\D/g, "") : text)
+        }
         autoCapitalize="words"
-        right={right}
+        keyboardType={numeric ? "number-pad" : "default"}
       />
     </View>
   );
@@ -100,13 +100,13 @@ function DocumentModule(props: DocumentModuleType & Props) {
       fastAccess={props.fastAccess}
     >
       <View style={{ gap: 8 }}>
-        <View style={[globalStyles.moduleView, { gap: 8 }]}>
+        <View style={[globalStyles.moduleView, moduleFormStyles.row]}>
           {input(
             "documentType",
             t("modules:documentType"),
             Object.values(document).every((value) => !value),
           )}
-          {input("number", t("modules:documentNumber"))}
+          {input("number", t("modules:documentNumber"), false, true)}
           <CopyToClipboard
             value={document.number ?? ""}
             disabled={!document.number}
@@ -115,20 +115,8 @@ function DocumentModule(props: DocumentModuleType & Props) {
         </View>
 
         {expanded ? (
-          <View style={[globalStyles.moduleView, { gap: 8 }]}>
+          <View style={[globalStyles.moduleView, moduleFormStyles.row]}>
             {input("issuer", t("modules:documentIssuer"))}
-            {input(
-              "expiryDate",
-              t("modules:documentExpiryDate"),
-              false,
-              <TextInput.Icon
-                icon="calendar"
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setPickerVisible(true);
-                }}
-              />,
-            )}
           </View>
         ) : null}
 
@@ -147,14 +135,6 @@ function DocumentModule(props: DocumentModuleType & Props) {
           </Button>
         </View>
 
-        <ExpiryPickerModal
-          visible={pickerVisible}
-          setVisible={setPickerVisible}
-          initialIso={document.expiryDate || null}
-          onConfirm={(iso) =>
-            setDocument((current) => ({ ...current, expiryDate: iso }))
-          }
-        />
       </View>
     </ModuleContainer>
   );

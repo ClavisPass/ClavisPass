@@ -10,6 +10,7 @@ import Props from "../../model/ModuleProps";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import ModulesEnum from "../../model/ModulesEnum";
 import CreditCardModuleType from "../../model/modules/CreditCardModuleType";
+import moduleFormStyles from "./moduleFormStyles";
 
 type CreditCardState = Pick<
   CreditCardModuleType,
@@ -129,16 +130,8 @@ function CreditCardModule(props: CreditCardModuleType & Props) {
       bankName: props.bankName ?? "",
       note: props.note ?? "",
     });
-  }, [
-    props.cardholderName,
-    props.number,
-    props.brand,
-    props.expiryMonth,
-    props.expiryYear,
-    props.securityCode,
-    props.bankName,
-    props.note,
-  ]);
+    didMount.current = false;
+  }, [props.id]);
 
   useEffect(() => {
     if (didMount.current) {
@@ -184,11 +177,11 @@ function CreditCardModule(props: CreditCardModuleType & Props) {
     autoFocus = false,
     keyboardType: "default" | "number-pad" = "default",
   ) => (
-    <View style={{ height: 40, flex: 1 }}>
+    <View style={moduleFormStyles.inputShell}>
       <TextInput
         autoFocus={autoFocus}
         outlineStyle={globalStyles.outlineStyle}
-        style={globalStyles.textInputStyle}
+        style={[globalStyles.textInputStyle, moduleFormStyles.input]}
         contentStyle={{ textAlignVertical: "center", paddingVertical: 0 }}
         value={card[field] ?? ""}
         placeholder={label}
@@ -201,13 +194,13 @@ function CreditCardModule(props: CreditCardModuleType & Props) {
   );
 
   const numberInput = (
-    <View style={{ height: 40, flex: 1 }}>
+    <View style={moduleFormStyles.inputShell}>
       <TextInput
         outlineStyle={[
           globalStyles.outlineStyle,
           !isCardNumberPlausible ? { borderColor: theme.colors.error } : null,
         ]}
-        style={globalStyles.textInputStyle}
+        style={[globalStyles.textInputStyle, moduleFormStyles.input]}
         contentStyle={{ textAlignVertical: "center", paddingVertical: 0 }}
         value={numberVisible ? (card.number ?? "") : maskCardNumber(card.number ?? "")}
         placeholder={t("modules:creditCardNumber")}
@@ -236,7 +229,7 @@ function CreditCardModule(props: CreditCardModuleType & Props) {
       fastAccess={props.fastAccess}
     >
       <View style={{ gap: 8 }}>
-        <View style={[globalStyles.moduleView, { gap: 8 }]}>
+        <View style={[globalStyles.moduleView, moduleFormStyles.row]}>
           {numberInput}
           <CopyToClipboard
             value={cardNumberDigits}
@@ -245,7 +238,7 @@ function CreditCardModule(props: CreditCardModuleType & Props) {
             sensitive
           />
         </View>
-        <View style={[globalStyles.moduleView, { gap: 8 }]}>
+        <View style={[globalStyles.moduleView, moduleFormStyles.row]}>
           {input(
             "cardholderName",
             t("modules:creditCardHolder"),
@@ -285,12 +278,12 @@ function CreditCardModule(props: CreditCardModuleType & Props) {
 
         {expanded ? (
           <>
-            <View style={[globalStyles.moduleView, { gap: 8 }]}>
+            <View style={[globalStyles.moduleView, moduleFormStyles.row]}>
               {input("brand", t("modules:creditCardBrand"))}
               {input("bankName", t("modules:creditCardBank"))}
             </View>
 
-            <View style={[globalStyles.moduleView, { gap: 8 }]}>
+            <View style={[globalStyles.moduleView, moduleFormStyles.row]}>
               {input(
                 "expiryMonth",
                 t("modules:creditCardExpiryMonth"),

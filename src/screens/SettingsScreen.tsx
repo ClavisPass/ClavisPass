@@ -39,6 +39,7 @@ import { useDevMode } from "../app/providers/DevModeProvider";
 import SettingsDropdownItem from "../features/settings/components/SettingsDropdownItem";
 import { useTranslation } from "react-i18next";
 import { Button as PaperButton, Chip, Text } from "react-native-paper";
+import { siBitwarden, siKeepassxc } from "simple-icons";
 import { useSetting } from "../app/providers/SettingsProvider";
 import { useToken } from "../app/providers/CloudProvider";
 import { useVault } from "../app/providers/VaultProvider";
@@ -67,6 +68,7 @@ import {
   resetDeviceSettings,
 } from "../infrastructure/storage/store";
 import { removeFile as removeLocalVaultFile } from "../infrastructure/cloud/clients/DeviceStorageClient";
+import BrandIcon from "../shared/components/icons/BrandIcon";
 
 const styles = StyleSheet.create({
   surface: {
@@ -930,12 +932,18 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 type={DocumentTypeEnum.KDBX}
                 title={"KeePass"}
                 icon={"key-chain"}
+                leading={
+                  <BrandIcon icon={siKeepassxc} color={theme.colors.primary} />
+                }
               />
               <SettingsDivider />
               <Import
                 type={DocumentTypeEnum.BITWARDEN}
                 title={"Bitwarden"}
                 icon={"shield-key"}
+                leading={
+                  <BrandIcon icon={siBitwarden} color={theme.colors.primary} />
+                }
               />
               <SettingsDivider />
               <Import

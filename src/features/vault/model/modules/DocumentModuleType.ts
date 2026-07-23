@@ -10,7 +10,6 @@ export const DocumentModuleTypeSchema = z.object({
   documentType: z.string().optional(),
   number: z.string().optional(),
   issuer: z.string().optional(),
-  expiryDate: z.string().optional(),
 });
 
 type DocumentModuleType = z.infer<typeof DocumentModuleTypeSchema>;

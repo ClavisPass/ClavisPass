@@ -5,6 +5,10 @@ import createUniqueID from "../../../shared/utils/createUniqueID";
 import getModuleData from "./getModuleData";
 import { getDateTime } from "../../../shared/utils/Timestamp";
 
+function getModules(...modules: ModulesEnum[]) {
+  return modules.map((module) => getModuleData(module));
+}
+
 function getTemplate(template: TemplateEnum) {
   const dateTime = getDateTime();
   let value: ValuesType = {
@@ -17,56 +21,72 @@ function getTemplate(template: TemplateEnum) {
     lastUpdated: dateTime,
   };
   if (template == TemplateEnum.DIGITAL_CARD) {
-    const digitalCard = getModuleData(ModulesEnum.DIGITAL_CARD);
-    if (digitalCard) {
-      value.modules = [digitalCard];
-    }
+    value.modules = getModules(ModulesEnum.DIGITAL_CARD);
     return value;
   }
   if (template == TemplateEnum.PASSWORD) {
-    const username = getModuleData(ModulesEnum.USERNAME);
-    const email = getModuleData(ModulesEnum.E_MAIL);
-    const password = getModuleData(ModulesEnum.PASSWORD);
-    if (username && email && password) {
-      value.modules = [username, email, password];
-    }
+    value.modules = getModules(
+      ModulesEnum.USERNAME,
+      ModulesEnum.E_MAIL,
+      ModulesEnum.PASSWORD,
+    );
     return value;
   }
   if (template == TemplateEnum.WIFI) {
-    const wifi = getModuleData(ModulesEnum.WIFI);
-    if (wifi) {
-      value.modules = [wifi];
-    }
+    value.modules = getModules(ModulesEnum.WIFI);
     return value;
   }
   if (template == TemplateEnum.KEY) {
-    const key = getModuleData(ModulesEnum.KEY);
-    if (key) {
-      value.modules = [key];
-    }
+    value.modules = getModules(ModulesEnum.KEY);
     return value;
   }
   if (template == TemplateEnum.TASKLIST) {
-    const task1 = getModuleData(ModulesEnum.TASK);
-    const task2 = getModuleData(ModulesEnum.TASK);
-    if (task1 && task2) {
-      value.modules = [task1, task2];
-    }
+    value.modules = getModules(ModulesEnum.TASK, ModulesEnum.TASK);
     return value;
   }
   if (template == TemplateEnum.NOTE) {
-    const note = getModuleData(ModulesEnum.NOTE);
-    if (note) {
-      value.modules = [note];
-    }
+    value.modules = getModules(ModulesEnum.NOTE);
     return value;
   }
   if (template == TemplateEnum.TWO_FACTOR) {
-    const totp = getModuleData(ModulesEnum.TOTP);
-    const recoveryCodes = getModuleData(ModulesEnum.RECOVERY_CODES);
-    if (totp && recoveryCodes) {
-      value.modules = [totp, recoveryCodes];
-    }
+    value.modules = getModules(ModulesEnum.TOTP, ModulesEnum.RECOVERY_CODES);
+    return value;
+  }
+  if (template == TemplateEnum.IDENTITY) {
+    value.modules = getModules(
+      ModulesEnum.PERSON,
+      ModulesEnum.ADDRESS,
+      ModulesEnum.PHONE_NUMBER,
+      ModulesEnum.E_MAIL,
+      ModulesEnum.COMPANY,
+    );
+    return value;
+  }
+  if (template == TemplateEnum.DOCUMENT) {
+    value.modules = getModules(
+      ModulesEnum.DOCUMENT,
+      ModulesEnum.EXPIRY,
+      ModulesEnum.ATTACHMENT,
+      ModulesEnum.NOTE,
+    );
+    return value;
+  }
+  if (template == TemplateEnum.CREDIT_CARD) {
+    value.modules = getModules(
+      ModulesEnum.CREDIT_CARD,
+      ModulesEnum.EXPIRY,
+      ModulesEnum.NOTE,
+    );
+    return value;
+  }
+  if (template == TemplateEnum.BANK_ACCOUNT) {
+    value.modules = getModules(
+      ModulesEnum.TITLE,
+      ModulesEnum.URL,
+      ModulesEnum.USERNAME,
+      ModulesEnum.PASSWORD,
+      ModulesEnum.NOTE,
+    );
     return value;
   }
   return value;

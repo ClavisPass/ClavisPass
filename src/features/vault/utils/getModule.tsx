@@ -188,7 +188,6 @@ const MODULE_RENDERERS = {
         documentType={m.documentType}
         number={m.number}
         issuer={m.issuer}
-        expiryDate={m.expiryDate}
         onDragStart={args.onDragStart}
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}

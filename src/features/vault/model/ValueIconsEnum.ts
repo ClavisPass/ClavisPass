@@ -7,6 +7,10 @@ enum ValueIconsEnum {
   TASKLIST = "checkbox-multiple-marked",
   NOTE = "note",
   TWO_FACTOR = "two-factor-authentication",
+  IDENTITY = "card-account-details-outline",
+  DOCUMENT = "file-document-outline",
+  CREDIT_CARD = "credit-card-outline",
+  BANK_ACCOUNT = "bank-outline",
 }
 
 export default ValueIconsEnum;

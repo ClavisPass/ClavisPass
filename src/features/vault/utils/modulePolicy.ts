@@ -198,7 +198,7 @@ export const MODULE_POLICY: Record<ManagedModules, ModulePolicy> = {
     extractMeta: (entry, meta) => {
       const document = firstModule(entry, ModulesEnum.DOCUMENT);
       if (!document) return meta;
-      const value = [document.documentType, document.issuer, document.expiryDate]
+      const value = [document.documentType, document.issuer]
         .map((part) => (typeof part === "string" ? part.trim() : ""))
         .filter(Boolean)
         .join("\n");
@@ -215,7 +215,6 @@ export const MODULE_POLICY: Record<ManagedModules, ModulePolicy> = {
           documentType: (m as any).documentType,
           number: (m as any).number,
           issuer: (m as any).issuer,
-          expiryDate: (m as any).expiryDate,
         })),
   },
 

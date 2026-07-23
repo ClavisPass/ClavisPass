@@ -10,6 +10,7 @@ import Props from "../../model/ModuleProps";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import ModulesEnum from "../../model/ModulesEnum";
 import AddressModuleType from "../../model/modules/AddressModuleType";
+import moduleFormStyles from "./moduleFormStyles";
 
 type AddressState = Pick<
   AddressModuleType,
@@ -42,14 +43,8 @@ function AddressModule(props: AddressModuleType & Props) {
       state: props.state ?? "",
       country: props.country ?? "",
     });
-  }, [
-    props.street1,
-    props.street2,
-    props.postalCode,
-    props.city,
-    props.state,
-    props.country,
-  ]);
+    didMount.current = false;
+  }, [props.id]);
 
   useEffect(() => {
     if (didMount.current) {
@@ -89,18 +84,22 @@ function AddressModule(props: AddressModuleType & Props) {
     field: keyof AddressState,
     label: string,
     autoFocus = false,
+    numeric = false,
   ) => (
-    <View style={{ height: 40, flex: 1 }}>
+    <View style={moduleFormStyles.inputShell}>
       <TextInput
         autoFocus={autoFocus}
         outlineStyle={globalStyles.outlineStyle}
-        style={globalStyles.textInputStyle}
+        style={[globalStyles.textInputStyle, moduleFormStyles.input]}
         contentStyle={{ textAlignVertical: "center", paddingVertical: 0 }}
         value={address[field] ?? ""}
         placeholder={label}
         mode="outlined"
-        onChangeText={changeField(field)}
+        onChangeText={(text) =>
+          changeField(field)(numeric ? text.replace(/\D/g, "") : text)
+        }
         autoCapitalize="words"
+        keyboardType={numeric ? "number-pad" : "default"}
       />
     </View>
   );
@@ -124,8 +123,8 @@ function AddressModule(props: AddressModuleType & Props) {
           <CopyToClipboard value={copyValue} disabled={!copyValue} />
         </View>
 
-        <View style={[globalStyles.moduleView, { gap: 8 }]}>
-          {input("postalCode", t("modules:addressPostalCode"))}
+        <View style={[globalStyles.moduleView, moduleFormStyles.row]}>
+          {input("postalCode", t("modules:addressPostalCode"), false, true)}
           {input("city", t("modules:addressCity"))}
         </View>
 
@@ -135,7 +134,7 @@ function AddressModule(props: AddressModuleType & Props) {
               {input("street2", t("modules:addressStreet2"))}
             </View>
 
-            <View style={[globalStyles.moduleView, { gap: 8 }]}>
+            <View style={[globalStyles.moduleView, moduleFormStyles.row]}>
               {input("state", t("modules:addressState"))}
               {input("country", t("modules:addressCountry"))}
             </View>

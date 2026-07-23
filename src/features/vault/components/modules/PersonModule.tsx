@@ -10,6 +10,7 @@ import Props from "../../model/ModuleProps";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import ModulesEnum from "../../model/ModulesEnum";
 import PersonModuleType from "../../model/modules/PersonModuleType";
+import moduleFormStyles from "./moduleFormStyles";
 
 type PersonState = Pick<
   PersonModuleType,
@@ -42,14 +43,8 @@ function PersonModule(props: PersonModuleType & Props) {
       username: props.username ?? "",
       title: props.title ?? "",
     });
-  }, [
-    props.firstName,
-    props.middleName,
-    props.lastName,
-    props.displayName,
-    props.username,
-    props.title,
-  ]);
+    didMount.current = false;
+  }, [props.id]);
 
   useEffect(() => {
     if (didMount.current) {
@@ -84,11 +79,11 @@ function PersonModule(props: PersonModuleType & Props) {
     label: string,
     autoFocus = false,
   ) => (
-    <View style={{ height: 40, flex: 1 }}>
+    <View style={moduleFormStyles.inputShell}>
       <TextInput
         autoFocus={autoFocus}
         outlineStyle={globalStyles.outlineStyle}
-        style={globalStyles.textInputStyle}
+        style={[globalStyles.textInputStyle, moduleFormStyles.input]}
         contentStyle={{ textAlignVertical: "center", paddingVertical: 0 }}
         value={person[field] ?? ""}
         placeholder={label}
@@ -114,7 +109,7 @@ function PersonModule(props: PersonModuleType & Props) {
           <CopyToClipboard value={copyValue} disabled={!copyValue} />
         </View>
 
-        <View style={[globalStyles.moduleView, { gap: 8 }]}>
+        <View style={[globalStyles.moduleView, moduleFormStyles.row]}>
           {input(
             "firstName",
             t("modules:personFirstName"),
@@ -125,7 +120,7 @@ function PersonModule(props: PersonModuleType & Props) {
 
         {expanded ? (
           <>
-            <View style={[globalStyles.moduleView, { gap: 8 }]}>
+            <View style={[globalStyles.moduleView, moduleFormStyles.row]}>
               {input("middleName", t("modules:personMiddleName"))}
               {input("title", t("modules:personTitle"))}
             </View>

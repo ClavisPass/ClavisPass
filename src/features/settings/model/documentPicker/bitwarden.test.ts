@@ -38,6 +38,7 @@ describe("importBitwarden", () => {
               city: "Berlin",
               company: "Analytical Engines",
               passportNumber: "P123",
+              passportExpirationDate: "2031-05-01T00:00:00.000Z",
             },
           },
           {
@@ -68,6 +69,7 @@ describe("importBitwarden", () => {
     expect(result.values[1].modules.some((m) => m.module === ModulesEnum.ADDRESS)).toBe(true);
     expect(result.values[1].modules.some((m) => m.module === ModulesEnum.COMPANY)).toBe(true);
     expect(result.values[1].modules.some((m) => m.module === ModulesEnum.DOCUMENT)).toBe(true);
+    expect(result.values[1].modules.some((m) => m.module === ModulesEnum.EXPIRY)).toBe(true);
     expect(result.values[2].modules.some((m) => m.module === ModulesEnum.CREDIT_CARD)).toBe(true);
   });
 });

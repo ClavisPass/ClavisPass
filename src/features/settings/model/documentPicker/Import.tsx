@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import * as DocumentPicker from "expo-document-picker";
 import { Button, Icon, Text, TextInput } from "react-native-paper";
 import { Platform, StyleSheet, View } from "react-native";
@@ -61,6 +61,7 @@ export enum DocumentTypeEnum {
 type Props = {
   title: string;
   icon: string;
+  leading?: ReactNode;
   type: DocumentTypeEnum;
 };
 
@@ -302,6 +303,7 @@ function Import(props: Props) {
     <>
       <SettingsItem
         leadingIcon={props.icon}
+        leading={props.leading}
         onPress={
           props.type === DocumentTypeEnum.KDBX
             ? () => {

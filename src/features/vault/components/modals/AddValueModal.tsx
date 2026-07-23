@@ -1,5 +1,5 @@
 import Modal from "../../../../shared/components/modals/Modal";
-import { View, StyleSheet } from "react-native";
+import { ScrollView, View, StyleSheet, useWindowDimensions } from "react-native";
 import ValueIconsEnum from "../../model/ValueIconsEnum";
 import TemplateEnum from "../../model/TemplateEnum";
 import getTemplate from "../../utils/getTemplate";
@@ -22,6 +22,8 @@ type Props = {
 function AddValueModal(props: Props) {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const { height } = useWindowDimensions();
+  const modalMaxHeight = Math.max(220, Math.min(440, height * 0.8));
   const hideModal = () => props.setVisible(false);
   const navigateToAddValue = (template: TemplateEnum) => {
     props.navigation.navigate("Edit", {
@@ -36,7 +38,7 @@ function AddValueModal(props: Props) {
     <Modal visible={props.visible} onDismiss={hideModal}>
       <View
         style={{
-          height: 296,
+          maxHeight: modalMaxHeight,
           width: 280,
           display: "flex",
           flexDirection: "column",
@@ -47,86 +49,136 @@ function AddValueModal(props: Props) {
           borderRadius: 12,
         }}
       >
-        <View
-          style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
+        <ScrollView
+          style={{ maxHeight: modalMaxHeight - 16 }}
+          contentContainerStyle={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+          }}
+          showsVerticalScrollIndicator={false}
         >
-          <CategoryItem
-            leadingIcon={ValueIconsEnum.PASSWORD}
-            onPress={() => {
-              navigateToAddValue(TemplateEnum.PASSWORD);
-            }}
+          <View
+            style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
           >
-            {t("moduleTemplates:password")}
-          </CategoryItem>
-          <CategoryItem
-            leadingIcon={ValueIconsEnum.WIFI}
-            onPress={() => {
-              navigateToAddValue(TemplateEnum.WIFI);
-            }}
+            <CategoryItem
+              leadingIcon={ValueIconsEnum.BLANK}
+              onPress={() => {
+                navigateToAddValue(TemplateEnum.BLANK);
+              }}
+            >
+              {t("moduleTemplates:empty")}
+            </CategoryItem>
+            <CategoryItem
+              leadingIcon={ValueIconsEnum.PASSWORD}
+              onPress={() => {
+                navigateToAddValue(TemplateEnum.PASSWORD);
+              }}
+            >
+              {t("moduleTemplates:password")}
+            </CategoryItem>
+          </View>
+          <View
+            style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
           >
-            {t("moduleTemplates:wifi")}
-          </CategoryItem>
-        </View>
-        <View
-          style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
-        >
-          <CategoryItem
-            leadingIcon={ValueIconsEnum.KEY}
-            onPress={() => {
-              navigateToAddValue(TemplateEnum.KEY);
-            }}
+            <CategoryItem
+              leadingIcon={ValueIconsEnum.WIFI}
+              onPress={() => {
+                navigateToAddValue(TemplateEnum.WIFI);
+              }}
+            >
+              {t("moduleTemplates:wifi")}
+            </CategoryItem>
+            <CategoryItem
+              leadingIcon={ValueIconsEnum.KEY}
+              onPress={() => {
+                navigateToAddValue(TemplateEnum.KEY);
+              }}
+            >
+              {t("moduleTemplates:key")}
+            </CategoryItem>
+          </View>
+          <View
+            style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
           >
-            {t("moduleTemplates:key")}
-          </CategoryItem>
-          <CategoryItem
-            leadingIcon={ValueIconsEnum.DIGITAL_CARD}
-            onPress={() => {
-              navigateToAddValue(TemplateEnum.DIGITAL_CARD);
-            }}
+            <CategoryItem
+              leadingIcon={ValueIconsEnum.IDENTITY}
+              onPress={() => {
+                navigateToAddValue(TemplateEnum.IDENTITY);
+              }}
+            >
+              {t("moduleTemplates:identity")}
+            </CategoryItem>
+            <CategoryItem
+              leadingIcon={ValueIconsEnum.DOCUMENT}
+              onPress={() => {
+                navigateToAddValue(TemplateEnum.DOCUMENT);
+              }}
+            >
+              {t("moduleTemplates:document")}
+            </CategoryItem>
+          </View>
+          <View
+            style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
           >
-            {t("moduleTemplates:digitalCard")}
-          </CategoryItem>
-        </View>
-        <View
-          style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
-        >
-          <CategoryItem
-            leadingIcon={ValueIconsEnum.TASKLIST}
-            onPress={() => {
-              navigateToAddValue(TemplateEnum.TASKLIST);
-            }}
+            <CategoryItem
+              leadingIcon={ValueIconsEnum.CREDIT_CARD}
+              onPress={() => {
+                navigateToAddValue(TemplateEnum.CREDIT_CARD);
+              }}
+            >
+              {t("moduleTemplates:creditCard")}
+            </CategoryItem>
+            <CategoryItem
+              leadingIcon={ValueIconsEnum.BANK_ACCOUNT}
+              onPress={() => {
+                navigateToAddValue(TemplateEnum.BANK_ACCOUNT);
+              }}
+            >
+              {t("moduleTemplates:bankAccount")}
+            </CategoryItem>
+          </View>
+          <View
+            style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
           >
-            {t("moduleTemplates:tasklist")}
-          </CategoryItem>
-          <CategoryItem
-            leadingIcon={ValueIconsEnum.NOTE}
-            onPress={() => {
-              navigateToAddValue(TemplateEnum.NOTE);
-            }}
+            <CategoryItem
+              leadingIcon={ValueIconsEnum.TASKLIST}
+              onPress={() => {
+                navigateToAddValue(TemplateEnum.TASKLIST);
+              }}
+            >
+              {t("moduleTemplates:tasklist")}
+            </CategoryItem>
+            <CategoryItem
+              leadingIcon={ValueIconsEnum.NOTE}
+              onPress={() => {
+                navigateToAddValue(TemplateEnum.NOTE);
+              }}
+            >
+              {t("moduleTemplates:note")}
+            </CategoryItem>
+          </View>
+          <View
+            style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
           >
-            {t("moduleTemplates:note")}
-          </CategoryItem>
-        </View>
-        <View
-          style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
-        >
-          <CategoryItem
-            leadingIcon={ValueIconsEnum.TWO_FACTOR}
-            onPress={() => {
-              navigateToAddValue(TemplateEnum.TWO_FACTOR);
-            }}
-          >
-            {t("moduleTemplates:twoFactor")}
-          </CategoryItem>
-          <CategoryItem
-            leadingIcon={ValueIconsEnum.BLANK}
-            onPress={() => {
-              navigateToAddValue(TemplateEnum.BLANK);
-            }}
-          >
-            {t("moduleTemplates:empty")}
-          </CategoryItem>
-        </View>
+            <CategoryItem
+              leadingIcon={ValueIconsEnum.TWO_FACTOR}
+              onPress={() => {
+                navigateToAddValue(TemplateEnum.TWO_FACTOR);
+              }}
+            >
+              {t("moduleTemplates:twoFactor")}
+            </CategoryItem>
+            <CategoryItem
+              leadingIcon={ValueIconsEnum.DIGITAL_CARD}
+              onPress={() => {
+                navigateToAddValue(TemplateEnum.DIGITAL_CARD);
+              }}
+            >
+              {t("moduleTemplates:digitalCard")}
+            </CategoryItem>
+          </View>
+        </ScrollView>
       </View>
     </Modal>
   );
