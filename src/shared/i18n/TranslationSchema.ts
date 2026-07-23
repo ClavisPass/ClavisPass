@@ -52,6 +52,7 @@ export type TranslationSchema = {
     removeModule: string;
     clearModules: string;
     clearModulesText: string;
+    exportVCard: string;
     showPassword: string;
     hidePassword: string;
     generatePassword: string;
@@ -513,6 +514,7 @@ export type TranslationSchema = {
     customFieldTypeText: string;
     customFieldTypeSecret: string;
     customFieldTypeNumber: string;
+    customFieldTypeDate: string;
     customFieldNumberOnly: string;
     document: string;
     documentType: string;

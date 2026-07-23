@@ -64,6 +64,7 @@ import {
   getFolderColor,
   getFolderIcon,
 } from "../features/vault/utils/folderAppearance";
+import { canExportVCard, exportVCard } from "../features/vault/utils/vcardExport";
 
 type EditScreenProps = NativeStackScreenProps<HomeStackParamList, "Edit">;
 
@@ -597,6 +598,18 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         label: t("common:editHistory"),
         onPress: () => setHistoryModalVisible(true),
       },
+      ...(canExportVCard(value)
+        ? [
+            {
+              key: "exportVCard",
+              icon: "card-account-details-outline",
+              label: t("common:exportVCard"),
+              onPress: () => {
+                void exportVCard(value);
+              },
+            },
+          ]
+        : []),
       ...(value.modules.length > 0
         ? [
             {
@@ -620,6 +633,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       sortCompletedTasksDown,
       t,
       taskModuleCount,
+      value,
       value.modules.length,
       value.pinnedAt,
     ]

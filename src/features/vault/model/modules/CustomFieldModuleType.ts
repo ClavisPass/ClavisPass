@@ -9,7 +9,7 @@ export const CustomFieldModuleTypeSchema = z.object({
   module: z.string().regex(regex),
   title: z.string(),
   value: z.string(),
-  inputType: z.enum(["text", "secret", "number"]).optional(),
+  inputType: z.enum(["text", "secret", "number", "date"]).optional(),
 });
 
 type CustomFieldModuleType = z.infer<typeof CustomFieldModuleTypeSchema>;

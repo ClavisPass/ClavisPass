@@ -29,6 +29,7 @@ function EditCustomFieldModal(props: Props) {
     { label: t("modules:customFieldTypeText"), value: "text" },
     { label: t("modules:customFieldTypeSecret"), value: "secret" },
     { label: t("modules:customFieldTypeNumber"), value: "number" },
+    { label: t("modules:customFieldTypeDate"), value: "date" },
   ];
 
   const CustomDropdownInput = ({
@@ -107,7 +108,12 @@ function EditCustomFieldModal(props: Props) {
             options={options}
             value={props.inputType}
             onSelect={(next?: string) => {
-              if (next === "text" || next === "secret" || next === "number") {
+              if (
+                next === "text" ||
+                next === "secret" ||
+                next === "number" ||
+                next === "date"
+              ) {
                 if (next === "number" && !/^\d*$/.test(props.value)) {
                   setTypeError(t("modules:customFieldNumberOnly"));
                   return;

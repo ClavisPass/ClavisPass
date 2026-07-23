@@ -12,12 +12,14 @@ import ModuleContainer from "../ModuleContainer";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import ModulesEnum from "../../model/ModulesEnum";
 import PasswordTextbox from "../../../../shared/components/PasswordTextbox";
+import ExpiryPickerModal from "../modals/ExpiryPickerModal";
 
 type CustomFieldInputType = NonNullable<CustomFieldModuleType["inputType"]>;
 
 function CustomFieldModule(props: CustomFieldModuleType & Props) {
   const { globalStyles } = useTheme();
   const [visible, setVisible] = useState(false);
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
 
   const inputType = props.inputType ?? "text";
 
@@ -81,11 +83,28 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
               autoCapitalize="none"
               autoCorrect={false}
               keyboardType={inputType === "number" ? "number-pad" : "default"}
+              right={
+                inputType === "date" ? (
+                  <TextInput.Icon
+                    icon="calendar"
+                    onPress={() => {
+                      Keyboard.dismiss();
+                      setDatePickerVisible(true);
+                    }}
+                  />
+                ) : undefined
+              }
             />
           )}
         </View>
         <CopyToClipboard value={props.value} kind={copyKind} />
       </View>
+      <ExpiryPickerModal
+        visible={datePickerVisible}
+        setVisible={setDatePickerVisible}
+        initialIso={props.value || null}
+        onConfirm={(iso) => changeCustomField({ value: iso })}
+      />
       <EditCustomFieldModal
         visible={visible}
         setVisible={setVisible}

@@ -54,6 +54,7 @@ const en: TranslationSchema = {
     clearModules: "Remove all modules",
     clearModulesText:
       "Do you want to remove all modules from this entry? The title, folder, and favorite status will stay unchanged.",
+    exportVCard: "Export as vCard",
     showPassword: "Show password",
     hidePassword: "Hide password",
     generatePassword: "Generate password",
@@ -565,6 +566,7 @@ const en: TranslationSchema = {
     customFieldTypeText: "Text",
     customFieldTypeSecret: "Secret",
     customFieldTypeNumber: "Number",
+    customFieldTypeDate: "Date",
     customFieldNumberOnly: "The current value may only contain numbers.",
     document: "Document",
     documentType: "Document type",

@@ -75,7 +75,7 @@ This note captures the planned direction for Bitwarden import support. The goal 
    - Use this for passport, license, SSN-like, and identity-number fields where a dedicated ClavisPass module is useful.
    - Sensitive document numbers should be treated as secret policy data where appropriate.
 
-5. [ ] Extend `CUSTOM_FIELD` with a date input type.
+5. [x] Extend `CUSTOM_FIELD` with a date input type.
    - Current custom fields support:
      ```ts
      inputType: "text" | "secret" | "number";
@@ -87,7 +87,7 @@ This note captures the planned direction for Bitwarden import support. The goal 
    - Reuse the existing date picker pattern from the expiry module where possible.
    - Decision: do not add a generic standalone date module for now. Dates that do not belong to expiry-specific behavior should live in custom fields.
 
-6. [ ] Add vCard export for compatible EditScreen entries.
+6. [x] Add vCard export for compatible EditScreen entries.
    - Add this after the identity-related modules are implemented.
    - In the EditScreen overflow menu, show an "Export as vCard" action only when the entry contains at least one compatible module.
    - Compatible modules should include at least:
