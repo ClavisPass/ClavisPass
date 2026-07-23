@@ -5,6 +5,7 @@ import {
   ScrollView,
   Dimensions,
   StyleSheet,
+  Platform,
 } from "react-native";
 import { Searchbar, Text, Icon, IconButton, Chip } from "react-native-paper";
 import Modal from "../../../../shared/components/modals/Modal";
@@ -16,7 +17,14 @@ import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { useSetting } from "../../../../app/providers/SettingsProvider";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 
-type ModuleCategory = "Common" | "Security" | "vCard" | "Utility";
+type ModuleCategory =
+  | "LoginAccess"
+  | "ContactIdentity"
+  | "PaymentDocuments"
+  | "SecurityCodes"
+  | "NotesFiles"
+  | "NetworkTechnical"
+  | "Custom";
 
 // UI shows only these modules (exclude internal/structural ones)
 type UiModules = Exclude<ModulesEnum, ModulesEnum.UNKNOWN | ModulesEnum.TITLE>;
@@ -171,6 +179,7 @@ export default function AddModuleModalCompactFav(props: Props) {
   const favs = props.favorites ?? storedFavs;
 
   const ScrollViewRef: any = useRef<ScrollView>(null);
+  const categoryScrollRef: any = useRef<ScrollView>(null);
   const [currentOffset, setCurrentOffset] = useState(0);
 
   // IMPORTANT: defineModules(...) enforces that all UiModules appear exactly somewhere here
@@ -179,7 +188,7 @@ export default function AddModuleModalCompactFav(props: Props) {
       id: ModulesEnum.ADDRESS,
       label: t("modules:address"),
       icon: MODULE_ICON[ModulesEnum.ADDRESS],
-      category: "vCard",
+      category: "ContactIdentity",
       keywords: [
         "adresse",
         "address",
@@ -191,27 +200,28 @@ export default function AddModuleModalCompactFav(props: Props) {
         "stadt",
         "kontakt",
         "contact",
+        "vcard",
       ],
     },
     {
       id: ModulesEnum.USERNAME,
       label: t("modules:username"),
       icon: MODULE_ICON[ModulesEnum.USERNAME],
-      category: "Common",
-      keywords: ["user", "login", "account"],
+      category: "LoginAccess",
+      keywords: ["user", "login", "account", "benutzer", "name"],
     },
     {
       id: ModulesEnum.E_MAIL,
       label: t("modules:email"),
       icon: MODULE_ICON[ModulesEnum.E_MAIL],
-      category: "Common",
-      keywords: ["mail", "email", "kontakt"],
+      category: "ContactIdentity",
+      keywords: ["mail", "email", "kontakt", "contact", "vcard"],
     },
     {
       id: ModulesEnum.COMPANY,
       label: t("modules:company"),
       icon: MODULE_ICON[ModulesEnum.COMPANY],
-      category: "vCard",
+      category: "ContactIdentity",
       keywords: [
         "firma",
         "company",
@@ -222,13 +232,16 @@ export default function AddModuleModalCompactFav(props: Props) {
         "abteilung",
         "rolle",
         "position",
+        "kontakt",
+        "contact",
+        "vcard",
       ],
     },
     {
       id: ModulesEnum.DOCUMENT,
       label: t("modules:document"),
       icon: MODULE_ICON[ModulesEnum.DOCUMENT],
-      category: "vCard",
+      category: "PaymentDocuments",
       keywords: [
         "document",
         "dokument",
@@ -240,20 +253,22 @@ export default function AddModuleModalCompactFav(props: Props) {
         "ausweis",
         "identity",
         "nummer",
+        "card",
+        "karte",
       ],
     },
     {
       id: ModulesEnum.PASSWORD,
       label: t("modules:password"),
       icon: MODULE_ICON[ModulesEnum.PASSWORD],
-      category: "Security",
-      keywords: ["passwort", "credential", "login"],
+      category: "LoginAccess",
+      keywords: ["passwort", "password", "credential", "login", "secret"],
     },
     {
       id: ModulesEnum.PERSON,
       label: t("modules:person"),
       icon: MODULE_ICON[ModulesEnum.PERSON],
-      category: "vCard",
+      category: "ContactIdentity",
       keywords: [
         "person",
         "kontakt",
@@ -269,91 +284,126 @@ export default function AddModuleModalCompactFav(props: Props) {
       id: ModulesEnum.PIN,
       label: t("modules:pin"),
       icon: MODULE_ICON[ModulesEnum.PIN],
-      category: "Security",
-      keywords: ["pin", "code", "numeric", "device"],
+      category: "LoginAccess",
+      keywords: ["pin", "code", "numeric", "device", "gerät", "login"],
     },
     {
       id: ModulesEnum.WIFI,
       label: t("modules:wifi"),
       icon: MODULE_ICON[ModulesEnum.WIFI],
-      category: "Utility",
-      keywords: ["wlan", "network", "ssid"],
+      category: "NetworkTechnical",
+      keywords: ["wlan", "wifi", "network", "ssid", "router", "netzwerk"],
     },
     {
       id: ModulesEnum.URL,
       label: t("modules:url"),
       icon: MODULE_ICON[ModulesEnum.URL],
-      category: "Common",
-      keywords: ["link", "website", "http"],
+      category: "LoginAccess",
+      keywords: ["link", "website", "http", "url", "domain", "site"],
     },
     {
       id: ModulesEnum.DIGITAL_CARD,
       label: t("modules:digitalCard"),
       icon: MODULE_ICON[ModulesEnum.DIGITAL_CARD],
-      category: "Utility",
-      keywords: ["card", "kontakt", "profile"],
+      category: "PaymentDocuments",
+      keywords: [
+        "card",
+        "karte",
+        "kundenkarte",
+        "loyalty",
+        "barcode",
+        "qr",
+        "mitglied",
+      ],
     },
     {
       id: ModulesEnum.KEY,
       label: t("modules:key"),
       icon: MODULE_ICON[ModulesEnum.KEY],
-      category: "Security",
-      keywords: ["ssh", "api", "token"],
+      category: "NetworkTechnical",
+      keywords: ["ssh", "api", "token", "key", "schlüssel", "private", "public"],
     },
     {
       id: ModulesEnum.CUSTOM_FIELD,
       label: t("modules:customField"),
       icon: MODULE_ICON[ModulesEnum.CUSTOM_FIELD],
-      category: "Utility",
-      keywords: ["frei", "meta", "notizen"],
+      category: "Custom",
+      keywords: ["frei", "custom", "field", "meta", "extra", "eigene", "datum"],
     },
     {
       id: ModulesEnum.PHONE_NUMBER,
       label: t("modules:phoneNumber"),
       icon: MODULE_ICON[ModulesEnum.PHONE_NUMBER],
-      category: "vCard",
-      keywords: ["telefon", "mobil", "kontakt"],
+      category: "ContactIdentity",
+      keywords: [
+        "telefon",
+        "phone",
+        "mobile",
+        "mobil",
+        "call",
+        "anrufen",
+        "kontakt",
+        "contact",
+        "vcard",
+      ],
     },
     {
       id: ModulesEnum.TASK,
       label: t("modules:task"),
       icon: MODULE_ICON[ModulesEnum.TASK],
-      category: "Utility",
-      keywords: ["todo", "aufgabe", "reminder"],
+      category: "NotesFiles",
+      keywords: ["todo", "task", "aufgabe", "reminder", "checklist"],
     },
     {
       id: ModulesEnum.TOTP,
       label: t("modules:totp"),
       icon: MODULE_ICON[ModulesEnum.TOTP],
-      category: "Security",
+      category: "SecurityCodes",
       keywords: ["2fa", "otp", "totp", "mfa"],
     },
     {
       id: ModulesEnum.RECOVERY_CODES,
       label: t("modules:recoveryCodes"),
       icon: MODULE_ICON[ModulesEnum.RECOVERY_CODES],
-      category: "Security",
-      keywords: ["2fa", "otp", "totp", "mfa", "recovery", "codes"],
+      category: "SecurityCodes",
+      keywords: [
+        "2fa",
+        "otp",
+        "totp",
+        "mfa",
+        "recovery",
+        "codes",
+        "backup",
+        "wiederherstellung",
+      ],
     },
     {
       id: ModulesEnum.ATTACHMENT,
       label: t("modules:attachment"),
       icon: MODULE_ICON[ModulesEnum.ATTACHMENT],
-      category: "Utility",
-      keywords: ["file", "datei", "anhang", "attachment", "document"],
+      category: "NotesFiles",
+      keywords: [
+        "file",
+        "datei",
+        "anhang",
+        "attachment",
+        "document",
+        "dokument",
+        "upload",
+      ],
     },
     {
       id: ModulesEnum.NOTE,
       label: t("modules:note"),
       icon: MODULE_ICON[ModulesEnum.NOTE],
-      category: "Utility",
-      keywords: ["notiz", "text", "memo"],
+      category: "NotesFiles",
+      keywords: ["notiz", "note", "text", "memo", "markdown", "code"],
     },
     {
       id: ModulesEnum.EXPIRY,
       label: t("modules:expiry"),
       icon: MODULE_ICON[ModulesEnum.EXPIRY],
-      category: "Utility",
+      category: "NetworkTechnical",
       keywords: ["ablauf", "gültig", "verfall"],
     },
   ] as const);
@@ -370,8 +420,41 @@ export default function AddModuleModalCompactFav(props: Props) {
     setCurrentOffset(nextOffset);
   };
 
-  const categories: ModuleCategory[] = ["Common", "Security", "vCard", "Utility"];
+  const categoryLabels = useMemo(
+    () =>
+      ({
+        LoginAccess: t("modules:addCategoryLoginAccess"),
+        ContactIdentity: t("modules:addCategoryContactIdentity"),
+        PaymentDocuments: t("modules:addCategoryPaymentDocuments"),
+        SecurityCodes: t("modules:addCategorySecurityCodes"),
+        NotesFiles: t("modules:addCategoryNotesFiles"),
+        NetworkTechnical: t("modules:addCategoryNetworkTechnical"),
+        Custom: t("modules:addCategoryCustom"),
+      }) satisfies Record<ModuleCategory, string>,
+    [t],
+  );
+  const categories: ModuleCategory[] = [
+    "LoginAccess",
+    "ContactIdentity",
+    "PaymentDocuments",
+    "SecurityCodes",
+    "NotesFiles",
+    "NetworkTechnical",
+    "Custom",
+  ];
   const [activeCats, setActiveCats] = useState<Set<ModuleCategory>>(new Set());
+  const categoryOffsetRef = useRef(0);
+  const handleCategoryWheel = (event: any) => {
+    if (Platform.OS !== "web") return;
+    const delta = event?.nativeEvent?.deltaY ?? event?.deltaY ?? 0;
+    if (!delta) return;
+    event?.preventDefault?.();
+    categoryOffsetRef.current = Math.max(0, categoryOffsetRef.current + delta);
+    categoryScrollRef.current?.scrollTo?.({
+      x: categoryOffsetRef.current,
+      animated: false,
+    });
+  };
   const toggleCat = (c: ModuleCategory) =>
     setActiveCats((s) => {
       const next = new Set(s);
@@ -388,12 +471,18 @@ export default function AddModuleModalCompactFav(props: Props) {
     if (normalizedQuery.length > 0) {
       const tokens = normalizedQuery.split(/\s+/);
       list = list.filter((m) => {
-        const hay = (m.label + " " + m.keywords.join(" ")).toLowerCase();
+        const hay = (
+          m.label +
+          " " +
+          categoryLabels[m.category] +
+          " " +
+          m.keywords.join(" ")
+        ).toLowerCase();
         return tokens.every((tok) => hay.includes(tok));
       });
     }
     return list;
-  }, [activeCats, normalizedQuery, MODULES]);
+  }, [activeCats, normalizedQuery, MODULES, categoryLabels]);
 
   const sections = useMemo(() => {
     const byId = new Map(filtered.map((m) => [m.id, m]));
@@ -415,9 +504,13 @@ export default function AddModuleModalCompactFav(props: Props) {
     if (favItems.length) s.push({ title: t("common:favorites"), data: favItems });
     if (recentItems.length)
       s.push({ title: t("common:recentlyUsed"), data: recentItems });
-    s.push({ title: t("common:allModules"), data: allItems });
+
+    categories.forEach((category) => {
+      const data = allItems.filter((m) => m.category === category);
+      if (data.length) s.push({ title: categoryLabels[category], data });
+    });
     return s.filter((sec) => sec.data.length > 0);
-  }, [filtered, favs, props.recent]);
+  }, [categoryLabels, filtered, favs, props.recent]);
 
   const handleSelect = useCallback(
     (m: ModuleMeta) => {
@@ -474,13 +567,21 @@ export default function AddModuleModalCompactFav(props: Props) {
   );
 
   const catIcon = (c: ModuleCategory) =>
-    c === "Security"
+    c === "LoginAccess"
       ? "shield-lock"
-      : c === "vCard"
+      : c === "ContactIdentity"
         ? "account-box"
-        : c === "Utility"
-          ? "wrench"
-          : "view-dashboard";
+        : c === "PaymentDocuments"
+          ? "credit-card-outline"
+          : c === "SecurityCodes"
+            ? "two-factor-authentication"
+            : c === "NotesFiles"
+              ? "note-text-outline"
+              : c === "NetworkTechnical"
+                ? "lan"
+                : c === "Custom"
+                  ? "wrench"
+                  : "view-dashboard";
 
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
@@ -508,18 +609,20 @@ export default function AddModuleModalCompactFav(props: Props) {
         />
 
         <ScrollView
-          ref={ScrollViewRef}
+          ref={categoryScrollRef}
           showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
+          showsHorizontalScrollIndicator
           horizontal
-          style={{ gap: 6, maxHeight: 36 }}
+          style={{ maxHeight: 36 }}
+          contentContainerStyle={{ gap: 6, paddingRight: 4 }}
+          {...(Platform.OS === "web" ? { onWheel: handleCategoryWheel } : {})}
         >
           {(categories as ModuleCategory[]).map((c) => {
             const selected = activeCats.has(c);
             return (
               <TinyFilterChip
                 key={c}
-                label={c}
+                label={categoryLabels[c]}
                 icon={catIcon(c)}
                 selected={selected}
                 onPress={() => toggleCat(c)}

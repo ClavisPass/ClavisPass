@@ -102,7 +102,7 @@ This note captures the planned direction for Bitwarden import support. The goal 
    - Keep incompatible modules out of the vCard instead of forcing them into notes.
    - This is useful independently from Bitwarden, but should wait until the new identity modules exist.
 
-7. [ ] Improve Add Module modal discovery for many modules.
+7. [x] Improve Add Module modal discovery for many modules.
    - Do this after the vCard-related identity work, because the module count will be noticeably higher.
    - Add alias-based module search so users can find modules by related terms, not only the visible module name.
    - Examples:

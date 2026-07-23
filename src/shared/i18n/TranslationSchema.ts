@@ -491,6 +491,13 @@ export type TranslationSchema = {
     addressCountry: string;
     addressShowMore: string;
     addressShowLess: string;
+    addCategoryLoginAccess: string;
+    addCategoryContactIdentity: string;
+    addCategoryPaymentDocuments: string;
+    addCategorySecurityCodes: string;
+    addCategoryNotesFiles: string;
+    addCategoryNetworkTechnical: string;
+    addCategoryCustom: string;
     attachment: string;
     attachmentAdd: string;
     attachmentEmpty: string;
