@@ -23,7 +23,6 @@ describe("getTemplate", () => {
       ModulesEnum.DOCUMENT,
       ModulesEnum.EXPIRY,
       ModulesEnum.ATTACHMENT,
-      ModulesEnum.NOTE,
     ]);
   });
 
@@ -31,17 +30,14 @@ describe("getTemplate", () => {
     expect(modules(TemplateEnum.CREDIT_CARD)).toEqual([
       ModulesEnum.CREDIT_CARD,
       ModulesEnum.EXPIRY,
-      ModulesEnum.NOTE,
     ]);
   });
 
   it("creates bank account template modules", () => {
     expect(modules(TemplateEnum.BANK_ACCOUNT)).toEqual([
-      ModulesEnum.TITLE,
       ModulesEnum.URL,
       ModulesEnum.USERNAME,
       ModulesEnum.PASSWORD,
-      ModulesEnum.NOTE,
     ]);
   });
 });

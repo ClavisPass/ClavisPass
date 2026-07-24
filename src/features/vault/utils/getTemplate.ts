@@ -67,7 +67,6 @@ function getTemplate(template: TemplateEnum) {
       ModulesEnum.DOCUMENT,
       ModulesEnum.EXPIRY,
       ModulesEnum.ATTACHMENT,
-      ModulesEnum.NOTE,
     );
     return value;
   }
@@ -75,17 +74,14 @@ function getTemplate(template: TemplateEnum) {
     value.modules = getModules(
       ModulesEnum.CREDIT_CARD,
       ModulesEnum.EXPIRY,
-      ModulesEnum.NOTE,
     );
     return value;
   }
   if (template == TemplateEnum.BANK_ACCOUNT) {
     value.modules = getModules(
-      ModulesEnum.TITLE,
       ModulesEnum.URL,
       ModulesEnum.USERNAME,
       ModulesEnum.PASSWORD,
-      ModulesEnum.NOTE,
     );
     return value;
   }
