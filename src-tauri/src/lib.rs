@@ -9,6 +9,7 @@ use std::{fs, path::PathBuf, time::Duration};
 use tauri::{
     menu::{Menu, MenuItem, PredefinedMenuItem},
     tray::{TrayIconBuilder, TrayIconEvent},
+    utils::config::Color,
     // Wichtig: diese Typen so importieren
     webview::NewWindowResponse,
     AppHandle,
@@ -243,6 +244,7 @@ pub fn run() {
             .resizable(true)
             .inner_size(initial_size.width, initial_size.height)
             .min_inner_size(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
+            .background_color(Color(13, 13, 13, 255))
             .decorations(false);
 
             #[cfg(any(target_os = "windows", target_os = "linux"))]

@@ -9,6 +9,7 @@ import {
   type Theme as NavigationTheme,
 } from "@react-navigation/native";
 import { AppTheme } from "../../shared/ui/appTheme";
+import StartupScreen from "../../shared/components/StartupScreen";
 
 import { useSetting } from "./SettingsProvider";
 
@@ -73,7 +74,7 @@ export const ThemeProvider = ({ children }: Props) => {
     setThemePref(value ? "dark" : "light");
   };
 
-  if (!isReady) return null;
+  if (!isReady) return <StartupScreen />;
 
   return (
     <ThemeContext.Provider

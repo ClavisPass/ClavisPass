@@ -6,7 +6,7 @@ import {
   LexendExa_700Bold,
 } from "@expo-google-fonts/lexend-exa";
 import { AuthProvider } from "./src/app/providers/AuthProvider";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import CustomTitlebar from "./src/shared/components/CustomTitlebar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import GlobalShortcuts from "./src/shared/components/shortcuts/GlobalShortcuts";
@@ -38,6 +38,19 @@ import {
   detectTauriEnvironment,
   useIsTauriEnvironment,
 } from "./src/infrastructure/platform/isTauri";
+import StartupScreen, {
+  applyStartupDocumentBackground,
+} from "./src/shared/components/StartupScreen";
+
+applyStartupDocumentBackground();
+
+function isMacWebRuntime() {
+  if (Platform.OS !== "web" || typeof navigator === "undefined") return false;
+
+  const platform = navigator.platform?.toLowerCase() ?? "";
+  const userAgent = navigator.userAgent?.toLowerCase() ?? "";
+  return platform.includes("mac") || userAgent.includes("mac os");
+}
 
 export function AppWithNavigation() {
   useEffect(() => {
@@ -192,7 +205,7 @@ export default function App() {
 
   const canRenderWithFonts = fontsLoaded || fontError || fontLoadTimedOut;
 
-  if (!canRenderWithFonts || view === null) return <></>;
+  if (!canRenderWithFonts || view === null) return <StartupScreen />;
 
   if (view === "popup") {
     return (
@@ -213,6 +226,7 @@ export default function App() {
 function AppShell() {
   const { theme } = useTheme();
   const isTauri = useIsTauriEnvironment();
+  const useRoundedWindowShell = isTauri && !isMacWebRuntime();
 
   return (
     <>
@@ -236,7 +250,7 @@ function AppShell() {
                       style={{
                         borderColor:
                           isTauri ? theme.colors.primary : undefined,
-                        borderRadius: isTauri ? 6 : 0,
+                        borderRadius: useRoundedWindowShell ? 6 : 0,
                         borderWidth: isTauri ? 1 : 0,
                         backgroundColor: theme.colors.background,
                         overflow: "hidden",
