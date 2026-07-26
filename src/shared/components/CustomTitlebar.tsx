@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { View, StyleSheet, useWindowDimensions } from "react-native";
+import { Icon } from "react-native-paper";
 import { useAuth } from "../../app/providers/AuthProvider";
 import { useTheme } from "../../app/providers/ThemeProvider";
 import showMainWindow from "../../infrastructure/platform/showMainWindow";
@@ -7,6 +8,7 @@ import AnimatedPressable from "./AnimatedPressable";
 import { useSetting } from "../../app/providers/SettingsProvider";
 import {
   detectTauriEnvironment,
+  isMacWebRuntime,
   isTauriEnvironment,
   useIsTauriEnvironment,
 } from "../../infrastructure/platform/isTauri";
@@ -79,6 +81,60 @@ function WindowControls(props: WindowControlsProps) {
   );
 }
 
+function WindowsWindowControls(props: WindowControlsProps) {
+  return (
+    <View
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        gap: 2,
+        alignItems: "center",
+        paddingLeft: 16,
+      }}
+    >
+      <AnimatedPressable
+        onPress={props.minimizeWindow}
+        style={{
+          cursor: "pointer",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 50,
+          height: 40,
+          borderRadius: 4,
+        }}
+      >
+        <Icon
+          source={"window-minimize"}
+          size={20}
+          color={props.headerWhite ? "white" : "#787FF6"}
+        />
+      </AnimatedPressable>
+      <AnimatedPressable
+        onPress={props.closeWindow}
+        style={{
+          cursor: "pointer",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 50,
+          height: 40,
+          borderRadius: 4,
+          borderBottomEndRadius: 12,
+        }}
+      >
+        <Icon
+          source={"window-close"}
+          size={20}
+          color={props.headerWhite ? "white" : "#787FF6"}
+        />
+      </AnimatedPressable>
+    </View>
+  );
+}
+
 export function TitlebarHeight(props: Props) {
   if (!isTauriEnvironment()) {
     return null;
@@ -101,6 +157,7 @@ function CustomTitlebar() {
   const auth = useAuth();
   const {
     headerWhite,
+    headerSpacing,
     titlebarCenterGap,
     titlebarOverlayDragEnabled,
   } = useTheme();
@@ -109,6 +166,7 @@ function CustomTitlebar() {
   const { value: closeBehavior } = useSetting("CLOSE_BEHAVIOR");
   const { value: startBehavior } = useSetting("START_BEHAVIOR");
   const isTauri = useIsTauriEnvironment();
+  const isMac = isMacWebRuntime();
 
   useEffect(() => {
     if (isTauri) {
@@ -180,15 +238,17 @@ function CustomTitlebar() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          marginLeft: 0,
+          marginLeft: isMac ? 0 : headerSpacing + (width > 600 ? 88 : 0),
         }}
         pointerEvents="box-none"
       >
-        <WindowControls
-          closeWindow={closeWindow}
-          headerWhite={headerWhite}
-          minimizeWindow={minimizeWindow}
-        />
+        {isMac ? (
+          <WindowControls
+            closeWindow={closeWindow}
+            headerWhite={headerWhite}
+            minimizeWindow={minimizeWindow}
+          />
+        ) : null}
         <View
           id={"titlebar"}
           style={{
@@ -206,14 +266,14 @@ function CustomTitlebar() {
               style={{
                 flex: 1,
                 height: 40,
-                marginLeft: TITLEBAR_CONTROLS_WIDTH,
+                marginLeft: isMac ? TITLEBAR_CONTROLS_WIDTH : 0,
               }}
             />
           ) : (
             <View
               style={{
                 flex: 1,
-                marginLeft: TITLEBAR_CONTROLS_WIDTH,
+                marginLeft: isMac ? TITLEBAR_CONTROLS_WIDTH : 0,
               }}
               pointerEvents="none"
             />
@@ -234,6 +294,13 @@ function CustomTitlebar() {
                 flex: 1,
                 height: 40,
               }}
+            />
+          ) : null}
+          {!isMac ? (
+            <WindowsWindowControls
+              closeWindow={closeWindow}
+              headerWhite={headerWhite}
+              minimizeWindow={minimizeWindow}
             />
           ) : null}
         </View>

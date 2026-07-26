@@ -22,6 +22,7 @@ import {
 } from "../shared/components/titlebarMetrics";
 import getColors from "../shared/ui/linearGradient";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
+import { isMacWebRuntime } from "../infrastructure/platform/isTauri";
 
 type ModuleReorderScreenProps = NativeStackScreenProps<
   HomeStackParamList,
@@ -348,10 +349,16 @@ export default function ModuleReorderScreen({
             paddingLeft:
               Platform.OS === "web" &&
               TITLEBAR_HEIGHT > 0 &&
-              width < 600
+              width < 600 &&
+              isMacWebRuntime()
                 ? TITLEBAR_CONTROLS_WIDTH
                 : 0,
-            paddingRight: 0,
+            paddingRight:
+              Platform.OS === "web" &&
+              TITLEBAR_HEIGHT > 0 &&
+              !isMacWebRuntime()
+                ? 104
+                : 0,
           }}
         >
           <View

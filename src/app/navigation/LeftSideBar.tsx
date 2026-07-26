@@ -10,6 +10,7 @@ import AnimatedPressable from "../../shared/components/AnimatedPressable";
 import { useTranslation } from "react-i18next";
 import { emitOpenAddValue } from "../../infrastructure/events/openAddValueBus";
 import { TITLEBAR_HEIGHT } from "../../shared/components/titlebarMetrics";
+import { isMacWebRuntime } from "../../infrastructure/platform/isTauri";
 
 const SIDEBAR_WIDTH = 88;
 export const sidebarWidth = SIDEBAR_WIDTH;
@@ -40,7 +41,7 @@ export default function LeftSideTabBar({
   const isInEditScreen =
     activeRouteName === "Edit" || activeRouteName === "EditScreen";
   const isAddDisabled = isInEditScreen;
-  const reserveWindowControlsSpace = TITLEBAR_HEIGHT > 0;
+  const reserveWindowControlsSpace = TITLEBAR_HEIGHT > 0 && isMacWebRuntime();
 
   const goAdd = () => {
     if (isAddDisabled) return;

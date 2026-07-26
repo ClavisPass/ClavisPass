@@ -8,6 +8,7 @@ import {
   TITLEBAR_CONTROLS_WIDTH,
   TITLEBAR_HEIGHT,
 } from "./titlebarMetrics";
+import { isMacWebRuntime } from "../../infrastructure/platform/isTauri";
 
 type Props = {
   children?: ReactNode;
@@ -25,7 +26,7 @@ function Header(props: Props) {
   } = useTheme();
   const { width } = useWindowDimensions();
   const reserveMacControlsSpace =
-    TITLEBAR_HEIGHT > 0 && width < 600;
+    TITLEBAR_HEIGHT > 0 && width < 600 && isMacWebRuntime();
 
   useEffect(() => {
     setTitlebarCenterGap(0);

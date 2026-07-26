@@ -55,6 +55,7 @@ import {
   TITLEBAR_CONTROLS_WIDTH,
   TITLEBAR_HEIGHT,
 } from "../shared/components/titlebarMetrics";
+import { isMacWebRuntime } from "../infrastructure/platform/isTauri";
 import FolderModal from "../features/vault/components/modals/FolderModal";
 import AddValueModal from "../features/vault/components/modals/AddValueModal";
 import { useAuth } from "../app/providers/AuthProvider";
@@ -1365,10 +1366,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 paddingLeft:
                   Platform.OS === "web" &&
                   TITLEBAR_HEIGHT > 0 &&
-                  isCompactHeader
+                  isCompactHeader &&
+                  isMacWebRuntime()
                     ? TITLEBAR_CONTROLS_WIDTH
                     : 0,
-                paddingRight: 0,
+                paddingRight:
+                  Platform.OS === "web" &&
+                  TITLEBAR_HEIGHT > 0 &&
+                  isCompactHeader &&
+                  !isMacWebRuntime()
+                    ? 104
+                    : 0,
               }}
             >
               {isCompactHeader && searchHeaderVisible ? (

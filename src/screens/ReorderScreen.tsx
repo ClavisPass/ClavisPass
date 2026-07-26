@@ -20,6 +20,7 @@ import {
   TITLEBAR_HEIGHT,
 } from "../shared/components/titlebarMetrics";
 import getColors from "../shared/ui/linearGradient";
+import { isMacWebRuntime } from "../infrastructure/platform/isTauri";
 
 type ReorderScreenProps = NativeStackScreenProps<HomeStackParamList, "Reorder">;
 
@@ -283,10 +284,16 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
             paddingLeft:
               Platform.OS === "web" &&
               TITLEBAR_HEIGHT > 0 &&
-              width < 600
+              width < 600 &&
+              isMacWebRuntime()
                 ? TITLEBAR_CONTROLS_WIDTH
                 : 0,
-            paddingRight: 0,
+            paddingRight:
+              Platform.OS === "web" &&
+              TITLEBAR_HEIGHT > 0 &&
+              !isMacWebRuntime()
+                ? 104
+                : 0,
           }}
         >
           <View
