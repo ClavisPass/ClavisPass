@@ -65,8 +65,8 @@ function getTemplate(template: TemplateEnum) {
   if (template == TemplateEnum.DOCUMENT) {
     value.modules = getModules(
       ModulesEnum.DOCUMENT,
-      ModulesEnum.EXPIRY,
       ModulesEnum.ATTACHMENT,
+      ModulesEnum.EXPIRY,
     );
     return value;
   }

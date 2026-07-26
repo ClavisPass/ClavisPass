@@ -7,6 +7,7 @@ import ModuleReorderScreen from "../../../screens/ModuleReorderScreen";
 import DigitalCardScanScreen from "../../../screens/DigitalCardScanScreen";
 import TotpScanScreen from "../../../screens/TotpScanScreen";
 import CardDetailsScreen from "../../../screens/CardDetailsScreen";
+import AttachmentPreviewScreen from "../../../screens/AttachmentPreviewScreen";
 import NoteEditorScreen from "../../../screens/NoteEditorScreen";
 import { HomeStackParamList } from "../model/types";
 
@@ -29,6 +30,7 @@ export default function HomeStack() {
       <Stack.Screen name="TotpScan" component={TotpScanScreen} />
       <Stack.Screen name="NoteEditor" component={NoteEditorScreen} />
       <Stack.Screen name="CardDetails" component={CardDetailsScreen} />
+      <Stack.Screen name="AttachmentPreview" component={AttachmentPreviewScreen} />
     </Stack.Navigator>
   );
 }

@@ -503,9 +503,14 @@ export type TranslationSchema = {
     attachmentEmpty: string;
     attachmentHelp: string;
     attachmentSave: string;
+    attachmentPreview: string;
     attachmentRemove: string;
     attachmentReadFailed: string;
     attachmentSaveFailed: string;
+    attachmentPreviewFailed: string;
+    attachmentPreviewUnavailable: string;
+    attachmentPreviewMissing: string;
+    attachmentPreviewLoadingPdf: string;
     attachmentFileTooLarge: string;
     attachmentEntryTooLarge: string;
     attachmentTooMany: string;

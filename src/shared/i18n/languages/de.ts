@@ -562,9 +562,14 @@ const de: TranslationSchema = {
     attachmentHelp:
       "Anhänge werden im Vault gespeichert und synchronisiert. Limit: {{fileLimit}} pro Datei, {{entryLimit}} pro Eintrag.",
     attachmentSave: "Datei speichern",
+    attachmentPreview: "Datei ansehen",
     attachmentRemove: "Datei entfernen",
     attachmentReadFailed: "Datei konnte nicht gelesen werden.",
     attachmentSaveFailed: "Datei konnte nicht gespeichert werden.",
+    attachmentPreviewFailed: "Datei konnte nicht geöffnet werden.",
+    attachmentPreviewUnavailable: "Preview nicht verfügbar.",
+    attachmentPreviewMissing: "Preview nicht mehr verfügbar.",
+    attachmentPreviewLoadingPdf: "Lade PDF...",
     attachmentFileTooLarge: "Diese Datei ist größer als {{limit}}.",
     attachmentEntryTooLarge:
       "Die Anhänge dieses Eintrags dürfen zusammen maximal {{limit}} groß sein.",

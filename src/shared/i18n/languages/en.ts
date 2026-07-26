@@ -554,9 +554,14 @@ const en: TranslationSchema = {
     attachmentHelp:
       "Attachments are stored in the vault and synced. Limit: {{fileLimit}} per file, {{entryLimit}} per entry.",
     attachmentSave: "Save file",
+    attachmentPreview: "Preview file",
     attachmentRemove: "Remove file",
     attachmentReadFailed: "Could not read file.",
     attachmentSaveFailed: "Could not save file.",
+    attachmentPreviewFailed: "Could not open file.",
+    attachmentPreviewUnavailable: "Preview unavailable.",
+    attachmentPreviewMissing: "Preview is no longer available.",
+    attachmentPreviewLoadingPdf: "Loading PDF...",
     attachmentFileTooLarge: "This file is larger than {{limit}}.",
     attachmentEntryTooLarge:
       "This entry's attachments may be {{limit}} in total.",

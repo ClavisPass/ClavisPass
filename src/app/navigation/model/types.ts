@@ -48,6 +48,9 @@ export type HomeStackParamList = {
     faviconUrl?: string | null;
     accentColor?: string | null;
   };
+  AttachmentPreview: {
+    previewId: string;
+  };
 };
 
 export type AnalysisStackParamList = {

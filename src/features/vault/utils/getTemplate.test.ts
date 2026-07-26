@@ -21,8 +21,8 @@ describe("getTemplate", () => {
   it("creates document template modules", () => {
     expect(modules(TemplateEnum.DOCUMENT)).toEqual([
       ModulesEnum.DOCUMENT,
-      ModulesEnum.EXPIRY,
       ModulesEnum.ATTACHMENT,
+      ModulesEnum.EXPIRY,
     ]);
   });
 
