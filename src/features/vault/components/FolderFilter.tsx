@@ -74,8 +74,10 @@ type Props = {
   setFolderModalVisible: (folderModalVisible: boolean) => void;
   selectedCard: boolean;
   setSelectedCard: (selectedCard: boolean) => void;
+  hasCardEntries: boolean;
   selected2FA: boolean;
   setSelected2FA: (selected2FA: boolean) => void;
+  hasTwoFactorEntries: boolean;
   moduleFilters: ModulesEnum[];
   selectedModuleFilters: ModulesEnum[];
   toggleModuleFilter: (module: ModulesEnum) => void;
@@ -379,32 +381,40 @@ function FolderFilter(props: Props) {
             )}
             ListHeaderComponent={
               <>
-                <MenuItem
-                  leadingIcon={"two-factor-authentication"}
-                  selected={props.selected2FA}
-                onPress={props.disabled ? undefined : () => {
-                    props.setSelected2FA(!props.selected2FA);
-                    props.setSelectedCard(false);
-                    props.setSelectedFav(false);
-                    props.setSelectedFolder(null);
-                  }}
-                >
-                  {t("home:twofa")}
-                </MenuItem>
-                <Divider />
-                <MenuItem
-                  leadingIcon={"credit-card-multiple"}
-                  selected={props.selectedCard}
-                  onPress={props.disabled ? undefined : () => {
-                    props.setSelectedCard(!props.selectedCard);
-                    props.setSelected2FA(false);
-                    props.setSelectedFav(false);
-                    props.setSelectedFolder(null);
-                  }}
-                >
-                  {t("home:card")}
-                </MenuItem>
-                <Divider />
+                {props.hasTwoFactorEntries ? (
+                  <>
+                    <MenuItem
+                      leadingIcon={"two-factor-authentication"}
+                      selected={props.selected2FA}
+                      onPress={props.disabled ? undefined : () => {
+                        props.setSelected2FA(!props.selected2FA);
+                        props.setSelectedCard(false);
+                        props.setSelectedFav(false);
+                        props.setSelectedFolder(null);
+                      }}
+                    >
+                      {t("home:twofa")}
+                    </MenuItem>
+                    <Divider />
+                  </>
+                ) : null}
+                {props.hasCardEntries ? (
+                  <>
+                    <MenuItem
+                      leadingIcon={"credit-card-multiple"}
+                      selected={props.selectedCard}
+                      onPress={props.disabled ? undefined : () => {
+                        props.setSelectedCard(!props.selectedCard);
+                        props.setSelected2FA(false);
+                        props.setSelectedFav(false);
+                        props.setSelectedFolder(null);
+                      }}
+                    >
+                      {t("home:card")}
+                    </MenuItem>
+                    <Divider />
+                  </>
+                ) : null}
                 <MenuItem
                   leadingIcon={"star"}
                   selected={props.selectedFav}
@@ -503,44 +513,48 @@ function FolderFilter(props: Props) {
               onScroll={handleHorizontalScroll}
               ListHeaderComponent={
                 <View style={{ display: "flex", flexDirection: "row" }}>
-                  <Chip
-                    icon={() => null}
-                    selected={props.selected2FA}
-                    showSelectedOverlay={true}
-                    onPress={props.disabled ? undefined : () => {
-                      props.setSelected2FA(!props.selected2FA);
-                      props.setSelectedCard(false);
-                      props.setSelectedFav(false);
-                      props.setSelectedFolder(null);
-                    }}
-                    style={styles.chip}
-                    textStyle={styles.chipText}
-                  >
-                    <MaterialCommunityIcons
-                      name="two-factor-authentication"
-                      size={18}
-                      color={theme.colors.primary}
-                    />
-                  </Chip>
-                  <Chip
-                    icon={() => null}
-                    selected={props.selectedCard}
-                    showSelectedOverlay={true}
-                    onPress={props.disabled ? undefined : () => {
-                      props.setSelectedCard(!props.selectedCard);
-                      props.setSelected2FA(false);
-                      props.setSelectedFav(false);
-                      props.setSelectedFolder(null);
-                    }}
-                    style={styles.chip}
-                    textStyle={styles.chipText}
-                  >
-                    <MaterialCommunityIcons
-                      name="credit-card-multiple"
-                      size={18}
-                      color={theme.colors.primary}
-                    />
-                  </Chip>
+                  {props.hasTwoFactorEntries ? (
+                    <Chip
+                      icon={() => null}
+                      selected={props.selected2FA}
+                      showSelectedOverlay={true}
+                      onPress={props.disabled ? undefined : () => {
+                        props.setSelected2FA(!props.selected2FA);
+                        props.setSelectedCard(false);
+                        props.setSelectedFav(false);
+                        props.setSelectedFolder(null);
+                      }}
+                      style={styles.chip}
+                      textStyle={styles.chipText}
+                    >
+                      <MaterialCommunityIcons
+                        name="two-factor-authentication"
+                        size={18}
+                        color={theme.colors.primary}
+                      />
+                    </Chip>
+                  ) : null}
+                  {props.hasCardEntries ? (
+                    <Chip
+                      icon={() => null}
+                      selected={props.selectedCard}
+                      showSelectedOverlay={true}
+                      onPress={props.disabled ? undefined : () => {
+                        props.setSelectedCard(!props.selectedCard);
+                        props.setSelected2FA(false);
+                        props.setSelectedFav(false);
+                        props.setSelectedFolder(null);
+                      }}
+                      style={styles.chip}
+                      textStyle={styles.chipText}
+                    >
+                      <MaterialCommunityIcons
+                        name="credit-card-multiple"
+                        size={18}
+                        color={theme.colors.primary}
+                      />
+                    </Chip>
+                  ) : null}
                   <Chip
                     icon={() => null}
                     selected={props.selectedFav}

@@ -618,6 +618,36 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     }
   }, [vault.isUnlocked, vault.entries, vault.folders, vault.dirty]);
 
+  const hasCardEntries = useMemo(
+    () =>
+      (vaultData?.values ?? []).some((item) =>
+        item.modules.some((module) => module.module === ModulesEnum.DIGITAL_CARD),
+      ),
+    [vaultData],
+  );
+
+  const hasTwoFactorEntries = useMemo(
+    () =>
+      (vaultData?.values ?? []).some((item) =>
+        item.modules.some((module) => module.module === ModulesEnum.TOTP),
+      ),
+    [vaultData],
+  );
+
+  useEffect(() => {
+    if (!vaultData) return;
+    if (selectedCard && !hasCardEntries) setSelectedCard(false);
+    if (selected2FA && !hasTwoFactorEntries) setSelected2FA(false);
+  }, [
+    hasCardEntries,
+    hasTwoFactorEntries,
+    selected2FA,
+    selectedCard,
+    setSelected2FA,
+    setSelectedCard,
+    vaultData,
+  ]);
+
   const filteredValues = useMemo(() => {
     const values = vaultData?.values ?? [];
 
@@ -1582,6 +1612,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                     setSelected2FA={saveSelected2FAState}
                     selectedCard={selectedCard}
                     setSelectedCard={saveSelectedCardState}
+                    hasTwoFactorEntries={hasTwoFactorEntries}
+                    hasCardEntries={hasCardEntries}
                     moduleFilters={moduleFilters}
                     selectedModuleFilters={selectedModuleFilters}
                     toggleModuleFilter={toggleModuleFilter}
