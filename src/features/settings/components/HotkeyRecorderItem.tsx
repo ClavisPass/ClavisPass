@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 import {
-  DEFAULT_HOTKEYS,
+  getDefaultHotkey,
   getHotkeyConflict,
   hotkeyFromKeyboardEvent,
   HotkeyAction,
@@ -33,6 +33,7 @@ export default function HotkeyRecorderItem({
   const endRecordingRef = useRef<null | (() => void)>(null);
 
   const value = hotkeys[action];
+  const defaultValue = getDefaultHotkey(action);
 
   const startRecording = () => {
     endRecordingRef.current?.();
@@ -131,7 +132,7 @@ export default function HotkeyRecorderItem({
           {label}
         </Text>
         <View style={{ width: 28, height: 30, justifyContent: "center" }}>
-          {value !== DEFAULT_HOTKEYS[action] ? (
+          {value !== defaultValue ? (
             <AnimatedPressable
               borderless={false}
               style={{
@@ -143,7 +144,7 @@ export default function HotkeyRecorderItem({
                 justifyContent: "center",
               }}
               onPress={() => {
-                onChange({ ...hotkeys, [action]: DEFAULT_HOTKEYS[action] });
+                onChange({ ...hotkeys, [action]: defaultValue });
                 setError(null);
                 stopRecording();
               }}

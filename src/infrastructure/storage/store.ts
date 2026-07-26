@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ModulesEnum from "../../features/vault/model/ModulesEnum";
 import {
-  DEFAULT_HOTKEYS,
+  getDefaultHotkeys,
   HotkeySettings,
   normalizeHotkeySettings,
 } from "../platform/hotkeys";
@@ -81,7 +81,7 @@ export const storeSchema = {
   },
   HOTKEYS: {
     type: "json",
-    default: DEFAULT_HOTKEYS as HotkeySettings,
+    default: getDefaultHotkeys() as HotkeySettings,
     validate: (v: unknown): v is HotkeySettings =>
       normalizeHotkeySettings(v) !== null,
   },

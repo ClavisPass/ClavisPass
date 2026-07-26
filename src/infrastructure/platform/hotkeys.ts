@@ -1,11 +1,18 @@
 export type HotkeyAction = "toggleMainWindow" | "lockVault" | "newEntry";
 
 export type HotkeySettings = Record<HotkeyAction, string | null>;
+type HotkeyPlatform = "macos" | "default";
 
 export const DEFAULT_HOTKEYS: HotkeySettings = {
   toggleMainWindow: "Alt+W",
   lockVault: "Alt+L",
   newEntry: "Alt+N",
+};
+
+export const MACOS_DEFAULT_HOTKEYS: HotkeySettings = {
+  toggleMainWindow: "Ctrl+Shift+W",
+  lockVault: "Ctrl+Shift+L",
+  newEntry: "Ctrl+Shift+N",
 };
 
 const ACTIONS: HotkeyAction[] = ["toggleMainWindow", "lockVault", "newEntry"];
@@ -22,6 +29,30 @@ const BLOCKED_HOTKEYS = new Set([
   "Ctrl+F",
   "Ctrl+L",
 ]);
+
+function getCurrentHotkeyPlatform(): HotkeyPlatform {
+  if (typeof navigator === "undefined") return "default";
+
+  const platform = navigator.platform?.toLowerCase() ?? "";
+  const userAgent = navigator.userAgent?.toLowerCase() ?? "";
+
+  return platform.includes("mac") || userAgent.includes("mac os")
+    ? "macos"
+    : "default";
+}
+
+export function getDefaultHotkeys(
+  platform: HotkeyPlatform = getCurrentHotkeyPlatform(),
+): HotkeySettings {
+  return platform === "macos" ? MACOS_DEFAULT_HOTKEYS : DEFAULT_HOTKEYS;
+}
+
+export function getDefaultHotkey(
+  action: HotkeyAction,
+  platform: HotkeyPlatform = getCurrentHotkeyPlatform(),
+): string | null {
+  return getDefaultHotkeys(platform)[action];
+}
 
 function normalizeKey(key: string): string | null {
   if (/^[a-z]$/i.test(key)) return key.toUpperCase();
@@ -96,17 +127,25 @@ export function isAllowedHotkey(hotkey: string): boolean {
   return true;
 }
 
-export function normalizeHotkeySettings(input: unknown): HotkeySettings | null {
+export function normalizeHotkeySettings(
+  input: unknown,
+  defaults: HotkeySettings = getDefaultHotkeys(),
+): HotkeySettings | null {
   if (!input || typeof input !== "object") return null;
 
   const source = input as Partial<Record<HotkeyAction, unknown>>;
-  const next: HotkeySettings = { ...DEFAULT_HOTKEYS };
+  const next: HotkeySettings = { ...defaults };
   const seen = new Set<string>();
 
   for (const action of ACTIONS) {
     const raw = source[action];
+    const legacyDefault = DEFAULT_HOTKEYS[action];
     const normalized =
-      raw === undefined ? DEFAULT_HOTKEYS[action] : normalizeHotkey(raw);
+      raw === undefined
+        ? defaults[action]
+        : raw === legacyDefault
+        ? defaults[action]
+        : normalizeHotkey(raw);
     next[action] = normalized;
 
     if (normalized) {
