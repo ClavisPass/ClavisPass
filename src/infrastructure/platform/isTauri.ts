@@ -15,6 +15,14 @@ export function isWebPlatform() {
   return Platform.OS === "web";
 }
 
+export function isMacWebRuntime() {
+  if (!isWebPlatform() || typeof navigator === "undefined") return false;
+
+  const platform = navigator.platform?.toLowerCase() ?? "";
+  const userAgent = navigator.userAgent?.toLowerCase() ?? "";
+  return platform.includes("mac") || userAgent.includes("mac os");
+}
+
 export function isTauriEnvironment() {
   if (!isWebPlatform() || typeof window === "undefined") {
     return false;

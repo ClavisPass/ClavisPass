@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
 import { View, StyleSheet, useWindowDimensions } from "react-native";
-import { Icon } from "react-native-paper";
-import theme from "../ui/theme";
 import { useAuth } from "../../app/providers/AuthProvider";
 import { useTheme } from "../../app/providers/ThemeProvider";
 import showMainWindow from "../../infrastructure/platform/showMainWindow";
@@ -12,8 +10,15 @@ import {
   isTauriEnvironment,
   useIsTauriEnvironment,
 } from "../../infrastructure/platform/isTauri";
+import {
+  TITLEBAR_CONTROLS_WIDTH,
+  TITLEBAR_HEIGHT,
+} from "./titlebarMetrics";
 
-export const TITLEBAR_HEIGHT = isTauriEnvironment() ? 40 : 0;
+export {
+  TITLEBAR_CONTROLS_WIDTH,
+  TITLEBAR_HEIGHT,
+};
 
 const styles = StyleSheet.create({
   titlebar: {
@@ -21,11 +26,58 @@ const styles = StyleSheet.create({
     width: "100%",
     zIndex: 0,
   },
+  windowControls: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
+    height: 40,
+    left: 14,
+    position: "absolute",
+    top: 0,
+    zIndex: 3,
+  },
+  windowControlButton: {
+    borderRadius: 6,
+    cursor: "pointer",
+    height: 12,
+    width: 12,
+  },
 });
 
 type Props = {
   filled?: boolean;
 };
+
+type WindowControlsProps = {
+  closeWindow: () => void;
+  headerWhite: boolean;
+  minimizeWindow: () => void;
+};
+
+function WindowControls(props: WindowControlsProps) {
+  return (
+    <View style={styles.windowControls} pointerEvents="box-none">
+      <AnimatedPressable
+        onPress={props.closeWindow}
+        style={[styles.windowControlButton, { backgroundColor: "#FF5F57" }]}
+      />
+      <AnimatedPressable
+        onPress={props.minimizeWindow}
+        style={[styles.windowControlButton, { backgroundColor: "#FFBD2E" }]}
+      />
+      <View
+        style={[
+          styles.windowControlButton,
+          {
+            backgroundColor: props.headerWhite
+              ? "rgba(255,255,255,0.36)"
+              : "rgba(120,127,246,0.32)",
+          },
+        ]}
+      />
+    </View>
+  );
+}
 
 export function TitlebarHeight(props: Props) {
   if (!isTauriEnvironment()) {
@@ -49,7 +101,6 @@ function CustomTitlebar() {
   const auth = useAuth();
   const {
     headerWhite,
-    headerSpacing,
     titlebarCenterGap,
     titlebarOverlayDragEnabled,
   } = useTheme();
@@ -129,10 +180,15 @@ function CustomTitlebar() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          marginLeft: headerSpacing + (width > 600 ? 88 : 0),
+          marginLeft: 0,
         }}
         pointerEvents="box-none"
       >
+        <WindowControls
+          closeWindow={closeWindow}
+          headerWhite={headerWhite}
+          minimizeWindow={minimizeWindow}
+        />
         <View
           id={"titlebar"}
           style={{
@@ -150,10 +206,17 @@ function CustomTitlebar() {
               style={{
                 flex: 1,
                 height: 40,
+                marginLeft: TITLEBAR_CONTROLS_WIDTH,
               }}
             />
           ) : (
-            <View style={{ flex: 1 }} pointerEvents="none" />
+            <View
+              style={{
+                flex: 1,
+                marginLeft: TITLEBAR_CONTROLS_WIDTH,
+              }}
+              pointerEvents="none"
+            />
           )}
           {titlebarOverlayDragEnabled && width > 600 && titlebarCenterGap > 0 ? (
             <View
@@ -173,55 +236,6 @@ function CustomTitlebar() {
               }}
             />
           ) : null}
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              gap: 2,
-              alignItems: "center",
-              paddingLeft: 16,
-            }}
-          >
-            <AnimatedPressable
-              onPress={minimizeWindow}
-              style={{
-                cursor: "pointer",
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 50,
-                height: 40,
-                borderRadius: 4,
-              }}
-            >
-              <Icon
-                source={"window-minimize"}
-                size={20}
-                color={headerWhite ? "white" : theme.colors.primary}
-              />
-            </AnimatedPressable>
-            <AnimatedPressable
-              onPress={closeWindow}
-              style={{
-                cursor: "pointer",
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 50,
-                height: 40,
-                borderRadius: 4,
-                borderBottomEndRadius: 12,
-              }}
-            >
-              <Icon
-                source={"window-close"}
-                size={20}
-                color={headerWhite ? "white" : theme.colors.primary}
-              />
-            </AnimatedPressable>
-          </View>
         </View>
       </View>
     ) : null}</>

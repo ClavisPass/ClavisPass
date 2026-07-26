@@ -9,6 +9,7 @@ import { useOnline } from "../providers/OnlineProvider";
 import AnimatedPressable from "../../shared/components/AnimatedPressable";
 import { useTranslation } from "react-i18next";
 import { emitOpenAddValue } from "../../infrastructure/events/openAddValueBus";
+import { TITLEBAR_HEIGHT } from "../../shared/components/titlebarMetrics";
 
 const SIDEBAR_WIDTH = 88;
 export const sidebarWidth = SIDEBAR_WIDTH;
@@ -39,6 +40,7 @@ export default function LeftSideTabBar({
   const isInEditScreen =
     activeRouteName === "Edit" || activeRouteName === "EditScreen";
   const isAddDisabled = isInEditScreen;
+  const reserveWindowControlsSpace = TITLEBAR_HEIGHT > 0;
 
   const goAdd = () => {
     if (isAddDisabled) return;
@@ -89,7 +91,7 @@ export default function LeftSideTabBar({
           bottom: 0,
           width: SIDEBAR_WIDTH,
           borderRightWidth: 1,
-          paddingVertical: 8,
+          paddingTop: reserveWindowControlsSpace ? TITLEBAR_HEIGHT + 4 : 8,
           borderColor: theme.colors.outlineVariant,
           backgroundColor: theme.colors.background,
           justifyContent: "space-between",

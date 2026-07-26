@@ -6,7 +6,7 @@ import {
   LexendExa_700Bold,
 } from "@expo-google-fonts/lexend-exa";
 import { AuthProvider } from "./src/app/providers/AuthProvider";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 import CustomTitlebar from "./src/shared/components/CustomTitlebar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import GlobalShortcuts from "./src/shared/components/shortcuts/GlobalShortcuts";
@@ -36,6 +36,7 @@ import { useTheme } from "./src/app/providers/ThemeProvider";
 import ClipboardLifecycleCleanup from "./src/shared/components/ClipboardLifecycleCleanup";
 import {
   detectTauriEnvironment,
+  isMacWebRuntime,
   useIsTauriEnvironment,
 } from "./src/infrastructure/platform/isTauri";
 import StartupScreen, {
@@ -43,14 +44,6 @@ import StartupScreen, {
 } from "./src/shared/components/StartupScreen";
 
 applyStartupDocumentBackground();
-
-function isMacWebRuntime() {
-  if (Platform.OS !== "web" || typeof navigator === "undefined") return false;
-
-  const platform = navigator.platform?.toLowerCase() ?? "";
-  const userAgent = navigator.userAgent?.toLowerCase() ?? "";
-  return platform.includes("mac") || userAgent.includes("mac os");
-}
 
 export function AppWithNavigation() {
   useEffect(() => {

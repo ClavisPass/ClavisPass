@@ -1,9 +1,13 @@
 import React, { ReactNode, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, useWindowDimensions } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import Constants from "expo-constants";
 import FocusAwareStatusBar from "./FocusAwareStatusBar";
 import { useTheme } from "../../app/providers/ThemeProvider";
+import {
+  TITLEBAR_CONTROLS_WIDTH,
+  TITLEBAR_HEIGHT,
+} from "./titlebarMetrics";
 
 type Props = {
   children?: ReactNode;
@@ -19,6 +23,9 @@ function Header(props: Props) {
     setTitlebarCenterGap,
     setTitlebarOverlayDragEnabled,
   } = useTheme();
+  const { width } = useWindowDimensions();
+  const reserveMacControlsSpace =
+    TITLEBAR_HEIGHT > 0 && width < 600;
 
   useEffect(() => {
     setTitlebarCenterGap(0);
@@ -53,6 +60,9 @@ function Header(props: Props) {
           flexDirection: "row",
           justifyContent: "space-between",
           paddingTop: Constants.statusBarHeight,
+          paddingLeft: reserveMacControlsSpace
+            ? TITLEBAR_CONTROLS_WIDTH
+            : 0,
         }}
       >
         <FocusAwareStatusBar

@@ -15,7 +15,10 @@ import { HomeStackParamList } from "../app/navigation/model/types";
 import ValuesType from "../features/vault/model/ValuesType";
 import ListItem from "../features/vault/components/items/ListItem";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
-import { TITLEBAR_HEIGHT } from "../shared/components/CustomTitlebar";
+import {
+  TITLEBAR_CONTROLS_WIDTH,
+  TITLEBAR_HEIGHT,
+} from "../shared/components/titlebarMetrics";
 import getColors from "../shared/ui/linearGradient";
 
 type ReorderScreenProps = NativeStackScreenProps<HomeStackParamList, "Reorder">;
@@ -277,7 +280,13 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
             flexDirection: "row",
             justifyContent: "space-between",
             gap: 8,
-            paddingRight: Platform.OS === "web" && TITLEBAR_HEIGHT > 0 ? 104 : 0,
+            paddingLeft:
+              Platform.OS === "web" &&
+              TITLEBAR_HEIGHT > 0 &&
+              width < 600
+                ? TITLEBAR_CONTROLS_WIDTH
+                : 0,
+            paddingRight: 0,
           }}
         >
           <View

@@ -51,7 +51,10 @@ import {
   useIsFocused,
   useScrollToTop,
 } from "@react-navigation/native";
-import { TITLEBAR_HEIGHT } from "../shared/components/CustomTitlebar";
+import {
+  TITLEBAR_CONTROLS_WIDTH,
+  TITLEBAR_HEIGHT,
+} from "../shared/components/titlebarMetrics";
 import FolderModal from "../features/vault/components/modals/FolderModal";
 import AddValueModal from "../features/vault/components/modals/AddValueModal";
 import { useAuth } from "../app/providers/AuthProvider";
@@ -1359,10 +1362,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 gap: 8,
                 position: "relative",
                 zIndex: 4,
-                paddingRight:
-                  Platform.OS === "web" && TITLEBAR_HEIGHT > 0 && isCompactHeader
-                    ? 104
+                paddingLeft:
+                  Platform.OS === "web" &&
+                  TITLEBAR_HEIGHT > 0 &&
+                  isCompactHeader
+                    ? TITLEBAR_CONTROLS_WIDTH
                     : 0,
+                paddingRight: 0,
               }}
             >
               {isCompactHeader && searchHeaderVisible ? (
