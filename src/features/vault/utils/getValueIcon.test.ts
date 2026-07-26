@@ -30,12 +30,67 @@ describe("getValueIcon", () => {
         entry([
           {
             id: "card-1",
+            module: ModulesEnum.CREDIT_CARD,
+            value: "",
+          } as any,
+        ]),
+      ),
+    ).toBe(MODULE_ICON[ModulesEnum.CREDIT_CARD]);
+    expect(
+      getValueIcon(
+        entry([
+          {
+            id: "digital-card-1",
             module: ModulesEnum.DIGITAL_CARD,
             value: "",
           } as any,
         ]),
       ),
     ).toBe("credit-card-multiple");
+    expect(
+      getValueIcon(
+        entry([
+          {
+            id: "document-1",
+            module: ModulesEnum.DOCUMENT,
+            value: "",
+          } as any,
+        ]),
+      ),
+    ).toBe(MODULE_ICON[ModulesEnum.DOCUMENT]);
+    expect(
+      getValueIcon(
+        entry([
+          {
+            id: "person-1",
+            module: ModulesEnum.PERSON,
+            value: "",
+          } as any,
+        ]),
+      ),
+    ).toBe(MODULE_ICON[ModulesEnum.PERSON]);
+    expect(
+      getValueIcon(
+        entry([
+          {
+            id: "company-1",
+            module: ModulesEnum.COMPANY,
+            value: "",
+          } as any,
+        ]),
+      ),
+    ).toBe(MODULE_ICON[ModulesEnum.COMPANY]);
+    expect(
+      getValueIcon(
+        entry([
+          {
+            id: "address-1",
+            module: ModulesEnum.ADDRESS,
+            value: "",
+          } as any,
+        ]),
+      ),
+    ).toBe(MODULE_ICON[ModulesEnum.ADDRESS]);
     expect(
       getValueIcon(
         entry([{ id: "pin-1", module: ModulesEnum.PIN, value: "" } as any]),
@@ -85,6 +140,17 @@ describe("getValueIcon", () => {
         ]),
       ),
     ).toBe(MODULE_ICON[ModulesEnum.RECOVERY_CODES]);
+    expect(
+      getValueIcon(
+        entry([
+          {
+            id: "attachment-1",
+            module: ModulesEnum.ATTACHMENT,
+            value: "",
+          } as any,
+        ]),
+      ),
+    ).toBe(MODULE_ICON[ModulesEnum.ATTACHMENT]);
     expect(
       getValueIcon(
         entry([
@@ -210,5 +276,44 @@ describe("getValueIcon", () => {
         entry([{ id: "url-1", module: ModulesEnum.URL, value: "" } as any]),
       ),
     ).toBe("lock");
+  });
+
+  it("uses new template primary modules before attachment and expiry", () => {
+    expect(
+      getValueIcon(
+        entry([
+          { id: "document-1", module: ModulesEnum.DOCUMENT } as any,
+          { id: "attachment-1", module: ModulesEnum.ATTACHMENT } as any,
+          { id: "expiry-1", module: ModulesEnum.EXPIRY } as any,
+        ]),
+      ),
+    ).toBe(MODULE_ICON[ModulesEnum.DOCUMENT]);
+    expect(
+      getValueIcon(
+        entry([
+          { id: "card-1", module: ModulesEnum.CREDIT_CARD } as any,
+          { id: "expiry-1", module: ModulesEnum.EXPIRY } as any,
+        ]),
+      ),
+    ).toBe(MODULE_ICON[ModulesEnum.CREDIT_CARD]);
+    expect(
+      getValueIcon(
+        entry([
+          { id: "person-1", module: ModulesEnum.PERSON } as any,
+          { id: "address-1", module: ModulesEnum.ADDRESS } as any,
+          { id: "phone-1", module: ModulesEnum.PHONE_NUMBER } as any,
+          { id: "email-1", module: ModulesEnum.E_MAIL } as any,
+          { id: "company-1", module: ModulesEnum.COMPANY } as any,
+        ]),
+      ),
+    ).toBe(MODULE_ICON[ModulesEnum.PERSON]);
+    expect(
+      getValueIcon(
+        entry([
+          { id: "attachment-1", module: ModulesEnum.ATTACHMENT } as any,
+          { id: "expiry-1", module: ModulesEnum.EXPIRY } as any,
+        ]),
+      ),
+    ).toBe(MODULE_ICON[ModulesEnum.ATTACHMENT]);
   });
 });

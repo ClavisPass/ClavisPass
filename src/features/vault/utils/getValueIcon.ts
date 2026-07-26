@@ -17,8 +17,23 @@ export function getValueIcon(value: Pick<ValuesType, "modules">): string {
   if (modules.some((m) => m.module === ModulesEnum.TASK)) {
     return "checkbox-multiple-marked";
   }
+  if (modules.some((m) => m.module === ModulesEnum.CREDIT_CARD)) {
+    return MODULE_ICON[ModulesEnum.CREDIT_CARD];
+  }
   if (modules.some((m) => m.module === ModulesEnum.DIGITAL_CARD)) {
     return "credit-card-multiple";
+  }
+  if (modules.some((m) => m.module === ModulesEnum.DOCUMENT)) {
+    return MODULE_ICON[ModulesEnum.DOCUMENT];
+  }
+  if (modules.some((m) => m.module === ModulesEnum.PERSON)) {
+    return MODULE_ICON[ModulesEnum.PERSON];
+  }
+  if (modules.some((m) => m.module === ModulesEnum.COMPANY)) {
+    return MODULE_ICON[ModulesEnum.COMPANY];
+  }
+  if (modules.some((m) => m.module === ModulesEnum.ADDRESS)) {
+    return MODULE_ICON[ModulesEnum.ADDRESS];
   }
   if (containsOnly(ModulesEnum.PIN)) {
     return MODULE_ICON[ModulesEnum.PIN];
@@ -38,9 +53,6 @@ export function getValueIcon(value: Pick<ValuesType, "modules">): string {
   ) {
     return MODULE_ICON[ModulesEnum.TOTP];
   }
-  if (modules.some((m) => m.module === ModulesEnum.EXPIRY)) {
-    return MODULE_ICON[ModulesEnum.EXPIRY];
-  }
   if (modules.some((m) => m.module === ModulesEnum.RECOVERY_CODES)) {
     return MODULE_ICON[ModulesEnum.RECOVERY_CODES];
   }
@@ -49,6 +61,12 @@ export function getValueIcon(value: Pick<ValuesType, "modules">): string {
   }
   if (containsOnly(ModulesEnum.NOTE)) {
     return MODULE_ICON[ModulesEnum.NOTE];
+  }
+  if (modules.some((m) => m.module === ModulesEnum.ATTACHMENT)) {
+    return MODULE_ICON[ModulesEnum.ATTACHMENT];
+  }
+  if (modules.some((m) => m.module === ModulesEnum.EXPIRY)) {
+    return MODULE_ICON[ModulesEnum.EXPIRY];
   }
 
   return "lock";
