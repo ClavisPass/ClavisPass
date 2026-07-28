@@ -46,6 +46,8 @@ const styles = StyleSheet.create({
   },
 });
 
+const GLOBAL_WEB_STYLE_ID = "clavispass-global-web-style";
+
 type Props = {
   filled?: boolean;
 };
@@ -195,11 +197,40 @@ function CustomTitlebar() {
         dragLeft?.setAttribute("data-tauri-drag-region", "");
         dragRight?.setAttribute("data-tauri-drag-region", "");
 
-        const sheet = new CSSStyleSheet();
-        sheet.replaceSync(
-          "::-webkit-scrollbar {width: 8px} ::-webkit-scrollbar-track {background: transparent;} ::-webkit-scrollbar-thumb {background: #5e5e5e50; border-radius: 10px;} input::-ms-reveal {display: none;} .css-text-146c3p1 {user-select: none;}"
-        );
-        document.adoptedStyleSheets = [sheet];
+        const existingStyle = document.getElementById(GLOBAL_WEB_STYLE_ID);
+        const css = `
+          ::-webkit-scrollbar { width: 8px; }
+          ::-webkit-scrollbar-track { background: transparent; }
+          ::-webkit-scrollbar-thumb { background: #5e5e5e50; border-radius: 10px; }
+          input::-ms-reveal { display: none; }
+
+          html,
+          body,
+          #root,
+          #root *:not(input):not(textarea):not([contenteditable="true"]) {
+            -webkit-user-select: none;
+            user-select: none;
+          }
+
+          input,
+          textarea,
+          [contenteditable="true"],
+          [contenteditable="true"] *,
+          .clavispass-selectable,
+          .clavispass-selectable * {
+            -webkit-user-select: text;
+            user-select: text;
+          }
+        `;
+
+        if (existingStyle) {
+          existingStyle.textContent = css;
+        } else {
+          const style = document.createElement("style");
+          style.id = GLOBAL_WEB_STYLE_ID;
+          style.textContent = css;
+          document.head.appendChild(style);
+        }
       }
     }
   }, [isTauri, titlebarOverlayDragEnabled, width]);

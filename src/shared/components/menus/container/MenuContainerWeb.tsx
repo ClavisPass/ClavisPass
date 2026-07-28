@@ -1,5 +1,11 @@
-import React, { ReactNode, useEffect, useState } from "react";
-import { Pressable, View, StyleSheet } from "react-native";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import {
+  LayoutChangeEvent,
+  Pressable,
+  View,
+  StyleSheet,
+  useWindowDimensions,
+} from "react-native";
 import { Portal } from "react-native-paper";
 import Animated, {
   Easing,
@@ -36,7 +42,41 @@ function MenuContainerWeb({
   offsetY = 6,
 }: Props) {
   const { theme } = useTheme();
+  const { height: windowHeight, width: windowWidth } = useWindowDimensions();
   const opensUpward = offsetY < 0;
+  const viewportPadding = 8;
+  const [menuSize, setMenuSize] = useState({ width: width ?? 180, height: 0 });
+  const resolvedWidth = width ?? menuSize.width;
+  const resolvedLeft = useMemo(() => {
+    if (typeof positionX !== "number") return undefined;
+
+    return Math.min(
+      Math.max(viewportPadding, positionX),
+      Math.max(viewportPadding, windowWidth - resolvedWidth - viewportPadding),
+    );
+  }, [positionX, resolvedWidth, windowWidth]);
+  const resolvedTop = useMemo(() => {
+    const desiredTop = positionY + offsetY;
+    if (menuSize.height <= 0) return Math.max(viewportPadding, desiredTop);
+
+    return Math.min(
+      Math.max(viewportPadding, desiredTop),
+      Math.max(viewportPadding, windowHeight - menuSize.height - viewportPadding),
+    );
+  }, [menuSize.height, offsetY, positionY, windowHeight]);
+
+  const handleLayout = (event: LayoutChangeEvent) => {
+    const { height, width: measuredWidth } = event.nativeEvent.layout;
+    setMenuSize((current) => {
+      if (
+        Math.abs(current.width - measuredWidth) < 1 &&
+        Math.abs(current.height - height) < 1
+      ) {
+        return current;
+      }
+      return { width: measuredWidth, height };
+    });
+  };
 
   // Ein progress steuert alles → smooth & synchron
   const progress = useSharedValue(0);
@@ -93,9 +133,9 @@ function MenuContainerWeb({
         style={[
           {
             position: "absolute",
-            top: positionY + offsetY,
+            top: resolvedTop,
             ...(typeof positionX === "number"
-              ? { left: positionX }
+              ? { left: resolvedLeft }
               : { right: 4 }),
             zIndex: 1,
           },
@@ -104,6 +144,7 @@ function MenuContainerWeb({
         pointerEvents="box-none"
       >
         <View
+          onLayout={handleLayout}
           style={{
             overflow: "hidden",
             backgroundColor: theme.colors?.elevation?.level3 ?? "white",
