@@ -208,6 +208,10 @@ export type TranslationSchema = {
     hotkeyInvalid: string;
     hotkeyConflict: string;
     language: string;
+    windowControlsStyle: string;
+    windowControlsSystem: string;
+    windowControlsLeft: string;
+    windowControlsRight: string;
     dateFormat: string;
     timeFormat: string;
     changeMasterPassword: string;

@@ -55,7 +55,7 @@ import {
   TITLEBAR_CONTROLS_WIDTH,
   TITLEBAR_HEIGHT,
 } from "../shared/components/titlebarMetrics";
-import { isMacWebRuntime } from "../infrastructure/platform/isTauri";
+import { resolveWindowControlsSide } from "../infrastructure/platform/windowControls";
 import FolderModal from "../features/vault/components/modals/FolderModal";
 import AddValueModal from "../features/vault/components/modals/AddValueModal";
 import { useAuth } from "../app/providers/AuthProvider";
@@ -273,6 +273,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     useSetting("TWOFA_FILTER");
   const { value: selectedCard, setValue: setSelectedCard } =
     useSetting("CARD_FILTER");
+  const { value: windowControlsStyle } = useSetting("WINDOW_CONTROLS_STYLE");
   const { value: dateFormat } = useSetting("DATE_FORMAT");
   const { value: timeFormat } = useSetting("TIME_FORMAT");
   const { value: systemAuthPromptDone, setValue: setSystemAuthPromptDone } =
@@ -332,6 +333,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   }, []);
 
   const isCompactHeader = width < 600;
+  const controlsLeft =
+    resolveWindowControlsSide(windowControlsStyle) === "left";
   const wideSearchWidth = Math.min(340, Math.max(200, width * 0.32));
 
   useEffect(() => {
@@ -1367,14 +1370,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                   Platform.OS === "web" &&
                   TITLEBAR_HEIGHT > 0 &&
                   isCompactHeader &&
-                  isMacWebRuntime()
+                  controlsLeft
                     ? TITLEBAR_CONTROLS_WIDTH
                     : 0,
                 paddingRight:
                   Platform.OS === "web" &&
                   TITLEBAR_HEIGHT > 0 &&
                   isCompactHeader &&
-                  !isMacWebRuntime()
+                  !controlsLeft
                     ? 104
                     : 0,
               }}

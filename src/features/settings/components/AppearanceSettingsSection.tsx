@@ -1,4 +1,5 @@
 import React from "react";
+import { Platform } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import DarkModeSwitch from "./DarkModeSwitch";
@@ -30,6 +31,11 @@ const AppearanceSettingsSection: React.FC<Props> = ({
     useSetting("DATE_FORMAT");
   const { value: timeFormat, setValue: setTimeFormatSetting } =
     useSetting("TIME_FORMAT");
+  const {
+    value: windowControlsStyle,
+    setValue: setWindowControlsStyleSetting,
+  } = useSetting("WINDOW_CONTROLS_STYLE");
+  const isDesktop = Platform.OS === "web";
 
   return (
     <>
@@ -49,6 +55,37 @@ const AppearanceSettingsSection: React.FC<Props> = ({
           
         ]}
       />
+
+      {isDesktop ? (
+        <>
+          <SettingsDivider />
+
+          <SettingsDropdownItem
+            value={windowControlsStyle}
+            setValue={(style) => {
+              setWindowControlsStyleSetting(
+                style as "system" | "left" | "right",
+              );
+            }}
+            label={t("settings:windowControlsStyle")}
+            dropdownMaxWidth={dropdownMaxWidth}
+            options={[
+              {
+                label: t("settings:windowControlsSystem"),
+                value: "system",
+              },
+              {
+                label: t("settings:windowControlsLeft"),
+                value: "left",
+              },
+              {
+                label: t("settings:windowControlsRight"),
+                value: "right",
+              },
+            ]}
+          />
+        </>
+      ) : null}
 
       <SettingsDivider />
 

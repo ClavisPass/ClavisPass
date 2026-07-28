@@ -20,7 +20,8 @@ import {
   TITLEBAR_HEIGHT,
 } from "../shared/components/titlebarMetrics";
 import getColors from "../shared/ui/linearGradient";
-import { isMacWebRuntime } from "../infrastructure/platform/isTauri";
+import { useSetting } from "../app/providers/SettingsProvider";
+import { resolveWindowControlsSide } from "../infrastructure/platform/windowControls";
 
 type ReorderScreenProps = NativeStackScreenProps<HomeStackParamList, "Reorder">;
 
@@ -105,6 +106,9 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
   } = useTheme();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
+  const { value: windowControlsStyle } = useSetting("WINDOW_CONTROLS_STYLE");
+  const controlsLeft =
+    resolveWindowControlsSide(windowControlsStyle) === "left";
   const vault = useVault();
   const [items, setItems] = useState<ValuesType[]>(route.params.values ?? []);
 
@@ -285,13 +289,13 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
               Platform.OS === "web" &&
               TITLEBAR_HEIGHT > 0 &&
               width < 600 &&
-              isMacWebRuntime()
+              controlsLeft
                 ? TITLEBAR_CONTROLS_WIDTH
                 : 0,
             paddingRight:
               Platform.OS === "web" &&
               TITLEBAR_HEIGHT > 0 &&
-              !isMacWebRuntime()
+              !controlsLeft
                 ? 104
                 : 0,
           }}

@@ -90,6 +90,11 @@ export const storeSchema = {
     values: ["shown", "hidden"] as const,
     default: "shown",
   },
+  WINDOW_CONTROLS_STYLE: {
+    type: "enum",
+    values: ["system", "left", "right"] as const,
+    default: "system",
+  },
   FAST_ACCESS: {
     type: "enum",
     values: ["disabled", "auto"] as const,
@@ -222,6 +227,7 @@ const SETTINGS_RESET_KEYS = [
   "BLUR_ON_UNFOCUS",
   "HOTKEYS",
   "START_BEHAVIOR",
+  "WINDOW_CONTROLS_STYLE",
   "FAST_ACCESS",
   "FAST_ACCESS_POSITION",
   "SIDEBAR_WIDTH",

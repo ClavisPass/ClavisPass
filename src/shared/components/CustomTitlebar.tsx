@@ -8,7 +8,6 @@ import AnimatedPressable from "./AnimatedPressable";
 import { useSetting } from "../../app/providers/SettingsProvider";
 import {
   detectTauriEnvironment,
-  isMacWebRuntime,
   isTauriEnvironment,
   useIsTauriEnvironment,
 } from "../../infrastructure/platform/isTauri";
@@ -16,6 +15,7 @@ import {
   TITLEBAR_CONTROLS_WIDTH,
   TITLEBAR_HEIGHT,
 } from "./titlebarMetrics";
+import { resolveWindowControlsSide } from "../../infrastructure/platform/windowControls";
 
 export {
   TITLEBAR_CONTROLS_WIDTH,
@@ -53,6 +53,7 @@ type Props = {
 type WindowControlsProps = {
   closeWindow: () => void;
   headerWhite: boolean;
+  onLightSurface: boolean;
   minimizeWindow: () => void;
 };
 
@@ -71,9 +72,17 @@ function WindowControls(props: WindowControlsProps) {
         style={[
           styles.windowControlButton,
           {
-            backgroundColor: props.headerWhite
-              ? "rgba(255,255,255,0.36)"
+            backgroundColor: props.onLightSurface
+              ? "rgba(120,127,246,0.32)"
+              : props.headerWhite
+              ? "rgba(255,255,255,0.56)"
               : "rgba(120,127,246,0.32)",
+            borderColor: props.onLightSurface
+              ? "rgba(120,127,246,0.24)"
+              : props.headerWhite
+              ? "rgba(255,255,255,0.52)"
+              : "rgba(120,127,246,0.24)",
+            borderWidth: 1,
           },
         ]}
       />
@@ -165,8 +174,16 @@ function CustomTitlebar() {
 
   const { value: closeBehavior } = useSetting("CLOSE_BEHAVIOR");
   const { value: startBehavior } = useSetting("START_BEHAVIOR");
+  const { value: windowControlsStyle } = useSetting("WINDOW_CONTROLS_STYLE");
   const isTauri = useIsTauriEnvironment();
-  const isMac = isMacWebRuntime();
+  const controlsSide = resolveWindowControlsSide(windowControlsStyle);
+  const controlsLeft = controlsSide === "left";
+  const controlsOnSidebar = controlsLeft && width > 600;
+  const sidebarOffset = width > 600 ? 88 : 0;
+  const layerOffset = controlsLeft ? 0 : headerSpacing + sidebarOffset;
+  const leftDragOffset = controlsLeft
+    ? TITLEBAR_CONTROLS_WIDTH + headerSpacing + sidebarOffset
+    : 0;
 
   useEffect(() => {
     if (isTauri) {
@@ -238,14 +255,15 @@ function CustomTitlebar() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          marginLeft: isMac ? 0 : headerSpacing + (width > 600 ? 88 : 0),
+          marginLeft: layerOffset,
         }}
         pointerEvents="box-none"
       >
-        {isMac ? (
+        {controlsLeft ? (
           <WindowControls
             closeWindow={closeWindow}
             headerWhite={headerWhite}
+            onLightSurface={controlsOnSidebar}
             minimizeWindow={minimizeWindow}
           />
         ) : null}
@@ -266,14 +284,14 @@ function CustomTitlebar() {
               style={{
                 flex: 1,
                 height: 40,
-                marginLeft: isMac ? TITLEBAR_CONTROLS_WIDTH : 0,
+                marginLeft: leftDragOffset,
               }}
             />
           ) : (
             <View
               style={{
                 flex: 1,
-                marginLeft: isMac ? TITLEBAR_CONTROLS_WIDTH : 0,
+                marginLeft: leftDragOffset,
               }}
               pointerEvents="none"
             />
@@ -296,10 +314,11 @@ function CustomTitlebar() {
               }}
             />
           ) : null}
-          {!isMac ? (
+          {!controlsLeft ? (
             <WindowsWindowControls
               closeWindow={closeWindow}
               headerWhite={headerWhite}
+              onLightSurface={false}
               minimizeWindow={minimizeWindow}
             />
           ) : null}

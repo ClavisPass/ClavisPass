@@ -8,7 +8,8 @@ import {
   TITLEBAR_CONTROLS_WIDTH,
   TITLEBAR_HEIGHT,
 } from "./titlebarMetrics";
-import { isMacWebRuntime } from "../../infrastructure/platform/isTauri";
+import { useSetting } from "../../app/providers/SettingsProvider";
+import { resolveWindowControlsSide } from "../../infrastructure/platform/windowControls";
 
 type Props = {
   children?: ReactNode;
@@ -25,8 +26,11 @@ function Header(props: Props) {
     setTitlebarOverlayDragEnabled,
   } = useTheme();
   const { width } = useWindowDimensions();
+  const { value: windowControlsStyle } = useSetting("WINDOW_CONTROLS_STYLE");
+  const controlsLeft =
+    resolveWindowControlsSide(windowControlsStyle) === "left";
   const reserveMacControlsSpace =
-    TITLEBAR_HEIGHT > 0 && width < 600 && isMacWebRuntime();
+    TITLEBAR_HEIGHT > 0 && width < 600 && controlsLeft;
 
   useEffect(() => {
     setTitlebarCenterGap(0);
