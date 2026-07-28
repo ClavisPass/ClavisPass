@@ -41,6 +41,8 @@ import {
 import StartupScreen, {
   applyStartupDocumentBackground,
 } from "./src/shared/components/StartupScreen";
+import { useSetting } from "./src/app/providers/SettingsProvider";
+import { resolveWindowCornerRadius } from "./src/infrastructure/platform/windowCorners";
 
 applyStartupDocumentBackground();
 
@@ -218,6 +220,10 @@ export default function App() {
 function AppShell() {
   const { theme } = useTheme();
   const isTauri = useIsTauriEnvironment();
+  const { value: windowCornerStyle } = useSetting("WINDOW_CORNER_STYLE");
+  const windowCornerRadius = isTauri
+    ? resolveWindowCornerRadius(windowCornerStyle)
+    : 0;
 
   return (
     <>
@@ -241,7 +247,7 @@ function AppShell() {
                       style={{
                         borderColor:
                           isTauri ? theme.colors.primary : undefined,
-                        borderRadius: isTauri ? 6 : 0,
+                        borderRadius: windowCornerRadius,
                         borderWidth: isTauri ? 1 : 0,
                         backgroundColor: theme.colors.background,
                         overflow: "hidden",

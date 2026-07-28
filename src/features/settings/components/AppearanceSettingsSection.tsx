@@ -35,6 +35,10 @@ const AppearanceSettingsSection: React.FC<Props> = ({
     value: windowControlsStyle,
     setValue: setWindowControlsStyleSetting,
   } = useSetting("WINDOW_CONTROLS_STYLE");
+  const {
+    value: windowCornerStyle,
+    setValue: setWindowCornerStyleSetting,
+  } = useSetting("WINDOW_CORNER_STYLE");
   const isDesktop = Platform.OS === "web";
 
   return (
@@ -81,6 +85,33 @@ const AppearanceSettingsSection: React.FC<Props> = ({
               {
                 label: t("settings:windowControlsRight"),
                 value: "right",
+              },
+            ]}
+          />
+
+          <SettingsDivider />
+
+          <SettingsDropdownItem
+            value={windowCornerStyle}
+            setValue={(style) => {
+              setWindowCornerStyleSetting(
+                style as "system" | "rounded" | "square",
+              );
+            }}
+            label={t("settings:windowCornerStyle")}
+            dropdownMaxWidth={dropdownMaxWidth}
+            options={[
+              {
+                label: t("settings:windowCornerSystem"),
+                value: "system",
+              },
+              {
+                label: t("settings:windowCornerRounded"),
+                value: "rounded",
+              },
+              {
+                label: t("settings:windowCornerSquare"),
+                value: "square",
               },
             ]}
           />

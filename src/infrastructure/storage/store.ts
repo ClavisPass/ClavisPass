@@ -95,6 +95,11 @@ export const storeSchema = {
     values: ["system", "left", "right"] as const,
     default: "system",
   },
+  WINDOW_CORNER_STYLE: {
+    type: "enum",
+    values: ["system", "rounded", "square"] as const,
+    default: "system",
+  },
   FAST_ACCESS: {
     type: "enum",
     values: ["disabled", "auto"] as const,
@@ -228,6 +233,7 @@ const SETTINGS_RESET_KEYS = [
   "HOTKEYS",
   "START_BEHAVIOR",
   "WINDOW_CONTROLS_STYLE",
+  "WINDOW_CORNER_STYLE",
   "FAST_ACCESS",
   "FAST_ACCESS_POSITION",
   "SIDEBAR_WIDTH",

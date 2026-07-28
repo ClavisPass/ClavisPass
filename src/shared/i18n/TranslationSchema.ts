@@ -212,6 +212,10 @@ export type TranslationSchema = {
     windowControlsSystem: string;
     windowControlsLeft: string;
     windowControlsRight: string;
+    windowCornerStyle: string;
+    windowCornerSystem: string;
+    windowCornerRounded: string;
+    windowCornerSquare: string;
     dateFormat: string;
     timeFormat: string;
     changeMasterPassword: string;
