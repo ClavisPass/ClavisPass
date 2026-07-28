@@ -233,6 +233,10 @@ pub fn run() {
                 height: DEFAULT_WINDOW_HEIGHT,
             });
             let initial_size = clamp_window_size(requested_size);
+            #[cfg(target_os = "macos")]
+            let startup_background = Color(13, 13, 13, 0);
+            #[cfg(not(target_os = "macos"))]
+            let startup_background = Color(13, 13, 13, 255);
 
             let builder = WebviewWindowBuilder::new(
                 &app_handle,
@@ -244,10 +248,10 @@ pub fn run() {
             .resizable(true)
             .inner_size(initial_size.width, initial_size.height)
             .min_inner_size(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
-            .background_color(Color(13, 13, 13, 255))
+            .background_color(startup_background)
             .decorations(false);
 
-            #[cfg(any(target_os = "windows", target_os = "linux"))]
+            #[cfg(any(target_os = "windows", target_os = "linux", target_os = "macos"))]
             let builder = builder.transparent(true);
 
             let builder = builder

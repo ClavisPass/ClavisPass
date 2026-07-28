@@ -178,8 +178,9 @@ function CustomTitlebar() {
   const isTauri = useIsTauriEnvironment();
   const controlsSide = resolveWindowControlsSide(windowControlsStyle);
   const controlsLeft = controlsSide === "left";
-  const controlsOnSidebar = controlsLeft && width > 600;
-  const sidebarOffset = width > 600 ? 88 : 0;
+  const hasSidebarOffset = auth.isLoggedIn && width > 600;
+  const controlsOnSidebar = controlsLeft && hasSidebarOffset;
+  const sidebarOffset = hasSidebarOffset ? 88 : 0;
   const layerOffset = controlsLeft ? 0 : headerSpacing + sidebarOffset;
   const leftDragOffset = controlsLeft
     ? TITLEBAR_CONTROLS_WIDTH + headerSpacing + sidebarOffset

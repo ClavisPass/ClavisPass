@@ -36,7 +36,6 @@ import { useTheme } from "./src/app/providers/ThemeProvider";
 import ClipboardLifecycleCleanup from "./src/shared/components/ClipboardLifecycleCleanup";
 import {
   detectTauriEnvironment,
-  isMacWebRuntime,
   useIsTauriEnvironment,
 } from "./src/infrastructure/platform/isTauri";
 import StartupScreen, {
@@ -219,7 +218,6 @@ export default function App() {
 function AppShell() {
   const { theme } = useTheme();
   const isTauri = useIsTauriEnvironment();
-  const useRoundedWindowShell = isTauri && !isMacWebRuntime();
 
   return (
     <>
@@ -243,7 +241,7 @@ function AppShell() {
                       style={{
                         borderColor:
                           isTauri ? theme.colors.primary : undefined,
-                        borderRadius: useRoundedWindowShell ? 6 : 0,
+                        borderRadius: isTauri ? 6 : 0,
                         borderWidth: isTauri ? 1 : 0,
                         backgroundColor: theme.colors.background,
                         overflow: "hidden",
