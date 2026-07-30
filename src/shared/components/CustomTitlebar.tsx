@@ -60,20 +60,49 @@ type WindowControlsProps = {
 };
 
 function WindowControls(props: WindowControlsProps) {
+  const [hovered, setHovered] = React.useState(false);
+  const macIconColor = "rgba(45, 45, 45, 0.72)";
+
   return (
-    <View style={styles.windowControls} pointerEvents="box-none">
+    <View
+      style={styles.windowControls}
+      pointerEvents="box-none"
+      {...({
+        onMouseEnter: () => setHovered(true),
+        onMouseLeave: () => setHovered(false),
+      } as any)}
+    >
       <AnimatedPressable
         onPress={props.closeWindow}
-        style={[styles.windowControlButton, { backgroundColor: "#FF5F57" }]}
-      />
+        style={[
+          styles.windowControlButton,
+          {
+            alignItems: "center",
+            backgroundColor: "#FF5F57",
+            justifyContent: "center",
+          },
+        ]}
+      >
+        {hovered ? <Icon source="close" size={8} color={macIconColor} /> : null}
+      </AnimatedPressable>
       <AnimatedPressable
         onPress={props.minimizeWindow}
-        style={[styles.windowControlButton, { backgroundColor: "#FFBD2E" }]}
-      />
+        style={[
+          styles.windowControlButton,
+          {
+            alignItems: "center",
+            backgroundColor: "#FFBD2E",
+            justifyContent: "center",
+          },
+        ]}
+      >
+        {hovered ? <Icon source="minus" size={8} color={macIconColor} /> : null}
+      </AnimatedPressable>
       <View
         style={[
           styles.windowControlButton,
           {
+            alignItems: "center",
             backgroundColor: props.onLightSurface
               ? "rgba(120,127,246,0.32)"
               : props.headerWhite
@@ -85,9 +114,14 @@ function WindowControls(props: WindowControlsProps) {
               ? "rgba(255,255,255,0.52)"
               : "rgba(120,127,246,0.24)",
             borderWidth: 1,
+            justifyContent: "center",
           },
         ]}
-      />
+      >
+        {hovered ? (
+          <Icon source="arrow-expand" size={7} color={macIconColor} />
+        ) : null}
+      </View>
     </View>
   );
 }
