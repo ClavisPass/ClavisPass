@@ -41,7 +41,7 @@ function getTemplate(template: TemplateEnum) {
     return value;
   }
   if (template == TemplateEnum.TASKLIST) {
-    value.modules = getModules(ModulesEnum.TASK, ModulesEnum.TASK);
+    value.modules = getModules(ModulesEnum.TASK);
     return value;
   }
   if (template == TemplateEnum.NOTE) {

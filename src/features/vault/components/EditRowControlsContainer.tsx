@@ -140,6 +140,7 @@ export function EditRowControlsContainer({
         {
           flexDirection: "row",
           flex: 1,
+          backgroundColor: theme.colors.background,
           borderRadius: 12,
           borderColor: darkmode ? theme.colors.outlineVariant : "white",
           borderWidth: StyleSheet.hairlineWidth,
