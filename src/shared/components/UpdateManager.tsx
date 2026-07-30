@@ -20,6 +20,18 @@ import {
   type MobileBinaryUpdate,
 } from "../utils/mobileUpdater";
 
+function formatUpdateErrorMessage(fallback: string, error: unknown) {
+  if (error instanceof Error && error.message) {
+    return `${fallback}: ${error.message}`;
+  }
+
+  if (typeof error === "string" && error.length > 0) {
+    return `${fallback}: ${error}`;
+  }
+
+  return fallback;
+}
+
 const UpdateManager = () => {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
@@ -169,7 +181,9 @@ const UpdateManager = () => {
       logger.info("update installed");
     } catch (error) {
       logger.error("Error while applying update:", error);
-      setUpdateMessage(t("settings:updateInstallFailed"));
+      setUpdateMessage(
+        formatUpdateErrorMessage(t("settings:updateInstallFailed"), error),
+      );
     }
   };
 

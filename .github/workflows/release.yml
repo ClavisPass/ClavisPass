@@ -228,6 +228,8 @@ jobs:
           files: |
             src-tauri/target/release/bundle/dmg/*.dmg
             src-tauri/target/release/bundle/macos/*.zip
+            src-tauri/target/release/bundle/macos/*.app.tar.gz
+            src-tauri/target/release/bundle/macos/*.app.tar.gz.sig
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -235,6 +237,8 @@ jobs:
           name: macos
           path: |
             src-tauri/target/release/bundle/dmg/*.dmg
+            src-tauri/target/release/bundle/macos/*.app.tar.gz
+            src-tauri/target/release/bundle/macos/*.app.tar.gz.sig
 
   expo-ota-update:
     name: Expo OTA Update
@@ -381,10 +385,22 @@ jobs:
             --password "${TAURI_SIGNING_PRIVATE_KEY_PASSWORD}" \
             "artifacts/linux/ClavisPass_${VERSION}_amd64.AppImage" | awk '/^Public signature:/{getline; print}')
 
-          SIGN_MACOS=$(cargo tauri signer sign \
-            --private-key "${TAURI_SIGNING_PRIVATE_KEY}" \
-            --password "${TAURI_SIGNING_PRIVATE_KEY_PASSWORD}" \
-            "artifacts/macos/ClavisPass_${VERSION}_aarch64.dmg" | awk '/^Public signature:/{getline; print}')
+          MACOS_UPDATE_ARTIFACT=$(find artifacts/macos -name "*.app.tar.gz" | head -n 1)
+          if [ -z "${MACOS_UPDATE_ARTIFACT}" ]; then
+            echo "No macOS updater artifact (*.app.tar.gz) found."
+            find artifacts/macos -maxdepth 2 -type f
+            exit 1
+          fi
+
+          MACOS_UPDATE_SIGNATURE_FILE="${MACOS_UPDATE_ARTIFACT}.sig"
+          if [ ! -f "${MACOS_UPDATE_SIGNATURE_FILE}" ]; then
+            echo "No macOS updater signature found next to ${MACOS_UPDATE_ARTIFACT}."
+            find artifacts/macos -maxdepth 2 -type f
+            exit 1
+          fi
+
+          MACOS_UPDATE_FILENAME=$(basename "${MACOS_UPDATE_ARTIFACT}")
+          SIGN_MACOS=$(cat "${MACOS_UPDATE_SIGNATURE_FILE}")
 
           echo "{
             \"version\": \"${VERSION}\",
@@ -401,7 +417,7 @@ jobs:
               },
               \"darwin-aarch64\": {
                 \"signature\": \"${SIGN_MACOS}\",
-                \"url\": \"${RELEASE_URL}/ClavisPass_${VERSION}_aarch64.dmg\"
+                \"url\": \"${RELEASE_URL}/${MACOS_UPDATE_FILENAME}\"
               }
             }
           }" > updater.json
