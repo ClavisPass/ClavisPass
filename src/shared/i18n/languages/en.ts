@@ -219,7 +219,6 @@ const en: TranslationSchema = {
     windowControlsLeft: "macOS",
     windowControlsRight: "Classic",
     windowCornerStyle: "Window Corners",
-    windowCornerSystem: "System Default",
     windowCornerRounded: "Rounded",
     windowCornerSquare: "Square",
     dateFormat: "Date Format",

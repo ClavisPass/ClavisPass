@@ -95,16 +95,12 @@ const AppearanceSettingsSection: React.FC<Props> = ({
             value={windowCornerStyle}
             setValue={(style) => {
               setWindowCornerStyleSetting(
-                style as "system" | "rounded" | "square",
+                style as "rounded" | "square",
               );
             }}
             label={t("settings:windowCornerStyle")}
             dropdownMaxWidth={dropdownMaxWidth}
             options={[
-              {
-                label: t("settings:windowCornerSystem"),
-                value: "system",
-              },
               {
                 label: t("settings:windowCornerRounded"),
                 value: "rounded",

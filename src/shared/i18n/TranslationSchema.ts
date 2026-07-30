@@ -213,7 +213,6 @@ export type TranslationSchema = {
     windowControlsLeft: string;
     windowControlsRight: string;
     windowCornerStyle: string;
-    windowCornerSystem: string;
     windowCornerRounded: string;
     windowCornerSquare: string;
     dateFormat: string;

@@ -97,8 +97,8 @@ export const storeSchema = {
   },
   WINDOW_CORNER_STYLE: {
     type: "enum",
-    values: ["system", "rounded", "square"] as const,
-    default: "system",
+    values: ["rounded", "square"] as const,
+    default: "rounded",
   },
   FAST_ACCESS: {
     type: "enum",
