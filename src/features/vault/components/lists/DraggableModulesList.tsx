@@ -1,9 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   InteractionManager,
   Keyboard,
   KeyboardAvoidingView,
-  LayoutChangeEvent,
   Platform,
   View,
 } from "react-native";
@@ -12,37 +17,27 @@ import DraggableFlatList, {
 } from "react-native-draggable-flatlist";
 import { useTranslation } from "react-i18next";
 
-import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { ModuleType } from "../../model/ModulesType";
 import getModule from "../../utils/getModule";
 import predictNextModule from "../../utils/predictNextModule";
 import {
   DraggableModulesFooter,
   DraggableModulesListProps,
-  getFooterButtonShift,
 } from "./DraggableModulesList.shared";
 
 function DraggableModulesList(props: DraggableModulesListProps) {
-  const { theme } = useTheme();
   const { t } = useTranslation();
-  const [footerWidth, setFooterWidth] = useState(0);
-  const [predictionChipWidth, setPredictionChipWidth] = useState(0);
 
   const listRef = useRef<any>(null);
   const contentHeightRef = useRef(0);
   const pendingKeyboardAwareScrollRef = useRef(false);
   const keyboardRetryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null
+    null,
   );
 
   const modulePrediction = useMemo(
     () => predictNextModule(props.value.modules),
-    [props.value.modules]
-  );
-
-  const requiredShift = useMemo(
-    () => getFooterButtonShift(footerWidth, predictionChipWidth),
-    [footerWidth, predictionChipWidth]
+    [props.value.modules],
   );
 
   const scrollToBottom = useCallback(() => {
@@ -82,7 +77,7 @@ function DraggableModulesList(props: DraggableModulesListProps) {
         props.changeModule,
         props.fastAccess,
         props.navigation,
-        props.value.title
+        props.value.title,
       ),
     [
       props.changeModule,
@@ -90,18 +85,7 @@ function DraggableModulesList(props: DraggableModulesListProps) {
       props.fastAccess,
       props.navigation,
       props.value.title,
-    ]
-  );
-
-  const handleFooterLayout = useCallback((event: LayoutChangeEvent) => {
-    setFooterWidth(event.nativeEvent.layout.width);
-  }, []);
-
-  const handlePredictionChipLayout = useCallback(
-    (event: LayoutChangeEvent) => {
-      setPredictionChipWidth(event.nativeEvent.layout.width);
-    },
-    []
+    ],
   );
 
   const previousLengthRef = useRef(props.value.modules.length);
@@ -140,11 +124,11 @@ function DraggableModulesList(props: DraggableModulesListProps) {
 
     const showSubscription = Keyboard.addListener(
       "keyboardDidShow",
-      handleKeyboardShown
+      handleKeyboardShown,
     );
     const hideSubscription = Keyboard.addListener(
       "keyboardDidHide",
-      handleKeyboardHidden
+      handleKeyboardHidden,
     );
 
     return () => {
@@ -184,14 +168,6 @@ function DraggableModulesList(props: DraggableModulesListProps) {
                 props.addModule(modulePrediction);
                 setTimeout(scheduleKeyboardAwareScroll, 0);
               }}
-              onOpenAddModuleModal={() => {
-                props.showAddModuleModal();
-                setTimeout(scrollToBottom, 0);
-              }}
-              onFooterLayout={handleFooterLayout}
-              onPredictionChipLayout={handlePredictionChipLayout}
-              requiredShift={requiredShift}
-              theme={theme}
               t={t}
             />
           }

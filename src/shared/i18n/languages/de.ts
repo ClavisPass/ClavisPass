@@ -35,6 +35,7 @@ const de: TranslationSchema = {
     moreInfo: "Mehr erfahren",
     setExpiry: "Ablauf festlegen",
     current: "Aktuell",
+    addModule: "Modul hinzufügen",
     addFolder: "Ordner hinzufügen",
     passwordLength: "Passwortlänge",
     includeUppercase: "Großbuchstaben",

@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
+  Keyboard,
   Platform,
+  ScrollView,
   View,
   InteractionManager,
   useWindowDimensions,
@@ -11,7 +13,7 @@ import ModulesEnum from "../features/vault/model/ModulesEnum";
 
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import { Icon, Text } from "react-native-paper";
+import { Chip, Icon, Text } from "react-native-paper";
 import Header from "../shared/components/Header";
 import ValuesType from "../features/vault/model/ValuesType";
 import getModuleData from "../features/vault/utils/getModuleData";
@@ -58,15 +60,41 @@ import AdaptiveMenu, {
 } from "../shared/components/menus/AdaptiveMenu";
 import AppTooltip from "../shared/components/tooltips/AppTooltip";
 import PerfProfiler from "../shared/performance/PerfProfiler";
-import TooltipIconButton from "../shared/components/buttons/TooltipIconButton";
 import {
   DEFAULT_FOLDER_ICON,
   getFolderColor,
   getFolderIcon,
 } from "../features/vault/utils/folderAppearance";
-import { canExportVCard, exportVCard } from "../features/vault/utils/vcardExport";
+import {
+  canExportVCard,
+  exportVCard,
+} from "../features/vault/utils/vcardExport";
 
 type EditScreenProps = NativeStackScreenProps<HomeStackParamList, "Edit">;
+
+const VerticalReorderIcon = ({
+  color,
+  size = 18,
+}: {
+  color?: string;
+  size?: number;
+}) => (
+  <View
+    style={{
+      width: size,
+      height: size,
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    <View style={{ height: size / 2, marginBottom: -2 }}>
+      <Icon source="chevron-up" size={size * 0.72} color={color} />
+    </View>
+    <View style={{ height: size / 2, marginTop: -2 }}>
+      <Icon source="chevron-down" size={size * 0.72} color={color} />
+    </View>
+  </View>
+);
 
 const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const {
@@ -122,11 +150,112 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const [favIcon, setFavIcon] = useState("star-outline");
 
   const didValidateFolderRef = useRef(false);
+  const actionChipScrollRef = useRef<ScrollView>(null);
+  const actionChipOffsetRef = useRef(0);
+  const actionChipTargetOffsetRef = useRef(0);
+  const actionChipAnimationFrameRef = useRef<number | null>(null);
+  const actionChipContentWidthRef = useRef(0);
+  const actionChipViewportWidthRef = useRef(0);
 
   const [fastAccessObject, setFastAccessObject] =
     useState<FastAccessType | null>(
-      extractFastAccessObject(value.modules, value.title)
+      extractFastAccessObject(value.modules, value.title),
     );
+
+  const getMaxActionChipOffset = React.useCallback(
+    () =>
+      Math.max(
+        0,
+        actionChipContentWidthRef.current - actionChipViewportWidthRef.current,
+      ),
+    [],
+  );
+
+  const animateActionChipScroll = React.useCallback(() => {
+    const current = actionChipOffsetRef.current;
+    const target = Math.min(
+      actionChipTargetOffsetRef.current,
+      getMaxActionChipOffset(),
+    );
+    const distance = target - current;
+
+    if (Math.abs(distance) < 0.5) {
+      actionChipOffsetRef.current = target;
+      actionChipTargetOffsetRef.current = target;
+      actionChipAnimationFrameRef.current = null;
+      actionChipScrollRef.current?.scrollTo({ animated: false, x: target });
+      return;
+    }
+
+    const next = current + distance * 0.28;
+    actionChipOffsetRef.current = next;
+    actionChipScrollRef.current?.scrollTo({ animated: false, x: next });
+    actionChipAnimationFrameRef.current = window.requestAnimationFrame(
+      animateActionChipScroll,
+    );
+  }, [getMaxActionChipOffset]);
+
+  const startSmoothActionChipScroll = React.useCallback(
+    (targetOffset: number) => {
+      actionChipTargetOffsetRef.current = Math.min(
+        Math.max(0, targetOffset),
+        getMaxActionChipOffset(),
+      );
+
+      if (actionChipAnimationFrameRef.current === null) {
+        actionChipAnimationFrameRef.current = window.requestAnimationFrame(
+          animateActionChipScroll,
+        );
+      }
+    },
+    [animateActionChipScroll, getMaxActionChipOffset],
+  );
+
+  const handleActionChipScroll = React.useCallback((event: any) => {
+    const offset = event?.nativeEvent?.contentOffset?.x ?? 0;
+    actionChipOffsetRef.current = offset;
+    if (actionChipAnimationFrameRef.current === null) {
+      actionChipTargetOffsetRef.current = offset;
+    }
+  }, []);
+
+  const handleActionChipWheel = React.useCallback(
+    (event: any) => {
+      if (Platform.OS !== "web") return;
+
+      const nativeEvent = event?.nativeEvent ?? event;
+      const deltaX = nativeEvent?.deltaX ?? 0;
+      const deltaY = nativeEvent?.deltaY ?? 0;
+      const rawDelta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
+      const deltaMode = nativeEvent?.deltaMode ?? 0;
+      const delta =
+        deltaMode === 1
+          ? rawDelta * 16
+          : deltaMode === 2
+            ? rawDelta * actionChipViewportWidthRef.current
+            : rawDelta;
+      if (!delta) return;
+
+      nativeEvent?.preventDefault?.();
+      startSmoothActionChipScroll(actionChipTargetOffsetRef.current + delta);
+    },
+    [startSmoothActionChipScroll],
+  );
+
+  const actionChipWheelProps =
+    Platform.OS === "web" ? ({ onWheel: handleActionChipWheel } as any) : {};
+
+  useEffect(
+    () => () => {
+      if (
+        Platform.OS === "web" &&
+        actionChipAnimationFrameRef.current !== null
+      ) {
+        window.cancelAnimationFrame(actionChipAnimationFrameRef.current);
+      }
+    },
+    [],
+  );
 
   useFocusEffect(
     React.useCallback(() => {
@@ -135,7 +264,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         setHeaderWhite(false);
       });
       return () => task?.cancel?.();
-    }, [])
+    }, []),
   );
 
   useEffect(() => {
@@ -253,7 +382,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     openFastAccess(
       fastAccessObject.title,
       fastAccessObject.username,
-      fastAccessObject.password
+      fastAccessObject.password,
     );
   };
 
@@ -310,14 +439,14 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       {
         action: "modules",
         label: t("common:editHistoryModulesUpdated"),
-      }
+      },
     );
     setAddModuleModalVisible(false);
   };
 
   const changeMultipleEntries = (
     folder: FolderType | null,
-    favorite?: boolean
+    favorite?: boolean,
   ) => {
     applyChange(
       (current) => ({
@@ -328,7 +457,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       {
         action: "folder",
         label: t("common:editHistoryFolderFavoriteUpdated"),
-      }
+      },
     );
     setFolderModalVisible(false);
   };
@@ -342,7 +471,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       {
         action: "folder",
         label: t("common:editHistoryFolderUpdated"),
-      }
+      },
     );
     setFolderModalVisible(false);
   };
@@ -356,7 +485,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       {
         action: "favorite",
         label: t("common:editHistoryFavoriteUpdated"),
-      }
+      },
     );
   };
 
@@ -369,7 +498,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       {
         action: "pin",
         label: t("common:editHistoryPinUpdated"),
-      }
+      },
     );
   };
 
@@ -384,7 +513,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       {
         action: "tags",
         label: t("common:editHistoryTagsUpdated"),
-      }
+      },
     );
   };
 
@@ -453,7 +582,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         action: "module",
         label: t("common:editHistoryModuleUpdated"),
         coalesceKey: `module:${module.id}`,
-      }
+      },
     );
   };
 
@@ -467,7 +596,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         action: "title",
         label: t("common:editHistoryTitleUpdated"),
         coalesceKey: "title",
-      }
+      },
     );
   };
 
@@ -480,7 +609,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       {
         action: "modules",
         label: t("common:editHistoryModulesReordered"),
-      }
+      },
     );
   };
 
@@ -493,7 +622,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       {
         action: "modules",
         label: t("common:editHistoryModulesCleared"),
-      }
+      },
     );
     setClearModulesModalVisible(false);
   };
@@ -508,7 +637,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   };
 
   const taskModuleCount = value.modules.filter(
-    (module) => module.module === ModulesEnum.TASK
+    (module) => module.module === ModulesEnum.TASK,
   ).length;
 
   const tagSuggestions = React.useMemo(
@@ -517,18 +646,21 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         ...vault.entries.flatMap((entry) => entry.tags ?? []),
         ...(value.tags ?? []),
       ]).sort((a, b) => a.localeCompare(b)),
-    [value.tags, vault.entries]
+    [value.tags, vault.entries],
   );
 
   const sortCompletedTasksDown = () => {
     if (taskModuleCount <= 1) return;
 
-    const sortTaskBlock = (modules: ModulesType): ModulesType => [
-      ...modules.filter(
-        (module) => !("completed" in module) || !module.completed
-      ),
-      ...modules.filter((module) => "completed" in module && module.completed),
-    ] as ModulesType;
+    const sortTaskBlock = (modules: ModulesType): ModulesType =>
+      [
+        ...modules.filter(
+          (module) => !("completed" in module) || !module.completed,
+        ),
+        ...modules.filter(
+          (module) => "completed" in module && module.completed,
+        ),
+      ] as ModulesType;
 
     const newModules: ModuleType[] = [];
     let taskBlock: ModuleType[] = [];
@@ -551,7 +683,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     }
 
     const changed = newModules.some(
-      (module, index) => module.id !== value.modules[index].id
+      (module, index) => module.id !== value.modules[index].id,
     );
     if (changed) {
       reorderModules(newModules as ModulesType);
@@ -587,9 +719,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       {
         key: "pin",
         icon: value.pinnedAt ? "pin-off" : "pin",
-        label: value.pinnedAt
-          ? t("common:removePin")
-          : t("common:addPin"),
+        label: value.pinnedAt ? t("common:removePin") : t("common:addPin"),
         onPress: changePin,
       },
       {
@@ -636,7 +766,89 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       value,
       value.modules.length,
       value.pinnedAt,
-    ]
+    ],
+  );
+
+  const actionChipStyle = {
+    height: 30,
+    borderRadius: 12,
+  };
+
+  const actionChipTextStyle = {
+    fontSize: 12,
+    lineHeight: 16,
+  };
+  const editSectionSpacing = 4;
+
+  const renderEditActionChips = () => (
+    <ScrollView
+      ref={actionChipScrollRef}
+      {...actionChipWheelProps}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      onLayout={(event) => {
+        actionChipViewportWidthRef.current = event.nativeEvent.layout.width;
+      }}
+      onContentSizeChange={(contentWidth) => {
+        actionChipContentWidthRef.current = contentWidth;
+      }}
+      onScroll={handleActionChipScroll}
+      scrollEventThrottle={16}
+      contentContainerStyle={{
+        alignItems: "center",
+        flexDirection: "row",
+        flexGrow: 1,
+        gap: editSectionSpacing,
+        justifyContent: "flex-start",
+        paddingHorizontal: 8,
+        paddingTop: editSectionSpacing,
+        paddingBottom: editSectionSpacing,
+      }}
+      style={{ flexGrow: 0, width: "100%" }}
+    >
+      <Chip
+        compact
+        icon="plus"
+        onPress={() => {
+          Keyboard.dismiss();
+          setAddModuleModalVisible(true);
+        }}
+        style={actionChipStyle}
+        textStyle={actionChipTextStyle}
+      >
+        {t("common:addModule")}
+      </Chip>
+      <Chip
+        compact
+        icon={({ color, size }) => (
+          <VerticalReorderIcon color={color} size={size} />
+        )}
+        disabled={value.modules.length < 2}
+        onPress={openModuleReorderScreen}
+        style={actionChipStyle}
+        textStyle={actionChipTextStyle}
+      >
+        {t("home:reorderChip")}
+      </Chip>
+      <Chip
+        compact
+        icon={(value.tags?.length ?? 0) > 0 ? "tag" : "tag-outline"}
+        onPress={() => setTagsModalVisible(true)}
+        style={actionChipStyle}
+        textStyle={actionChipTextStyle}
+      >
+        {t("common:tags")}
+      </Chip>
+      <Chip
+        compact
+        icon="dots-horizontal"
+        onPress={() => setOverflowMenuVisible(true)}
+        style={actionChipStyle}
+        textStyle={actionChipTextStyle}
+      >
+        {t("common:more")}
+      </Chip>
+    </ScrollView>
   );
 
   return (
@@ -647,6 +859,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         translucent={true}
       />
       <Header
+        marginBottom={0}
         onPress={() => {
           if (canUndo) {
             setDiscardChangesVisible(true);
@@ -655,41 +868,23 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           }
         }}
         leftNode={
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <TitleModule
-              value={value}
-              changeTitle={changeTitle}
-              initialTitle={routeSearchstring ?? null}
-            />
-            <TooltipIconButton
-              tooltip={t("common:manageTags")}
-              icon={(value.tags?.length ?? 0) > 0 ? "tag" : "tag-outline"}
-              iconColor={
-                (value.tags?.length ?? 0) > 0
-                  ? theme.colors.primary
-                  : theme.colors.onSurfaceVariant
-              }
-              size={20}
-              onPress={() => setTagsModalVisible(true)}
-              style={{ margin: 0 }}
-            />
-          </View>
+          <TitleModule
+            value={value}
+            changeTitle={changeTitle}
+            initialTitle={routeSearchstring ?? null}
+          />
         }
       />
+      {renderEditActionChips()}
       <View
         style={{
           width: "100%",
-          padding: 8,
+          paddingHorizontal: 8,
           paddingTop: 0,
+          paddingBottom: editSectionSpacing,
           display: "flex",
           flexDirection: "row",
-          gap: 8,
+          gap: editSectionSpacing,
         }}
       >
         {width > 600 && (
@@ -820,20 +1015,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             </SquaredContainerButton>
           </AppTooltip>
         )}
-        <AppTooltip title={t("common:more")}>
-          <SquaredContainerButton onPress={() => setOverflowMenuVisible(true)}>
-            <Icon
-              source="dots-vertical"
-              size={20}
-              color={theme.colors?.primary}
-            />
-          </SquaredContainerButton>
-        </AppTooltip>
       </View>
       <AdaptiveMenu
         visible={overflowMenuVisible}
         setVisible={setOverflowMenuVisible}
-        positionY={Constants.statusBarHeight + (width > 600 ? 92 : 86)}
+        positionY={Constants.statusBarHeight + (width > 600 ? 126 : 120)}
         items={editOverflowItems}
       />
       <PerfProfiler id="EditScreen.ModulesList">
@@ -844,12 +1030,17 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           addModule={addModule}
           fastAccess={fastAccessObject}
           navigation={navigation}
-          showAddModuleModal={() => setAddModuleModalVisible(true)}
-          openReorderScreen={openModuleReorderScreen}
         />
       </PerfProfiler>
       {!(width > 600) && (
-        <View style={{ padding: 8, width: "100%" }}>
+        <View
+          style={{
+            paddingHorizontal: 8,
+            paddingTop: 0,
+            paddingBottom: editSectionSpacing,
+            width: "100%",
+          }}
+        >
           <Button
             icon="content-save"
             onPress={saveValue}

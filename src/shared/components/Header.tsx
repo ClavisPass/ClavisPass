@@ -16,6 +16,7 @@ type Props = {
   title?: string;
   onPress?: () => void;
   leftNode?: ReactNode;
+  marginBottom?: number;
 };
 
 function Header(props: Props) {
@@ -45,7 +46,7 @@ function Header(props: Props) {
         display: "flex",
         flexDirection: "column",
         backgroundColor: theme.colors?.background,
-        marginBottom: 8,
+        marginBottom: props.marginBottom ?? 8,
         borderRadius: 12,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,

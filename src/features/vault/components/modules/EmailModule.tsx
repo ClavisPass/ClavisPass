@@ -35,7 +35,7 @@ function EmailModule(props: EmailModuleType & Props) {
   const { t } = useTranslation();
 
   const [value, setValue] = useState<string>(props.value ?? "");
-  const [isValid, setIsValid] = useState<boolean>(false);
+  const isValid = useMemo(() => validateEmail(value ?? ""), [value]);
 
   const [isFocused, setIsFocused] = useState(false);
   const interactingListRef = useRef(false);
@@ -89,10 +89,6 @@ function EmailModule(props: EmailModuleType & Props) {
       return t.includes(norm) && t !== norm;
     });
   }, [baseItems, value]);
-
-  useEffect(() => {
-    setIsValid(validateEmail(value ?? ""));
-  }, [value]);
 
   useEffect(() => {
     if (!didMount.current) {

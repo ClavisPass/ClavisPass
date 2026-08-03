@@ -1,7 +1,6 @@
 import React from "react";
-import { LayoutChangeEvent, StyleSheet, View } from "react-native";
-import { MD3Theme } from "react-native-paper";
-import { Chip, Icon, IconButton, Text } from "react-native-paper";
+import { StyleSheet, View } from "react-native";
+import { Chip, Text } from "react-native-paper";
 import { TFunction } from "i18next";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -18,53 +17,21 @@ export type DraggableModulesListProps = {
   deleteModule: (id: string) => void;
   changeModule: (module: ModuleType) => void;
   addModule: (module: ModulesEnum) => void;
-  showAddModuleModal: () => void;
   fastAccess: FastAccessType | null;
   navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>;
 };
 
-const VerticalReorderIcon = ({
-  color,
-  size = 20,
-}: {
-  color?: string;
-  size?: number;
-}) => (
-  <View
-    style={{
-      width: size,
-      height: size,
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-  >
-    <View style={{ height: size / 2, marginBottom: -2 }}>
-      <Icon source="chevron-up" size={size * 0.72} color={color} />
-    </View>
-    <View style={{ height: size / 2, marginTop: -2 }}>
-      <Icon source="chevron-down" size={size * 0.72} color={color} />
-    </View>
-  </View>
-);
-
 export const draggableModulesListStyles = StyleSheet.create({
   footer: {
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-start",
     width: "100%",
-    paddingBottom: 8,
+    paddingHorizontal: 8,
+    paddingBottom: 4,
     position: "relative",
   },
   predictionChip: {
-    position: "absolute",
-    left: 8,
-    maxWidth: "60%",
-    borderRadius: 12,
-  },
-  reorderChip: {
-    position: "absolute",
-    right: 8,
-    maxWidth: "40%",
+    maxWidth: "80%",
     borderRadius: 12,
   },
   predictionChipContent: {
@@ -76,7 +43,7 @@ export const draggableModulesListStyles = StyleSheet.create({
 export const reorderModules = <T,>(
   list: readonly T[],
   startIndex: number,
-  endIndex: number
+  endIndex: number,
 ) => {
   const result = [...list];
   const [removed] = result.splice(startIndex, 1);
@@ -84,57 +51,24 @@ export const reorderModules = <T,>(
   return result;
 };
 
-export const getFooterButtonShift = (
-  footerWidth: number,
-  predictionChipWidth: number
-) => {
-  const addButtonBaseWidth = 40;
-  const leftPadding = 8;
-  const safetyGap = 4;
-  const centeredButtonLeft = Math.max(0, (footerWidth - addButtonBaseWidth) / 2);
-  const predictionChipRight = leftPadding + predictionChipWidth;
-
-  return footerWidth > 0
-    ? Math.max(0, predictionChipRight + safetyGap - centeredButtonLeft)
-    : 0;
-};
-
 type FooterProps = {
   modulePrediction: ModulesEnum | null;
   onAddPredictedModule: () => void;
-  onOpenAddModuleModal: () => void;
-  onOpenReorderScreen?: () => void;
-  canReorder?: boolean;
-  onFooterLayout: (event: LayoutChangeEvent) => void;
-  onPredictionChipLayout: (event: LayoutChangeEvent) => void;
-  requiredShift: number;
-  theme: MD3Theme;
   t: TFunction;
 };
 
 export function DraggableModulesFooter({
   modulePrediction,
   onAddPredictedModule,
-  onOpenAddModuleModal,
-  onOpenReorderScreen,
-  canReorder = true,
-  onFooterLayout,
-  onPredictionChipLayout,
-  requiredShift,
-  theme,
   t,
 }: FooterProps) {
   return (
-    <View
-      style={draggableModulesListStyles.footer}
-      onLayout={onFooterLayout}
-    >
+    <View style={draggableModulesListStyles.footer}>
       {modulePrediction && (
         <Chip
           icon={"plus"}
           onPress={onAddPredictedModule}
           style={draggableModulesListStyles.predictionChip}
-          onLayout={onPredictionChipLayout}
           compact
         >
           <Text
@@ -146,34 +80,6 @@ export function DraggableModulesFooter({
           </Text>
         </Chip>
       )}
-      <IconButton
-        icon={"plus"}
-        iconColor={theme.colors.primary}
-        style={{ margin: 0, transform: [{ translateX: requiredShift }] }}
-        onPress={onOpenAddModuleModal}
-        size={20}
-        selected={true}
-        mode="contained-tonal"
-      />
-      {onOpenReorderScreen ? (
-        <Chip
-          icon={({ color, size }) => (
-            <VerticalReorderIcon color={color} size={size} />
-          )}
-          disabled={!canReorder}
-          onPress={onOpenReorderScreen}
-          style={draggableModulesListStyles.reorderChip}
-          compact
-        >
-          <Text
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            style={draggableModulesListStyles.predictionChipContent}
-          >
-            {t("home:reorderChip")}
-          </Text>
-        </Chip>
-      ) : null}
     </View>
   );
 }

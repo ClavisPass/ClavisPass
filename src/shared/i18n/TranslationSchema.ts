@@ -35,6 +35,7 @@ export type TranslationSchema = {
     moreInfo: string;
     setExpiry: string;
     current: string;
+    addModule: string;
     addFolder: string;
     passwordLength: string;
     includeUppercase: string;

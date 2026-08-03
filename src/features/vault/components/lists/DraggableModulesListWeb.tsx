@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   DragDropContext,
   Draggable,
@@ -7,17 +13,15 @@ import {
   Droppable,
   DroppableProvided,
 } from "@hello-pangea/dnd";
-import { LayoutChangeEvent, View } from "react-native";
+import { View } from "react-native";
 import { useTranslation } from "react-i18next";
 
-import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { ModuleType } from "../../model/ModulesType";
 import getModule from "../../utils/getModule";
 import predictNextModule from "../../utils/predictNextModule";
 import {
   DraggableModulesFooter,
   DraggableModulesListProps,
-  getFooterButtonShift,
   reorderModules,
 } from "./DraggableModulesList.shared";
 import { WebDragHandlePropsProvider } from "../EditRowControlsContainer";
@@ -28,37 +32,18 @@ const getItemStyle = (draggableStyle: any) => ({
 });
 
 function DraggableModulesListWeb(props: DraggableModulesListProps) {
-  const { theme } = useTheme();
   const { t } = useTranslation();
-  const [footerWidth, setFooterWidth] = useState(0);
-  const [predictionChipWidth, setPredictionChipWidth] = useState(0);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const modulePrediction = useMemo(
     () => predictNextModule(props.value.modules),
-    [props.value.modules]
-  );
-
-  const requiredShift = useMemo(
-    () => getFooterButtonShift(footerWidth, predictionChipWidth),
-    [footerWidth, predictionChipWidth]
+    [props.value.modules],
   );
 
   const scrollToBottom = useCallback(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, []);
-
-  const handleFooterLayout = useCallback((event: LayoutChangeEvent) => {
-    setFooterWidth(event.nativeEvent.layout.width);
-  }, []);
-
-  const handlePredictionChipLayout = useCallback(
-    (event: LayoutChangeEvent) => {
-      setPredictionChipWidth(event.nativeEvent.layout.width);
-    },
-    []
-  );
 
   const handleDragEnd = useCallback(
     (result: DropResult) => {
@@ -67,11 +52,11 @@ function DraggableModulesListWeb(props: DraggableModulesListProps) {
         reorderModules(
           props.value.modules,
           result.source.index,
-          result.destination.index
-        )
+          result.destination.index,
+        ),
       );
     },
-    [props.changeModules, props.value.modules]
+    [props.changeModules, props.value.modules],
   );
 
   const previousLengthRef = useRef(props.value.modules.length);
@@ -117,7 +102,7 @@ function DraggableModulesListWeb(props: DraggableModulesListProps) {
                         props.changeModule,
                         props.fastAccess,
                         props.navigation,
-                        props.value.title
+                        props.value.title,
                       )}
                     </WebDragHandlePropsProvider>
                   </div>
@@ -135,11 +120,6 @@ function DraggableModulesListWeb(props: DraggableModulesListProps) {
                 props.addModule(modulePrediction);
                 setTimeout(scrollToBottom, 0);
               }}
-              onOpenAddModuleModal={props.showAddModuleModal}
-              onFooterLayout={handleFooterLayout}
-              onPredictionChipLayout={handlePredictionChipLayout}
-              requiredShift={requiredShift}
-              theme={theme}
               t={t}
             />
           </div>

@@ -6,6 +6,8 @@ import FastAccessType from "../../fastaccess/model/FastAccessType";
 import { EditRowControlsContainer } from "./EditRowControlsContainer";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 
+const MODULE_SPACING = 4;
+
 const moduleStyles = StyleSheet.create({
   container: {
     display: "flex",
@@ -55,14 +57,14 @@ export default function ModuleContainer({
       onDragStart={onDragStart}
       onDelete={deleteModule}
       swipeActionRightInset={8}
-      swipeActionBottomInset={8}
+      swipeActionBottomInset={MODULE_SPACING}
       style={[
         moduleStyles.container,
         moduleStyles.inner,
         {
           backgroundColor: theme.colors?.background,
           boxShadow: (theme.colors as any)?.shadow,
-          marginBottom: 8,
+          marginBottom: MODULE_SPACING,
           borderRadius: 12,
           overflow: "hidden",
         },
