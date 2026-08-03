@@ -34,6 +34,7 @@ import BrowserBridgeSessionSync from "./src/features/browserBridge/components/Br
 import BrowserBridgeWriteSync from "./src/features/browserBridge/components/BrowserBridgeWriteSync";
 import { useTheme } from "./src/app/providers/ThemeProvider";
 import ClipboardLifecycleCleanup from "./src/shared/components/ClipboardLifecycleCleanup";
+import VaultFileOpenHandler from "./src/shared/components/VaultFileOpenHandler";
 import {
   detectTauriEnvironment,
   useIsTauriEnvironment,
@@ -152,7 +153,9 @@ export default function App() {
     let cancelled = false;
     const fallback = setTimeout(() => {
       if (!cancelled) {
-        logger.warn("Tauri window detection timed out; falling back to main view.");
+        logger.warn(
+          "Tauri window detection timed out; falling back to main view.",
+        );
         setView((current) => current ?? "main");
       }
     }, 3000);
@@ -241,12 +244,12 @@ function AppShell() {
                 <BottomSheetModalProvider>
                   <GlobalErrorSnackbar />
                   <GlobalClipboardSnackbar />
+                  <VaultFileOpenHandler />
                   <MobileFastAccessOverlay />
                   <View style={{ flex: 1, backgroundColor: "transparent" }}>
                     <View
                       style={{
-                        borderColor:
-                          isTauri ? theme.colors.primary : undefined,
+                        borderColor: isTauri ? theme.colors.primary : undefined,
                         borderRadius: windowCornerRadius,
                         borderWidth: isTauri ? 1 : 0,
                         backgroundColor: theme.colors.background,
@@ -268,4 +271,3 @@ function AppShell() {
     </>
   );
 }
-

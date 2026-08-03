@@ -153,6 +153,13 @@ const de: TranslationSchema = {
     deviceSaveConfirmText:
       "Möchtest du die Cloud-Speicherung wirklich trennen und wieder nur lokale Speicherung verwenden?",
     deviceSaveConfirmAction: "Bestätigen",
+    openVaultFileTitle: "Vault-Datei öffnen?",
+    openVaultFileText:
+      "Möchtest du zu dieser Vault-Datei wechseln? ClavisPass sperrt die aktuelle Sitzung und verwendet danach diese Datei als Speicherort.",
+    openVaultFileDirtyText:
+      "Du hast ungespeicherte Änderungen. Wenn du jetzt wechselst, wird die aktuelle Sitzung gesperrt und diese Vault-Datei als Speicherort verwendet.",
+    openVaultFileAction: "Vault verbinden",
+    openVaultFileSaveAction: "Speichern und verbinden",
   },
   home: {
     search: "Suche",

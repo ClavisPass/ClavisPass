@@ -138,6 +138,36 @@ fn show_main_window(app: &AppHandle<tauri::Wry>) {
     }
 }
 
+fn get_requested_vault_file_path(args: &[String]) -> Option<String> {
+    args.iter()
+        .filter(|arg| !arg.starts_with("--"))
+        .filter_map(|arg| {
+            let trimmed = arg.trim_matches('"');
+            let path = PathBuf::from(trimmed);
+            let extension = path
+                .extension()
+                .and_then(|value| value.to_str())
+                .map(|value| value.to_ascii_lowercase());
+
+            match extension.as_deref() {
+                Some("lock") => Some(path.to_string_lossy().to_string()),
+                _ => None,
+            }
+        })
+        .next()
+}
+
+fn emit_vault_file_open_request(app: AppHandle<tauri::Wry>, path: String) {
+    show_main_window(&app);
+
+    std::thread::spawn(move || {
+        for delay_ms in [250, 900, 1800] {
+            std::thread::sleep(Duration::from_millis(delay_ms));
+            let _ = app.emit("vault-file-open-requested", path.clone());
+        }
+    });
+}
+
 fn schedule_hide_watchdog(app_handle: AppHandle, generation: u64) {
     std::thread::spawn(move || {
         std::thread::sleep(Duration::from_millis(500));
@@ -202,11 +232,15 @@ pub fn run() {
         .plugin(tauri_plugin_cli::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+        .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
             if app.get_webview_window("main").is_some() {
                 show_main_window(app);
             } else {
                 println!("main window not ready yet");
+            }
+
+            if let Some(path) = get_requested_vault_file_path(&args) {
+                emit_vault_file_open_request(app.clone(), path);
             }
         }))
         .plugin(tauri_plugin_process::init())
@@ -227,6 +261,8 @@ pub fn run() {
             }
 
             let app_handle = app.handle().clone();
+            let requested_vault_file_path =
+                get_requested_vault_file_path(&std::env::args().collect::<Vec<_>>());
             let started_hidden = std::env::args().any(|arg| arg == "--hidden");
             let requested_size = load_window_size(app.handle()).unwrap_or(WindowSize {
                 width: DEFAULT_WINDOW_WIDTH,
@@ -278,6 +314,10 @@ pub fn run() {
             if !started_hidden {
                 let _ = main_window.show();
                 let _ = main_window.set_focus();
+            }
+
+            if let Some(path) = requested_vault_file_path {
+                emit_vault_file_open_request(app_handle.clone(), path);
             }
 
             #[cfg(desktop)]

@@ -147,6 +147,11 @@ export type TranslationSchema = {
     deviceSaveConfirmTitle: string;
     deviceSaveConfirmText: string;
     deviceSaveConfirmAction: string;
+    openVaultFileTitle: string;
+    openVaultFileText: string;
+    openVaultFileDirtyText: string;
+    openVaultFileAction: string;
+    openVaultFileSaveAction: string;
   };
   home: {
     search: string;

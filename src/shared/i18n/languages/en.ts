@@ -151,6 +151,13 @@ const en: TranslationSchema = {
     deviceSaveConfirmText:
       "Do you really want to disconnect from cloud storage and switch back to local storage only?",
     deviceSaveConfirmAction: "Confirm",
+    openVaultFileTitle: "Open vault file?",
+    openVaultFileText:
+      "Do you want to switch to this vault file? ClavisPass will lock the current session and use this file as the storage location.",
+    openVaultFileDirtyText:
+      "You have unsaved changes. If you switch now, the current session will be locked and this vault file will be used as the storage location.",
+    openVaultFileAction: "Connect vault",
+    openVaultFileSaveAction: "Save and connect",
   },
   home: {
     search: "Search",
