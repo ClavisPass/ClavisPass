@@ -179,6 +179,8 @@ const en: TranslationSchema = {
   },
   settings: {
     sync: "Sync",
+    search: "Search settings",
+    noSearchResults: "No matching settings found.",
     system: "System",
     updates: "Updates",
     appearance: "Appearance",
@@ -235,6 +237,9 @@ const en: TranslationSchema = {
     fastAccessPositionBottomRight: "Bottom right",
     importBackup: "Import",
     exportBackup: "Export",
+    importData: "Import data",
+    importDataHint:
+      "Import passwords and entries from other password managers or browser exports.",
     importPasswords: "{{title}} Passwords",
     keepassMasterPassword: "KeePass file master password",
     keepassPasswordTitle: "Open KeePass vault",
@@ -359,6 +364,9 @@ const en: TranslationSchema = {
       "Shorter delays save sooner but can sync more often.",
     infoAutosaveDelayBullet2:
       "When off, changes stay pending until you save or sync manually.",
+    infoSessionDurationTitle: "Lock after inactivity",
+    infoSessionDurationBody:
+      "Controls how long ClavisPass waits without activity before locking the vault again.",
     infoFastAccessTitle: "Fast Access",
     infoFastAccessBody:
       "Lets ClavisPass prepare a small quick-access popup for entries that contain username and password data.",
@@ -366,6 +374,12 @@ const en: TranslationSchema = {
       "Only the selected entry is handed to the popup when you use Fast Access.",
     infoFastAccessBullet2:
       "It is meant for faster autofill-like workflows on desktop and mobile.",
+    infoWindowControlsTitle: "Window buttons",
+    infoWindowControlsBody:
+      "Controls whether ClavisPass shows desktop window buttons in the system style, macOS-style on the left, or classic-style on the right.",
+    infoWindowCornersTitle: "Window corners",
+    infoWindowCornersBody:
+      "Controls whether the desktop window uses rounded or square outer corners.",
   },
   analysis: {
     // headline blocks (optional – falls du später "Top findings" wieder einblendest)
@@ -638,8 +652,7 @@ const en: TranslationSchema = {
     unknownModule: "Unknown Module",
     recoveryCodes: "Recovery Codes",
     recoveryCodesPlaceholder: "Paste codes…",
-    recoveryCodesHelp:
-      "Tap a chip to copy. Press and hold to mark it as used.",
+    recoveryCodesHelp: "Tap a chip to copy. Press and hold to mark it as used.",
     recoveryCodesShowMore: "Show {{count}} more",
     recoveryCodesShowLess: "Show less",
     noteCompact: "Compact",

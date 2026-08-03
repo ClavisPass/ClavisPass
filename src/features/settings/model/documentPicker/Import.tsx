@@ -12,7 +12,7 @@ import Modal from "../../../../shared/components/modals/Modal";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import SettingsItem from "../../components/SettingsItem";
 import { logger } from "../../../../infrastructure/logging/logger";
-import { useVault } from "../../../../app/providers/VaultProvider";
+import type { VaultContextType } from "../../../../app/providers/VaultProvider";
 import FolderType from "../../../vault/model/FolderType";
 
 type PendingKdbxFile = {
@@ -63,10 +63,11 @@ type Props = {
   icon: string;
   leading?: ReactNode;
   type: DocumentTypeEnum;
+  vault: VaultContextType;
 };
 
 function Import(props: Props) {
-  const vault = useVault();
+  const vault = props.vault;
   const { t } = useTranslation();
   const { globalStyles, theme } = useTheme();
 
@@ -175,9 +176,7 @@ function Import(props: Props) {
   const pickKdbxFile = async (): Promise<PendingKdbxFile | null> => {
     if (Platform.OS === "web") return readDesktopKdbxFile();
 
-    const result: any = await DocumentPicker.getDocumentAsync(
-      pickerOptions(),
-    );
+    const result: any = await DocumentPicker.getDocumentAsync(pickerOptions());
 
     if (result.canceled !== false) return null;
 
@@ -245,9 +244,8 @@ function Import(props: Props) {
 
   const pickDocument = async () => {
     try {
-      const result: any = await DocumentPicker.getDocumentAsync(
-        pickerOptions(),
-      );
+      const result: any =
+        await DocumentPicker.getDocumentAsync(pickerOptions());
 
       if (result.canceled !== false) return;
 
@@ -310,11 +308,11 @@ function Import(props: Props) {
                 void openKdbxPasswordModal();
               }
             : props.type === DocumentTypeEnum.PCLOUD
-            ? () => {
-                setValue("");
-                setModalVisible(true);
-              }
-            : pickDocument
+              ? () => {
+                  setValue("");
+                  setModalVisible(true);
+                }
+              : pickDocument
         }
       >
         {t("settings:importPasswords", { title: props.title })}

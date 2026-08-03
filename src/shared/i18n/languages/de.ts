@@ -171,7 +171,8 @@ const de: TranslationSchema = {
     reorderEntries: "Manuell anordnen",
     reorderHint: "Ziehe Einträge, um sie neu anzuordnen.",
     moduleFilterTitle: "Modulfilter",
-    moduleFilterText: "Wähle Modultypen aus, die in der Liste sichtbar sein sollen.",
+    moduleFilterText:
+      "Wähle Modultypen aus, die in der Liste sichtbar sein sollen.",
     editFolders: "Ordner bearbeiten",
     systemAuthPromptTitle: "Systemauthentifizierung nutzen?",
     systemAuthPromptText:
@@ -181,6 +182,8 @@ const de: TranslationSchema = {
   },
   settings: {
     sync: "Synchronisation",
+    search: "Einstellungen durchsuchen",
+    noSearchResults: "Keine passenden Einstellungen gefunden.",
     system: "System",
     updates: "Updates",
     appearance: "Erscheinungsbild",
@@ -237,6 +240,9 @@ const de: TranslationSchema = {
     fastAccessPositionBottomRight: "Unten rechts",
     importBackup: "Importieren",
     exportBackup: "Exportieren",
+    importData: "Daten importieren",
+    importDataHint:
+      "Importiere Passwörter und Einträge aus anderen Passwortmanagern oder Browser-Exporten.",
     importPasswords: "{{title}} Passwörter",
     keepassMasterPassword: "Master-Passwort der KeePass-Datei",
     keepassPasswordTitle: "KeePass-Vault öffnen",
@@ -361,6 +367,9 @@ const de: TranslationSchema = {
       "Kürzere Zeiten speichern früher, können aber häufiger synchronisieren.",
     infoAutosaveDelayBullet2:
       "Bei 'Aus' bleiben Änderungen ausstehend, bis du manuell speicherst oder synchronisierst.",
+    infoSessionDurationTitle: "Sperren bei Inaktivität",
+    infoSessionDurationBody:
+      "Legt fest, nach welcher Zeit ohne Nutzung der Vault wieder gesperrt wird.",
     infoFastAccessTitle: "Fast Access",
     infoFastAccessBody:
       "Erlaubt ClavisPass, ein kleines Schnellzugriffsfenster für Einträge mit Benutzername und Passwort vorzubereiten.",
@@ -368,6 +377,12 @@ const de: TranslationSchema = {
       "Nur der ausgewählte Eintrag wird beim Verwenden von Fast Access an das Popup übergeben.",
     infoFastAccessBullet2:
       "Es ist für schnellere Autofill-ähnliche Workflows auf Desktop und Mobile gedacht.",
+    infoWindowControlsTitle: "Fensterbuttons",
+    infoWindowControlsBody:
+      "Legt fest, ob ClavisPass die Fensterbuttons im Stil des Systems, im macOS-Stil links oder im klassischen Stil rechts anzeigt.",
+    infoWindowCornersTitle: "Fensterecken",
+    infoWindowCornersBody:
+      "Legt fest, ob das Desktop-Fenster abgerundete oder eckige Außenkanten verwendet.",
   },
   analysis: {
     topFindings: "Top-Funde",

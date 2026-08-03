@@ -19,7 +19,12 @@ import {
 } from "../../infrastructure/events/openAddValueBus";
 
 const titlebarLightRoutes = new Set(["Home", "Reorder", "ModuleReorder"]);
-const titlebarContentDragRoutes = new Set(["Home", "Reorder", "ModuleReorder"]);
+const titlebarContentDragRoutes = new Set([
+  "Home",
+  "Reorder",
+  "ModuleReorder",
+  "Settings",
+]);
 
 function getFocusedRouteName(
   state?: NavigationState | PartialState<NavigationState>,

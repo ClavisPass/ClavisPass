@@ -174,6 +174,8 @@ export type TranslationSchema = {
   };
   settings: {
     sync: string;
+    search: string;
+    noSearchResults: string;
     system: string;
     updates: string;
     appearance: string;
@@ -228,6 +230,8 @@ export type TranslationSchema = {
     fastAccessPositionBottomRight: string;
     importBackup: string;
     exportBackup: string;
+    importData: string;
+    importDataHint: string;
     importPasswords: string;
     keepassMasterPassword: string;
     keepassPasswordTitle: string;
@@ -323,10 +327,16 @@ export type TranslationSchema = {
     infoAutosaveDelayBody: string;
     infoAutosaveDelayBullet1: string;
     infoAutosaveDelayBullet2: string;
+    infoSessionDurationTitle: string;
+    infoSessionDurationBody: string;
     infoFastAccessTitle: string;
     infoFastAccessBody: string;
     infoFastAccessBullet1: string;
     infoFastAccessBullet2: string;
+    infoWindowControlsTitle: string;
+    infoWindowControlsBody: string;
+    infoWindowCornersTitle: string;
+    infoWindowCornersBody: string;
   };
   analysis: {
     topFindings: string;

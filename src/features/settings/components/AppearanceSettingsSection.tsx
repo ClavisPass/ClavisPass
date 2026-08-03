@@ -1,5 +1,4 @@
-import React from "react";
-import { Platform } from "react-native";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import DarkModeSwitch from "./DarkModeSwitch";
@@ -13,6 +12,10 @@ import {
   formatAbsoluteDate,
   formatAbsoluteTime,
 } from "../../../shared/utils/Timestamp";
+import {
+  detectTauriEnvironment,
+  isTauriEnvironment,
+} from "../../../infrastructure/platform/isTauri";
 
 type Props = {
   dropdownMaxWidth?: number;
@@ -35,11 +38,15 @@ const AppearanceSettingsSection: React.FC<Props> = ({
     value: windowControlsStyle,
     setValue: setWindowControlsStyleSetting,
   } = useSetting("WINDOW_CONTROLS_STYLE");
-  const {
-    value: windowCornerStyle,
-    setValue: setWindowCornerStyleSetting,
-  } = useSetting("WINDOW_CORNER_STYLE");
-  const isDesktop = Platform.OS === "web";
+  const { value: windowCornerStyle, setValue: setWindowCornerStyleSetting } =
+    useSetting("WINDOW_CORNER_STYLE");
+  const [isTauri, setIsTauri] = useState(isTauriEnvironment());
+
+  useEffect(() => {
+    void (async () => {
+      setIsTauri(await detectTauriEnvironment());
+    })();
+  }, []);
 
   return (
     <>
@@ -56,11 +63,10 @@ const AppearanceSettingsSection: React.FC<Props> = ({
         options={[
           { label: "Deutsch", value: "de" },
           { label: "English", value: "en" },
-          
         ]}
       />
 
-      {isDesktop ? (
+      {isTauri ? (
         <>
           <SettingsDivider />
 
@@ -72,6 +78,10 @@ const AppearanceSettingsSection: React.FC<Props> = ({
               );
             }}
             label={t("settings:windowControlsStyle")}
+            info={{
+              title: t("settings:infoWindowControlsTitle"),
+              body: t("settings:infoWindowControlsBody"),
+            }}
             dropdownMaxWidth={dropdownMaxWidth}
             options={[
               {
@@ -94,11 +104,13 @@ const AppearanceSettingsSection: React.FC<Props> = ({
           <SettingsDropdownItem
             value={windowCornerStyle}
             setValue={(style) => {
-              setWindowCornerStyleSetting(
-                style as "rounded" | "square",
-              );
+              setWindowCornerStyleSetting(style as "rounded" | "square");
             }}
             label={t("settings:windowCornerStyle")}
+            info={{
+              title: t("settings:infoWindowCornersTitle"),
+              body: t("settings:infoWindowCornersBody"),
+            }}
             dropdownMaxWidth={dropdownMaxWidth}
             options={[
               {
@@ -125,17 +137,11 @@ const AppearanceSettingsSection: React.FC<Props> = ({
         dropdownMaxWidth={dropdownMaxWidth}
         options={[
           {
-            label: formatAbsoluteDate(
-              new Date().toISOString(),
-              "de-DE"
-            ),
+            label: formatAbsoluteDate(new Date().toISOString(), "de-DE"),
             value: "de-DE",
           },
           {
-            label: formatAbsoluteDate(
-              new Date().toISOString(),
-              "en-US"
-            ),
+            label: formatAbsoluteDate(new Date().toISOString(), "en-US"),
             value: "en-US",
           },
         ]}
@@ -151,17 +157,11 @@ const AppearanceSettingsSection: React.FC<Props> = ({
         label={t("settings:timeFormat")}
         options={[
           {
-            label: formatAbsoluteTime(
-              new Date().toISOString(),
-              "de-DE"
-            ),
+            label: formatAbsoluteTime(new Date().toISOString(), "de-DE"),
             value: "de-DE",
           },
           {
-            label: formatAbsoluteTime(
-              new Date().toISOString(),
-              "en-US"
-            ),
+            label: formatAbsoluteTime(new Date().toISOString(), "en-US"),
             value: "en-US",
           },
         ]}
