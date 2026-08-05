@@ -14,7 +14,7 @@
     "createUpdaterArtifacts": true,
     "active": true,
     "category": "DeveloperTool",
-    "copyright": "",
+    "copyright": "Copyright (c) 2026 Arratel",
     "targets": [
       "msi",
       "nsis",

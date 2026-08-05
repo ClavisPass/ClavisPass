@@ -1799,7 +1799,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 icon={"web"}
                 showSelectedOverlay={true}
                 onPress={() => {
-                  openURL("https://clavispass.github.io/ClavisPass/");
+                  openURL("https://clavispass.arratel.dev/");
                 }}
                 style={styles.chip}
                 textStyle={styles.chipText}

@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 
 const TASK_LINE_HEIGHT = 18;
 const SINGLE_LINE_GROWTH_THRESHOLD = 80;
+const TASK_MODULE_SPACING = 4;
 
 function TaskModule(props: TaskModuleType & Props) {
   const didMount = useRef(false);
@@ -82,7 +83,7 @@ function TaskModule(props: TaskModuleType & Props) {
       style={{
         marginLeft: 8,
         marginRight: 8,
-        marginBottom: 8,
+        marginBottom: TASK_MODULE_SPACING,
         borderRadius: 12,
         backgroundColor: theme.colors.background,
         boxShadow: theme.colors.shadow,
@@ -93,6 +94,8 @@ function TaskModule(props: TaskModuleType & Props) {
         id={props.id}
         onDragStart={props.onDragStart}
         onDelete={props.deleteModule}
+        swipeActionRightInset={8}
+        swipeActionBottomInset={TASK_MODULE_SPACING}
       >
         <View
           style={[

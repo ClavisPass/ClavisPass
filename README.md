@@ -246,7 +246,7 @@ The result is a system that is **predictable, auditable, and resilient by design
 
 ## FAQ
 
-> See the [FAQ section on the homepage](https://clavispass.github.io/ClavisPass/) for common questions and answers.
+> See the [FAQ section on the homepage](https://clavispass.arratel.dev/) for common questions and answers.
 
 ---
 
@@ -258,4 +258,4 @@ This project is licensed under the MIT License – see the [LICENSE](LICENSE) fi
 
 ## Homepage
 
-[https://clavispass.github.io/ClavisPass/](https://clavispass.github.io/ClavisPass/)
+[https://clavispass.arratel.dev/](https://clavispass.arratel.dev/)

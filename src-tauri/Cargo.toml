@@ -2,7 +2,7 @@
 name = "ClavisPass"
 version = "1.8.1"
 description = "ClavisPass"
-authors = ["you"]
+authors = ["Arratel"]
 license = ""
 repository = ""
 default-run = "app_main"

@@ -39,7 +39,7 @@ export const OnlineProvider = ({ children }: Props) => {
 
     const probeUrls = [
       "https://www.gstatic.com/generate_204",
-      "https://clavispass.github.io/ClavisPass/",
+      "https://clavispass.arratel.dev/",
     ];
 
     for (const url of probeUrls) {

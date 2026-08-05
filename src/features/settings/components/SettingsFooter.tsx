@@ -75,7 +75,7 @@ function SettingsFooter() {
           <Icon color={"white"} name="copyright" size={16} />
           <Text
             style={{ color: "white", userSelect: "none" }}
-          >{`${appName} ${year}`}</Text>
+          >{`ClavisPass by Arratel ${year}`}</Text>
         </View>
         <Text
           onPress={handleDevModeToggle}

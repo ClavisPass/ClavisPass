@@ -3,6 +3,7 @@ import {
   Keyboard,
   Platform,
   ScrollView,
+  StyleSheet,
   View,
   InteractionManager,
   useWindowDimensions,
@@ -27,7 +28,6 @@ import DiscardChangesModal from "../features/vault/components/modals/DiscardChan
 import { useFocusEffect } from "@react-navigation/native";
 import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import Constants from "expo-constants";
-import ContainerButton from "../shared/components/buttons/ContainerButton";
 import SquaredContainerButton from "../shared/components/buttons/SquaredContainerButton";
 import DeleteModal from "../features/vault/components/modals/DeleteModal";
 import Button from "../shared/components/buttons/Button";
@@ -60,6 +60,7 @@ import AdaptiveMenu, {
 } from "../shared/components/menus/AdaptiveMenu";
 import AppTooltip from "../shared/components/tooltips/AppTooltip";
 import PerfProfiler from "../shared/performance/PerfProfiler";
+import AnimatedPressable from "../shared/components/AnimatedPressable";
 import {
   DEFAULT_FOLDER_ICON,
   getFolderColor,
@@ -851,6 +852,180 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     </ScrollView>
   );
 
+  const renderControlDivider = () => (
+    <View
+      style={{
+        width: StyleSheet.hairlineWidth,
+        height: 24,
+        alignSelf: "center",
+        backgroundColor: darkmode
+          ? theme.colors.outlineVariant
+          : "rgba(0, 0, 0, 0.12)",
+      }}
+    />
+  );
+
+  const renderControlSegment = ({
+    children,
+    disabled,
+    flexGrow,
+    justifyContent = "center",
+    onPress,
+    roundedEnd,
+    roundedStart,
+    tooltip,
+  }: {
+    children: React.ReactNode;
+    disabled?: boolean;
+    flexGrow?: number;
+    justifyContent?: "center" | "flex-start";
+    onPress: () => void;
+    roundedEnd?: boolean;
+    roundedStart?: boolean;
+    tooltip: string;
+  }) => (
+    <View
+      style={{
+        width: flexGrow ? undefined : 40,
+        flexBasis: flexGrow ? 100 : undefined,
+        flexGrow: flexGrow ?? 0,
+        flexShrink: flexGrow ? 1 : 0,
+        overflow: "hidden",
+        justifyContent: "center",
+      }}
+    >
+      <AppTooltip title={tooltip}>
+        <AnimatedPressable
+          disabled={disabled}
+          style={{
+            flex: 1,
+          padding: 6,
+            display: "flex",
+            justifyContent,
+            alignItems: "center",
+            backgroundColor: "transparent",
+            borderTopLeftRadius: roundedStart ? 8 : 0,
+            borderBottomLeftRadius: roundedStart ? 8 : 0,
+            borderTopRightRadius: roundedEnd ? 8 : 0,
+            borderBottomRightRadius: roundedEnd ? 8 : 0,
+            overflow: "hidden",
+          }}
+          onPress={onPress}
+        >
+          {children}
+        </AnimatedPressable>
+      </AppTooltip>
+    </View>
+  );
+
+  const renderEditControlGroup = () => (
+    <View
+      style={{
+        height: 40,
+        flexBasis: 220,
+        flexGrow: 5,
+        flexShrink: 1,
+        flexDirection: "row",
+        alignItems: "stretch",
+        borderRadius: 12,
+        paddingHorizontal: editSectionSpacing,
+        margin: 0,
+        overflow: "hidden",
+        backgroundColor: theme.colors.background,
+        boxShadow: theme.colors.shadow,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: darkmode ? theme.colors.outlineVariant : "white",
+      }}
+    >
+      {renderControlSegment({
+        disabled: !canUndo,
+        onPress: undo,
+        roundedStart: true,
+        tooltip: t("common:undo"),
+        children: (
+          <Icon
+            source="undo-variant"
+            color={
+              canUndo ? theme.colors.primary : theme.colors.onSurfaceDisabled
+            }
+            size={20}
+          />
+        ),
+      })}
+      {renderControlDivider()}
+      {renderControlSegment({
+        disabled: !canRedo,
+        onPress: redo,
+        tooltip: t("common:redo"),
+        children: (
+          <Icon
+            source="redo-variant"
+            color={
+              canRedo ? theme.colors.primary : theme.colors.onSurfaceDisabled
+            }
+            size={20}
+          />
+        ),
+      })}
+      {renderControlDivider()}
+      {renderControlSegment({
+        onPress: () => changeFav(!value.fav),
+        tooltip: value.fav
+          ? t("common:removeFavorite")
+          : t("common:addFavorite"),
+        children: (
+          <Icon source={favIcon} color={theme.colors.primary} size={20} />
+        ),
+      })}
+      {renderControlDivider()}
+      {renderControlSegment({
+        flexGrow: 5,
+        justifyContent: "center",
+        onPress: () => {
+          setFolderModalVisible(true);
+        },
+        roundedEnd: true,
+        tooltip: t("common:moveToFolder"),
+        children: (
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 4,
+              minWidth: 0,
+              width: "100%",
+            }}
+          >
+            <Icon
+              source={
+                value.folder ? getFolderIcon(value.folder) : DEFAULT_FOLDER_ICON
+              }
+              size={20}
+              color={
+                value.folder
+                  ? (getFolderColor(value.folder) ?? theme.colors.primary)
+                  : theme.colors.primary
+              }
+            />
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={{ userSelect: "none", flexShrink: 1 }}
+            >
+              {value.folder === null ||
+              value.folder.name === "" ||
+              value.folder === undefined
+                ? t("common:none")
+                : value.folder.name}
+            </Text>
+          </View>
+        ),
+      })}
+    </View>
+  );
+
   return (
     <AnimatedContainer style={globalStyles.container}>
       <FocusAwareStatusBar
@@ -884,6 +1059,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           paddingBottom: editSectionSpacing,
           display: "flex",
           flexDirection: "row",
+          alignItems: "center",
           gap: editSectionSpacing,
         }}
       >
@@ -899,109 +1075,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             />
           </View>
         )}
-        {width > 600 && (
-          <AppTooltip title={t("common:undo")}>
-            <SquaredContainerButton onPress={undo} disabled={!canUndo}>
-              <Icon
-                source="undo-variant"
-                color={
-                  canUndo
-                    ? theme.colors?.primary
-                    : theme.colors.onSurfaceDisabled
-                }
-                size={20}
-              />
-            </SquaredContainerButton>
-          </AppTooltip>
-        )}
-        {width > 600 && (
-          <AppTooltip title={t("common:redo")}>
-            <SquaredContainerButton onPress={redo} disabled={!canRedo}>
-              <Icon
-                source="redo-variant"
-                color={
-                  canRedo
-                    ? theme.colors?.primary
-                    : theme.colors.onSurfaceDisabled
-                }
-                size={20}
-              />
-            </SquaredContainerButton>
-          </AppTooltip>
-        )}
-        {!(width > 600) && (
-          <AppTooltip title={t("common:undo")}>
-            <SquaredContainerButton onPress={undo} disabled={!canUndo}>
-              <Icon
-                source="undo-variant"
-                color={
-                  canUndo
-                    ? theme.colors?.primary
-                    : theme.colors.onSurfaceDisabled
-                }
-                size={20}
-              />
-            </SquaredContainerButton>
-          </AppTooltip>
-        )}
-        {!(width > 600) && (
-          <AppTooltip title={t("common:redo")}>
-            <SquaredContainerButton onPress={redo} disabled={!canRedo}>
-              <Icon
-                source="redo-variant"
-                color={
-                  canRedo
-                    ? theme.colors?.primary
-                    : theme.colors.onSurfaceDisabled
-                }
-                size={20}
-              />
-            </SquaredContainerButton>
-          </AppTooltip>
-        )}
-        <AppTooltip
-          title={
-            value.fav ? t("common:removeFavorite") : t("common:addFavorite")
-          }
-        >
-          <SquaredContainerButton onPress={() => changeFav(!value.fav)}>
-            <Icon source={favIcon} color={theme.colors?.primary} size={20} />
-          </SquaredContainerButton>
-        </AppTooltip>
-        <ContainerButton
-          flexGrow={5}
-          onPress={() => {
-            setFolderModalVisible(true);
-          }}
-        >
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 4,
-            }}
-          >
-            <Icon
-              source={
-                value.folder ? getFolderIcon(value.folder) : DEFAULT_FOLDER_ICON
-              }
-              size={20}
-              color={
-                value.folder
-                  ? (getFolderColor(value.folder) ?? theme.colors?.primary)
-                  : theme.colors?.primary
-              }
-            />
-            <Text style={{ userSelect: "none" }}>
-              {value.folder === null ||
-              value.folder.name === "" ||
-              value.folder === undefined
-                ? t("common:none")
-                : value.folder.name}
-            </Text>
-          </View>
-        </ContainerButton>
+        {renderEditControlGroup()}
         {fastAccessObject === null ||
         fastAccessObject.username === "" ||
         fastAccessObject.password === "" ? null : (
