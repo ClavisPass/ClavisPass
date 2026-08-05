@@ -1,10 +1,12 @@
 # ClavisPass
+
+**ClavisPass by Arratel**
 <p align="center">
   <img src="/assets/icon.svg" alt="Screenshot" width="300" />
 </p>
 
 **Take control of your passwords – securely and seamlessly.**  
-ClavisPass is a modern, privacy-focused password manager that works *with your own cloud*. Use Dropbox (or any other file-based sync) to securely manage your encrypted vault across all your devices.
+ClavisPass by Arratel is a modern, privacy-focused password manager that works *with your own cloud*. Use Dropbox (or any other file-based sync) to securely manage your encrypted vault across all your devices.
 
 ---
 
@@ -258,4 +260,4 @@ This project is licensed under the MIT License – see the [LICENSE](LICENSE) fi
 
 ## Homepage
 
-[https://clavispass.arratel.dev/](https://clavispass.arratel.dev/)
+[ClavisPass by Arratel](https://clavispass.arratel.dev/)
