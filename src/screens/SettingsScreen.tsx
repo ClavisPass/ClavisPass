@@ -1104,7 +1104,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         display: "flex",
         flexDirection: "column",
         backgroundColor: theme.colors?.background,
-        marginBottom: 8,
+        marginBottom: 4,
         borderRadius: 12,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
@@ -1816,10 +1816,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               style={{
                 display: "flex",
                 flexDirection: "row",
-                gap: 8,
+                gap: 4,
                 flexWrap: "wrap",
                 margin: 8,
                 marginTop: 0,
+                marginBottom: 4,
               }}
             >
               <Chip
