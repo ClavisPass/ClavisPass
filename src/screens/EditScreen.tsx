@@ -883,23 +883,14 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     roundedEnd?: boolean;
     roundedStart?: boolean;
     tooltip: string;
-  }) => (
-    <View
-      style={{
-        width: flexGrow ? undefined : 40,
-        flexBasis: flexGrow ? 100 : undefined,
-        flexGrow: flexGrow ?? 0,
-        flexShrink: flexGrow ? 1 : 0,
-        overflow: "hidden",
-        justifyContent: "center",
-      }}
-    >
-      <AppTooltip title={tooltip}>
+  }) => {
+    const pressable = (
         <AnimatedPressable
           disabled={disabled}
           style={{
             flex: 1,
-          padding: 6,
+            height: "100%",
+            padding: 6,
             display: "flex",
             justifyContent,
             alignItems: "center",
@@ -914,9 +905,28 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         >
           {children}
         </AnimatedPressable>
-      </AppTooltip>
-    </View>
-  );
+    );
+
+    return (
+      <View
+        style={{
+          width: flexGrow ? undefined : 40,
+          flexBasis: flexGrow ? 100 : undefined,
+          flexGrow: flexGrow ?? 0,
+          flexShrink: flexGrow ? 1 : 0,
+          overflow: "hidden",
+          justifyContent: "center",
+          alignSelf: "stretch",
+        }}
+      >
+        {Platform.OS === "web" ? (
+          <AppTooltip title={tooltip}>{pressable}</AppTooltip>
+        ) : (
+          pressable
+        )}
+      </View>
+    );
+  };
 
   const renderEditControlGroup = () => (
     <View

@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Chip, Text } from "react-native-paper";
+import { Chip } from "react-native-paper";
 import { TFunction } from "i18next";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -32,9 +32,12 @@ export const draggableModulesListStyles = StyleSheet.create({
   },
   predictionChip: {
     maxWidth: "80%",
+    height: 30,
     borderRadius: 12,
   },
-  predictionChipContent: {
+  predictionChipText: {
+    fontSize: 12,
+    lineHeight: 16,
     flexShrink: 1,
     minWidth: 0,
   },
@@ -69,15 +72,10 @@ export function DraggableModulesFooter({
           icon={"plus"}
           onPress={onAddPredictedModule}
           style={draggableModulesListStyles.predictionChip}
+          textStyle={draggableModulesListStyles.predictionChipText}
           compact
         >
-          <Text
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            style={draggableModulesListStyles.predictionChipContent}
-          >
-            {getModuleNameByEnum(modulePrediction, t)}
-          </Text>
+          {getModuleNameByEnum(modulePrediction, t)}
         </Chip>
       )}
     </View>

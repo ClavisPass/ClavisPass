@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { InteractionManager, View, StyleSheet } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import { Dropdown, DropdownInputProps } from "react-native-paper-dropdown";
 import Modal from "../../../../shared/components/modals/Modal";
@@ -46,12 +46,23 @@ function EditCustomFieldModal(props: Props) {
   );
 
   useEffect(() => {
-    if (props.visible) {
-      setTypeError(null);
-      requestAnimationFrame(() => {
-        inputRef.current?.focus?.();
-      });
-    }
+    if (!props.visible) return;
+
+    setTypeError(null);
+
+    const focusInput = () => {
+      inputRef.current?.focus?.();
+    };
+
+    const frame = requestAnimationFrame(focusInput);
+    const interactionTask = InteractionManager.runAfterInteractions(focusInput);
+    const timer = setTimeout(focusInput, 180);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      interactionTask?.cancel?.();
+      clearTimeout(timer);
+    };
   }, [props.visible]);
   return (
     <Modal
@@ -81,6 +92,7 @@ function EditCustomFieldModal(props: Props) {
           </Text>
           <TextInput
             ref={inputRef}
+            autoFocus={props.visible}
             outlineStyle={[globalStyles.outlineStyle]}
             style={globalStyles.textInputStyle}
             value={props.title}
