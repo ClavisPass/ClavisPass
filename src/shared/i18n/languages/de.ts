@@ -238,6 +238,10 @@ const de: TranslationSchema = {
     timeFormat: "Zeitformat",
     changeMasterPassword: "Master-Passwort ändern",
     useSystemAuth: "Systemauthentifizierung",
+    expiryReminders: "Ablauf-Erinnerungen",
+    expiryReminderNotificationTitle: "Ein Eintrag läuft bald ab",
+    expiryReminderNotificationBody:
+      "Ein gespeicherter Eintrag erreicht bald sein Ablaufdatum.",
     autoOpenFastAccess: "Automatisch öffnen",
     fastAccessPosition: "Popup-Position",
     fastAccessPositionHint:
@@ -260,6 +264,7 @@ const de: TranslationSchema = {
     pcloudMasterPassword: "Master-Passwort von pCloud",
     cryptography: "Kryptografie",
     website: "Webseite",
+    contact: "Kontakt",
     hours: "{{count}} Stunden",
     minutes: "{{count}} Minuten",
     seconds: "{{count}} Sekunden",
@@ -378,6 +383,13 @@ const de: TranslationSchema = {
     infoSessionDurationTitle: "Sperren bei Inaktivität",
     infoSessionDurationBody:
       "Legt fest, nach welcher Zeit ohne Nutzung der Vault wieder gesperrt wird.",
+    infoExpiryRemindersTitle: "Ablauf-Erinnerungen",
+    infoExpiryRemindersBody:
+      "Plant lokal eine Erinnerung am Vortag eines Ablaufdatums.",
+    infoExpiryRemindersBullet1:
+      "Die Erinnerung wird nur auf diesem Gerät geplant.",
+    infoExpiryRemindersBullet2:
+      "Benachrichtigungen enthalten keine sensiblen Details.",
     infoFastAccessTitle: "Fast Access",
     infoFastAccessBody:
       "Erlaubt ClavisPass, ein kleines Schnellzugriffsfenster für Einträge mit Benutzername und Passwort vorzubereiten.",

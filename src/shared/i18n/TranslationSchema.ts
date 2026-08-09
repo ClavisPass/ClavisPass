@@ -227,6 +227,9 @@ export type TranslationSchema = {
     timeFormat: string;
     changeMasterPassword: string;
     useSystemAuth: string;
+    expiryReminders: string;
+    expiryReminderNotificationTitle: string;
+    expiryReminderNotificationBody: string;
     autoOpenFastAccess: string;
     fastAccessPosition: string;
     fastAccessPositionHint: string;
@@ -246,6 +249,7 @@ export type TranslationSchema = {
     pcloudMasterPassword: string;
     cryptography: string;
     website: string;
+    contact: string;
     hours: string;
     minutes: string;
     seconds: string;
@@ -335,6 +339,10 @@ export type TranslationSchema = {
     infoAutosaveDelayBullet2: string;
     infoSessionDurationTitle: string;
     infoSessionDurationBody: string;
+    infoExpiryRemindersTitle: string;
+    infoExpiryRemindersBody: string;
+    infoExpiryRemindersBullet1: string;
+    infoExpiryRemindersBullet2: string;
     infoFastAccessTitle: string;
     infoFastAccessBody: string;
     infoFastAccessBullet1: string;

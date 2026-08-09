@@ -159,6 +159,10 @@ export const storeSchema = {
     type: "number",
     default: 30 * 60,
   },
+  EXPIRY_REMINDERS: {
+    type: "boolean",
+    default: false,
+  },
   ONBOARDING_DONE: {
     type: "boolean",
     default: false,
@@ -247,6 +251,7 @@ const SETTINGS_RESET_KEYS = [
   "COPY_DURATION",
   "AUTOSAVE_DELAY",
   "SESSION_DURATION",
+  "EXPIRY_REMINDERS",
   "SYSTEM_AUTH_PROMPT_DONE",
 ] as const satisfies readonly DataKey[];
 

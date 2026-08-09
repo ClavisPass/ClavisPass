@@ -299,6 +299,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     useSetting("SESSION_DURATION");
   const { value: blurOnUnfocus, setValue: setBlurOnUnfocus } =
     useSetting("BLUR_ON_UNFOCUS");
+  const { value: expiryReminders, setValue: setExpiryReminders } =
+    useSetting("EXPIRY_REMINDERS");
   const { value: hotkeys, setValue: setHotkeys } = useSetting("HOTKEYS");
 
   const closeBehavior = closeBehaviorValue === "hide";
@@ -408,6 +410,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         t("settings:useSystemAuth"),
         t("settings:contentProtection"),
         t("settings:blurOnUnfocus"),
+        t("settings:expiryReminders"),
         t("settings:manageDevices"),
         t("settings:copyDuration"),
         t("settings:autosaveDelay"),
@@ -418,6 +421,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         "password",
         "clipboard",
         "device",
+        "expiry",
+        "reminder",
+        "notification",
       ]),
       browserExtensions:
         isTauri &&
@@ -881,6 +887,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
       sessionDuration: {
         title: t("settings:infoSessionDurationTitle"),
         body: t("settings:infoSessionDurationBody"),
+      },
+      expiryReminders: {
+        title: t("settings:infoExpiryRemindersTitle"),
+        body: t("settings:infoExpiryRemindersBody"),
+        bullets: [
+          t("settings:infoExpiryRemindersBullet1"),
+          t("settings:infoExpiryRemindersBullet2"),
+        ],
       },
       fastAccess: {
         title: t("settings:infoFastAccessTitle"),
@@ -1427,6 +1441,19 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                     />
                   </>
                 ) : null}
+                {Platform.OS !== "web" ? (
+                  <>
+                    <SettingsDivider />
+                    <SettingsSwitch
+                      label={t("settings:expiryReminders")}
+                      value={expiryReminders}
+                      info={settingInfo.expiryReminders}
+                      onValueChange={(checked) => {
+                        void setExpiryReminders(checked);
+                      }}
+                    />
+                  </>
+                ) : null}
                 <SettingsDivider />
                 <SettingsItem
                   onPress={() => {
@@ -1816,6 +1843,17 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 textStyle={styles.chipText}
               >
                 Github
+              </Chip>
+              <Chip
+                icon={"email-outline"}
+                showSelectedOverlay={true}
+                onPress={() => {
+                  openURL("mailto:clavispass@arratel.dev");
+                }}
+                style={styles.chip}
+                textStyle={styles.chipText}
+              >
+                {t("settings:contact")}
               </Chip>
             </View>
           </ScrollView>

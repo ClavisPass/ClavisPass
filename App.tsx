@@ -32,6 +32,7 @@ import FastAccessSessionBridge from "./src/features/fastaccess/components/FastAc
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import BrowserBridgeSessionSync from "./src/features/browserBridge/components/BrowserBridgeSessionSync";
 import BrowserBridgeWriteSync from "./src/features/browserBridge/components/BrowserBridgeWriteSync";
+import ExpiryNotificationScheduler from "./src/features/vault/components/ExpiryNotificationScheduler";
 import { useTheme } from "./src/app/providers/ThemeProvider";
 import ClipboardLifecycleCleanup from "./src/shared/components/ClipboardLifecycleCleanup";
 import VaultFileOpenHandler from "./src/shared/components/VaultFileOpenHandler";
@@ -240,6 +241,7 @@ function AppShell() {
             <VaultProvider>
               <BrowserBridgeSessionSync />
               <BrowserBridgeWriteSync />
+              <ExpiryNotificationScheduler />
               <DevModeProvider>
                 <BottomSheetModalProvider>
                   <GlobalErrorSnackbar />

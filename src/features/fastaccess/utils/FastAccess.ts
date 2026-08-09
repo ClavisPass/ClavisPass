@@ -24,6 +24,7 @@ let popupReady = false;
 let popupReadyListenerSet = false;
 let popupReadyResolvers: Array<() => void> = [];
 
+const FAST_ACCESS_NOTIFICATION_KIND = "clavispass-fast-access";
 const FAST_ACCESS_WINDOW_WIDTH = 320;
 const FAST_ACCESS_WINDOW_HEIGHT = 150;
 const FAST_ACCESS_MARGIN_X = 20;
@@ -54,6 +55,32 @@ async function isNotificationStillPresented(notificationId: string) {
       error,
     );
     return true;
+  }
+}
+
+async function dismissPresentedFastAccessNotifications() {
+  try {
+    const presented = await Notifications.getPresentedNotificationsAsync();
+    await Promise.all(
+      presented.map((item) => {
+        const data = item.request.content.data as { kind?: string } | undefined;
+        const isFastAccess =
+          data?.kind === FAST_ACCESS_NOTIFICATION_KIND ||
+          item.request.content.categoryIdentifier ===
+            FAST_ACCESS_NOTIFICATION_CATEGORY;
+
+        if (!isFastAccess) {
+          return Promise.resolve();
+        }
+
+        return Notifications.dismissNotificationAsync(item.request.identifier);
+      }),
+    );
+  } catch (error) {
+    logger.warn(
+      "[FastAccess] Failed to dismiss presented Fast Access notifications:",
+      error,
+    );
   }
 }
 
@@ -125,6 +152,7 @@ async function configureMobileFastAccess() {
   if (!notificationListenerSet) {
     Notifications.addNotificationResponseReceivedListener((response) => {
       const data = (response.notification.request.content.data as {
+        kind?: string;
         username?: string;
         password?: string;
         title?: string;
@@ -270,7 +298,12 @@ export async function openFastAccess(
       categoryIdentifier: FAST_ACCESS_NOTIFICATION_CATEGORY,
       body: username,
       sound: false,
-      data: { title, username, password },
+      data: {
+        kind: FAST_ACCESS_NOTIFICATION_KIND,
+        title,
+        username,
+        password,
+      },
       priority: Notifications.AndroidNotificationPriority.MAX,
     },
     trigger: null,
@@ -298,7 +331,7 @@ export async function hideFastAccess() {
       return;
     }
 
-    await Notifications.dismissAllNotificationsAsync();
+    await dismissPresentedFastAccessNotifications();
   }
 
   activeFastAccessKey = null;
@@ -336,11 +369,7 @@ export async function syncFastAccessSession(sessionKey: string | null) {
   }
 
   if (sessionKey === null) {
-    try {
-      await Notifications.dismissAllNotificationsAsync();
-    } catch (error) {
-      logger.warn("[FastAccess] Failed to dismiss stale notifications:", error);
-    }
+    await dismissPresentedFastAccessNotifications();
   }
 }
 
@@ -363,11 +392,7 @@ export async function cleanupFastAccessOnStartup(hasActiveSession: boolean) {
   }
 
   if (!hasActiveSession) {
-    try {
-      await Notifications.dismissAllNotificationsAsync();
-    } catch (error) {
-      logger.warn("[FastAccess] Failed startup cleanup for stale notifications:", error);
-    }
+    await dismissPresentedFastAccessNotifications();
   }
 
   lastNotificationId = null;

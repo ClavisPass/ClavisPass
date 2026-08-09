@@ -235,6 +235,10 @@ const en: TranslationSchema = {
     timeFormat: "Time Format",
     changeMasterPassword: "Change Master Password",
     useSystemAuth: "System Authentication",
+    expiryReminders: "Expiry reminders",
+    expiryReminderNotificationTitle: "An entry expires soon",
+    expiryReminderNotificationBody:
+      "A saved entry is about to reach its expiry date.",
     autoOpenFastAccess: "Auto Open",
     fastAccessPosition: "Popup Position",
     fastAccessPositionHint:
@@ -257,6 +261,7 @@ const en: TranslationSchema = {
     pcloudMasterPassword: "pCloud master password",
     cryptography: "Cryptography",
     website: "Website",
+    contact: "Contact",
     hours: "{{count}} hours",
     minutes: "{{count}} minutes",
     seconds: "{{count}} seconds",
@@ -375,6 +380,13 @@ const en: TranslationSchema = {
     infoSessionDurationTitle: "Lock after inactivity",
     infoSessionDurationBody:
       "Controls how long ClavisPass waits without activity before locking the vault again.",
+    infoExpiryRemindersTitle: "Expiry reminders",
+    infoExpiryRemindersBody:
+      "Schedules a local reminder on the day before an expiry date.",
+    infoExpiryRemindersBullet1:
+      "The reminder is scheduled only on this device.",
+    infoExpiryRemindersBullet2:
+      "Notifications do not include sensitive details.",
     infoFastAccessTitle: "Fast Access",
     infoFastAccessBody:
       "Lets ClavisPass prepare a small quick-access popup for entries that contain username and password data.",
