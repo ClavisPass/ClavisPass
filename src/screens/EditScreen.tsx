@@ -143,6 +143,10 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const [historyModalVisible, setHistoryModalVisible] = useState(false);
   const [tagsModalVisible, setTagsModalVisible] = useState(false);
   const [overflowMenuVisible, setOverflowMenuVisible] = useState(false);
+  const [overflowMenuAnchor, setOverflowMenuAnchor] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
   const [pendingModuleDeleteId, setPendingModuleDeleteId] = useState<
     string | null
   >(null);
@@ -157,6 +161,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const actionChipAnimationFrameRef = useRef<number | null>(null);
   const actionChipContentWidthRef = useRef(0);
   const actionChipViewportWidthRef = useRef(0);
+  const moreChipRef = useRef<View>(null);
 
   const [fastAccessObject, setFastAccessObject] =
     useState<FastAccessType | null>(
@@ -781,6 +786,18 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   };
   const editSectionSpacing = 4;
 
+  const openOverflowMenu = () => {
+    if (Platform.OS !== "web") {
+      setOverflowMenuVisible(true);
+      return;
+    }
+
+    moreChipRef.current?.measureInWindow?.((x, y, _chipWidth, chipHeight) => {
+      setOverflowMenuAnchor({ x, y: y + chipHeight });
+      setOverflowMenuVisible(true);
+    });
+  };
+
   const renderEditActionChips = () => (
     <ScrollView
       ref={actionChipScrollRef}
@@ -840,15 +857,17 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       >
         {t("common:tags")}
       </Chip>
-      <Chip
-        compact
-        icon="dots-horizontal"
-        onPress={() => setOverflowMenuVisible(true)}
-        style={actionChipStyle}
-        textStyle={actionChipTextStyle}
-      >
-        {t("common:more")}
-      </Chip>
+      <View ref={moreChipRef} collapsable={false}>
+        <Chip
+          compact
+          icon="dots-horizontal"
+          onPress={openOverflowMenu}
+          style={actionChipStyle}
+          textStyle={actionChipTextStyle}
+        >
+          {t("common:more")}
+        </Chip>
+      </View>
     </ScrollView>
   );
 
@@ -1103,7 +1122,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       <AdaptiveMenu
         visible={overflowMenuVisible}
         setVisible={setOverflowMenuVisible}
-        positionY={Constants.statusBarHeight + (width > 600 ? 126 : 120)}
+        positionY={
+          overflowMenuAnchor?.y ??
+          Constants.statusBarHeight + (width > 600 ? 126 : 120)
+        }
+        positionX={overflowMenuAnchor?.x}
         items={editOverflowItems}
       />
       <PerfProfiler id="EditScreen.ModulesList">

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Platform, View } from "react-native";
-import { TextInput, Checkbox } from "react-native-paper";
+import { Platform, TextInput as NativeTextInput, View } from "react-native";
+import { Checkbox } from "react-native-paper";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 const TASK_LINE_HEIGHT = 18;
 const SINGLE_LINE_GROWTH_THRESHOLD = 80;
 const TASK_MODULE_SPACING = 4;
+const TASK_NATIVE_HEIGHT_PADDING = 12;
 
 function TaskModule(props: TaskModuleType & Props) {
   const didMount = useRef(false);
@@ -28,7 +29,7 @@ function TaskModule(props: TaskModuleType & Props) {
   const [inputHeight, setInputHeight] = useState<number>(MIN_HEIGHT);
   const keepsSingleLineHeight =
     !value.includes("\n") && value.length <= SINGLE_LINE_GROWTH_THRESHOLD;
-  const isSingleLine = keepsSingleLineHeight && inputHeight <= MIN_HEIGHT;
+  const isSingleLine = keepsSingleLineHeight;
   const animatedInputHeight = useSharedValue(inputHeight);
   const animatedInputStyle = useAnimatedStyle(() => ({
     height: animatedInputHeight.value,
@@ -113,10 +114,10 @@ function TaskModule(props: TaskModuleType & Props) {
             status={checked ? "checked" : "unchecked"}
             onPress={() => setChecked(!checked)}
           />
-          <Animated.View
-            style={[{ flex: 1, minWidth: 0 }, animatedInputStyle]}
-          >
-            {Platform.OS === "web" ? (
+          {Platform.OS === "web" ? (
+            <Animated.View
+              style={[{ flex: 1, minWidth: 0 }, animatedInputStyle]}
+            >
               <textarea
                 ref={webTextareaRef}
                 autoFocus={value === ""}
@@ -148,60 +149,54 @@ function TaskModule(props: TaskModuleType & Props) {
                   } as React.CSSProperties
                 }
               />
-            ) : (
-              <TextInput
+            </Animated.View>
+          ) : (
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <NativeTextInput
                 autoFocus={value === "" ? true : false}
-                mode="outlined"
                 multiline
                 scrollEnabled={false}
-                dense
                 onContentSizeChange={(e) => {
+                  const contentHeight = Math.ceil(
+                    e.nativeEvent.contentSize.height,
+                  );
                   const nextHeight = keepsSingleLineHeight
                     ? MIN_HEIGHT
                     : Math.max(
                         MIN_HEIGHT,
-                        Math.ceil(e.nativeEvent.contentSize.height),
+                        contentHeight + TASK_NATIVE_HEIGHT_PADDING,
                       );
                   setInputHeight((prev) =>
-                    prev === nextHeight ? prev : nextHeight,
+                    Math.abs(prev - nextHeight) < 2 ? prev : nextHeight,
                   );
                 }}
-                outlineStyle={[
-                  globalStyles.outlineStyle,
-                  { borderWidth: 0, padding: 0 },
-                ]}
-                contentStyle={[
-                  checked
-                    ? { color: "gray", textDecorationLine: "line-through" }
-                    : null,
-                  {
-                    textAlignVertical: isSingleLine ? "center" : "top",
-                    paddingHorizontal: 0,
-                    paddingVertical: isSingleLine ? 0 : 4,
-                    margin: 0,
-                    borderWidth: 0,
-                    lineHeight: TASK_LINE_HEIGHT,
-                  },
-                ]}
                 style={[
-                  globalStyles.textInputStyle,
                   {
                     backgroundColor: "transparent",
-                    padding: 0,
-                    paddingHorizontal: 0,
-                    paddingVertical: 0,
-                    borderWidth: 0,
+                    color: checked ? "gray" : theme.colors.onSurface,
+                    flex: 1,
+                    fontFamily: theme.fonts.bodyLarge.fontFamily,
+                    fontSize: 15,
+                    fontWeight: theme.fonts.bodyLarge.fontWeight,
+                    height: inputHeight,
+                    lineHeight: TASK_LINE_HEIGHT,
+                    margin: 0,
                     minHeight: MIN_HEIGHT,
-                    height: "100%",
-                    justifyContent: "center",
+                    outlineStyle: "none" as any,
+                    paddingHorizontal: 0,
+                    paddingVertical: isSingleLine ? 0 : 6,
+                    borderWidth: 0,
+                    textAlignVertical: isSingleLine ? "center" : "top",
+                    textDecorationLine: checked ? "line-through" : "none",
                   },
                 ]}
                 value={value}
                 onChangeText={setValue}
                 placeholder={t("modules:task")}
+                placeholderTextColor={theme.colors.outline}
               />
-            )}
-          </Animated.View>
+            </View>
+          )}
         </View>
       </EditRowControlsContainer>
     </View>
