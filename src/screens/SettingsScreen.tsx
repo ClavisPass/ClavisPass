@@ -427,11 +427,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
       ]),
       browserExtensions:
         isTauri &&
-        devMode &&
         matchesSettingsSearch([
           t("settings:browserExtensions"),
-          t("settings:browserAssistantTitle"),
-          t("settings:browserManageConnections"),
+          t("settings:browserExtensionSettingsItem"),
           "browser",
           "extension",
           "firefox",
@@ -1632,19 +1630,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 title={t("settings:browserExtensions")}
               >
                 <SettingsItem
-                  onPress={() => {
-                    navigation.navigate("BrowserExtensionSetup");
-                  }}
-                >
-                  {t("settings:browserAssistantTitle")}
-                </SettingsItem>
-                <SettingsDivider />
-                <SettingsItem
+                  leadingIcon="puzzle-outline"
                   onPress={() => {
                     navigation.navigate("BrowserExtensions");
                   }}
                 >
-                  {t("settings:browserManageConnections")}
+                  {t("settings:browserExtensionSettingsItem")}
                 </SettingsItem>
               </SettingsContainer>
             ) : null}

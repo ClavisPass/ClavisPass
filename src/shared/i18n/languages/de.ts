@@ -302,53 +302,38 @@ const de: TranslationSchema = {
     encryption: "Verschlüsselung",
     keyDerivation: "Schlüsselableitung",
     browserExtensions: "Browser-Erweiterungen",
+    browserExtensionSettingsItem: "Browser-Zugriff verwalten",
     browserPairingDescription:
-      "Neue Browser-Anfragen werden hier geprüft, bevor eine Erweiterung auf Fill-Daten zugreifen darf.",
+      "Freigegebene Browser dürfen Fill-Daten anfragen, solange ClavisPass entsperrt ist.",
     browserPendingRequests: "Offene Anfragen",
-    browserPendingHint:
-      "Neue Browser bleiben auf ausstehend, bis du sie ausdrücklich freigibst.",
+    browserPendingEmptyTitle: "Keine offenen Anfragen",
     browserPendingEmpty: "Aktuell wartet kein Browser auf Freigabe.",
     browserPendingBadge: "Ausstehend",
-    browserPairedClients: "Freigegebene Browser",
-    browserPairedHint:
-      "Diese Browser wurden bestätigt und dürfen die Erweiterungs-Bridge nutzen.",
-    browserPairedEmpty: "Noch kein Browser freigegeben.",
-    browserPairedBadge: "Gekoppelt",
-    browserApprove: "Browser freigeben",
+    browserPairedClients: "Vertrauenswürdige Browser",
+    browserPairedEmptyTitle: "Keine vertrauenswürdigen Browser",
+    browserPairedEmpty:
+      "Öffne die ClavisPass-Erweiterung im Browser, um Zugriff anzufragen.",
+    browserPairedBadge: "Vertraut",
+    browserApprove: "Browser vertrauen",
     browserReject: "Browser ablehnen",
     browserDisconnect: "Browser entfernen",
     browserRequestedAt: "Angefragt: {{value}}",
-    browserApprovedAt: "Freigegeben: {{value}}",
+    browserApprovedAt: "Vertraut seit: {{value}}",
     browserLastSeenAt: "Zuletzt gesehen: {{value}}",
     browserUnknownClient: "Browser-Client ({{extensionId}})",
-    browserAssistantTitle: "Installationsassistent",
-    browserAssistantDescription:
-      "Wähle deinen Browser und gehe die Verbindung Schritt für Schritt durch.",
-    browserAssistantFirefox: "Firefox",
-    browserAssistantEdge: "Edge",
-    browserAssistantChrome: "Chrome",
-    browserAssistantStepInstallTitle: "1. Erweiterung im Browser laden",
-    browserAssistantStepInstallFirefox:
-      "Öffne die Firefox-Debug-Seite und lade die ClavisPass-Erweiterung dort temporär.",
-    browserAssistantStepInstallEdge:
-      "Öffne die Erweiterungsseite in Edge und lade die ClavisPass-Erweiterung als entpackte Erweiterung.",
-    browserAssistantStepInstallChrome:
-      "Öffne die Erweiterungsseite in Chrome und lade die ClavisPass-Erweiterung als entpackte Erweiterung.",
-    browserAssistantOpenBrowserPage: "Browser-Seite öffnen",
-    browserAssistantOpenGuide: "Anleitung öffnen",
-    browserAssistantStepBridgeTitle: "2. Desktop-Verbindung vorbereiten",
-    browserAssistantStepBridgeDescription:
-      "Die Erweiterung spricht über Native Messaging mit ClavisPass. Wenn etwas hakt, hilft dir die Installationsanleitung weiter.",
-    browserAssistantStepPairingTitle: "3. Freigabe in ClavisPass bestätigen",
-    browserAssistantStepPairingWaiting:
-      "Starte die Erweiterung im Browser. Neue Anfragen erscheinen dann unten in dieser Liste.",
-    browserAssistantStepPairingPending:
-      "Es wartet mindestens eine Browser-Anfrage auf deine Freigabe.",
-    browserAssistantStepPairingReady:
-      "Mindestens ein Browser ist bereits freigegeben und kann die Desktop-Brücke nutzen.",
-    browserAssistantReloadStatus: "Status neu laden",
-    browserAssistantOpenApprovals: "Freigaben öffnen",
-    browserManageConnections: "Browser-Verbindungen",
+    browserUnknownVersion: "Unbekannte Version",
+    browserStatusPendingTitle: "Browser-Anfrage prüfen",
+    browserStatusPendingDescription:
+      "Ein Browser möchte sich mit diesem Vault verbinden.",
+    browserStatusReadyTitle: "Browser-Zugriff ist bereit",
+    browserStatusReadyDescription:
+      "Vertrauenswürdige Browser können ClavisPass nutzen, solange die Desktop-App entsperrt ist.",
+    browserStatusEmptyTitle: "Kein Browser verbunden",
+    browserStatusEmptyDescription:
+      "Browser-Anfragen erscheinen hier, sobald die Erweiterung ClavisPass kontaktiert.",
+    browserLoading: "Browser-Zugriff wird geladen...",
+    browserLoadFailed: "Browser-Zugriff konnte nicht geladen werden.",
+    browserActionFailed: "Browser-Zugriff konnte nicht aktualisiert werden.",
     infoSystemAuthTitle: "Systemauthentifizierung",
     infoSystemAuthBody:
       "Nutzt deine Geräteentsperrung, um das aktuelle Master-Passwort nach der Aktivierung wiederherzustellen.",

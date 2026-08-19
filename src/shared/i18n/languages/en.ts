@@ -299,53 +299,38 @@ const en: TranslationSchema = {
     encryption: "Encryption",
     keyDerivation: "Key Derivation",
     browserExtensions: "Browser Extensions",
+    browserExtensionSettingsItem: "Manage browser access",
     browserPairingDescription:
-      "Review new browser requests here before a browser extension can access fill data.",
+      "Approved browsers can request fill data while ClavisPass is unlocked.",
     browserPendingRequests: "Pending requests",
-    browserPendingHint:
-      "New browsers stay pending until you explicitly approve them.",
+    browserPendingEmptyTitle: "No pending requests",
     browserPendingEmpty: "No browser is waiting for approval right now.",
     browserPendingBadge: "Pending",
-    browserPairedClients: "Approved browsers",
-    browserPairedHint:
-      "These browsers were approved and may request extension bridge data.",
-    browserPairedEmpty: "No browser has been approved yet.",
-    browserPairedBadge: "Paired",
-    browserApprove: "Approve browser",
+    browserPairedClients: "Trusted browsers",
+    browserPairedEmptyTitle: "No trusted browsers",
+    browserPairedEmpty:
+      "Open the ClavisPass extension in your browser to request access.",
+    browserPairedBadge: "Trusted",
+    browserApprove: "Trust browser",
     browserReject: "Reject browser",
     browserDisconnect: "Remove browser",
     browserRequestedAt: "Requested: {{value}}",
-    browserApprovedAt: "Approved: {{value}}",
+    browserApprovedAt: "Trusted: {{value}}",
     browserLastSeenAt: "Last seen: {{value}}",
     browserUnknownClient: "Browser client ({{extensionId}})",
-    browserAssistantTitle: "Install assistant",
-    browserAssistantDescription:
-      "Choose your browser and go through the connection step by step.",
-    browserAssistantFirefox: "Firefox",
-    browserAssistantEdge: "Edge",
-    browserAssistantChrome: "Chrome",
-    browserAssistantStepInstallTitle: "1. Load the extension in your browser",
-    browserAssistantStepInstallFirefox:
-      "Open the Firefox debugging page and load the ClavisPass extension there temporarily.",
-    browserAssistantStepInstallEdge:
-      "Open the extensions page in Edge and load the ClavisPass extension as an unpacked extension.",
-    browserAssistantStepInstallChrome:
-      "Open the extensions page in Chrome and load the ClavisPass extension as an unpacked extension.",
-    browserAssistantOpenBrowserPage: "Open browser page",
-    browserAssistantOpenGuide: "Open guide",
-    browserAssistantStepBridgeTitle: "2. Prepare the desktop bridge",
-    browserAssistantStepBridgeDescription:
-      "The extension connects to ClavisPass through Native Messaging. If anything fails, the setup guide will walk you through it.",
-    browserAssistantStepPairingTitle: "3. Approve the connection in ClavisPass",
-    browserAssistantStepPairingWaiting:
-      "Start the extension in your browser. New requests will appear below in this list.",
-    browserAssistantStepPairingPending:
-      "At least one browser request is waiting for your approval.",
-    browserAssistantStepPairingReady:
-      "At least one browser is already approved and can use the desktop bridge.",
-    browserAssistantReloadStatus: "Reload status",
-    browserAssistantOpenApprovals: "Open approvals",
-    browserManageConnections: "Browser connections",
+    browserUnknownVersion: "Unknown version",
+    browserStatusPendingTitle: "Review browser request",
+    browserStatusPendingDescription:
+      "A browser wants to connect to this vault.",
+    browserStatusReadyTitle: "Browser access is ready",
+    browserStatusReadyDescription:
+      "Trusted browsers can use ClavisPass while the desktop app is unlocked.",
+    browserStatusEmptyTitle: "No browser connected",
+    browserStatusEmptyDescription:
+      "Browser requests appear here after the extension contacts ClavisPass.",
+    browserLoading: "Loading browser access...",
+    browserLoadFailed: "Browser access could not be loaded.",
+    browserActionFailed: "Browser access could not be updated.",
     infoSystemAuthTitle: "System Authentication",
     infoSystemAuthBody:
       "Uses your device unlock method to restore the current master password after you have enabled it.",
