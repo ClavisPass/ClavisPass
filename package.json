@@ -7,6 +7,7 @@
     "tauri:use": "tauri",
     "tauri:check-versions": "node scripts/check-tauri-version-sync.js",
     "tauri:dev": "tauri dev",
+    "tauri:prepare-native-host": "node scripts/prepare-native-host-sidecar.js",
     "tauri:build": "tauri build",
     "extension:dev": "npm run dev --prefix browser-extension",
     "extension:build": "npm run build --prefix browser-extension",

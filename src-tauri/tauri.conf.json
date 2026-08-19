@@ -5,7 +5,7 @@
   "version": "1.8.2",
   "identifier": "com.ClavisPass.app",
   "build": {
-    "beforeBuildCommand": "npx expo export --platform web",
+    "beforeBuildCommand": "npm run web:build-tauri && npm run tauri:prepare-native-host",
     "beforeDevCommand": "npm run web",
     "frontendDist": "../dist",
     "devUrl": "http://localhost:8081"
@@ -23,7 +23,9 @@
       "dmg",
       "app"
     ],
-    "externalBin": [],
+    "externalBin": [
+      "binaries/clavispass_native_host"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -34,7 +36,10 @@
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
-      "timestampUrl": ""
+      "timestampUrl": "",
+      "nsis": {
+        "installerHooks": "./windows/native-host-hooks.nsh"
+      }
     },
     "longDescription": "",
     "macOS": {

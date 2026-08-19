@@ -40,6 +40,9 @@ browser-extension/.vite/
 
 release
 
+# Generated Tauri sidecars
+src-tauri/binaries/
+
 #android
 android.keystore
 android.keystore.base64

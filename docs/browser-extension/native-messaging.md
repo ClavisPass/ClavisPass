@@ -204,6 +204,16 @@ This repo includes a setup script:
 
 - `scripts/setup-native-host.ps1`
 
+Production Windows builds also register the host from the NSIS installer hook:
+
+- `src-tauri/windows/native-host-hooks.nsh`
+
+The installer hook writes the browser native-messaging manifests next to the
+installed `clavispass_native_host.exe` and registers the per-user browser
+registry keys. Chromium-family registration is intentionally skipped until the
+final Chrome Web Store or Edge Add-ons extension IDs are filled into the hook,
+because `allowed_origins` cannot use wildcards.
+
 It can:
 
 - generate the Chromium-family manifest
