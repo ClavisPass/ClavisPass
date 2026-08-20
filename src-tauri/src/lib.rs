@@ -134,7 +134,9 @@ fn show_main_window(app: &AppHandle<tauri::Wry>) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.show();
         let _ = window.unminimize();
+        let _ = window.set_always_on_top(true);
         let _ = window.set_focus();
+        let _ = window.set_always_on_top(false);
     }
 }
 
@@ -415,6 +417,7 @@ pub fn run() {
             commands::get_key,
             commands::remove_key,
             commands::close_main_window,
+            commands::focus_main_window,
             commands::set_close_behavior,
             commands::claim_pending_lock_request,
             commands::update_tray_menu,

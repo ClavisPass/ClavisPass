@@ -61,6 +61,7 @@ function normalizeDesktopStatus(result: GetStatusResult): DesktopBridgeStatusVie
     pairingStatus: result.pairingStatus,
     appState,
     appVersion: result.appVersion,
+    appScheme: result.appScheme,
     hostVersion:
       typeof result.protocolVersion === "number"
         ? `protocol ${result.protocolVersion}`

@@ -6,7 +6,7 @@ import { isExtensionMessage } from "../shared/messages";
 import type { ContentMessage } from "../shared/content-messages";
 import type { FillDataResult, SearchEntrySuggestion } from "../shared/bridge";
 import type { BrowserWriteResult, CreateEntryFromBrowserPayload, UpdateEntryFromBrowserPayload } from "../shared/bridge";
-import type { ContentDebugResponse, FillExecutionResult, PromptResolutionResult, SavePromptCandidate } from "../shared/types";
+import type { ContentDebugResponse, FillExecutionResult, OpenDesktopAppPayload, PromptResolutionResult, SavePromptCandidate } from "../shared/types";
 import { getNormalizedDomainFromUrl } from "../shared/domain";
 
 const desktopBridge = new DesktopBridgeService();
@@ -66,9 +66,16 @@ async function getActiveTab() {
   return activeTab;
 }
 
-async function openDesktopApp(): Promise<{ success: boolean; detail: string }> {
-  const launchUrls = ["clavispass://redirect", "clavispass-dev://redirect"];
+async function openDesktopApp(payload?: OpenDesktopAppPayload): Promise<{ success: boolean; detail: string }> {
+  const preferredScheme =
+    payload?.appScheme === "clavispass" || payload?.appScheme === "clavispass-dev"
+      ? payload.appScheme
+      : undefined;
+  const launchUrls = preferredScheme
+    ? [`${preferredScheme}://redirect`]
+    : ["clavispass-dev://redirect", "clavispass://redirect"];
   let lastError: unknown;
+  let attempted = false;
 
   for (const url of launchUrls) {
     try {
@@ -83,14 +90,17 @@ async function openDesktopApp(): Promise<{ success: boolean; detail: string }> {
           });
         }, 1200);
       }
-
-      return {
-        success: true,
-        detail: "Tried to open the ClavisPass desktop app."
-      };
+      attempted = true;
     } catch (error) {
       lastError = error;
     }
+  }
+
+  if (attempted) {
+    return {
+      success: true,
+      detail: "Tried to open the ClavisPass desktop app."
+    };
   }
 
   return {
@@ -499,7 +509,7 @@ const router = new BackgroundMessageRouter({
       };
     }
   },
-  "bridge:openDesktopApp": async () => openDesktopApp(),
+  "bridge:openDesktopApp": async (payload) => openDesktopApp(payload),
   "prompt:getPending": async () => ({
     prompt: state.getPendingPrompt()
   }),

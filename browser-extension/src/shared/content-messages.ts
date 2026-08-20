@@ -21,7 +21,7 @@ export type ContentResponseFor<T extends ContentMessageType> = ContentMessageMap
 
 export interface ContentMessage<T extends ContentMessageType = ContentMessageType> {
   type: T;
-  payload: ContentRequestFor<T>;
+  payload?: ContentRequestFor<T>;
 }
 
 export function isContentMessage(value: unknown): value is ContentMessage {
@@ -30,5 +30,5 @@ export function isContentMessage(value: unknown): value is ContentMessage {
   }
 
   const candidate = value as Partial<ContentMessage>;
-  return typeof candidate.type === "string" && "payload" in candidate;
+  return typeof candidate.type === "string";
 }

@@ -16,10 +16,18 @@ const INLINE_ROOT_ID = "clavispass-inline-root";
 const INLINE_STYLE_ID = "clavispass-inline-style";
 const INLINE_BUTTON_TITLE = "Fill with ClavisPass";
 const INLINE_LOGO = `
-  <svg viewBox="0 0 1080 1080" aria-hidden="true" focusable="false">
-    <path d="M478.678 145.834C535.884 138.414 585.754 121.531 628.335 98.647C671.044 121.599 721.092 138.516 778.497 145.901C719.667 193.161 671.262 248.886 628.635 309.926C585.988 248.858 537.564 193.109 478.678 145.834Z" fill="white"/>
-    <path d="M565.198 499.942C479.15 437.845 427.04 380.143 395.22 319.688C359.89 252.538 349.638 182.241 344.735 99.539C453.47 186.758 538.587 295.389 612.02 416.24L565.198 499.942Z" fill="white"/>
-    <path d="M820.867 161.445C817.562 214.998 810.65 260.544 786.819 304.044C760.45 352.203 713.415 397.677 628.335 449.048C618.969 443.392 610.058 437.802 601.579 432.271C601.579 432.271 630.876 382.002 632.396 379.395C683.896 295.957 743.647 220.922 820.867 161.445Z" fill="white"/>
+  <svg viewBox="0 0 1080 1080" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid meet">
+    <g transform="matrix(1.67587,0,0,1.74365,-366.657,-477.218)">
+      <g transform="matrix(1,0,0,1.08209,0.502861,41.5011)">
+        <path d="M288.857,324.383C384.853,311.928 468.535,283.596 540,245.197C611.68,283.711 695.651,312.099 792.011,324.495C693.27,403.812 612.016,497.341 540.504,599.811C468.957,497.293 387.661,403.724 288.857,324.383Z" fill="white"/>
+      </g>
+      <g transform="matrix(0.674354,0,0,0.648143,175.513,217.837)">
+        <path d="M434.139,917.703C289.78,813.531 202.333,716.705 148.924,615.274C89.601,502.613 72.395,384.634 64.17,245.936C246.691,392.332 389.535,574.621 512.834,777.337C511.268,779.967 509.706,782.6 508.146,785.236C508.041,785.413 507.938,785.593 507.837,785.773L434.139,917.703Z" fill="white"/>
+      </g>
+      <g transform="matrix(1,0,0,1,0.502861,26.6667)">
+        <path d="M862.724,350.572C857.177,440.468 845.574,516.935 805.569,589.956C761.291,670.777 682.322,747.088 540,833.279C524.328,823.787 509.419,814.409 495.235,805.128C495.235,805.128 544.244,720.806 546.785,716.433C632.969,576.457 732.982,450.591 862.724,350.572Z" fill="white"/>
+      </g>
+    </g>
   </svg>
 `;
 
@@ -54,7 +62,8 @@ function setupSavePromptListener(): void {
       }
 
       window.setTimeout(() => {
-        void sendRuntimeMessage("content:savePromptCandidate", candidate);
+        void sendRuntimeMessage("content:savePromptCandidate", candidate).catch(() => {
+        });
       }, 250);
     },
     true
@@ -148,7 +157,8 @@ function ensureInlineStyles(): void {
       width: 42px;
       height: 34px;
       background: linear-gradient(135deg, #787ff6 0%, #69c4ff 100%);
-      border-radius: 999px;
+      border: 1px solid #787ff6;
+      border-radius: 12px;
       cursor: pointer;
       box-shadow: rgba(120, 127, 246, 0.28) 0px 10px 24px;
       transition: box-shadow 140ms ease, opacity 140ms ease, filter 140ms ease;
@@ -158,28 +168,32 @@ function ensureInlineStyles(): void {
     #${INLINE_ROOT_ID} button::after {
       content: "";
       position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background: linear-gradient(120deg, transparent 22%, rgba(255, 255, 255, 0.32) 50%, transparent 78%);
-      transform: translateX(-140%);
-      transition: transform 260ms ease;
+      inset: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.34);
+      opacity: 0;
       pointer-events: none;
+      transform: translate(-50%, -50%) scale(1);
+      transition: opacity 180ms ease, transform 280ms ease;
     }
 
     #${INLINE_ROOT_ID} button:hover {
       box-shadow: rgba(120, 127, 246, 0.36) 0px 12px 28px;
-      filter: saturate(1.08) brightness(1.04);
+      filter: saturate(1.05) brightness(1.03);
     }
 
     #${INLINE_ROOT_ID} button:hover::after {
-      transform: translateX(140%);
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(8);
     }
 
     #${INLINE_ROOT_ID} button svg {
       position: relative;
       z-index: 1;
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       display: block;
     }
   `;
@@ -334,20 +348,27 @@ async function previewInlineAction(button: HTMLButtonElement): Promise<void> {
 }
 
 async function commitInlineAction(button: HTMLButtonElement): Promise<void> {
-  if (inlinePreviewState && !inlinePreviewState.committed) {
-    inlinePreviewState.committed = true;
-    setInlineButtonState(button, "Filled with ClavisPass.");
-    return;
-  }
+  try {
+    if (inlinePreviewState && !inlinePreviewState.committed) {
+      inlinePreviewState.committed = true;
+      setInlineButtonState(button, "Filled with ClavisPass.");
+      return;
+    }
 
-  const candidate = await loadSingleInlineFillData();
-  if (candidate.status !== "ready") {
-    setInlineButtonState(button, candidate.detail);
-    return;
-  }
+    const candidate = await loadSingleInlineFillData();
+    if (candidate.status !== "ready") {
+      setInlineButtonState(button, candidate.detail);
+      return;
+    }
 
-  const result = executeFill(candidate.fillData, document);
-  setInlineButtonState(button, result.status === "filled" ? "Filled with ClavisPass." : result.detail);
+    const result = executeFill(candidate.fillData, document);
+    setInlineButtonState(button, result.status === "filled" ? "Filled with ClavisPass." : result.detail);
+  } catch (error) {
+    setInlineButtonState(
+      button,
+      error instanceof Error ? error.message : "ClavisPass could not fill this page."
+    );
+  }
 }
 
 function positionInlineRoot(): void {
@@ -365,11 +386,26 @@ function positionInlineRoot(): void {
   const button = root.querySelector("button");
   const rect = passwordField.getBoundingClientRect();
   const rootRect = root.getBoundingClientRect();
-  const top = window.scrollY + rect.top + Math.max((rect.height - rootRect.height) / 2, 0);
-  const left = window.scrollX + rect.left - rootRect.width - 10;
+  const gap = 8;
+  const viewportPadding = 8;
+  const topInViewport = rect.top + Math.max((rect.height - rootRect.height) / 2, 0);
+  const rightInViewport = rect.right + gap;
+  const leftFallbackInViewport = rect.left - rootRect.width - gap;
+  const maxTopInViewport = window.innerHeight - rootRect.height - viewportPadding;
+  const maxLeftInViewport = window.innerWidth - rootRect.width - viewportPadding;
+  const canPlaceRight = rightInViewport + rootRect.width <= window.innerWidth - viewportPadding;
+  const leftInViewport = canPlaceRight ? rightInViewport : leftFallbackInViewport;
+  const clampedTop = Math.min(
+    Math.max(topInViewport, viewportPadding),
+    Math.max(maxTopInViewport, viewportPadding)
+  );
+  const clampedLeft = Math.min(
+    Math.max(leftInViewport, viewportPadding),
+    Math.max(maxLeftInViewport, viewportPadding)
+  );
 
-  root.style.top = `${Math.max(top, window.scrollY + 8)}px`;
-  root.style.left = `${Math.max(left, window.scrollX + 8)}px`;
+  root.style.top = `${window.scrollY + clampedTop}px`;
+  root.style.left = `${window.scrollX + clampedLeft}px`;
 
   if (button && !inlinePreviewState?.committed) {
     setInlineButtonState(button, INLINE_BUTTON_TITLE);

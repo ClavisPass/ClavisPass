@@ -93,6 +93,10 @@ export interface OpenDesktopAppResult {
   detail: string;
 }
 
+export interface OpenDesktopAppPayload {
+  appScheme?: string;
+}
+
 export type EntryActionType = "autofill" | "copy-username" | "copy-password" | "copy-totp";
 
 export interface EntryActionResult {
@@ -231,6 +235,7 @@ export interface DesktopBridgeStatusView {
   pairingStatus?: import("./bridge").PairingStatus;
   appState?: "ready" | "locked" | "not_ready";
   appVersion?: string;
+  appScheme?: string;
   hostVersion?: string;
   desktopName?: string;
   lastError?: import("./bridge").BridgeError;

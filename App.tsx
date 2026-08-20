@@ -32,6 +32,7 @@ import FastAccessSessionBridge from "./src/features/fastaccess/components/FastAc
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import BrowserBridgeSessionSync from "./src/features/browserBridge/components/BrowserBridgeSessionSync";
 import BrowserBridgeWriteSync from "./src/features/browserBridge/components/BrowserBridgeWriteSync";
+import BrowserBridgePairingPrompt from "./src/features/browserBridge/components/BrowserBridgePairingPrompt";
 import ExpiryNotificationScheduler from "./src/features/vault/components/ExpiryNotificationScheduler";
 import { useTheme } from "./src/app/providers/ThemeProvider";
 import ClipboardLifecycleCleanup from "./src/shared/components/ClipboardLifecycleCleanup";
@@ -70,6 +71,14 @@ export function AppWithNavigation() {
       const { onOpenUrl } = await import("@tauri-apps/plugin-deep-link");
       cleanup = onOpenUrl((event) => {
         logger.info("Deep link received:", event);
+        void (async () => {
+          try {
+            const { invoke } = await import("@tauri-apps/api/core");
+            await invoke("focus_main_window");
+          } catch (focusError) {
+            logger.warn("Failed to focus main window from deep link:", focusError);
+          }
+        })();
         try {
           const url = new URL(event as any);
           const code = url.searchParams.get("code");
@@ -262,6 +271,7 @@ function AppShell() {
                       <GlobalShortcuts />
                       <CustomTitlebar />
                       <NavigationContainer />
+                      <BrowserBridgePairingPrompt />
                     </View>
                   </View>
                 </BottomSheetModalProvider>

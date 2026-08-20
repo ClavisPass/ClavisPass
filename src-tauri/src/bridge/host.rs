@@ -16,6 +16,7 @@ struct StatusResult {
     host_name: &'static str,
     protocol_version: u32,
     app_version: &'static str,
+    app_scheme: &'static str,
     ready: bool,
     pairing_status: PairingStatus,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -189,12 +190,21 @@ fn respond_status(id: String, pairing_status: PairingStatus, extension_id: &str)
             host_name: HOST_NAME,
             protocol_version: PROTOCOL_VERSION,
             app_version: env!("CARGO_PKG_VERSION"),
+            app_scheme: app_scheme(),
             ready: session_snapshot.is_some(),
             pairing_status,
             peer,
             session_updated_at_ms: session_snapshot.map(|snapshot| snapshot.updated_at_ms),
         },
     )
+}
+
+fn app_scheme() -> &'static str {
+    if cfg!(debug_assertions) {
+        "clavispass-dev"
+    } else {
+        "clavispass"
+    }
 }
 
 fn respond_search(id: String, payload: serde_json::Value) -> BridgeResponse {

@@ -307,6 +307,10 @@ export type TranslationSchema = {
     browserStatusReadyDescription: string;
     browserStatusEmptyTitle: string;
     browserStatusEmptyDescription: string;
+    browserPairingPromptTitle: string;
+    browserPairingPromptDescription: string;
+    browserPairingPromptLater: string;
+    browserUnknownClientShort: string;
     browserLoading: string;
     browserLoadFailed: string;
     browserActionFailed: string;

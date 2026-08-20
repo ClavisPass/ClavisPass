@@ -331,6 +331,11 @@ const de: TranslationSchema = {
     browserStatusEmptyTitle: "Kein Browser verbunden",
     browserStatusEmptyDescription:
       "Browser-Anfragen erscheinen hier, sobald die Erweiterung ClavisPass kontaktiert.",
+    browserPairingPromptTitle: "Browser vertraut machen",
+    browserPairingPromptDescription:
+      "{{client}} möchte ClavisPass verwenden. Vertraue nur Browsern, die du gerade selbst eingerichtet hast.",
+    browserPairingPromptLater: "Später",
+    browserUnknownClientShort: "Dieser Browser",
     browserLoading: "Browser-Zugriff wird geladen...",
     browserLoadFailed: "Browser-Zugriff konnte nicht geladen werden.",
     browserActionFailed: "Browser-Zugriff konnte nicht aktualisiert werden.",

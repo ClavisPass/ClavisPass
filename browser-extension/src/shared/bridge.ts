@@ -24,6 +24,7 @@ export interface GetStatusResult {
   ready: boolean;
   pairingStatus: PairingStatus;
   appVersion?: string;
+  appScheme?: "clavispass" | "clavispass-dev" | string;
   peer?: {
     extensionId: string;
     clientName?: string;

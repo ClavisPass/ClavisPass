@@ -74,8 +74,11 @@ function Set-RegistryDefaultValue {
   )
 
   if ($PSCmdlet.ShouldProcess($RegistryPath, "Register native host manifest")) {
-    New-Item -Path $RegistryPath -Force | Out-Null
-    New-ItemProperty -Path $RegistryPath -Name "(default)" -Value $Value -PropertyType String -Force | Out-Null
+    $regPath = $RegistryPath -replace "^HKCU:\\", "HKCU\"
+    & reg.exe add $regPath /ve /t REG_SZ /d $Value /f | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+      throw "Failed to register native host manifest at '$RegistryPath'."
+    }
   }
 }
 

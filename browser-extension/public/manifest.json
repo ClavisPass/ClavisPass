@@ -25,7 +25,6 @@
   },
   "background": {
     "service_worker": "background/index.js",
-    "scripts": ["background/index.js"],
     "type": "module"
   },
   "permissions": ["storage", "tabs", "scripting", "nativeMessaging"],

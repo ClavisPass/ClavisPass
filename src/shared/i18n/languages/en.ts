@@ -328,6 +328,11 @@ const en: TranslationSchema = {
     browserStatusEmptyTitle: "No browser connected",
     browserStatusEmptyDescription:
       "Browser requests appear here after the extension contacts ClavisPass.",
+    browserPairingPromptTitle: "Trust browser",
+    browserPairingPromptDescription:
+      "{{client}} wants to use ClavisPass. Only trust browsers you are setting up right now.",
+    browserPairingPromptLater: "Later",
+    browserUnknownClientShort: "This browser",
     browserLoading: "Loading browser access...",
     browserLoadFailed: "Browser access could not be loaded.",
     browserActionFailed: "Browser access could not be updated.",

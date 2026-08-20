@@ -11,6 +11,8 @@ import type {
   ContentDebugResponse
   ,
   OpenDesktopAppResult
+  ,
+  OpenDesktopAppPayload
 } from "./types";
 import type { GetFillDataForEntryPayload } from "./bridge";
 
@@ -40,7 +42,7 @@ export type MessageMap = {
     response: ContentDebugResponse;
   };
   "bridge:openDesktopApp": {
-    request: undefined;
+    request: OpenDesktopAppPayload | undefined;
     response: OpenDesktopAppResult;
   };
   "prompt:getPending": {
@@ -68,7 +70,7 @@ export type ResponseFor<T extends MessageType> = MessageMap[T]["response"];
 
 export interface ExtensionMessage<T extends MessageType = MessageType> {
   type: T;
-  payload: RequestFor<T>;
+  payload?: RequestFor<T>;
 }
 
 export function sendRuntimeMessage<T extends MessageType>(
@@ -84,5 +86,5 @@ export function isExtensionMessage(value: unknown): value is ExtensionMessage {
   }
 
   const candidate = value as Partial<ExtensionMessage>;
-  return typeof candidate.type === "string" && "payload" in candidate;
+  return typeof candidate.type === "string";
 }

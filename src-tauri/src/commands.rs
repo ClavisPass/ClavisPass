@@ -225,6 +225,26 @@ pub async fn close_main_window(
 }
 
 #[tauri::command]
+pub async fn focus_main_window(
+    app: AppHandle,
+    state: State<'_, CloseBehaviorState>,
+) -> Result<(), String> {
+    state.cancel_hide_watchdog();
+
+    let win = app
+        .get_webview_window("main")
+        .ok_or("main window not found")?;
+
+    win.show().map_err(|e| e.to_string())?;
+    win.unminimize().map_err(|e| e.to_string())?;
+    let _ = win.set_always_on_top(true);
+    win.set_focus().map_err(|e| e.to_string())?;
+    let _ = win.set_always_on_top(false);
+
+    Ok(())
+}
+
+#[tauri::command]
 pub async fn set_close_behavior(
     state: State<'_, CloseBehaviorState>,
     behavior: CloseBehavior,

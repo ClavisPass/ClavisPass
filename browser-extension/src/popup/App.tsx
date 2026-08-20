@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { BrandHeader } from "./components/branding/BrandHeader";
+import { useEffect, useRef, useState } from "react";
 import { BrandLogo } from "./components/branding/BrandLogo";
 import { sendRuntimeMessage } from "../shared/messages";
 import type { SearchEntrySuggestion } from "../shared/bridge";
@@ -7,32 +6,187 @@ import type {
   DesktopBridgeStatusView,
   DesktopEntrySuggestionsView,
   FillExecutionResult,
-  PreparedFillSummary,
   SavePromptDecision,
-  SavePromptResolution,
-  ContentDebugResponse
+  SavePromptResolution
 } from "../shared/types";
 import {
-  CLAVISPASS_BRAND_NAME,
-  CLAVISPASS_POPUP_DESCRIPTION,
-  CLAVISPASS_POPUP_EYEBROW,
-  CLAVISPASS_POPUP_TITLE
+  CLAVISPASS_BRAND_NAME
 } from "../../../src/shared/branding/brand";
 
-const INITIAL_STATUS: DesktopBridgeStatusView = {
-  transport: "native-messaging",
-  state: "host_unreachable",
-  label: "Checking Desktop App",
-  detail: "Trying to reach the ClavisPass native messaging host."
-};
+const STATUS_REFRESH_INTERVAL_MS = 2000;
 
-const INITIAL_SUGGESTIONS: DesktopEntrySuggestionsView = {
-  domain: {
-    isSupported: false,
-    detail: "Waiting for active tab context."
-  },
-  items: []
+type RefreshStatusOptions = {
+  reloadSuggestions?: boolean;
+  silent?: boolean;
 };
+type ThemeMode = "light" | "dark";
+type Language = "en" | "de";
+
+const translations = {
+  en: {
+    checkingDesktopApp: "Checking Desktop App",
+    checkingDesktopAppDetail: "Trying to reach the ClavisPass native messaging host.",
+    waitingForTab: "Waiting for active tab context.",
+    notReachable: "Not reachable",
+    protocolError: "Protocol error",
+    unpaired: "Unpaired",
+    pairingPending: "Pairing pending",
+    locked: "Locked",
+    notReady: "Not ready",
+    ready: "Ready",
+    noIdentity: "No username or email",
+    switchToMode: "Switch to {{mode}} mode",
+    light: "Light",
+    dark: "Dark",
+    language: "Language",
+    trustBrowserTitle: "Trust this browser in ClavisPass",
+    trustBrowserDetail: "Go to the desktop app and approve the browser request. After that, come back here.",
+    unpairedTitle: "Browser access is not trusted",
+    unpairedDetail: "Open ClavisPass Desktop to review and approve this browser.",
+    lockedTitle: "Unlock ClavisPass Desktop",
+    lockedDetail: "Your vault must be unlocked before this extension can fill passwords.",
+    notReadyTitle: "ClavisPass is not ready yet",
+    notReadyDetail: "Finish setup or unlock your vault in the desktop app.",
+    readyTitle: "Ready to fill",
+    readyDetail: "Choose a matching login for this website.",
+    unreachableTitle: "Open ClavisPass Desktop",
+    unreachableDetail: "The extension cannot reach the desktop app yet.",
+    bridgeAttentionTitle: "Bridge needs attention",
+    openDesktopApp: "Open desktop app",
+    opening: "Opening...",
+    details: "Details",
+    invalidStatus: "The desktop bridge returned an invalid status response.",
+    statusFailedTitle: "Status Check Failed",
+    statusFailedDetail: "The popup could not get a desktop bridge status from the background service.",
+    unknownPopupError: "Unknown popup error.",
+    suggestionsFailed: "Could not load desktop suggestions.",
+    desktopOpenFailed: "The desktop app could not be opened.",
+    fillFailed: "Fill failed for the active page.",
+    saveSuggestion: "Save suggestion",
+    saveEntryPrompt: "Save {{title}}?",
+    updateEntryPrompt: "Update {{title}}?",
+    noUsernameCaptured: "No username captured from this login form.",
+    username: "Username",
+    url: "URL",
+    working: "Working...",
+    saveEntry: "Save entry",
+    updateEntry: "Update entry",
+    dismiss: "Dismiss",
+    promptStatus: "Prompt status",
+    suggestions: "Suggestions",
+    matchesTitle: "Matches for this website",
+    website: "Website",
+    noSearchableDomain: "No searchable domain",
+    couldNotLoadSuggestions: "Could not load suggestions",
+    loadingSuggestions: "Loading suggestions",
+    loadingSuggestionsDetail: "ClavisPass is asking the desktop app for matching entries.",
+    noMatchesFound: "No matches found",
+    noMatchesDetail: "No desktop entries matched this domain yet.",
+    favourite: "Fav",
+    matchedVia: "Matched via {{host}}",
+    password: "Password",
+    totp: "TOTP",
+    filling: "Filling...",
+    fill: "Fill",
+    fillState: "Fill state",
+    selectedEntry: "Selected entry",
+    filled: "Filled",
+    noFields: "No fields",
+    failed: "Failed",
+    fillingNow: "ClavisPass is filling the active page now.",
+    fillHint: "Choose fill to send this login to the active page.",
+    fieldFilled: "{{field}} filled"
+  },
+  de: {
+    checkingDesktopApp: "Desktop-App wird geprüft",
+    checkingDesktopAppDetail: "ClavisPass versucht, den Native-Messaging-Host zu erreichen.",
+    waitingForTab: "Warte auf den aktuellen Tab.",
+    notReachable: "Nicht erreichbar",
+    protocolError: "Protokollfehler",
+    unpaired: "Nicht vertraut",
+    pairingPending: "Freigabe offen",
+    locked: "Gesperrt",
+    notReady: "Nicht bereit",
+    ready: "Bereit",
+    noIdentity: "Kein Benutzername oder keine E-Mail",
+    switchToMode: "Zu {{mode}} wechseln",
+    light: "Hell",
+    dark: "Dunkel",
+    language: "Sprache",
+    trustBrowserTitle: "Browser in ClavisPass vertrauen",
+    trustBrowserDetail: "Gehe zur Desktop-App und bestätige die Browser-Anfrage. Danach bist du hier bereit.",
+    unpairedTitle: "Browser-Zugriff ist nicht vertraut",
+    unpairedDetail: "Öffne ClavisPass Desktop, um diesen Browser zu prüfen und freizugeben.",
+    lockedTitle: "ClavisPass Desktop entsperren",
+    lockedDetail: "Dein Vault muss entsperrt sein, bevor die Erweiterung Passwörter ausfüllen kann.",
+    notReadyTitle: "ClavisPass ist noch nicht bereit",
+    notReadyDetail: "Schließe die Einrichtung ab oder entsperre deinen Vault in der Desktop-App.",
+    readyTitle: "Bereit zum Ausfüllen",
+    readyDetail: "Wähle einen passenden Login für diese Website.",
+    unreachableTitle: "ClavisPass Desktop öffnen",
+    unreachableDetail: "Die Erweiterung kann die Desktop-App noch nicht erreichen.",
+    bridgeAttentionTitle: "Bridge braucht Aufmerksamkeit",
+    openDesktopApp: "Desktop-App öffnen",
+    opening: "Öffne...",
+    details: "Details",
+    invalidStatus: "Die Desktop-Bridge hat einen ungültigen Status zurückgegeben.",
+    statusFailedTitle: "Statusprüfung fehlgeschlagen",
+    statusFailedDetail: "Das Popup konnte keinen Desktop-Bridge-Status vom Hintergrunddienst abrufen.",
+    unknownPopupError: "Unbekannter Popup-Fehler.",
+    suggestionsFailed: "Desktop-Vorschläge konnten nicht geladen werden.",
+    desktopOpenFailed: "Die Desktop-App konnte nicht geöffnet werden.",
+    fillFailed: "Ausfüllen der aktiven Seite fehlgeschlagen.",
+    saveSuggestion: "Speichervorschlag",
+    saveEntryPrompt: "{{title}} speichern?",
+    updateEntryPrompt: "{{title}} aktualisieren?",
+    noUsernameCaptured: "Aus diesem Login-Formular wurde kein Benutzername erkannt.",
+    username: "Benutzername",
+    url: "URL",
+    working: "Arbeite...",
+    saveEntry: "Eintrag speichern",
+    updateEntry: "Eintrag aktualisieren",
+    dismiss: "Verwerfen",
+    promptStatus: "Prompt-Status",
+    suggestions: "Vorschläge",
+    matchesTitle: "Treffer für diese Website",
+    website: "Website",
+    noSearchableDomain: "Keine durchsuchbare Domain",
+    couldNotLoadSuggestions: "Vorschläge konnten nicht geladen werden",
+    loadingSuggestions: "Vorschläge werden geladen",
+    loadingSuggestionsDetail: "ClavisPass fragt die Desktop-App nach passenden Einträgen.",
+    noMatchesFound: "Keine Treffer gefunden",
+    noMatchesDetail: "Noch kein Desktop-Eintrag passt zu dieser Domain.",
+    favourite: "Fav",
+    matchedVia: "Treffer über {{host}}",
+    password: "Passwort",
+    totp: "TOTP",
+    filling: "Fülle aus...",
+    fill: "Ausfüllen",
+    fillState: "Ausfüllstatus",
+    selectedEntry: "Ausgewählter Eintrag",
+    filled: "Ausgefüllt",
+    noFields: "Keine Felder",
+    failed: "Fehlgeschlagen",
+    fillingNow: "ClavisPass füllt die aktive Seite jetzt aus.",
+    fillHint: "Wähle Ausfüllen, um diesen Login an die aktive Seite zu senden.",
+    fieldFilled: "{{field}} ausgefüllt"
+  }
+} satisfies Record<Language, Record<string, string>>;
+
+type TranslationKey = keyof typeof translations.en;
+
+function translate(language: Language, key: TranslationKey, values?: Record<string, string>) {
+  let text = translations[language][key];
+  if (!values) {
+    return text;
+  }
+
+  for (const [name, value] of Object.entries(values)) {
+    text = text.replaceAll(`{{${name}}}`, value);
+  }
+
+  return text;
+}
 
 function isDesktopBridgeStatusView(value: unknown): value is DesktopBridgeStatusView {
   if (!value || typeof value !== "object") {
@@ -48,51 +202,144 @@ function isDesktopBridgeStatusView(value: unknown): value is DesktopBridgeStatus
   );
 }
 
-function formatStateLabel(state: DesktopBridgeStatusView["state"]): string {
+function formatStateLabel(state: DesktopBridgeStatusView["state"], t: (key: TranslationKey) => string): string {
   switch (state) {
     case "host_unreachable":
-      return "Not reachable";
+      return t("notReachable");
     case "protocol_error":
-      return "Protocol error";
+      return t("protocolError");
     case "unpaired":
-      return "Unpaired";
+      return t("unpaired");
     case "pending":
-      return "Pairing pending";
+      return t("pairingPending");
     case "locked":
-      return "Locked";
+      return t("locked");
     case "not_ready":
-      return "Not ready";
+      return t("notReady");
     case "ready":
-      return "Ready";
+      return t("ready");
   }
 }
 
-function describeIdentity(item: SearchEntrySuggestion): string {
-  return item.email ?? item.username ?? "No username or email";
+function describeIdentity(item: SearchEntrySuggestion, t: (key: TranslationKey) => string): string {
+  return item.email ?? item.username ?? t("noIdentity");
 }
 
 function selectedEntryTitle(items: SearchEntrySuggestion[], entryId?: string): string | undefined {
   return items.find((item) => item.entryId === entryId)?.title;
 }
 
+function getInitialTheme(): ThemeMode {
+  const stored = localStorage.getItem("clavispass-popup-theme");
+  if (stored === "light" || stored === "dark") {
+    return stored;
+  }
+
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+function getInitialLanguage(): Language {
+  const stored = localStorage.getItem("clavispass-popup-language");
+  if (stored === "en" || stored === "de") {
+    return stored;
+  }
+
+  return navigator.language.toLowerCase().startsWith("de") ? "de" : "en";
+}
+
+function getStatusContent(status: DesktopBridgeStatusView, t: (key: TranslationKey) => string) {
+  switch (status.state) {
+    case "pending":
+      return {
+        tone: "attention",
+        title: t("trustBrowserTitle"),
+        detail: t("trustBrowserDetail"),
+        action: t("openDesktopApp")
+      };
+    case "unpaired":
+      return {
+        tone: "attention",
+        title: t("unpairedTitle"),
+        detail: t("unpairedDetail"),
+        action: t("openDesktopApp")
+      };
+    case "locked":
+      return {
+        tone: "attention",
+        title: t("lockedTitle"),
+        detail: t("lockedDetail"),
+        action: t("openDesktopApp")
+      };
+    case "not_ready":
+      return {
+        tone: "attention",
+        title: t("notReadyTitle"),
+        detail: t("notReadyDetail"),
+        action: t("openDesktopApp")
+      };
+    case "ready":
+      return {
+        tone: "ready",
+        title: t("readyTitle"),
+        detail: t("readyDetail"),
+        action: t("openDesktopApp")
+      };
+    case "host_unreachable":
+      return {
+        tone: "blocked",
+        title: t("unreachableTitle"),
+        detail: t("unreachableDetail"),
+        action: t("openDesktopApp")
+      };
+    case "protocol_error":
+      return {
+        tone: "blocked",
+        title: t("bridgeAttentionTitle"),
+        detail: status.detail,
+        action: t("openDesktopApp")
+      };
+  }
+}
+
 export function App() {
-  const [status, setStatus] = useState<DesktopBridgeStatusView>(INITIAL_STATUS);
-  const [suggestions, setSuggestions] = useState<DesktopEntrySuggestionsView>(INITIAL_SUGGESTIONS);
+  const [themeMode, setThemeMode] = useState<ThemeMode>(getInitialTheme);
+  const [language, setLanguage] = useState<Language>(getInitialLanguage);
+  const t = (key: TranslationKey, values?: Record<string, string>) =>
+    translate(language, key, values);
+  const initialStatus: DesktopBridgeStatusView = {
+    transport: "native-messaging",
+    state: "host_unreachable",
+    label: t("checkingDesktopApp"),
+    detail: t("checkingDesktopAppDetail")
+  };
+  const initialSuggestions: DesktopEntrySuggestionsView = {
+    domain: {
+      isSupported: false,
+      detail: t("waitingForTab")
+    },
+    items: []
+  };
+  const [status, setStatus] = useState<DesktopBridgeStatusView>(initialStatus);
+  const [suggestions, setSuggestions] = useState<DesktopEntrySuggestionsView>(initialSuggestions);
   const [selectedEntryId, setSelectedEntryId] = useState<string>();
-  const [preparedFill, setPreparedFill] = useState<PreparedFillSummary>();
   const [fillResult, setFillResult] = useState<FillExecutionResult>();
   const [pendingPrompt, setPendingPrompt] = useState<SavePromptDecision>();
-  const [promptMessage, setPromptMessage] = useState<string>();
-  const [contentDebug, setContentDebug] = useState<ContentDebugResponse>();
   const [isRefreshing, setIsRefreshing] = useState(true);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
-  const [isPreparingFill, setIsPreparingFill] = useState(false);
   const [isFilling, setIsFilling] = useState(false);
   const [isResolvingPrompt, setIsResolvingPrompt] = useState(false);
-  const [isLoadingDebug, setIsLoadingDebug] = useState(false);
   const [isOpeningDesktopApp, setIsOpeningDesktopApp] = useState(false);
   const [error, setError] = useState<string>();
   const [searchError, setSearchError] = useState<string>();
+  const isRefreshingRef = useStateRef(isRefreshing);
+  const isBusyRef = useStateRef(
+    isLoadingSuggestions ||
+      isFilling ||
+      isResolvingPrompt ||
+      isOpeningDesktopApp
+  );
 
   async function refreshPendingPrompt(): Promise<void> {
     const response = await sendRuntimeMessage("prompt:getPending", undefined);
@@ -101,12 +348,11 @@ export function App() {
 
   async function refreshSuggestions(nextStatus: DesktopBridgeStatusView): Promise<void> {
     setSelectedEntryId(undefined);
-    setPreparedFill(undefined);
     setFillResult(undefined);
     setSearchError(undefined);
 
     if (nextStatus.state !== "ready") {
-      setSuggestions(INITIAL_SUGGESTIONS);
+      setSuggestions(initialSuggestions);
       return;
     }
 
@@ -117,47 +363,44 @@ export function App() {
       setSuggestions(nextSuggestions);
       setSearchError(nextSuggestions.error);
     } catch (suggestionError) {
-      setSuggestions(INITIAL_SUGGESTIONS);
-      setSearchError(suggestionError instanceof Error ? suggestionError.message : "Could not load desktop suggestions.");
+      setSuggestions(initialSuggestions);
+      setSearchError(suggestionError instanceof Error ? suggestionError.message : t("suggestionsFailed"));
     } finally {
       setIsLoadingSuggestions(false);
     }
   }
 
-  async function refreshStatus(): Promise<void> {
-    setIsRefreshing(true);
+  async function refreshStatus(options: RefreshStatusOptions = {}): Promise<void> {
+    const reloadSuggestions = options.reloadSuggestions ?? true;
+    if (!options.silent) {
+      setIsRefreshing(true);
+    }
     setError(undefined);
 
     try {
       const nextStatus = await sendRuntimeMessage("bridge:getStatus", undefined);
       if (!isDesktopBridgeStatusView(nextStatus)) {
-        throw new Error("The desktop bridge returned an invalid status response.");
+        throw new Error(t("invalidStatus"));
       }
 
       setStatus(nextStatus);
-      await Promise.all([refreshSuggestions(nextStatus), refreshPendingPrompt()]);
+      await Promise.all([
+        reloadSuggestions ? refreshSuggestions(nextStatus) : Promise.resolve(),
+        refreshPendingPrompt()
+      ]);
     } catch (statusError) {
       setStatus({
         transport: "native-messaging",
         state: "protocol_error",
-        label: "Status Check Failed",
-        detail: "The popup could not get a desktop bridge status from the background service."
+        label: t("statusFailedTitle"),
+        detail: t("statusFailedDetail")
       });
-      setSuggestions(INITIAL_SUGGESTIONS);
-      setError(statusError instanceof Error ? statusError.message : "Unknown popup error.");
+      setSuggestions(initialSuggestions);
+      setError(statusError instanceof Error ? statusError.message : t("unknownPopupError"));
     } finally {
-      setIsRefreshing(false);
-    }
-  }
-
-  async function refreshContentDebug(): Promise<void> {
-    setIsLoadingDebug(true);
-
-    try {
-      const result = await sendRuntimeMessage("bridge:getContentDebug", undefined);
-      setContentDebug(result);
-    } finally {
-      setIsLoadingDebug(false);
+      if (!options.silent) {
+        setIsRefreshing(false);
+      }
     }
   }
 
@@ -165,43 +408,13 @@ export function App() {
     setIsOpeningDesktopApp(true);
 
     try {
-      const result = await sendRuntimeMessage("bridge:openDesktopApp", undefined);
-      setPromptMessage(result.detail);
+      await sendRuntimeMessage("bridge:openDesktopApp", {
+        appScheme: status.appScheme
+      });
     } catch (openError) {
-      setPromptMessage(
-        openError instanceof Error
-          ? openError.message
-          : "The desktop app could not be opened."
-      );
+      setError(openError instanceof Error ? openError.message : t("desktopOpenFailed"));
     } finally {
       setIsOpeningDesktopApp(false);
-    }
-  }
-
-  async function handlePrepareFill(entryId: string): Promise<void> {
-    setSelectedEntryId(entryId);
-    setPreparedFill(undefined);
-    setFillResult(undefined);
-    setIsPreparingFill(true);
-
-    try {
-      const result = await sendRuntimeMessage("bridge:prepareFillForActiveTab", { entryId });
-      if (result.status === "ready") {
-        setPreparedFill(result.entry);
-      }
-      if (result.status === "failed") {
-        setFillResult({
-          status: "failed",
-          detail: result.detail
-        });
-      }
-    } catch (prepareError) {
-      setFillResult({
-        status: "failed",
-        detail: prepareError instanceof Error ? prepareError.message : "Fill preparation failed."
-      });
-    } finally {
-      setIsPreparingFill(false);
     }
   }
 
@@ -216,7 +429,7 @@ export function App() {
     } catch (fillError) {
       setFillResult({
         status: "failed",
-        detail: fillError instanceof Error ? fillError.message : "Fill failed for the active page."
+        detail: fillError instanceof Error ? fillError.message : t("fillFailed")
       });
     } finally {
       setIsFilling(false);
@@ -236,9 +449,8 @@ export function App() {
         decision
       });
       setPendingPrompt(result.prompt);
-      setPromptMessage(result.message);
       if (result.applied) {
-        await refreshStatus();
+        await refreshStatus({ reloadSuggestions: true });
       }
     } finally {
       setIsResolvingPrompt(false);
@@ -246,122 +458,119 @@ export function App() {
   }
 
   useEffect(() => {
-    void refreshStatus();
+    document.documentElement.dataset.theme = themeMode;
+    localStorage.setItem("clavispass-popup-theme", themeMode);
+  }, [themeMode]);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+    localStorage.setItem("clavispass-popup-language", language);
+  }, [language]);
+
+  useEffect(() => {
+    void refreshStatus({ reloadSuggestions: true });
   }, []);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (document.visibilityState === "hidden" || isRefreshingRef.current || isBusyRef.current) {
+        return;
+      }
+
+      void refreshStatus({
+        reloadSuggestions: status.state !== "ready",
+        silent: true
+      });
+    }, STATUS_REFRESH_INTERVAL_MS);
+
+    return () => clearInterval(timer);
+  }, [isBusyRef, isRefreshingRef, status.state]);
+
   const selectedTitle = selectedEntryTitle(suggestions.items, selectedEntryId);
+  const statusContent = getStatusContent(status, t);
+  const busy =
+    isRefreshing ||
+    isLoadingSuggestions ||
+    isFilling ||
+    isResolvingPrompt ||
+    isOpeningDesktopApp;
 
   return (
     <main className="app-shell">
-      <BrandHeader
-        eyebrow={CLAVISPASS_POPUP_EYEBROW}
-        title={CLAVISPASS_POPUP_TITLE}
-        description={CLAVISPASS_POPUP_DESCRIPTION}
-        visual={<BrandLogo className="brand-logo" />}
-      />
-
-      <section className="status-card">
-        <div className="status-head">
-          <div>
-            <p className="meta-label">Transport</p>
-            <p className="status-title">{status.transport}</p>
-          </div>
-          <span className={`status-badge status-${status.state}`}>{formatStateLabel(status.state)}</span>
+      <header className="app-header">
+        <div className="brand-lockup">
+          <BrandLogo className="header-logo" />
+          <p className="brand-title">{CLAVISPASS_BRAND_NAME}</p>
         </div>
+      </header>
 
-        <div className="status-copy">
-          <p className="section-title">{status.label}</p>
-          <p className="subtle">{status.detail}</p>
-        </div>
-
-        <div className="status-grid">
-          <div className="info-block">
-            <p className="meta-label">Pairing</p>
-            <p>{status.pairingStatus ?? "unknown"}</p>
-          </div>
-          <div className="info-block">
-            <p className="meta-label">App state</p>
-            <p>{status.appState ?? "unknown"}</p>
-          </div>
-          <div className="info-block">
-            <p className="meta-label">Current domain</p>
-            <p>{suggestions.domain.host ?? "Unavailable"}</p>
-          </div>
-          <div className="info-block">
-            <p className="meta-label">Lookup domain</p>
-            <p>{suggestions.domain.normalizedHost ?? "Unavailable"}</p>
-          </div>
-          <div className="info-block">
-            <p className="meta-label">Desktop app</p>
-            <p>{status.desktopName ?? CLAVISPASS_BRAND_NAME}</p>
-          </div>
-          <div className="info-block">
-            <p className="meta-label">Host version</p>
-            <p>{status.hostVersion ?? "unknown"}</p>
-          </div>
-        </div>
-
-        {status.lastError ? (
-          <div className="error-panel">
-            <p className="meta-label">Bridge error</p>
-            <p>{status.lastError.message}</p>
-            {status.lastError.details ? <p className="error-inline">{status.lastError.details}</p> : null}
-          </div>
-        ) : null}
-
-        {error ? <p className="error-inline">{error}</p> : null}
-
-        <div className="suggestion-actions">
-          <button className="refresh-button" type="button" onClick={() => void refreshStatus()} disabled={isRefreshing || isLoadingSuggestions || isPreparingFill || isFilling || isResolvingPrompt || isLoadingDebug || isOpeningDesktopApp}>
-            {isRefreshing ? "Checking..." : isLoadingSuggestions ? "Loading suggestions..." : "Refresh"}
+      <section className="controls-bar" aria-label="Popup settings">
+        {status.state !== "ready" ? (
+          <span className={`status-badge status-${status.state}`}>
+            {formatStateLabel(status.state, t)}
+          </span>
+        ) : (
+          <span aria-hidden="true" />
+        )}
+        <div className="controls-actions">
+          <button
+            aria-label={t("switchToMode", { mode: themeMode === "dark" ? t("light") : t("dark") })}
+            className="theme-toggle"
+            type="button"
+            onClick={() => setThemeMode((current) => current === "dark" ? "light" : "dark")}
+          >
+            <span className="theme-toggle-track">
+              <span className="theme-toggle-thumb" />
+            </span>
+            <span>{themeMode === "dark" ? t("dark") : t("light")}</span>
           </button>
-          <button className="row-button" type="button" onClick={() => void handleOpenDesktopApp()} disabled={isOpeningDesktopApp || isRefreshing}>
-            {isOpeningDesktopApp ? "Opening app..." : "Open app"}
-          </button>
-          <button className="row-button" type="button" onClick={() => void refreshContentDebug()} disabled={isRefreshing || isLoadingDebug}>
-            {isLoadingDebug ? "Checking page..." : "Page debug"}
-          </button>
+          <div className="language-toggle" aria-label={t("language")}>
+            <button
+              className={language === "en" ? "language-option language-option-active" : "language-option"}
+              type="button"
+              onClick={() => setLanguage("en")}
+            >
+              EN
+            </button>
+            <button
+              className={language === "de" ? "language-option language-option-active" : "language-option"}
+              type="button"
+              onClick={() => setLanguage("de")}
+            >
+              DE
+            </button>
+          </div>
         </div>
       </section>
 
-      {contentDebug ? (
-        <section className="prepare-card">
-          <div className="section-header-row">
+      {status.state !== "ready" ? (
+        <section className={`status-card status-card-${statusContent.tone}`}>
+          <div className="status-head">
             <div>
-              <p className="meta-label">Page debug</p>
-              <p className="section-title">{contentDebug.status === "ok" ? "Content script reachable" : "Content script failed"}</p>
+              <p className="meta-label">{CLAVISPASS_BRAND_NAME}</p>
+              <p className="status-title">{statusContent.title}</p>
             </div>
-            <span className={`status-badge status-${contentDebug.status === "ok" ? "ready" : "protocol_error"}`}>{contentDebug.status}</span>
           </div>
-          <p className="subtle">{contentDebug.detail}</p>
-          {contentDebug.info ? (
-            <div className="status-grid">
-              <div className="info-block">
-                <p className="meta-label">Password fields</p>
-                <p>{contentDebug.info.passwordFieldCount}</p>
-              </div>
-              <div className="info-block">
-                <p className="meta-label">Visible password</p>
-                <p>{contentDebug.info.visiblePasswordFieldCount}</p>
-              </div>
-              <div className="info-block">
-                <p className="meta-label">Forms</p>
-                <p>{contentDebug.info.formsCount}</p>
-              </div>
-              <div className="info-block">
-                <p className="meta-label">Iframes</p>
-                <p>{contentDebug.info.iframeCount}</p>
-              </div>
-              <div className="info-block">
-                <p className="meta-label">Text-like inputs</p>
-                <p>{contentDebug.info.textLikeFieldCount}</p>
-              </div>
-              <div className="info-block">
-                <p className="meta-label">Inline button</p>
-                <p>{contentDebug.info.inlineButtonVisible ? "visible" : "missing"}</p>
-              </div>
+
+          <div className="status-copy">
+            <p className="status-large">{statusContent.detail}</p>
+          </div>
+
+          {status.lastError ? (
+            <div className="error-panel">
+              <p className="meta-label">{t("details")}</p>
+              <p>{status.lastError.message}</p>
+              {status.lastError.details ? <p className="error-inline">{status.lastError.details}</p> : null}
             </div>
           ) : null}
+
+          {error ? <p className="error-inline">{error}</p> : null}
+
+          <div className="suggestion-actions">
+            <button className="refresh-button" type="button" onClick={() => void handleOpenDesktopApp()} disabled={busy}>
+              {isOpeningDesktopApp ? t("opening") : statusContent.action}
+            </button>
+          </div>
         </section>
       ) : null}
 
@@ -369,138 +578,118 @@ export function App() {
         <section className="prompt-card">
           <div className="section-header-row">
             <div>
-              <p className="meta-label">Save suggestion</p>
-              <p className="section-title">{pendingPrompt.kind === "create" ? `Save ${pendingPrompt.suggestedTitle}?` : `Update ${pendingPrompt.existingEntryTitle ?? pendingPrompt.suggestedTitle}?`}</p>
+              <p className="meta-label">{t("saveSuggestion")}</p>
+              <p className="section-title">
+                {pendingPrompt.kind === "create"
+                  ? t("saveEntryPrompt", { title: pendingPrompt.suggestedTitle })
+                  : t("updateEntryPrompt", { title: pendingPrompt.existingEntryTitle ?? pendingPrompt.suggestedTitle })}
+              </p>
             </div>
             <span className={`status-badge status-${pendingPrompt.kind === "create" ? "ready" : "pending"}`}>{pendingPrompt.kind}</span>
           </div>
-          <p className="subtle">{pendingPrompt.candidate.username ? `Username: ${pendingPrompt.candidate.username}` : "No username captured from this login form."}</p>
-          <p className="subtle">URL: {pendingPrompt.candidate.url}</p>
+          <p className="subtle">{pendingPrompt.candidate.username ? `${t("username")}: ${pendingPrompt.candidate.username}` : t("noUsernameCaptured")}</p>
+          <p className="subtle">{t("url")}: {pendingPrompt.candidate.url}</p>
           <div className="suggestion-actions">
             <button className="row-button row-button-primary" type="button" disabled={isResolvingPrompt} onClick={() => void handlePromptResolution(pendingPrompt.kind === "create" ? "save" : "update")}>
-              {isResolvingPrompt ? "Working..." : pendingPrompt.kind === "create" ? "Save entry" : "Update entry"}
+              {isResolvingPrompt ? t("working") : pendingPrompt.kind === "create" ? t("saveEntry") : t("updateEntry")}
             </button>
             <button className="row-button" type="button" disabled={isResolvingPrompt} onClick={() => void handlePromptResolution("dismiss")}>
-              Dismiss
+              {t("dismiss")}
             </button>
           </div>
         </section>
       ) : null}
 
-      {!pendingPrompt && promptMessage ? (
-        <section className="prepare-card">
-          <p className="meta-label">Prompt status</p>
-          <p className="subtle">{promptMessage}</p>
-        </section>
-      ) : null}
-
-      <section className="suggestions-card">
-        <div className="section-header-row">
-          <div>
-            <p className="meta-label">Suggestions</p>
-            <p className="section-title">Matches for this website</p>
-          </div>
-          {suggestions.domain.normalizedHost ? <span className="domain-pill">{suggestions.domain.normalizedHost}</span> : null}
-        </div>
-
-        {status.state !== "ready" ? (
-          <div className="empty-card">
-            <p className="section-title">Suggestions unavailable</p>
-            <p className="subtle">The desktop app must be paired, unlocked and ready before domain suggestions can load.</p>
-          </div>
-        ) : !suggestions.domain.isSupported ? (
-          <div className="empty-card">
-            <p className="section-title">No searchable domain</p>
-            <p className="subtle">{suggestions.domain.detail}</p>
-          </div>
-        ) : searchError ? (
-          <div className="empty-card">
-            <p className="section-title">Could not load suggestions</p>
-            <p className="subtle">{searchError}</p>
-          </div>
-        ) : isLoadingSuggestions ? (
-          <div className="empty-card">
-            <p className="section-title">Loading suggestions</p>
-            <p className="subtle">ClavisPass is asking the desktop app for matching entries.</p>
-          </div>
-        ) : suggestions.items.length === 0 ? (
-          <div className="empty-card">
-            <p className="section-title">No matches found</p>
-            <p className="subtle">No desktop entries matched this domain yet.</p>
-          </div>
-        ) : (
-          <div className="suggestion-list">
-            {suggestions.items.map((item) => (
-              <article className="suggestion-row" key={item.entryId}>
-                <div className="suggestion-main">
-                  <div className="suggestion-copy">
-                    <div className="suggestion-title-row">
-                      <p className="suggestion-title">{item.title}</p>
-                      {item.fav ? <span className="flag-pill">Fav</span> : null}
-                    </div>
-                    <p className="suggestion-identity">{describeIdentity(item)}</p>
-                    {item.matchedHost && item.matchedHost !== suggestions.domain.normalizedHost ? (
-                      <p className="suggestion-host">Matched via {item.matchedHost}</p>
-                    ) : null}
-                  </div>
-                  <div className="hint-row">
-                    {item.hasPassword ? <span className="hint-pill">Password</span> : null}
-                    {item.hasTotp ? <span className="hint-pill">TOTP</span> : null}
-                  </div>
-                </div>
-                <div className="suggestion-actions">
-                  <button className="row-button" type="button" onClick={() => void handlePrepareFill(item.entryId)} disabled={isPreparingFill || isFilling}>
-                    {isPreparingFill && selectedEntryId === item.entryId ? "Preparing..." : "Prepare"}
-                  </button>
-                  <button className="row-button row-button-primary" type="button" onClick={() => void handleFill(item.entryId)} disabled={isPreparingFill || isFilling}>
-                    {isFilling && selectedEntryId === item.entryId ? "Filling..." : "Fill"}
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {selectedEntryId ? (
-        <section className="prepare-card">
+      {status.state === "ready" ? (
+        <section className="suggestions-card">
           <div className="section-header-row">
             <div>
-              <p className="meta-label">Fill state</p>
-              <p className="section-title">{preparedFill?.title ?? selectedTitle ?? "Selected entry"}</p>
+              <p className="meta-label">{t("suggestions")}</p>
+              <p className="section-title">{t("matchesTitle")}</p>
             </div>
-            {fillResult ? (
-              <span className={`status-badge status-${fillResult.status === "filled" ? "ready" : fillResult.status === "no_fields" ? "not_ready" : "protocol_error"}`}>
-                {fillResult.status === "filled" ? "Filled" : fillResult.status === "no_fields" ? "No fields" : "Failed"}
-              </span>
-            ) : preparedFill ? (
-              <span className="status-badge status-ready">Prepared</span>
-            ) : null}
+            {suggestions.domain.normalizedHost ? <span className="domain-pill">{suggestions.domain.normalizedHost}</span> : null}
           </div>
 
-          {isPreparingFill ? <p className="subtle">Secure fill data is being requested from the desktop app.</p> : null}
-          {isFilling ? <p className="subtle">ClavisPass is filling the active page now.</p> : null}
-          {!isPreparingFill && !isFilling && fillResult ? <p className="subtle">{fillResult.detail}</p> : null}
-          {!isPreparingFill && !isFilling && !fillResult && preparedFill ? <p className="subtle">Fill data is ready for the active tab. You can trigger the actual fill now.</p> : null}
-          {!isPreparingFill && !isFilling && !fillResult && !preparedFill ? <p className="subtle">Choose a suggestion to prepare or fill the active page.</p> : null}
-
-          {preparedFill ? (
-            <div className="hint-row hint-row-left">
-              {preparedFill.hasUsername ? <span className="hint-pill">Username ready</span> : null}
-              {preparedFill.hasPassword ? <span className="hint-pill">Password ready</span> : null}
-              {preparedFill.hasTotp ? <span className="hint-pill">TOTP ready</span> : null}
+          {!suggestions.domain.isSupported ? (
+            <div className="empty-card">
+              <p className="section-title">{t("noSearchableDomain")}</p>
+              <p className="subtle">{suggestions.domain.detail}</p>
             </div>
-          ) : null}
-
-          {fillResult?.filledFields?.length ? (
-            <div className="hint-row hint-row-left">
-              {fillResult.filledFields.map((field) => (
-                <span className="hint-pill" key={field}>{field} filled</span>
+          ) : searchError ? (
+            <div className="empty-card">
+              <p className="section-title">{t("couldNotLoadSuggestions")}</p>
+              <p className="subtle">{searchError}</p>
+            </div>
+          ) : isLoadingSuggestions ? (
+            <div className="empty-card">
+              <p className="section-title">{t("loadingSuggestions")}</p>
+              <p className="subtle">{t("loadingSuggestionsDetail")}</p>
+            </div>
+          ) : suggestions.items.length === 0 ? (
+            <div className="empty-card">
+              <p className="section-title">{t("noMatchesFound")}</p>
+              <p className="subtle">{t("noMatchesDetail")}</p>
+            </div>
+          ) : (
+            <div className="suggestion-list">
+              {suggestions.items.map((item) => (
+                <article className="suggestion-row" key={item.entryId}>
+                  <div className="suggestion-main">
+                    <div className="suggestion-copy">
+                      <div className="suggestion-title-row">
+                        <p className="suggestion-title">{item.title}</p>
+                        {item.fav ? <span className="flag-pill">{t("favourite")}</span> : null}
+                      </div>
+                      <p className="suggestion-identity">{describeIdentity(item, t)}</p>
+                      {item.matchedHost && item.matchedHost !== suggestions.domain.normalizedHost ? (
+                        <p className="suggestion-host">{t("matchedVia", { host: item.matchedHost })}</p>
+                      ) : null}
+                    </div>
+                    <div className="suggestion-side">
+                      <div className="hint-row">
+                        {item.hasTotp ? <span className="hint-pill">{t("totp")}</span> : null}
+                      </div>
+                      <button className="row-button row-button-primary suggestion-fill-button" type="button" onClick={() => void handleFill(item.entryId)} disabled={isFilling}>
+                        {isFilling && selectedEntryId === item.entryId ? t("filling") : t("fill")}
+                      </button>
+                    </div>
+                  </div>
+                </article>
               ))}
+            </div>
+          )}
+
+          {selectedEntryId ? (
+            <div className="inline-status">
+              <div>
+                <p className="meta-label">{t("fillState")}</p>
+                <p className="subtle">
+                  {isFilling
+                    ? t("fillingNow")
+                    : fillResult
+                      ? fillResult.detail
+                      : `${t("fillHint")} ${selectedTitle ?? t("selectedEntry")}`}
+                </p>
+              </div>
+              {fillResult ? (
+                <span className={`status-badge status-${fillResult.status === "filled" ? "ready" : fillResult.status === "no_fields" ? "not_ready" : "protocol_error"}`}>
+                  {fillResult.status === "filled" ? t("filled") : fillResult.status === "no_fields" ? t("noFields") : t("failed")}
+                </span>
+              ) : null}
             </div>
           ) : null}
         </section>
       ) : null}
     </main>
   );
+}
+
+function useStateRef<T>(value: T) {
+  const ref = useRef(value);
+
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+
+  return ref;
 }
