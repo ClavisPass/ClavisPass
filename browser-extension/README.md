@@ -86,6 +86,14 @@ npm run build:firefox
 ```
 
 The Firefox archive is written to `artifacts/clavispass-firefox-test.zip`.
+During packaging, the manifest is rewritten for Firefox so the background script uses
+`background.scripts` instead of Chrome's `background.service_worker`.
+
+To override the Firefox add-on ID for a release build:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/package-firefox.ps1 -FirefoxExtensionId "firefox@clavispass.com"
+```
 
 ## Working from the repo root
 
@@ -93,6 +101,7 @@ The main repo now exposes convenience scripts:
 
 - `npm run extension:dev`
 - `npm run extension:build`
+- `npm run extension:build:firefox`
 - `npm run extension:typecheck`
 - `npm run extension:package:firefox`
 
@@ -105,7 +114,9 @@ Firefox:
 1. open `about:debugging`
 2. go to `This Firefox`
 3. choose `Load Temporary Add-on`
-4. select `browser-extension/dist/manifest.json`
+4. run `npm run build:firefox`
+5. extract `browser-extension/artifacts/clavispass-firefox-test.zip`
+6. select the extracted `manifest.json`
 
 Chromium / Edge:
 

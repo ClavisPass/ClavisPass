@@ -242,5 +242,103 @@ fn match_domain_score(requested: &str, candidate: &str) -> u8 {
         return 1;
     }
 
+    if related_domains_match(requested, candidate) {
+        return 1;
+    }
+
     0
+}
+
+fn related_domains_match(requested: &str, candidate: &str) -> bool {
+    const RELATED_DOMAIN_GROUPS: &[&[&str]] = &[
+        &[
+            "accounts.google.com",
+            "google.com",
+            "youtube.com",
+            "youtu.be",
+        ],
+    ];
+
+    RELATED_DOMAIN_GROUPS.iter().any(|group| {
+        group.iter().any(|domain| domain_contains(requested, domain))
+            && group.iter().any(|domain| domain_contains(candidate, domain))
+    })
+}
+
+fn domain_contains(host: &str, domain: &str) -> bool {
+    host == domain || host.ends_with(&format!(".{domain}"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    fn login_entry(id: &str, title: &str, url: &str, username: &str, fav: bool) -> VaultEntry {
+        VaultEntry {
+            id: id.to_string(),
+            title: title.to_string(),
+            fav,
+            modules: vec![
+                VaultModule {
+                    module: "URL".to_string(),
+                    value: Some(json!(url)),
+                    ..Default::default()
+                },
+                VaultModule {
+                    module: "USERNAME".to_string(),
+                    value: Some(json!(username)),
+                    ..Default::default()
+                },
+                VaultModule {
+                    module: "PASSWORD".to_string(),
+                    value: Some(json!("secret")),
+                    ..Default::default()
+                },
+            ],
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn search_entries_by_domain_returns_all_matching_entries() {
+        let vault = VaultData {
+            values: vec![
+                login_entry("first", "YouTube Personal", "https://youtube.com", "one", false),
+                login_entry("second", "YouTube Work", "https://www.youtube.com", "two", true),
+                login_entry("other", "Other", "https://example.com", "other", false),
+            ],
+            ..Default::default()
+        };
+
+        let results = search_entries_by_domain(&vault, "youtube.com");
+
+        assert_eq!(results.len(), 2);
+        assert_eq!(results[0].entry_id, "second");
+        assert_eq!(results[1].entry_id, "first");
+    }
+
+    #[test]
+    fn search_entries_by_domain_includes_related_google_accounts_for_youtube() {
+        let vault = VaultData {
+            values: vec![
+                login_entry("youtube", "YouTube Direct", "https://youtube.com", "yt", false),
+                login_entry(
+                    "google",
+                    "Google Account",
+                    "https://accounts.google.com",
+                    "google",
+                    false,
+                ),
+            ],
+            ..Default::default()
+        };
+
+        let results = search_entries_by_domain(&vault, "www.youtube.com");
+
+        assert_eq!(results.len(), 2);
+        assert_eq!(results[0].entry_id, "youtube");
+        assert_eq!(results[1].entry_id, "google");
+        assert_eq!(results[1].matched_host.as_deref(), Some("accounts.google.com"));
+    }
 }

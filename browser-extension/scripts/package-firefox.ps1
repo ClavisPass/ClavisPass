@@ -1,7 +1,8 @@
 param(
   [string]$DistDir = "dist",
   [string]$ArtifactsDir = "artifacts",
-  [string]$ArchiveName = "clavispass-firefox-test.zip"
+  [string]$ArchiveName = "clavispass-firefox-test.zip",
+  [string]$FirefoxExtensionId = "clavispass-extension@clavispass.local"
 )
 
 $ErrorActionPreference = "Stop"
@@ -35,7 +36,29 @@ if (Test-Path $tempRoot) {
 
 New-Item -ItemType Directory -Path $tempPackageDir -Force | Out-Null
 Copy-Item -Path (Join-Path $distPath "*") -Destination $tempPackageDir -Recurse -Force
+
+$manifestPath = Join-Path $tempPackageDir "manifest.json"
+$manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+
+$manifest.background = [ordered]@{
+  scripts = @("background/index.js")
+  type = "module"
+}
+
+if (!$manifest.browser_specific_settings) {
+  $manifest | Add-Member -MemberType NoteProperty -Name "browser_specific_settings" -Value ([ordered]@{})
+}
+
+$manifest.browser_specific_settings = [ordered]@{
+  gecko = [ordered]@{
+    id = $FirefoxExtensionId
+  }
+}
+
+$manifest | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
+
 Compress-Archive -Path (Join-Path $tempPackageDir "*") -DestinationPath $archivePath -Force
 Remove-Item -LiteralPath $tempRoot -Recurse -Force
 
 Write-Host "Firefox test archive created:" $archivePath
+Write-Host "Firefox extension ID:" $FirefoxExtensionId

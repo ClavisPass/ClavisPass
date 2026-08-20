@@ -22,6 +22,7 @@ use tauri::{
 };
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_deep_link;
+use tauri_plugin_deep_link::DeepLinkExt;
 use tauri_plugin_global_shortcut;
 use tauri_plugin_oauth;
 use tauri_plugin_os;
@@ -260,6 +261,11 @@ pub fn run() {
         .setup(|app| {
             if let Err(error) = bridge::session::clear_session() {
                 eprintln!("Failed to clear stale browser bridge session on startup: {error}");
+            }
+
+            #[cfg(debug_assertions)]
+            if let Err(error) = app.deep_link().register("clavispass-dev") {
+                eprintln!("Failed to register clavispass-dev deep link for development: {error}");
             }
 
             let app_handle = app.handle().clone();

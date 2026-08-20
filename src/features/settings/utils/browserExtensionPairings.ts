@@ -19,6 +19,26 @@ export type PairedClient = {
   capabilities?: string[];
 };
 
+type BrowserExtensionPairingChangeListener = () => void;
+
+const pairingChangeListeners = new Set<BrowserExtensionPairingChangeListener>();
+
+export function subscribeBrowserExtensionPairingChanges(
+  listener: BrowserExtensionPairingChangeListener,
+) {
+  pairingChangeListeners.add(listener);
+
+  return () => {
+    pairingChangeListeners.delete(listener);
+  };
+}
+
+function notifyBrowserExtensionPairingChanges() {
+  pairingChangeListeners.forEach((listener) => {
+    listener();
+  });
+}
+
 export async function listBrowserExtensionPairings() {
   if (!(await detectTauriEnvironment())) {
     return {
@@ -55,6 +75,7 @@ export async function actOnBrowserExtensionPairing(
     extensionId: item.extensionId,
     clientInstanceId: item.clientInstanceId ?? null,
   });
+  notifyBrowserExtensionPairingChanges();
 }
 
 export function buildBrowserClientKey(

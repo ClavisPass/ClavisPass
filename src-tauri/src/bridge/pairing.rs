@@ -116,15 +116,9 @@ pub fn evaluate_pairing(client: &BridgeClientInfo) -> io::Result<PairingStatus> 
         .find(|peer| same_client_identity(peer.extension_id.as_str(), peer.client_instance_id.as_deref(), client))
     {
         peer.last_seen_at_ms = now;
-        if peer.client_name.is_none() {
-            peer.client_name = client.name.clone();
-        }
-        if peer.client_version.is_none() {
-            peer.client_version = client.version.clone();
-        }
-        if peer.client_instance_id.is_none() {
-            peer.client_instance_id = client.instance_id.clone();
-        }
+        peer.client_name = client.name.clone();
+        peer.client_version = client.version.clone();
+        peer.client_instance_id = client.instance_id.clone();
         save_pairing_store(&store)?;
         return Ok(PairingStatus::Paired);
     }
@@ -141,15 +135,9 @@ pub fn evaluate_pairing(client: &BridgeClientInfo) -> io::Result<PairingStatus> 
         })
     {
         rejected.last_seen_at_ms = now;
-        if rejected.client_name.is_none() {
-            rejected.client_name = client.name.clone();
-        }
-        if rejected.client_version.is_none() {
-            rejected.client_version = client.version.clone();
-        }
-        if rejected.client_instance_id.is_none() {
-            rejected.client_instance_id = client.instance_id.clone();
-        }
+        rejected.client_name = client.name.clone();
+        rejected.client_version = client.version.clone();
+        rejected.client_instance_id = client.instance_id.clone();
         save_pairing_store(&store)?;
         return Ok(PairingStatus::Unpaired);
     }
@@ -166,15 +154,9 @@ pub fn evaluate_pairing(client: &BridgeClientInfo) -> io::Result<PairingStatus> 
         })
     {
         pending.last_seen_at_ms = now;
-        if pending.client_name.is_none() {
-            pending.client_name = client.name.clone();
-        }
-        if pending.client_version.is_none() {
-            pending.client_version = client.version.clone();
-        }
-        if pending.client_instance_id.is_none() {
-            pending.client_instance_id = client.instance_id.clone();
-        }
+        pending.client_name = client.name.clone();
+        pending.client_version = client.version.clone();
+        pending.client_instance_id = client.instance_id.clone();
         save_pairing_store(&store)?;
         return Ok(PairingStatus::Pending);
     }

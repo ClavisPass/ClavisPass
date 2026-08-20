@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
@@ -20,6 +20,7 @@ import {
   actOnBrowserExtensionPairing,
   buildBrowserClientKey,
   listBrowserExtensionPairings,
+  subscribeBrowserExtensionPairingChanges,
   type PairedClient,
   type PendingPairing,
 } from "../features/settings/utils/browserExtensionPairings";
@@ -35,6 +36,28 @@ type BrowserPairingAction =
   | "bridge_approve_pairing"
   | "bridge_reject_pairing"
   | "bridge_revoke_pairing";
+
+function browserIconForClient(name?: string | null) {
+  const normalized = name?.trim().toLowerCase() ?? "";
+
+  if (normalized.includes("firefox")) {
+    return "firefox";
+  }
+  if (normalized.includes("edge")) {
+    return "microsoft-edge";
+  }
+  if (normalized.includes("chrome") || normalized.includes("chromium")) {
+    return "google-chrome";
+  }
+  if (normalized.includes("safari")) {
+    return "apple-safari";
+  }
+  if (normalized.includes("opera")) {
+    return "opera";
+  }
+
+  return "web";
+}
 
 const BrowserExtensionsScreen: React.FC<BrowserExtensionsScreenProps> = ({
   navigation,
@@ -58,29 +81,44 @@ const BrowserExtensionsScreen: React.FC<BrowserExtensionsScreenProps> = ({
   const [actingKey, setActingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const loadPairings = useCallback(async (showRefresh = false) => {
-    if (showRefresh) {
-      setRefreshing(true);
-    } else {
-      setLoading(true);
-    }
-    setError(null);
+  const loadPairings = useCallback(
+    async (showRefresh = false, silent = false) => {
+      if (!silent) {
+        if (showRefresh) {
+          setRefreshing(true);
+        } else {
+          setLoading(true);
+        }
+      }
+      setError(null);
 
-    try {
-      const result = await listBrowserExtensionPairings();
-      setPending(result.pending);
-      setPaired(result.paired);
-    } catch (loadError) {
-      setError(
-        loadError instanceof Error
-          ? loadError.message
-          : t("settings:browserLoadFailed"),
-      );
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [t]);
+      try {
+        const result = await listBrowserExtensionPairings();
+        setPending(result.pending);
+        setPaired(result.paired);
+      } catch (loadError) {
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : t("settings:browserLoadFailed"),
+        );
+      } finally {
+        if (!silent) {
+          setLoading(false);
+          setRefreshing(false);
+        }
+      }
+    },
+    [t],
+  );
+
+  useEffect(
+    () =>
+      subscribeBrowserExtensionPairingChanges(() => {
+        void loadPairings(false, true);
+      }),
+    [loadPairings],
+  );
 
   useFocusEffect(
     React.useCallback(() => {
@@ -103,7 +141,6 @@ const BrowserExtensionsScreen: React.FC<BrowserExtensionsScreenProps> = ({
       setError(null);
       try {
         await actOnBrowserExtensionPairing(action, item);
-        await loadPairings();
       } catch (actionError) {
         setError(
           actionError instanceof Error
@@ -114,7 +151,7 @@ const BrowserExtensionsScreen: React.FC<BrowserExtensionsScreenProps> = ({
         setActingKey(null);
       }
     },
-    [loadPairings, t],
+    [t],
   );
 
   const pairedCount = paired.length;
@@ -474,7 +511,7 @@ function BrowserClientCard(props: {
           ]}
         >
           <Icon
-            source={props.status === "pending" ? "web-clock" : "web-check"}
+            source={browserIconForClient(props.item.clientName)}
             size={22}
             color={theme.colors.primary}
           />
@@ -490,22 +527,22 @@ function BrowserClientCard(props: {
         <StatusPill status={props.status} />
       </View>
 
-      <View style={styles.clientMeta}>
-        <Text numberOfLines={1} style={{ opacity: 0.72 }}>
-          {eventLabel}
-        </Text>
-        <Text numberOfLines={1} style={{ opacity: 0.72 }}>
-          {t("settings:browserLastSeenAt", { value: lastSeenAt })}
-        </Text>
-      </View>
+      {props.status === "pending" ? (
+        <>
+          <View style={styles.clientMeta}>
+            <Text numberOfLines={1} style={{ opacity: 0.72 }}>
+              {eventLabel}
+            </Text>
+            <Text numberOfLines={1} style={{ opacity: 0.72 }}>
+              {t("settings:browserLastSeenAt", { value: lastSeenAt })}
+            </Text>
+          </View>
 
-      <Text numberOfLines={1} variant="labelSmall" style={{ opacity: 0.55 }}>
-        {props.item.clientInstanceId || props.item.extensionId}
-      </Text>
+          <Text numberOfLines={1} variant="labelSmall" style={{ opacity: 0.55 }}>
+            {props.item.clientInstanceId || props.item.extensionId}
+          </Text>
 
-      <View style={styles.actions}>
-        {props.status === "pending" ? (
-          <>
+          <View style={styles.actions}>
             <ActionButton
               label={t("settings:browserApprove")}
               icon="check"
@@ -520,17 +557,36 @@ function BrowserClientCard(props: {
               disabled={props.acting}
               onPress={props.onReject}
             />
-          </>
-        ) : (
-          <ActionButton
-            label={t("settings:browserDisconnect")}
-            icon="link-off"
-            variant="muted"
-            disabled={props.acting}
-            onPress={props.onDisconnect}
-          />
-        )}
-      </View>
+          </View>
+        </>
+      ) : (
+        <>
+          <View style={styles.clientCompactMetaRow}>
+            <Text numberOfLines={1} style={styles.clientCompactMeta}>
+              {t("settings:browserLastSeenAt", { value: lastSeenAt })}
+            </Text>
+            <Text numberOfLines={1} style={styles.clientCompactMeta}>
+              {eventLabel}
+            </Text>
+          </View>
+          <View style={styles.clientCompactBottomRow}>
+            <Text
+              numberOfLines={1}
+              variant="labelSmall"
+              style={{ flex: 1, opacity: 0.55 }}
+            >
+              {props.item.clientInstanceId || props.item.extensionId}
+            </Text>
+            <ActionButton
+              label={t("settings:browserDisconnect")}
+              icon="link-off"
+              variant="mutedDanger"
+              disabled={props.acting}
+              onPress={props.onDisconnect}
+            />
+          </View>
+        </>
+      )}
     </Animated.View>
   );
 }
@@ -557,7 +613,7 @@ function ActionButton(props: {
   icon: string;
   onPress?: () => void;
   disabled?: boolean;
-  variant: "primary" | "danger" | "muted";
+  variant: "primary" | "danger" | "muted" | "mutedDanger";
 }) {
   const { theme } = useTheme();
   const backgroundColor =
@@ -566,7 +622,12 @@ function ActionButton(props: {
       : props.variant === "danger"
         ? theme.colors.error
         : theme.colors.elevation.level3;
-  const textColor = props.variant === "muted" ? theme.colors.primary : "white";
+  const textColor =
+    props.variant === "muted"
+      ? theme.colors.primary
+      : props.variant === "mutedDanger"
+        ? theme.colors.error
+        : "white";
 
   return (
     <AnimatedPressable
@@ -578,14 +639,25 @@ function ActionButton(props: {
           backgroundColor: props.disabled
             ? theme.colors.surfaceDisabled
             : backgroundColor,
+          borderColor:
+            props.variant === "mutedDanger"
+              ? `${theme.colors.error}40`
+              : "transparent",
+          borderWidth:
+            props.variant === "mutedDanger" ? StyleSheet.hairlineWidth : 0,
           opacity: props.disabled ? 0.7 : 1,
         },
       ]}
     >
-      <Icon source={props.icon} size={15} color={textColor} />
-      <Text variant="bodySmall" style={{ color: textColor, fontWeight: "700" }}>
-        {props.label}
-      </Text>
+      <View style={styles.actionButtonContent}>
+        <Icon source={props.icon} size={18} color={textColor} />
+        <Text
+          variant="bodySmall"
+          style={[styles.actionButtonLabel, { color: textColor }]}
+        >
+          {props.label}
+        </Text>
+      </View>
     </AnimatedPressable>
   );
 }
@@ -670,9 +742,9 @@ const styles = StyleSheet.create({
   clientCard: {
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
-    gap: 10,
+    gap: 8,
     overflow: "hidden",
-    padding: 12,
+    padding: 8,
   },
   clientTopRow: {
     alignItems: "center",
@@ -686,6 +758,22 @@ const styles = StyleSheet.create({
   clientMeta: {
     gap: 2,
   },
+  clientCompactMetaRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    paddingLeft: 50,
+  },
+  clientCompactMeta: {
+    opacity: 0.72,
+    userSelect: "none",
+  },
+  clientCompactBottomRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
+    paddingLeft: 50,
+  },
   actions: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -697,13 +785,19 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   actionButton: {
-    alignItems: "center",
-    borderRadius: 10,
-    flexDirection: "row",
-    gap: 5,
+    borderRadius: 8,
+    justifyContent: "center",
     minHeight: 34,
     paddingHorizontal: 10,
     paddingVertical: 6,
+  },
+  actionButtonContent: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 7,
+  },
+  actionButtonLabel: {
+    fontWeight: "700",
   },
 });
 

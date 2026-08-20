@@ -19,12 +19,40 @@ async function getInstanceId(): Promise<string> {
   return nextId;
 }
 
+function getBrowserDisplayName(): string {
+  const userAgent = navigator.userAgent.toLowerCase();
+
+  if (userAgent.includes("firefox")) {
+    return "Firefox";
+  }
+  if (userAgent.includes("edg/")) {
+    return "Microsoft Edge";
+  }
+  if (userAgent.includes("opr/") || userAgent.includes("opera")) {
+    return "Opera";
+  }
+  if (userAgent.includes("vivaldi")) {
+    return "Vivaldi";
+  }
+  if (userAgent.includes("brave")) {
+    return "Brave";
+  }
+  if (userAgent.includes("chrome") || userAgent.includes("chromium")) {
+    return "Chrome";
+  }
+  if (userAgent.includes("safari")) {
+    return "Safari";
+  }
+
+  return "Browser";
+}
+
 export async function getBridgeClientInfo(): Promise<BridgeClientInfo> {
   const manifest = chrome.runtime.getManifest();
 
   return {
     extensionId: chrome.runtime.id,
-    name: manifest.name,
+    name: getBrowserDisplayName(),
     version: manifest.version,
     instanceId: await getInstanceId()
   };
