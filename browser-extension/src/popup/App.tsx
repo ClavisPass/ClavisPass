@@ -340,6 +340,8 @@ export function App() {
       isResolvingPrompt ||
       isOpeningDesktopApp
   );
+  const year = new Date().getFullYear();
+  const extensionVersion = chrome.runtime.getManifest().version;
 
   async function refreshPendingPrompt(): Promise<void> {
     const response = await sendRuntimeMessage("prompt:getPending", undefined);
@@ -680,6 +682,11 @@ export function App() {
           ) : null}
         </section>
       ) : null}
+
+      <footer className="app-footer">
+        <span>&copy; {CLAVISPASS_BRAND_NAME} by Arratel {year}</span>
+        <span>Version {extensionVersion}</span>
+      </footer>
     </main>
   );
 }

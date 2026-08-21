@@ -22,7 +22,7 @@ param(
   [string[]]$AdditionalChromiumOrigins,
 
   [Parameter(Mandatory = $false)]
-  [string]$FirefoxExtensionId = "clavispass-extension@clavispass.local",
+  [string]$FirefoxExtensionId = "clavispass@arratel.dev",
 
   [switch]$SkipChromium,
   [switch]$SkipFirefox

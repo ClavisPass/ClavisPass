@@ -1,8 +1,8 @@
 param(
   [string]$DistDir = "dist",
   [string]$ArtifactsDir = "artifacts",
-  [string]$ArchiveName = "clavispass-firefox-test.zip",
-  [string]$FirefoxExtensionId = "clavispass-extension@clavispass.local"
+  [string]$ArchiveName = "",
+  [string]$FirefoxExtensionId = "clavispass@arratel.dev"
 )
 
 $ErrorActionPreference = "Stop"
@@ -10,9 +10,16 @@ $ErrorActionPreference = "Stop"
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $distPath = Join-Path $projectRoot $DistDir
 $artifactsPath = Join-Path $projectRoot $ArtifactsDir
-$archivePath = Join-Path $artifactsPath $ArchiveName
 $tempRoot = Join-Path $projectRoot ".tmp-firefox-package"
 $tempPackageDir = Join-Path $tempRoot "package"
+$packageJsonPath = Join-Path $projectRoot "package.json"
+$packageJson = Get-Content -LiteralPath $packageJsonPath -Raw | ConvertFrom-Json
+
+if ([string]::IsNullOrWhiteSpace($ArchiveName)) {
+  $ArchiveName = "clavispass-firefox-$($packageJson.version).zip"
+}
+
+$archivePath = Join-Path $artifactsPath $ArchiveName
 
 if (!(Test-Path $distPath)) {
   throw "Build output not found at '$distPath'. Run 'npm run build' first."
@@ -60,5 +67,5 @@ $manifest | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manifestPath -E
 Compress-Archive -Path (Join-Path $tempPackageDir "*") -DestinationPath $archivePath -Force
 Remove-Item -LiteralPath $tempRoot -Recurse -Force
 
-Write-Host "Firefox test archive created:" $archivePath
+Write-Host "Firefox release archive created:" $archivePath
 Write-Host "Firefox extension ID:" $FirefoxExtensionId

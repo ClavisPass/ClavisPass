@@ -5,7 +5,7 @@
 ; Fill these once the Chrome Web Store / Edge Add-ons IDs are known.
 !define CLAVISPASS_CHROME_EXTENSION_ID ""
 !define CLAVISPASS_EDGE_EXTENSION_ID ""
-!define CLAVISPASS_FIREFOX_EXTENSION_ID "clavispass-extension@clavispass.local"
+!define CLAVISPASS_FIREFOX_EXTENSION_ID "clavispass@arratel.dev"
 
 !macro WriteClavisPassNativeHostManifest MANIFEST_PATH HOST_PATH_KIND
   FileOpen $0 "${MANIFEST_PATH}" w

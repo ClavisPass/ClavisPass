@@ -145,7 +145,7 @@ Firefox template:
 Firefox uses:
 
 - `allowed_extensions`
-- required add-on ID: `clavispass-extension@clavispass.local`
+- required add-on ID: `clavispass@arratel.dev`
 
 Chromium-family browsers use:
 
@@ -270,7 +270,7 @@ Notes:
 
 - Firefox registration is enabled by default.
 - Firefox extension ID defaults to:
-  - `clavispass-extension@clavispass.local`
+  - `clavispass@arratel.dev`
 - Chromium-family registration is skipped automatically if no valid Chromium-family origin is provided.
 - You can skip one side explicitly with:
   - `-SkipChromium`

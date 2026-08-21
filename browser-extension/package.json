@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "package:firefox": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/package-firefox.ps1",
-    "build:firefox": "npm run build && npm run package:firefox"
+    "package:firefox:source": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/package-firefox-source.ps1",
+    "build:firefox": "npm run build && npm run package:firefox",
+    "release:firefox": "npm run typecheck && npm run build:firefox && npm run package:firefox:source"
   },
   "dependencies": {
     "react": "^18.3.1",

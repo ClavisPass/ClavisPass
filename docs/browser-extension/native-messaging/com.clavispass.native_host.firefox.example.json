@@ -4,6 +4,6 @@
   "path": "REPLACE_WITH_HOST_EXE_PATH",
   "type": "stdio",
   "allowed_extensions": [
-    "clavispass-extension@clavispass.local"
+    "clavispass@arratel.dev"
   ]
 }

@@ -73,7 +73,7 @@ Create a production build:
 npm run build
 ```
 
-Package a Firefox test zip:
+Package a Firefox release zip:
 
 ```bash
 npm run package:firefox
@@ -85,15 +85,26 @@ Build and package Firefox in one step:
 npm run build:firefox
 ```
 
-The Firefox archive is written to `artifacts/clavispass-firefox-test.zip`.
+The Firefox archive is written to `artifacts/clavispass-firefox-<version>.zip`.
 During packaging, the manifest is rewritten for Firefox so the background script uses
 `background.scripts` instead of Chrome's `background.service_worker`.
 
-To override the Firefox add-on ID for a release build:
+Package the source archive required for Mozilla review:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/package-firefox.ps1 -FirefoxExtensionId "firefox@clavispass.com"
+```bash
+npm run package:firefox:source
 ```
+
+The source archive is written to `artifacts/clavispass-firefox-source-<version>.zip`.
+It includes `REVIEWER_BUILD.md` with the exact reviewer build steps.
+
+Create both release artifacts in one step:
+
+```bash
+npm run release:firefox
+```
+
+The release Firefox add-on ID is `clavispass@arratel.dev`.
 
 ## Working from the repo root
 
@@ -104,6 +115,8 @@ The main repo now exposes convenience scripts:
 - `npm run extension:build:firefox`
 - `npm run extension:typecheck`
 - `npm run extension:package:firefox`
+- `npm run extension:package:firefox:source`
+- `npm run extension:release:firefox`
 
 These delegate into `browser-extension/` so you do not need to `cd` for common tasks.
 
@@ -115,7 +128,7 @@ Firefox:
 2. go to `This Firefox`
 3. choose `Load Temporary Add-on`
 4. run `npm run build:firefox`
-5. extract `browser-extension/artifacts/clavispass-firefox-test.zip`
+5. extract `browser-extension/artifacts/clavispass-firefox-0.1.0.zip`
 6. select the extracted `manifest.json`
 
 Chromium / Edge:

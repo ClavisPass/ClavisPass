@@ -14,6 +14,8 @@
     "extension:build:firefox": "npm run build:firefox --prefix browser-extension",
     "extension:typecheck": "npm run typecheck --prefix browser-extension",
     "extension:package:firefox": "npm run package:firefox --prefix browser-extension",
+    "extension:package:firefox:source": "npm run package:firefox:source --prefix browser-extension",
+    "extension:release:firefox": "npm run release:firefox --prefix browser-extension",
     "web:build-tauri": "npx expo export --platform web",
     "test": "vitest run",
     "test:watch": "vitest",
