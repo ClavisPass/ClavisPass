@@ -2,7 +2,7 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "ClavisPass",
   "mainBinaryName": "ClavisPass",
-  "version": "1.8.3",
+  "version": "1.8.4",
   "identifier": "com.ClavisPass.app",
   "build": {
     "beforeBuildCommand": "npm run web:build-tauri && npm run tauri:prepare-native-host",
@@ -16,7 +16,6 @@
     "category": "DeveloperTool",
     "copyright": "Copyright (c) 2026 Arratel",
     "targets": [
-      "msi",
       "nsis",
       "deb",
       "appimage",
