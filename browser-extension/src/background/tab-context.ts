@@ -12,6 +12,7 @@ function parseActiveDomain(url: string | undefined): ActiveDomainContext {
   if (!url) {
     return {
       isSupported: false,
+      reason: "missing_url",
       detail: "No active tab URL is available."
     };
   }
@@ -22,6 +23,7 @@ function parseActiveDomain(url: string | undefined): ActiveDomainContext {
       return {
         isSupported: false,
         host: sanitizeHost(parsedUrl.hostname),
+        reason: "unsupported_protocol",
         detail: "This page does not expose a searchable website domain."
       };
     }
@@ -33,6 +35,7 @@ function parseActiveDomain(url: string | undefined): ActiveDomainContext {
       return {
         isSupported: false,
         host,
+        reason: "missing_domain",
         detail: "No searchable domain could be derived from the active tab."
       };
     }
@@ -41,11 +44,13 @@ function parseActiveDomain(url: string | undefined): ActiveDomainContext {
       isSupported: true,
       host,
       normalizedHost,
+      reason: "ready",
       detail: "Domain ready for desktop suggestions."
     };
   } catch {
     return {
       isSupported: false,
+      reason: "invalid_url",
       detail: "The active tab URL could not be parsed safely."
     };
   }

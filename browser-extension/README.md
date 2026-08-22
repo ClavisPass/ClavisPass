@@ -106,6 +106,10 @@ npm run release:firefox
 
 The release Firefox add-on ID is `clavispass@arratel.dev`.
 
+Store submission notes for Firefox and Chrome live in:
+
+- [`../docs/browser-extension/store-release.md`](../docs/browser-extension/store-release.md)
+
 ## Working from the repo root
 
 The main repo now exposes convenience scripts:

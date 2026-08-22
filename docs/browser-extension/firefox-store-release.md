@@ -1,5 +1,9 @@
 # Firefox Store Release Notes
 
+General store listing data for Firefox and Chrome is tracked in:
+
+- `docs/browser-extension/store-release.md`
+
 This document contains the current release inputs for submitting ClavisPass to addons.mozilla.org.
 
 ## Release Artifacts
@@ -26,6 +30,14 @@ Firefox add-on ID:
 
 ```text
 clavispass@arratel.dev
+```
+
+Data collection permission:
+
+```json
+{
+  "required": ["none"]
+}
 ```
 
 Native messaging host:
@@ -76,6 +88,8 @@ Test steps:
 4. Approve the browser pairing request in ClavisPass Desktop.
 5. Open a login page with a matching vault entry.
 6. Use the popup or inline fill button.
+
+The AMO linter may report innerHTML warnings in the popup bundle from React DOM's runtime implementation. ClavisPass extension code does not use dangerouslySetInnerHTML. The inline content-script logo is created with DOM/SVG APIs and does not assign innerHTML.
 ```
 
 ## Privacy Policy Draft

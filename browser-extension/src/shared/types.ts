@@ -42,6 +42,7 @@ export interface ActiveDomainContext {
   normalizedHost?: string;
   isSupported: boolean;
   detail: string;
+  reason?: "missing_url" | "unsupported_protocol" | "missing_domain" | "ready" | "invalid_url";
 }
 
 export interface DesktopEntrySuggestionsView {

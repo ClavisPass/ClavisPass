@@ -77,6 +77,10 @@ const translations = {
     matchesTitle: "Matches for this website",
     website: "Website",
     noSearchableDomain: "No searchable domain",
+    domainMissingUrl: "No active tab URL is available.",
+    domainUnsupportedProtocol: "This page does not expose a searchable website domain.",
+    domainMissingDomain: "No searchable domain could be derived from the active tab.",
+    domainInvalidUrl: "The active tab URL could not be parsed safely.",
     couldNotLoadSuggestions: "Could not load suggestions",
     loadingSuggestions: "Loading suggestions",
     loadingSuggestionsDetail: "ClavisPass is asking the desktop app for matching entries.",
@@ -151,6 +155,10 @@ const translations = {
     matchesTitle: "Treffer für diese Website",
     website: "Website",
     noSearchableDomain: "Keine durchsuchbare Domain",
+    domainMissingUrl: "Keine URL für den aktiven Tab verfügbar.",
+    domainUnsupportedProtocol: "Diese Seite stellt keine durchsuchbare Website-Domain bereit.",
+    domainMissingDomain: "Aus dem aktiven Tab konnte keine durchsuchbare Domain ermittelt werden.",
+    domainInvalidUrl: "Die URL des aktiven Tabs konnte nicht sicher gelesen werden.",
     couldNotLoadSuggestions: "Vorschläge konnten nicht geladen werden",
     loadingSuggestions: "Vorschläge werden geladen",
     loadingSuggestionsDetail: "ClavisPass fragt die Desktop-App nach passenden Einträgen.",
@@ -227,6 +235,24 @@ function describeIdentity(item: SearchEntrySuggestion, t: (key: TranslationKey) 
 
 function selectedEntryTitle(items: SearchEntrySuggestion[], entryId?: string): string | undefined {
   return items.find((item) => item.entryId === entryId)?.title;
+}
+
+function domainDetailText(
+  domain: DesktopEntrySuggestionsView["domain"],
+  t: (key: TranslationKey) => string
+): string {
+  switch (domain.reason) {
+    case "missing_url":
+      return t("domainMissingUrl");
+    case "unsupported_protocol":
+      return t("domainUnsupportedProtocol");
+    case "missing_domain":
+      return t("domainMissingDomain");
+    case "invalid_url":
+      return t("domainInvalidUrl");
+    default:
+      return domain.detail;
+  }
 }
 
 function getInitialTheme(): ThemeMode {
@@ -615,7 +641,7 @@ export function App() {
           {!suggestions.domain.isSupported ? (
             <div className="empty-card">
               <p className="section-title">{t("noSearchableDomain")}</p>
-              <p className="subtle">{suggestions.domain.detail}</p>
+              <p className="subtle">{domainDetailText(suggestions.domain, t)}</p>
             </div>
           ) : searchError ? (
             <div className="empty-card">

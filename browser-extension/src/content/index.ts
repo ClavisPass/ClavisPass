@@ -15,21 +15,21 @@ declare global {
 const INLINE_ROOT_ID = "clavispass-inline-root";
 const INLINE_STYLE_ID = "clavispass-inline-style";
 const INLINE_BUTTON_TITLE = "Fill with ClavisPass";
-const INLINE_LOGO = `
-  <svg viewBox="0 0 1080 1080" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid meet">
-    <g transform="matrix(1.67587,0,0,1.74365,-366.657,-477.218)">
-      <g transform="matrix(1,0,0,1.08209,0.502861,41.5011)">
-        <path d="M288.857,324.383C384.853,311.928 468.535,283.596 540,245.197C611.68,283.711 695.651,312.099 792.011,324.495C693.27,403.812 612.016,497.341 540.504,599.811C468.957,497.293 387.661,403.724 288.857,324.383Z" fill="white"/>
-      </g>
-      <g transform="matrix(0.674354,0,0,0.648143,175.513,217.837)">
-        <path d="M434.139,917.703C289.78,813.531 202.333,716.705 148.924,615.274C89.601,502.613 72.395,384.634 64.17,245.936C246.691,392.332 389.535,574.621 512.834,777.337C511.268,779.967 509.706,782.6 508.146,785.236C508.041,785.413 507.938,785.593 507.837,785.773L434.139,917.703Z" fill="white"/>
-      </g>
-      <g transform="matrix(1,0,0,1,0.502861,26.6667)">
-        <path d="M862.724,350.572C857.177,440.468 845.574,516.935 805.569,589.956C761.291,670.777 682.322,747.088 540,833.279C524.328,823.787 509.419,814.409 495.235,805.128C495.235,805.128 544.244,720.806 546.785,716.433C632.969,576.457 732.982,450.591 862.724,350.572Z" fill="white"/>
-      </g>
-    </g>
-  </svg>
-`;
+const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+const INLINE_LOGO_PATHS = [
+  {
+    transform: "matrix(1,0,0,1.08209,0.502861,41.5011)",
+    d: "M288.857,324.383C384.853,311.928 468.535,283.596 540,245.197C611.68,283.711 695.651,312.099 792.011,324.495C693.27,403.812 612.016,497.341 540.504,599.811C468.957,497.293 387.661,403.724 288.857,324.383Z",
+  },
+  {
+    transform: "matrix(0.674354,0,0,0.648143,175.513,217.837)",
+    d: "M434.139,917.703C289.78,813.531 202.333,716.705 148.924,615.274C89.601,502.613 72.395,384.634 64.17,245.936C246.691,392.332 389.535,574.621 512.834,777.337C511.268,779.967 509.706,782.6 508.146,785.236C508.041,785.413 507.938,785.593 507.837,785.773L434.139,917.703Z",
+  },
+  {
+    transform: "matrix(1,0,0,1,0.502861,26.6667)",
+    d: "M862.724,350.572C857.177,440.468 845.574,516.935 805.569,589.956C761.291,670.777 682.322,747.088 540,833.279C524.328,823.787 509.419,814.409 495.235,805.128C495.235,805.128 544.244,720.806 546.785,716.433C632.969,576.457 732.982,450.591 862.724,350.572Z",
+  },
+];
 
 interface InlinePreviewState {
   entryId: string;
@@ -230,7 +230,7 @@ function getOrCreateInlineRoot(): HTMLDivElement {
   button.type = "button";
   button.title = INLINE_BUTTON_TITLE;
   button.setAttribute("aria-label", INLINE_BUTTON_TITLE);
-  button.innerHTML = INLINE_LOGO;
+  button.appendChild(createInlineLogo());
 
   button.addEventListener("mouseenter", () => {
     void previewInlineAction(button);
@@ -247,6 +247,32 @@ function getOrCreateInlineRoot(): HTMLDivElement {
   root.appendChild(button);
   document.documentElement.appendChild(root);
   return root;
+}
+
+function createInlineLogo(): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NAMESPACE, "svg");
+  svg.setAttribute("viewBox", "0 0 1080 1080");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("focusable", "false");
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+  const rootGroup = document.createElementNS(SVG_NAMESPACE, "g");
+  rootGroup.setAttribute("transform", "matrix(1.67587,0,0,1.74365,-366.657,-477.218)");
+
+  for (const pathDefinition of INLINE_LOGO_PATHS) {
+    const group = document.createElementNS(SVG_NAMESPACE, "g");
+    group.setAttribute("transform", pathDefinition.transform);
+
+    const path = document.createElementNS(SVG_NAMESPACE, "path");
+    path.setAttribute("d", pathDefinition.d);
+    path.setAttribute("fill", "white");
+
+    group.appendChild(path);
+    rootGroup.appendChild(group);
+  }
+
+  svg.appendChild(rootGroup);
+  return svg;
 }
 
 function setInlineButtonState(button: HTMLButtonElement, title: string): void {

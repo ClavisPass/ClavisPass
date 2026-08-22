@@ -69,14 +69,15 @@ h1 {
 }
 
 #root {
-  min-height: 100vh;
+  display: inline-block;
+  width: 100%;
 }
 
 .app-shell {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 0 14px 14px;
+  padding: 0 8px;
 }
 
 .app-header {
@@ -87,7 +88,7 @@ h1 {
   box-shadow: rgba(120, 127, 246, 0.24) 0 12px 26px;
   display: flex;
   justify-content: space-between;
-  margin: 0 -14px;
+  margin: 0 -8px;
   min-height: 42px;
   padding: 7px 14px;
 }
@@ -96,7 +97,7 @@ h1 {
   align-items: center;
   animation: panel-enter 180ms ease-out both;
   background: var(--cp-gradient-brand);
-  border-radius: 8px;
+  border-radius: 8px 8px 0 0;
   box-shadow: rgba(120, 127, 246, 0.14) 0 8px 18px;
   box-sizing: border-box;
   color: #ffffff;
@@ -106,6 +107,7 @@ h1 {
   gap: 10px;
   justify-content: space-between;
   line-height: 1;
+  margin: 0 -8px;
   min-height: 30px;
   padding: 9px 11px;
   user-select: none;
