@@ -11,7 +11,8 @@ The same repository contains:
 - The app UI for mobile, web, and desktop via React Native + Expo.
 - A Tauri desktop host for Windows, macOS, and Linux.
 - Native Rust commands for desktop-only capabilities such as secure key storage, content protection, and device identity.
-- A small homepage deployed separately from the application itself.
+
+The public homepage is maintained in a separate repository and is no longer part of this app repo.
 
 ## High-Level Runtime Model
 

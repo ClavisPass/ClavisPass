@@ -38,7 +38,6 @@ Use this file as the fast-start context for future work, then open [docs/project
 - `src/infrastructure`: storage, crypto, cloud clients, logging, platform helpers.
 - `src/shared`: reusable UI, hooks, i18n, shared utilities.
 - `src-tauri`: Rust/Tauri desktop host, key storage commands, tray, window handling, device identity.
-- `homepage`: marketing / GitHub Pages site.
 - `plugins`: Expo config plugins for platform identifiers.
 - `patches`: local package patches, currently including `react-native-sodium-jsi`.
 

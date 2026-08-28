@@ -244,7 +244,7 @@ The result is a system that is **predictable, auditable, and resilient by design
 ### CI / CD & Deployment
 - GitHub Actions – automated builds, code signing, and release uploads
 - Expo OTA Updates – over-the-air updates for mobile platforms
-- GitHub Pages – hosts the homepage and automatically serves the `updater.json`
+- GitHub Releases – hosts release artifacts and updater metadata
 
 ## FAQ
 

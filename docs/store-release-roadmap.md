@@ -38,9 +38,9 @@ This note captures the planned store/distribution path for ClavisPass across des
    - Avoid paid hosting for now; use static hosting through GitHub Pages, Cloudflare Pages, Netlify, or a similar free static host.
    - Avoid buying many defensive domains until Arratel or the products generate revenue.
 
-2. [ ] Create a separate private Arratel homepage repository.
-   - Suggested repository name: `arratel-homepage`.
-   - Use the existing SaaS/homepage template as the base.
+2. [x] Create a separate private Arratel homepage repository.
+   - The homepage is maintained outside this app repository.
+   - Use the SaaS/homepage template as the base.
    - Start with a small static site:
      - `/`
      - `/products`
