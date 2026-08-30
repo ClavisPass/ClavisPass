@@ -393,6 +393,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create demo env file
+        run: |
+          cat > .env <<EOF
+          BROWSER=none
+          DROPBOX_CLIENT_ID=${{ vars.DROPBOX_CLIENT_ID }}
+          GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_ID_ANDROID=${{ vars.GOOGLE_CLIENT_ID_ANDROID }}
+          GOOGLE_CLIENT_ID_IOS=${{ vars.GOOGLE_CLIENT_ID_IOS }}
+          GOOGLE_CLIENT_ID_DESKTOP=${{ vars.GOOGLE_CLIENT_ID_DESKTOP }}
+          GOOGLE_CLIENT_SECRET_DESKTOP=
+          EOF
+
+      - name: Build web demo
+        run: npm run web:build-demo
+
       - name: Download release artifacts
         uses: actions/download-artifact@v4
         with:
@@ -472,7 +496,7 @@ jobs:
           ANDROID_APK_FILENAME="ClavisPass_${{ env.VERSION_NO_V }}_android.apk"
           RELEASE_URL="$RELEASE_URL" ANDROID_APK_FILENAME="$ANDROID_APK_FILENAME" node scripts/generate-mobile-version-manifest.js
 
-      - name: Publish Windows Store package to GitHub Pages
+      - name: Publish demo and Windows installer to GitHub Pages
         run: |
           VERSION="${{ env.VERSION_NO_V }}"
           TAG_NAME="${{ github.ref_name }}"
@@ -499,25 +523,20 @@ jobs:
 
           find "${PAGES_DIR}" -mindepth 1 -maxdepth 1 ! -name ".git" ! -name "downloads" -exec rm -rf {} +
 
+          cp -R dist-demo/. "${PAGES_DIR}/"
+
           mkdir -p "${VERSION_DIR}"
           cp "${INSTALLER_SOURCE}" "${VERSION_DIR}/${INSTALLER_FILENAME}"
 
           touch "${PAGES_DIR}/.nojekyll"
-
-          cat > "${PAGES_DIR}/index.html" <<EOF
-          <!doctype html>
-          <meta charset="utf-8">
-          <meta http-equiv="refresh" content="0; url=./downloads/windows/">
-          <title>ClavisPass Downloads</title>
-          <p><a href="./downloads/windows/">ClavisPass downloads</a></p>
-          EOF
+          echo "clavispass.arratel.dev" > "${PAGES_DIR}/CNAME"
 
           cat > "${PAGES_DIR}/downloads/windows/latest.json" <<EOF
           {
             "version": "${VERSION}",
             "tag": "${TAG_NAME}",
             "filename": "${INSTALLER_FILENAME}",
-            "url": "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/downloads/windows/${TAG_NAME}/${INSTALLER_FILENAME}"
+            "url": "https://clavispass.arratel.dev/downloads/windows/${TAG_NAME}/${INSTALLER_FILENAME}"
           }
           EOF
 
@@ -534,9 +553,9 @@ jobs:
           git -C "${PAGES_DIR}" add -A
 
           if git -C "${PAGES_DIR}" diff --cached --quiet; then
-            echo "No GitHub Pages download changes to publish."
+            echo "No GitHub Pages changes to publish."
           else
-            git -C "${PAGES_DIR}" commit -m "Publish Windows installer ${TAG_NAME}"
+            git -C "${PAGES_DIR}" commit -m "Publish demo and Windows installer ${TAG_NAME}"
             git -C "${PAGES_DIR}" push origin HEAD:gh-pages
           fi
 

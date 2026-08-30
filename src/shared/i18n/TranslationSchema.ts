@@ -113,8 +113,6 @@ export type TranslationSchema = {
     tagSuggestions: string;
     noTags: string;
     editHistoryTagsUpdated: string;
-    demoVaultTitle: string;
-    demoVaultDescription: string;
   };
   login: {
     masterPassword: string;
