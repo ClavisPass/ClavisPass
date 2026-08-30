@@ -14,6 +14,7 @@ import SettingsItem from "../../components/SettingsItem";
 import { logger } from "../../../../infrastructure/logging/logger";
 import type { VaultContextType } from "../../../../app/providers/VaultProvider";
 import FolderType from "../../../vault/model/FolderType";
+import { detectTauriEnvironment } from "../../../../infrastructure/platform/isTauri";
 
 type PendingKdbxFile = {
   data: ArrayBuffer;
@@ -174,7 +175,9 @@ function Import(props: Props) {
   };
 
   const pickKdbxFile = async (): Promise<PendingKdbxFile | null> => {
-    if (Platform.OS === "web") return readDesktopKdbxFile();
+    if (Platform.OS === "web" && (await detectTauriEnvironment())) {
+      return readDesktopKdbxFile();
+    }
 
     const result: any = await DocumentPicker.getDocumentAsync(pickerOptions());
 

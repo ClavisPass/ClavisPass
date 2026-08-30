@@ -1,4 +1,5 @@
 import { Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { detectTauriEnvironment } from "../platform/isTauri";
 
 let nativeSecureStore: any;
@@ -15,9 +16,20 @@ async function getTauriCore() {
   return import("@tauri-apps/api/core");
 }
 
+const getWebStorageKey = (key: string) => `ClavisPass-SecureStore-${key}`;
+
+async function useWebFallback() {
+  return Platform.OS === "web" && !(await detectTauriEnvironment());
+}
+
 export const saveData = async (key: string, value: string) => {
   if (Platform.OS === "ios" || Platform.OS === "android") {
     await nativeSecureStore.setItemAsync(key, value);
+    return;
+  }
+
+  if (await useWebFallback()) {
+    await AsyncStorage.setItem(getWebStorageKey(key), value);
     return;
   }
 
@@ -30,6 +42,10 @@ export const getData = async (key: string) => {
     return (await nativeSecureStore.getItemAsync(key)) as string;
   }
 
+  if (await useWebFallback()) {
+    return await AsyncStorage.getItem(getWebStorageKey(key));
+  }
+
   const tauri = await getTauriCore();
   return (await tauri.invoke("get_key", { key })) as string;
 };
@@ -37,6 +53,11 @@ export const getData = async (key: string) => {
 export const removeData = async (key: string) => {
   if (Platform.OS === "ios" || Platform.OS === "android") {
     await nativeSecureStore.deleteItemAsync(key);
+    return;
+  }
+
+  if (await useWebFallback()) {
+    await AsyncStorage.removeItem(getWebStorageKey(key));
     return;
   }
 

@@ -4,6 +4,7 @@
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "web": "expo start --web",
+    "web:build-demo": "node scripts/build-web-demo.js",
     "tauri:use": "tauri",
     "tauri:check-versions": "node scripts/check-tauri-version-sync.js",
     "tauri:dev": "tauri dev",

@@ -1,14 +1,13 @@
-import { Platform } from "react-native";
-
 import { logger } from "../../logging/logger";
 import { triggerGlobalError } from "../../events/errorBus";
 import UserInfoType from "../../../features/sync/model/UserInfoType";
 import { VaultFetchResult } from "../model/VaultFetchResult";
 import type { UploadContent } from "../model/UploadFileParams";
+import { isTauriEnvironment } from "../../platform/isTauri";
 
 const ensureDesktop = () => {
-  if (Platform.OS !== "web") {
-    throw new Error("[LocalFile] Local file provider is desktop-only");
+  if (!isTauriEnvironment()) {
+    throw new Error("[LocalFile] Local file provider is only available in Tauri desktop");
   }
 };
 

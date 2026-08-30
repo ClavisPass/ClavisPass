@@ -115,6 +115,9 @@ const en: TranslationSchema = {
     tagSuggestions: "Suggestions",
     noTags: "No tags yet.",
     editHistoryTagsUpdated: "Updated tags",
+    demoVaultTitle: "Demo vault",
+    demoVaultDescription:
+      "Sample data is already unlocked. Master password: demo",
   },
   login: {
     masterPassword: "Master Password",

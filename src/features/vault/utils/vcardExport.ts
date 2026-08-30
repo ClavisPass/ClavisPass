@@ -3,6 +3,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 
 import { logger } from "../../../infrastructure/logging/logger";
+import { detectTauriEnvironment } from "../../../infrastructure/platform/isTauri";
 import ModulesEnum from "../model/ModulesEnum";
 import ValuesType from "../model/ValuesType";
 
@@ -134,7 +135,7 @@ export async function exportVCard(entry: ValuesType) {
   const fileName = `${sanitizeFileName(entry.title)}.vcf`;
 
   try {
-    if (Platform.OS === "web") {
+    if (Platform.OS === "web" && (await detectTauriEnvironment())) {
       const tauriDialog = require("@tauri-apps/plugin-dialog");
       const filePath = await tauriDialog.save({
         defaultPath: fileName,
@@ -150,6 +151,19 @@ export async function exportVCard(entry: ValuesType) {
 
       const tauriFs = require("@tauri-apps/plugin-fs");
       await tauriFs.writeTextFile(filePath, content);
+      return;
+    }
+
+    if (Platform.OS === "web") {
+      const blob = new Blob([content], { type: "text/vcard;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
       return;
     }
 

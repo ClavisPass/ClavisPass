@@ -7,6 +7,8 @@
   "exclude": [
     "browser-extension",
     "dist",
+    "dist-demo",
+    "dist-msix",
     "node_modules",
     "src-tauri/target",
     "target"

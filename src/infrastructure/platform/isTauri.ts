@@ -33,6 +33,10 @@ export function isTauriEnvironment() {
   );
 }
 
+export function isBrowserWebEnvironment() {
+  return isWebPlatform() && !isTauriEnvironment();
+}
+
 export async function detectTauriEnvironment(): Promise<boolean> {
   if (isTauriEnvironment()) {
     return true;
@@ -54,6 +58,10 @@ export async function detectTauriEnvironment(): Promise<boolean> {
   }
 
   return detectedTauriPromise;
+}
+
+export async function detectBrowserWebEnvironment(): Promise<boolean> {
+  return isWebPlatform() && !(await detectTauriEnvironment());
 }
 
 export function useIsTauriEnvironment() {

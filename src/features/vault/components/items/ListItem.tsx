@@ -32,6 +32,7 @@ import {
   buildFaviconUrl,
   normalizeUrl,
 } from "../../utils/digitalCardTheme";
+import { detectTauriEnvironment } from "../../../../infrastructure/platform/isTauri";
 
 const failedFaviconUrls = new Set<string>();
 const nonSelectableImageStyle =
@@ -576,7 +577,7 @@ function ListItem(props: Props) {
   const openItemFastAccess = async () => {
     if (!fastAccessData) return;
 
-    if (Platform.OS === "web") {
+    if (Platform.OS === "web" && (await detectTauriEnvironment())) {
       try {
         const tauri = require("@tauri-apps/api/webviewWindow");
         const win = await tauri.WebviewWindow.getByLabel("main");

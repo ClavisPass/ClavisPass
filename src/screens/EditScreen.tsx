@@ -44,6 +44,7 @@ import {
   hideFastAccess,
   prepareFastAccess,
 } from "../features/fastaccess/utils/FastAccess";
+import { detectTauriEnvironment } from "../infrastructure/platform/isTauri";
 import extractFastAccessObject from "../features/fastaccess/utils/extractFastAccessObject";
 import FastAccessType from "../features/fastaccess/model/FastAccessType";
 import FolderType from "../features/vault/model/FolderType";
@@ -393,7 +394,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   };
 
   const openFastAccessFeature = async () => {
-    if (Platform.OS === "web") {
+    if (Platform.OS === "web" && (await detectTauriEnvironment())) {
       if (
         fastAccessObject === null ||
         fastAccessObject.username === "" ||

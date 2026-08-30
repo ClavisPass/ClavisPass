@@ -14,6 +14,7 @@ import { useTheme } from "../../../../app/providers/ThemeProvider";
 import TooltipIconButton from "../../../../shared/components/buttons/TooltipIconButton";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import createUniqueID from "../../../../shared/utils/createUniqueID";
+import { detectTauriEnvironment } from "../../../../infrastructure/platform/isTauri";
 import ModulesEnum from "../../model/ModulesEnum";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import Props from "../../model/ModuleProps";
@@ -89,6 +90,25 @@ async function saveDesktopAttachment(file: AttachmentFile) {
 
   const tauriFs = require("@tauri-apps/plugin-fs");
   await tauriFs.writeFile(filePath, toByteArray(file.dataBase64));
+}
+
+function downloadBrowserAttachment(file: AttachmentFile) {
+  const bytes = toByteArray(file.dataBase64);
+  const data = bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength,
+  ) as ArrayBuffer;
+  const blob = new Blob([data], {
+    type: file.mimeType || "application/octet-stream",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = getSafeFileName(file);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 function getSafeFileName(file: AttachmentFile): string {
@@ -227,10 +247,10 @@ function AttachmentModule(props: AttachmentModuleType & Props) {
         return;
       }
 
-      const file =
-        Platform.OS === "web"
-          ? await pickDesktopAttachment()
-          : await pickMobileAttachment();
+      const isTauri = Platform.OS === "web" && (await detectTauriEnvironment());
+      const file = isTauri
+        ? await pickDesktopAttachment()
+        : await pickMobileAttachment();
 
       if (!file) return;
 
@@ -267,8 +287,11 @@ function AttachmentModule(props: AttachmentModuleType & Props) {
     setError(null);
 
     try {
-      if (Platform.OS === "web") {
+      const isTauri = Platform.OS === "web" && (await detectTauriEnvironment());
+      if (isTauri) {
         await saveDesktopAttachment(file);
+      } else if (Platform.OS === "web") {
+        downloadBrowserAttachment(file);
       } else {
         await shareMobileAttachment(file);
       }

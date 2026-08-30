@@ -7,6 +7,7 @@ import {
 } from "@expo-google-fonts/lexend-exa";
 import { AuthProvider } from "./src/app/providers/AuthProvider";
 import { View } from "react-native";
+import { Text } from "react-native-paper";
 import CustomTitlebar from "./src/shared/components/CustomTitlebar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import GlobalShortcuts from "./src/shared/components/shortcuts/GlobalShortcuts";
@@ -46,6 +47,14 @@ import StartupScreen, {
 } from "./src/shared/components/StartupScreen";
 import { useSetting } from "./src/app/providers/SettingsProvider";
 import { resolveWindowCornerRadius } from "./src/infrastructure/platform/windowCorners";
+import { isDemoDistribution } from "./src/shared/utils/distribution";
+import { useAuth } from "./src/app/providers/AuthProvider";
+import { useVault } from "./src/app/providers/VaultProvider";
+import {
+  createDemoVault,
+  DEMO_MASTER_PASSWORD,
+} from "./src/features/demo/demoVault";
+import { useTranslation } from "react-i18next";
 
 applyStartupDocumentBackground();
 
@@ -248,6 +257,7 @@ function AppShell() {
           <FastAccessSessionBridge />
           <CloudProvider>
             <VaultProvider>
+              <DemoBootstrap />
               <BrowserBridgeSessionSync />
               <BrowserBridgeWriteSync />
               <ExpiryNotificationScheduler />
@@ -270,6 +280,7 @@ function AppShell() {
                     >
                       <GlobalShortcuts />
                       <CustomTitlebar />
+                      <DemoBanner />
                       <NavigationContainer />
                       <BrowserBridgePairingPrompt />
                     </View>
@@ -281,5 +292,62 @@ function AppShell() {
         </AuthProvider>
       </OnlineProvider>
     </>
+  );
+}
+
+function DemoBootstrap() {
+  const auth = useAuth();
+  const vault = useVault();
+  const initializedRef = useRef(false);
+
+  useEffect(() => {
+    if (!isDemoDistribution() || initializedRef.current) {
+      return;
+    }
+
+    initializedRef.current = true;
+    vault.unlockWithDecryptedVault(createDemoVault());
+    auth.login(DEMO_MASTER_PASSWORD);
+  }, [auth, vault]);
+
+  return null;
+}
+
+function DemoBanner() {
+  const { theme } = useTheme();
+  const { t } = useTranslation();
+
+  if (!isDemoDistribution()) {
+    return null;
+  }
+
+  return (
+    <View
+      style={{
+        backgroundColor: theme.colors.secondaryContainer,
+        borderBottomColor: theme.colors.outlineVariant,
+        borderBottomWidth: 1,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+      }}
+    >
+      <Text
+        style={{
+          color: theme.colors.primary,
+          fontWeight: "700",
+          fontSize: 13,
+        }}
+      >
+        {t("common:demoVaultTitle")}
+      </Text>
+      <Text
+        style={{
+          color: theme.colors.onSecondaryContainer,
+          fontSize: 12,
+        }}
+      >
+        {t("common:demoVaultDescription")}
+      </Text>
+    </View>
   );
 }
