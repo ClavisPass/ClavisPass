@@ -77,6 +77,7 @@ import AppearanceSettingsSection from "../features/settings/components/Appearanc
 import FastAccessPositionPicker from "../features/settings/components/FastAccessPositionPicker";
 import HotkeyRecorderItem from "../features/settings/components/HotkeyRecorderItem";
 import { checkForDesktopUpdate } from "../shared/utils/desktopUpdater";
+import { shouldUseDesktopUpdater } from "../shared/utils/distribution";
 import { checkMobileBinaryUpdate } from "../shared/utils/mobileUpdater";
 import { publishUpdateCheck } from "../infrastructure/events/updateBus";
 import { logger } from "../infrastructure/logging/logger";
@@ -386,13 +387,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           "keyboard",
           "global",
         ]),
-      updates: matchesSettingsSearch([
-        t("settings:updates"),
-        t("settings:checkForUpdates"),
-        "update",
-        "version",
-        "release",
-      ]),
+      updates:
+        (!isTauri || shouldUseDesktopUpdater()) &&
+        matchesSettingsSearch([
+          t("settings:updates"),
+          t("settings:checkForUpdates"),
+          "update",
+          "version",
+          "release",
+        ]),
       appearance: matchesSettingsSearch([
         t("settings:appearance"),
         "appearance",
@@ -774,6 +777,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 
     try {
       if (await detectTauriEnvironment()) {
+        if (!shouldUseDesktopUpdater()) {
+          setManualUpdateLabel(t("settings:noUpdatesAvailable"));
+          return;
+        }
+
         const update = await checkForDesktopUpdate();
         publishUpdateCheck(update);
         setManualUpdateLabel(

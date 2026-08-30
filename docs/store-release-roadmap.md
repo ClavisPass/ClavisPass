@@ -33,9 +33,9 @@ This note captures the planned store/distribution path for ClavisPass across des
 ## Arratel Setup Plan
 
 1. [ ] Secure the Arratel foundation.
-   - Buy exactly one Arratel domain first, preferably `arratel.app` if pricing stays acceptable.
-   - Set up one low-cost business email such as `hello@arratel.app`.
-   - Avoid paid hosting for now; use static hosting through GitHub Pages, Cloudflare Pages, Netlify, or a similar free static host.
+   - Active domain: `arratel.dev`.
+   - Active support/product email: `contact@arratel.dev`; ClavisPass-specific alias can be `clavispass@arratel.dev`.
+   - Avoid additional paid hosting for now; use the existing Vercel homepage and GitHub-hosted release assets/pages where possible.
    - Avoid buying many defensive domains until Arratel or the products generate revenue.
 
 2. [x] Create a separate private Arratel homepage repository.
@@ -57,7 +57,7 @@ This note captures the planned store/distribution path for ClavisPass across des
    - Keep this generic enough to reuse for later products such as Splice or other SaaS ideas.
 
 4. [ ] Build the first ClavisPass product page under Arratel.
-   - Initial path: `arratel.app/clavispass`.
+   - Initial path: `clavispass.arratel.dev`.
    - Include downloads, store links, security notes, privacy policy, changelog, support contact, and import/export capabilities.
    - Present ClavisPass as `ClavisPass by Arratel`.
 
@@ -84,6 +84,10 @@ This note captures the planned store/distribution path for ClavisPass across des
    - Microsoft Store MSIX submissions are re-signed by Microsoft after certification, so no separate CA-trusted signing certificate should be needed for Store-distributed MSIX.
    - EXE/MSI Store submission is possible, but Microsoft does not re-sign the installer. A CA-trusted Authenticode certificate would still be required for the installer and relevant binaries.
    - Store-managed updates and the existing Tauri updater need a clear strategy. Store builds should probably not update outside the Store.
+   - Current Store package URL approach: keep GitHub Releases as the public release source, then automatically publish the Windows installer into the `gh-pages` branch as a static file.
+   - Store URL pattern: `https://clavispass.github.io/ClavisPass/downloads/windows/vX.Y.Z/ClavisPass_X.Y.Z_x64-setup.exe`.
+   - The `gh-pages` branch is now intended for direct downloads, not the product homepage.
+   - After each release, verify the Store package URL with `curl.exe -I`; it must return `200 OK` without `301`, `302`, `307`, or `308`.
    - Cost note: Microsoft currently documents free developer account creation for individual and company accounts.
 
 2. [ ] Google Play Store for Android.
@@ -114,6 +118,16 @@ This note captures the planned store/distribution path for ClavisPass across des
 - Preferred package: MSIX, if compatible with the current Tauri build.
 - Main benefit: trusted Windows install experience.
 - Avoid mixing Store updates with the GitHub/Tauri updater unless there is a clean channel distinction.
+- For the current EXE submission flow, GitHub Release asset URLs are not suitable as package URLs because they redirect to temporary signed release-asset URLs.
+- Use the generated GitHub Pages download URL for Microsoft Store package submission.
+- MSIX prototype status:
+  - `msix/Package.appxmanifest` contains a first desktop full-trust manifest for ClavisPass.
+  - `npm run msix:prepare` stages `ClavisPass.exe`, the native-host sidecar, MSIX assets, and the versioned manifest into `dist-msix/`.
+  - `npm run msix:cert` creates a local development certificate at `devcert.pfx` for local testing only.
+  - `winapp pack .\dist-msix --manifest .\dist-msix\Package.appxmanifest --cert .\devcert.pfx --output .\dist-msix\ClavisPass.msix` successfully creates a signed local test package.
+  - Before Store submission, replace the prototype identity/publisher values with the exact Microsoft Partner Center package identity.
+  - Store builds should likely disable the existing Tauri updater and rely on Store-managed updates.
+  - Test these MSIX-specific behaviors before submission: app launch, vault create/open/save, `.lock` file association, `clavispass://` deep link, local vault provider paths, tray/fast access, and browser extension native-host setup.
 
 ### Google Play
 

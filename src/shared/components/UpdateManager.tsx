@@ -15,6 +15,7 @@ import {
   checkForDesktopUpdate,
   installDesktopUpdate,
 } from "../utils/desktopUpdater";
+import { shouldUseDesktopUpdater } from "../utils/distribution";
 import {
   checkMobileBinaryUpdate,
   type MobileBinaryUpdate,
@@ -48,6 +49,10 @@ const UpdateManager = () => {
 
   useEffect(() => {
     if (Platform.OS === "web") {
+      if (!shouldUseDesktopUpdater()) {
+        return;
+      }
+
       checkTauriUpdate();
     } else {
       checkMobileUpdates();

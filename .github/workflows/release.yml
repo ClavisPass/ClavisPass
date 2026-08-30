@@ -5,6 +5,9 @@ on:
     tags:
       - "v*.*.*"
 
+permissions:
+  contents: write
+
 jobs:
   validate-release:
     runs-on: ubuntu-latest
@@ -128,6 +131,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Set version without 'v'
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}" -replace '^v', ''
+          "VERSION_NO_V=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
+
       - name: Create build env file
         shell: pwsh
         run: |
@@ -172,6 +181,35 @@ jobs:
           name: windows
           path: |
             src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
+
+      - name: Install Windows App CLI
+        shell: pwsh
+        run: |
+          winget install Microsoft.WinAppCli --source winget --accept-package-agreements --accept-source-agreements --disable-interactivity
+
+      - name: Build Microsoft Store MSIX
+        shell: pwsh
+        env:
+          EXPO_PUBLIC_CLAVISPASS_DISTRIBUTION: store
+        run: |
+          npm run tauri:build -- --target x86_64-pc-windows-msvc
+          npm run msix:prepare
+          winapp pack .\dist-msix --manifest .\dist-msix\Package.appxmanifest --output ".\dist-msix\ClavisPass_${{ env.VERSION_NO_V }}_x64.msix"
+
+      - name: Upload Microsoft Store MSIX
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: |
+            dist-msix/ClavisPass_${{ env.VERSION_NO_V }}_x64.msix
+
+      - name: Upload Microsoft Store MSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-store-msix
+          path: |
+            dist-msix/ClavisPass_${{ env.VERSION_NO_V }}_x64.msix
 
   build-macos:
     runs-on: macos-latest
@@ -433,6 +471,74 @@ jobs:
           RELEASE_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}"
           ANDROID_APK_FILENAME="ClavisPass_${{ env.VERSION_NO_V }}_android.apk"
           RELEASE_URL="$RELEASE_URL" ANDROID_APK_FILENAME="$ANDROID_APK_FILENAME" node scripts/generate-mobile-version-manifest.js
+
+      - name: Publish Windows Store package to GitHub Pages
+        run: |
+          VERSION="${{ env.VERSION_NO_V }}"
+          TAG_NAME="${{ github.ref_name }}"
+          INSTALLER_FILENAME="ClavisPass_${VERSION}_x64-setup.exe"
+          INSTALLER_SOURCE="artifacts/windows/${INSTALLER_FILENAME}"
+          PAGES_DIR="../clavispass-gh-pages"
+          VERSION_DIR="${PAGES_DIR}/downloads/windows/${TAG_NAME}"
+
+          if [ ! -f "${INSTALLER_SOURCE}" ]; then
+            echo "Windows installer not found at ${INSTALLER_SOURCE}"
+            find artifacts/windows -maxdepth 2 -type f
+            exit 1
+          fi
+
+          git fetch origin gh-pages || true
+
+          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            git worktree add "${PAGES_DIR}" origin/gh-pages
+          else
+            git worktree add --detach "${PAGES_DIR}"
+            git -C "${PAGES_DIR}" checkout --orphan gh-pages
+            git -C "${PAGES_DIR}" rm -rf . || true
+          fi
+
+          find "${PAGES_DIR}" -mindepth 1 -maxdepth 1 ! -name ".git" ! -name "downloads" -exec rm -rf {} +
+
+          mkdir -p "${VERSION_DIR}"
+          cp "${INSTALLER_SOURCE}" "${VERSION_DIR}/${INSTALLER_FILENAME}"
+
+          touch "${PAGES_DIR}/.nojekyll"
+
+          cat > "${PAGES_DIR}/index.html" <<EOF
+          <!doctype html>
+          <meta charset="utf-8">
+          <meta http-equiv="refresh" content="0; url=./downloads/windows/">
+          <title>ClavisPass Downloads</title>
+          <p><a href="./downloads/windows/">ClavisPass downloads</a></p>
+          EOF
+
+          cat > "${PAGES_DIR}/downloads/windows/latest.json" <<EOF
+          {
+            "version": "${VERSION}",
+            "tag": "${TAG_NAME}",
+            "filename": "${INSTALLER_FILENAME}",
+            "url": "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/downloads/windows/${TAG_NAME}/${INSTALLER_FILENAME}"
+          }
+          EOF
+
+          cat > "${PAGES_DIR}/downloads/windows/index.html" <<EOF
+          <!doctype html>
+          <meta charset="utf-8">
+          <title>ClavisPass Windows Downloads</title>
+          <h1>ClavisPass Windows Downloads</h1>
+          <p>Latest Windows installer: <a href="./${TAG_NAME}/${INSTALLER_FILENAME}">${INSTALLER_FILENAME}</a></p>
+          EOF
+
+          git -C "${PAGES_DIR}" config user.name "github-actions[bot]"
+          git -C "${PAGES_DIR}" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "${PAGES_DIR}" add -A
+
+          if git -C "${PAGES_DIR}" diff --cached --quiet; then
+            echo "No GitHub Pages download changes to publish."
+          else
+            git -C "${PAGES_DIR}" commit -m "Publish Windows installer ${TAG_NAME}"
+            git -C "${PAGES_DIR}" push origin HEAD:gh-pages
+          fi
 
       - name: Upload updater.json and signature to release
         uses: softprops/action-gh-release@v1
