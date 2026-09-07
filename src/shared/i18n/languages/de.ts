@@ -55,6 +55,9 @@ const de: TranslationSchema = {
     clearModules: "Alle Module entfernen",
     clearModulesText:
       "Möchtest du alle Module dieses Eintrags entfernen? Der Titel, Ordner und Favoritenstatus bleiben erhalten.",
+    clearCompletedTasks: "Erledigte Tasks entfernen",
+    clearCompletedTasksText:
+      "Möchtest du alle erledigten Tasks aus diesem Eintrag entfernen? Offene Tasks und andere Module bleiben erhalten.",
     exportVCard: "Als vCard exportieren",
     showPassword: "Passwort anzeigen",
     hidePassword: "Passwort ausblenden",
@@ -87,6 +90,7 @@ const de: TranslationSchema = {
     editHistoryModulesUpdated: "Module geändert",
     editHistoryModulesReordered: "Module neu angeordnet",
     editHistoryModulesCleared: "Alle Module entfernt",
+    editHistoryCompletedTasksCleared: "Erledigte Tasks entfernt",
     editHistoryFavoriteUpdated: "Favorit geändert",
     editHistoryPinUpdated: "Pin geändert",
     editHistoryFolderUpdated: "Ordner geändert",

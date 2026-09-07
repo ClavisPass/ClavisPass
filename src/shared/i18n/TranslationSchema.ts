@@ -53,6 +53,8 @@ export type TranslationSchema = {
     removeModule: string;
     clearModules: string;
     clearModulesText: string;
+    clearCompletedTasks: string;
+    clearCompletedTasksText: string;
     exportVCard: string;
     showPassword: string;
     hidePassword: string;
@@ -85,6 +87,7 @@ export type TranslationSchema = {
     editHistoryModulesUpdated: string;
     editHistoryModulesReordered: string;
     editHistoryModulesCleared: string;
+    editHistoryCompletedTasksCleared: string;
     editHistoryFavoriteUpdated: string;
     editHistoryPinUpdated: string;
     editHistoryFolderUpdated: string;

@@ -55,6 +55,9 @@ const en: TranslationSchema = {
     clearModules: "Remove all modules",
     clearModulesText:
       "Do you want to remove all modules from this entry? The title, folder, and favorite status will stay unchanged.",
+    clearCompletedTasks: "Remove completed tasks",
+    clearCompletedTasksText:
+      "Do you want to remove all completed tasks from this entry? Open tasks and other modules will stay unchanged.",
     exportVCard: "Export as vCard",
     showPassword: "Show password",
     hidePassword: "Hide password",
@@ -87,6 +90,7 @@ const en: TranslationSchema = {
     editHistoryModulesUpdated: "Updated modules",
     editHistoryModulesReordered: "Reordered modules",
     editHistoryModulesCleared: "Removed all modules",
+    editHistoryCompletedTasksCleared: "Removed completed tasks",
     editHistoryFavoriteUpdated: "Updated favorite",
     editHistoryPinUpdated: "Updated pin",
     editHistoryFolderUpdated: "Updated folder",

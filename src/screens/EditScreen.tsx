@@ -33,6 +33,7 @@ import DeleteModal from "../features/vault/components/modals/DeleteModal";
 import Button from "../shared/components/buttons/Button";
 import DeleteModuleModal from "../features/vault/components/modals/DeleteModuleModal";
 import ClearModulesModal from "../features/vault/components/modals/ClearModulesModal";
+import ClearCompletedTasksModal from "../features/vault/components/modals/ClearCompletedTasksModal";
 import EditHistoryModal from "../features/vault/components/modals/EditHistoryModal";
 import EntryTagsModal, {
   normalizeTags,
@@ -141,6 +142,10 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     useState(false);
   const [clearModulesModalVisible, setClearModulesModalVisible] =
     useState(false);
+  const [
+    clearCompletedTasksModalVisible,
+    setClearCompletedTasksModalVisible,
+  ] = useState(false);
   const [historyModalVisible, setHistoryModalVisible] = useState(false);
   const [tagsModalVisible, setTagsModalVisible] = useState(false);
   const [overflowMenuVisible, setOverflowMenuVisible] = useState(false);
@@ -646,6 +651,9 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const taskModuleCount = value.modules.filter(
     (module) => module.module === ModulesEnum.TASK,
   ).length;
+  const completedTaskModuleCount = value.modules.filter(
+    (module) => module.module === ModulesEnum.TASK && "completed" in module && module.completed,
+  ).length;
 
   const tagSuggestions = React.useMemo(
     () =>
@@ -697,6 +705,27 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     }
   };
 
+  const clearCompletedTasks = () => {
+    if (completedTaskModuleCount === 0) return;
+
+    applyChange(
+      (current) => ({
+        ...current,
+        modules: current.modules.filter(
+          (module) =>
+            module.module !== ModulesEnum.TASK ||
+            !("completed" in module) ||
+            !module.completed,
+        ) as ModulesType,
+      }),
+      {
+        action: "modules",
+        label: t("common:editHistoryCompletedTasksCleared"),
+      },
+    );
+    setClearCompletedTasksModalVisible(false);
+  };
+
   const deleteValue = (id: string) => {
     vault.deleteEntry(id);
     setDeleteModalVisible(false);
@@ -720,6 +749,16 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
               icon: "sort-descending",
               label: t("common:sortCompletedTasksDown"),
               onPress: sortCompletedTasksDown,
+            },
+          ]
+        : []),
+      ...(completedTaskModuleCount > 0
+        ? [
+            {
+              key: "clearCompletedTasks",
+              icon: "playlist-remove",
+              label: t("common:clearCompletedTasks"),
+              onPress: () => setClearCompletedTasksModalVisible(true),
             },
           ]
         : []),
@@ -767,6 +806,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     ],
     [
       sessionLog.length,
+      clearCompletedTasks,
+      completedTaskModuleCount,
       sortCompletedTasksDown,
       t,
       taskModuleCount,
@@ -1199,6 +1240,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         visible={clearModulesModalVisible}
         setVisible={setClearModulesModalVisible}
         onClear={clearModules}
+      />
+      <ClearCompletedTasksModal
+        visible={clearCompletedTasksModalVisible}
+        setVisible={setClearCompletedTasksModalVisible}
+        onClear={clearCompletedTasks}
       />
       <EditHistoryModal
         visible={historyModalVisible}
