@@ -36,7 +36,7 @@ function formatUpdateErrorMessage(fallback: string, error: unknown) {
 
 const UpdateManager = () => {
   const { theme } = useTheme();
-  const { t, i18n } = useTranslation();
+  const { t, i18n, ready } = useTranslation("settings");
   const insets = useSafeAreaInsets();
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [updateMessage, setUpdateMessage] = useState("");
@@ -50,6 +50,8 @@ const UpdateManager = () => {
   const [isApplyingUpdate, setIsApplyingUpdate] = useState(false);
 
   useEffect(() => {
+    if (!ready) return;
+
     if (Platform.OS === "web") {
       if (!shouldUseDesktopUpdater()) {
         return;
@@ -59,37 +61,39 @@ const UpdateManager = () => {
     } else {
       checkMobileUpdates();
     }
-  }, []);
+  }, [ready]);
 
   useEffect(() => {
+    if (!ready) return;
+
     const handler = (nextUpdate: UpdateProp | null) => {
       setUpdate(nextUpdate);
 
       if (nextUpdate) {
         setUpdateAvailable(true);
-        setUpdateMessage(t("settings:updateAvailable"));
+        setUpdateMessage(t("updateAvailable"));
         return;
       }
 
       setUpdateAvailable(false);
-      setUpdateMessage(t("settings:noUpdatesAvailable"));
+      setUpdateMessage(t("noUpdatesAvailable"));
     };
 
     subscribeUpdateCheck(handler);
     return () => unsubscribeUpdateCheck(handler);
-  }, [t]);
+  }, [ready, t]);
 
   const checkExpoUpdate = async () => {
     try {
       const updateResult = await Updates.checkForUpdateAsync();
       if (updateResult.isAvailable) {
         setUpdateAvailable(true);
-        setUpdateMessage(t("settings:updateAvailable"));
+        setUpdateMessage(t("updateAvailable"));
       } else {
-        setUpdateMessage(t("settings:noUpdatesAvailable"));
+        setUpdateMessage(t("noUpdatesAvailable"));
       }
     } catch (error) {
-      setUpdateMessage(t("settings:updateCheckFailed"));
+      setUpdateMessage(t("updateCheckFailed"));
     }
   };
 
@@ -103,9 +107,10 @@ const UpdateManager = () => {
         setMobileBinaryUpdate(nextMobileBinaryUpdate);
         setUpdateAvailable(true);
         setUpdateMessage(
-          nextMobileBinaryUpdate.required
-            ? t("settings:mobileUpdateRequiredTitle")
-            : t("settings:mobileUpdateAvailable"),
+          nextMobileBinaryUpdate.message ??
+            (nextMobileBinaryUpdate.required
+              ? t("mobileUpdateRequiredTitle")
+              : t("mobileUpdateAvailable")),
         );
 
         return;
@@ -122,7 +127,7 @@ const UpdateManager = () => {
       await Updates.fetchUpdateAsync();
       await Updates.reloadAsync();
     } catch (error) {
-      setUpdateMessage(t("settings:updateInstallFailed"));
+      setUpdateMessage(t("updateInstallFailed"));
     }
   };
 
@@ -133,7 +138,7 @@ const UpdateManager = () => {
       await Linking.openURL(mobileBinaryUpdate.downloadUrl);
     } catch (error) {
       logger.error("Error while opening mobile update URL:", error);
-      setUpdateMessage(t("settings:updateInstallFailed"));
+      setUpdateMessage(t("updateInstallFailed"));
     }
   };
 
@@ -144,12 +149,12 @@ const UpdateManager = () => {
       publishUpdateCheck(nextUpdate);
       if (nextUpdate) {
         setUpdateAvailable(true);
-        setUpdateMessage(t("settings:updateAvailable"));
+        setUpdateMessage(t("updateAvailable"));
       } else {
-        setUpdateMessage(t("settings:noUpdatesAvailable"));
+        setUpdateMessage(t("noUpdatesAvailable"));
       }
     } catch (error) {
-      setUpdateMessage(t("settings:updateCheckFailed"));
+      setUpdateMessage(t("updateCheckFailed"));
       logger.error("Error while checking for updates:", error);
     }
   };
@@ -189,7 +194,7 @@ const UpdateManager = () => {
     } catch (error) {
       logger.error("Error while applying update:", error);
       setUpdateMessage(
-        formatUpdateErrorMessage(t("settings:updateInstallFailed"), error),
+        formatUpdateErrorMessage(t("updateInstallFailed"), error),
       );
     }
   };
@@ -198,7 +203,7 @@ const UpdateManager = () => {
     if (isApplyingUpdate) return;
 
     setIsApplyingUpdate(true);
-    setUpdateMessage(t("settings:installingUpdate"));
+    setUpdateMessage(t("installingUpdate"));
 
     try {
       if (mobileBinaryUpdate) {
@@ -219,7 +224,7 @@ const UpdateManager = () => {
   useEffect(() => {
     if (update) {
       setUpdateAvailable(true);
-      setUpdateMessage(t("settings:updateAvailable"));
+      setUpdateMessage(t("updateAvailable"));
     }
   }, [t, update]);
 
@@ -289,8 +294,8 @@ const UpdateManager = () => {
           loading={isApplyingUpdate}
         >
           {mobileBinaryUpdate
-            ? t("settings:mobileUpdateDownload")
-            : t("settings:updateNow")}
+            ? t("mobileUpdateDownload")
+            : t("updateNow")}
         </Button>
       </View>
     </View>
