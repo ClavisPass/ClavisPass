@@ -2,7 +2,7 @@ import { sendRuntimeMessage } from "../shared/messages";
 import { isContentMessage } from "../shared/content-messages";
 import { executeFill, previewFill } from "./fill";
 import { classifyFieldSnapshot, createFieldSnapshot, extractSavePromptCandidate, isVisibleFieldCandidate } from "../shared/forms";
-import type { ContentDebugInfo } from "../shared/types";
+import type { AutofillEligibilityResult, ContentDebugInfo } from "../shared/types";
 import type { FillDataResult } from "../shared/bridge";
 
 declare global {
@@ -15,6 +15,7 @@ declare global {
 const INLINE_ROOT_ID = "clavispass-inline-root";
 const INLINE_STYLE_ID = "clavispass-inline-style";
 const INLINE_BUTTON_TITLE = "Fill with ClavisPass";
+const INLINE_ELIGIBILITY_REFRESH_MS = 3000;
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 const INLINE_LOGO_PATHS = [
   {
@@ -39,6 +40,15 @@ interface InlinePreviewState {
 
 let inlinePreviewState: InlinePreviewState | undefined;
 let inlinePreviewRequestId = 0;
+let inlineEligibilityRequestId = 0;
+let inlineEligibility = {
+  checkedAt: 0,
+  hasMatches: false,
+  pending: false,
+  url: "",
+  desktopState: undefined as AutofillEligibilityResult["desktopState"] | undefined,
+  appScheme: undefined as string | undefined
+};
 
 function registerContentFrame(): void {
   void sendRuntimeMessage("content:ready", {
@@ -294,6 +304,74 @@ function clearInlinePreview(): void {
   }
 }
 
+function removeInlineRoot(): void {
+  clearInlinePreview();
+  document.getElementById(INLINE_ROOT_ID)?.remove();
+}
+
+async function refreshInlineEligibility(): Promise<void> {
+  const requestId = ++inlineEligibilityRequestId;
+  const url = window.location.href;
+
+  inlineEligibility = {
+    ...inlineEligibility,
+    pending: true,
+    url
+  };
+
+  try {
+    const eligibility = await sendRuntimeMessage("bridge:getAutofillEligibility", { url });
+    if (requestId !== inlineEligibilityRequestId || url !== window.location.href) {
+      return;
+    }
+
+    inlineEligibility = {
+      checkedAt: Date.now(),
+      hasMatches: eligibility.hasMatches,
+      pending: false,
+      url,
+      desktopState: eligibility.desktopState,
+      appScheme: eligibility.appScheme
+    };
+  } catch {
+    if (requestId !== inlineEligibilityRequestId) {
+      return;
+    }
+
+    inlineEligibility = {
+      checkedAt: Date.now(),
+      hasMatches: false,
+      pending: false,
+      url,
+      desktopState: undefined,
+      appScheme: undefined
+    };
+  } finally {
+    if (requestId === inlineEligibilityRequestId) {
+      positionInlineRoot();
+    }
+  }
+}
+
+function isInlineDesktopReady(): boolean {
+  return inlineEligibility.desktopState === "ready";
+}
+
+async function openDesktopForInlineAction(button: HTMLButtonElement): Promise<void> {
+  const message =
+    inlineEligibility.desktopState === "locked"
+      ? "Unlock ClavisPass Desktop to fill this page."
+      : "Open ClavisPass Desktop to fill this page.";
+  setInlineButtonState(button, message);
+
+  try {
+    await sendRuntimeMessage("bridge:openDesktopApp", {
+      appScheme: inlineEligibility.appScheme
+    });
+  } catch {
+  }
+}
+
 async function loadSingleInlineFillData(): Promise<
   | { status: "ready"; fillData: FillDataResult }
   | { status: "empty"; detail: string }
@@ -327,6 +405,16 @@ async function loadSingleInlineFillData(): Promise<
 
 async function previewInlineAction(button: HTMLButtonElement): Promise<void> {
   if (inlinePreviewState?.committed) {
+    return;
+  }
+
+  if (!isInlineDesktopReady()) {
+    setInlineButtonState(
+      button,
+      inlineEligibility.desktopState === "locked"
+        ? "Unlock ClavisPass Desktop to fill this page."
+        : "Open ClavisPass Desktop to fill this page."
+    );
     return;
   }
 
@@ -375,6 +463,11 @@ async function previewInlineAction(button: HTMLButtonElement): Promise<void> {
 
 async function commitInlineAction(button: HTMLButtonElement): Promise<void> {
   try {
+    if (!isInlineDesktopReady()) {
+      await openDesktopForInlineAction(button);
+      return;
+    }
+
     if (inlinePreviewState && !inlinePreviewState.committed) {
       inlinePreviewState.committed = true;
       setInlineButtonState(button, "Filled with ClavisPass.");
@@ -400,11 +493,23 @@ async function commitInlineAction(button: HTMLButtonElement): Promise<void> {
 function positionInlineRoot(): void {
   ensureInlineStyles();
   const passwordField = getPrimaryPasswordField();
-  const existingRoot = document.getElementById(INLINE_ROOT_ID) as HTMLDivElement | null;
 
   if (!passwordField) {
-    clearInlinePreview();
-    existingRoot?.remove();
+    removeInlineRoot();
+    return;
+  }
+
+  const now = Date.now();
+  const isEligibilityStale =
+    inlineEligibility.url !== window.location.href ||
+    now - inlineEligibility.checkedAt > INLINE_ELIGIBILITY_REFRESH_MS;
+
+  if (isEligibilityStale && !inlineEligibility.pending) {
+    void refreshInlineEligibility();
+  }
+
+  if (!inlineEligibility.hasMatches) {
+    removeInlineRoot();
     return;
   }
 
@@ -463,6 +568,7 @@ function setupInlineTrigger(): void {
 
   window.addEventListener("scroll", refresh, true);
   window.addEventListener("resize", refresh);
+  window.setInterval(refresh, INLINE_ELIGIBILITY_REFRESH_MS);
   refresh();
 }
 

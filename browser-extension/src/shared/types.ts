@@ -51,6 +51,20 @@ export interface DesktopEntrySuggestionsView {
   error?: string;
 }
 
+export interface AutofillEligibilityPayload {
+  url: string;
+}
+
+export interface AutofillEligibilityResult {
+  isSupported: boolean;
+  normalizedHost?: string;
+  hasMatches: boolean;
+  source: "desktop" | "cache" | "stale-cache" | "none";
+  desktopState?: DesktopBridgeStatusView["state"];
+  appScheme?: string;
+  detail: string;
+}
+
 export interface PreparedFillSummary {
   entryId: string;
   title: string;

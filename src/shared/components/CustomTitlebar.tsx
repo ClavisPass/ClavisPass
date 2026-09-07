@@ -16,6 +16,7 @@ import {
   TITLEBAR_HEIGHT,
 } from "./titlebarMetrics";
 import { resolveWindowControlsSide } from "../../infrastructure/platform/windowControls";
+import { isDemoDistribution } from "../utils/distribution";
 
 export {
   TITLEBAR_CONTROLS_WIDTH,
@@ -181,7 +182,7 @@ function WindowsWindowControls(props: WindowControlsProps) {
 }
 
 export function TitlebarHeight(props: Props) {
-  if (!isTauriEnvironment()) {
+  if (isDemoDistribution() || !isTauriEnvironment()) {
     return null;
   }
 
@@ -211,7 +212,7 @@ function CustomTitlebar() {
   const { value: closeBehavior } = useSetting("CLOSE_BEHAVIOR");
   const { value: startBehavior } = useSetting("START_BEHAVIOR");
   const { value: windowControlsStyle } = useSetting("WINDOW_CONTROLS_STYLE");
-  const isTauri = useIsTauriEnvironment();
+  const isTauri = useIsTauriEnvironment() && !isDemoDistribution();
   const controlsSide = resolveWindowControlsSide(windowControlsStyle);
   const controlsLeft = controlsSide === "left";
   const hasSidebarOffset = auth.isLoggedIn && width > 600;

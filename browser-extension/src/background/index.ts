@@ -3,6 +3,11 @@ import { DesktopBridgeService } from "./bridge";
 import { ExtensionState } from "./state";
 import { getActiveDomainContext } from "./tab-context";
 import { isExtensionMessage } from "../shared/messages";
+import {
+  clearAutofillDomainCache,
+  getAutofillEligibilityForUrl,
+  rememberAutofillSuggestions
+} from "./autofill-cache";
 import type { ContentMessage } from "../shared/content-messages";
 import type { FillDataResult, SearchEntrySuggestion } from "../shared/bridge";
 import type { BrowserWriteResult, CreateEntryFromBrowserPayload, UpdateEntryFromBrowserPayload } from "../shared/bridge";
@@ -445,9 +450,12 @@ const router = new BackgroundMessageRouter({
     }
 
     try {
+      const items = await loadSuggestionsForDomain(domain.normalizedHost);
+      await rememberAutofillSuggestions(domain.normalizedHost, items);
+
       return {
         domain,
-        items: await loadSuggestionsForDomain(domain.normalizedHost)
+        items
       };
     } catch (error) {
       return {
@@ -457,6 +465,8 @@ const router = new BackgroundMessageRouter({
       };
     }
   },
+  "bridge:getAutofillEligibility": async (payload) =>
+    getAutofillEligibilityForUrl(payload.url, desktopBridge),
   "bridge:prepareFillForActiveTab": async (payload) => {
     const prepared = await prepareFillForActiveTab(payload.entryId);
     return prepared.result;
@@ -531,6 +541,7 @@ const router = new BackgroundMessageRouter({
 
 chrome.runtime.onInstalled.addListener(() => {
   console.info("ClavisPass extension installed with native messaging bridge support.");
+  void clearAutofillDomainCache();
   void injectContentScriptIntoOpenTabs();
 });
 

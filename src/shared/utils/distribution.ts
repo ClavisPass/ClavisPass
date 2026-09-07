@@ -1,3 +1,5 @@
+import { isTauriEnvironment } from "../../infrastructure/platform/isTauri";
+
 export type AppDistribution = "direct" | "store" | "demo";
 
 function readDistributionEnv(): string | undefined {
@@ -5,7 +7,7 @@ function readDistributionEnv(): string | undefined {
 }
 
 export function getAppDistribution(): AppDistribution {
-  if (readDistributionEnv() === "demo") return "demo";
+  if (readDistributionEnv() === "demo" && !isTauriEnvironment()) return "demo";
   return readDistributionEnv() === "store" ? "store" : "direct";
 }
 

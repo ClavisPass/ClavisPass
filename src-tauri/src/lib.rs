@@ -33,6 +33,7 @@ use tauri_plugin_updater;
 
 mod commands;
 mod device_identity;
+mod native_host_registration;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct WindowSize {
@@ -262,6 +263,10 @@ pub fn run() {
         .setup(|app| {
             if let Err(error) = bridge::session::clear_session() {
                 eprintln!("Failed to clear stale browser bridge session on startup: {error}");
+            }
+
+            if let Err(error) = native_host_registration::register_native_host(app.handle()) {
+                eprintln!("Failed to register browser native host: {error}");
             }
 
             #[cfg(debug_assertions)]

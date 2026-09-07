@@ -1,6 +1,8 @@
 import type {
   DesktopBridgeStatusView,
   DesktopEntrySuggestionsView,
+  AutofillEligibilityPayload,
+  AutofillEligibilityResult,
   FillExecutionResult,
   PendingPromptResponse,
   PrepareFillForActiveTabResult,
@@ -24,6 +26,10 @@ export type MessageMap = {
   "bridge:getSuggestions": {
     request: undefined;
     response: DesktopEntrySuggestionsView;
+  };
+  "bridge:getAutofillEligibility": {
+    request: AutofillEligibilityPayload;
+    response: AutofillEligibilityResult;
   };
   "bridge:prepareFillForActiveTab": {
     request: GetFillDataForEntryPayload;

@@ -9,7 +9,9 @@ import {
   TITLEBAR_HEIGHT,
 } from "./titlebarMetrics";
 import { useSetting } from "../../app/providers/SettingsProvider";
+import { isTauriEnvironment } from "../../infrastructure/platform/isTauri";
 import { resolveWindowControlsSide } from "../../infrastructure/platform/windowControls";
+import { isDemoDistribution } from "../utils/distribution";
 
 type Props = {
   children?: ReactNode;
@@ -31,7 +33,11 @@ function Header(props: Props) {
   const controlsLeft =
     resolveWindowControlsSide(windowControlsStyle) === "left";
   const reserveMacControlsSpace =
-    TITLEBAR_HEIGHT > 0 && width < 600 && controlsLeft;
+    !isDemoDistribution() &&
+    isTauriEnvironment() &&
+    TITLEBAR_HEIGHT > 0 &&
+    width < 600 &&
+    controlsLeft;
 
   useEffect(() => {
     setTitlebarCenterGap(0);

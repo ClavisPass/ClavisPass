@@ -1,6 +1,6 @@
 {
   "name": "clavispass-extension",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,8 +8,11 @@
     "build": "vite build && vite build --config vite.content.config.ts",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
+    "package:chrome": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/package-chrome.ps1",
     "package:firefox": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/package-firefox.ps1",
     "package:firefox:source": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/package-firefox-source.ps1",
+    "build:chrome": "npm run build && npm run package:chrome",
+    "release:chrome": "npm run typecheck && npm run build:chrome",
     "build:firefox": "npm run build && npm run package:firefox",
     "release:firefox": "npm run typecheck && npm run build:firefox && npm run package:firefox:source"
   },

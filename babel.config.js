@@ -1,5 +1,8 @@
 module.exports = function (api) {
-  api.cache(true);
+  api.cache.using(() => process.env.CLAVISPASS_DOTENV_PATH || '.env');
+
+  const dotenvPath = process.env.CLAVISPASS_DOTENV_PATH || '.env';
+
   return {
     presets: ['babel-preset-expo'],
     plugins: [
@@ -7,7 +10,7 @@ module.exports = function (api) {
         'module:react-native-dotenv',
         {
           moduleName: '@env',
-          path: '.env',
+          path: dotenvPath,
           safe: false,
           allowUndefined: true,
         },

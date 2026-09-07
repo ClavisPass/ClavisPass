@@ -192,7 +192,7 @@ jobs:
         env:
           EXPO_PUBLIC_CLAVISPASS_DISTRIBUTION: store
         run: |
-          npm run tauri:build -- --target x86_64-pc-windows-msvc
+          npm run tauri:build -- --target x86_64-pc-windows-msvc --no-bundle
           npm run msix:prepare
           winapp pack .\dist-msix --manifest .\dist-msix\Package.appxmanifest --output ".\dist-msix\ClavisPass_${{ env.VERSION_NO_V }}_x64.msix"
 
@@ -349,7 +349,7 @@ jobs:
       - name: Trigger Android build in Expo Cloud (non-interactive)
         id: eas_build
         run: |
-          eas build --platform android --profile production --non-interactive --wait --json > build-info.json
+          eas build --platform android --profile production-apk --non-interactive --wait --json > build-info.json
           cat build-info.json
 
       - name: Get APK download URL
@@ -529,14 +529,14 @@ jobs:
           cp "${INSTALLER_SOURCE}" "${VERSION_DIR}/${INSTALLER_FILENAME}"
 
           touch "${PAGES_DIR}/.nojekyll"
-          echo "clavispass.arratel.dev" > "${PAGES_DIR}/CNAME"
+          rm -f "${PAGES_DIR}/CNAME"
 
           cat > "${PAGES_DIR}/downloads/windows/latest.json" <<EOF
           {
             "version": "${VERSION}",
             "tag": "${TAG_NAME}",
             "filename": "${INSTALLER_FILENAME}",
-            "url": "https://clavispass.arratel.dev/downloads/windows/${TAG_NAME}/${INSTALLER_FILENAME}"
+            "url": "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/downloads/windows/${TAG_NAME}/${INSTALLER_FILENAME}"
           }
           EOF
 

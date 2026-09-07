@@ -7,12 +7,12 @@
 !define CLAVISPASS_EDGE_EXTENSION_ID ""
 !define CLAVISPASS_FIREFOX_EXTENSION_ID "clavispass@arratel.dev"
 
-!macro WriteClavisPassNativeHostManifest MANIFEST_PATH HOST_PATH_KIND
+!macro WriteClavisPassNativeHostManifest MANIFEST_PATH HOST_PATH HOST_PATH_KIND
   FileOpen $0 "${MANIFEST_PATH}" w
   FileWrite $0 "{$\r$\n"
   FileWrite $0 "  $\"name$\": $\"${CLAVISPASS_NATIVE_HOST_NAME}$\",$\r$\n"
   FileWrite $0 "  $\"description$\": $\"ClavisPass Native Messaging Host$\",$\r$\n"
-  FileWrite $0 "  $\"path$\": $\"clavispass_native_host.exe$\",$\r$\n"
+  FileWrite $0 "  $\"path$\": $\"${HOST_PATH}$\",$\r$\n"
   FileWrite $0 "  $\"type$\": $\"stdio$\",$\r$\n"
   ${If} "${HOST_PATH_KIND}" == "chromium"
     FileWrite $0 "  $\"allowed_origins$\": [$\r$\n"
@@ -38,26 +38,8 @@
 !macroend
 
 !macro NSIS_HOOK_POSTINSTALL
-  IfFileExists "$INSTDIR\clavispass_native_host.exe" 0 native_host_done
-
-  ${If} "${CLAVISPASS_CHROME_EXTENSION_ID}" != ""
-  ${OrIf} "${CLAVISPASS_EDGE_EXTENSION_ID}" != ""
-    !insertmacro WriteClavisPassNativeHostManifest "$INSTDIR\${CLAVISPASS_NATIVE_HOST_NAME}.chromium.json" "chromium"
-    ${If} "${CLAVISPASS_CHROME_EXTENSION_ID}" != ""
-      WriteRegStr HKCU "Software\Google\Chrome\NativeMessagingHosts\${CLAVISPASS_NATIVE_HOST_NAME}" "" "$INSTDIR\${CLAVISPASS_NATIVE_HOST_NAME}.chromium.json"
-      WriteRegStr HKCU "Software\Chromium\NativeMessagingHosts\${CLAVISPASS_NATIVE_HOST_NAME}" "" "$INSTDIR\${CLAVISPASS_NATIVE_HOST_NAME}.chromium.json"
-    ${EndIf}
-    ${If} "${CLAVISPASS_EDGE_EXTENSION_ID}" != ""
-      WriteRegStr HKCU "Software\Microsoft\Edge\NativeMessagingHosts\${CLAVISPASS_NATIVE_HOST_NAME}" "" "$INSTDIR\${CLAVISPASS_NATIVE_HOST_NAME}.chromium.json"
-    ${EndIf}
-  ${EndIf}
-
-  ${If} "${CLAVISPASS_FIREFOX_EXTENSION_ID}" != ""
-    !insertmacro WriteClavisPassNativeHostManifest "$INSTDIR\${CLAVISPASS_NATIVE_HOST_NAME}.firefox.json" "firefox"
-    WriteRegStr HKCU "Software\Mozilla\NativeMessagingHosts\${CLAVISPASS_NATIVE_HOST_NAME}" "" "$INSTDIR\${CLAVISPASS_NATIVE_HOST_NAME}.firefox.json"
-  ${EndIf}
-
-  native_host_done:
+  ; Native Messaging registration is repaired on app startup.
+  ; This keeps NSIS and MSIX behavior aligned and avoids hand-written JSON path escaping issues.
 !macroend
 
 !macro NSIS_HOOK_POSTUNINSTALL
@@ -67,4 +49,9 @@
   DeleteRegKey HKCU "Software\Mozilla\NativeMessagingHosts\${CLAVISPASS_NATIVE_HOST_NAME}"
   Delete "$INSTDIR\${CLAVISPASS_NATIVE_HOST_NAME}.chromium.json"
   Delete "$INSTDIR\${CLAVISPASS_NATIVE_HOST_NAME}.firefox.json"
+  Delete "$LOCALAPPDATA\ClavisPass\bridge\native-hosts\${CLAVISPASS_NATIVE_HOST_NAME}.chromium.json"
+  Delete "$LOCALAPPDATA\ClavisPass\bridge\native-hosts\${CLAVISPASS_NATIVE_HOST_NAME}.firefox.json"
+  Delete "$LOCALAPPDATA\ClavisPass\bridge\native-hosts\bin\clavispass_native_host.exe"
+  RMDir "$LOCALAPPDATA\ClavisPass\bridge\native-hosts\bin"
+  RMDir "$LOCALAPPDATA\ClavisPass\bridge\native-hosts"
 !macroend

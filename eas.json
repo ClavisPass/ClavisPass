@@ -17,8 +17,24 @@
       "distribution": "store",
       "channel": "production",
       "environment": "production",
+      "env": { "APP_VARIANT": "production" }
+    },
+    "production-apk": {
+      "developmentClient": false,
+      "distribution": "store",
+      "channel": "production",
+      "environment": "production",
       "env": { "APP_VARIANT": "production" },
       "android": { "buildType": "apk" }
+    }
+  },
+  "submit": {
+    "production": {
+      "android": {
+        "applicationId": "com.clavispass.app",
+        "track": "internal",
+        "releaseStatus": "draft"
+      }
     }
   }
 }

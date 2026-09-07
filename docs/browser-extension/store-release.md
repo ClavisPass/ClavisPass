@@ -208,10 +208,29 @@ Not submitted yet.
 Before Chrome submission:
 
 - Decide whether the Chrome listing uses the same privacy policy text or Chrome-specific wording.
-- Build a Chrome-specific release ZIP from `browser-extension/dist`.
+- Build a Chrome-specific release ZIP with `npm run extension:release:chrome`.
 - Fill the final Chrome Web Store extension ID into native messaging installer configuration once Google assigns it.
 - Update Chromium `allowed_origins` for `com.clavispass.native_host`.
 - Add Chrome-specific screenshots and promotional images.
+
+Build command:
+
+```powershell
+npm run extension:release:chrome
+```
+
+Upload package:
+
+```text
+browser-extension/artifacts/clavispass-chrome-0.1.1.zip
+```
+
+Chrome package notes:
+
+- The ZIP contains the contents of `browser-extension/dist`, not the `dist` folder itself.
+- The package keeps Manifest V3 `background.service_worker`.
+- Firefox-only `browser_specific_settings` are removed from the Chrome archive.
+- ZIP entries are created with `/` path separators.
 
 Likely category:
 

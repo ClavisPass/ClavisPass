@@ -1,9 +1,33 @@
 import { resolve } from "node:path";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 
+function escapeNonAsciiJavaScript(): Plugin {
+  return {
+    name: "escape-non-ascii-javascript",
+    generateBundle(_options, bundle) {
+      for (const output of Object.values(bundle)) {
+        if (output.type !== "chunk") {
+          continue;
+        }
+
+        output.code = output.code.replace(/[^\x00-\x7F]/g, (character) => {
+          const codePoint = character.codePointAt(0);
+          if (codePoint === undefined) {
+            return character;
+          }
+
+          return codePoint <= 0xffff
+            ? `\\u${codePoint.toString(16).padStart(4, "0")}`
+            : `\\u{${codePoint.toString(16)}}`;
+        });
+      }
+    }
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), escapeNonAsciiJavaScript()],
   server: {
     fs: {
       allow: [resolve(__dirname, "..")]

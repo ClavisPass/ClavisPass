@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { spawnSync } = require("child_process");
 
 const repoRoot = path.resolve(__dirname, "..");
 const tauriDir = path.join(repoRoot, "src-tauri");
@@ -26,6 +27,61 @@ function copyFile(source, target) {
 
 function firstExisting(paths) {
   return paths.find((candidate) => fs.existsSync(candidate));
+}
+
+function escapePowerShellSingleQuoted(value) {
+  return String(value).replace(/'/g, "''");
+}
+
+function createUnplatedTargetSizeIcons() {
+  if (process.platform !== "win32") {
+    return;
+  }
+
+  const source = path.join(tauriDir, "icons", "icon.png");
+  const sizes = [16, 20, 24, 30, 32, 36, 40, 44, 48, 60, 64, 72, 80, 96, 256];
+  const script = `
+Add-Type -AssemblyName System.Drawing
+$source = '${escapePowerShellSingleQuoted(source)}'
+$outputDir = '${escapePowerShellSingleQuoted(assetsOutputDir)}'
+$sourceImage = [System.Drawing.Bitmap]::FromFile($source)
+try {
+  foreach ($size in @(${sizes.join(",")})) {
+    $target = Join-Path $outputDir "Square44x44Logo.targetsize-$($size)_altform-unplated.png"
+    $bitmap = New-Object System.Drawing.Bitmap $size, $size, ([System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+    $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+    try {
+      $graphics.Clear([System.Drawing.Color]::Transparent)
+      $graphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+      $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
+      $graphics.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
+      $graphics.CompositingQuality = [System.Drawing.Drawing2D.CompositingQuality]::HighQuality
+      $graphics.DrawImage($sourceImage, 0, 0, $size, $size)
+      $bitmap.Save($target, [System.Drawing.Imaging.ImageFormat]::Png)
+    } finally {
+      $graphics.Dispose()
+      $bitmap.Dispose()
+    }
+  }
+} finally {
+  $sourceImage.Dispose()
+}
+`;
+
+  const result = spawnSync("powershell.exe", [
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-Command",
+    script,
+  ], {
+    cwd: repoRoot,
+    stdio: "inherit",
+  });
+
+  if (result.status !== 0) {
+    throw new Error("Failed to generate unplated MSIX target-size icons.");
+  }
 }
 
 function toMsixVersion(version) {
@@ -81,6 +137,8 @@ if (nativeHostExe) {
     path.join(assetsOutputDir, assetName),
   );
 });
+
+createUnplatedTargetSizeIcons();
 
 const manifestSource = path.join(repoRoot, "msix", "Package.appxmanifest");
 const manifestTarget = path.join(outputDir, "Package.appxmanifest");

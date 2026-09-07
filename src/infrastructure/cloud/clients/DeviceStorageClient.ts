@@ -5,16 +5,21 @@ import UserInfoType from "../../../features/sync/model/UserInfoType";
 import { VaultFetchResult } from "../model/VaultFetchResult";
 import type { UploadContent } from "../model/UploadFileParams";
 import { getDateTime } from "../../../shared/utils/Timestamp";
+import { getDesktopDistributionStorageKey } from "../../storage/distributionStorage";
 
 const LOCAL_SYNC_KEY = "LOCAL_SYNC";
 const LOCAL_SYNC_METADATA_KEY = "LOCAL_SYNC_METADATA";
+
+const getLocalSyncKey = () => getDesktopDistributionStorageKey(LOCAL_SYNC_KEY);
+const getLocalSyncMetadataKey = () =>
+  getDesktopDistributionStorageKey(LOCAL_SYNC_METADATA_KEY);
 
 type LocalSyncMetadata = {
   updatedAt?: string;
 };
 
 const readLocalSyncMetadata = async (): Promise<LocalSyncMetadata | null> => {
-  const raw = await AsyncStorage.getItem(LOCAL_SYNC_METADATA_KEY);
+  const raw = await AsyncStorage.getItem(getLocalSyncMetadataKey());
   if (!raw) return null;
 
   try {
@@ -36,10 +41,11 @@ export const fetchUserInfo = async (
 
 export const fetchFile = async (): Promise<VaultFetchResult> => {
   try {
-    const data = await AsyncStorage.getItem(LOCAL_SYNC_KEY);
+    const localSyncKey = getLocalSyncKey();
+    const data = await AsyncStorage.getItem(localSyncKey);
 
     if (!data) {
-      logger.info(`[LocalSync] No local file found for key "${LOCAL_SYNC_KEY}"`);
+      logger.info(`[LocalSync] No local file found for key "${localSyncKey}"`);
       return { status: "not_found" };
     }
 
@@ -73,10 +79,11 @@ export const uploadFile = async (
 ): Promise<void> => {
   try {
     const toStore = typeof content === "string" ? content : JSON.stringify(content);
-    await AsyncStorage.setItem(LOCAL_SYNC_KEY, toStore);
+    const localSyncKey = getLocalSyncKey();
+    await AsyncStorage.setItem(localSyncKey, toStore);
     try {
       await AsyncStorage.setItem(
-        LOCAL_SYNC_METADATA_KEY,
+        getLocalSyncMetadataKey(),
         JSON.stringify({ updatedAt: getDateTime() } satisfies LocalSyncMetadata),
       );
     } catch (metadataError) {
@@ -85,7 +92,7 @@ export const uploadFile = async (
     onCompleted?.();
   } catch (error) {
     logger.error(
-      `[LocalSync] Error writing file "${LOCAL_SYNC_KEY}" to local storage:`,
+      `[LocalSync] Error writing file "${getLocalSyncKey()}" to local storage:`,
       error
     );
     triggerGlobalError({
@@ -99,8 +106,8 @@ export const uploadFile = async (
 
 export const removeFile = async (): Promise<void> => {
   try {
-    await AsyncStorage.removeItem(LOCAL_SYNC_KEY);
-    await AsyncStorage.removeItem(LOCAL_SYNC_METADATA_KEY);
+    await AsyncStorage.removeItem(getLocalSyncKey());
+    await AsyncStorage.removeItem(getLocalSyncMetadataKey());
   } catch (error) {
     logger.error(
       `[LocalSync] Error removing file "${LOCAL_SYNC_KEY}" from local storage:`,
