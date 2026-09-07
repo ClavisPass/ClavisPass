@@ -4,6 +4,7 @@ import * as Updates from "expo-updates";
 import type { Update as UpdateProp } from "@tauri-apps/plugin-updater";
 import { ActivityIndicator, Button, Icon, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../app/providers/ThemeProvider";
 import {
   publishUpdateCheck,
@@ -36,6 +37,7 @@ function formatUpdateErrorMessage(fallback: string, error: unknown) {
 const UpdateManager = () => {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
+  const insets = useSafeAreaInsets();
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [updateMessage, setUpdateMessage] = useState("");
   const [getContentLength, setContentlength] = useState<number | undefined>(
@@ -223,11 +225,14 @@ const UpdateManager = () => {
 
   if (!updateAvailable) return null;
 
+  const bottomInset = Platform.OS === "android" ? Math.max(insets.bottom, 8) : 0;
+
   return (
     <View
       style={{
         width: "100%",
         backgroundColor: theme.colors.background,
+        paddingBottom: bottomInset,
       }}
     >
       <View

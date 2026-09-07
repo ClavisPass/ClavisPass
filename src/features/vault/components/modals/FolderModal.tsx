@@ -78,7 +78,13 @@ function FolderModal(props: Props) {
     const newFolder: FolderType[] = props.folder.filter(
       (item: FolderType) => item.id !== folder.id
     );
-    applyFolders(newFolder);
+    vault.update((draft) => {
+      draft.folder = newFolder;
+      draft.values = (draft.values ?? []).map((entry) =>
+        entry.folder?.id === folder.id ? { ...entry, folder: null } : entry
+      );
+    });
+    props.setSelectedFolder?.(null);
   };
 
   const addFolder = () => {
