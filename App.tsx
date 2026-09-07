@@ -53,6 +53,7 @@ import {
   createDemoVault,
   DEMO_MASTER_PASSWORD,
 } from "./src/features/demo/demoVault";
+import showMainWindow from "./src/infrastructure/platform/showMainWindow";
 
 applyStartupDocumentBackground();
 
@@ -247,6 +248,7 @@ function AppShell() {
 
   return (
     <>
+      <MainWindowReadySignal />
       <DropdownLayer />
       <I18nBridge />
       <OnlineProvider>
@@ -290,6 +292,21 @@ function AppShell() {
       </OnlineProvider>
     </>
   );
+}
+
+function MainWindowReadySignal() {
+  const reportedRef = useRef(false);
+
+  useEffect(() => {
+    if (reportedRef.current) return;
+    reportedRef.current = true;
+
+    void showMainWindow().catch((error) => {
+      logger.warn("Failed to show main window after startup:", error);
+    });
+  }, []);
+
+  return null;
 }
 
 function DemoBootstrap() {

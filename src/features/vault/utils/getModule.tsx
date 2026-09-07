@@ -78,7 +78,7 @@ type RenderableModules = Exclude<
 
 type GetModuleArgs = {
   onDragStart?: () => void;
-  deleteModule: (id: string) => void;
+  deleteModule?: (id: string) => void;
   changeModule: (module: ModuleType) => void;
   fastAccess: FastAccessType | null;
   navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>;
@@ -447,7 +447,7 @@ const MODULE_RENDERERS = {
 function getModule(
   module: ModuleType,
   onDragStart: (() => void) | undefined,
-  deleteModule: (id: string) => void,
+  deleteModule: ((id: string) => void) | undefined,
   changeModule: (module: ModuleType) => void,
   fastAccess: FastAccessType | null,
   navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>,

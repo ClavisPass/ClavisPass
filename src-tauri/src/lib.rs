@@ -162,8 +162,10 @@ fn get_requested_vault_file_path(args: &[String]) -> Option<String> {
         .next()
 }
 
-fn emit_vault_file_open_request(app: AppHandle<tauri::Wry>, path: String) {
-    show_main_window(&app);
+fn emit_vault_file_open_request(app: AppHandle<tauri::Wry>, path: String, reveal_window: bool) {
+    if reveal_window {
+        show_main_window(&app);
+    }
 
     std::thread::spawn(move || {
         for delay_ms in [250, 900, 1800] {
@@ -245,7 +247,7 @@ pub fn run() {
             }
 
             if let Some(path) = get_requested_vault_file_path(&args) {
-                emit_vault_file_open_request(app.clone(), path);
+                emit_vault_file_open_request(app.clone(), path, true);
             }
         }))
         .plugin(tauri_plugin_process::init())
@@ -277,7 +279,6 @@ pub fn run() {
             let app_handle = app.handle().clone();
             let requested_vault_file_path =
                 get_requested_vault_file_path(&std::env::args().collect::<Vec<_>>());
-            let started_hidden = std::env::args().any(|arg| arg == "--hidden");
             let requested_size = load_window_size(app.handle()).unwrap_or(WindowSize {
                 width: DEFAULT_WINDOW_WIDTH,
                 height: DEFAULT_WINDOW_HEIGHT,
@@ -325,13 +326,9 @@ pub fn run() {
                 size.height,
             )));
             let _ = main_window.center();
-            if !started_hidden {
-                let _ = main_window.show();
-                let _ = main_window.set_focus();
-            }
 
             if let Some(path) = requested_vault_file_path {
-                emit_vault_file_open_request(app_handle.clone(), path);
+                emit_vault_file_open_request(app_handle.clone(), path, false);
             }
 
             #[cfg(desktop)]

@@ -219,28 +219,30 @@ export function EditRowControlsContainer({
         {children}
       </View>
 
-      <View
-        pointerEvents="box-none"
-        style={{
-          position: "absolute",
-          top: 6,
-          right: 1,
-          width: DELETE_BUTTON_ZONE,
-          alignItems: "center",
-          justifyContent: "flex-start",
-        }}
-      >
-        <TooltipIconButton
-          tooltip={t("common:removeModule")}
-          style={{ margin: 0, width: 24, height: 24 }}
-          selected
-          mode="contained-tonal"
-          icon="close"
-          size={12}
-          onPress={() => onDelete?.(id)}
-          tabIndex={-1 as any}
-        />
-      </View>
+      {onDelete ? (
+        <View
+          pointerEvents="box-none"
+          style={{
+            position: "absolute",
+            top: 6,
+            right: 1,
+            width: DELETE_BUTTON_ZONE,
+            alignItems: "center",
+            justifyContent: "flex-start",
+          }}
+        >
+          <TooltipIconButton
+            tooltip={t("common:removeModule")}
+            style={{ margin: 0, width: 24, height: 24 }}
+            selected
+            mode="contained-tonal"
+            icon="close"
+            size={12}
+            onPress={() => onDelete(id)}
+            tabIndex={-1 as any}
+          />
+        </View>
+      ) : null}
     </Animated.View>
   );
 

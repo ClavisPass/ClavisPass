@@ -3,7 +3,7 @@ import { Platform, View, useWindowDimensions } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import type { RenderItemParams } from "react-native-draggable-flatlist";
-import { Icon, IconButton, Text } from "react-native-paper";
+import { Button, Icon, Text } from "react-native-paper";
 import Constants from "expo-constants";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
@@ -349,40 +349,51 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
               {
                 flexDirection: "row",
                 alignItems: "center",
-                gap: 4,
+                gap: 6,
                 zIndex: 10,
               },
               webNoDragStyle,
             ]}
           >
-            <IconButton
+            <Button
               accessibilityLabel={t("common:cancel")}
-              icon="close"
-              iconColor="white"
-              size={22}
+              mode="text"
+              compact
+              textColor="white"
               onPress={() => navigation.goBack()}
               style={[
-                { margin: 0, width: 36, height: 36, zIndex: 11 },
+                {
+                  margin: 0,
+                  borderRadius: 12,
+                  zIndex: 11,
+                  cursor: "pointer",
+                } as any,
                 webNoDragStyle,
               ]}
-            />
-            <IconButton
+              labelStyle={{ marginHorizontal: 8, marginVertical: 4 }}
+            >
+              {t("common:cancel")}
+            </Button>
+            <Button
               accessibilityLabel={t("common:apply")}
-              icon="check"
-              iconColor="white"
-              size={22}
+              mode="contained-tonal"
+              compact
+              textColor="white"
               onPress={applyChanges}
               style={[
                 {
                   margin: 0,
-                  width: 36,
-                  height: 36,
                   zIndex: 11,
                   backgroundColor: "rgba(255, 255, 255, 0.18)",
-                },
+                  borderRadius: 12,
+                  cursor: "pointer",
+                } as any,
                 webNoDragStyle,
               ]}
-            />
+              labelStyle={{ marginHorizontal: 10, marginVertical: 4 }}
+            >
+              {t("common:save")}
+            </Button>
           </View>
         </View>
       </LinearGradient>

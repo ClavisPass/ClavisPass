@@ -3,7 +3,7 @@ import { Platform, StyleSheet, View, useWindowDimensions } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import type { RenderItemParams } from "react-native-draggable-flatlist";
-import { Icon, IconButton, Text } from "react-native-paper";
+import { Button, Icon, Text } from "react-native-paper";
 import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
 import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
@@ -12,16 +12,14 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "../app/providers/ThemeProvider";
 import { HomeStackParamList } from "../app/navigation/model/types";
 import ModulesType, { ModuleType } from "../features/vault/model/ModulesType";
-import { MODULE_ICON } from "../features/vault/model/ModuleIconsEnum";
-import ModulesEnum from "../features/vault/model/ModulesEnum";
-import getModuleNameByEnum from "../features/vault/utils/getModuleNameByEnum";
+import { WebDragHandlePropsProvider } from "../features/vault/components/EditRowControlsContainer";
+import getModule from "../features/vault/utils/getModule";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import {
   TITLEBAR_CONTROLS_WIDTH,
   TITLEBAR_HEIGHT,
 } from "../shared/components/titlebarMetrics";
 import getColors from "../shared/ui/linearGradient";
-import AnimatedPressable from "../shared/components/AnimatedPressable";
 import { useSetting } from "../app/providers/SettingsProvider";
 import { resolveWindowControlsSide } from "../infrastructure/platform/windowControls";
 
@@ -31,28 +29,10 @@ type ModuleReorderScreenProps = NativeStackScreenProps<
 >;
 
 const styles = StyleSheet.create({
-  item: {
-    height: 44,
-    marginHorizontal: 8,
-    marginBottom: 4,
-    borderRadius: 12,
-    overflow: "hidden",
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  dragHandle: {
-    width: 32,
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  content: {
-    flex: 1,
-    minWidth: 0,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 10,
+  readOnlyOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    left: 29,
+    backgroundColor: "transparent",
   },
 });
 const webNoDragStyle =
@@ -118,6 +98,7 @@ export default function ModuleReorderScreen({
   const controlsLeft =
     resolveWindowControlsSide(windowControlsStyle) === "left";
   const [items, setItems] = useState<ModulesType>(route.params.modules);
+  const ignoreModuleChange = useCallback(() => {}, []);
 
   const headerTop =
     Constants.statusBarHeight + (TITLEBAR_HEIGHT > 0 ? 4 : 6);
@@ -149,87 +130,35 @@ export default function ModuleReorderScreen({
   const renderModuleItem = useCallback(
     (
       item: ModuleType,
-      index: number,
       onDragStart?: () => void,
       dragHandleProps?: any,
     ) => {
-      const moduleKind = (item.module ?? ModulesEnum.UNKNOWN) as ModulesEnum;
-      const icon = MODULE_ICON[moduleKind] ?? MODULE_ICON[ModulesEnum.UNKNOWN];
-      const label = getModuleNameByEnum(moduleKind, t);
-      const dragIconColor = darkmode
-        ? theme.colors.outline
-        : theme.colors.outlineVariant;
-
-      const dragHandle = Platform.OS === "web" ? (
-        <div
-          {...(dragHandleProps ?? {})}
-          style={{
-            width: 32,
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "grab",
-            touchAction: "none",
-            userSelect: "none",
-          }}
-        >
-          <Icon source="drag" size={20} color={dragIconColor} />
-        </div>
-      ) : (
-        <AnimatedPressable
-          borderless={false}
-          rippleColor="rgba(0, 0, 0, .12)"
-          onPressIn={onDragStart}
-          style={styles.dragHandle}
-        >
-          <Icon source="drag" size={20} color={dragIconColor} />
-        </AnimatedPressable>
+      const moduleNode = getModule(
+        item,
+        onDragStart,
+        undefined,
+        ignoreModuleChange,
+        null,
+        navigation as any,
+        "",
       );
 
-      return (
-        <View
-          style={[
-            styles.item,
-            {
-              backgroundColor: theme.colors.background,
-              boxShadow: theme.colors.shadow,
-              borderColor: darkmode ? theme.colors.outlineVariant : "white",
-              borderWidth: StyleSheet.hairlineWidth,
-            },
-          ]}
-        >
-          {dragHandle}
-          <View
-            style={{
-              width: StyleSheet.hairlineWidth,
-              height: "100%",
-              backgroundColor: darkmode
-                ? theme.colors.outlineVariant
-                : theme.colors.outline,
-              opacity: darkmode ? 1 : 0.28,
-            }}
-          />
-          <View style={styles.content}>
-            <Icon source={icon} size={20} color={theme.colors.primary} />
-            <Text
-              variant="bodyMedium"
-              numberOfLines={1}
-              style={{ flex: 1, userSelect: "none" }}
-            >
-              {label}
-            </Text>
-            <Text
-              variant="labelSmall"
-              style={{ opacity: 0.55, userSelect: "none" }}
-            >
-              {index + 1}
-            </Text>
-          </View>
+      const content = (
+        <View style={{ position: "relative", width: "100%" }}>
+          {moduleNode}
+          <View pointerEvents="auto" style={styles.readOnlyOverlay} />
         </View>
       );
+
+      if (Platform.OS !== "web") return content;
+
+      return (
+        <WebDragHandlePropsProvider dragHandleProps={dragHandleProps}>
+          {content}
+        </WebDragHandlePropsProvider>
+      );
     },
-    [darkmode, t, theme.colors],
+    [ignoreModuleChange, navigation],
   );
 
   const webList = useMemo(() => {
@@ -276,7 +205,6 @@ export default function ModuleReorderScreen({
                     >
                       {renderModuleItem(
                         item,
-                        index,
                         undefined,
                         draggableProvided.dragHandleProps,
                       )}
@@ -310,8 +238,8 @@ export default function ModuleReorderScreen({
         windowSize={7}
         removeClippedSubviews
         contentContainerStyle={{ paddingTop: 4 }}
-        renderItem={({ item, getIndex, drag }: RenderItemParams<ModuleType>) =>
-          renderModuleItem(item, getIndex?.() ?? 0, drag)
+        renderItem={({ item, drag }: RenderItemParams<ModuleType>) =>
+          renderModuleItem(item, drag)
         }
         onDragEnd={({ data }: { data: ModulesType }) => setItems(data)}
       />
@@ -413,40 +341,51 @@ export default function ModuleReorderScreen({
               {
                 flexDirection: "row",
                 alignItems: "center",
-                gap: 4,
+                gap: 6,
                 zIndex: 10,
               },
               webNoDragStyle,
             ]}
           >
-            <IconButton
+            <Button
               accessibilityLabel={t("common:cancel")}
-              icon="close"
-              iconColor="white"
-              size={22}
+              mode="text"
+              compact
+              textColor="white"
               onPress={() => navigation.goBack()}
               style={[
-                { margin: 0, width: 36, height: 36, zIndex: 11 },
+                {
+                  margin: 0,
+                  borderRadius: 12,
+                  zIndex: 11,
+                  cursor: "pointer",
+                } as any,
                 webNoDragStyle,
               ]}
-            />
-            <IconButton
+              labelStyle={{ marginHorizontal: 8, marginVertical: 4 }}
+            >
+              {t("common:cancel")}
+            </Button>
+            <Button
               accessibilityLabel={t("common:apply")}
-              icon="check"
-              iconColor="white"
-              size={22}
+              mode="contained-tonal"
+              compact
+              textColor="white"
               onPress={applyChanges}
               style={[
                 {
                   margin: 0,
-                  width: 36,
-                  height: 36,
                   zIndex: 11,
                   backgroundColor: "rgba(255, 255, 255, 0.18)",
-                },
+                  borderRadius: 12,
+                  cursor: "pointer",
+                } as any,
                 webNoDragStyle,
               ]}
-            />
+              labelStyle={{ marginHorizontal: 10, marginVertical: 4 }}
+            >
+              {t("common:save")}
+            </Button>
           </View>
         </View>
       </LinearGradient>
