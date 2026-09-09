@@ -98,7 +98,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       setIsUnlocked(true);
       refresh();
     },
-    [refresh]
+    [refresh],
   );
 
   const lock = useCallback(() => {
@@ -117,7 +117,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       if (!entry) return null;
       return getSecretFor(entry, module);
     },
-    []
+    [],
   );
 
   const getSecretValue = useCallback(
@@ -125,7 +125,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       const payload = getSecretPayload(entryId, module);
       return typeof payload === "string" ? payload : null;
     },
-    [getSecretPayload]
+    [getSecretPayload],
   );
 
   const upsertEntry = useCallback(
@@ -134,7 +134,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       bumpRevision();
       refresh();
     },
-    [bumpRevision, refresh]
+    [bumpRevision, refresh],
   );
 
   const deleteEntry = useCallback(
@@ -143,7 +143,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       bumpRevision();
       refresh();
     },
-    [bumpRevision, refresh]
+    [bumpRevision, refresh],
   );
 
   const exportFullData = useCallback(() => VaultSession.exportFullData(), []);
@@ -169,6 +169,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
         ...snapshot,
         folder: [...(snapshot.folder ?? [])],
         values: [...(snapshot.values ?? [])],
+        deletedEntries: [...(snapshot.deletedEntries ?? [])],
         devices: [...(snapshot.devices ?? [])], // ✅ NEW
       };
 
@@ -185,7 +186,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       bumpRevision();
       refresh();
     },
-    [bumpRevision, isUnlocked, refresh]
+    [bumpRevision, isUnlocked, refresh],
   );
 
   const setFolders = useCallback(
@@ -194,7 +195,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
         draft.folder = nextFolders;
       });
     },
-    [update]
+    [update],
   );
 
   const value = useMemo<VaultContextType>(
@@ -237,7 +238,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       exportFullData,
       getRevision,
       markSaved,
-    ]
+    ],
   );
 
   return (

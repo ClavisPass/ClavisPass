@@ -8,6 +8,7 @@ function vaultData(): VaultDataType {
     version: "1",
     folder: [{ id: "folder-1", name: "Private" }],
     devices: [],
+    deletedEntries: [],
     values: [
       {
         id: "entry-1",
@@ -41,7 +42,9 @@ describe("VaultSession", () => {
     expect(VaultSession.isUnlocked()).toBe(true);
     expect(VaultSession.isDirty()).toBe(false);
     expect(VaultSession.getValues()).toHaveLength(1);
-    expect(VaultSession.getFolders()).toEqual([{ id: "folder-1", name: "Private" }]);
+    expect(VaultSession.getFolders()).toEqual([
+      { id: "folder-1", name: "Private" },
+    ]);
   });
 
   it("marks the session dirty when entries change and clean after save", () => {
@@ -78,7 +81,13 @@ describe("VaultSession", () => {
     VaultSession.deleteEntry("entry-1");
 
     expect(VaultSession.getEntry("entry-1")).toBeNull();
-    expect(VaultSession.getValues().map((value) => value.id)).toEqual(["entry-2"]);
+    expect(VaultSession.getValues().map((value) => value.id)).toEqual([
+      "entry-2",
+    ]);
+    expect(VaultSession.exportFullData().deletedEntries).toHaveLength(1);
+    expect(VaultSession.exportFullData().deletedEntries?.[0].id).toBe(
+      "entry-1",
+    );
   });
 
   it("throws for writes while locked", () => {

@@ -6,6 +6,7 @@ function getEmptyData() {
     folder: [],
     values: [],
     devices: [],
+    deletedEntries: [],
   };
   return data;
 }

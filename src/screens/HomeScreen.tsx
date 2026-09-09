@@ -16,13 +16,7 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
-import {
-  Button,
-  Chip,
-  Icon,
-  IconButton,
-  Searchbar,
-} from "react-native-paper";
+import { Button, Chip, Icon, IconButton, Searchbar } from "react-native-paper";
 
 import { Text } from "react-native-paper";
 
@@ -82,6 +76,10 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { HomeStackParamList } from "../app/navigation/model/types";
 import { decryptVaultContent } from "../infrastructure/crypto/decryptVaultContent";
 import { extractUrlFromEntry } from "../features/vault/utils/digitalCardTheme";
+import {
+  areVaultDataEqual,
+  mergeVaultData,
+} from "../features/vault/utils/mergeVaultData";
 import ExpiryOverviewModal from "../features/vault/components/modals/ExpiryOverviewModal";
 import ModuleFilterModal from "../features/vault/components/modals/ModuleFilterModal";
 import type ExpiryModuleType from "../features/vault/model/modules/ExpiryModuleType";
@@ -359,11 +357,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     return () => {
       setTitlebarCenterGap(0);
     };
-  }, [
-    isFocused,
-    setTitlebarCenterGap,
-    setTitlebarOverlayDragEnabled,
-  ]);
+  }, [isFocused, setTitlebarCenterGap, setTitlebarOverlayDragEnabled]);
 
   useEffect(() => {
     if (Platform.OS !== "web") return;
@@ -442,12 +436,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           : [...current, module],
       );
     },
-    [
-      selectedModuleFilters,
-      setSelectedCard,
-      setSelected2FA,
-      setSelectedFav,
-    ],
+    [selectedModuleFilters, setSelectedCard, setSelected2FA, setSelectedFav],
   );
 
   const removeModuleFilter = useCallback((module: ModulesEnum) => {
@@ -628,7 +617,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const hasCardEntries = useMemo(
     () =>
       (vaultData?.values ?? []).some((item) =>
-        item.modules.some((module) => module.module === ModulesEnum.DIGITAL_CARD),
+        item.modules.some(
+          (module) => module.module === ModulesEnum.DIGITAL_CARD,
+        ),
       ),
     [vaultData],
   );
@@ -721,8 +712,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       const meta = buildEntryMeta(item);
       const domain = getDomain(meta.url);
       const tagScores =
-        meta.tags?.map((tag) => scoreField(tag, normalizedQuery, 38, 42)) ??
-        [];
+        meta.tags?.map((tag) => scoreField(tag, normalizedQuery, 38, 42)) ?? [];
 
       const scores = [
         scoreField(item.title, normalizedQuery, 0, 10),
@@ -753,7 +743,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         if (pinned !== 0) return pinned;
         return a._relevance - b._relevance;
       });
-  }, [vaultData, searchQuery, selectedFolder, selectedFav, selectedModuleFilters]);
+  }, [
+    vaultData,
+    searchQuery,
+    selectedFolder,
+    selectedFav,
+    selectedModuleFilters,
+  ]);
 
   const reorderValues = useMemo(() => {
     const values = vaultData?.values ?? [];
@@ -763,7 +759,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     if (selectedCard) {
       return orderPinnedFirst(
         values.filter((item) =>
-          item.modules.some((module) => module.module === ModulesEnum.DIGITAL_CARD),
+          item.modules.some(
+            (module) => module.module === ModulesEnum.DIGITAL_CARD,
+          ),
         ),
       );
     }
@@ -949,8 +947,32 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         return;
       }
 
-      vault.unlockWithDecryptedVault(decrypted.payload);
-      vault.markSaved();
+      const localVault = vault.exportFullData();
+      const mergeResult = mergeVaultData(localVault, decrypted.payload, {
+        sameTimestampConflictStrategy: "keepRemote",
+      });
+
+      if (areVaultDataEqual(mergeResult.vault, localVault)) {
+        vault.markSaved();
+      } else {
+        vault.update((draft) => {
+          draft.version = mergeResult.vault.version;
+          draft.folder = mergeResult.vault.folder ?? [];
+          draft.values = mergeResult.vault.values ?? [];
+          draft.devices = mergeResult.vault.devices ?? [];
+          draft.deletedEntries = mergeResult.vault.deletedEntries ?? [];
+        });
+
+        if (areVaultDataEqual(mergeResult.vault, decrypted.payload)) {
+          vault.markSaved();
+        }
+      }
+
+      if (mergeResult.summary.conflicts.length > 0) {
+        logger.warn("[Home] Vault refresh merge created conflict copies.", {
+          conflicts: mergeResult.summary.conflicts.length,
+        });
+      }
 
       setSelectedFolder(null);
       saveSelectedFavState(false);
@@ -1024,11 +1046,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   const renderValueItem = useCallback(
     ({ item, index }: { item: ValuesType; index: number }) => (
-      <HomeValueListItem
-        item={item}
-        index={index}
-        onPress={openEditScreen}
-      />
+      <HomeValueListItem item={item} index={index} onPress={openEditScreen} />
     ),
     [openEditScreen],
   );
@@ -1422,19 +1440,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                       onBlur={handleCompactSearchBlur}
                       returnKeyType="search"
                       selectionColor={theme.colors.primary}
-                      style={{
-                        flex: 1,
-                        height: 32,
-                        minHeight: 32,
-                        padding: 0,
-                        paddingHorizontal: 8,
-                        color: "white",
-                        fontSize: 16,
-                        lineHeight: 18,
-                        textAlignVertical: "center",
-                        includeFontPadding: false,
-                        outlineStyle: "none",
-                      } as any}
+                      style={
+                        {
+                          flex: 1,
+                          height: 32,
+                          minHeight: 32,
+                          padding: 0,
+                          paddingHorizontal: 8,
+                          color: "white",
+                          fontSize: 16,
+                          lineHeight: 18,
+                          textAlignVertical: "center",
+                          includeFontPadding: false,
+                          outlineStyle: "none",
+                        } as any
+                      }
                     />
                     {searchQuery ? (
                       <IconButton
@@ -1557,7 +1577,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               {isCompactHeader ? (
                 <IconButton
                   accessibilityLabel={
-                    searchHeaderVisible ? t("home:closeSearch") : t("home:search")
+                    searchHeaderVisible
+                      ? t("home:closeSearch")
+                      : t("home:search")
                   }
                   icon={searchHeaderVisible ? "close" : "magnify"}
                   iconColor="white"

@@ -34,6 +34,7 @@ const demoVault: VaultDataType = {
   version: "1",
   folder: folders,
   devices: [],
+  deletedEntries: [],
   values: [
     {
       id: "demo-entry-github",

@@ -33,7 +33,7 @@ const readLocalSyncMetadata = async (): Promise<LocalSyncMetadata | null> => {
 export const fetchUserInfo = async (
   _token: string,
   setUserInfo: (data: UserInfoType) => void,
-  callback?: () => void
+  callback?: () => void,
 ): Promise<void> => {
   setUserInfo(null);
   callback?.();
@@ -75,25 +75,31 @@ export const fetchFile = async (): Promise<VaultFetchResult> => {
 
 export const uploadFile = async (
   content: UploadContent,
-  onCompleted?: () => void
+  onCompleted?: () => void,
 ): Promise<void> => {
   try {
-    const toStore = typeof content === "string" ? content : JSON.stringify(content);
+    const toStore =
+      typeof content === "string" ? content : JSON.stringify(content);
     const localSyncKey = getLocalSyncKey();
     await AsyncStorage.setItem(localSyncKey, toStore);
     try {
       await AsyncStorage.setItem(
         getLocalSyncMetadataKey(),
-        JSON.stringify({ updatedAt: getDateTime() } satisfies LocalSyncMetadata),
+        JSON.stringify({
+          updatedAt: getDateTime(),
+        } satisfies LocalSyncMetadata),
       );
     } catch (metadataError) {
-      logger.warn("[LocalSync] Error writing local sync metadata:", metadataError);
+      logger.warn(
+        "[LocalSync] Error writing local sync metadata:",
+        metadataError,
+      );
     }
     onCompleted?.();
   } catch (error) {
     logger.error(
       `[LocalSync] Error writing file "${getLocalSyncKey()}" to local storage:`,
-      error
+      error,
     );
     triggerGlobalError({
       title: "LocalSync",
@@ -111,9 +117,8 @@ export const removeFile = async (): Promise<void> => {
   } catch (error) {
     logger.error(
       `[LocalSync] Error removing file "${LOCAL_SYNC_KEY}" from local storage:`,
-      error
+      error,
     );
     throw new Error("Error removing file from local device storage");
   }
 };
-

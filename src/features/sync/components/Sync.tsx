@@ -9,7 +9,10 @@ import { useOnline } from "../../../app/providers/OnlineProvider";
 import { useToken } from "../../../app/providers/CloudProvider";
 
 import { getDateTime } from "../../../shared/utils/Timestamp";
-import { uploadRemoteVaultFile } from "../../../infrastructure/cloud/clients/CloudStorageClient";
+import {
+  fetchRemoteVaultFile,
+  uploadRemoteVaultFile,
+} from "../../../infrastructure/cloud/clients/CloudStorageClient";
 import { logger } from "../../../infrastructure/logging/logger";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 import { useVault } from "../../../app/providers/VaultProvider";
@@ -21,6 +24,12 @@ import {
 } from "../../vault/utils/deviceInfo";
 import { encryptVaultContent } from "../../../infrastructure/crypto/encryptVaultContent";
 import { useSetting } from "../../../app/providers/SettingsProvider";
+import { decryptVaultContent } from "../../../infrastructure/crypto/decryptVaultContent";
+import {
+  areVaultDataEqual,
+  mergeVaultData,
+} from "../../vault/utils/mergeVaultData";
+import VaultDataType from "../../vault/model/VaultDataType";
 
 type Props = {
   refreshing: boolean;
@@ -43,7 +52,9 @@ const Sync = (props: Props) => {
 
   const showSync = vault.dirty || refreshing;
   const syncHeight = 40 + bottomPadding;
-  const slideAnim = useRef(new Animated.Value(showSync ? syncHeight : 0)).current;
+  const slideAnim = useRef(
+    new Animated.Value(showSync ? syncHeight : 0),
+  ).current;
   const fadeAnim = useRef(new Animated.Value(showSync ? 1 : 0)).current;
   const saveInFlightRef = useRef(false);
   const saveAgainAfterCurrentRef = useRef(false);
@@ -55,6 +66,19 @@ const Sync = (props: Props) => {
     null,
   );
   const [renderSync, setRenderSync] = useState(showSync);
+
+  const applyMergedVault = useCallback(
+    (mergedVault: VaultDataType) => {
+      vault.update((draft) => {
+        draft.version = mergedVault.version;
+        draft.folder = mergedVault.folder ?? [];
+        draft.values = mergedVault.values ?? [];
+        draft.devices = mergedVault.devices ?? [];
+        draft.deletedEntries = mergedVault.deletedEntries ?? [];
+      });
+    },
+    [vault],
+  );
 
   useEffect(() => {
     if (showSync) setRenderSync(true);
@@ -115,11 +139,47 @@ const Sync = (props: Props) => {
       );
     });
 
-    const payloadRevision = vault.getRevision();
-    const payload = vault.exportFullData();
+    let payloadRevision = vault.getRevision();
+    let payload = vault.exportFullData();
     const master = auth.getMaster();
     if (!master)
       throw new Error("[Sync] Missing master password in auth context");
+
+    const remote = await fetchRemoteVaultFile({
+      provider,
+      accessToken: tokenToUse,
+      remotePath: "clavispass.lock",
+    });
+
+    if (remote.status === "error") {
+      throw new Error(`[Sync] Failed to fetch remote vault: ${remote.message}`);
+    }
+
+    if (remote.status === "ok") {
+      const decryptedRemote = await decryptVaultContent(remote.content, master);
+
+      if (!decryptedRemote.ok) {
+        throw new Error(
+          `[Sync] Failed to decrypt remote vault before merge: ${decryptedRemote.reason}`,
+        );
+      }
+
+      const mergeResult = mergeVaultData(payload, decryptedRemote.payload, {
+        sameTimestampConflictStrategy: "keepRemote",
+      });
+
+      if (!areVaultDataEqual(mergeResult.vault, payload)) {
+        applyMergedVault(mergeResult.vault);
+        payloadRevision = vault.getRevision();
+        payload = mergeResult.vault;
+      }
+
+      if (mergeResult.summary.conflicts.length > 0) {
+        logger.warn("[Sync] Vault merge created conflict copies.", {
+          conflicts: mergeResult.summary.conflicts.length,
+        });
+      }
+    }
 
     const result = await encryptVaultContent(payload, master, {
       lastUpdated: iso,
@@ -140,7 +200,14 @@ const Sync = (props: Props) => {
     logger.info("[Sync] Remote vault upload completed.");
 
     return payloadRevision;
-  }, [accessToken, auth, ensureFreshAccessToken, provider, vault]);
+  }, [
+    accessToken,
+    applyMergedVault,
+    auth,
+    ensureFreshAccessToken,
+    provider,
+    vault,
+  ]);
 
   const requestSave = useCallback(async () => {
     if (!vault.isUnlocked) return;
@@ -225,10 +292,9 @@ const Sync = (props: Props) => {
 
   const shouldShowAutosaveCountdown =
     autosaveRemaining !== null && autosaveRemaining <= 5;
-  const saveLabel =
-    shouldShowAutosaveCountdown
-      ? `${t("common:save")} (${autosaveRemaining}s)`
-      : t("common:save");
+  const saveLabel = shouldShowAutosaveCountdown
+    ? `${t("common:save")} (${autosaveRemaining}s)`
+    : t("common:save");
 
   return (
     <Animated.View

@@ -3,6 +3,7 @@ import ValuesType from "../model/ValuesType";
 import VaultDataType from "../model/VaultDataType";
 import VaultDeviceType from "../model/VaultDeviceType";
 import VaultSessionState from "../model/VaultSessionState";
+import { getDateTime } from "../../../shared/utils/Timestamp";
 
 let session: VaultSessionState | null = null;
 
@@ -77,9 +78,21 @@ export const VaultSession = {
   deleteEntry(id: string) {
     if (!session) throw new Error("Vault locked");
 
+    const existing = session.data.values.find((v: any) => v.id === id);
+    if (!existing) return;
+
     session.data = {
       ...session.data,
       values: session.data.values.filter((v: any) => v.id !== id),
+      deletedEntries: [
+        ...(session.data.deletedEntries ?? []).filter(
+          (tombstone) => tombstone.id !== id,
+        ),
+        {
+          id,
+          deletedAt: getDateTime(),
+        },
+      ],
     };
     session.dirty = true;
   },
