@@ -100,7 +100,7 @@ export default function LeftSideTabBar({
           borderColor: theme.colors.outlineVariant,
           backgroundColor: theme.colors.background,
           justifyContent: "space-between",
-          paddingBottom:0,
+          paddingBottom: 0,
         },
       ]}
     >

@@ -44,7 +44,7 @@ export default function TabNavigator() {
           tabBarLabel: "Home",
           title: "Home",
           tabBarIcon: ({ color, size }) => (
-            <Icon name="home" size={size} color={color} />
+            <Icon name="home-outline" size={size} color={color} />
           ),
         }}
       />
@@ -56,7 +56,7 @@ export default function TabNavigator() {
           tabBarLabel: "Analysis",
           title: "Analysis",
           tabBarIcon: ({ color, size }) => (
-            <Icon name="shield-search" size={size} color={color} />
+            <Icon name="clipboard-search-outline" size={size} color={color} />
           ),
         }}
       />
@@ -80,7 +80,7 @@ export default function TabNavigator() {
           tabBarLabel: "Settings",
           title: "Settings",
           tabBarIcon: ({ color, size }) => (
-            <Icon name="tune-variant" size={size} color={color} />
+            <Icon name="cog-outline" size={size} color={color} />
           ),
         }}
       />

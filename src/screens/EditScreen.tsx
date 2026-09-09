@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Keyboard,
   Platform,
-  ScrollView,
   StyleSheet,
   View,
   InteractionManager,
@@ -159,13 +158,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const [favIcon, setFavIcon] = useState("star-outline");
 
   const didValidateFolderRef = useRef(false);
-  const actionChipScrollRef = useRef<ScrollView>(null);
-  const actionChipOffsetRef = useRef(0);
-  const actionChipTargetOffsetRef = useRef(0);
-  const actionChipAnimationFrameRef = useRef<number | null>(null);
-  const actionChipContentWidthRef = useRef(0);
-  const actionChipViewportWidthRef = useRef(0);
   const moreChipRef = useRef<View>(null);
+  const [actionChipViewportWidth, setActionChipViewportWidth] = useState(0);
+  const [actionChipWidths, setActionChipWidths] = useState<
+    Record<string, number>
+  >({});
 
   const [fastAccessObject, setFastAccessObject] =
     useState<FastAccessType | null>(
@@ -179,101 +176,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       value.folder
     );
   }, [value.folder, vault.folders]);
-
-  const getMaxActionChipOffset = React.useCallback(
-    () =>
-      Math.max(
-        0,
-        actionChipContentWidthRef.current - actionChipViewportWidthRef.current,
-      ),
-    [],
-  );
-
-  const animateActionChipScroll = React.useCallback(() => {
-    const current = actionChipOffsetRef.current;
-    const target = Math.min(
-      actionChipTargetOffsetRef.current,
-      getMaxActionChipOffset(),
-    );
-    const distance = target - current;
-
-    if (Math.abs(distance) < 0.5) {
-      actionChipOffsetRef.current = target;
-      actionChipTargetOffsetRef.current = target;
-      actionChipAnimationFrameRef.current = null;
-      actionChipScrollRef.current?.scrollTo({ animated: false, x: target });
-      return;
-    }
-
-    const next = current + distance * 0.28;
-    actionChipOffsetRef.current = next;
-    actionChipScrollRef.current?.scrollTo({ animated: false, x: next });
-    actionChipAnimationFrameRef.current = window.requestAnimationFrame(
-      animateActionChipScroll,
-    );
-  }, [getMaxActionChipOffset]);
-
-  const startSmoothActionChipScroll = React.useCallback(
-    (targetOffset: number) => {
-      actionChipTargetOffsetRef.current = Math.min(
-        Math.max(0, targetOffset),
-        getMaxActionChipOffset(),
-      );
-
-      if (actionChipAnimationFrameRef.current === null) {
-        actionChipAnimationFrameRef.current = window.requestAnimationFrame(
-          animateActionChipScroll,
-        );
-      }
-    },
-    [animateActionChipScroll, getMaxActionChipOffset],
-  );
-
-  const handleActionChipScroll = React.useCallback((event: any) => {
-    const offset = event?.nativeEvent?.contentOffset?.x ?? 0;
-    actionChipOffsetRef.current = offset;
-    if (actionChipAnimationFrameRef.current === null) {
-      actionChipTargetOffsetRef.current = offset;
-    }
-  }, []);
-
-  const handleActionChipWheel = React.useCallback(
-    (event: any) => {
-      if (Platform.OS !== "web") return;
-
-      const nativeEvent = event?.nativeEvent ?? event;
-      const deltaX = nativeEvent?.deltaX ?? 0;
-      const deltaY = nativeEvent?.deltaY ?? 0;
-      const rawDelta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
-      const deltaMode = nativeEvent?.deltaMode ?? 0;
-      const delta =
-        deltaMode === 1
-          ? rawDelta * 16
-          : deltaMode === 2
-            ? rawDelta * actionChipViewportWidthRef.current
-            : rawDelta;
-      if (!delta) return;
-
-      nativeEvent?.preventDefault?.();
-      startSmoothActionChipScroll(actionChipTargetOffsetRef.current + delta);
-    },
-    [startSmoothActionChipScroll],
-  );
-
-  const actionChipWheelProps =
-    Platform.OS === "web" ? ({ onWheel: handleActionChipWheel } as any) : {};
-
-  useEffect(
-    () => () => {
-      if (
-        Platform.OS === "web" &&
-        actionChipAnimationFrameRef.current !== null
-      ) {
-        window.cancelAnimationFrame(actionChipAnimationFrameRef.current);
-      }
-    },
-    [],
-  );
 
   useFocusEffect(
     React.useCallback(() => {
@@ -766,8 +668,51 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     }
   }, [value, value.fav]);
 
-  const editOverflowItems = React.useMemo<AdaptiveMenuItem[]>(
+  type EditToolbarAction = AdaptiveMenuItem & {
+    chipIcon?: React.ComponentProps<typeof Chip>["icon"];
+  };
+
+  const editSectionSpacing = 4;
+  const actionChipHorizontalPadding = 16;
+  const moreActionKey = "__more";
+
+  const recordActionChipWidth = React.useCallback(
+    (key: string, width: number) => {
+      const roundedWidth = Math.ceil(width);
+      setActionChipWidths((prev) =>
+        prev[key] === roundedWidth ? prev : { ...prev, [key]: roundedWidth },
+      );
+    },
+    [],
+  );
+
+  const editToolbarActions = React.useMemo<EditToolbarAction[]>(
     () => [
+      {
+        key: "addModule",
+        icon: "plus",
+        label: t("common:addModule"),
+        onPress: () => {
+          Keyboard.dismiss();
+          setAddModuleModalVisible(true);
+        },
+      },
+      {
+        key: "reorderModules",
+        icon: "sort",
+        chipIcon: ({ color, size }) => (
+          <VerticalReorderIcon color={color} size={size} />
+        ),
+        disabled: value.modules.length < 2,
+        label: t("home:reorderChip"),
+        onPress: openModuleReorderScreen,
+      },
+      {
+        key: "tags",
+        icon: (value.tags?.length ?? 0) > 0 ? "tag" : "tag-outline",
+        label: t("common:tags"),
+        onPress: () => setTagsModalVisible(true),
+      },
       ...(taskModuleCount > 1
         ? [
             {
@@ -794,12 +739,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         label: value.pinnedAt ? t("common:removePin") : t("common:addPin"),
         onPress: changePin,
       },
-      {
-        key: "history",
-        icon: "history",
-        label: t("common:editHistory"),
-        onPress: () => setHistoryModalVisible(true),
-      },
       ...(canExportVCard(value)
         ? [
             {
@@ -812,6 +751,12 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             },
           ]
         : []),
+      {
+        key: "history",
+        icon: "history",
+        label: t("common:editHistory"),
+        onPress: () => setHistoryModalVisible(true),
+      },
       ...(value.modules.length > 0
         ? [
             {
@@ -831,17 +776,68 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       },
     ],
     [
-      sessionLog.length,
       clearCompletedTasks,
       completedTaskModuleCount,
+      openModuleReorderScreen,
       sortCompletedTasksDown,
       t,
       taskModuleCount,
       value,
       value.modules.length,
       value.pinnedAt,
+      value.tags?.length,
     ],
   );
+
+  const { visibleEditActions, editOverflowItems } = React.useMemo(() => {
+    const availableWidth = Math.max(
+      0,
+      actionChipViewportWidth - actionChipHorizontalPadding,
+    );
+    const moreWidth = actionChipWidths[moreActionKey];
+    const allWidthsKnown =
+      availableWidth > 0 &&
+      Boolean(moreWidth) &&
+      editToolbarActions.every((action) =>
+        Boolean(actionChipWidths[action.key]),
+      );
+
+    if (!allWidthsKnown) {
+      const fallbackVisibleActions = editToolbarActions.slice(0, 3);
+      return {
+        visibleEditActions: fallbackVisibleActions,
+        editOverflowItems: editToolbarActions.slice(
+          fallbackVisibleActions.length,
+        ),
+      };
+    }
+
+    const getActionsWidth = (actions: EditToolbarAction[]) =>
+      actions.reduce((sum, action) => sum + actionChipWidths[action.key], 0) +
+      Math.max(0, actions.length - 1) * editSectionSpacing;
+
+    if (getActionsWidth(editToolbarActions) <= availableWidth) {
+      return {
+        visibleEditActions: editToolbarActions,
+        editOverflowItems: [],
+      };
+    }
+
+    const visibleActions: EditToolbarAction[] = [];
+    for (const action of editToolbarActions) {
+      const nextVisibleActions = [...visibleActions, action];
+      const totalWithMore =
+        getActionsWidth(nextVisibleActions) + moreWidth + editSectionSpacing;
+
+      if (totalWithMore > availableWidth) break;
+      visibleActions.push(action);
+    }
+
+    return {
+      visibleEditActions: visibleActions,
+      editOverflowItems: editToolbarActions.slice(visibleActions.length),
+    };
+  }, [actionChipViewportWidth, actionChipWidths, editToolbarActions]);
 
   const actionChipStyle = {
     height: 30,
@@ -852,7 +848,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     fontSize: 12,
     lineHeight: 16,
   };
-  const editSectionSpacing = 4;
 
   const openOverflowMenu = () => {
     if (Platform.OS !== "web") {
@@ -866,77 +861,98 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     });
   };
 
-  const renderEditActionChips = () => (
-    <ScrollView
-      ref={actionChipScrollRef}
-      {...actionChipWheelProps}
-      horizontal
-      showsHorizontalScrollIndicator={false}
+  const renderActionChip = (
+    action: EditToolbarAction,
+    options?: { measureOnly?: boolean },
+  ) => (
+    <Chip
+      key={action.key}
+      compact
+      disabled={action.disabled}
+      icon={action.chipIcon ?? action.icon}
       onLayout={(event) => {
-        actionChipViewportWidthRef.current = event.nativeEvent.layout.width;
+        if (options?.measureOnly) {
+          recordActionChipWidth(action.key, event.nativeEvent.layout.width);
+        }
       }}
-      onContentSizeChange={(contentWidth) => {
-        actionChipContentWidthRef.current = contentWidth;
+      onPress={action.onPress}
+      style={actionChipStyle}
+      textStyle={actionChipTextStyle}
+    >
+      {action.label}
+    </Chip>
+  );
+
+  const renderEditActionChips = () => (
+    <View
+      onLayout={(event) => {
+        setActionChipViewportWidth(event.nativeEvent.layout.width);
       }}
-      onScroll={handleActionChipScroll}
-      scrollEventThrottle={16}
-      contentContainerStyle={{
-        alignItems: "center",
-        flexDirection: "row",
-        flexGrow: 1,
-        gap: editSectionSpacing,
-        justifyContent: "flex-start",
+      style={{
+        flexGrow: 0,
+        width: "100%",
         paddingHorizontal: 8,
         paddingTop: editSectionSpacing,
         paddingBottom: editSectionSpacing,
+        overflow: "hidden",
       }}
-      style={{ flexGrow: 0, width: "100%" }}
     >
-      <Chip
-        compact
-        icon="plus"
-        onPress={() => {
-          Keyboard.dismiss();
-          setAddModuleModalVisible(true);
+      <View
+        pointerEvents="none"
+        style={{
+          position: "absolute",
+          left: 8,
+          top: editSectionSpacing,
+          opacity: 0,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: editSectionSpacing,
+          zIndex: -1,
         }}
-        style={actionChipStyle}
-        textStyle={actionChipTextStyle}
       >
-        {t("common:addModule")}
-      </Chip>
-      <Chip
-        compact
-        icon={({ color, size }) => (
-          <VerticalReorderIcon color={color} size={size} />
+        {editToolbarActions.map((action) =>
+          renderActionChip(action, { measureOnly: true }),
         )}
-        disabled={value.modules.length < 2}
-        onPress={openModuleReorderScreen}
-        style={actionChipStyle}
-        textStyle={actionChipTextStyle}
-      >
-        {t("home:reorderChip")}
-      </Chip>
-      <Chip
-        compact
-        icon={(value.tags?.length ?? 0) > 0 ? "tag" : "tag-outline"}
-        onPress={() => setTagsModalVisible(true)}
-        style={actionChipStyle}
-        textStyle={actionChipTextStyle}
-      >
-        {t("common:tags")}
-      </Chip>
-      <View ref={moreChipRef} collapsable={false}>
         <Chip
           compact
           icon="dots-horizontal"
-          onPress={openOverflowMenu}
+          onLayout={(event) => {
+            recordActionChipWidth(
+              moreActionKey,
+              event.nativeEvent.layout.width,
+            );
+          }}
           style={actionChipStyle}
           textStyle={actionChipTextStyle}
         >
           {t("common:more")}
         </Chip>
       </View>
-    </ScrollView>
+      <View
+        style={{
+          alignItems: "center",
+          flexDirection: "row",
+          gap: editSectionSpacing,
+          justifyContent: "flex-start",
+          minHeight: 30,
+        }}
+      >
+        {visibleEditActions.map((action) => renderActionChip(action))}
+        {editOverflowItems.length > 0 ? (
+          <View ref={moreChipRef} collapsable={false}>
+            <Chip
+              compact
+              icon="dots-horizontal"
+              onPress={openOverflowMenu}
+              style={actionChipStyle}
+              textStyle={actionChipTextStyle}
+            >
+              {t("common:more")}
+            </Chip>
+          </View>
+        ) : null}
+      </View>
+    </View>
   );
 
   const renderControlDivider = () => (

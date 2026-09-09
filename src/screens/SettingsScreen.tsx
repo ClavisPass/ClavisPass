@@ -1625,7 +1625,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 title={t("settings:import")}
               >
                 <SettingsItem
-                  leadingIcon="file-import-outline"
                   onPress={() => {
                     setShowImportModal(true);
                   }}
@@ -1642,7 +1641,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 title={t("settings:browserExtensions")}
               >
                 <SettingsItem
-                  leadingIcon="puzzle-outline"
                   onPress={() => {
                     navigation.navigate("BrowserExtensions");
                   }}
