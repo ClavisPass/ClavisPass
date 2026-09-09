@@ -1,13 +1,10 @@
 import React, { ReactNode, useEffect } from "react";
-import { View, StyleSheet, useWindowDimensions } from "react-native";
+import { Platform, View, StyleSheet, useWindowDimensions } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import Constants from "expo-constants";
 import FocusAwareStatusBar from "./FocusAwareStatusBar";
 import { useTheme } from "../../app/providers/ThemeProvider";
-import {
-  TITLEBAR_CONTROLS_WIDTH,
-  TITLEBAR_HEIGHT,
-} from "./titlebarMetrics";
+import { TITLEBAR_CONTROLS_WIDTH, TITLEBAR_HEIGHT } from "./titlebarMetrics";
 import { useSetting } from "../../app/providers/SettingsProvider";
 import { isTauriEnvironment } from "../../infrastructure/platform/isTauri";
 import { resolveWindowControlsSide } from "../../infrastructure/platform/windowControls";
@@ -72,9 +69,7 @@ function Header(props: Props) {
           flexDirection: "row",
           justifyContent: "space-between",
           paddingTop: Constants.statusBarHeight,
-          paddingLeft: reserveMacControlsSpace
-            ? TITLEBAR_CONTROLS_WIDTH
-            : 0,
+          paddingLeft: reserveMacControlsSpace ? TITLEBAR_CONTROLS_WIDTH : 0,
         }}
       >
         <FocusAwareStatusBar
@@ -93,11 +88,17 @@ function Header(props: Props) {
         >
           {props.onPress ? (
             <IconButton
+              {...(Platform.OS === "web"
+                ? ({ className: "clavispass-cursor-pointer" } as any)
+                : null)}
               icon={"chevron-left"}
               iconColor={theme.colors?.primary}
               size={20}
               onPress={props.onPress}
-              style={{ margin: 0 }}
+              style={[
+                { margin: 0 },
+                Platform.OS === "web" ? ({ cursor: "pointer" } as any) : null,
+              ]}
             />
           ) : null}
           {props.title ? (

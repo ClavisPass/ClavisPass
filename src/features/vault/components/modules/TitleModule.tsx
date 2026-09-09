@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { Icon, TextInput } from "react-native-paper";
 import ValuesType from "../../model/ValuesType";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 type Props = {
@@ -33,6 +33,9 @@ function TitleModule(props: Props) {
 
   return (
     <View
+      {...(Platform.OS === "web"
+        ? ({ className: "clavispass-cursor-text" } as any)
+        : null)}
       style={{
         height: 36,
         width: 200,
@@ -44,6 +47,9 @@ function TitleModule(props: Props) {
       <TextInput
         autoFocus={props.value.title === "" ? true : false}
         ref={textInputRef}
+        {...(Platform.OS === "web"
+          ? ({ className: "clavispass-cursor-text" } as any)
+          : null)}
         placeholder={`${t("modules:title")}...`}
         placeholderTextColor={"lightgrey"}
         outlineStyle={[
@@ -62,9 +68,15 @@ function TitleModule(props: Props) {
             maxWidth: 200,
           },
         ]}
-        contentStyle={{ margin: 0, padding: 0, height: 36 }}
+        contentStyle={[
+          { margin: 0, padding: 0, height: 36 },
+          Platform.OS === "web" ? ({ cursor: "text" } as any) : null,
+        ]}
         underlineStyle={{ margin: 0, padding: 0 }}
-        style={[{ flex: 1, width: "100%", margin: 0, padding: 0, height: 36 }]}
+        style={[
+          { flex: 1, width: "100%", margin: 0, padding: 0, height: 36 },
+          Platform.OS === "web" ? ({ cursor: "text" } as any) : null,
+        ]}
         value={props.value.title}
         mode="outlined"
         onChangeText={(text) => changeTitle(text)}

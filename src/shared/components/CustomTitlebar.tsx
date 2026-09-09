@@ -11,17 +11,11 @@ import {
   isTauriEnvironment,
   useIsTauriEnvironment,
 } from "../../infrastructure/platform/isTauri";
-import {
-  TITLEBAR_CONTROLS_WIDTH,
-  TITLEBAR_HEIGHT,
-} from "./titlebarMetrics";
+import { TITLEBAR_CONTROLS_WIDTH, TITLEBAR_HEIGHT } from "./titlebarMetrics";
 import { resolveWindowControlsSide } from "../../infrastructure/platform/windowControls";
 import { isDemoDistribution } from "../utils/distribution";
 
-export {
-  TITLEBAR_CONTROLS_WIDTH,
-  TITLEBAR_HEIGHT,
-};
+export { TITLEBAR_CONTROLS_WIDTH, TITLEBAR_HEIGHT };
 
 const styles = StyleSheet.create({
   titlebar: {
@@ -107,13 +101,13 @@ function WindowControls(props: WindowControlsProps) {
             backgroundColor: props.onLightSurface
               ? "rgba(120,127,246,0.32)"
               : props.headerWhite
-              ? "rgba(255,255,255,0.56)"
-              : "rgba(120,127,246,0.32)",
+                ? "rgba(255,255,255,0.56)"
+                : "rgba(120,127,246,0.32)",
             borderColor: props.onLightSurface
               ? "rgba(120,127,246,0.24)"
               : props.headerWhite
-              ? "rgba(255,255,255,0.52)"
-              : "rgba(120,127,246,0.24)",
+                ? "rgba(255,255,255,0.52)"
+                : "rgba(120,127,246,0.24)",
             borderWidth: 1,
             justifyContent: "center",
           },
@@ -256,6 +250,16 @@ function CustomTitlebar() {
             -webkit-user-select: text;
             user-select: text;
           }
+
+          .clavispass-cursor-pointer,
+          .clavispass-cursor-pointer * {
+            cursor: pointer !important;
+          }
+
+          .clavispass-cursor-text,
+          .clavispass-cursor-text * {
+            cursor: text !important;
+          }
         `;
 
         if (existingStyle) {
@@ -311,87 +315,91 @@ function CustomTitlebar() {
   };
 
   return (
-    <>{isTauri ? (
-      <View
-        style={{
-          left: 0,
-          right: 0,
-          position: "absolute",
-          backgroundColor: "transparent",
-          zIndex: 2,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          marginLeft: layerOffset,
-        }}
-        pointerEvents="box-none"
-      >
-        {controlsLeft ? (
-          <WindowControls
-            closeWindow={closeWindow}
-            headerWhite={headerWhite}
-            onLightSurface={controlsOnSidebar}
-            minimizeWindow={minimizeWindow}
-          />
-        ) : null}
+    <>
+      {isTauri ? (
         <View
-          id={"titlebar"}
           style={{
-            width: "100%",
-            height: 40,
+            left: 0,
+            right: 0,
+            position: "absolute",
+            backgroundColor: "transparent",
+            zIndex: 2,
             display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
+            flexDirection: "column",
+            alignItems: "center",
+            marginLeft: layerOffset,
           }}
           pointerEvents="box-none"
         >
-          {titlebarOverlayDragEnabled ? (
-            <View
-              id={"titlebar-drag-left"}
-              style={{
-                flex: 1,
-                height: 40,
-                marginLeft: leftDragOffset,
-              }}
-            />
-          ) : (
-            <View
-              style={{
-                flex: 1,
-                marginLeft: leftDragOffset,
-              }}
-              pointerEvents="none"
-            />
-          )}
-          {titlebarOverlayDragEnabled && width > 600 && titlebarCenterGap > 0 ? (
-            <View
-              style={{
-                width: titlebarCenterGap,
-                height: 40,
-              }}
-              pointerEvents="none"
-            />
-          ) : null}
-          {titlebarOverlayDragEnabled && width > 600 ? (
-            <View
-              id={"titlebar-drag-right"}
-              style={{
-                flex: 1,
-                height: 40,
-              }}
-            />
-          ) : null}
-          {!controlsLeft ? (
-            <WindowsWindowControls
+          {controlsLeft ? (
+            <WindowControls
               closeWindow={closeWindow}
               headerWhite={headerWhite}
-              onLightSurface={false}
+              onLightSurface={controlsOnSidebar}
               minimizeWindow={minimizeWindow}
             />
           ) : null}
+          <View
+            id={"titlebar"}
+            style={{
+              width: "100%",
+              height: 40,
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+            pointerEvents="box-none"
+          >
+            {titlebarOverlayDragEnabled ? (
+              <View
+                id={"titlebar-drag-left"}
+                style={{
+                  flex: 1,
+                  height: 40,
+                  marginLeft: leftDragOffset,
+                }}
+              />
+            ) : (
+              <View
+                style={{
+                  flex: 1,
+                  marginLeft: leftDragOffset,
+                }}
+                pointerEvents="none"
+              />
+            )}
+            {titlebarOverlayDragEnabled &&
+            width > 600 &&
+            titlebarCenterGap > 0 ? (
+              <View
+                style={{
+                  width: titlebarCenterGap,
+                  height: 40,
+                }}
+                pointerEvents="none"
+              />
+            ) : null}
+            {titlebarOverlayDragEnabled && width > 600 ? (
+              <View
+                id={"titlebar-drag-right"}
+                style={{
+                  flex: 1,
+                  height: 40,
+                }}
+              />
+            ) : null}
+            {!controlsLeft ? (
+              <WindowsWindowControls
+                closeWindow={closeWindow}
+                headerWhite={headerWhite}
+                onLightSurface={false}
+                minimizeWindow={minimizeWindow}
+              />
+            ) : null}
+          </View>
         </View>
-      </View>
-    ) : null}</>
+      ) : null}
+    </>
   );
 }
 
