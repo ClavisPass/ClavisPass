@@ -17,8 +17,6 @@ type Props = {
   // Web: Menu positioning
   positionY: number;
 
-  openEditFolder: () => void; // aktuell nicht genutzt
-
   // Native sizing
   nativeSnapPoints?: (string | number)[];
 };
@@ -31,7 +29,7 @@ function HomeFilterMenu(props: Props) {
   // Shared: sort state + actions
   // -----------------------------
   const [sortByTitleMode, setSortByTitleMode] = React.useState<"asc" | "desc">(
-    "asc"
+    "asc",
   );
   const [sortByTitleIcon, setSortByTitleIcon] = React.useState<
     "sort-alphabetical-ascending" | "sort-alphabetical-descending"
@@ -62,7 +60,7 @@ function HomeFilterMenu(props: Props) {
       const values = sortPinnedFirst(draft.values ?? [], (a, b) =>
         sort === "asc"
           ? a.title.localeCompare(b.title)
-          : b.title.localeCompare(a.title)
+          : b.title.localeCompare(a.title),
       );
       draft.values = values;
     });
@@ -148,7 +146,7 @@ function HomeFilterMenu(props: Props) {
       sortByTitleMode,
       t,
       close,
-    ]
+    ],
   );
 
   const topContent = (

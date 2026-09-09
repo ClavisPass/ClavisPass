@@ -29,10 +29,7 @@ import { getFolderColor } from "../../utils/folderAppearance";
 import TooltipIconButton from "../../../../shared/components/buttons/TooltipIconButton";
 import AppTooltip from "../../../../shared/components/tooltips/AppTooltip";
 import { useDeferredDragStart } from "../../../../shared/hooks/useDeferredDragStart";
-import {
-  buildFaviconUrl,
-  normalizeUrl,
-} from "../../utils/digitalCardTheme";
+import { buildFaviconUrl, normalizeUrl } from "../../utils/digitalCardTheme";
 import { detectTauriEnvironment } from "../../../../infrastructure/platform/isTauri";
 
 const failedFaviconUrls = new Set<string>();
@@ -249,7 +246,7 @@ function ListItem(props: Props) {
   const [menuOffsetY, setMenuOffsetY] = useState(6);
   const [faviconFailed, setFaviconFailed] = useState(false);
 
-  const [usernameIcon, setUsernameIcon] = useState("account");
+  const [usernameIcon, setUsernameIcon] = useState("account-outline");
   const [passwordIcon, setPasswordIcon] = useState("form-textbox-password");
 
   const clearUsernameTimer = () => {
@@ -268,7 +265,7 @@ function ListItem(props: Props) {
 
   const resetUsernameIcon = () => {
     clearUsernameTimer();
-    setUsernameIcon("account");
+    setUsernameIcon("account-outline");
   };
 
   const resetPasswordIcon = () => {
@@ -311,7 +308,7 @@ function ListItem(props: Props) {
       clearUsernameTimer();
       setUsernameIcon("check");
       usernameTimerRef.current = setTimeout(() => {
-        setUsernameIcon("account");
+        setUsernameIcon("account-outline");
         usernameTimerRef.current = null;
       }, 1000);
     } else {
@@ -409,15 +406,13 @@ function ListItem(props: Props) {
         : []),
       {
         key: "pin",
-        icon: props.item.pinnedAt ? "pin-off" : "pin",
-        label: props.item.pinnedAt
-          ? t("common:removePin")
-          : t("common:addPin"),
+        icon: props.item.pinnedAt ? "pin-off-outline" : "pin-outline",
+        label: props.item.pinnedAt ? t("common:removePin") : t("common:addPin"),
         onPress: togglePinned,
       },
       {
         key: "move-folder",
-        icon: "folder",
+        icon: "folder-outline",
         label: t("common:moveToFolder"),
         onPress: () => {
           setFolderSelectVisible(true);
@@ -425,7 +420,7 @@ function ListItem(props: Props) {
       },
       {
         key: "delete",
-        icon: "trash-can",
+        icon: "trash-can-outline",
         label: t("common:delete"),
         onPress: () => setDeleteModalVisible(true),
         withDivider: false,
@@ -468,9 +463,7 @@ function ListItem(props: Props) {
       />
       <TooltipIconButton
         tooltip={
-          props.item.fav
-            ? t("common:removeFavorite")
-            : t("common:addFavorite")
+          props.item.fav ? t("common:removeFavorite") : t("common:addFavorite")
         }
         icon={props.item.fav ? "star" : "star-outline"}
         size={18}
@@ -484,7 +477,7 @@ function ListItem(props: Props) {
         tooltip={
           props.item.pinnedAt ? t("common:removePin") : t("common:addPin")
         }
-        icon={props.item.pinnedAt ? "pin" : "pin-outline"}
+        icon="pin-outline"
         size={18}
         onPress={() => {
           togglePinned();
@@ -632,15 +625,10 @@ function ListItem(props: Props) {
         },
       ]}
     >
-      <View
-        style={[
-          styles.swipeAction,
-          styles.swipeActionLeft,
-        ]}
-      >
+      <View style={[styles.swipeAction, styles.swipeActionLeft]}>
         <Icon
           color={props.item.fav ? theme.colors.primary : theme.colors.onPrimary}
-          source={props.item.fav ? "star-off" : "star"}
+          source={props.item.fav ? "star-off-outline" : "star-outline"}
           size={24}
         />
       </View>
@@ -658,13 +646,12 @@ function ListItem(props: Props) {
         },
       ]}
     >
-      <View
-        style={[
-          styles.swipeAction,
-          styles.swipeActionRight,
-        ]}
-      >
-        <Icon color={theme.colors.onError} source="trash-can" size={24} />
+      <View style={[styles.swipeAction, styles.swipeActionRight]}>
+        <Icon
+          color={theme.colors.onError}
+          source="trash-can-outline"
+          size={24}
+        />
       </View>
     </View>
   );
@@ -812,9 +799,7 @@ function ListItem(props: Props) {
           ? { marginLeft: 0, marginRight: 0, marginBottom: 0 }
           : null,
         isNativeSwipeItem ? { borderRadius: 0, borderWidth: 0 } : null,
-        props.reorderMode && Platform.OS !== "web"
-          ? { marginBottom: 4 }
-          : null,
+        props.reorderMode && Platform.OS !== "web" ? { marginBottom: 4 } : null,
         {
           backgroundColor: theme.colors?.background,
           boxShadow: theme.colors?.shadow,
@@ -926,7 +911,11 @@ function ListItem(props: Props) {
             )}
 
             {props.item.pinnedAt ? (
-              <Icon color={theme.colors.primary} source="pin" size={16} />
+              <Icon
+                color={theme.colors.primary}
+                source="pin-outline"
+                size={16}
+              />
             ) : null}
 
             {!props.hideChevron ? (
@@ -959,9 +948,7 @@ function ListItem(props: Props) {
             overshootRight={false}
             containerStyle={[
               styles.swipeContainer,
-              props.reorderMode
-                ? { marginBottom: 4, height: 44 }
-                : null,
+              props.reorderMode ? { marginBottom: 4, height: 44 } : null,
             ]}
             renderLeftActions={renderFavoriteSwipeAction}
             renderRightActions={renderDeleteSwipeAction}

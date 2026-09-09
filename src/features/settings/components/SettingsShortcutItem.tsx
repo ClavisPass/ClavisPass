@@ -38,7 +38,7 @@ function SettingsItem(props: Props) {
         <Icon
           size={20}
           color={theme.colors.primary}
-          source={"keyboard"}
+          source={"keyboard-outline"}
         />*/}
         <Text
           variant="bodyLarge"

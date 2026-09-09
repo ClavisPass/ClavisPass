@@ -257,7 +257,11 @@ function VaultFileOpenHandler() {
               { backgroundColor: theme.colors.secondaryContainer },
             ]}
           >
-            <Icon source="folder" size={22} color={theme.colors.primary} />
+            <Icon
+              source="folder-outline"
+              size={22}
+              color={theme.colors.primary}
+            />
           </View>
           <View style={{ flex: 1, minWidth: 0 }}>
             <Text variant="titleMedium">{t("login:openVaultFileTitle")}</Text>

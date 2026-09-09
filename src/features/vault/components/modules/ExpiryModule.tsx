@@ -199,7 +199,7 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
                   <IconButton
                     style={{ margin: 0 }}
                     iconColor={theme.colors.primary}
-                    icon="pencil"
+                    icon="pencil-outline"
                     size={18}
                     onPress={() => {
                       Keyboard.dismiss();
@@ -246,7 +246,7 @@ function ExpiryModule(props: ExpiryModuleType & Props) {
               Keyboard.dismiss();
               setPickerVisible(true);
             }}
-            icon="calendar"
+            icon="calendar-outline"
             textColor={theme.colors.primary}
           >
             {t("common:setExpiry")}

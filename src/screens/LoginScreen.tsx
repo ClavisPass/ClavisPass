@@ -60,12 +60,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     useTheme();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
-  const { value: onboardingDone } =
-    useSetting("ONBOARDING_DONE");
+  const { value: onboardingDone } = useSetting("ONBOARDING_DONE");
   const isWideLoginLayout = width >= 600;
-  const loginCardWidth = isWideLoginLayout
-    ? Math.min(width - 220, 760)
-    : 300;
+  const loginCardWidth = isWideLoginLayout ? Math.min(width - 220, 760) : 300;
 
   const {
     provider,
@@ -259,10 +256,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       : provider === "googleDrive"
         ? "google-drive"
         : provider === "clavispassHub"
-        ? "server-network"
-        : provider === "localFile"
-          ? "folder"
-          : "cloud-off-outline";
+          ? "server-network"
+          : provider === "localFile"
+            ? "folder-outline"
+            : "cloud-off-outline";
 
   return (
     <BottomSheetModalProvider>
@@ -340,9 +337,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               ) : isInitializing || loadingUserInfo ? (
                 <AnimatedLogo />
               ) : !onboardingDone ? (
-                <FirstOpened
-                  navigation={navigation}
-                />
+                <FirstOpened navigation={navigation} />
               ) : (
                 <Login userInfo={userInfo} />
               )}
@@ -371,7 +366,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 }}
               >
                 <Icon
-                  source="folder"
+                  source="folder-outline"
                   size={18}
                   color={theme.colors.primary}
                 />
@@ -431,7 +426,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                     borderLeftColor: theme.colors.outlineVariant,
                   }}
                 >
-                  <Icon source="logout" size={18} color={theme.colors.primary} />
+                  <Icon
+                    source="logout"
+                    size={18}
+                    color={theme.colors.primary}
+                  />
                 </AnimatedPressable>
               </View>
             </View>
@@ -454,7 +453,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 borderColor: theme.colors.outlineVariant,
               }}
             >
-              <View style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <View
+                style={{ display: "flex", flexDirection: "column", gap: 6 }}
+              >
                 <Text variant="headlineSmall" style={{ userSelect: "none" }}>
                   {t("login:deviceSaveConfirmTitle")}
                 </Text>

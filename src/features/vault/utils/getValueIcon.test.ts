@@ -24,7 +24,7 @@ describe("getValueIcon", () => {
       getValueIcon(
         entry([{ id: "task-1", module: ModulesEnum.TASK, value: "" } as any]),
       ),
-    ).toBe("checkbox-multiple-marked");
+    ).toBe("checkbox-multiple-outline");
     expect(
       getValueIcon(
         entry([
@@ -46,7 +46,7 @@ describe("getValueIcon", () => {
           } as any,
         ]),
       ),
-    ).toBe("credit-card-multiple");
+    ).toBe("credit-card-multiple-outline");
     expect(
       getValueIcon(
         entry([
@@ -98,7 +98,9 @@ describe("getValueIcon", () => {
     ).toBe(MODULE_ICON[ModulesEnum.PIN]);
     expect(
       getValueIcon(
-        entry([{ id: "email-1", module: ModulesEnum.E_MAIL, value: "" } as any]),
+        entry([
+          { id: "email-1", module: ModulesEnum.E_MAIL, value: "" } as any,
+        ]),
       ),
     ).toBe(MODULE_ICON[ModulesEnum.E_MAIL]);
     expect(
@@ -126,7 +128,9 @@ describe("getValueIcon", () => {
     ).toBe(MODULE_ICON[ModulesEnum.TOTP]);
     expect(
       getValueIcon(
-        entry([{ id: "expiry-1", module: ModulesEnum.EXPIRY, value: "" } as any]),
+        entry([
+          { id: "expiry-1", module: ModulesEnum.EXPIRY, value: "" } as any,
+        ]),
       ),
     ).toBe(MODULE_ICON[ModulesEnum.EXPIRY]);
     expect(
@@ -181,7 +185,7 @@ describe("getValueIcon", () => {
           } as any,
         ]),
       ),
-    ).toBe("lock");
+    ).toBe("lock-outline");
   });
 
   it("only uses simple field icons when all modules are the same simple field", () => {
@@ -198,7 +202,7 @@ describe("getValueIcon", () => {
           passwordModule,
         ]),
       ),
-    ).toBe("lock");
+    ).toBe("lock-outline");
     expect(
       getValueIcon(
         entry([
@@ -206,7 +210,7 @@ describe("getValueIcon", () => {
           passwordModule,
         ]),
       ),
-    ).toBe("lock");
+    ).toBe("lock-outline");
     expect(
       getValueIcon(
         entry([
@@ -214,7 +218,7 @@ describe("getValueIcon", () => {
           passwordModule,
         ]),
       ),
-    ).toBe("lock");
+    ).toBe("lock-outline");
     expect(
       getValueIcon(
         entry([
@@ -226,7 +230,7 @@ describe("getValueIcon", () => {
           passwordModule,
         ]),
       ),
-    ).toBe("lock");
+    ).toBe("lock-outline");
   });
 
   it("uses the TOTP icon for TOTP entries with optional recovery codes only", () => {
@@ -253,7 +257,7 @@ describe("getValueIcon", () => {
           } as any,
         ]),
       ),
-    ).toBe("lock");
+    ).toBe("lock-outline");
   });
 
   it("keeps normal password entries on the neutral lock icon", () => {
@@ -267,7 +271,7 @@ describe("getValueIcon", () => {
           } as any,
         ]),
       ),
-    ).toBe("lock");
+    ).toBe("lock-outline");
   });
 
   it("keeps URL-only entries on the neutral lock icon", () => {
@@ -275,7 +279,7 @@ describe("getValueIcon", () => {
       getValueIcon(
         entry([{ id: "url-1", module: ModulesEnum.URL, value: "" } as any]),
       ),
-    ).toBe("lock");
+    ).toBe("lock-outline");
   });
 
   it("uses new template primary modules before attachment and expiry", () => {

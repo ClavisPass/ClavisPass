@@ -35,7 +35,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
 
   const [entropyPercentage, setEntropyPercentage] = useState(0);
   const [progressbarColor, setProgressbarColor] = useState(
-    getStrengthColor(PasswordStrengthLevel.STRONG)
+    getStrengthColor(PasswordStrengthLevel.STRONG),
   );
 
   const [visible, setVisible] = useState(false);
@@ -77,7 +77,12 @@ function PasswordModule(props: PasswordModuleType & Props) {
     >
       <View style={globalStyles.moduleView}>
         <View style={{ height: 40, flex: 1 }}>
-          <PasswordTextbox autofocus={value === "" ? true : false} setValue={setValue} value={value} placeholder="" />
+          <PasswordTextbox
+            autofocus={value === "" ? true : false}
+            setValue={setValue}
+            value={value}
+            placeholder=""
+          />
         </View>
         <CopyToClipboard value={value} kind="password" />
       </View>
@@ -98,7 +103,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
           tooltip={t("common:generatePassword")}
           style={{ margin: 0, marginLeft: 8, marginRight: 8 }}
           iconColor={theme.colors.primary}
-          icon="lock-check"
+          icon="lock-check-outline"
           size={16}
           onPress={() => {
             Keyboard.dismiss();

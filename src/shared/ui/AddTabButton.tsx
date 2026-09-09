@@ -19,7 +19,7 @@ function AddTabButton({ navigation, state, ...props }: any) {
         justifyContent: "center",
       }}
     >
-      <Icon source="plus-circle" size={24} color="#6200ee" />
+      <Icon source="plus-circle-outline" size={24} color="#6200ee" />
     </TouchableOpacity>
   );
 }

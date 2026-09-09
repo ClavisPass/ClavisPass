@@ -15,9 +15,7 @@ import { useTranslation } from "react-i18next";
 import FolderType from "../../model/FolderType";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
-import {
-  getFolderIcon,
-} from "../../utils/folderAppearance";
+import { getFolderIcon } from "../../utils/folderAppearance";
 
 type Props = {
   folder: FolderType[];
@@ -63,7 +61,7 @@ function DraggableFolderListWeb(props: Props) {
     const reordered = reorder(
       props.folder,
       result.source.index,
-      result.destination.index
+      result.destination.index,
     );
 
     props.persistFolderOrder(reordered);
@@ -100,7 +98,7 @@ function DraggableFolderListWeb(props: Props) {
                 >
                   <>
                     <Icon
-                      source="folder"
+                      source="folder-outline"
                       size={20}
                       color={theme.colors.primary}
                     />
@@ -128,7 +126,7 @@ function DraggableFolderListWeb(props: Props) {
               >
                 {(
                   provided: DraggableProvided,
-                  snapshot: DraggableStateSnapshot
+                  snapshot: DraggableStateSnapshot,
                 ) => (
                   <div
                     ref={provided.innerRef}
@@ -137,7 +135,7 @@ function DraggableFolderListWeb(props: Props) {
                     style={{
                       ...getItemStyle(
                         snapshot.isDragging,
-                        provided.draggableProps.style
+                        provided.draggableProps.style,
                       ),
                       marginBottom: 4,
                       opacity: props.draggableDisabled ? 0.8 : 1,

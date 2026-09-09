@@ -142,10 +142,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     useState(false);
   const [clearModulesModalVisible, setClearModulesModalVisible] =
     useState(false);
-  const [
-    clearCompletedTasksModalVisible,
-    setClearCompletedTasksModalVisible,
-  ] = useState(false);
+  const [clearCompletedTasksModalVisible, setClearCompletedTasksModalVisible] =
+    useState(false);
   const [historyModalVisible, setHistoryModalVisible] = useState(false);
   const [tagsModalVisible, setTagsModalVisible] = useState(false);
   const [overflowMenuVisible, setOverflowMenuVisible] = useState(false);
@@ -173,6 +171,14 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     useState<FastAccessType | null>(
       extractFastAccessObject(value.modules, value.title),
     );
+
+  const currentFolder = React.useMemo(() => {
+    if (!value.folder) return null;
+    return (
+      (vault.folders ?? []).find((folder) => folder.id === value.folder?.id) ??
+      value.folder
+    );
+  }, [value.folder, vault.folders]);
 
   const getMaxActionChipOffset = React.useCallback(
     () =>
@@ -351,6 +357,23 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       return { ...prev, folder: null };
     });
   }, [replaceCurrent, vault.folders]);
+
+  useEffect(() => {
+    if (!value.folder) return;
+
+    const matchingFolder = (vault.folders ?? []).find(
+      (folder) => folder.id === value.folder?.id,
+    );
+    if (!matchingFolder) return;
+
+    const folderChanged =
+      value.folder.name !== matchingFolder.name ||
+      value.folder.icon !== matchingFolder.icon ||
+      value.folder.color !== matchingFolder.color;
+    if (!folderChanged) return;
+
+    replaceCurrent((prev) => ({ ...prev, folder: matchingFolder }));
+  }, [replaceCurrent, value.folder, vault.folders]);
 
   useEffect(() => {
     if (Platform.OS !== "web") return;
@@ -652,7 +675,10 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     (module) => module.module === ModulesEnum.TASK,
   ).length;
   const completedTaskModuleCount = value.modules.filter(
-    (module) => module.module === ModulesEnum.TASK && "completed" in module && module.completed,
+    (module) =>
+      module.module === ModulesEnum.TASK &&
+      "completed" in module &&
+      module.completed,
   ).length;
 
   const tagSuggestions = React.useMemo(
@@ -764,7 +790,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         : []),
       {
         key: "pin",
-        icon: value.pinnedAt ? "pin-off" : "pin",
+        icon: value.pinnedAt ? "pin-off-outline" : "pin-outline",
         label: value.pinnedAt ? t("common:removePin") : t("common:addPin"),
         onPress: changePin,
       },
@@ -790,7 +816,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         ? [
             {
               key: "clearModules",
-              icon: "delete-sweep",
+              icon: "delete-sweep-outline",
               label: t("common:clearModules"),
               onPress: () => setClearModulesModalVisible(true),
             },
@@ -798,7 +824,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         : []),
       {
         key: "delete",
-        icon: "trash-can",
+        icon: "trash-can-outline",
         label: t("common:delete"),
         onPress: () => setDeleteModalVisible(true),
         withDivider: false,
@@ -946,26 +972,26 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     tooltip: string;
   }) => {
     const pressable = (
-        <AnimatedPressable
-          disabled={disabled}
-          style={{
-            flex: 1,
-            height: "100%",
-            padding: 6,
-            display: "flex",
-            justifyContent,
-            alignItems: "center",
-            backgroundColor: "transparent",
-            borderTopLeftRadius: roundedStart ? 8 : 0,
-            borderBottomLeftRadius: roundedStart ? 8 : 0,
-            borderTopRightRadius: roundedEnd ? 8 : 0,
-            borderBottomRightRadius: roundedEnd ? 8 : 0,
-            overflow: "hidden",
-          }}
-          onPress={onPress}
-        >
-          {children}
-        </AnimatedPressable>
+      <AnimatedPressable
+        disabled={disabled}
+        style={{
+          flex: 1,
+          height: "100%",
+          padding: 6,
+          display: "flex",
+          justifyContent,
+          alignItems: "center",
+          backgroundColor: "transparent",
+          borderTopLeftRadius: roundedStart ? 8 : 0,
+          borderBottomLeftRadius: roundedStart ? 8 : 0,
+          borderTopRightRadius: roundedEnd ? 8 : 0,
+          borderBottomRightRadius: roundedEnd ? 8 : 0,
+          overflow: "hidden",
+        }}
+        onPress={onPress}
+      >
+        {children}
+      </AnimatedPressable>
     );
 
     return (
@@ -1071,12 +1097,14 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           >
             <Icon
               source={
-                value.folder ? getFolderIcon(value.folder) : DEFAULT_FOLDER_ICON
+                currentFolder
+                  ? getFolderIcon(currentFolder)
+                  : DEFAULT_FOLDER_ICON
               }
               size={20}
               color={
-                value.folder
-                  ? (getFolderColor(value.folder) ?? theme.colors.primary)
+                currentFolder
+                  ? (getFolderColor(currentFolder) ?? theme.colors.primary)
                   : theme.colors.primary
               }
             />
@@ -1085,11 +1113,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
               ellipsizeMode="tail"
               style={{ userSelect: "none", flexShrink: 1 }}
             >
-              {value.folder === null ||
-              value.folder.name === "" ||
-              value.folder === undefined
+              {currentFolder === null ||
+              currentFolder.name === "" ||
+              currentFolder === undefined
                 ? t("common:none")
-                : value.folder.name}
+                : currentFolder.name}
             </Text>
           </View>
         ),
@@ -1213,7 +1241,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         visible={folderModalVisible}
         setVisible={setFolderModalVisible}
         folders={vault.folders ?? []}
-        selectedFolder={value.folder}
+        selectedFolder={currentFolder}
         onSelectFolder={changeSelectedFolder}
       />
       <DiscardChangesModal

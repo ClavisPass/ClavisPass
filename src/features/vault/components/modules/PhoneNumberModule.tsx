@@ -94,7 +94,7 @@ function PhoneNumberModule(props: PhoneNumberModuleType & Props) {
         <View style={{ width: 48 }}>
           <TooltipIconButton
             tooltip={t("common:callPhoneNumber")}
-            icon={"phone"}
+            icon={"phone-outline"}
             iconColor={theme.colors.primary}
             size={20}
             onPress={() => {

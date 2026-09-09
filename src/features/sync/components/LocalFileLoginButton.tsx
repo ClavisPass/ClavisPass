@@ -23,12 +23,15 @@ function LocalFileLoginButton() {
         refreshToken: filePath,
       });
     } catch (error) {
-      logger.error("[LocalFileLoginButton] Failed to select vault file:", error);
+      logger.error(
+        "[LocalFileLoginButton] Failed to select vault file:",
+        error,
+      );
     }
   };
 
   return (
-    <SettingsItem leadingIcon="folder" onPress={handleSelectVault}>
+    <SettingsItem leadingIcon="folder-outline" onPress={handleSelectVault}>
       {t("login:loadVault")}
     </SettingsItem>
   );

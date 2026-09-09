@@ -15,13 +15,13 @@ export function getValueIcon(value: Pick<ValuesType, "modules">): string {
     return MODULE_ICON[ModulesEnum.KEY];
   }
   if (modules.some((m) => m.module === ModulesEnum.TASK)) {
-    return "checkbox-multiple-marked";
+    return "checkbox-multiple-outline";
   }
   if (modules.some((m) => m.module === ModulesEnum.CREDIT_CARD)) {
     return MODULE_ICON[ModulesEnum.CREDIT_CARD];
   }
   if (modules.some((m) => m.module === ModulesEnum.DIGITAL_CARD)) {
-    return "credit-card-multiple";
+    return "credit-card-multiple-outline";
   }
   if (modules.some((m) => m.module === ModulesEnum.DOCUMENT)) {
     return MODULE_ICON[ModulesEnum.DOCUMENT];
@@ -69,5 +69,5 @@ export function getValueIcon(value: Pick<ValuesType, "modules">): string {
     return MODULE_ICON[ModulesEnum.EXPIRY];
   }
 
-  return "lock";
+  return "lock-outline";
 }

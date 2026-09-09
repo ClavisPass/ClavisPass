@@ -86,7 +86,7 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
               right={
                 inputType === "date" ? (
                   <TextInput.Icon
-                    icon="calendar"
+                    icon="calendar-outline"
                     onPress={() => {
                       Keyboard.dismiss();
                       setDatePickerVisible(true);

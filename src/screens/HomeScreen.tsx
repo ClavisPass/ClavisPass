@@ -1079,7 +1079,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={{
         alignItems: "center",
-        flexDirection: "row-reverse",
+        flexDirection: "row",
         flexGrow: 1,
         gap: 4,
         justifyContent: "flex-start",
@@ -1088,25 +1088,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       }}
       style={{ flexGrow: 0, width: "100%" }}
     >
-      {expiryEntries.length > 0 ? (
-        <Chip
-          compact
-          icon="calendar-clock"
-          onPress={() => setExpiryModalVisible(true)}
-          style={actionChipStyle}
-          textStyle={actionChipTextStyle}
-        >
-          {`${t("home:expiries")} ${expiryEntries.length}`}
-        </Chip>
-      ) : null}
       <Chip
         compact
-        icon="sort-variant"
-        onPress={() => setShowMenu(true)}
+        icon="refresh"
+        disabled={!isOnline || refreshing}
+        onPress={refreshData}
         style={actionChipStyle}
         textStyle={actionChipTextStyle}
       >
-        {t("home:sort")}
+        {t("common:reload")}
       </Chip>
       <Chip
         compact
@@ -1122,14 +1112,33 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       </Chip>
       <Chip
         compact
-        icon="refresh"
-        disabled={!isOnline || refreshing}
-        onPress={refreshData}
+        icon="folder-outline"
+        onPress={() => setFolderModalVisible(true)}
         style={actionChipStyle}
         textStyle={actionChipTextStyle}
       >
-        {t("common:reload")}
+        {t("home:editFolders")}
       </Chip>
+      <Chip
+        compact
+        icon="sort-variant"
+        onPress={() => setShowMenu(true)}
+        style={actionChipStyle}
+        textStyle={actionChipTextStyle}
+      >
+        {t("home:sort")}
+      </Chip>
+      {expiryEntries.length > 0 ? (
+        <Chip
+          compact
+          icon="calendar-clock-outline"
+          onPress={() => setExpiryModalVisible(true)}
+          style={actionChipStyle}
+          textStyle={actionChipTextStyle}
+        >
+          {`${t("home:expiries")} ${expiryEntries.length}`}
+        </Chip>
+      ) : null}
     </ScrollView>
   );
 
@@ -1657,7 +1666,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                     setSelectedFav={saveSelectedFavState}
                     selectedFolder={selectedFolder}
                     setSelectedFolder={saveSelectedFolderState}
-                    setFolderModalVisible={setFolderModalVisible}
                     selected2FA={selected2FA}
                     setSelected2FA={saveSelected2FAState}
                     selectedCard={selectedCard}
@@ -1685,7 +1693,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               TITLEBAR_HEIGHT +
               (Platform.OS === "web" ? 48 : 90)
             }
-            openEditFolder={() => setFolderModalVisible(true)}
           />
 
           <FolderModal

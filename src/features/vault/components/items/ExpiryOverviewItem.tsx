@@ -81,7 +81,11 @@ function ExpiryOverviewItem(props: ExpiryOverviewEntry) {
               },
             ]}
           >
-            <Icon source="calendar-clock" size={16} color={statusIconColor} />
+            <Icon
+              source="calendar-clock-outline"
+              size={16}
+              color={statusIconColor}
+            />
           </View>
 
           <View style={styles.content}>

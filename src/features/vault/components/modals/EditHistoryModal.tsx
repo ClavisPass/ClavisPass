@@ -19,13 +19,13 @@ type Props = {
 const ACTION_ICON: Record<EditHistoryActionType, string> = {
   init: "circle-outline",
   title: "format-title",
-  favorite: "star",
-  pin: "pin",
-  tags: "tag",
-  folder: "folder",
-  modules: "view-list",
-  module: "puzzle",
-  system: "cog",
+  favorite: "star-outline",
+  pin: "pin-outline",
+  tags: "tag-outline",
+  folder: "folder-outline",
+  modules: "view-list-outline",
+  module: "puzzle-outline",
+  system: "cog-outline",
   undo: "undo-variant",
   redo: "redo-variant",
   save: "content-save",
@@ -87,7 +87,10 @@ function EditHistoryModal(props: Props) {
           <Text variant="headlineSmall" style={{ userSelect: "none" }}>
             {t("common:editHistory")}
           </Text>
-          <Text variant="bodyMedium" style={{ userSelect: "none", opacity: 0.72 }}>
+          <Text
+            variant="bodyMedium"
+            style={{ userSelect: "none", opacity: 0.72 }}
+          >
             {t("common:editHistoryDescription")}
           </Text>
         </View>
@@ -128,7 +131,6 @@ function EditHistoryModal(props: Props) {
             ))}
           </ScrollView>
         )}
-
       </View>
     </Modal>
   );

@@ -47,7 +47,7 @@ function UserInformation(props: Props) {
 
   const hasCloudSession = useMemo(
     () => provider !== "device" && !!refreshToken,
-    [provider, refreshToken]
+    [provider, refreshToken],
   );
 
   const loadUserInfo = async () => {
@@ -85,7 +85,7 @@ function UserInformation(props: Props) {
           setUserInfoState(info);
           props.setUserInfo?.(info);
         },
-        () => setLoading(false)
+        () => setLoading(false),
       );
     } catch (err) {
       logger.error("[UserInformation] Failed to load user info:", err);
@@ -104,7 +104,7 @@ function UserInformation(props: Props) {
 
   const avatarSource = useMemo(
     () => (userInfo?.avatar ? { uri: userInfo.avatar } : undefined),
-    [userInfo?.avatar]
+    [userInfo?.avatar],
   );
 
   const handleLogout = async () => {
@@ -133,23 +133,23 @@ function UserInformation(props: Props) {
     provider === "dropbox"
       ? "Dropbox " + t("common:connected")
       : provider === "googleDrive"
-      ? "Google Drive " + t("common:connected")
-      : provider === "clavispassHub"
-      ? "ClavisPass Hub " + t("common:connected")
-      : provider === "localFile"
-      ? t("login:localVaultConnected")
-      : t("common:notConnected");
+        ? "Google Drive " + t("common:connected")
+        : provider === "clavispassHub"
+          ? "ClavisPass Hub " + t("common:connected")
+          : provider === "localFile"
+            ? t("login:localVaultConnected")
+            : t("common:notConnected");
 
   const providerIcon =
     provider === "dropbox"
       ? "dropbox"
       : provider === "googleDrive"
-      ? "google-drive"
-      : provider === "clavispassHub"
-      ? "server-network"
-      : provider === "localFile"
-      ? "folder"
-      : "cloud-off-outline";
+        ? "google-drive"
+        : provider === "clavispassHub"
+          ? "server-network"
+          : provider === "localFile"
+            ? "folder"
+            : "cloud-off-outline";
 
   return (
     <View style={{ width: "100%" }}>
@@ -220,7 +220,7 @@ function UserInformation(props: Props) {
                     }}
                   >
                     <Icon
-                      source="account"
+                      source="account-outline"
                       size={25}
                       color={paperTheme.colors.primary}
                     />

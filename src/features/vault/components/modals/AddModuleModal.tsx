@@ -57,7 +57,7 @@ type MissingIds<List extends readonly { id: UiModules }[]> = Exclude<
 >;
 
 function defineModules<const L extends readonly ModuleMeta[]>(
-  list: MissingIds<L> extends never ? L : never
+  list: MissingIds<L> extends never ? L : never,
 ) {
   return list;
 }
@@ -338,7 +338,15 @@ export default function AddModuleModalCompactFav(props: Props) {
       label: t("modules:key"),
       icon: MODULE_ICON[ModulesEnum.KEY],
       category: "NetworkTechnical",
-      keywords: ["ssh", "api", "token", "key", "schlüssel", "private", "public"],
+      keywords: [
+        "ssh",
+        "api",
+        "token",
+        "key",
+        "schlüssel",
+        "private",
+        "public",
+      ],
     },
     {
       id: ModulesEnum.CUSTOM_FIELD,
@@ -518,7 +526,8 @@ export default function AddModuleModalCompactFav(props: Props) {
     const allItems = filtered.filter((m) => !taken.has(m.id));
 
     const s: Array<{ title: string; data: ModuleMeta[] }> = [];
-    if (favItems.length) s.push({ title: t("common:favorites"), data: favItems });
+    if (favItems.length)
+      s.push({ title: t("common:favorites"), data: favItems });
     if (recentItems.length)
       s.push({ title: t("common:recentlyUsed"), data: recentItems });
 
@@ -536,7 +545,7 @@ export default function AddModuleModalCompactFav(props: Props) {
       props.onSelect?.(m.id);
       hideModal();
     },
-    [props]
+    [props],
   );
 
   const isFavorite = (id: ModulesEnum) => (favs as ModulesEnum[]).includes(id);
@@ -585,9 +594,9 @@ export default function AddModuleModalCompactFav(props: Props) {
 
   const catIcon = (c: ModuleCategory) =>
     c === "LoginAccess"
-      ? "shield-lock"
+      ? "shield-lock-outline"
       : c === "ContactIdentity"
-        ? "account-box"
+        ? "account-box-outline"
         : c === "PaymentDocuments"
           ? "credit-card-outline"
           : c === "SecurityCodes"
@@ -597,8 +606,8 @@ export default function AddModuleModalCompactFav(props: Props) {
               : c === "NetworkTechnical"
                 ? "lan"
                 : c === "Custom"
-                  ? "wrench"
-                  : "view-dashboard";
+                  ? "wrench-outline"
+                  : "view-dashboard-outline";
 
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
@@ -648,7 +657,10 @@ export default function AddModuleModalCompactFav(props: Props) {
           })}
         </ScrollView>
 
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 8 }}>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: 8 }}
+        >
           {sections.length === 0 && <EmptyState />}
 
           {sections.map((sec) => {
@@ -681,9 +693,14 @@ export default function AddModuleModalCompactFav(props: Props) {
                       </View>
                     ))}
                     {row.length < columns &&
-                      Array.from({ length: columns - row.length }).map((_, k) => (
-                        <View key={`spacer-${k}`} style={{ flex: 1, padding: 6 }} />
-                      ))}
+                      Array.from({ length: columns - row.length }).map(
+                        (_, k) => (
+                          <View
+                            key={`spacer-${k}`}
+                            style={{ flex: 1, padding: 6 }}
+                          />
+                        ),
+                      )}
                   </View>
                 ))}
               </View>

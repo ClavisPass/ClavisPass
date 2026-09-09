@@ -7,10 +7,8 @@ import {
   View,
 } from "react-native";
 import { Chip, Divider, IconButton, Text } from "react-native-paper";
-import AnimatedOpacityContainer from "../../../shared/components/container/AnimatedOpacityContainer";
 import { MenuItem } from "../../../shared/components/menus/MenuItem";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
-import AppTooltip from "../../../shared/components/tooltips/AppTooltip";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import FolderType from "../model/FolderType";
 import ModulesEnum from "../model/ModulesEnum";
@@ -26,10 +24,7 @@ import { DraggableHandle } from "../../../shared/components/DraggableHandle";
 import { get, set } from "../../../infrastructure/storage/store";
 import { useTranslation } from "react-i18next";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import {
-  getFolderColor,
-  getFolderIcon,
-} from "../utils/folderAppearance";
+import { getFolderColor, getFolderIcon } from "../utils/folderAppearance";
 
 const styles = StyleSheet.create({
   chip: {
@@ -71,7 +66,6 @@ type Props = {
   setSelectedFav: (selectedFav: boolean) => void;
   selectedFolder: FolderType | null;
   setSelectedFolder: (selectedFolder: FolderType | null) => void;
-  setFolderModalVisible: (folderModalVisible: boolean) => void;
   selectedCard: boolean;
   setSelectedCard: (selectedCard: boolean) => void;
   hasCardEntries: boolean;
@@ -98,8 +92,6 @@ function FolderFilter(props: Props) {
   const horizontalContentWidthRef = useRef(0);
   const horizontalViewportWidthRef = useRef(0);
 
-  const [showAddButton, setShowAddButton] = useState(false);
-
   const [sidebarWidth, setSidebarWidth] = useState(180);
   const MIN_W = 20;
   const MAX_W = 420;
@@ -107,26 +99,26 @@ function FolderFilter(props: Props) {
   const handleResize = useCallback(
     (dx: number) => {
       setSidebarWidth((w) =>
-        clamp(w + dx, MIN_W, Math.min(MAX_W, Math.max(MIN_W, width * 0.6)))
+        clamp(w + dx, MIN_W, Math.min(MAX_W, Math.max(MIN_W, width * 0.6))),
       );
     },
-    [width]
+    [width],
   );
 
   const getMaxHorizontalOffset = useCallback(
     () =>
       Math.max(
         0,
-        horizontalContentWidthRef.current - horizontalViewportWidthRef.current
+        horizontalContentWidthRef.current - horizontalViewportWidthRef.current,
       ),
-    []
+    [],
   );
 
   const animateHorizontalScroll = useCallback(() => {
     const current = horizontalOffsetRef.current;
     const target = Math.min(
       horizontalTargetOffsetRef.current,
-      getMaxHorizontalOffset()
+      getMaxHorizontalOffset(),
     );
     const distance = target - current;
 
@@ -141,24 +133,25 @@ function FolderFilter(props: Props) {
     const next = current + distance * 0.28;
     horizontalOffsetRef.current = next;
     flatListRef.current?.scrollToOffset({ animated: false, offset: next });
-    horizontalAnimationFrameRef.current =
-      window.requestAnimationFrame(animateHorizontalScroll);
+    horizontalAnimationFrameRef.current = window.requestAnimationFrame(
+      animateHorizontalScroll,
+    );
   }, [getMaxHorizontalOffset]);
 
   const startSmoothHorizontalScroll = useCallback(
     (targetOffset: number) => {
       horizontalTargetOffsetRef.current = Math.min(
         Math.max(0, targetOffset),
-        getMaxHorizontalOffset()
+        getMaxHorizontalOffset(),
       );
 
       if (horizontalAnimationFrameRef.current === null) {
         horizontalAnimationFrameRef.current = window.requestAnimationFrame(
-          animateHorizontalScroll
+          animateHorizontalScroll,
         );
       }
     },
-    [animateHorizontalScroll, getMaxHorizontalOffset]
+    [animateHorizontalScroll, getMaxHorizontalOffset],
   );
 
   const handleHorizontalScroll = (event: any) => {
@@ -169,58 +162,31 @@ function FolderFilter(props: Props) {
     }
   };
 
-  const handleHorizontalWheel = useCallback((event: any) => {
-    if (Platform.OS !== "web") return;
+  const handleHorizontalWheel = useCallback(
+    (event: any) => {
+      if (Platform.OS !== "web") return;
 
-    const nativeEvent = event?.nativeEvent ?? event;
-    const deltaX = nativeEvent?.deltaX ?? 0;
-    const deltaY = nativeEvent?.deltaY ?? 0;
-    const rawDelta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
-    const deltaMode = nativeEvent?.deltaMode ?? 0;
-    const delta =
-      deltaMode === 1
-        ? rawDelta * 16
-        : deltaMode === 2
-          ? rawDelta * horizontalViewportWidthRef.current
-          : rawDelta;
-    if (!delta) return;
+      const nativeEvent = event?.nativeEvent ?? event;
+      const deltaX = nativeEvent?.deltaX ?? 0;
+      const deltaY = nativeEvent?.deltaY ?? 0;
+      const rawDelta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
+      const deltaMode = nativeEvent?.deltaMode ?? 0;
+      const delta =
+        deltaMode === 1
+          ? rawDelta * 16
+          : deltaMode === 2
+            ? rawDelta * horizontalViewportWidthRef.current
+            : rawDelta;
+      if (!delta) return;
 
-    nativeEvent?.preventDefault?.();
-    startSmoothHorizontalScroll(horizontalTargetOffsetRef.current + delta);
-  }, [startSmoothHorizontalScroll]);
+      nativeEvent?.preventDefault?.();
+      startSmoothHorizontalScroll(horizontalTargetOffsetRef.current + delta);
+    },
+    [startSmoothHorizontalScroll],
+  );
 
   const horizontalWheelProps =
     Platform.OS === "web" ? ({ onWheel: handleHorizontalWheel } as any) : {};
-
-  const moduleFilterButton = (size: number, style?: any) => (
-    <AppTooltip title={t("home:moduleFilterTitle")}>
-      <IconButton
-        icon={"filter-variant-plus"}
-        iconColor={theme.colors.primary}
-        style={style}
-        onPress={props.disabled ? undefined : props.openModuleFilterModal}
-        size={size}
-        selected={true}
-        mode="contained-tonal"
-      />
-    </AppTooltip>
-  );
-
-  const editFolderButton = (size: number, style?: any) => (
-    <AppTooltip title={t("home:editFolders")}>
-      <IconButton
-        icon={"pencil"}
-        iconColor={theme.colors.primary}
-        style={style}
-        onPress={
-          props.disabled ? undefined : () => props.setFolderModalVisible(true)
-        }
-        size={size}
-        selected={true}
-        mode="contained-tonal"
-      />
-    </AppTooltip>
-  );
 
   useEffect(() => {
     let isMounted = true;
@@ -230,7 +196,7 @@ function FolderFilter(props: Props) {
         const clamped = clamp(
           saved ?? 180,
           MIN_W,
-          Math.min(MAX_W, Math.max(MIN_W, width * 0.6))
+          Math.min(MAX_W, Math.max(MIN_W, width * 0.6)),
         );
         if (isMounted) setSidebarWidth(clamped);
       } catch (e) {}
@@ -260,7 +226,7 @@ function FolderFilter(props: Props) {
         window.cancelAnimationFrame(horizontalAnimationFrameRef.current);
       }
     },
-    []
+    [],
   );
 
   const renderDesktopModuleFilter = (module: ModulesEnum) => {
@@ -348,8 +314,6 @@ function FolderFilter(props: Props) {
             paddingRight: 4,
             overflow: "hidden",
           }}
-          onPointerEnter={() => setShowAddButton(true)}
-          onPointerLeave={() => setShowAddButton(false)}
         >
           <FlatList
             showsVerticalScrollIndicator={false}
@@ -362,18 +326,24 @@ function FolderFilter(props: Props) {
                 <MenuItem
                   key={index}
                   leadingIcon={getFolderIcon(item)}
-                  leadingIconColor={getFolderColor(item) ?? theme.colors.primary}
+                  leadingIconColor={
+                    getFolderColor(item) ?? theme.colors.primary
+                  }
                   selectedColor={getFolderColor(item) ?? undefined}
                   selected={props.selectedFolder?.id === item.id ? true : false}
-                  onPress={props.disabled ? undefined : () => {
-                    props.setSelected2FA(false);
-                    props.setSelectedCard(false);
-                    if (props.selectedFolder != item) {
-                      props.setSelectedFolder(item);
-                    } else {
-                      props.setSelectedFolder(null);
-                    }
-                  }}
+                  onPress={
+                    props.disabled
+                      ? undefined
+                      : () => {
+                          props.setSelected2FA(false);
+                          props.setSelectedCard(false);
+                          if (props.selectedFolder != item) {
+                            props.setSelectedFolder(item);
+                          } else {
+                            props.setSelectedFolder(null);
+                          }
+                        }
+                  }
                 >
                   {item.name}
                 </MenuItem>
@@ -386,12 +356,16 @@ function FolderFilter(props: Props) {
                     <MenuItem
                       leadingIcon={"two-factor-authentication"}
                       selected={props.selected2FA}
-                      onPress={props.disabled ? undefined : () => {
-                        props.setSelected2FA(!props.selected2FA);
-                        props.setSelectedCard(false);
-                        props.setSelectedFav(false);
-                        props.setSelectedFolder(null);
-                      }}
+                      onPress={
+                        props.disabled
+                          ? undefined
+                          : () => {
+                              props.setSelected2FA(!props.selected2FA);
+                              props.setSelectedCard(false);
+                              props.setSelectedFav(false);
+                              props.setSelectedFolder(null);
+                            }
+                      }
                     >
                       {t("home:twofa")}
                     </MenuItem>
@@ -401,14 +375,18 @@ function FolderFilter(props: Props) {
                 {props.hasCardEntries ? (
                   <>
                     <MenuItem
-                      leadingIcon={"credit-card-multiple"}
+                      leadingIcon={"credit-card-multiple-outline"}
                       selected={props.selectedCard}
-                      onPress={props.disabled ? undefined : () => {
-                        props.setSelectedCard(!props.selectedCard);
-                        props.setSelected2FA(false);
-                        props.setSelectedFav(false);
-                        props.setSelectedFolder(null);
-                      }}
+                      onPress={
+                        props.disabled
+                          ? undefined
+                          : () => {
+                              props.setSelectedCard(!props.selectedCard);
+                              props.setSelected2FA(false);
+                              props.setSelectedFav(false);
+                              props.setSelectedFolder(null);
+                            }
+                      }
                     >
                       {t("home:card")}
                     </MenuItem>
@@ -416,13 +394,17 @@ function FolderFilter(props: Props) {
                   </>
                 ) : null}
                 <MenuItem
-                  leadingIcon={"star"}
+                  leadingIcon={"star-outline"}
                   selected={props.selectedFav}
-                  onPress={props.disabled ? undefined : () => {
-                    props.setSelectedFav(!props.selectedFav);
-                    props.setSelected2FA(false);
-                    props.setSelectedCard(false);
-                  }}
+                  onPress={
+                    props.disabled
+                      ? undefined
+                      : () => {
+                          props.setSelectedFav(!props.selectedFav);
+                          props.setSelected2FA(false);
+                          props.setSelectedCard(false);
+                        }
+                  }
                 >
                   {t("home:favorite")}
                 </MenuItem>
@@ -430,22 +412,18 @@ function FolderFilter(props: Props) {
               </>
             }
             ListFooterComponent={
-              <View
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  flexDirection: "row",
-                }}
-              >
-                <AnimatedOpacityContainer visible={showAddButton}>
-                  <View style={{ flexDirection: "row", gap: 4 }}>
-                    {moduleFilterButton(20, { margin: 0 })}
-                    {editFolderButton(20, { margin: 0 })}
-                  </View>
-                </AnimatedOpacityContainer>
-              </View>
+              <>
+                <Divider />
+                <MenuItem
+                  leadingIcon={"filter-variant-plus"}
+                  selected={props.selectedModuleFilters.length > 0}
+                  onPress={
+                    props.disabled ? undefined : props.openModuleFilterModal
+                  }
+                >
+                  {t("home:moduleFilterTitle")}
+                </MenuItem>
+              </>
             }
           />
           <View
@@ -518,12 +496,16 @@ function FolderFilter(props: Props) {
                       icon={() => null}
                       selected={props.selected2FA}
                       showSelectedOverlay={true}
-                      onPress={props.disabled ? undefined : () => {
-                        props.setSelected2FA(!props.selected2FA);
-                        props.setSelectedCard(false);
-                        props.setSelectedFav(false);
-                        props.setSelectedFolder(null);
-                      }}
+                      onPress={
+                        props.disabled
+                          ? undefined
+                          : () => {
+                              props.setSelected2FA(!props.selected2FA);
+                              props.setSelectedCard(false);
+                              props.setSelectedFav(false);
+                              props.setSelectedFolder(null);
+                            }
+                      }
                       style={styles.chip}
                       textStyle={styles.chipText}
                     >
@@ -539,17 +521,21 @@ function FolderFilter(props: Props) {
                       icon={() => null}
                       selected={props.selectedCard}
                       showSelectedOverlay={true}
-                      onPress={props.disabled ? undefined : () => {
-                        props.setSelectedCard(!props.selectedCard);
-                        props.setSelected2FA(false);
-                        props.setSelectedFav(false);
-                        props.setSelectedFolder(null);
-                      }}
+                      onPress={
+                        props.disabled
+                          ? undefined
+                          : () => {
+                              props.setSelectedCard(!props.selectedCard);
+                              props.setSelected2FA(false);
+                              props.setSelectedFav(false);
+                              props.setSelectedFolder(null);
+                            }
+                      }
                       style={styles.chip}
                       textStyle={styles.chipText}
                     >
                       <MaterialCommunityIcons
-                        name="credit-card-multiple"
+                        name="credit-card-multiple-outline"
                         size={18}
                         color={theme.colors.primary}
                       />
@@ -559,16 +545,20 @@ function FolderFilter(props: Props) {
                     icon={() => null}
                     selected={props.selectedFav}
                     showSelectedOverlay={true}
-                    onPress={props.disabled ? undefined : () => {
-                      props.setSelectedFav(!props.selectedFav);
-                      props.setSelected2FA(false);
-                      props.setSelectedCard(false);
-                    }}
+                    onPress={
+                      props.disabled
+                        ? undefined
+                        : () => {
+                            props.setSelectedFav(!props.selectedFav);
+                            props.setSelected2FA(false);
+                            props.setSelectedCard(false);
+                          }
+                    }
                     style={styles.chip}
                     textStyle={styles.chipText}
                   >
                     <MaterialCommunityIcons
-                      name="star"
+                      name="star-outline"
                       size={18}
                       color={theme.colors.primary}
                     />
@@ -616,15 +606,19 @@ function FolderFilter(props: Props) {
                     )}
                     selected={props.selectedFolder == item ? true : false}
                     showSelectedOverlay={true}
-                    onPress={props.disabled ? undefined : () => {
-                      props.setSelected2FA(false);
-                      props.setSelectedCard(false);
-                      if (props.selectedFolder != item) {
-                        props.setSelectedFolder(item);
-                      } else {
-                        props.setSelectedFolder(null);
-                      }
-                    }}
+                    onPress={
+                      props.disabled
+                        ? undefined
+                        : () => {
+                            props.setSelected2FA(false);
+                            props.setSelectedCard(false);
+                            if (props.selectedFolder != item) {
+                              props.setSelectedFolder(item);
+                            } else {
+                              props.setSelectedFolder(null);
+                            }
+                          }
+                    }
                     style={styles.chip}
                     textStyle={styles.chipText}
                   >
@@ -635,16 +629,23 @@ function FolderFilter(props: Props) {
               ListFooterComponent={
                 <View
                   style={{
-                    flex: 1,
                     display: "flex",
                     flexDirection: "row",
-                    justifyContent: "center",
                     alignItems: "center",
-                    gap: 4,
                   }}
                 >
-                  {moduleFilterButton(12, { margin: 0, alignSelf: "center" })}
-                  {editFolderButton(12, { margin: 0, alignSelf: "center" })}
+                  <Chip
+                    icon="filter-variant-plus"
+                    selected={props.selectedModuleFilters.length > 0}
+                    showSelectedOverlay={true}
+                    onPress={
+                      props.disabled ? undefined : props.openModuleFilterModal
+                    }
+                    style={styles.chip}
+                    textStyle={styles.chipText}
+                  >
+                    {t("home:moduleFilterTitle")}
+                  </Chip>
                 </View>
               }
             />

@@ -8,9 +8,7 @@ import { useTheme } from "../../../../app/providers/ThemeProvider";
 import FolderType from "../../model/FolderType";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import { useTranslation } from "react-i18next";
-import {
-  getFolderIcon,
-} from "../../utils/folderAppearance";
+import { getFolderIcon } from "../../utils/folderAppearance";
 import { useDeferredDragStart } from "../../../../shared/hooks/useDeferredDragStart";
 
 type Props = {
@@ -42,15 +40,11 @@ function FolderDragHandle({
   onPendingStart?: () => void;
   onDragStart?: () => void;
 }) {
-  const deferredDragStartProps = useDeferredDragStart(
-    onDragStart,
-    undefined,
-    {
-      onPendingEnd,
-      onPendingStart,
-      startImmediately: true,
-    },
-  );
+  const deferredDragStartProps = useDeferredDragStart(onDragStart, undefined, {
+    onPendingEnd,
+    onPendingStart,
+    startImmediately: true,
+  });
 
   return (
     <Pressable disabled={disabled} {...deferredDragStartProps}>
@@ -155,7 +149,7 @@ function DraggableFolderList(props: Props) {
       props.setSelectedFolder,
       theme.colors.background,
       theme.colors.primary,
-    ]
+    ],
   );
 
   return (
@@ -186,7 +180,11 @@ function DraggableFolderList(props: Props) {
               onPress={() => props.setSelectedFolder?.(null)}
             >
               <>
-                <Icon source="folder" size={20} color={theme.colors.primary} />
+                <Icon
+                  source="folder-outline"
+                  size={20}
+                  color={theme.colors.primary}
+                />
                 <Text
                   style={{
                     userSelect: "none",

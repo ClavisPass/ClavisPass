@@ -525,7 +525,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ? [
             {
               title: t("settings:security"),
-              icon: "shield",
+              icon: "shield-outline",
               ref: authSettingsRef,
               plattform: null,
             } satisfies QuickSelectItem,
@@ -545,7 +545,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ? [
             {
               title: t("settings:backup"),
-              icon: "database",
+              icon: "database-outline",
               ref: backupRef,
               plattform: null,
             } satisfies QuickSelectItem,
@@ -555,7 +555,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ? [
             {
               title: t("settings:import"),
-              icon: "import",
+              icon: "file-import-outline",
               ref: importRef,
               plattform: null,
             } satisfies QuickSelectItem,
@@ -565,7 +565,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ? ([
             {
               title: t("settings:browserExtensions"),
-              icon: "puzzle",
+              icon: "puzzle-outline",
               ref: browserExtensionRef,
               plattform: "web",
             },
@@ -585,7 +585,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ? [
             {
               title: t("settings:system"),
-              icon: "cogs",
+              icon: "cog-outline",
               ref: systemRef,
               plattform: "web",
             } satisfies QuickSelectItem,
@@ -595,7 +595,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ? [
             {
               title: t("settings:hotkeys"),
-              icon: "keyboard",
+              icon: "keyboard-outline",
               ref: hotkeysRef,
               plattform: "web",
             } satisfies QuickSelectItem,
@@ -605,7 +605,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ? [
             {
               title: t("settings:cryptography"),
-              icon: "key-chain",
+              icon: "key-outline",
               ref: cryptoRef,
               plattform: null,
             } satisfies QuickSelectItem,
@@ -615,7 +615,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ? [
             {
               title: t("settings:dangerZone"),
-              icon: "alert",
+              icon: "alert-outline",
               ref: dataResetRef,
               plattform: null,
             } satisfies QuickSelectItem,
@@ -1411,7 +1411,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             {visibleSettingsSections.security ? (
               <SettingsContainer
                 ref={authSettingsRef}
-                icon="shield"
+                icon="shield-outline"
                 title={t("settings:security")}
               >
                 <SettingsItem
@@ -1609,7 +1609,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             {visibleSettingsSections.backup ? (
               <SettingsContainer
                 ref={backupRef}
-                icon="database"
+                icon="database-outline"
                 title={t("settings:backup")}
               >
                 <BackupImportButton />
@@ -1621,11 +1621,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             {visibleSettingsSections.import ? (
               <SettingsContainer
                 ref={importRef}
-                icon="import"
+                icon="file-import-outline"
                 title={t("settings:import")}
               >
                 <SettingsItem
-                  leadingIcon="import"
+                  leadingIcon="file-import-outline"
                   onPress={() => {
                     setShowImportModal(true);
                   }}
@@ -1638,7 +1638,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             {visibleSettingsSections.browserExtensions ? (
               <SettingsContainer
                 ref={browserExtensionRef}
-                icon="puzzle"
+                icon="puzzle-outline"
                 title={t("settings:browserExtensions")}
               >
                 <SettingsItem
@@ -1689,7 +1689,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             {visibleSettingsSections.system ? (
               <SettingsContainer
                 ref={systemRef}
-                icon="cogs"
+                icon="cog-outline"
                 title={t("settings:system")}
               >
                 <SettingsSwitch
@@ -1729,7 +1729,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             {visibleSettingsSections.hotkeys ? (
               <SettingsContainer
                 ref={hotkeysRef}
-                icon="keyboard"
+                icon="keyboard-outline"
                 title={t("settings:hotkeys")}
               >
                 <HotkeyRecorderItem
@@ -1764,7 +1764,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             {visibleSettingsSections.cryptography ? (
               <SettingsContainer
                 ref={cryptoRef}
-                icon="key-chain"
+                icon="key-outline"
                 title={t("settings:cryptography")}
               >
                 <SettingsShortcutItem shortcut="XChaCha20">
@@ -1780,7 +1780,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             {visibleSettingsSections.dangerZone ? (
               <SettingsContainer
                 ref={dataResetRef}
-                icon="alert"
+                icon="alert-outline"
                 title={t("settings:dangerZone")}
               >
                 <SettingsItem onPress={() => setResetAction("settings")}>
@@ -1902,7 +1902,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                   <Import
                     type={DocumentTypeEnum.KDBX}
                     title="KeePass"
-                    icon="key-chain"
+                    icon="key-outline"
                     vault={vault}
                     leading={
                       <BrandIcon
@@ -1917,7 +1917,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               <Import
                 type={DocumentTypeEnum.BITWARDEN}
                 title="Bitwarden"
-                icon="shield-key"
+                icon="shield-key-outline"
                 vault={vault}
                 leading={
                   <BrandIcon icon={siBitwarden} color={theme.colors.primary} />

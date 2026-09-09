@@ -61,7 +61,11 @@ function GlobalErrorSnackbar() {
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <Icon source="alert-circle" size={18} color={theme.colors.onError} />
+          <Icon
+            source="alert-circle-outline"
+            size={18}
+            color={theme.colors.onError}
+          />
           <View style={{ flex: 1, minWidth: 0 }}>
             {error?.title ? (
               <Text
