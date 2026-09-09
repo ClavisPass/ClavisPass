@@ -12,7 +12,10 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "../app/providers/ThemeProvider";
 import { HomeStackParamList } from "../app/navigation/model/types";
 import ModulesType, { ModuleType } from "../features/vault/model/ModulesType";
-import { WebDragHandlePropsProvider } from "../features/vault/components/EditRowControlsContainer";
+import {
+  NativeDragHandleScrollLockProvider,
+  WebDragHandlePropsProvider,
+} from "../features/vault/components/EditRowControlsContainer";
 import getModule from "../features/vault/utils/getModule";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import {
@@ -35,6 +38,14 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
 });
+const dragDropAnimationConfig = {
+  damping: 32,
+  mass: 0.12,
+  overshootClamping: true,
+  restDisplacementThreshold: 1,
+  restSpeedThreshold: 1,
+  stiffness: 420,
+};
 const webNoDragStyle =
   Platform.OS === "web"
     ? ({
@@ -99,6 +110,7 @@ export default function ModuleReorderScreen({
     resolveWindowControlsSide(windowControlsStyle) === "left";
   const [items, setItems] = useState<ModulesType>(route.params.modules);
   const ignoreModuleChange = useCallback(() => {}, []);
+  const [nativeScrollEnabled, setNativeScrollEnabled] = useState(true);
 
   const headerTop =
     Constants.statusBarHeight + (TITLEBAR_HEIGHT > 0 ? 4 : 6);
@@ -228,27 +240,34 @@ export default function ModuleReorderScreen({
       draggableFlatListModule.default ?? draggableFlatListModule;
 
     return (
-      <DraggableFlatList
-        data={items}
-        keyExtractor={(item: ModuleType) => item.id}
-        activationDistance={8}
-        initialNumToRender={16}
-        maxToRenderPerBatch={10}
-        updateCellsBatchingPeriod={50}
-        windowSize={7}
-        removeClippedSubviews
-        contentContainerStyle={{ paddingTop: 4 }}
-        renderItem={({ item, drag }: RenderItemParams<ModuleType>) =>
-          renderModuleItem(item, drag)
-        }
-        onDragEnd={({ data }: { data: ModulesType }) => setItems(data)}
-      />
+      <NativeDragHandleScrollLockProvider
+        onPendingStart={() => setNativeScrollEnabled(false)}
+        onPendingEnd={() => setNativeScrollEnabled(true)}
+      >
+        <DraggableFlatList
+          data={items}
+          keyExtractor={(item: ModuleType) => item.id}
+          activationDistance={0}
+          animationConfig={dragDropAnimationConfig}
+          scrollEnabled={nativeScrollEnabled}
+          initialNumToRender={16}
+          maxToRenderPerBatch={10}
+          updateCellsBatchingPeriod={50}
+          windowSize={7}
+          removeClippedSubviews
+          contentContainerStyle={{ paddingTop: 4 }}
+          renderItem={({ item, drag }: RenderItemParams<ModuleType>) =>
+            renderModuleItem(item, drag)
+          }
+          onDragEnd={({ data }: { data: ModulesType }) => setItems(data)}
+        />
+      </NativeDragHandleScrollLockProvider>
     );
-  }, [items, renderModuleItem]);
+  }, [items, nativeScrollEnabled, renderModuleItem]);
 
   const applyChanges = () => {
     route.params.onApply(items);
-    navigation.goBack();
+    requestAnimationFrame(() => navigation.goBack());
   };
 
   return (

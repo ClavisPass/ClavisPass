@@ -26,6 +26,14 @@ import { resolveWindowControlsSide } from "../infrastructure/platform/windowCont
 type ReorderScreenProps = NativeStackScreenProps<HomeStackParamList, "Reorder">;
 
 const noop = () => {};
+const dragDropAnimationConfig = {
+  damping: 32,
+  mass: 0.12,
+  overshootClamping: true,
+  restDisplacementThreshold: 1,
+  restSpeedThreshold: 1,
+  stiffness: 420,
+};
 const webNoDragStyle =
   Platform.OS === "web"
     ? ({
@@ -111,6 +119,7 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
     resolveWindowControlsSide(windowControlsStyle) === "left";
   const vault = useVault();
   const [items, setItems] = useState<ValuesType[]>(route.params.values ?? []);
+  const [nativeScrollEnabled, setNativeScrollEnabled] = useState(true);
 
   const headerTop =
     Constants.statusBarHeight + (TITLEBAR_HEIGHT > 0 ? 4 : 6);
@@ -154,6 +163,8 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
         hideChevron
         pressDisabled
         onDragStart={onDragStart}
+        onDragHandlePressIn={() => setNativeScrollEnabled(false)}
+        onDragHandleRelease={() => setNativeScrollEnabled(true)}
         dragHandleProps={dragHandleProps}
         onPress={noop}
       />
@@ -237,7 +248,9 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
       <DraggableFlatList
         data={items}
         keyExtractor={(item: ValuesType) => item.id}
-        activationDistance={8}
+        activationDistance={0}
+        animationConfig={dragDropAnimationConfig}
+        scrollEnabled={nativeScrollEnabled}
         initialNumToRender={16}
         maxToRenderPerBatch={10}
         updateCellsBatchingPeriod={50}
@@ -249,13 +262,13 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
         onDragEnd={({ data }: { data: ValuesType[] }) => setItems(data)}
       />
     );
-  }, [items, renderReorderItem]);
+  }, [items, nativeScrollEnabled, renderReorderItem]);
 
   const applyChanges = () => {
     vault.update((draft) => {
       draft.values = applyVisibleOrder(draft.values ?? [], items);
     });
-    navigation.goBack();
+    requestAnimationFrame(() => navigation.goBack());
   };
 
   return (

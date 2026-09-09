@@ -28,6 +28,7 @@ import { getValueIcon } from "../../utils/getValueIcon";
 import { getFolderColor } from "../../utils/folderAppearance";
 import TooltipIconButton from "../../../../shared/components/buttons/TooltipIconButton";
 import AppTooltip from "../../../../shared/components/tooltips/AppTooltip";
+import { useDeferredDragStart } from "../../../../shared/hooks/useDeferredDragStart";
 import {
   buildFaviconUrl,
   normalizeUrl,
@@ -220,6 +221,8 @@ type Props = {
   hideChevron?: boolean;
   pressDisabled?: boolean;
   onDragStart?: () => void;
+  onDragHandlePressIn?: () => void;
+  onDragHandleRelease?: () => void;
   dragHandleProps?: any;
 };
 
@@ -676,6 +679,15 @@ function ListItem(props: Props) {
 
   const webDragHandleProps = props.dragHandleProps ?? {};
   const folderColor = getFolderColor(props.item.folder);
+  const deferredDragStartProps = useDeferredDragStart(
+    props.onDragStart,
+    undefined,
+    {
+      onPendingEnd: props.onDragHandleRelease,
+      onPendingStart: props.onDragHandlePressIn,
+      startImmediately: true,
+    },
+  );
 
   const dragHandle = props.reorderMode ? (
     Platform.OS === "web" ? (
@@ -748,10 +760,10 @@ function ListItem(props: Props) {
         rippleColor="rgba(0, 0, 0, .12)"
         onPressIn={() => {
           setDragHandlePressed(true);
-          props.onDragStart?.();
         }}
         onPressOut={() => setDragHandlePressed(false)}
         onPress={() => {}}
+        {...deferredDragStartProps}
         style={[
           styles.dragHandle,
           dragHandlePressed
@@ -783,7 +795,7 @@ function ListItem(props: Props) {
   ) : null;
 
   const enterAnimation =
-    props.index >= 12
+    props.reorderMode || props.index >= 12
       ? undefined
       : FadeInDown.delay(props.index * 50).duration(250);
   const animateContentDirectly = Platform.OS === "web" || props.reorderMode;

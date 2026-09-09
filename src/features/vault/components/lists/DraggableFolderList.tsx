@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import DraggableFlatList, {
   RenderItemParams,
@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import {
   getFolderIcon,
 } from "../../utils/folderAppearance";
+import { useDeferredDragStart } from "../../../../shared/hooks/useDeferredDragStart";
 
 type Props = {
   folder: FolderType[];
@@ -21,9 +22,52 @@ type Props = {
   persistFolderOrder: (nextFolders: FolderType[]) => void;
 };
 
+const dragDropAnimationConfig = {
+  damping: 32,
+  mass: 0.12,
+  overshootClamping: true,
+  restDisplacementThreshold: 1,
+  restSpeedThreshold: 1,
+  stiffness: 420,
+};
+
+function FolderDragHandle({
+  disabled,
+  onPendingEnd,
+  onPendingStart,
+  onDragStart,
+}: {
+  disabled?: boolean;
+  onPendingEnd?: () => void;
+  onPendingStart?: () => void;
+  onDragStart?: () => void;
+}) {
+  const deferredDragStartProps = useDeferredDragStart(
+    onDragStart,
+    undefined,
+    {
+      onPendingEnd,
+      onPendingStart,
+      startImmediately: true,
+    },
+  );
+
+  return (
+    <Pressable disabled={disabled} {...deferredDragStartProps}>
+      <Icon source="drag" size={20} />
+    </Pressable>
+  );
+}
+
 function DraggableFolderList(props: Props) {
   const { globalStyles, theme } = useTheme();
   const { t } = useTranslation();
+  const [localFolders, setLocalFolders] = useState(props.folder);
+  const [nativeScrollEnabled, setNativeScrollEnabled] = useState(true);
+
+  useEffect(() => {
+    setLocalFolders(props.folder);
+  }, [props.folder]);
 
   const renderItem = useCallback(
     ({ item, drag, isActive }: RenderItemParams<FolderType>) => {
@@ -38,9 +82,12 @@ function DraggableFolderList(props: Props) {
           }}
         >
           <View style={[globalStyles.folderContainer]}>
-            <Pressable onPressIn={drag} disabled={props.draggableDisabled}>
-              <Icon source="drag" size={20} />
-            </Pressable>
+            <FolderDragHandle
+              disabled={props.draggableDisabled}
+              onPendingStart={() => setNativeScrollEnabled(false)}
+              onPendingEnd={() => setNativeScrollEnabled(true)}
+              onDragStart={drag}
+            />
 
             <AnimatedPressable
               borderless={false}
@@ -156,14 +203,18 @@ function DraggableFolderList(props: Props) {
         </View>
       )}
       <DraggableFlatList
-        data={props.folder}
+        data={localFolders}
+        extraData={localFolders}
         renderItem={renderItem}
-        keyExtractor={(item, index) => `drag-item-${item.id}-${index}`}
-        activationDistance={props.draggableDisabled ? 10_000 : 8}
-        scrollEnabled={!props.draggableDisabled}
+        keyExtractor={(item) => `drag-item-${item.id}`}
+        activationDistance={props.draggableDisabled ? 10_000 : 0}
+        animationConfig={dragDropAnimationConfig}
+        scrollEnabled={!props.draggableDisabled && nativeScrollEnabled}
         onDragEnd={(event) => {
           if (props.draggableDisabled) return;
-          if (event?.data) props.persistFolderOrder(event.data);
+          if (!event?.data) return;
+          setLocalFolders(event.data);
+          props.persistFolderOrder(event.data);
         }}
       />
     </View>

@@ -15,6 +15,7 @@ import { useTheme } from "../../../app/providers/ThemeProvider";
 import Animated, { FadeOutUp } from "react-native-reanimated";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 import TooltipIconButton from "../../../shared/components/buttons/TooltipIconButton";
+import { useDeferredDragStart } from "../../../shared/hooks/useDeferredDragStart";
 
 export type EditRowControlsContainerProps = {
   id: string;
@@ -33,6 +34,10 @@ const DELETE_BUTTON_ZONE = 36;
 const SWIPE_DELETE_WIDTH = 78;
 const SWIPE_DELETE_OVERSCAN = 48;
 const WebDragHandlePropsContext = React.createContext<any>(null);
+const NativeDragHandleScrollLockContext = React.createContext<{
+  onPendingEnd?: () => void;
+  onPendingStart?: () => void;
+} | null>(null);
 
 export function WebDragHandlePropsProvider({
   children,
@@ -45,6 +50,24 @@ export function WebDragHandlePropsProvider({
     <WebDragHandlePropsContext.Provider value={dragHandleProps ?? null}>
       {children}
     </WebDragHandlePropsContext.Provider>
+  );
+}
+
+export function NativeDragHandleScrollLockProvider({
+  children,
+  onPendingEnd,
+  onPendingStart,
+}: {
+  children: ReactNode;
+  onPendingEnd?: () => void;
+  onPendingStart?: () => void;
+}) {
+  return (
+    <NativeDragHandleScrollLockContext.Provider
+      value={{ onPendingEnd, onPendingStart }}
+    >
+      {children}
+    </NativeDragHandleScrollLockContext.Provider>
   );
 }
 
@@ -62,11 +85,23 @@ export function EditRowControlsContainer({
   const { t } = useTranslation();
   const { theme, darkmode } = useTheme();
   const webDragHandleProps = React.useContext(WebDragHandlePropsContext);
+  const nativeDragHandleScrollLock = React.useContext(
+    NativeDragHandleScrollLockContext,
+  );
   const swipeableRef = React.useRef<SwipeableMethods | null>(null);
   const [dragHovered, setDragHovered] = React.useState(false);
   const [dragPressed, setDragPressed] = React.useState(false);
   const showDragHandle = Boolean(onDragStart) || Boolean(webDragHandleProps);
   const canSwipeDelete = Platform.OS !== "web" && Boolean(onDelete);
+  const deferredDragStartProps = useDeferredDragStart(
+    onDragStart,
+    undefined,
+    {
+      onPendingEnd: nativeDragHandleScrollLock?.onPendingEnd,
+      onPendingStart: nativeDragHandleScrollLock?.onPendingStart,
+      startImmediately: true,
+    },
+  );
   const dragHandleContent = (
     <AnimatedPressable
       borderless={false}
@@ -94,7 +129,13 @@ export function EditRowControlsContainer({
             }
           : null,
       ]}
-      onPressIn={Platform.OS === "web" ? undefined : onDragStart}
+      onPressIn={
+        Platform.OS === "web" ? undefined : () => setDragPressed(true)
+      }
+      onPressOut={
+        Platform.OS === "web" ? undefined : () => setDragPressed(false)
+      }
+      {...(Platform.OS === "web" ? {} : deferredDragStartProps)}
     >
       <Icon
         source="drag"

@@ -24,6 +24,16 @@ import {
   DraggableModulesFooter,
   DraggableModulesListProps,
 } from "./DraggableModulesList.shared";
+import { NativeDragHandleScrollLockProvider } from "../EditRowControlsContainer";
+
+const dragDropAnimationConfig = {
+  damping: 32,
+  mass: 0.12,
+  overshootClamping: true,
+  restDisplacementThreshold: 1,
+  restSpeedThreshold: 1,
+  stiffness: 420,
+};
 
 function DraggableModulesList(props: DraggableModulesListProps) {
   const { t } = useTranslation();
@@ -34,10 +44,16 @@ function DraggableModulesList(props: DraggableModulesListProps) {
   const keyboardRetryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
+  const [localModules, setLocalModules] = useState(props.value.modules);
+  const [nativeScrollEnabled, setNativeScrollEnabled] = useState(true);
+
+  useEffect(() => {
+    setLocalModules(props.value.modules);
+  }, [props.value.modules]);
 
   const modulePrediction = useMemo(
-    () => predictNextModule(props.value.modules),
-    [props.value.modules],
+    () => predictNextModule(localModules),
+    [localModules],
   );
 
   const scrollToBottom = useCallback(() => {
@@ -88,14 +104,14 @@ function DraggableModulesList(props: DraggableModulesListProps) {
     ],
   );
 
-  const previousLengthRef = useRef(props.value.modules.length);
+  const previousLengthRef = useRef(localModules.length);
   useEffect(() => {
-    const nextLength = props.value.modules.length;
+    const nextLength = localModules.length;
     if (nextLength > previousLengthRef.current) {
       scheduleKeyboardAwareScroll();
     }
     previousLengthRef.current = nextLength;
-  }, [props.value.modules.length, scheduleKeyboardAwareScroll]);
+  }, [localModules.length, scheduleKeyboardAwareScroll]);
 
   useEffect(() => {
     const handleKeyboardShown = () => {
@@ -147,31 +163,41 @@ function DraggableModulesList(props: DraggableModulesListProps) {
       keyboardVerticalOffset={40}
     >
       <View style={{ flex: 1, width: "100%" }}>
-        <DraggableFlatList
-          ref={listRef}
-          data={props.value.modules}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          onDragEnd={({ data }) => {
-            props.changeModules(data);
-          }}
-          keyboardShouldPersistTaps="always"
-          keyboardDismissMode="on-drag"
-          onContentSizeChange={(_, height) => {
-            contentHeightRef.current = height;
-          }}
-          ListFooterComponent={
-            <DraggableModulesFooter
-              modulePrediction={modulePrediction}
-              onAddPredictedModule={() => {
-                if (!modulePrediction) return;
-                props.addModule(modulePrediction);
-                setTimeout(scheduleKeyboardAwareScroll, 0);
-              }}
-              t={t}
-            />
-          }
-        />
+        <NativeDragHandleScrollLockProvider
+          onPendingStart={() => setNativeScrollEnabled(false)}
+          onPendingEnd={() => setNativeScrollEnabled(true)}
+        >
+          <DraggableFlatList
+            ref={listRef}
+            data={localModules}
+            extraData={localModules}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            onDragEnd={({ data }) => {
+              setLocalModules(data);
+              props.changeModules(data);
+            }}
+            activationDistance={0}
+            animationConfig={dragDropAnimationConfig}
+            scrollEnabled={nativeScrollEnabled}
+            keyboardShouldPersistTaps="always"
+            keyboardDismissMode="on-drag"
+            onContentSizeChange={(_, height) => {
+              contentHeightRef.current = height;
+            }}
+            ListFooterComponent={
+              <DraggableModulesFooter
+                modulePrediction={modulePrediction}
+                onAddPredictedModule={() => {
+                  if (!modulePrediction) return;
+                  props.addModule(modulePrediction);
+                  setTimeout(scheduleKeyboardAwareScroll, 0);
+                }}
+                t={t}
+              />
+            }
+          />
+        </NativeDragHandleScrollLockProvider>
       </View>
     </KeyboardAvoidingView>
   );
