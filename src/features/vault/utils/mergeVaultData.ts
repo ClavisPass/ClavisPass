@@ -2,6 +2,7 @@ import FolderType from "../model/FolderType";
 import ValuesType from "../model/ValuesType";
 import VaultDataType, { VaultEntryTombstone } from "../model/VaultDataType";
 import VaultDeviceType from "../model/VaultDeviceType";
+import { resolveMergedVaultId } from "./vaultIdentity";
 
 type VaultData = NonNullable<VaultDataType>;
 
@@ -214,6 +215,7 @@ export function mergeVaultData(
 ) {
   const sameTimestampConflictStrategy =
     options.sameTimestampConflictStrategy ?? "copyRemote";
+  const vaultId = resolveMergedVaultId(localVault, remoteVault);
   const localById = new Map(
     (localVault.values ?? []).map((entry) => [entry.id, entry]),
   );
@@ -350,6 +352,7 @@ export function mergeVaultData(
   return {
     vault: {
       ...clone(localVault),
+      vaultId,
       folder: mergedFolders,
       values: mergedValues,
       devices: mergedDevices,

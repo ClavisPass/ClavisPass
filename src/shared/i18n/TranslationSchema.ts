@@ -64,6 +64,8 @@ export type TranslationSchema = {
     copiedFor: string;
     connected: string;
     notConnected: string;
+    vaultMismatchTitle: string;
+    vaultMismatchText: string;
     favorites: string;
     allModules: string;
     recentlyUsed: string;

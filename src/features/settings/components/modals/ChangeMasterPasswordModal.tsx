@@ -145,7 +145,8 @@ function ChangeMasterPasswordModal(props: Props) {
         remotePath: "clavispass.lock",
         content,
         onCompleted: undefined,
-      } as any);
+        vaultId: data.vaultId,
+      });
 
       auth.login(newPassword);
       vault.markSaved();

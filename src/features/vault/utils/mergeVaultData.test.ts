@@ -3,6 +3,7 @@ import ModulesEnum from "../model/ModulesEnum";
 import VaultDataType from "../model/VaultDataType";
 import ValuesType from "../model/ValuesType";
 import { mergeVaultData } from "./mergeVaultData";
+import { VaultIdentityMismatchError } from "./vaultIdentity";
 
 const baseDate = "2026-05-21T10:00:00.000Z";
 
@@ -36,6 +37,36 @@ function vault(overrides: Partial<VaultDataType> = {}): VaultDataType {
 }
 
 describe("mergeVaultData", () => {
+  it("keeps the matching vault id while merging", () => {
+    const result = mergeVaultData(
+      vault({ vaultId: "vault-main", values: [entry("local-only", "Local")] }),
+      vault({
+        vaultId: "vault-main",
+        values: [entry("remote-only", "Remote")],
+      }),
+    );
+
+    expect(result.vault.vaultId).toBe("vault-main");
+  });
+
+  it("adopts the existing vault id when one side is a legacy vault", () => {
+    const result = mergeVaultData(
+      vault({ vaultId: "vault-main" }),
+      vault({ vaultId: undefined }),
+    );
+
+    expect(result.vault.vaultId).toBe("vault-main");
+  });
+
+  it("rejects merging different vault identities", () => {
+    expect(() =>
+      mergeVaultData(
+        vault({ vaultId: "vault-local" }),
+        vault({ vaultId: "vault-remote" }),
+      ),
+    ).toThrow(VaultIdentityMismatchError);
+  });
+
   it("adds entries that exist on only one side", () => {
     const result = mergeVaultData(
       vault({ values: [entry("local-only", "Local")] }),

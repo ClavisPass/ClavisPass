@@ -67,6 +67,9 @@ const en: TranslationSchema = {
     copiedFor: "Copied for {{seconds}} seconds",
     connected: "connected",
     notConnected: "not connected",
+    vaultMismatchTitle: "Different vault detected",
+    vaultMismatchText:
+      "This cloud vault belongs to another vault. Sync was stopped to protect your data.",
     favorites: "Favorites",
     allModules: "All Modules",
     recentlyUsed: "Recently Used",

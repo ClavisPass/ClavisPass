@@ -22,6 +22,7 @@ import {
 import { VaultSession } from "../../features/vault/utils/VaultSession";
 import VaultDeviceType from "../../features/vault/model/VaultDeviceType";
 import { clipboardClearScheduler } from "../../infrastructure/clipboard/clipboardClearScheduler";
+import { ensureVaultId } from "../../features/vault/utils/vaultIdentity";
 
 type VaultData = NonNullable<VaultDataType>;
 
@@ -94,7 +95,9 @@ export function VaultProvider({ children }: { children: ReactNode }) {
 
   const unlockWithDecryptedVault = useCallback(
     (decrypted: VaultData) => {
-      VaultSession.unlock(decrypted);
+      const ensured = ensureVaultId(decrypted);
+      VaultSession.unlock(ensured.vault);
+      if (ensured.changed) VaultSession.markDirty();
       setIsUnlocked(true);
       refresh();
     },

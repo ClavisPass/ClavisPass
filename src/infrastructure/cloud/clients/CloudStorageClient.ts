@@ -19,7 +19,7 @@ export const fetchUserInfo = async (
   token: string,
   provider: Provider,
   setUserInfo: (data: UserInfoType) => void,
-  callback?: () => void
+  callback?: () => void,
 ): Promise<void> => {
   switch (provider) {
     case "dropbox":
@@ -41,7 +41,7 @@ export const fetchUserInfo = async (
       const _exhaustiveCheck: never = provider as never;
       logger.error(
         "[CloudStorage] Unsupported provider for user info:",
-        provider
+        provider,
       );
       triggerGlobalError({
         title: "CloudStorage",
@@ -92,12 +92,11 @@ export const fetchRemoteVaultFile = async (params: {
   }
 };
 
-
-
 export const uploadRemoteVaultFile = async (
-  params: UploadFileParams
+  params: UploadFileParams,
 ): Promise<void> => {
-  const { provider, accessToken, remotePath, content, onCompleted } = params;
+  const { provider, accessToken, remotePath, content, onCompleted, vaultId } =
+    params;
 
   switch (provider) {
     case "dropbox":
@@ -105,7 +104,8 @@ export const uploadRemoteVaultFile = async (
         accessToken,
         content,
         remotePath,
-        onCompleted
+        onCompleted,
+        vaultId,
       );
 
     case "googleDrive":
@@ -113,16 +113,17 @@ export const uploadRemoteVaultFile = async (
         accessToken,
         content,
         remotePath,
-        onCompleted
+        onCompleted,
+        vaultId,
       );
     case "device":
-      return DeviceStorageClient.uploadFile(content, onCompleted);
+      return DeviceStorageClient.uploadFile(content, onCompleted, vaultId);
     case "clavispassHub":
       return ClavisPassHubClient.uploadFile(
         accessToken,
         content,
         remotePath,
-        onCompleted
+        onCompleted,
       );
     case "localFile":
       return LocalFileClient.uploadFile(accessToken, content, onCompleted);
@@ -134,7 +135,7 @@ export const uploadRemoteVaultFile = async (
 };
 
 export const refreshAccessToken = async (
-  params: TokenRefreshParams
+  params: TokenRefreshParams,
 ): Promise<TokenRefreshResult> => {
   const { provider, refreshToken } = params;
 
@@ -149,7 +150,7 @@ export const refreshAccessToken = async (
       return ClavisPassHubClient.refreshAccessToken(refreshToken);
     case "localFile":
       throw new Error(
-        "[OAuth] Local file provider does not support token refresh"
+        "[OAuth] Local file provider does not support token refresh",
       );
     default: {
       throw new Error(`[OAuth] Unsupported provider: ${String(provider)}`);

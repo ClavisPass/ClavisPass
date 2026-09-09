@@ -80,6 +80,7 @@ import {
   areVaultDataEqual,
   mergeVaultData,
 } from "../features/vault/utils/mergeVaultData";
+import { VaultIdentityMismatchError } from "../features/vault/utils/vaultIdentity";
 import ExpiryOverviewModal from "../features/vault/components/modals/ExpiryOverviewModal";
 import ModuleFilterModal from "../features/vault/components/modals/ModuleFilterModal";
 import type ExpiryModuleType from "../features/vault/model/modules/ExpiryModuleType";
@@ -102,6 +103,7 @@ import {
   saveAuthentication,
 } from "../features/auth/utils/authenticateUser";
 import PerfProfiler from "../shared/performance/PerfProfiler";
+import { triggerGlobalError } from "../infrastructure/events/errorBus";
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
@@ -956,6 +958,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         vault.markSaved();
       } else {
         vault.update((draft) => {
+          draft.vaultId = mergeResult.vault.vaultId;
           draft.version = mergeResult.vault.version;
           draft.folder = mergeResult.vault.folder ?? [];
           draft.values = mergeResult.vault.values ?? [];
@@ -981,6 +984,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       setModuleFilters([]);
       setSelectedModuleFilters([]);
     } catch (error) {
+      if (error instanceof VaultIdentityMismatchError) {
+        triggerGlobalError({
+          title: t("common:vaultMismatchTitle"),
+          message: t("common:vaultMismatchText"),
+          code: "VAULT_IDENTITY_MISMATCH",
+        });
+      }
       logger.error("[Home] Error during refreshData:", error);
     } finally {
       setRefreshing(false);
@@ -993,6 +1003,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     saveSelected2FAState,
     saveSelectedCardState,
     saveSelectedFavState,
+    t,
     vault,
   ]);
 

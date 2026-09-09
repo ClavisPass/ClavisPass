@@ -66,10 +66,13 @@ function Login(props: Props) {
   const [masterPassword, setMasterPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
 
-  const [isUsingAuthenticationButtonVisible, setIsUsingAuthenticationButtonVisible] =
-    useState(false);
+  const [
+    isUsingAuthenticationButtonVisible,
+    setIsUsingAuthenticationButtonVisible,
+  ] = useState(false);
   const transitionEasing = Easing.bezier(0.22, 1, 0.36, 1);
-  const contentTransition = LinearTransition.duration(320).easing(transitionEasing);
+  const contentTransition =
+    LinearTransition.duration(320).easing(transitionEasing);
 
   const resolveAccessToken = useCallback(async (): Promise<string> => {
     if (!provider || provider === "device") return "";
@@ -77,7 +80,7 @@ function Login(props: Props) {
   }, [provider, accessToken, ensureFreshAccessToken]);
 
   const writeVaultJson = useCallback(
-    async (vaultJson: string) => {
+    async (vaultJson: string, vaultId?: string) => {
       if (!provider) return;
 
       const token = await resolveAccessToken();
@@ -88,9 +91,10 @@ function Login(props: Props) {
         remotePath: "clavispass.lock",
         content: vaultJson,
         onCompleted: undefined,
+        vaultId,
       });
     },
-    [provider, resolveAccessToken]
+    [provider, resolveAccessToken],
   );
 
   const loginWithMasterPassword = useCallback(
@@ -98,10 +102,7 @@ function Login(props: Props) {
       try {
         if (!content) return;
 
-        const result = await decryptVaultContent(
-          content,
-          masterPasswordToUse,
-        );
+        const result = await decryptVaultContent(content, masterPasswordToUse);
 
         if (!result.ok) {
           const failure = result;
@@ -117,7 +118,7 @@ function Login(props: Props) {
         setTimeout(() => setError(false), 1000);
       }
     },
-    [auth, vault, writeVaultJson]
+    [auth, vault, writeVaultJson],
   );
 
   const authenticate = useCallback(async () => {
@@ -140,7 +141,9 @@ function Login(props: Props) {
 
       const tokenToUse = await resolveAccessToken();
       if (provider !== "device" && !tokenToUse) {
-        setFetchError(t("login:cloudAuthMissing") ?? "No access token available.");
+        setFetchError(
+          t("login:cloudAuthMissing") ?? "No access token available.",
+        );
         setLoading(false);
         return;
       }
@@ -198,7 +201,13 @@ function Login(props: Props) {
 
   const newMasterPassword = useCallback(async () => {
     try {
-      if (!(masterPassword === newPasswordConfirm && masterPassword && newPasswordConfirm)) {
+      if (
+        !(
+          masterPassword === newPasswordConfirm &&
+          masterPassword &&
+          newPasswordConfirm
+        )
+      ) {
         logger.error("[Login] Master password confirmation does not match.");
         return;
       }
@@ -216,7 +225,7 @@ function Login(props: Props) {
 
       // 3) write to provider
       if (provider) {
-        await writeVaultJson(vaultJson);
+        await writeVaultJson(vaultJson, empty.vaultId);
       }
 
       // 4) unlock
@@ -226,16 +235,22 @@ function Login(props: Props) {
       logger.error("[Login] Failed to create new vault:", e);
       setFetchError("Failed to create vault.");
     }
-  }, [auth, masterPassword, newPasswordConfirm, provider, vault, writeVaultJson]);
+  }, [
+    auth,
+    masterPassword,
+    newPasswordConfirm,
+    provider,
+    vault,
+    writeVaultJson,
+  ]);
 
-  const stageKey =
-    loading
-      ? "loading"
-      : fetchError && !showNewData
-        ? "error"
-        : showNewData
-          ? "create"
-          : "unlock";
+  const stageKey = loading
+    ? "loading"
+    : fetchError && !showNewData
+      ? "error"
+      : showNewData
+        ? "create"
+        : "unlock";
 
   const renderStageContent = () => {
     if (loading) {
@@ -268,11 +283,17 @@ function Login(props: Props) {
         <TypeWriterComponent displayName={props.userInfo?.username ?? ""} />
 
         {fetchError && !showNewData && (
-          <Animated.View layout={contentTransition} style={{ width: "100%", gap: 8 }}>
+          <Animated.View
+            layout={contentTransition}
+            style={{ width: "100%", gap: 8 }}
+          >
             <Text style={{ color: theme.colors.error, textAlign: "center" }}>
               {fetchError}
             </Text>
-            <Button text={t("common:retry") ?? "Retry"} onPress={authenticate} />
+            <Button
+              text={t("common:retry") ?? "Retry"}
+              onPress={authenticate}
+            />
           </Animated.View>
         )}
 
@@ -280,7 +301,12 @@ function Login(props: Props) {
           <>
             <Animated.View
               layout={contentTransition}
-              style={{ width: "100%", display: "flex", flexDirection: "column", gap: 6 }}
+              style={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+              }}
             >
               <PasswordTextbox
                 autofocus
@@ -289,7 +315,9 @@ function Login(props: Props) {
                 setValue={setMasterPassword}
                 value={masterPassword}
                 placeholder={t("login:newMasterPassword")}
-                onSubmitEditing={() => textInputNewConfirmRef.current?.focus?.()}
+                onSubmitEditing={() =>
+                  textInputNewConfirmRef.current?.focus?.()
+                }
               />
               <PasswordTextbox
                 textInputRef={textInputNewConfirmRef}
@@ -299,7 +327,10 @@ function Login(props: Props) {
                 placeholder={t("login:confirmMasterPassword")}
               />
             </Animated.View>
-            <Button text={t("login:setNewPassword")} onPress={newMasterPassword} />
+            <Button
+              text={t("login:setNewPassword")}
+              onPress={newMasterPassword}
+            />
           </>
         ) : !fetchError ? (
           <>
@@ -352,10 +383,7 @@ function Login(props: Props) {
         alignItems: "center",
       }}
     >
-      <Logo
-        width={isWideLayout ? 76 : 44}
-        height={isWideLayout ? 76 : 44}
-      />
+      <Logo width={isWideLayout ? 76 : 44} height={isWideLayout ? 76 : 44} />
       <Text
         style={{
           width: "100%",
@@ -428,7 +456,9 @@ function Login(props: Props) {
         />
 
         <Animated.View
-          entering={FadeInDown.delay(120).duration(360).easing(transitionEasing)}
+          entering={FadeInDown.delay(120)
+            .duration(360)
+            .easing(transitionEasing)}
           layout={contentTransition}
           style={{
             flex: 1.55,

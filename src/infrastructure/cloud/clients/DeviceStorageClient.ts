@@ -9,17 +9,26 @@ import { getDesktopDistributionStorageKey } from "../../storage/distributionStor
 
 const LOCAL_SYNC_KEY = "LOCAL_SYNC";
 const LOCAL_SYNC_METADATA_KEY = "LOCAL_SYNC_METADATA";
+const ACTIVE_LOCAL_VAULT_ID_KEY = "ACTIVE_LOCAL_VAULT_ID";
 
 const getLocalSyncKey = () => getDesktopDistributionStorageKey(LOCAL_SYNC_KEY);
+const getVaultLocalSyncKey = (vaultId: string) =>
+  getDesktopDistributionStorageKey(`${LOCAL_SYNC_KEY}:${vaultId}`);
 const getLocalSyncMetadataKey = () =>
   getDesktopDistributionStorageKey(LOCAL_SYNC_METADATA_KEY);
+const getVaultLocalSyncMetadataKey = (vaultId: string) =>
+  getDesktopDistributionStorageKey(`${LOCAL_SYNC_METADATA_KEY}:${vaultId}`);
+const getActiveLocalVaultIdKey = () =>
+  getDesktopDistributionStorageKey(ACTIVE_LOCAL_VAULT_ID_KEY);
 
 type LocalSyncMetadata = {
   updatedAt?: string;
 };
 
-const readLocalSyncMetadata = async (): Promise<LocalSyncMetadata | null> => {
-  const raw = await AsyncStorage.getItem(getLocalSyncMetadataKey());
+const readLocalSyncMetadata = async (
+  metadataKey = getLocalSyncMetadataKey(),
+): Promise<LocalSyncMetadata | null> => {
+  const raw = await AsyncStorage.getItem(metadataKey);
   if (!raw) return null;
 
   try {
@@ -41,15 +50,34 @@ export const fetchUserInfo = async (
 
 export const fetchFile = async (): Promise<VaultFetchResult> => {
   try {
-    const localSyncKey = getLocalSyncKey();
+    const activeVaultId = await AsyncStorage.getItem(
+      getActiveLocalVaultIdKey(),
+    );
+    const localSyncKey = activeVaultId
+      ? getVaultLocalSyncKey(activeVaultId)
+      : getLocalSyncKey();
     const data = await AsyncStorage.getItem(localSyncKey);
 
     if (!data) {
+      if (activeVaultId) {
+        const legacyData = await AsyncStorage.getItem(getLocalSyncKey());
+        if (legacyData) {
+          const metadata = await readLocalSyncMetadata();
+          return {
+            status: "ok",
+            content: legacyData,
+            updatedAt: metadata?.updatedAt,
+          };
+        }
+      }
+
       logger.info(`[LocalSync] No local file found for key "${localSyncKey}"`);
       return { status: "not_found" };
     }
 
-    const metadata = await readLocalSyncMetadata();
+    const metadata = await readLocalSyncMetadata(
+      activeVaultId ? getVaultLocalSyncMetadataKey(activeVaultId) : undefined,
+    );
 
     return {
       status: "ok",
@@ -76,19 +104,31 @@ export const fetchFile = async (): Promise<VaultFetchResult> => {
 export const uploadFile = async (
   content: UploadContent,
   onCompleted?: () => void,
+  vaultId?: string,
 ): Promise<void> => {
   try {
     const toStore =
       typeof content === "string" ? content : JSON.stringify(content);
     const localSyncKey = getLocalSyncKey();
+    const vaultLocalSyncKey = vaultId ? getVaultLocalSyncKey(vaultId) : null;
+
     await AsyncStorage.setItem(localSyncKey, toStore);
+    if (vaultId && vaultLocalSyncKey) {
+      await AsyncStorage.setItem(vaultLocalSyncKey, toStore);
+      await AsyncStorage.setItem(getActiveLocalVaultIdKey(), vaultId);
+    }
+
     try {
-      await AsyncStorage.setItem(
-        getLocalSyncMetadataKey(),
-        JSON.stringify({
-          updatedAt: getDateTime(),
-        } satisfies LocalSyncMetadata),
-      );
+      const metadata = JSON.stringify({
+        updatedAt: getDateTime(),
+      } satisfies LocalSyncMetadata);
+      await AsyncStorage.setItem(getLocalSyncMetadataKey(), metadata);
+      if (vaultId) {
+        await AsyncStorage.setItem(
+          getVaultLocalSyncMetadataKey(vaultId),
+          metadata,
+        );
+      }
     } catch (metadataError) {
       logger.warn(
         "[LocalSync] Error writing local sync metadata:",
@@ -114,6 +154,16 @@ export const removeFile = async (): Promise<void> => {
   try {
     await AsyncStorage.removeItem(getLocalSyncKey());
     await AsyncStorage.removeItem(getLocalSyncMetadataKey());
+    const activeVaultId = await AsyncStorage.getItem(
+      getActiveLocalVaultIdKey(),
+    );
+    if (activeVaultId) {
+      await AsyncStorage.removeItem(getVaultLocalSyncKey(activeVaultId));
+      await AsyncStorage.removeItem(
+        getVaultLocalSyncMetadataKey(activeVaultId),
+      );
+      await AsyncStorage.removeItem(getActiveLocalVaultIdKey());
+    }
   } catch (error) {
     logger.error(
       `[LocalSync] Error removing file "${LOCAL_SYNC_KEY}" from local storage:`,

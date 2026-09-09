@@ -14,6 +14,7 @@ export type VaultEntryTombstone = z.infer<typeof VaultEntryTombstoneSchema>;
 export const VaultDataTypeSchema = z
   .object({
     version: z.string().default("1"),
+    vaultId: z.string().optional(),
     folder: z.array(FolderSchema).default([]),
     values: ValuesListTypeSchema.default([]),
     devices: z.array(VaultDeviceSchema).default([]),

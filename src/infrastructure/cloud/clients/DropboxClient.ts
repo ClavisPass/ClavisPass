@@ -10,7 +10,7 @@ import { UploadContent } from "../model/UploadFileParams";
 export const fetchUserInfo = async (
   token: string,
   setUserInfo: (data: UserInfoType) => void,
-  callback?: () => void
+  callback?: () => void,
 ): Promise<void> => {
   if (!token) {
     callback?.();
@@ -25,7 +25,7 @@ export const fetchUserInfo = async (
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
 
     if (!response.ok) {
@@ -59,18 +59,21 @@ export const fetchUserInfo = async (
 
 export const fetchFile = async (
   accessToken: string,
-  filePath: string
+  filePath: string,
 ): Promise<VaultFetchResult> => {
   const normalizedPath = filePath.startsWith("/") ? filePath : `/${filePath}`;
 
   try {
-    const response = await fetch("https://content.dropboxapi.com/2/files/download", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Dropbox-API-Arg": JSON.stringify({ path: normalizedPath }),
+    const response = await fetch(
+      "https://content.dropboxapi.com/2/files/download",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Dropbox-API-Arg": JSON.stringify({ path: normalizedPath }),
+        },
       },
-    });
+    );
 
     if (response.ok) {
       const content = await response.text();
@@ -80,7 +83,9 @@ export const fetchFile = async (
     // Dropbox: Not found kommt oft als 409 + JSON error payload
     const bodyText = await response.text().catch(() => "");
     let body: any = null;
-    try { body = bodyText ? JSON.parse(bodyText) : null; } catch {}
+    try {
+      body = bodyText ? JSON.parse(bodyText) : null;
+    } catch {}
 
     const isNotFound =
       response.status === 409 &&
@@ -90,7 +95,12 @@ export const fetchFile = async (
       return { status: "not_found" };
     }
 
-    logger.warn("[Dropbox] fetch failed:", response.status, response.statusText, bodyText);
+    logger.warn(
+      "[Dropbox] fetch failed:",
+      response.status,
+      response.statusText,
+      bodyText,
+    );
 
     return {
       status: "error",
@@ -107,10 +117,11 @@ export const uploadFile = async (
   accessToken: string,
   content: UploadContent,
   filePath: string,
-  onCompleted?: () => void
+  onCompleted?: () => void,
+  vaultId?: string,
 ): Promise<void> => {
   try {
-    await DeviceStorageClient.uploadFile(content);
+    await DeviceStorageClient.uploadFile(content, undefined, vaultId);
   } catch (error) {
     logger.error("[Dropbox] DeviceStorage save failed (continuing):", error);
   }
@@ -118,7 +129,8 @@ export const uploadFile = async (
   const uploadEndpoint = "https://content.dropboxapi.com/2/files/upload";
   const normalizedPath = filePath.startsWith("/") ? filePath : `/${filePath}`;
 
-  const payload = typeof content === "string" ? content : JSON.stringify(content);
+  const payload =
+    typeof content === "string" ? content : JSON.stringify(content);
 
   const response = await fetch(uploadEndpoint, {
     method: "POST",
@@ -141,7 +153,7 @@ export const uploadFile = async (
       `[Dropbox] Fehler beim Hochladen der Datei "${normalizedPath}":`,
       response.status,
       response.statusText,
-      errorText
+      errorText,
     );
     triggerGlobalError({
       title: "Dropbox",
@@ -155,7 +167,7 @@ export const uploadFile = async (
 };
 
 export const refreshAccessToken = async (
-  refreshToken: string
+  refreshToken: string,
 ): Promise<TokenRefreshResult> => {
   const tokenEndpoint = "https://api.dropboxapi.com/oauth2/token";
 
@@ -182,7 +194,7 @@ export const refreshAccessToken = async (
         code: "TOKEN_REFRESH_FAILED",
       });
       throw new Error(
-        data.error_description || "Failed to refresh Dropbox token"
+        data.error_description || "Failed to refresh Dropbox token",
       );
     }
 

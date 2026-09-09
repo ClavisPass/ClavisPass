@@ -32,6 +32,7 @@ const folders = [
 
 const demoVault: VaultDataType = {
   version: "1",
+  vaultId: "vault_demo",
   folder: folders,
   devices: [],
   deletedEntries: [],

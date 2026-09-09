@@ -196,6 +196,7 @@ function VaultFileOpenHandler() {
       accessToken: tokenToUse,
       remotePath: "clavispass.lock",
       content: encrypted.content,
+      vaultId: payload.vaultId,
     });
 
     vault.markSaved();

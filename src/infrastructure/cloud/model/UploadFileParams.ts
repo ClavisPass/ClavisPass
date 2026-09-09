@@ -8,4 +8,5 @@ export interface UploadFileParams {
   remotePath: string;
   content: UploadContent;
   onCompleted?: () => void;
+  vaultId?: string;
 }

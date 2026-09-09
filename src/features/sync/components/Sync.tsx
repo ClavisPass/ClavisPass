@@ -30,6 +30,8 @@ import {
   mergeVaultData,
 } from "../../vault/utils/mergeVaultData";
 import VaultDataType from "../../vault/model/VaultDataType";
+import { VaultIdentityMismatchError } from "../../vault/utils/vaultIdentity";
+import { triggerGlobalError } from "../../../infrastructure/events/errorBus";
 
 type Props = {
   refreshing: boolean;
@@ -70,6 +72,7 @@ const Sync = (props: Props) => {
   const applyMergedVault = useCallback(
     (mergedVault: VaultDataType) => {
       vault.update((draft) => {
+        draft.vaultId = mergedVault.vaultId;
         draft.version = mergedVault.version;
         draft.folder = mergedVault.folder ?? [];
         draft.values = mergedVault.values ?? [];
@@ -195,6 +198,7 @@ const Sync = (props: Props) => {
       accessToken: tokenToUse,
       remotePath: "clavispass.lock",
       content: result.content,
+      vaultId: payload.vaultId,
     });
 
     logger.info("[Sync] Remote vault upload completed.");
@@ -235,12 +239,19 @@ const Sync = (props: Props) => {
         }
       } while (saveAgainAfterCurrentRef.current);
     } catch (err) {
+      if (err instanceof VaultIdentityMismatchError) {
+        triggerGlobalError({
+          title: t("common:vaultMismatchTitle"),
+          message: t("common:vaultMismatchText"),
+          code: "VAULT_IDENTITY_MISMATCH",
+        });
+      }
       logger.error("[Sync] Save failed:", err);
     } finally {
       saveInFlightRef.current = false;
       setRefreshing(false);
     }
-  }, [cancelAutosaveCountdown, saveOnce, setRefreshing, vault]);
+  }, [cancelAutosaveCountdown, saveOnce, setRefreshing, t, vault]);
 
   useEffect(() => {
     requestSaveRef.current = requestSave;

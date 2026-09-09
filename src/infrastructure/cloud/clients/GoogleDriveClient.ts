@@ -44,7 +44,7 @@ async function readJsonSafe(res: Response) {
 
 async function findFileIdByName(
   accessToken: string,
-  name: string
+  name: string,
 ): Promise<string | null> {
   const q = `name='${escapeDriveQueryString(name)}' and trashed=false`;
 
@@ -77,7 +77,7 @@ async function findFileIdByName(
 function buildMultipartBody(
   metadata: Record<string, any>,
   contentText: string,
-  boundary: string
+  boundary: string,
 ) {
   return (
     `--${boundary}\r\n` +
@@ -98,7 +98,7 @@ function buildMultipartBody(
 async function upsertByName(
   accessToken: string,
   name: string,
-  contentText: string
+  contentText: string,
 ): Promise<void> {
   const boundary = `----clavispass-${Math.random().toString(16).slice(2)}`;
   const fileId = await findFileIdByName(accessToken, name);
@@ -111,8 +111,8 @@ async function upsertByName(
   logger.info("[GoogleDrive] upsertByName", { name, fileId, method, url });
 
   const metadata: Record<string, any> = fileId
-  ? { name }
-  : { name, parents: ["appDataFolder"] };
+    ? { name }
+    : { name, parents: ["appDataFolder"] };
   const body = buildMultipartBody(metadata, contentText, boundary);
 
   const res = await fetch(url, {
@@ -128,7 +128,11 @@ async function upsertByName(
   logger.info("[GoogleDrive] upsert response", data);
 
   if (!res.ok) {
-    logger.error(`[GoogleDrive] Upsert failed for "${name}":`, res.status, data);
+    logger.error(
+      `[GoogleDrive] Upsert failed for "${name}":`,
+      res.status,
+      data,
+    );
     throw new Error("Error uploading the file to Google Drive");
   }
 }
@@ -136,7 +140,7 @@ async function upsertByName(
 export const fetchUserInfo = async (
   token: string,
   setUserInfo: (data: UserInfoType) => void,
-  callback?: () => void
+  callback?: () => void,
 ): Promise<void> => {
   if (!token) {
     callback?.();
@@ -151,7 +155,7 @@ export const fetchUserInfo = async (
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
 
     if (!response.ok) {
@@ -177,7 +181,7 @@ export const fetchUserInfo = async (
   } catch (error) {
     logger.error(
       "[GoogleDrive] Network error while fetching user info:",
-      error
+      error,
     );
     triggerGlobalError({
       title: "GoogleDrive",
@@ -190,7 +194,7 @@ export const fetchUserInfo = async (
 
 export const fetchFile = async (
   accessToken: string,
-  filePath: string
+  filePath: string,
 ): Promise<VaultFetchResult> => {
   const name = filePath;
 
@@ -237,17 +241,22 @@ export const uploadFile = async (
   accessToken: string,
   content: UploadContent,
   filePath: string,
-  onCompleted?: () => void
+  onCompleted?: () => void,
+  vaultId?: string,
 ): Promise<void> => {
   try {
-    await DeviceStorageClient.uploadFile(content);
+    await DeviceStorageClient.uploadFile(content, undefined, vaultId);
   } catch (error) {
-    logger.error("[GoogleDrive] DeviceStorage save failed (continuing):", error);
+    logger.error(
+      "[GoogleDrive] DeviceStorage save failed (continuing):",
+      error,
+    );
   }
 
   const name = filePath;
 
-  const payload = typeof content === "string" ? content : JSON.stringify(content);
+  const payload =
+    typeof content === "string" ? content : JSON.stringify(content);
 
   try {
     await upsertByName(accessToken, name, payload);
@@ -264,7 +273,7 @@ export const uploadFile = async (
 };
 
 export const refreshAccessToken = async (
-  refreshToken: string
+  refreshToken: string,
 ): Promise<TokenRefreshResult> => {
   const tokenEndpoint = "https://oauth2.googleapis.com/token";
   const clientId = getGoogleClientIdForCurrentPlatform();
@@ -297,7 +306,7 @@ export const refreshAccessToken = async (
       logger.error("[GoogleDrive] Error refreshing token:", data);
 
       const error = new Error(
-        oauthErrorDescription || "Failed to refresh Google token"
+        oauthErrorDescription || "Failed to refresh Google token",
       ) as GoogleTokenRefreshError;
       error.oauthError = oauthError;
       error.oauthErrorDescription = oauthErrorDescription;
