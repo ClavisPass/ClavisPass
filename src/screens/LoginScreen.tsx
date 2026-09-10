@@ -51,16 +51,36 @@ import FirstOpened from "../features/onboarding/components/FirstOpened";
 import { useSetting } from "../app/providers/SettingsProvider";
 import Modal from "../shared/components/modals/Modal";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
+import {
+  TITLEBAR_CONTROLS_WIDTH,
+  TITLEBAR_HEIGHT,
+} from "../shared/components/titlebarMetrics";
+import { resolveWindowControlsSide } from "../infrastructure/platform/windowControls";
 
 type LoginScreenProps = NativeStackScreenProps<LoginStackParamList, "Login">;
 
+const webDragRegionProps =
+  Platform.OS === "web"
+    ? ({ dataSet: { tauriDragRegion: "" } } as any)
+    : null;
+
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { isOnline } = useOnline();
-  const { headerWhite, setHeaderWhite, darkmode, theme, setHeaderSpacing } =
-    useTheme();
+  const {
+    headerWhite,
+    setHeaderWhite,
+    darkmode,
+    theme,
+    setHeaderSpacing,
+    setTitlebarCenterGap,
+    setTitlebarOverlayDragEnabled,
+  } = useTheme();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const { value: onboardingDone } = useSetting("ONBOARDING_DONE");
+  const { value: windowControlsStyle } = useSetting("WINDOW_CONTROLS_STYLE");
+  const controlsLeft =
+    resolveWindowControlsSide(windowControlsStyle) === "left";
   const isWideLoginLayout = width >= 600;
   const loginCardWidth = isWideLoginLayout ? Math.min(width - 220, 760) : 300;
 
@@ -83,7 +103,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     React.useCallback(() => {
       setHeaderSpacing(0);
       setHeaderWhite(false);
-    }, [setHeaderSpacing, setHeaderWhite]),
+      setTitlebarCenterGap(0);
+      setTitlebarOverlayDragEnabled(false);
+    }, [
+      setHeaderSpacing,
+      setHeaderWhite,
+      setTitlebarCenterGap,
+      setTitlebarOverlayDragEnabled,
+    ]),
   );
 
   const loadUserInfo = useCallback(async () => {
@@ -298,6 +325,20 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             style={headerWhite ? "light" : darkmode ? "light" : "dark"}
             translucent={true}
           />
+          {Platform.OS === "web" && TITLEBAR_HEIGHT > 0 ? (
+            <View
+              {...webDragRegionProps}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: controlsLeft ? TITLEBAR_CONTROLS_WIDTH : 0,
+                right: controlsLeft ? 0 : 104,
+                height: TITLEBAR_HEIGHT,
+                cursor: "default",
+                zIndex: 1,
+              } as any}
+            />
+          ) : null}
           <View style={{ height: 17 }}></View>
           <BlurView
             intensity={80}

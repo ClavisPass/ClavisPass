@@ -20,9 +20,12 @@ import {
 
 const titlebarLightRoutes = new Set(["Home", "Reorder", "ModuleReorder"]);
 const titlebarContentDragRoutes = new Set([
+  "HomeStack",
   "Home",
+  "Edit",
   "Reorder",
   "ModuleReorder",
+  "SettingsStack",
   "Settings",
 ]);
 

@@ -53,6 +53,10 @@ const webNoDragStyle =
         appRegion: "no-drag",
       } as any)
     : null;
+const webDragRegionProps =
+  Platform.OS === "web"
+    ? ({ dataSet: { tauriDragRegion: "" } } as any)
+    : null;
 
 const VerticalReorderIcon = ({
   color,
@@ -121,8 +125,6 @@ export default function ModuleReorderScreen({
       setHeaderWhite(true);
       setTitlebarCenterGap(0);
       setTitlebarOverlayDragEnabled(false);
-
-      return () => setTitlebarOverlayDragEnabled(true);
     }, [
       setHeaderSpacing,
       setHeaderWhite,
@@ -130,14 +132,6 @@ export default function ModuleReorderScreen({
       setTitlebarOverlayDragEnabled,
     ]),
   );
-
-  React.useEffect(() => {
-    if (Platform.OS !== "web") return;
-
-    document
-      .getElementById("module-reorder-header-drag-region")
-      ?.setAttribute("data-tauri-drag-region", "");
-  }, []);
 
   const renderModuleItem = useCallback(
     (
@@ -314,6 +308,7 @@ export default function ModuleReorderScreen({
         >
           <View
             id="module-reorder-header-drag-region"
+            {...webDragRegionProps}
             style={{
               flex: 1,
               minWidth: 0,

@@ -174,8 +174,12 @@ const webDragStyle =
     ? ({
         WebkitAppRegion: "drag",
         appRegion: "drag",
-        cursor: "grab",
+        cursor: "default",
       } as any)
+    : null;
+const webDragRegionProps =
+  Platform.OS === "web"
+    ? ({ dataSet: { tauriDragRegion: "" } } as any)
     : null;
 
 const normalizeSettingsSearch = (value: string) =>
@@ -688,28 +692,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     document.head.appendChild(style);
   }, []);
 
-  useEffect(() => {
-    if (Platform.OS !== "web") return;
-
-    const titleDragRegion = document.getElementById(
-      "settings-header-title-drag-region",
-    );
-    const rightDragRegion = document.getElementById(
-      "settings-header-right-drag-region",
-    );
-
-    rightDragRegion?.setAttribute("data-tauri-drag-region", "");
-
-    if (!titleDragRegion) return;
-
-    if (searchHeaderVisible) {
-      titleDragRegion.removeAttribute("data-tauri-drag-region");
-      return;
-    }
-
-    titleDragRegion.setAttribute("data-tauri-drag-region", "");
-  }, [searchHeaderVisible]);
-
   const changeAuthentication = async (authentication: boolean) => {
     if (authentication) {
       const master = getMaster();
@@ -1145,7 +1127,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           paddingRight:
             Platform.OS === "web" &&
             TITLEBAR_HEIGHT > 0 &&
-            isCompactHeader &&
             !controlsLeft
               ? 104
               : 0,
@@ -1235,6 +1216,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ) : (
           <Animated.View
             id="settings-header-title-drag-region"
+            {...(isFocused && !searchHeaderVisible
+              ? webDragRegionProps
+              : null)}
             entering={FadeInLeft.duration(180).easing(settingsSearchTransition)}
             exiting={FadeOutLeft.duration(120).easing(settingsSearchTransition)}
             layout={Layout.duration(180).easing(settingsSearchTransition)}
@@ -1248,7 +1232,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 position: "relative",
                 zIndex: 5,
               },
-              !searchHeaderVisible ? webDragStyle : null,
+              isFocused && !searchHeaderVisible ? webDragStyle : null,
             ]}
           >
             <Text
@@ -1355,13 +1339,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ) : (
           <View
             id="settings-header-right-drag-region"
+            {...(isFocused ? webDragRegionProps : null)}
             style={[
               {
                 flex: 1,
                 alignSelf: "stretch",
                 minHeight: 34,
               },
-              webDragStyle,
+              isFocused ? webDragStyle : null,
             ]}
           />
         )}

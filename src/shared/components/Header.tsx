@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode } from "react";
 import { Platform, View, StyleSheet, useWindowDimensions } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import Constants from "expo-constants";
@@ -10,11 +10,17 @@ import { isTauriEnvironment } from "../../infrastructure/platform/isTauri";
 import { resolveWindowControlsSide } from "../../infrastructure/platform/windowControls";
 import { isDemoDistribution } from "../utils/distribution";
 
+const webDragRegionProps =
+  Platform.OS === "web"
+    ? ({ dataSet: { tauriDragRegion: "" } } as any)
+    : null;
+
 type Props = {
   children?: ReactNode;
   title?: string;
   onPress?: () => void;
   leftNode?: ReactNode;
+  leftContentDraggable?: boolean;
   marginBottom?: number;
 };
 
@@ -22,8 +28,6 @@ function Header(props: Props) {
   const {
     theme,
     darkmode,
-    setTitlebarCenterGap,
-    setTitlebarOverlayDragEnabled,
   } = useTheme();
   const { width } = useWindowDimensions();
   const { value: windowControlsStyle } = useSetting("WINDOW_CONTROLS_STYLE");
@@ -35,11 +39,8 @@ function Header(props: Props) {
     TITLEBAR_HEIGHT > 0 &&
     width < 600 &&
     controlsLeft;
-
-  useEffect(() => {
-    setTitlebarCenterGap(0);
-    setTitlebarOverlayDragEnabled(true);
-  }, [setTitlebarCenterGap, setTitlebarOverlayDragEnabled]);
+  const contentDraggable =
+    props.leftContentDraggable ?? props.leftNode === undefined;
 
   return (
     <View
@@ -115,6 +116,17 @@ function Header(props: Props) {
             </Text>
           ) : null}
           {props.leftNode}
+          {contentDraggable ? (
+            <View
+              {...webDragRegionProps}
+              style={{
+                flex: 1,
+                alignSelf: "stretch",
+                minWidth: 24,
+                cursor: Platform.OS === "web" ? "default" : undefined,
+              } as any}
+            />
+          ) : null}
         </View>
         <View
           style={{

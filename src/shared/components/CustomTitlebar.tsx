@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     left: 14,
     position: "absolute",
     top: 0,
-    zIndex: 3,
+    zIndex: 20,
   },
   windowControlButton: {
     borderRadius: 6,
@@ -130,9 +130,12 @@ function WindowsWindowControls(props: WindowControlsProps) {
         gap: 2,
         alignItems: "center",
         paddingLeft: 16,
+        position: "relative",
+        zIndex: 20,
       }}
     >
       <AnimatedPressable
+        {...({ className: "clavispass-cursor-pointer" } as any)}
         onPress={props.minimizeWindow}
         style={{
           cursor: "pointer",
@@ -152,6 +155,7 @@ function WindowsWindowControls(props: WindowControlsProps) {
         />
       </AnimatedPressable>
       <AnimatedPressable
+        {...({ className: "clavispass-cursor-pointer" } as any)}
         onPress={props.closeWindow}
         style={{
           cursor: "pointer",
@@ -198,8 +202,6 @@ function CustomTitlebar() {
   const {
     headerWhite,
     headerSpacing,
-    titlebarCenterGap,
-    titlebarOverlayDragEnabled,
   } = useTheme();
   const { width } = useWindowDimensions();
 
@@ -220,12 +222,6 @@ function CustomTitlebar() {
   useEffect(() => {
     if (isTauri) {
       if (document) {
-        const dragLeft = document.getElementById("titlebar-drag-left");
-        const dragRight = document.getElementById("titlebar-drag-right");
-
-        dragLeft?.setAttribute("data-tauri-drag-region", "");
-        dragRight?.setAttribute("data-tauri-drag-region", "");
-
         const existingStyle = document.getElementById(GLOBAL_WEB_STYLE_ID);
         const css = `
           ::-webkit-scrollbar { width: 8px; }
@@ -251,6 +247,11 @@ function CustomTitlebar() {
             user-select: text;
           }
 
+          [data-tauri-drag-region],
+          [data-tauri-drag-region] * {
+            cursor: default !important;
+          }
+
           .clavispass-cursor-pointer,
           .clavispass-cursor-pointer * {
             cursor: pointer !important;
@@ -272,7 +273,7 @@ function CustomTitlebar() {
         }
       }
     }
-  }, [isTauri, titlebarOverlayDragEnabled, width]);
+  }, [isTauri, width]);
 
   useEffect(() => {
     if (isTauri) {
@@ -323,7 +324,7 @@ function CustomTitlebar() {
             right: 0,
             position: "absolute",
             backgroundColor: "transparent",
-            zIndex: 2,
+            zIndex: 20,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -350,44 +351,13 @@ function CustomTitlebar() {
             }}
             pointerEvents="box-none"
           >
-            {titlebarOverlayDragEnabled ? (
-              <View
-                id={"titlebar-drag-left"}
-                style={{
-                  flex: 1,
-                  height: 40,
-                  marginLeft: leftDragOffset,
-                }}
-              />
-            ) : (
-              <View
-                style={{
-                  flex: 1,
-                  marginLeft: leftDragOffset,
-                }}
-                pointerEvents="none"
-              />
-            )}
-            {titlebarOverlayDragEnabled &&
-            width > 600 &&
-            titlebarCenterGap > 0 ? (
-              <View
-                style={{
-                  width: titlebarCenterGap,
-                  height: 40,
-                }}
-                pointerEvents="none"
-              />
-            ) : null}
-            {titlebarOverlayDragEnabled && width > 600 ? (
-              <View
-                id={"titlebar-drag-right"}
-                style={{
-                  flex: 1,
-                  height: 40,
-                }}
-              />
-            ) : null}
+            <View
+              style={{
+                flex: 1,
+                marginLeft: leftDragOffset,
+              }}
+              pointerEvents="none"
+            />
             {!controlsLeft ? (
               <WindowsWindowControls
                 closeWindow={closeWindow}

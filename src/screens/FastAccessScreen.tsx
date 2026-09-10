@@ -121,7 +121,7 @@ export default function FastAccessScreen() {
             style={{
               flex: 1,
               height: 40,
-              cursor: "move",
+              cursor: "default",
               justifyContent: "center",
             } as any}
           >

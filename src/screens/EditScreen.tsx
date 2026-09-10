@@ -4,7 +4,6 @@ import {
   Platform,
   StyleSheet,
   View,
-  InteractionManager,
   useWindowDimensions,
 } from "react-native";
 import ModulesType, { ModuleType } from "../features/vault/model/ModulesType";
@@ -24,7 +23,7 @@ import AnimatedContainer from "../shared/components/container/AnimatedContainer"
 import FolderSelectModal from "../features/vault/components/modals/FolderSelectModal";
 import { useTheme } from "../app/providers/ThemeProvider";
 import DiscardChangesModal from "../features/vault/components/modals/DiscardChangesModal";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import Constants from "expo-constants";
 import SquaredContainerButton from "../shared/components/buttons/SquaredContainerButton";
@@ -114,9 +113,12 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     setHeaderWhite,
     darkmode,
     setHeaderSpacing,
+    setTitlebarCenterGap,
+    setTitlebarOverlayDragEnabled,
   } = useTheme();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
+  const isFocused = useIsFocused();
 
   const { value: fastAccessBehavior } = useSetting("FAST_ACCESS");
 
@@ -179,12 +181,16 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      let task = InteractionManager.runAfterInteractions(() => {
-        setHeaderSpacing(260);
-        setHeaderWhite(false);
-      });
-      return () => task?.cancel?.();
-    }, []),
+      setHeaderSpacing(260);
+      setHeaderWhite(false);
+      setTitlebarCenterGap(0);
+      setTitlebarOverlayDragEnabled(false);
+    }, [
+      setHeaderSpacing,
+      setHeaderWhite,
+      setTitlebarCenterGap,
+      setTitlebarOverlayDragEnabled,
+    ]),
   );
 
   useEffect(() => {
@@ -1150,6 +1156,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       />
       <Header
         marginBottom={0}
+        leftContentDraggable={isFocused}
         onPress={() => {
           if (canUndo) {
             setDiscardChangesVisible(true);
