@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Animated, Easing, Platform, View, StyleSheet } from "react-native";
 import { BottomNavigation, IconButton, Text } from "react-native-paper";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../providers/ThemeProvider";
 import { useAuth } from "../providers/AuthProvider";
 import { useOnline } from "../providers/OnlineProvider";
@@ -84,7 +84,7 @@ const CustomBottomTab = ({
 
         if (isLogout) {
           return (
-            <MaterialCommunityIcons name="logout" size={size} color={color} />
+            <Feather name="log-out" size={size} color={color} />
           );
         }
 

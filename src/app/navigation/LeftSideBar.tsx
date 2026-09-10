@@ -2,7 +2,7 @@ import * as React from "react";
 import { View, StyleSheet, Animated, Easing } from "react-native";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { IconButton, Text } from "react-native-paper";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../providers/ThemeProvider";
 import { useAuth } from "../providers/AuthProvider";
 import { useOnline } from "../providers/OnlineProvider";
@@ -131,8 +131,8 @@ export default function LeftSideTabBar({
             );
           } else if (name === "LogoutStack") {
             iconEl = (
-              <MaterialCommunityIcons
-                name="logout"
+              <Feather
+                name="log-out"
                 size={26}
                 color={isFocused ? theme.colors.primary : "#777"}
               />

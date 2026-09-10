@@ -1,7 +1,7 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Platform, useWindowDimensions } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { Feather } from "@expo/vector-icons";
 
 import HomeStack from "./stacks/HomeStack";
 import AnalysisStack from "./stacks/AnalysisStack";
@@ -44,7 +44,7 @@ export default function TabNavigator() {
           tabBarLabel: "Home",
           title: "Home",
           tabBarIcon: ({ color, size }) => (
-            <Icon name="home-outline" size={size} color={color} />
+            <Feather name="home" size={size} color={color} />
           ),
         }}
       />
@@ -56,7 +56,7 @@ export default function TabNavigator() {
           tabBarLabel: "Analysis",
           title: "Analysis",
           tabBarIcon: ({ color, size }) => (
-            <Icon name="clipboard-search-outline" size={size} color={color} />
+            <Feather name="search" size={size} color={color} />
           ),
         }}
       />
@@ -68,7 +68,7 @@ export default function TabNavigator() {
         options={{
           tabBarLabel: "Add",
           tabBarIcon: ({ color, size }) => (
-            <Icon name="plus" size={size} color={color} />
+            <Feather name="plus" size={size} color={color} />
           ),
         }}
       />
@@ -80,7 +80,7 @@ export default function TabNavigator() {
           tabBarLabel: "Settings",
           title: "Settings",
           tabBarIcon: ({ color, size }) => (
-            <Icon name="cog-outline" size={size} color={color} />
+            <Feather name="settings" size={size} color={color} />
           ),
         }}
       />
@@ -92,7 +92,7 @@ export default function TabNavigator() {
         options={{
           tabBarLabel: "Logout",
           tabBarIcon: ({ color, size }) => (
-            <Icon name="logout" color={color} size={size} />
+            <Feather name="log-out" color={color} size={size} />
           ),
         }}
       />
