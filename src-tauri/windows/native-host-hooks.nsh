@@ -3,7 +3,7 @@
 !define CLAVISPASS_NATIVE_HOST_NAME "com.clavispass.native_host"
 
 ; Fill these once the Chrome Web Store / Edge Add-ons IDs are known.
-!define CLAVISPASS_CHROME_EXTENSION_ID ""
+!define CLAVISPASS_CHROME_EXTENSION_ID "ojjkfbkgabdddgajcgfnppgahbfnpppm"
 !define CLAVISPASS_EDGE_EXTENSION_ID ""
 !define CLAVISPASS_FIREFOX_EXTENSION_ID "clavispass@arratel.dev"
 

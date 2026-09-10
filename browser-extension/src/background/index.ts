@@ -5,6 +5,7 @@ import { getActiveDomainContext } from "./tab-context";
 import { isExtensionMessage } from "../shared/messages";
 import {
   clearAutofillDomainCache,
+  getCachedAutofillMatchCountForUrl,
   getAutofillEligibilityForUrl,
   rememberAutofillSuggestions
 } from "./autofill-cache";
@@ -16,6 +17,8 @@ import { getNormalizedDomainFromUrl } from "../shared/domain";
 
 const desktopBridge = new DesktopBridgeService();
 const state = new ExtensionState();
+
+const BADGE_BACKGROUND_COLOR = "#787ff6";
 
 function isScriptablePageUrl(url: string | undefined): boolean {
   if (!url) {
@@ -69,6 +72,73 @@ async function getActiveTab() {
   });
 
   return activeTab;
+}
+
+function formatBadgeCount(count: number): string {
+  if (count <= 0) {
+    return "";
+  }
+
+  return count > 99 ? "99+" : String(count);
+}
+
+async function setTabBadge(tabId: number, count: number): Promise<void> {
+  await chrome.action.setBadgeBackgroundColor({ color: BADGE_BACKGROUND_COLOR });
+  await chrome.action.setBadgeText({
+    tabId,
+    text: formatBadgeCount(count)
+  });
+}
+
+async function clearTabBadge(tabId: number): Promise<void> {
+  await chrome.action.setBadgeText({
+    tabId,
+    text: ""
+  });
+}
+
+async function refreshBadgeForTab(tabId: number, url?: string): Promise<void> {
+  const pageUrl = url;
+  if (!pageUrl || !isScriptablePageUrl(pageUrl)) {
+    await clearTabBadge(tabId);
+    return;
+  }
+
+  const domain = getNormalizedDomainFromUrl(pageUrl);
+  if (!domain) {
+    await clearTabBadge(tabId);
+    return;
+  }
+
+  const cachedCount = await getCachedAutofillMatchCountForUrl(pageUrl);
+
+  try {
+    const status = await desktopBridge.getDesktopBridgeStatus();
+
+    if (status.state === "unpaired") {
+      await clearTabBadge(tabId);
+      return;
+    }
+
+    if (status.state === "ready") {
+      const suggestions = await loadSuggestionsForDomain(domain);
+      await rememberAutofillSuggestions(domain, suggestions);
+      await setTabBadge(tabId, suggestions.filter((item) => item.hasPassword).length);
+      return;
+    }
+  } catch {
+  }
+
+  await setTabBadge(tabId, cachedCount ?? 0);
+}
+
+async function refreshBadgeForActiveTab(): Promise<void> {
+  const activeTab = await getActiveTab();
+  if (typeof activeTab?.id !== "number") {
+    return;
+  }
+
+  await refreshBadgeForTab(activeTab.id, activeTab.url);
 }
 
 async function openDesktopApp(payload?: OpenDesktopAppPayload): Promise<{ success: boolean; detail: string }> {
@@ -452,6 +522,10 @@ const router = new BackgroundMessageRouter({
     try {
       const items = await loadSuggestionsForDomain(domain.normalizedHost);
       await rememberAutofillSuggestions(domain.normalizedHost, items);
+      const tabId = await getActiveTabId();
+      if (typeof tabId === "number") {
+        await setTabBadge(tabId, items.filter((item) => item.hasPassword).length);
+      }
 
       return {
         domain,
@@ -465,8 +539,15 @@ const router = new BackgroundMessageRouter({
       };
     }
   },
-  "bridge:getAutofillEligibility": async (payload) =>
-    getAutofillEligibilityForUrl(payload.url, desktopBridge),
+  "bridge:getAutofillEligibility": async (payload, context) => {
+    const eligibility = await getAutofillEligibilityForUrl(payload.url, desktopBridge);
+    const tabId = context.sender.tab?.id;
+    if (typeof tabId === "number") {
+      await setTabBadge(tabId, eligibility.matchCount ?? 0);
+    }
+
+    return eligibility;
+  },
   "bridge:prepareFillForActiveTab": async (payload) => {
     const prepared = await prepareFillForActiveTab(payload.entryId);
     return prepared.result;
@@ -543,6 +624,15 @@ chrome.runtime.onInstalled.addListener(() => {
   console.info("ClavisPass extension installed with native messaging bridge support.");
   void clearAutofillDomainCache();
   void injectContentScriptIntoOpenTabs();
+  void refreshBadgeForActiveTab();
+});
+
+chrome.runtime.onStartup.addListener(() => {
+  void refreshBadgeForActiveTab();
+});
+
+chrome.tabs.onActivated.addListener(() => {
+  void refreshBadgeForActiveTab();
 });
 
 chrome.tabs.onRemoved.addListener((tabId) => {
@@ -554,6 +644,12 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   if (changeInfo.status === "loading") {
     state.clearPreparedFill(tabId);
     state.clearFramesForTab(tabId);
+    void clearTabBadge(tabId);
+  }
+
+  if (changeInfo.url || changeInfo.status === "complete") {
+    void chrome.tabs.get(tabId).then((tab) => refreshBadgeForTab(tabId, tab.url)).catch(() => {
+    });
   }
 });
 

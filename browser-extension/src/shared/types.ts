@@ -59,6 +59,7 @@ export interface AutofillEligibilityResult {
   isSupported: boolean;
   normalizedHost?: string;
   hasMatches: boolean;
+  matchCount?: number;
   source: "desktop" | "cache" | "stale-cache" | "none";
   desktopState?: DesktopBridgeStatusView["state"];
   appScheme?: string;

@@ -11,7 +11,10 @@ const NATIVE_HOST_NAME: &str = "com.clavispass.native_host";
 const FIREFOX_EXTENSION_ID: &str = "clavispass@arratel.dev";
 
 #[cfg(target_os = "windows")]
-const CHROME_EXTENSION_IDS: &[&str] = &[];
+const CHROME_EXTENSION_IDS: &[&str] = &[
+    "ojjkfbkgabdddgajcgfnppgahbfnpppm",
+    "ofjldoiimhnlecdapfbkbenogohlbjle",
+];
 #[cfg(target_os = "windows")]
 const EDGE_EXTENSION_IDS: &[&str] = &[];
 
