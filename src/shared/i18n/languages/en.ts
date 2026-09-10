@@ -307,6 +307,8 @@ const en: TranslationSchema = {
     keyDerivation: "Key Derivation",
     browserExtensions: "Browser Extensions",
     browserExtensionSettingsItem: "Manage browser access",
+    browserExtensionChromeStore: "Install Chrome extension",
+    browserExtensionFirefoxStore: "Install Firefox extension",
     browserPairingDescription:
       "Approved browsers can request fill data while ClavisPass is unlocked.",
     browserPendingRequests: "Pending requests",

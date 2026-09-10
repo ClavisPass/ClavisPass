@@ -310,6 +310,8 @@ const de: TranslationSchema = {
     keyDerivation: "Schlüsselableitung",
     browserExtensions: "Browser-Erweiterungen",
     browserExtensionSettingsItem: "Browser-Zugriff verwalten",
+    browserExtensionChromeStore: "Chrome-Erweiterung installieren",
+    browserExtensionFirefoxStore: "Firefox-Erweiterung installieren",
     browserPairingDescription:
       "Freigegebene Browser dürfen Fill-Daten anfragen, solange ClavisPass entsperrt ist.",
     browserPendingRequests: "Offene Anfragen",

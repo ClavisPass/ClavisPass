@@ -248,6 +248,11 @@ type SettingsScreenProps = NativeStackScreenProps<
   "Settings"
 >;
 
+const CHROME_EXTENSION_URL =
+  "https://chromewebstore.google.com/detail/ojjkfbkgabdddgajcgfnppgahbfnpppm?utm_source=item-share-cb";
+const FIREFOX_EXTENSION_URL =
+  "https://addons.mozilla.org/de/firefox/addon/clavispass/";
+
 type ResetAction = "settings" | "device" | "vault" | "syncDevices";
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
@@ -441,6 +446,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         matchesSettingsSearch([
           t("settings:browserExtensions"),
           t("settings:browserExtensionSettingsItem"),
+          t("settings:browserExtensionChromeStore"),
+          t("settings:browserExtensionFirefoxStore"),
           "browser",
           "extension",
           "firefox",
@@ -1631,6 +1638,26 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                   }}
                 >
                   {t("settings:browserExtensionSettingsItem")}
+                </SettingsItem>
+                <SettingsDivider />
+                <SettingsItem
+                  leadingIcon="google-chrome"
+                  rightIcon="open-in-new"
+                  onPress={() => {
+                    openURL(CHROME_EXTENSION_URL);
+                  }}
+                >
+                  {t("settings:browserExtensionChromeStore")}
+                </SettingsItem>
+                <SettingsDivider />
+                <SettingsItem
+                  leadingIcon="firefox"
+                  rightIcon="open-in-new"
+                  onPress={() => {
+                    openURL(FIREFOX_EXTENSION_URL);
+                  }}
+                >
+                  {t("settings:browserExtensionFirefoxStore")}
                 </SettingsItem>
               </SettingsContainer>
             ) : null}

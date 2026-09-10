@@ -289,6 +289,8 @@ export type TranslationSchema = {
     keyDerivation: string;
     browserExtensions: string;
     browserExtensionSettingsItem: string;
+    browserExtensionChromeStore: string;
+    browserExtensionFirefoxStore: string;
     browserPairingDescription: string;
     browserPendingRequests: string;
     browserPendingEmptyTitle: string;
