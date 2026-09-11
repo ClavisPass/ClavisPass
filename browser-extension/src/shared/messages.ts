@@ -4,6 +4,8 @@ import type {
   AutofillEligibilityPayload,
   AutofillEligibilityResult,
   FillExecutionResult,
+  InlineAutofillPreferencePayload,
+  InlineAutofillPreferenceResult,
   PendingPromptResponse,
   PrepareFillForActiveTabResult,
   PromptResolutionPayload,
@@ -30,6 +32,18 @@ export type MessageMap = {
   "bridge:getAutofillEligibility": {
     request: AutofillEligibilityPayload;
     response: AutofillEligibilityResult;
+  };
+  "autofill:getInlinePreferenceForActiveTab": {
+    request: undefined;
+    response: InlineAutofillPreferenceResult;
+  };
+  "autofill:setInlineDisabledForActiveSite": {
+    request: InlineAutofillPreferencePayload;
+    response: InlineAutofillPreferenceResult;
+  };
+  "autofill:updatePolicyForActiveSite": {
+    request: InlineAutofillPreferencePayload;
+    response: InlineAutofillPreferenceResult;
   };
   "bridge:prepareFillForActiveTab": {
     request: GetFillDataForEntryPayload;

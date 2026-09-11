@@ -2,6 +2,7 @@ import type { SearchEntrySuggestion } from "../shared/bridge";
 import type { AutofillEligibilityResult, DesktopBridgeStatusView } from "../shared/types";
 import { getNormalizedDomainFromUrl } from "../shared/domain";
 import type { DesktopBridgeService } from "./bridge";
+import { getInlineAutofillPreferenceForUrl } from "./autofill-preferences";
 
 const STORAGE_KEY = "clavispass.autofillDomainCache.v1";
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -83,11 +84,16 @@ export async function getAutofillEligibilityForUrl(
   desktopBridge: DesktopBridgeService
 ): Promise<AutofillEligibilityResult> {
   const normalizedHost = getNormalizedDomainFromUrl(url);
+  const inlinePreference = await getInlineAutofillPreferenceForUrl(url);
 
   if (!normalizedHost) {
     return {
       isSupported: false,
       hasMatches: false,
+      inlineAutofillDisabled: false,
+      autofillDisabled: false,
+      popupSuggestionsDisabled: false,
+      savePromptDisabled: false,
       source: "none",
       detail: "No searchable domain could be derived from this page."
     };
@@ -109,6 +115,10 @@ export async function getAutofillEligibilityForUrl(
       isSupported: true,
       normalizedHost,
       hasMatches: false,
+      inlineAutofillDisabled: inlinePreference.inlineAutofillDisabled,
+      autofillDisabled: inlinePreference.autofillDisabled,
+      popupSuggestionsDisabled: inlinePreference.popupSuggestionsDisabled,
+      savePromptDisabled: inlinePreference.savePromptDisabled,
       source: "none",
       desktopState: status.state,
       appScheme: status.appScheme,
@@ -127,6 +137,10 @@ export async function getAutofillEligibilityForUrl(
         normalizedHost,
         hasMatches: matchCount > 0,
         matchCount,
+        inlineAutofillDisabled: inlinePreference.inlineAutofillDisabled,
+        autofillDisabled: inlinePreference.autofillDisabled,
+        popupSuggestionsDisabled: inlinePreference.popupSuggestionsDisabled,
+        savePromptDisabled: inlinePreference.savePromptDisabled,
         source: "desktop",
         desktopState: status.state,
         appScheme: status.appScheme,
@@ -143,6 +157,10 @@ export async function getAutofillEligibilityForUrl(
           normalizedHost,
           hasMatches: true,
           matchCount,
+          inlineAutofillDisabled: inlinePreference.inlineAutofillDisabled,
+          autofillDisabled: inlinePreference.autofillDisabled,
+          popupSuggestionsDisabled: inlinePreference.popupSuggestionsDisabled,
+          savePromptDisabled: inlinePreference.savePromptDisabled,
           source: cachedFresh ? "cache" : "stale-cache",
           desktopState: status.state,
           appScheme: status.appScheme,
@@ -159,6 +177,10 @@ export async function getAutofillEligibilityForUrl(
       normalizedHost,
       hasMatches: true,
       matchCount,
+      inlineAutofillDisabled: inlinePreference.inlineAutofillDisabled,
+      autofillDisabled: inlinePreference.autofillDisabled,
+      popupSuggestionsDisabled: inlinePreference.popupSuggestionsDisabled,
+      savePromptDisabled: inlinePreference.savePromptDisabled,
       source: cachedFresh ? "cache" : "stale-cache",
       desktopState: status?.state,
       appScheme: status?.appScheme,
@@ -171,6 +193,10 @@ export async function getAutofillEligibilityForUrl(
     normalizedHost,
     hasMatches: false,
     matchCount: 0,
+    inlineAutofillDisabled: inlinePreference.inlineAutofillDisabled,
+    autofillDisabled: inlinePreference.autofillDisabled,
+    popupSuggestionsDisabled: inlinePreference.popupSuggestionsDisabled,
+    savePromptDisabled: inlinePreference.savePromptDisabled,
     source: cachedEntry ? (cachedFresh ? "cache" : "stale-cache") : "none",
     desktopState: status?.state,
     appScheme: status?.appScheme,

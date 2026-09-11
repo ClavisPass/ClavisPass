@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { BrandLogo } from "./components/branding/BrandLogo";
 import { sendRuntimeMessage } from "../shared/messages";
+import { EXTENSION_THEME_STORAGE_KEY, isExtensionThemeMode } from "../shared/theme";
 import type { SearchEntrySuggestion } from "../shared/bridge";
 import type {
   DesktopBridgeStatusView,
   DesktopEntrySuggestionsView,
+  DomainAutofillMode,
   FillExecutionResult,
   SavePromptDecision,
   SavePromptResolution
@@ -14,6 +16,8 @@ import {
 } from "../../../src/shared/branding/brand";
 
 const STATUS_REFRESH_INTERVAL_MS = 2000;
+const CLAVISPASS_WEBSITE_URL = "https://clavispass.arratel.dev/";
+const CLAVISPASS_CONTACT_URL = "mailto:clavispass@arratel.dev";
 
 type RefreshStatusOptions = {
   reloadSuggestions?: boolean;
@@ -50,9 +54,25 @@ const translations = {
     readyTitle: "Ready to fill",
     readyDetail: "Choose a matching login for this website.",
     unreachableTitle: "Open ClavisPass Desktop",
-    unreachableDetail: "The extension cannot reach the desktop app yet.",
+    unreachableDetail: "Install or open the ClavisPass desktop app to connect the extension.",
+    desktopInstallHint: "If ClavisPass Desktop is not installed yet, download it first. After installation, open the app once so the browser connection can be registered.",
     bridgeAttentionTitle: "Bridge needs attention",
     openDesktopApp: "Open desktop app",
+    downloadClavisPass: "Download ClavisPass",
+    openWebsite: "Open ClavisPass website",
+    contactSupport: "Contact ClavisPass",
+    autofillMode: "Autofill mode",
+    autofillModeEnabled: "All actions",
+    autofillModeHideInline: "No page button",
+    autofillModeBadgeOnly: "Badge only",
+    autofillModeDisabled: "Never autofill",
+    savePromptEnabled: "Save suggestions on",
+    savePromptDisabledLabel: "Save suggestions off",
+    disableSavePrompts: "Do not suggest saving",
+    searchMatches: "Search matches",
+    diagnostics: "Diagnostics",
+    matchedPasswords: "{{count}} matches",
+    cachedMatches: "Cached matches",
     opening: "Opening...",
     details: "Details",
     invalidStatus: "The desktop bridge returned an invalid status response.",
@@ -95,8 +115,11 @@ const translations = {
     fillState: "Fill state",
     selectedEntry: "Selected entry",
     filled: "Filled",
+    filledDetail: "Login filled on this page.",
     noFields: "No fields",
+    noFieldsDetail: "No compatible login fields were found on this page.",
     failed: "Failed",
+    failedDetail: "ClavisPass could not fill this page.",
     fillingNow: "ClavisPass is filling the active page now.",
     fillHint: "Choose fill to send this login to the active page.",
     fieldFilled: "{{field}} filled"
@@ -128,9 +151,25 @@ const translations = {
     readyTitle: "Bereit zum Ausf\u00fcllen",
     readyDetail: "W\u00e4hle einen passenden Login f\u00fcr diese Website.",
     unreachableTitle: "ClavisPass Desktop \u00f6ffnen",
-    unreachableDetail: "Die Erweiterung kann die Desktop-App noch nicht erreichen.",
+    unreachableDetail: "Installiere oder \u00f6ffne ClavisPass Desktop, um die Erweiterung zu verbinden.",
+    desktopInstallHint: "Falls ClavisPass Desktop noch nicht installiert ist, lade die App zuerst herunter. Nach der Installation einmal \u00f6ffnen, damit die Browser-Verbindung registriert werden kann.",
     bridgeAttentionTitle: "Bridge braucht Aufmerksamkeit",
     openDesktopApp: "Desktop-App \u00f6ffnen",
+    downloadClavisPass: "ClavisPass herunterladen",
+    openWebsite: "ClavisPass-Webseite \u00f6ffnen",
+    contactSupport: "ClavisPass kontaktieren",
+    autofillMode: "Autofill-Modus",
+    autofillModeEnabled: "Alle Aktionen",
+    autofillModeHideInline: "Kein Seitenbutton",
+    autofillModeBadgeOnly: "Nur Badge",
+    autofillModeDisabled: "Nie autofillen",
+    savePromptEnabled: "Speichervorschläge an",
+    savePromptDisabledLabel: "Speichervorschläge aus",
+    disableSavePrompts: "Speichern nicht vorschlagen",
+    searchMatches: "Treffer suchen",
+    diagnostics: "Diagnose",
+    matchedPasswords: "{{count}} Treffer",
+    cachedMatches: "Gecachte Treffer",
     opening: "\u00d6ffne...",
     details: "Details",
     invalidStatus: "Die Desktop-Bridge hat einen ung\u00fcltigen Status zur\u00fcckgegeben.",
@@ -173,8 +212,11 @@ const translations = {
     fillState: "Ausf\u00fcllstatus",
     selectedEntry: "Ausgew\u00e4hlter Eintrag",
     filled: "Ausgef\u00fcllt",
+    filledDetail: "Login auf dieser Seite ausgef\u00fcllt.",
     noFields: "Keine Felder",
+    noFieldsDetail: "Auf dieser Seite wurden keine passenden Login-Felder gefunden.",
     failed: "Fehlgeschlagen",
+    failedDetail: "ClavisPass konnte diese Seite nicht ausf\u00fcllen.",
     fillingNow: "ClavisPass f\u00fcllt die aktive Seite jetzt aus.",
     fillHint: "W\u00e4hle Ausf\u00fcllen, um diesen Login an die aktive Seite zu senden.",
     fieldFilled: "{{field}} ausgef\u00fcllt"
@@ -233,10 +275,6 @@ function describeIdentity(item: SearchEntrySuggestion, t: (key: TranslationKey) 
   return item.email ?? item.username ?? t("noIdentity");
 }
 
-function selectedEntryTitle(items: SearchEntrySuggestion[], entryId?: string): string | undefined {
-  return items.find((item) => item.entryId === entryId)?.title;
-}
-
 function domainDetailText(
   domain: DesktopEntrySuggestionsView["domain"],
   t: (key: TranslationKey) => string
@@ -256,7 +294,7 @@ function domainDetailText(
 }
 
 function getInitialTheme(): ThemeMode {
-  const stored = localStorage.getItem("clavispass-popup-theme");
+  const stored = localStorage.getItem(EXTENSION_THEME_STORAGE_KEY) ?? localStorage.getItem("clavispass-popup-theme");
   if (stored === "light" || stored === "dark") {
     return stored;
   }
@@ -357,6 +395,13 @@ export function App() {
   const [isFilling, setIsFilling] = useState(false);
   const [isResolvingPrompt, setIsResolvingPrompt] = useState(false);
   const [isOpeningDesktopApp, setIsOpeningDesktopApp] = useState(false);
+  const [inlineAutofillHost, setInlineAutofillHost] = useState<string>();
+  const [autofillMode, setAutofillMode] = useState<DomainAutofillMode>("enabled");
+  const [autofillDisabled, setAutofillDisabled] = useState(false);
+  const [popupSuggestionsDisabled, setPopupSuggestionsDisabled] = useState(false);
+  const [savePromptDisabled, setSavePromptDisabled] = useState(false);
+  const [isUpdatingInlinePreference, setIsUpdatingInlinePreference] = useState(false);
+  const [suggestionQuery, setSuggestionQuery] = useState("");
   const [error, setError] = useState<string>();
   const [searchError, setSearchError] = useState<string>();
   const isRefreshingRef = useStateRef(isRefreshing);
@@ -398,6 +443,23 @@ export function App() {
     }
   }
 
+  async function refreshInlineAutofillPreference(): Promise<void> {
+    try {
+      const preference = await sendRuntimeMessage("autofill:getInlinePreferenceForActiveTab", undefined);
+      setInlineAutofillHost(preference.normalizedHost);
+      setAutofillMode(preference.policy.mode);
+      setAutofillDisabled(preference.autofillDisabled);
+      setPopupSuggestionsDisabled(preference.popupSuggestionsDisabled);
+      setSavePromptDisabled(preference.savePromptDisabled);
+    } catch {
+      setInlineAutofillHost(undefined);
+      setAutofillMode("enabled");
+      setAutofillDisabled(false);
+      setPopupSuggestionsDisabled(false);
+      setSavePromptDisabled(false);
+    }
+  }
+
   async function refreshStatus(options: RefreshStatusOptions = {}): Promise<void> {
     const reloadSuggestions = options.reloadSuggestions ?? true;
     if (!options.silent) {
@@ -414,7 +476,8 @@ export function App() {
       setStatus(nextStatus);
       await Promise.all([
         reloadSuggestions ? refreshSuggestions(nextStatus) : Promise.resolve(),
-        refreshPendingPrompt()
+        refreshPendingPrompt(),
+        refreshInlineAutofillPreference()
       ]);
     } catch (statusError) {
       setStatus({
@@ -443,6 +506,54 @@ export function App() {
       setError(openError instanceof Error ? openError.message : t("desktopOpenFailed"));
     } finally {
       setIsOpeningDesktopApp(false);
+    }
+  }
+
+  async function openExternalUrl(url: string): Promise<void> {
+    await chrome.tabs.create({
+      url,
+      active: true
+    });
+    window.close();
+  }
+
+  async function handleUpdateAutofillMode(normalizedHost: string, mode: DomainAutofillMode): Promise<void> {
+    setIsUpdatingInlinePreference(true);
+
+    try {
+      const preference = await sendRuntimeMessage("autofill:updatePolicyForActiveSite", {
+        normalizedHost,
+        mode
+      });
+      setInlineAutofillHost(preference.normalizedHost);
+      setAutofillMode(preference.policy.mode);
+      setAutofillDisabled(preference.autofillDisabled);
+      setPopupSuggestionsDisabled(preference.popupSuggestionsDisabled);
+      setSavePromptDisabled(preference.savePromptDisabled);
+    } catch (preferenceError) {
+      setError(preferenceError instanceof Error ? preferenceError.message : t("unknownPopupError"));
+    } finally {
+      setIsUpdatingInlinePreference(false);
+    }
+  }
+
+  async function handleToggleSavePrompts(normalizedHost: string): Promise<void> {
+    setIsUpdatingInlinePreference(true);
+
+    try {
+      const preference = await sendRuntimeMessage("autofill:updatePolicyForActiveSite", {
+        normalizedHost,
+        savePromptDisabled: !savePromptDisabled
+      });
+      setInlineAutofillHost(preference.normalizedHost);
+      setAutofillMode(preference.policy.mode);
+      setAutofillDisabled(preference.autofillDisabled);
+      setPopupSuggestionsDisabled(preference.popupSuggestionsDisabled);
+      setSavePromptDisabled(preference.savePromptDisabled);
+    } catch (preferenceError) {
+      setError(preferenceError instanceof Error ? preferenceError.message : t("unknownPopupError"));
+    } finally {
+      setIsUpdatingInlinePreference(false);
     }
   }
 
@@ -486,8 +597,27 @@ export function App() {
   }
 
   useEffect(() => {
+    let cancelled = false;
+
+    void chrome.storage.local.get(EXTENSION_THEME_STORAGE_KEY)
+      .then((stored) => {
+        const storedTheme = stored[EXTENSION_THEME_STORAGE_KEY];
+        if (!cancelled && isExtensionThemeMode(storedTheme)) {
+          setThemeMode(storedTheme);
+        }
+      })
+      .catch(() => {
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     document.documentElement.dataset.theme = themeMode;
-    localStorage.setItem("clavispass-popup-theme", themeMode);
+    localStorage.setItem(EXTENSION_THEME_STORAGE_KEY, themeMode);
+    void chrome.storage.local.set({ [EXTENSION_THEME_STORAGE_KEY]: themeMode });
   }, [themeMode]);
 
   useEffect(() => {
@@ -514,14 +644,29 @@ export function App() {
     return () => clearInterval(timer);
   }, [isBusyRef, isRefreshingRef, status.state]);
 
-  const selectedTitle = selectedEntryTitle(suggestions.items, selectedEntryId);
   const statusContent = getStatusContent(status, t);
   const busy =
     isRefreshing ||
     isLoadingSuggestions ||
     isFilling ||
     isResolvingPrompt ||
-    isOpeningDesktopApp;
+    isOpeningDesktopApp ||
+    isUpdatingInlinePreference;
+  const normalizedSuggestionQuery = suggestionQuery.trim().toLowerCase();
+  const filteredSuggestions = normalizedSuggestionQuery
+    ? suggestions.items.filter((item) =>
+        [
+          item.title,
+          item.username,
+          item.email,
+          item.matchedHost
+        ]
+          .filter(Boolean)
+          .some((value) => value!.toLowerCase().includes(normalizedSuggestionQuery))
+      )
+    : suggestions.items;
+  const passwordMatchCount = suggestions.items.filter((item) => item.hasPassword).length;
+  const showNativeHostInstallHint = status.state === "host_unreachable";
 
   return (
     <main className="app-shell">
@@ -530,11 +675,35 @@ export function App() {
           <BrandLogo className="header-logo" />
           <p className="brand-title">{CLAVISPASS_BRAND_NAME}</p>
         </div>
+        <div className="header-actions" aria-label="ClavisPass links">
+          <button
+            aria-label={t("openWebsite")}
+            className="header-icon-button"
+            title={t("openWebsite")}
+            type="button"
+            onClick={() => void openExternalUrl(CLAVISPASS_WEBSITE_URL)}
+          >
+            <ExternalLinkIcon />
+          </button>
+          <button
+            aria-label={t("contactSupport")}
+            className="header-icon-button"
+            title={t("contactSupport")}
+            type="button"
+            onClick={() => void openExternalUrl(CLAVISPASS_CONTACT_URL)}
+          >
+            <MailIcon />
+          </button>
+        </div>
       </header>
 
       <section className="controls-bar" aria-label="Popup settings">
-        {status.state !== "ready" ? (
-          <span className={`status-badge status-${status.state}`}>
+        {status.state === "ready" && inlineAutofillHost ? (
+          <span className="top-context-pill" title={inlineAutofillHost}>
+            {inlineAutofillHost}
+          </span>
+        ) : status.state !== "ready" ? (
+          <span className="top-context-pill">
             {formatStateLabel(status.state, t)}
           </span>
         ) : (
@@ -575,7 +744,6 @@ export function App() {
         <section className={`status-card status-card-${statusContent.tone}`}>
           <div className="status-head">
             <div>
-              <p className="meta-label">{CLAVISPASS_BRAND_NAME}</p>
               <p className="status-title">{statusContent.title}</p>
             </div>
           </div>
@@ -584,7 +752,11 @@ export function App() {
             <p className="status-large">{statusContent.detail}</p>
           </div>
 
-          {status.lastError ? (
+          {showNativeHostInstallHint ? (
+            <div className="info-panel">
+              <p>{t("desktopInstallHint")}</p>
+            </div>
+          ) : status.lastError ? (
             <div className="error-panel">
               <p className="meta-label">{t("details")}</p>
               <p>{status.lastError.message}</p>
@@ -594,9 +766,54 @@ export function App() {
 
           {error ? <p className="error-inline">{error}</p> : null}
 
-          <div className="suggestion-actions">
+          {inlineAutofillHost ? (
+            <div className="site-preference-panel">
+              <div>
+                <p className="meta-label">{t("website")}</p>
+                <p className="site-preference-host">{inlineAutofillHost}</p>
+              </div>
+              <div className="site-preference-actions">
+                <select
+                  aria-label={t("autofillMode")}
+                  className="site-mode-select"
+                  disabled={isUpdatingInlinePreference}
+                  value={autofillMode}
+                  onChange={(event) =>
+                    void handleUpdateAutofillMode(
+                      inlineAutofillHost,
+                      event.currentTarget.value as DomainAutofillMode
+                    )
+                  }
+                >
+                  <option value="enabled">{t("autofillModeEnabled")}</option>
+                  <option value="hide-inline">{t("autofillModeHideInline")}</option>
+                  <option value="badge-only">{t("autofillModeBadgeOnly")}</option>
+                  <option value="disabled">{t("autofillModeDisabled")}</option>
+                </select>
+                <button
+                  aria-label={t("disableSavePrompts")}
+                  className={savePromptDisabled ? "site-inline-toggle site-inline-toggle-muted" : "site-inline-toggle"}
+                  disabled={isUpdatingInlinePreference}
+                  title={t("disableSavePrompts")}
+                  type="button"
+                  onClick={() => void handleToggleSavePrompts(inlineAutofillHost)}
+                >
+                  {savePromptDisabled ? t("savePromptDisabledLabel") : t("savePromptEnabled")}
+                </button>
+              </div>
+            </div>
+          ) : null}
+
+          <div className="desktop-action-group">
             <button className="refresh-button" type="button" onClick={() => void handleOpenDesktopApp()} disabled={busy}>
               {isOpeningDesktopApp ? t("opening") : statusContent.action}
+            </button>
+            <button
+              className="row-button desktop-download-button"
+              type="button"
+              onClick={() => void openExternalUrl(CLAVISPASS_WEBSITE_URL)}
+            >
+              {t("downloadClavisPass")}
             </button>
           </div>
         </section>
@@ -630,12 +847,31 @@ export function App() {
 
       {status.state === "ready" ? (
         <section className="suggestions-card">
-          <div className="section-header-row">
-            <div>
-              <p className="meta-label">{t("suggestions")}</p>
-              <p className="section-title">{t("matchesTitle")}</p>
-            </div>
-            {suggestions.domain.normalizedHost ? <span className="domain-pill">{suggestions.domain.normalizedHost}</span> : null}
+          <div className="suggestions-toolbar">
+            {inlineAutofillHost ? (
+              <div className="site-controls">
+                <select
+                  aria-label={t("autofillMode")}
+                  className="site-mode-select"
+                  disabled={isUpdatingInlinePreference}
+                  value={autofillMode}
+                  onChange={(event) =>
+                    void handleUpdateAutofillMode(
+                      inlineAutofillHost,
+                      event.currentTarget.value as DomainAutofillMode
+                    )
+                  }
+                >
+                  <option value="enabled">{t("autofillModeEnabled")}</option>
+                  <option value="hide-inline">{t("autofillModeHideInline")}</option>
+                  <option value="badge-only">{t("autofillModeBadgeOnly")}</option>
+                  <option value="disabled">{t("autofillModeDisabled")}</option>
+                </select>
+              </div>
+            ) : null}
+            <span className="diagnostic-pill diagnostic-pill-ok">
+              {t("matchedPasswords", { count: String(passwordMatchCount) })}
+            </span>
           </div>
 
           {!suggestions.domain.isSupported ? (
@@ -648,6 +884,11 @@ export function App() {
               <p className="section-title">{t("couldNotLoadSuggestions")}</p>
               <p className="subtle">{searchError}</p>
             </div>
+          ) : popupSuggestionsDisabled ? (
+            <div className="empty-card">
+              <p className="section-title">{t("autofillModeBadgeOnly")}</p>
+              <p className="subtle">{t("matchedPasswords", { count: String(passwordMatchCount) })}</p>
+            </div>
           ) : isLoadingSuggestions ? (
             <div className="empty-card">
               <p className="section-title">{t("loadingSuggestions")}</p>
@@ -659,53 +900,76 @@ export function App() {
               <p className="subtle">{t("noMatchesDetail")}</p>
             </div>
           ) : (
-            <div className="suggestion-list">
-              {suggestions.items.map((item) => (
-                <article className="suggestion-row" key={item.entryId}>
-                  <div className="suggestion-main">
-                    <div className="suggestion-copy">
-                      <div className="suggestion-title-row">
-                        <p className="suggestion-title">{item.title}</p>
-                        {item.fav ? <span className="flag-pill">{t("favourite")}</span> : null}
+            <>
+              {suggestions.items.length > 4 ? (
+                <input
+                  aria-label={t("searchMatches")}
+                  className="suggestion-search"
+                  placeholder={t("searchMatches")}
+                  type="search"
+                  value={suggestionQuery}
+                  onChange={(event) => setSuggestionQuery(event.currentTarget.value)}
+                />
+              ) : null}
+
+              {filteredSuggestions.length === 0 ? (
+                <div className="empty-card">
+                  <p className="section-title">{t("noMatchesFound")}</p>
+                  <p className="subtle">{t("noMatchesDetail")}</p>
+                </div>
+              ) : (
+                <div className="suggestion-list">
+                  {filteredSuggestions.map((item) => (
+                    <article className="suggestion-row" key={item.entryId}>
+                      <div className="suggestion-main">
+                        <div className="suggestion-copy">
+                          <div className="suggestion-title-row">
+                            <p className="suggestion-title">{item.title}</p>
+                            {item.fav ? <span className="flag-pill">{t("favourite")}</span> : null}
+                          </div>
+                          <p className="suggestion-identity">{describeIdentity(item, t)}</p>
+                          {item.matchedHost && item.matchedHost !== suggestions.domain.normalizedHost ? (
+                            <p className="suggestion-host">{t("matchedVia", { host: item.matchedHost })}</p>
+                          ) : null}
+                        </div>
+                        <div className="suggestion-side">
+                          <div className="hint-row">
+                            {item.hasTotp ? <span className="hint-pill">{t("totp")}</span> : null}
+                          </div>
+                          <button
+                            className={
+                              fillResult?.status === "filled" && selectedEntryId === item.entryId
+                                ? "suggestion-fill-button suggestion-fill-button-success"
+                                : "suggestion-fill-button"
+                            }
+                            type="button"
+                            onClick={() => void handleFill(item.entryId)}
+                            disabled={isFilling || autofillDisabled}
+                          >
+                            <span className="suggestion-fill-icon" aria-hidden="true">
+                              {fillResult?.status === "filled" && selectedEntryId === item.entryId ? (
+                                <CheckIcon />
+                              ) : (
+                                <FillIcon />
+                              )}
+                            </span>
+                            <span>
+                              {isFilling && selectedEntryId === item.entryId
+                                ? t("filling")
+                                : fillResult?.status === "filled" && selectedEntryId === item.entryId
+                                  ? t("filled")
+                                  : t("fill")}
+                            </span>
+                          </button>
+                        </div>
                       </div>
-                      <p className="suggestion-identity">{describeIdentity(item, t)}</p>
-                      {item.matchedHost && item.matchedHost !== suggestions.domain.normalizedHost ? (
-                        <p className="suggestion-host">{t("matchedVia", { host: item.matchedHost })}</p>
-                      ) : null}
-                    </div>
-                    <div className="suggestion-side">
-                      <div className="hint-row">
-                        {item.hasTotp ? <span className="hint-pill">{t("totp")}</span> : null}
-                      </div>
-                      <button className="row-button row-button-primary suggestion-fill-button" type="button" onClick={() => void handleFill(item.entryId)} disabled={isFilling}>
-                        {isFilling && selectedEntryId === item.entryId ? t("filling") : t("fill")}
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </>
           )}
 
-          {selectedEntryId ? (
-            <div className="inline-status">
-              <div>
-                <p className="meta-label">{t("fillState")}</p>
-                <p className="subtle">
-                  {isFilling
-                    ? t("fillingNow")
-                    : fillResult
-                      ? fillResult.detail
-                      : `${t("fillHint")} ${selectedTitle ?? t("selectedEntry")}`}
-                </p>
-              </div>
-              {fillResult ? (
-                <span className={`status-badge status-${fillResult.status === "filled" ? "ready" : fillResult.status === "no_fields" ? "not_ready" : "protocol_error"}`}>
-                  {fillResult.status === "filled" ? t("filled") : fillResult.status === "no_fields" ? t("noFields") : t("failed")}
-                </span>
-              ) : null}
-            </div>
-          ) : null}
         </section>
       ) : null}
 
@@ -714,6 +978,44 @@ export function App() {
         <span>Version {extensionVersion}</span>
       </footer>
     </main>
+  );
+}
+
+function ExternalLinkIcon() {
+  return (
+    <svg aria-hidden="true" fill="none" height="16" viewBox="0 0 24 24" width="16">
+      <path d="M10 6H6.8C5.8 6 5 6.8 5 7.8v9.4c0 1 .8 1.8 1.8 1.8h9.4c1 0 1.8-.8 1.8-1.8V14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+      <path d="M14 5h5v5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+      <path d="m13 11 6-6" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function MailIcon() {
+  return (
+    <svg aria-hidden="true" fill="none" height="16" viewBox="0 0 24 24" width="16">
+      <path d="M4.8 6h14.4c1 0 1.8.8 1.8 1.8v8.4c0 1-.8 1.8-1.8 1.8H4.8c-1 0-1.8-.8-1.8-1.8V7.8C3 6.8 3.8 6 4.8 6Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+      <path d="m4 7 8 6 8-6" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function FillIcon() {
+  return (
+    <svg aria-hidden="true" fill="none" height="15" viewBox="0 0 24 24" width="15">
+      <path d="M5 12h12" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" />
+      <path d="m13 8 4 4-4 4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" />
+      <path d="M5 5h5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" />
+      <path d="M5 19h5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg aria-hidden="true" fill="none" height="15" viewBox="0 0 24 24" width="15">
+      <path d="m5 12 4 4 10-10" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.4" />
+    </svg>
   );
 }
 

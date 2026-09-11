@@ -12,6 +12,7 @@ import { VaultFetchResult } from "../model/VaultFetchResult";
 import { UploadContent } from "../model/UploadFileParams";
 import {
   getGoogleClientIdForCurrentPlatform,
+  getGoogleClientSecretForCurrentPlatform,
   getGoogleDesktopClientSecret,
 } from "../utils/googleOAuth";
 
@@ -277,7 +278,7 @@ export const refreshAccessToken = async (
 ): Promise<TokenRefreshResult> => {
   const tokenEndpoint = "https://oauth2.googleapis.com/token";
   const clientId = getGoogleClientIdForCurrentPlatform();
-  const clientSecret = getGoogleDesktopClientSecret();
+  const clientSecret = getGoogleClientSecretForCurrentPlatform();
 
   try {
     if (!clientId) {

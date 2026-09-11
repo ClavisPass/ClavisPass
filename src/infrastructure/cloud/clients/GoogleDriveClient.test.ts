@@ -75,6 +75,35 @@ describe("GoogleDriveClient", () => {
     expect(body.has("client_secret")).toBe(false);
   });
 
+  it("does not send the desktop client secret for mobile token refreshes", async () => {
+    setEnv({
+      GOOGLE_CLIENT_ID_ANDROID:
+        "1234567890-androidabc.apps.googleusercontent.com",
+      GOOGLE_CLIENT_SECRET_DESKTOP: "desktop-secret",
+    });
+
+    const fetchMock = vi.fn().mockResolvedValue(
+      response({
+        ok: true,
+        status: 200,
+        body: {
+          access_token: "access-token",
+          expires_in: 3599,
+          token_type: "Bearer",
+        },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await refreshAccessToken("refresh-token");
+
+    const body = new URLSearchParams(fetchMock.mock.calls[0][1].body);
+    expect(body.get("client_id")).toBe(
+      "1234567890-androidabc.apps.googleusercontent.com",
+    );
+    expect(body.has("client_secret")).toBe(false);
+  });
+
   it("preserves Google OAuth errors from failed token refreshes", async () => {
     vi.stubGlobal(
       "fetch",

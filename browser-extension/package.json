@@ -1,6 +1,6 @@
 {
   "name": "clavispass-extension",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,8 +11,10 @@
     "package:chrome": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/package-chrome.ps1",
     "package:firefox": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/package-firefox.ps1",
     "package:firefox:source": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/package-firefox-source.ps1",
+    "prepare:firefox-local": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/prepare-firefox-local.ps1",
     "build:chrome": "npm run build && npm run package:chrome",
     "release:chrome": "npm run typecheck && npm run build:chrome",
+    "build:firefox-local": "npm run build && npm run prepare:firefox-local",
     "build:firefox": "npm run build && npm run package:firefox",
     "release:firefox": "npm run typecheck && npm run build:firefox && npm run package:firefox:source"
   },

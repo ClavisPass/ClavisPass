@@ -12,6 +12,14 @@ export type ContentMessageMap = {
     request: undefined;
     response: ContentDebugInfo;
   };
+  "content:refreshInlineAutofill": {
+    request: undefined;
+    response: { refreshed: true };
+  };
+  "content:showAutofillPicker": {
+    request: undefined;
+    response: { shown: boolean };
+  };
 };
 
 export type ContentMessageType = keyof ContentMessageMap;

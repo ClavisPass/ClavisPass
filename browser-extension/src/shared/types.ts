@@ -60,10 +60,38 @@ export interface AutofillEligibilityResult {
   normalizedHost?: string;
   hasMatches: boolean;
   matchCount?: number;
+  inlineAutofillDisabled?: boolean;
+  autofillDisabled?: boolean;
+  popupSuggestionsDisabled?: boolean;
+  savePromptDisabled?: boolean;
   source: "desktop" | "cache" | "stale-cache" | "none";
   desktopState?: DesktopBridgeStatusView["state"];
   appScheme?: string;
   detail: string;
+}
+
+export type DomainAutofillMode = "enabled" | "hide-inline" | "badge-only" | "disabled";
+
+export interface DomainAutofillPolicy {
+  mode: DomainAutofillMode;
+  savePromptDisabled: boolean;
+}
+
+export interface InlineAutofillPreferencePayload {
+  normalizedHost: string;
+  disabled?: boolean;
+  mode?: DomainAutofillMode;
+  savePromptDisabled?: boolean;
+}
+
+export interface InlineAutofillPreferenceResult {
+  isSupported: boolean;
+  normalizedHost?: string;
+  policy: DomainAutofillPolicy;
+  inlineAutofillDisabled: boolean;
+  autofillDisabled: boolean;
+  popupSuggestionsDisabled: boolean;
+  savePromptDisabled: boolean;
 }
 
 export interface PreparedFillSummary {

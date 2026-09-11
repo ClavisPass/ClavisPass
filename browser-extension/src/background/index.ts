@@ -9,6 +9,11 @@ import {
   getAutofillEligibilityForUrl,
   rememberAutofillSuggestions
 } from "./autofill-cache";
+import {
+  getInlineAutofillPreferenceForUrl,
+  setInlineAutofillDisabledForHost,
+  updateAutofillPolicyForHost
+} from "./autofill-preferences";
 import type { ContentMessage } from "../shared/content-messages";
 import type { FillDataResult, SearchEntrySuggestion } from "../shared/bridge";
 import type { BrowserWriteResult, CreateEntryFromBrowserPayload, UpdateEntryFromBrowserPayload } from "../shared/bridge";
@@ -19,6 +24,9 @@ const desktopBridge = new DesktopBridgeService();
 const state = new ExtensionState();
 
 const BADGE_BACKGROUND_COLOR = "#787ff6";
+const BADGE_TEXT_COLOR = "#ffffff";
+const CONTEXT_MENU_FILL_ID = "clavispass-fill-first-match";
+const DESKTOP_LAUNCH_TAB_CLOSE_DELAY_MS = 1200;
 
 function isScriptablePageUrl(url: string | undefined): boolean {
   if (!url) {
@@ -84,6 +92,9 @@ function formatBadgeCount(count: number): string {
 
 async function setTabBadge(tabId: number, count: number): Promise<void> {
   await chrome.action.setBadgeBackgroundColor({ color: BADGE_BACKGROUND_COLOR });
+  if ("setBadgeTextColor" in chrome.action) {
+    await chrome.action.setBadgeTextColor({ color: BADGE_TEXT_COLOR });
+  }
   await chrome.action.setBadgeText({
     tabId,
     text: formatBadgeCount(count)
@@ -141,6 +152,34 @@ async function refreshBadgeForActiveTab(): Promise<void> {
   await refreshBadgeForTab(activeTab.id, activeTab.url);
 }
 
+async function getActiveTabInlineAutofillPreference() {
+  const activeTab = await getActiveTab();
+  if (!activeTab?.url) {
+    return {
+      isSupported: false,
+      policy: {
+        mode: "enabled" as const,
+        savePromptDisabled: false
+      },
+      inlineAutofillDisabled: false,
+      autofillDisabled: false,
+      popupSuggestionsDisabled: false,
+      savePromptDisabled: false
+    };
+  }
+
+  return getInlineAutofillPreferenceForUrl(activeTab.url);
+}
+
+async function isAutofillDisabledForTab(tab: chrome.tabs.Tab | undefined): Promise<boolean> {
+  if (!tab?.url) {
+    return false;
+  }
+
+  const preference = await getInlineAutofillPreferenceForUrl(tab.url);
+  return preference.autofillDisabled;
+}
+
 async function openDesktopApp(payload?: OpenDesktopAppPayload): Promise<{ success: boolean; detail: string }> {
   const preferredScheme =
     payload?.appScheme === "clavispass" || payload?.appScheme === "clavispass-dev"
@@ -148,23 +187,17 @@ async function openDesktopApp(payload?: OpenDesktopAppPayload): Promise<{ succes
       : undefined;
   const launchUrls = preferredScheme
     ? [`${preferredScheme}://redirect`]
-    : ["clavispass-dev://redirect", "clavispass://redirect"];
+    : ["clavispass://redirect"];
   let lastError: unknown;
   let attempted = false;
 
   for (const url of launchUrls) {
     try {
-      const createdTab = await chrome.tabs.create({
+      const tab = await chrome.tabs.create({
         url,
-        active: false
+        active: true
       });
-
-      if (typeof createdTab.id === "number") {
-        setTimeout(() => {
-          void chrome.tabs.remove(createdTab.id!).catch(() => {
-          });
-        }, 1200);
-      }
+      scheduleDesktopLaunchTabClose(tab.id, url);
       attempted = true;
     } catch (error) {
       lastError = error;
@@ -185,6 +218,23 @@ async function openDesktopApp(payload?: OpenDesktopAppPayload): Promise<{ succes
         ? lastError.message
         : "The browser could not open the ClavisPass desktop app."
   };
+}
+
+function scheduleDesktopLaunchTabClose(tabId: number | undefined, launchUrl: string): void {
+  if (typeof tabId !== "number") {
+    return;
+  }
+
+  globalThis.setTimeout(() => {
+    void chrome.tabs.get(tabId)
+      .then((tab) => {
+        if (tab.url === launchUrl || tab.pendingUrl === launchUrl) {
+          return chrome.tabs.remove(tabId);
+        }
+      })
+      .catch(() => {
+      });
+  }, DESKTOP_LAUNCH_TAB_CLOSE_DELAY_MS);
 }
 
 async function prepareFillForActiveTab(entryId: string): Promise<{ tabId?: number; fillData?: FillDataResult; result: import("../shared/types").PrepareFillForActiveTabResult }> {
@@ -346,6 +396,25 @@ async function sendContentDebugMessage(tabId: number): Promise<ContentDebugRespo
   };
 }
 
+async function refreshInlineAutofillInTab(tabId: number): Promise<void> {
+  try {
+    await ensureContentScriptReady(tabId);
+    await sendMessageToRegisteredFrames(tabId, {
+      type: "content:refreshInlineAutofill",
+      payload: undefined
+    });
+  } catch {
+  }
+}
+
+async function showAutofillPickerInTab(tabId: number): Promise<void> {
+  await ensureContentScriptReady(tabId);
+  await sendMessageToRegisteredFrames(tabId, {
+    type: "content:showAutofillPicker",
+    payload: undefined
+  });
+}
+
 async function fillPreparedDataInTab(tabId: number, fillData: FillDataResult): Promise<FillExecutionResult> {
   try {
     await ensureContentScriptReady(tabId);
@@ -365,6 +434,57 @@ async function fillPreparedDataInTab(tabId: number, fillData: FillDataResult): P
   }
 }
 
+async function fillFirstAvailableMatchInActiveTab(): Promise<FillExecutionResult> {
+  const activeTab = await getActiveTab();
+  const tabId = typeof activeTab?.id === "number" ? activeTab.id : undefined;
+
+  if (typeof tabId !== "number" || !activeTab?.url) {
+    return {
+      status: "failed",
+      detail: "No active browser tab is available for autofill."
+    };
+  }
+
+  if (await isAutofillDisabledForTab(activeTab)) {
+    return {
+      status: "failed",
+      detail: "Autofill is disabled for this website."
+    };
+  }
+
+  const domain = getNormalizedDomainFromUrl(activeTab.url);
+  if (!domain) {
+    return {
+      status: "failed",
+      detail: "No searchable domain is available for the active tab."
+    };
+  }
+
+  const suggestions = await loadSuggestionsForDomain(domain);
+  await rememberAutofillSuggestions(domain, suggestions);
+  await setTabBadge(tabId, suggestions.filter((item) => item.hasPassword).length);
+
+  const passwordSuggestions = suggestions.filter((item) => item.hasPassword);
+  if (passwordSuggestions.length > 1) {
+    await showAutofillPickerInTab(tabId);
+    return {
+      status: "failed",
+      detail: "Multiple matching ClavisPass logins are available."
+    };
+  }
+
+  const entry = passwordSuggestions[0] ?? suggestions[0];
+  if (!entry) {
+    return {
+      status: "failed",
+      detail: "No matching ClavisPass login is available for this website."
+    };
+  }
+
+  const fillData = await desktopBridge.getDesktopFillData(entry.entryId);
+  return fillPreparedDataInTab(tabId, fillData);
+}
+
 async function loadSuggestionsForDomain(domain: string): Promise<SearchEntrySuggestion[]> {
   return desktopBridge.searchDesktopEntriesByDomain(domain);
 }
@@ -373,6 +493,11 @@ async function evaluateSavePromptCandidate(candidate: SavePromptCandidate) {
   const domain = getNormalizedDomainFromUrl(candidate.url);
   if (!domain || !candidate.password) {
     return { accepted: false, promptCreated: false };
+  }
+
+  const preference = await getInlineAutofillPreferenceForUrl(candidate.url);
+  if (preference.savePromptDisabled) {
+    return { accepted: true, promptCreated: false };
   }
 
   try {
@@ -548,11 +673,42 @@ const router = new BackgroundMessageRouter({
 
     return eligibility;
   },
+  "autofill:getInlinePreferenceForActiveTab": async () => getActiveTabInlineAutofillPreference(),
+  "autofill:setInlineDisabledForActiveSite": async (payload) => {
+    const result = await setInlineAutofillDisabledForHost(payload.normalizedHost, payload.disabled === true);
+    const tabId = await getActiveTabId();
+    if (typeof tabId === "number") {
+      void refreshInlineAutofillInTab(tabId);
+    }
+
+    return result;
+  },
+  "autofill:updatePolicyForActiveSite": async (payload) => {
+    const result = await updateAutofillPolicyForHost(payload.normalizedHost, {
+      ...(payload.mode ? { mode: payload.mode } : {}),
+      ...(typeof payload.savePromptDisabled === "boolean"
+        ? { savePromptDisabled: payload.savePromptDisabled }
+        : {})
+    });
+    const tabId = await getActiveTabId();
+    if (typeof tabId === "number") {
+      void refreshInlineAutofillInTab(tabId);
+    }
+
+    return result;
+  },
   "bridge:prepareFillForActiveTab": async (payload) => {
     const prepared = await prepareFillForActiveTab(payload.entryId);
     return prepared.result;
   },
   "bridge:fillActiveTab": async (payload) => {
+    if (await isAutofillDisabledForTab(await getActiveTab())) {
+      return {
+        status: "failed",
+        detail: "Autofill is disabled for this website."
+      };
+    }
+
     const prepared = await prepareFillForActiveTab(payload.entryId);
     if (prepared.result.status !== "ready" || typeof prepared.tabId !== "number" || !prepared.fillData) {
       return {
@@ -620,15 +776,48 @@ const router = new BackgroundMessageRouter({
   }
 });
 
+function createContextMenus(): void {
+  if (!chrome.contextMenus) {
+    return;
+  }
+
+  chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({
+      id: CONTEXT_MENU_FILL_ID,
+      title: "Fill with ClavisPass",
+      contexts: ["editable"],
+      documentUrlPatterns: ["http://*/*", "https://*/*"]
+    });
+  });
+}
+
 chrome.runtime.onInstalled.addListener(() => {
   console.info("ClavisPass extension installed with native messaging bridge support.");
+  createContextMenus();
   void clearAutofillDomainCache();
   void injectContentScriptIntoOpenTabs();
   void refreshBadgeForActiveTab();
 });
 
 chrome.runtime.onStartup.addListener(() => {
+  createContextMenus();
   void refreshBadgeForActiveTab();
+});
+
+chrome.contextMenus?.onClicked.addListener((info) => {
+  if (info.menuItemId !== CONTEXT_MENU_FILL_ID) {
+    return;
+  }
+
+  void fillFirstAvailableMatchInActiveTab();
+});
+
+chrome.commands?.onCommand.addListener((command) => {
+  if (command !== "fill-first-match") {
+    return;
+  }
+
+  void fillFirstAvailableMatchInActiveTab();
 });
 
 chrome.tabs.onActivated.addListener(() => {

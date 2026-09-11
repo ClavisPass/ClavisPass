@@ -1,12 +1,16 @@
 #[cfg(target_os = "windows")]
 use serde_json::json;
 #[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+#[cfg(target_os = "windows")]
 use std::{fs, io, path::PathBuf, process::Command};
 #[cfg(target_os = "windows")]
 use tauri::{AppHandle, Manager};
 
 #[cfg(target_os = "windows")]
 const NATIVE_HOST_NAME: &str = "com.clavispass.native_host";
+#[cfg(target_os = "windows")]
+const CREATE_NO_WINDOW: u32 = 0x08000000;
 #[cfg(target_os = "windows")]
 const FIREFOX_EXTENSION_ID: &str = "clavispass@arratel.dev";
 
@@ -57,6 +61,7 @@ fn register_manifest(browser_key: &str, manifest_path: &PathBuf) -> io::Result<(
             &manifest_path.to_string_lossy(),
             "/f",
         ])
+        .creation_flags(CREATE_NO_WINDOW)
         .status()?;
 
     if status.success() {

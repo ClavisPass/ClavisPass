@@ -60,6 +60,10 @@ export function getGoogleDesktopClientSecret(): string {
   return normalizeClientId(GOOGLE_CLIENT_SECRET_DESKTOP);
 }
 
+export function getGoogleClientSecretForCurrentPlatform(): string {
+  return Platform.OS === "web" ? getGoogleDesktopClientSecret() : "";
+}
+
 export function buildGoogleLoopbackRedirectUri(port: number): string {
   return `http://${GOOGLE_LOOPBACK_HOST}:${port}`;
 }

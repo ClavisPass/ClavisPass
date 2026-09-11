@@ -1,9 +1,10 @@
 import { sendRuntimeMessage } from "../shared/messages";
 import { isContentMessage } from "../shared/content-messages";
+import { EXTENSION_THEME_STORAGE_KEY, isExtensionThemeMode, type ExtensionThemeMode } from "../shared/theme";
 import { executeFill, previewFill } from "./fill";
 import { classifyFieldSnapshot, createFieldSnapshot, extractSavePromptCandidate, isVisibleFieldCandidate } from "../shared/forms";
-import type { AutofillEligibilityResult, ContentDebugInfo } from "../shared/types";
-import type { FillDataResult } from "../shared/bridge";
+import type { AutofillEligibilityResult, ContentDebugInfo, FillExecutionResult } from "../shared/types";
+import type { FillDataResult, SearchEntrySuggestion } from "../shared/bridge";
 
 declare global {
   interface Window {
@@ -13,6 +14,7 @@ declare global {
 }
 
 const INLINE_ROOT_ID = "clavispass-inline-root";
+const INLINE_PICKER_ID = "clavispass-inline-picker";
 const INLINE_STYLE_ID = "clavispass-inline-style";
 const INLINE_BUTTON_TITLE = "Fill with ClavisPass";
 const INLINE_ELIGIBILITY_REFRESH_MS = 3000;
@@ -32,6 +34,18 @@ const INLINE_LOGO_PATHS = [
   },
 ];
 
+const contentText = navigator.language.toLowerCase().startsWith("de")
+  ? {
+      chooseLogin: "Login ausw\u00e4hlen",
+      close: "Schlie\u00dfen",
+      noUsername: "Kein Benutzername"
+    }
+  : {
+      chooseLogin: "Choose login",
+      close: "Close",
+      noUsername: "No username"
+    };
+
 interface InlinePreviewState {
   entryId: string;
   restore: () => void;
@@ -41,11 +55,14 @@ interface InlinePreviewState {
 let inlinePreviewState: InlinePreviewState | undefined;
 let inlinePreviewRequestId = 0;
 let inlineEligibilityRequestId = 0;
+let inlinePickerCleanup: (() => void) | undefined;
+let extensionThemeMode: ExtensionThemeMode | undefined;
 let inlineEligibility = {
   checkedAt: 0,
   hasMatches: false,
   pending: false,
   url: "",
+  inlineAutofillDisabled: false,
   desktopState: undefined as AutofillEligibilityResult["desktopState"] | undefined,
   appScheme: undefined as string | undefined
 };
@@ -116,6 +133,22 @@ function setupFillListener(): void {
       return true;
     }
 
+    if (rawMessage.type === "content:refreshInlineAutofill") {
+      void refreshInlineEligibility();
+      sendResponse({
+        refreshed: true
+      });
+      return true;
+    }
+
+    if (rawMessage.type === "content:showAutofillPicker") {
+      void showAutofillPicker();
+      sendResponse({
+        shown: true
+      });
+      return true;
+    }
+
     if (rawMessage.type !== "content:fillData") {
       return false;
     }
@@ -164,47 +197,194 @@ function ensureInlineStyles(): void {
       place-items: center;
       position: relative;
       overflow: hidden;
-      width: 42px;
-      height: 34px;
-      background: linear-gradient(135deg, #787ff6 0%, #69c4ff 100%);
-      border: 1px solid #787ff6;
+      width: 40px;
+      height: 32px;
+      background: rgba(120, 127, 246, 0.11);
+      border: 1px solid rgba(120, 127, 246, 0.22);
       border-radius: 12px;
       cursor: pointer;
-      box-shadow: rgba(120, 127, 246, 0.28) 0px 10px 24px;
-      transition: box-shadow 140ms ease, opacity 140ms ease, filter 140ms ease;
-      opacity: 0.98;
-    }
-
-    #${INLINE_ROOT_ID} button::after {
-      content: "";
-      position: absolute;
-      inset: 50%;
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.34);
-      opacity: 0;
-      pointer-events: none;
-      transform: translate(-50%, -50%) scale(1);
-      transition: opacity 180ms ease, transform 280ms ease;
+      box-shadow: rgba(20, 24, 38, 0.12) 0px 8px 18px;
+      backdrop-filter: blur(10px);
+      transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
+      opacity: 0.96;
     }
 
     #${INLINE_ROOT_ID} button:hover {
-      box-shadow: rgba(120, 127, 246, 0.36) 0px 12px 28px;
-      filter: saturate(1.05) brightness(1.03);
-    }
-
-    #${INLINE_ROOT_ID} button:hover::after {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(8);
+      background: rgba(120, 127, 246, 0.16);
+      border-color: rgba(120, 127, 246, 0.34);
+      box-shadow: rgba(20, 24, 38, 0.16) 0px 10px 22px;
     }
 
     #${INLINE_ROOT_ID} button svg {
       position: relative;
       z-index: 1;
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       display: block;
+    }
+
+    #${INLINE_PICKER_ID} {
+      all: initial;
+      --clavispass-picker-background: #ffffff;
+      --clavispass-picker-border: rgba(120, 127, 246, 0.28);
+      --clavispass-picker-title: #787ff6;
+      --clavispass-picker-text: #141826;
+      --clavispass-picker-muted: #5f667a;
+      --clavispass-picker-hover: rgba(120, 127, 246, 0.09);
+      --clavispass-picker-logo-bg: rgba(120, 127, 246, 0.12);
+      --clavispass-picker-shadow: rgba(20, 24, 38, 0.18) 0px 14px 34px;
+      --clavispass-picker-divider: rgba(20, 24, 38, 0.08);
+      box-sizing: border-box;
+      position: absolute;
+      z-index: 2147483647;
+      width: min(300px, calc(100vw - 16px));
+      max-height: min(300px, calc(100vh - 16px));
+      overflow: hidden;
+      background: var(--clavispass-picker-background);
+      border: 1px solid var(--clavispass-picker-border);
+      border-radius: 12px;
+      box-shadow: var(--clavispass-picker-shadow);
+      color: var(--clavispass-picker-text);
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      pointer-events: auto;
+    }
+
+    #${INLINE_PICKER_ID}[data-theme="dark"] {
+      --clavispass-picker-background: #292929;
+      --clavispass-picker-border: rgba(120, 127, 246, 0.34);
+      --clavispass-picker-title: #9ca1ff;
+      --clavispass-picker-text: #f4f2f7;
+      --clavispass-picker-muted: #c6c2cf;
+      --clavispass-picker-hover: rgba(120, 127, 246, 0.16);
+      --clavispass-picker-logo-bg: rgba(120, 127, 246, 0.18);
+      --clavispass-picker-shadow: rgba(0, 0, 0, 0.42) 0px 18px 38px;
+      --clavispass-picker-divider: rgba(255, 255, 255, 0.09);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      #${INLINE_PICKER_ID}:not([data-theme]) {
+        --clavispass-picker-background: #292929;
+        --clavispass-picker-border: rgba(120, 127, 246, 0.34);
+        --clavispass-picker-title: #9ca1ff;
+        --clavispass-picker-text: #f4f2f7;
+        --clavispass-picker-muted: #c6c2cf;
+        --clavispass-picker-hover: rgba(120, 127, 246, 0.16);
+        --clavispass-picker-logo-bg: rgba(120, 127, 246, 0.18);
+        --clavispass-picker-shadow: rgba(0, 0, 0, 0.42) 0px 18px 38px;
+        --clavispass-picker-divider: rgba(255, 255, 255, 0.09);
+      }
+    }
+
+    #${INLINE_PICKER_ID} * {
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    #${INLINE_PICKER_ID} .clavispass-picker-head {
+      align-items: center;
+      border-bottom: 1px solid var(--clavispass-picker-divider);
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      padding: 10px 10px 8px;
+    }
+
+    #${INLINE_PICKER_ID} .clavispass-picker-title {
+      color: var(--clavispass-picker-title);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    #${INLINE_PICKER_ID} .clavispass-picker-close {
+      all: unset;
+      align-items: center;
+      border-radius: 8px;
+      color: var(--clavispass-picker-muted);
+      cursor: pointer;
+      display: inline-flex;
+      font-size: 18px;
+      height: 26px;
+      justify-content: center;
+      line-height: 1;
+      width: 26px;
+    }
+
+    #${INLINE_PICKER_ID} .clavispass-picker-close:hover {
+      background: var(--clavispass-picker-hover);
+      color: var(--clavispass-picker-title);
+    }
+
+    #${INLINE_PICKER_ID} .clavispass-picker-close svg {
+      display: block;
+      height: 15px;
+      width: 15px;
+    }
+
+    #${INLINE_PICKER_ID} .clavispass-picker-list {
+      display: flex;
+      flex-direction: column;
+      max-height: 248px;
+      overflow-y: auto;
+      padding: 0;
+    }
+
+    #${INLINE_PICKER_ID} .clavispass-picker-item {
+      all: unset;
+      align-items: center;
+      border-bottom: 1px solid var(--clavispass-picker-divider);
+      cursor: pointer;
+      display: flex;
+      gap: 9px;
+      min-height: 48px;
+      padding: 8px 12px;
+    }
+
+    #${INLINE_PICKER_ID} .clavispass-picker-item:last-child {
+      border-bottom: 0;
+    }
+
+    #${INLINE_PICKER_ID} .clavispass-picker-item:hover {
+      background: var(--clavispass-picker-hover);
+    }
+
+    #${INLINE_PICKER_ID} .clavispass-picker-mark {
+      align-items: center;
+      background: var(--clavispass-picker-logo-bg);
+      border-radius: 9px;
+      color: #787ff6;
+      display: inline-flex;
+      flex: 0 0 auto;
+      height: 30px;
+      justify-content: center;
+      width: 30px;
+    }
+
+    #${INLINE_PICKER_ID} .clavispass-picker-copy {
+      min-width: 0;
+    }
+
+    #${INLINE_PICKER_ID} .clavispass-picker-name,
+    #${INLINE_PICKER_ID} .clavispass-picker-identity {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #${INLINE_PICKER_ID} .clavispass-picker-name {
+      color: var(--clavispass-picker-text);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    #${INLINE_PICKER_ID} .clavispass-picker-identity {
+      color: var(--clavispass-picker-muted);
+      font-size: 12px;
+      line-height: 1.35;
+      margin-top: 2px;
     }
   `;
 
@@ -270,12 +450,13 @@ function createInlineLogo(): SVGSVGElement {
   rootGroup.setAttribute("transform", "matrix(1.67587,0,0,1.74365,-366.657,-477.218)");
 
   for (const pathDefinition of INLINE_LOGO_PATHS) {
+    const pathIndex = rootGroup.childElementCount;
     const group = document.createElementNS(SVG_NAMESPACE, "g");
     group.setAttribute("transform", pathDefinition.transform);
 
     const path = document.createElementNS(SVG_NAMESPACE, "path");
     path.setAttribute("d", pathDefinition.d);
-    path.setAttribute("fill", "white");
+    path.setAttribute("fill", pathIndex === 1 ? "#69c4ff" : "#787ff6");
 
     group.appendChild(path);
     rootGroup.appendChild(group);
@@ -309,6 +490,50 @@ function removeInlineRoot(): void {
   document.getElementById(INLINE_ROOT_ID)?.remove();
 }
 
+function removeInlinePicker(): void {
+  inlinePickerCleanup?.();
+  inlinePickerCleanup = undefined;
+  document.getElementById(INLINE_PICKER_ID)?.remove();
+}
+
+function applyThemeToInlinePicker(): void {
+  const picker = document.getElementById(INLINE_PICKER_ID);
+  if (!picker) {
+    return;
+  }
+
+  if (extensionThemeMode) {
+    picker.dataset.theme = extensionThemeMode;
+  } else {
+    delete picker.dataset.theme;
+  }
+}
+
+function setupExtensionThemeSync(): void {
+  void chrome.storage.local.get(EXTENSION_THEME_STORAGE_KEY)
+    .then((stored) => {
+      const storedTheme = stored[EXTENSION_THEME_STORAGE_KEY];
+      extensionThemeMode = isExtensionThemeMode(storedTheme) ? storedTheme : undefined;
+      applyThemeToInlinePicker();
+    })
+    .catch(() => {
+    });
+
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName !== "local") {
+      return;
+    }
+
+    const change = changes[EXTENSION_THEME_STORAGE_KEY];
+    if (!change) {
+      return;
+    }
+
+    extensionThemeMode = isExtensionThemeMode(change.newValue) ? change.newValue : undefined;
+    applyThemeToInlinePicker();
+  });
+}
+
 async function refreshInlineEligibility(): Promise<void> {
   const requestId = ++inlineEligibilityRequestId;
   const url = window.location.href;
@@ -330,6 +555,7 @@ async function refreshInlineEligibility(): Promise<void> {
       hasMatches: eligibility.hasMatches,
       pending: false,
       url,
+      inlineAutofillDisabled: eligibility.inlineAutofillDisabled ?? false,
       desktopState: eligibility.desktopState,
       appScheme: eligibility.appScheme
     };
@@ -343,6 +569,7 @@ async function refreshInlineEligibility(): Promise<void> {
       hasMatches: false,
       pending: false,
       url,
+      inlineAutofillDisabled: false,
       desktopState: undefined,
       appScheme: undefined
     };
@@ -378,15 +605,16 @@ async function loadSingleInlineFillData(): Promise<
   | { status: "multiple"; detail: string }
 > {
   const suggestions = await sendRuntimeMessage("bridge:getSuggestions", undefined);
+  const passwordSuggestions = suggestions.items.filter((item) => item.hasPassword);
 
-  if (suggestions.items.length === 0) {
+  if (passwordSuggestions.length === 0) {
     return {
       status: "empty",
       detail: "No matching entries for this page."
     };
   }
 
-  if (suggestions.items.length > 1) {
+  if (passwordSuggestions.length > 1) {
     return {
       status: "multiple",
       detail: "Multiple matches found. Open the popup to choose one."
@@ -394,12 +622,193 @@ async function loadSingleInlineFillData(): Promise<
   }
 
   const fillData = await sendRuntimeMessage("bridge:getFillDataForEntry", {
-    entryId: suggestions.items[0].entryId
+    entryId: passwordSuggestions[0].entryId
   });
 
   return {
     status: "ready",
     fillData
+  };
+}
+
+function createPickerLogo(): SVGSVGElement {
+  const svg = createInlineLogo();
+  svg.setAttribute("width", "17");
+  svg.setAttribute("height", "17");
+  return svg;
+}
+
+function createCloseIcon(): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NAMESPACE, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("focusable", "false");
+
+  const firstLine = document.createElementNS(SVG_NAMESPACE, "path");
+  firstLine.setAttribute("d", "M6 6l12 12");
+  firstLine.setAttribute("stroke", "currentColor");
+  firstLine.setAttribute("stroke-linecap", "round");
+  firstLine.setAttribute("stroke-width", "2.4");
+
+  const secondLine = document.createElementNS(SVG_NAMESPACE, "path");
+  secondLine.setAttribute("d", "M18 6L6 18");
+  secondLine.setAttribute("stroke", "currentColor");
+  secondLine.setAttribute("stroke-linecap", "round");
+  secondLine.setAttribute("stroke-width", "2.4");
+
+  svg.appendChild(firstLine);
+  svg.appendChild(secondLine);
+  return svg;
+}
+
+function getSuggestionIdentity(item: SearchEntrySuggestion): string {
+  return item.email || item.username || contentText.noUsername;
+}
+
+function positionPicker(picker: HTMLDivElement): void {
+  const passwordField = getPrimaryPasswordField();
+  const anchor = document.getElementById(INLINE_ROOT_ID) || passwordField;
+  if (!anchor) {
+    return;
+  }
+
+  const rect = anchor.getBoundingClientRect();
+  const pickerRect = picker.getBoundingClientRect();
+  const viewportPadding = 8;
+  const gap = 8;
+  const maxLeft = window.innerWidth - pickerRect.width - viewportPadding;
+  const maxTop = window.innerHeight - pickerRect.height - viewportPadding;
+  const preferredLeft = rect.left;
+  const preferredTop = rect.bottom + gap;
+  const fallbackTop = rect.top - pickerRect.height - gap;
+  const top = preferredTop + pickerRect.height <= window.innerHeight - viewportPadding
+    ? preferredTop
+    : fallbackTop;
+
+  picker.style.left = `${window.scrollX + Math.min(Math.max(preferredLeft, viewportPadding), Math.max(maxLeft, viewportPadding))}px`;
+  picker.style.top = `${window.scrollY + Math.min(Math.max(top, viewportPadding), Math.max(maxTop, viewportPadding))}px`;
+}
+
+async function fillSuggestionFromPicker(entryId: string, picker: HTMLDivElement): Promise<void> {
+  let result: FillExecutionResult;
+
+  try {
+    const fillData = await sendRuntimeMessage("bridge:getFillDataForEntry", { entryId });
+    result = executeFill(fillData, document);
+  } catch (error) {
+    picker.querySelector(".clavispass-picker-title")!.textContent =
+      error instanceof Error ? error.message : "ClavisPass could not fill this page.";
+    return;
+  }
+
+  if (result.status === "filled") {
+    removeInlinePicker();
+    return;
+  }
+
+  picker.querySelector(".clavispass-picker-title")!.textContent = result.detail;
+}
+
+async function showAutofillPicker(): Promise<void> {
+  ensureInlineStyles();
+  clearInlinePreview();
+  removeInlinePicker();
+
+  const suggestions = await sendRuntimeMessage("bridge:getSuggestions", undefined);
+  const passwordSuggestions = suggestions.items.filter((item) => item.hasPassword);
+  if (passwordSuggestions.length === 0) {
+    return;
+  }
+
+  if (passwordSuggestions.length === 1) {
+    const fillData = await sendRuntimeMessage("bridge:getFillDataForEntry", {
+      entryId: passwordSuggestions[0].entryId
+    });
+    executeFill(fillData, document);
+    return;
+  }
+
+  const picker = document.createElement("div");
+  picker.id = INLINE_PICKER_ID;
+  picker.setAttribute("role", "dialog");
+  picker.setAttribute("aria-label", "Choose ClavisPass login");
+  applyThemeToInlinePicker();
+
+  const head = document.createElement("div");
+  head.className = "clavispass-picker-head";
+
+  const title = document.createElement("p");
+  title.className = "clavispass-picker-title";
+  title.textContent = contentText.chooseLogin;
+
+  const close = document.createElement("button");
+  close.className = "clavispass-picker-close";
+  close.type = "button";
+  close.setAttribute("aria-label", contentText.close);
+  close.appendChild(createCloseIcon());
+  close.addEventListener("click", removeInlinePicker);
+
+  head.appendChild(title);
+  head.appendChild(close);
+
+  const list = document.createElement("div");
+  list.className = "clavispass-picker-list";
+
+  for (const item of passwordSuggestions) {
+    const button = document.createElement("button");
+    button.className = "clavispass-picker-item";
+    button.type = "button";
+
+    const mark = document.createElement("span");
+    mark.className = "clavispass-picker-mark";
+    mark.appendChild(createPickerLogo());
+
+    const copy = document.createElement("span");
+    copy.className = "clavispass-picker-copy";
+
+    const name = document.createElement("span");
+    name.className = "clavispass-picker-name";
+    name.textContent = item.title;
+
+    const identity = document.createElement("span");
+    identity.className = "clavispass-picker-identity";
+    identity.textContent = getSuggestionIdentity(item);
+
+    copy.appendChild(name);
+    copy.appendChild(identity);
+    button.appendChild(mark);
+    button.appendChild(copy);
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      void fillSuggestionFromPicker(item.entryId, picker);
+    });
+
+    list.appendChild(button);
+  }
+
+  picker.appendChild(head);
+  picker.appendChild(list);
+  document.documentElement.appendChild(picker);
+  applyThemeToInlinePicker();
+  positionPicker(picker);
+
+  const handleOutsidePointerDown = (event: PointerEvent) => {
+    if (!picker.contains(event.target as Node)) {
+      removeInlinePicker();
+    }
+  };
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      removeInlinePicker();
+    }
+  };
+
+  document.addEventListener("pointerdown", handleOutsidePointerDown, true);
+  document.addEventListener("keydown", handleKeyDown, true);
+  inlinePickerCleanup = () => {
+    document.removeEventListener("pointerdown", handleOutsidePointerDown, true);
+    document.removeEventListener("keydown", handleKeyDown, true);
   };
 }
 
@@ -476,6 +885,11 @@ async function commitInlineAction(button: HTMLButtonElement): Promise<void> {
 
     const candidate = await loadSingleInlineFillData();
     if (candidate.status !== "ready") {
+      if (candidate.status === "multiple") {
+        await showAutofillPicker();
+        return;
+      }
+
       setInlineButtonState(button, candidate.detail);
       return;
     }
@@ -508,7 +922,7 @@ function positionInlineRoot(): void {
     void refreshInlineEligibility();
   }
 
-  if (!inlineEligibility.hasMatches) {
+  if (inlineEligibility.inlineAutofillDisabled || !inlineEligibility.hasMatches) {
     removeInlineRoot();
     return;
   }
@@ -525,7 +939,16 @@ function positionInlineRoot(): void {
   const maxTopInViewport = window.innerHeight - rootRect.height - viewportPadding;
   const maxLeftInViewport = window.innerWidth - rootRect.width - viewportPadding;
   const canPlaceRight = rightInViewport + rootRect.width <= window.innerWidth - viewportPadding;
-  const leftInViewport = canPlaceRight ? rightInViewport : leftFallbackInViewport;
+  const canPlaceLeft = leftFallbackInViewport >= viewportPadding;
+  const canPlaceInside = rect.width >= rootRect.width + 20 && rect.height >= rootRect.height - 2;
+  const insideInViewport = rect.right - rootRect.width - 6;
+  const leftInViewport = canPlaceRight
+    ? rightInViewport
+    : canPlaceLeft
+      ? leftFallbackInViewport
+      : canPlaceInside
+        ? insideInViewport
+        : leftFallbackInViewport;
   const clampedTop = Math.min(
     Math.max(topInViewport, viewportPadding),
     Math.max(maxTopInViewport, viewportPadding)
@@ -576,6 +999,7 @@ registerContentFrame();
 
 if (!window.__clavispassContentScriptLoaded) {
   window.__clavispassContentScriptLoaded = true;
+  setupExtensionThemeSync();
   setupFillListener();
   setupSavePromptListener();
   setupInlineTrigger();
