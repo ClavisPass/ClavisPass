@@ -425,6 +425,8 @@ pub fn run() {
             commands::save_key,
             commands::get_key,
             commands::remove_key,
+            commands::is_system_auth_available,
+            commands::authenticate_with_system,
             commands::close_main_window,
             commands::focus_main_window,
             commands::set_close_behavior,

@@ -135,6 +135,10 @@ Important runtime facts:
 
 Legacy vault crypto has been removed from the main ClavisPass vault flow. Any remaining separate crypto helpers, such as third-party importers, should not be confused with the vault format itself.
 
+Planned follow-up:
+
+- [docs/vault-v2-key-envelope-roadmap.md](/e:/Projects/ClavisPass/docs/vault-v2-key-envelope-roadmap.md) captures the intended V2 key-envelope architecture for moving Argon2id out of the unlocked-session sync hot path. This is a future crypto migration and should be handled deliberately with V1 read compatibility and coordinated device updates.
+
 ## Sync And Storage Model
 
 ### Cloud/session tokens

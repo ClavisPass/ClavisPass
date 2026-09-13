@@ -104,6 +104,7 @@ import {
 } from "../features/auth/utils/authenticateUser";
 import PerfProfiler from "../shared/performance/PerfProfiler";
 import { triggerGlobalError } from "../infrastructure/events/errorBus";
+import { detectTauriEnvironment } from "../infrastructure/platform/isTauri";
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
@@ -447,13 +448,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   }, []);
 
   useEffect(() => {
-    if (Platform.OS === "web") return;
     if (systemAuthPromptDone) return;
     if (!auth.isLoggedIn) return;
 
     let cancelled = false;
 
     (async () => {
+      if (Platform.OS === "web" && !(await detectTauriEnvironment())) return;
+
       const master = auth.getMaster();
       if (!master) return;
 

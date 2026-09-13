@@ -10,22 +10,19 @@ import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import ModuleContainer from "../ModuleContainer";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
+import { useExclusiveSecretReveal } from "../../../../shared/hooks/useExclusiveSecretReveal";
 
 function PinModule(props: PinModuleType & Props) {
   const didMount = useRef(false);
   const { t } = useTranslation();
   const { globalStyles, theme } = useTheme();
   const [value, setValue] = useState(props.value);
-  const [secureTextEntry, setSecureTextEntry] = useState(true);
-  const [eyeIcon, setEyeIcon] = useState("eye");
+  const reveal = useExclusiveSecretReveal(`vault:${props.id}:pin`);
+  const secureTextEntry = !reveal.isRevealed;
 
   useEffect(() => {
     setValue(props.value);
   }, [props.value]);
-
-  useEffect(() => {
-    setEyeIcon(secureTextEntry ? "eye" : "eye-off");
-  }, [secureTextEntry]);
 
   useEffect(() => {
     if (didMount.current) {
@@ -68,11 +65,11 @@ function PinModule(props: PinModuleType & Props) {
             right={
               <TextInput.Icon
                 animated
-                icon={eyeIcon}
+                icon={secureTextEntry ? "eye" : "eye-off"}
                 color={theme.colors.primary}
                 onPress={() => {
                   Keyboard.dismiss();
-                  setSecureTextEntry(!secureTextEntry);
+                  reveal.toggle();
                 }}
               />
             }

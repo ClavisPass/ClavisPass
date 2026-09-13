@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
+import { useExclusiveSecretReveal } from "../../../../shared/hooks/useExclusiveSecretReveal";
 import ModuleContainer from "../ModuleContainer";
 import Props from "../../model/ModuleProps";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
@@ -107,7 +108,11 @@ function CreditCardModule(props: CreditCardModuleType & Props) {
       props.note,
   );
   const [expanded, setExpanded] = useState(hasAdditionalValues);
-  const [numberVisible, setNumberVisible] = useState(false);
+  const numberReveal = useExclusiveSecretReveal(`vault:${props.id}:card-number`);
+  const securityCodeReveal = useExclusiveSecretReveal(
+    `vault:${props.id}:card-security-code`,
+  );
+  const numberVisible = numberReveal.isRevealed;
   const [card, setCard] = useState<CreditCardState>({
     cardholderName: props.cardholderName ?? "",
     number: props.number ?? "",
@@ -176,6 +181,7 @@ function CreditCardModule(props: CreditCardModuleType & Props) {
     label: string,
     autoFocus = false,
     keyboardType: "default" | "number-pad" = "default",
+    secure = false,
   ) => (
     <View style={moduleFormStyles.inputShell}>
       <TextInput
@@ -189,6 +195,22 @@ function CreditCardModule(props: CreditCardModuleType & Props) {
         onChangeText={changeField(field)}
         autoCapitalize={field === "number" || field === "securityCode" ? "none" : "words"}
         keyboardType={keyboardType}
+        secureTextEntry={
+          secure && field === "securityCode"
+            ? !securityCodeReveal.isRevealed
+            : false
+        }
+        textContentType={secure ? "password" : "none"}
+        autoComplete={secure ? "off" : undefined}
+        right={
+          secure && field === "securityCode" ? (
+            <TextInput.Icon
+              icon={securityCodeReveal.isRevealed ? "eye-off" : "eye"}
+              color={theme.colors.primary}
+              onPress={securityCodeReveal.toggle}
+            />
+          ) : undefined
+        }
       />
     </View>
   );
@@ -206,13 +228,14 @@ function CreditCardModule(props: CreditCardModuleType & Props) {
         placeholder={t("modules:creditCardNumber")}
         mode="outlined"
         onChangeText={changeCardNumber}
-        onFocus={() => setNumberVisible(true)}
+        onFocus={numberReveal.reveal}
         autoCapitalize="none"
         keyboardType="number-pad"
         right={
           <TextInput.Icon
             icon={numberVisible ? "eye-off" : "eye"}
-            onPress={() => setNumberVisible((current) => !current)}
+            color={theme.colors.primary}
+            onPress={numberReveal.toggle}
           />
         }
       />
@@ -253,6 +276,7 @@ function CreditCardModule(props: CreditCardModuleType & Props) {
             t("modules:creditCardSecurityCode"),
             false,
             "number-pad",
+            true,
           )}
           <CopyToClipboard
             value={card.securityCode ?? ""}

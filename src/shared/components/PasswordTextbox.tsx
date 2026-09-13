@@ -3,6 +3,7 @@ import { useTheme } from "../../app/providers/ThemeProvider";
 import { useEffect, useRef, useState } from "react";
 import { Platform, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { useExclusiveSecretReveal } from "../hooks/useExclusiveSecretReveal";
 type Props = {
   placeholder?: string;
   value: string;
@@ -12,12 +13,18 @@ type Props = {
   onSubmitEditing?: () => void;
   textInputRef?: any;
   setCapsLock?: (capsLock: boolean) => void;
+  exclusiveRevealId?: string;
 };
 function PasswordTextbox(props: Props) {
   const { t } = useTranslation();
   const { globalStyles, theme } = useTheme();
-  const [eyeIcon, setEyeIcon] = useState("eye");
-  const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const localReveal = useState(false);
+  const exclusiveReveal = useExclusiveSecretReveal(
+    props.exclusiveRevealId ?? "__password-textbox-disabled__",
+  );
+  const isExclusive = Boolean(props.exclusiveRevealId);
+  const isRevealed = isExclusive ? exclusiveReveal.isRevealed : localReveal[0];
+  const secureTextEntry = !isRevealed;
 
   const textInputRef = useRef<any>(null);
 
@@ -31,14 +38,6 @@ function PasswordTextbox(props: Props) {
     }
   }, [props.autofocus]);
 
-  useEffect(() => {
-    if (secureTextEntry) {
-      setEyeIcon("eye");
-    } else {
-      setEyeIcon("eye-off");
-    }
-  }, [secureTextEntry]);
-
   const handleKeyPress = (e: any) => {
     if (e.key === "Enter") {
       props.onSubmitEditing?.();
@@ -50,6 +49,15 @@ function PasswordTextbox(props: Props) {
         props.setCapsLock?.(false);
       }
     }
+  };
+
+  const toggleReveal = () => {
+    if (isExclusive) {
+      exclusiveReveal.toggle();
+      return;
+    }
+
+    localReveal[1]((current) => !current);
   };
 
   return (
@@ -82,14 +90,14 @@ function PasswordTextbox(props: Props) {
         right={
           <TextInput.Icon
             animated
-            icon={eyeIcon}
+            icon={secureTextEntry ? "eye" : "eye-off"}
             color={theme.colors.primary}
             accessibilityLabel={
               secureTextEntry
                 ? t("common:showPassword")
                 : t("common:hidePassword")
             }
-            onPress={() => setSecureTextEntry(!secureTextEntry)}
+            onPress={toggleReveal}
           />
         }
       />

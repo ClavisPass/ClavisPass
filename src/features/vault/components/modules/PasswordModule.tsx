@@ -82,6 +82,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
             setValue={setValue}
             value={value}
             placeholder=""
+            exclusiveRevealId={`vault:${props.id}:password`}
           />
         </View>
         <CopyToClipboard value={value} kind="password" />

@@ -6,12 +6,44 @@ import {
   saveData,
 } from "../../../infrastructure/storage/secureStore";
 import { logger } from "../../../infrastructure/logging/logger";
+import { detectTauriEnvironment } from "../../../infrastructure/platform/isTauri";
 
 const MASTER_KEY = "ClavisPass-Master";
+const SYSTEM_AUTH_PROMPT = "Authenticate to unlock ClavisPass";
+
+async function invokeTauriSystemAuthAvailable(): Promise<boolean> {
+  try {
+    if (!(await detectTauriEnvironment())) return false;
+
+    const { invoke } = await import("@tauri-apps/api/core");
+    return (await invoke("is_system_auth_available")) as boolean;
+  } catch (error) {
+    logger.error("Fehler beim Pruefen der Systemauthentifizierung:", error);
+    return false;
+  }
+}
+
+async function invokeTauriSystemAuth(): Promise<boolean> {
+  try {
+    if (!(await detectTauriEnvironment())) return false;
+
+    const { invoke } = await import("@tauri-apps/api/core");
+    return (await invoke("authenticate_with_system", {
+      message: SYSTEM_AUTH_PROMPT,
+    })) as boolean;
+  } catch (error) {
+    logger.error("Fehler bei der Systemauthentifizierung:", error);
+    return false;
+  }
+}
 
 export const authenticateUser = async () => {
   if (Platform.OS === "web") {
     // WebAuthn für Web
+    if (await detectTauriEnvironment()) {
+      return invokeTauriSystemAuth();
+    }
+
     if (!window.PublicKeyCredential) return false;
     try {
       const publicKeyOptions = {
@@ -45,6 +77,10 @@ export const authenticateUser = async () => {
 
 export const isSystemAuthenticationAvailable = async (): Promise<boolean> => {
   if (Platform.OS === "web") {
+    if (await detectTauriEnvironment()) {
+      return invokeTauriSystemAuthAvailable();
+    }
+
     return typeof window !== "undefined" && !!window.PublicKeyCredential;
   }
 

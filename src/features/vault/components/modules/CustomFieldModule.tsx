@@ -71,6 +71,7 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
               setValue={(nextValue) => changeCustomField({ value: nextValue })}
               value={props.value}
               placeholder=""
+              exclusiveRevealId={`vault:${props.id}:custom-secret`}
             />
           ) : (
             <TextInput

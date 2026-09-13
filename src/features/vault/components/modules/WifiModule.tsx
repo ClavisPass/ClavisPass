@@ -7,6 +7,7 @@ import { Dropdown, DropdownInputProps } from "react-native-paper-dropdown";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
 import Modal from "../../../../shared/components/modals/Modal";
+import { useExclusiveSecretReveal } from "../../../../shared/hooks/useExclusiveSecretReveal";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import Props from "../../model/ModuleProps";
 import ModulesEnum from "../../model/ModulesEnum";
@@ -18,7 +19,8 @@ function WifiModule(props: WifiModuleType & Props) {
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
   const { t } = useTranslation();
-  const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const reveal = useExclusiveSecretReveal(`vault:${props.id}:wifi-password`);
+  const secureTextEntry = !reveal.isRevealed;
 
   const OPTIONS = [
     { label: "WPA", value: "WPA" },
@@ -73,16 +75,7 @@ function WifiModule(props: WifiModuleType & Props) {
     setWifiType(props.wifiType);
   }, [props.wifiType]);
 
-  const [eyeIcon, setEyeIcon] = useState("eye");
   const [settingsVisible, setSettingsVisible] = useState(false);
-
-  useEffect(() => {
-    if (secureTextEntry) {
-      setEyeIcon("eye");
-    } else {
-      setEyeIcon("eye-off");
-    }
-  }, [secureTextEntry]);
 
   useEffect(() => {
     if (didMount.current) {
@@ -180,11 +173,11 @@ function WifiModule(props: WifiModuleType & Props) {
               right={
                 <TextInput.Icon
                   animated
-                  icon={eyeIcon}
+                  icon={secureTextEntry ? "eye" : "eye-off"}
                   color={theme.colors.primary}
                   onPress={() => {
                     Keyboard.dismiss();
-                    setSecureTextEntry(!secureTextEntry);
+                    reveal.toggle();
                   }}
                 />
               }
