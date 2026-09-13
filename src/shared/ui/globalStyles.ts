@@ -12,8 +12,10 @@ export type GlobalStyles = {
 
 const globalStyles = (
   background: string,
-  tertiary: string,
-  secondaryContainer: string
+  secondaryContainer: string,
+  surfaceVariant: string,
+  outlineVariant: string,
+  onSurface: string
 ): GlobalStyles => ({
   container: {
     flex: 1,
@@ -22,25 +24,29 @@ const globalStyles = (
     display: "flex",
   },
   outlineStyle: {
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 0,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    borderColor: tertiary,
-    borderWidth: 2,
+    borderColor: outlineVariant,
+    borderWidth: 1,
   },
   textInputStyle: {
     height: 40,
-    lineHeight: 16,
-    backgroundColor: tertiary,
+    lineHeight: 18,
+    fontSize: 14,
+    color: onSurface,
+    backgroundColor: surfaceVariant,
     minWidth: 200,
     maxWidth: "100%",
   },
   textInputNoteStyle: {
-    lineHeight: 16,
-    padding: 4,
-    backgroundColor: tertiary,
+    lineHeight: 20,
+    fontSize: 14,
+    padding: 8,
+    color: onSurface,
+    backgroundColor: surfaceVariant,
   },
   moduleView: {
     display: "flex",

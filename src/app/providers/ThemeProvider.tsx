@@ -66,8 +66,10 @@ export const ThemeProvider = ({ children }: Props) => {
 
   const globalStyles = styles(
     theme.colors.elevation.level2,
-    theme.colors.tertiary,
-    theme.colors.secondaryContainer
+    theme.colors.secondaryContainer,
+    theme.colors.surfaceVariant,
+    theme.colors.outlineVariant,
+    theme.colors.onSurface
   );
 
   const setDarkmode = (value: boolean) => {
