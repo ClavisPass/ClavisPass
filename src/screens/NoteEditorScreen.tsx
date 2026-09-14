@@ -1,7 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { StyleSheet, View, useWindowDimensions } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import { Button, IconButton, Text } from "react-native-paper";
 import Animated, {
@@ -43,6 +50,7 @@ const NoteEditorScreen: React.FC<NoteEditorScreenProps> = ({
   } = route.params;
   const { t } = useTranslation();
   const { height, width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const {
     globalStyles,
     theme,
@@ -92,6 +100,7 @@ const NoteEditorScreen: React.FC<NoteEditorScreenProps> = ({
     () => LinearTransition.duration(180),
     [],
   );
+  const editorBottomPadding = Math.max(88, insets.bottom + 80);
   const headerTitle = title
     ? `${t("modules:note")} - ${title}`
     : t("modules:note");
@@ -297,208 +306,218 @@ const NoteEditorScreen: React.FC<NoteEditorScreenProps> = ({
         translucent={true}
       />
       <Header onPress={() => navigation.goBack()} title={headerTitle} />
-      <View
-        style={[
-          styles.toolbar,
-          {
-            borderColor: theme.colors.outlineVariant,
-          },
-        ]}
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoiding}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <View style={styles.toolbarMainRow}>
-          <View style={styles.toolbarLeft}>
-            <NoteSelector
-              value={variantLocal}
-              options={variantOptions}
-              onSelect={changeVariant}
-            />
-            {isSnippet ? (
+        <View
+          style={[
+            styles.toolbar,
+            {
+              borderColor: theme.colors.outlineVariant,
+            },
+          ]}
+        >
+          <View style={styles.toolbarMainRow}>
+            <View style={styles.toolbarLeft}>
               <NoteSelector
-                value={languageLocal}
-                options={languageOptions}
-                onSelect={changeLanguage}
+                value={variantLocal}
+                options={variantOptions}
+                onSelect={changeVariant}
               />
-            ) : null}
-            {isMarkdown && showMarkdownFormatTools ? (
-              <>
-                <IconButton
-                  icon="format-bold"
-                  size={20}
-                  iconColor={theme.colors.primary}
-                  onPress={() => wrapSelection("**")}
-                  accessibilityLabel={t("modules:noteBold")}
-                  style={styles.iconButton}
+              {isSnippet ? (
+                <NoteSelector
+                  value={languageLocal}
+                  options={languageOptions}
+                  onSelect={changeLanguage}
                 />
-                <IconButton
-                  icon="format-italic"
-                  size={20}
-                  iconColor={theme.colors.primary}
-                  onPress={() => wrapSelection("*")}
-                  accessibilityLabel={t("modules:noteItalic")}
-                  style={styles.iconButton}
-                />
-                <IconButton
-                  icon="code-tags"
-                  size={20}
-                  iconColor={theme.colors.primary}
-                  onPress={() => wrapSelection("`")}
-                  accessibilityLabel={t("modules:noteInlineCode")}
-                  style={styles.iconButton}
-                />
-                <IconButton
-                  icon="format-header-1"
-                  size={20}
-                  iconColor={theme.colors.primary}
-                  onPress={() => prefixCurrentLine("# ", "Heading")}
-                  accessibilityLabel={t("modules:noteHeading")}
-                  style={styles.iconButton}
-                />
-                <IconButton
-                  icon="format-list-bulleted"
-                  size={20}
-                  iconColor={theme.colors.primary}
-                  onPress={() => prefixListLines("bullet")}
-                  accessibilityLabel={t("modules:noteBulletList")}
-                  style={styles.iconButton}
-                />
-                <IconButton
-                  icon="format-list-numbered"
-                  size={20}
-                  iconColor={theme.colors.primary}
-                  onPress={() => prefixListLines("numbered")}
-                  accessibilityLabel={t("modules:noteNumberedList")}
-                  style={styles.iconButton}
-                />
-                <IconButton
-                  icon="code-braces"
-                  size={20}
-                  iconColor={theme.colors.primary}
-                  onPress={insertCodeBlock}
-                  accessibilityLabel={t("modules:noteCodeBlock")}
-                  style={styles.iconButton}
-                />
-              </>
-            ) : null}
-            {isSnippet && languageLocal === "json" ? (
-              <AppChip
-                compact
-                icon="format-align-left"
-                onPress={formatJson}
-                accessibilityLabel={t("modules:noteFormatJson")}
-                style={styles.formatJsonChip}
-                textStyle={styles.formatJsonChipText}
-              >
-                {t("modules:noteFormatJson")}
-              </AppChip>
-            ) : null}
-          </View>
-          <View style={styles.toolbarActions}>
-            {isMarkdown ? (
-              <Button
-                compact
-                mode="contained-tonal"
-                textColor={theme.colors.primary}
-                onPress={() => setMarkdownPreview(!markdownPreview)}
-                accessibilityLabel={
-                  markdownPreview
+              ) : null}
+              {isMarkdown && showMarkdownFormatTools ? (
+                <>
+                  <IconButton
+                    icon="format-bold"
+                    size={20}
+                    iconColor={theme.colors.primary}
+                    onPress={() => wrapSelection("**")}
+                    accessibilityLabel={t("modules:noteBold")}
+                    style={styles.iconButton}
+                  />
+                  <IconButton
+                    icon="format-italic"
+                    size={20}
+                    iconColor={theme.colors.primary}
+                    onPress={() => wrapSelection("*")}
+                    accessibilityLabel={t("modules:noteItalic")}
+                    style={styles.iconButton}
+                  />
+                  <IconButton
+                    icon="code-tags"
+                    size={20}
+                    iconColor={theme.colors.primary}
+                    onPress={() => wrapSelection("`")}
+                    accessibilityLabel={t("modules:noteInlineCode")}
+                    style={styles.iconButton}
+                  />
+                  <IconButton
+                    icon="format-header-1"
+                    size={20}
+                    iconColor={theme.colors.primary}
+                    onPress={() => prefixCurrentLine("# ", "Heading")}
+                    accessibilityLabel={t("modules:noteHeading")}
+                    style={styles.iconButton}
+                  />
+                  <IconButton
+                    icon="format-list-bulleted"
+                    size={20}
+                    iconColor={theme.colors.primary}
+                    onPress={() => prefixListLines("bullet")}
+                    accessibilityLabel={t("modules:noteBulletList")}
+                    style={styles.iconButton}
+                  />
+                  <IconButton
+                    icon="format-list-numbered"
+                    size={20}
+                    iconColor={theme.colors.primary}
+                    onPress={() => prefixListLines("numbered")}
+                    accessibilityLabel={t("modules:noteNumberedList")}
+                    style={styles.iconButton}
+                  />
+                  <IconButton
+                    icon="code-braces"
+                    size={20}
+                    iconColor={theme.colors.primary}
+                    onPress={insertCodeBlock}
+                    accessibilityLabel={t("modules:noteCodeBlock")}
+                    style={styles.iconButton}
+                  />
+                </>
+              ) : null}
+              {isSnippet && languageLocal === "json" ? (
+                <AppChip
+                  compact
+                  icon="format-align-left"
+                  onPress={formatJson}
+                  accessibilityLabel={t("modules:noteFormatJson")}
+                  style={styles.formatJsonChip}
+                  textStyle={styles.formatJsonChipText}
+                >
+                  {t("modules:noteFormatJson")}
+                </AppChip>
+              ) : null}
+            </View>
+            <View style={styles.toolbarActions}>
+              {isMarkdown ? (
+                <Button
+                  compact
+                  mode="contained-tonal"
+                  textColor={theme.colors.primary}
+                  onPress={() => setMarkdownPreview(!markdownPreview)}
+                  accessibilityLabel={
+                    markdownPreview
+                      ? t("modules:noteHidePreview")
+                      : t("modules:noteShowPreview")
+                  }
+                  contentStyle={styles.previewButtonContent}
+                  labelStyle={styles.previewButtonLabel}
+                  style={styles.previewButton}
+                >
+                  {markdownPreview
                     ? t("modules:noteHidePreview")
-                    : t("modules:noteShowPreview")
-                }
-                contentStyle={styles.previewButtonContent}
-                labelStyle={styles.previewButtonLabel}
-                style={styles.previewButton}
-              >
-                {markdownPreview
-                  ? t("modules:noteHidePreview")
-                  : t("modules:noteShowPreview")}
-              </Button>
-            ) : null}
+                    : t("modules:noteShowPreview")}
+                </Button>
+              ) : null}
+            </View>
           </View>
         </View>
-      </View>
-      <View
-        style={[
-          styles.editorShell,
-          {
-            backgroundColor: theme.colors.elevation.level2,
-          },
-        ]}
-      >
-        {markdownPreviewReplacesEditor ? (
-          <Animated.View
-            entering={FadeIn.duration(140)}
-            exiting={FadeOut.duration(120)}
-            layout={markdownPreviewTransition}
-            style={styles.markdownPreviewPane}
-          >
-            <NoteMarkdownPreview value={value} />
-          </Animated.View>
-        ) : (
-          <Animated.View
-            entering={FadeIn.duration(140)}
-            exiting={FadeOut.duration(120)}
-            layout={markdownPreviewTransition}
-            style={[
-              styles.editorSplit,
-              canSplitMarkdownPreview && isMarkdown && markdownPreview
-                ? styles.editorSplitWide
-                : null,
-            ]}
-          >
-            <Animated.View
-              layout={markdownPreviewTransition}
-              style={styles.editorPane}
-            >
-              <NoteFullscreenEditor
-                value={value}
-                onChangeText={changeValue}
-                minHeight={minEditorHeight}
-                variant={variantLocal}
-                language={languageLocal}
-                showLineNumbers={variantLocal !== "plain"}
-                wrapLines
-                initialSelection={initialSelection}
-                onSelectionChange={changeSelection}
-              />
-            </Animated.View>
-            {canSplitMarkdownPreview && isMarkdown && markdownPreview ? (
-              <Animated.View
-                entering={FadeIn.duration(160)}
-                exiting={FadeOut.duration(120)}
-                layout={markdownPreviewTransition}
-                style={styles.markdownPreviewPane}
-              >
-                <NoteMarkdownPreview value={value} />
-              </Animated.View>
-            ) : null}
-          </Animated.View>
-        )}
-      </View>
-      <View
-        style={[
-          styles.footerMeta,
-          {
-            backgroundColor: theme.colors.elevation.level2,
-            borderColor: theme.colors.outlineVariant,
-          },
-        ]}
-      >
-        <Text
-          variant="labelSmall"
-          style={{ color: theme.colors.onSurfaceVariant }}
-          numberOfLines={1}
+        <View
+          style={[
+            styles.editorShell,
+            {
+              backgroundColor: theme.colors.elevation.level2,
+            },
+          ]}
         >
-          {`${t("modules:noteCharacters", { count: value.length })} - ${t(
-            "modules:noteWords",
-            { count: wordCount },
-          )} - ${t("modules:noteLines", { count: lineCount })}`}
-        </Text>
-      </View>
+          {markdownPreviewReplacesEditor ? (
+            <Animated.View
+              entering={FadeIn.duration(140)}
+              exiting={FadeOut.duration(120)}
+              layout={markdownPreviewTransition}
+              style={styles.markdownPreviewPane}
+            >
+              <NoteMarkdownPreview value={value} />
+            </Animated.View>
+          ) : (
+            <Animated.View
+              entering={FadeIn.duration(140)}
+              exiting={FadeOut.duration(120)}
+              layout={markdownPreviewTransition}
+              style={[
+                styles.editorSplit,
+                canSplitMarkdownPreview && isMarkdown && markdownPreview
+                  ? styles.editorSplitWide
+                  : null,
+              ]}
+            >
+              <Animated.View
+                layout={markdownPreviewTransition}
+                style={styles.editorPane}
+              >
+                <NoteFullscreenEditor
+                  value={value}
+                  onChangeText={changeValue}
+                  minHeight={minEditorHeight}
+                  variant={variantLocal}
+                  language={languageLocal}
+                  showLineNumbers={variantLocal !== "plain"}
+                  wrapLines
+                  initialSelection={initialSelection}
+                  onSelectionChange={changeSelection}
+                  bottomPadding={editorBottomPadding}
+                />
+              </Animated.View>
+              {canSplitMarkdownPreview && isMarkdown && markdownPreview ? (
+                <Animated.View
+                  entering={FadeIn.duration(160)}
+                  exiting={FadeOut.duration(120)}
+                  layout={markdownPreviewTransition}
+                  style={styles.markdownPreviewPane}
+                >
+                  <NoteMarkdownPreview value={value} />
+                </Animated.View>
+              ) : null}
+            </Animated.View>
+          )}
+        </View>
+        <View
+          style={[
+            styles.footerMeta,
+            {
+              backgroundColor: theme.colors.elevation.level2,
+              borderColor: theme.colors.outlineVariant,
+            },
+          ]}
+        >
+          <Text
+            variant="labelSmall"
+            style={{ color: theme.colors.onSurfaceVariant }}
+            numberOfLines={1}
+          >
+            {`${t("modules:noteCharacters", { count: value.length })} - ${t(
+              "modules:noteWords",
+              { count: wordCount },
+            )} - ${t("modules:noteLines", { count: lineCount })}`}
+          </Text>
+        </View>
+      </KeyboardAvoidingView>
     </AnimatedContainer>
   );
 };
 
 const styles = StyleSheet.create({
+  keyboardAvoiding: {
+    flex: 1,
+    width: "100%",
+  },
   toolbar: {
     width: "100%",
     minHeight: 42,

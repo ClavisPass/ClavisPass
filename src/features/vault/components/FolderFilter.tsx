@@ -495,6 +495,7 @@ function FolderFilter(props: Props) {
                   {props.hasTwoFactorEntries ? (
                     <AppChip
                       icon="two-factor-authentication"
+                      iconOnly
                       selected={props.selected2FA}
                       showSelectedOverlay={true}
                       onPress={
@@ -509,13 +510,12 @@ function FolderFilter(props: Props) {
                       }
                       style={styles.chip}
                       textStyle={styles.chipText}
-                    >
-                      {""}
-                    </AppChip>
+                    />
                   ) : null}
                   {props.hasCardEntries ? (
                     <AppChip
                       icon="credit-card-multiple-outline"
+                      iconOnly
                       selected={props.selectedCard}
                       showSelectedOverlay={true}
                       onPress={
@@ -530,12 +530,11 @@ function FolderFilter(props: Props) {
                       }
                       style={styles.chip}
                       textStyle={styles.chipText}
-                    >
-                      {""}
-                    </AppChip>
+                    />
                   ) : null}
                   <AppChip
                     icon="star-outline"
+                    iconOnly
                     selected={props.selectedFav}
                     showSelectedOverlay={true}
                     onPress={
@@ -549,9 +548,7 @@ function FolderFilter(props: Props) {
                     }
                     style={styles.chip}
                     textStyle={styles.chipText}
-                  >
-                    {""}
-                  </AppChip>
+                  />
                   {props.moduleFilters.map((module) => (
                     <AppChip
                       key={module}

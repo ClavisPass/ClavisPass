@@ -19,6 +19,7 @@ export type DraggableModulesListProps = {
   addModule: (module: ModulesEnum) => void;
   fastAccess: FastAccessType | null;
   navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>;
+  bottomPadding?: number;
 };
 
 export const draggableModulesListStyles = StyleSheet.create({

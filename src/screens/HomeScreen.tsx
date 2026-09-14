@@ -487,7 +487,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   );
 
   const searchRef = useRef<any>(null);
-  const skipNextSearchBlurCloseRef = useRef(false);
   const suppressNextCompactSearchOpenRef = useRef(false);
 
   const closeCompactSearchIfEmpty = useCallback(() => {
@@ -1061,7 +1060,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       </AppChip>
       <AppChip
         compact
-        icon="drag"
+        icon="arrow-split-horizontal"
         disabled={reorderValues.length < 2}
         onPress={openReorderScreen}
         style={actionChipStyle}
@@ -1113,38 +1112,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     });
   }, []);
 
-  const closeHeaderSearch = useCallback(() => {
-    skipNextSearchBlurCloseRef.current = false;
-    setSearchHeaderVisible(false);
-    setSearchQuery("");
-  }, []);
-
   const handleCompactSearchBlur = useCallback(() => {
-    if (skipNextSearchBlurCloseRef.current) {
-      return;
-    }
-
     closeCompactSearchIfEmpty();
   }, [closeCompactSearchIfEmpty]);
-
-  const compactSearchHasQuery = searchQuery.trim() !== "";
-  const compactSearchButtonPress = searchHeaderVisible
-    ? Platform.OS === "web" && !compactSearchHasQuery
-      ? undefined
-      : closeHeaderSearch
-    : openHeaderSearch;
-
-  const compactSearchButtonWebProps =
-    Platform.OS === "web" && searchHeaderVisible && compactSearchHasQuery
-      ? ({
-          onMouseDown: (event: any) => {
-            event.preventDefault?.();
-            event.stopPropagation?.();
-            skipNextSearchBlurCloseRef.current = true;
-            closeHeaderSearch();
-          },
-        } as any)
-      : null;
 
   const syncBar = (
     <Sync
@@ -1335,7 +1305,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
-              paddingHorizontal: 10,
+              paddingHorizontal:
+                isCompactHeader && searchHeaderVisible
+                  ? TITLEBAR_HEIGHT > 0
+                    ? 4
+                    : 6
+                  : 10,
               paddingTop:
                 Constants.statusBarHeight + (TITLEBAR_HEIGHT > 0 ? 4 : 6),
               paddingBottom: TITLEBAR_HEIGHT > 0 ? 4 : 6,
@@ -1388,7 +1363,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                     {
                       flex: 1,
                       height: 32,
-                      marginLeft: 2,
+                      marginLeft: 0,
                       overflow: "hidden",
                       position: "relative",
                       zIndex: 5,
@@ -1446,7 +1421,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                         }}
                         style={{
                           margin: 0,
-                          width: 32,
+                          width: 28,
                           height: 32,
                           ...webNoDragStyle,
                         }}
@@ -1556,33 +1531,24 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 </View>
               ) : null}
               {isCompactHeader ? (
-                <IconButton
-                  accessibilityLabel={
-                    searchHeaderVisible
-                      ? t("home:closeSearch")
-                      : t("home:search")
-                  }
-                  icon={searchHeaderVisible ? "close" : "magnify"}
-                  iconColor="white"
-                  size={22}
-                  {...compactSearchButtonWebProps}
-                  onPressIn={() => {
-                    if (Platform.OS === "web") return;
-                    if (searchHeaderVisible) {
-                      skipNextSearchBlurCloseRef.current = true;
-                    }
-                  }}
-                  onPress={compactSearchButtonPress}
-                  style={{
-                    margin: 0,
-                    marginRight: 2,
-                    width: 36,
-                    height: 32,
-                    position: "relative",
-                    zIndex: 5,
-                    ...webNoDragStyle,
-                  }}
-                />
+                !searchHeaderVisible ? (
+                  <IconButton
+                    accessibilityLabel={t("home:search")}
+                    icon="magnify"
+                    iconColor="white"
+                    size={22}
+                    onPress={openHeaderSearch}
+                    style={{
+                      margin: 0,
+                      marginRight: 2,
+                      width: 36,
+                      height: 32,
+                      position: "relative",
+                      zIndex: 5,
+                      ...webNoDragStyle,
+                    }}
+                  />
+                ) : null
               ) : (
                 <View
                   id="home-header-right-drag-region"

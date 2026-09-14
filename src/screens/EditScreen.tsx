@@ -683,7 +683,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       },
       {
         key: "reorderModules",
-        icon: "drag",
+        icon: "arrow-split-horizontal",
         disabled: value.modules.length < 2,
         label: t("home:reorderChip"),
         onPress: openModuleReorderScreen,
@@ -1205,6 +1205,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           addModule={addModule}
           fastAccess={fastAccessObject}
           navigation={navigation}
+          bottomPadding={width > 600 ? 12 : 96}
         />
       </PerfProfiler>
       {!(width > 600) && (

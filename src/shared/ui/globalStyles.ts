@@ -4,7 +4,6 @@ export type GlobalStyles = {
   container: ViewStyle;
   outlineStyle: ViewStyle;
   textInputStyle: TextStyle;
-  textInputNoteStyle: TextStyle;
   moduleView: ViewStyle;
   fab: ViewStyle;
   folderContainer: ViewStyle;
@@ -40,13 +39,6 @@ const globalStyles = (
     backgroundColor: surfaceVariant,
     minWidth: 200,
     maxWidth: "100%",
-  },
-  textInputNoteStyle: {
-    lineHeight: 20,
-    fontSize: 14,
-    padding: 8,
-    color: onSurface,
-    backgroundColor: surfaceVariant,
   },
   moduleView: {
     display: "flex",

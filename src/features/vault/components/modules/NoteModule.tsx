@@ -255,13 +255,12 @@ function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
       outlineStyle={[globalStyles.outlineStyle, styles.outline]}
       contentStyle={styles.inputContent}
       style={[
-        globalStyles.textInputNoteStyle,
+        globalStyles.textInputStyle,
         styles.input,
         {
           minHeight: sizing.min,
           height: inputHeight,
           maxHeight: sizing.max,
-          backgroundColor: theme.colors.tertiary,
         },
       ]}
       value={value}
@@ -339,7 +338,8 @@ function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
                 minHeight: sizing.min,
                 height: inputHeight,
                 maxHeight: sizing.max,
-                backgroundColor: theme.colors.tertiary,
+                backgroundColor: theme.colors.surfaceVariant,
+                borderColor: theme.colors.outlineVariant,
               },
             ]}
           >
@@ -354,7 +354,8 @@ function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
                 minHeight: sizing.min,
                 height: inputHeight,
                 maxHeight: sizing.max,
-                backgroundColor: theme.colors.tertiary,
+                backgroundColor: theme.colors.surfaceVariant,
+                borderColor: theme.colors.outlineVariant,
               },
             ]}
           >
@@ -396,6 +397,9 @@ const styles = StyleSheet.create({
   },
   input: {
     padding: 0,
+    height: undefined,
+    minWidth: 0,
+    width: "100%",
   },
   inputContent: {
     paddingHorizontal: 12,
@@ -404,11 +408,11 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   outline: {
-    borderRadius: 8,
     borderWidth: 1,
   },
   preview: {
-    borderRadius: 8,
+    borderRadius: 12,
+    borderWidth: 1,
     overflow: "hidden",
   },
 });

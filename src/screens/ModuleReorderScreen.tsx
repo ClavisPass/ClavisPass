@@ -295,7 +295,7 @@ export default function ModuleReorderScreen({
               gap: 8,
             }}
           >
-            <AppIcon name="drag" size={20} color="white" />
+            <AppIcon name="arrow-split-horizontal" size={20} color="white" />
             <Text
               variant="titleMedium"
               numberOfLines={1}

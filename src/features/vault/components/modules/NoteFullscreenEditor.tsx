@@ -14,6 +14,7 @@ type Props = {
   wrapLines?: boolean;
   initialSelection?: { start: number; end: number };
   onSelectionChange?: (selection: { start: number; end: number }) => void;
+  bottomPadding?: number;
 };
 
 export default function NoteFullscreenEditor({
@@ -23,8 +24,9 @@ export default function NoteFullscreenEditor({
   variant,
   initialSelection,
   onSelectionChange,
+  bottomPadding = 88,
 }: Props) {
-  const { globalStyles, theme } = useTheme();
+  const { globalStyles } = useTheme();
   const isSnippet = variant === "snippet";
   const scrollRef = useRef<ScrollView>(null);
   const didApplyInitialScrollRef = useRef(false);
@@ -50,19 +52,22 @@ export default function NoteFullscreenEditor({
     <ScrollView
       ref={scrollRef}
       style={styles.body}
-      contentContainerStyle={styles.bodyContent}
+      contentContainerStyle={[
+        styles.bodyContent,
+        { paddingBottom: bottomPadding },
+      ]}
       keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="interactive"
     >
       <TextInput
         autoFocus
         outlineStyle={[globalStyles.outlineStyle, styles.outline]}
         contentStyle={[styles.inputContent, { minHeight }]}
         style={[
-          globalStyles.textInputNoteStyle,
+          globalStyles.textInputStyle,
           styles.input,
           {
             minHeight,
-            backgroundColor: theme.colors.tertiary,
           },
         ]}
         value={value}
@@ -92,6 +97,8 @@ const styles = StyleSheet.create({
   input: {
     height: undefined,
     padding: 0,
+    minWidth: 0,
+    width: "100%",
   },
   inputContent: {
     paddingHorizontal: 12,
@@ -101,7 +108,6 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   outline: {
-    borderRadius: 0,
     borderWidth: 1,
   },
 });

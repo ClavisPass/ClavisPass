@@ -182,6 +182,9 @@ function DraggableModulesList(props: DraggableModulesListProps) {
             scrollEnabled={nativeScrollEnabled}
             keyboardShouldPersistTaps="always"
             keyboardDismissMode="on-drag"
+            contentContainerStyle={{
+              paddingBottom: props.bottomPadding ?? 12,
+            }}
             onContentSizeChange={(_, height) => {
               contentHeightRef.current = height;
             }}

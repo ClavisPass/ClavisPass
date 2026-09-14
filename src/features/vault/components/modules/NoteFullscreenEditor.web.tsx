@@ -14,6 +14,7 @@ type Props = {
   wrapLines?: boolean;
   initialSelection?: { start: number; end: number };
   onSelectionChange?: (selection: { start: number; end: number }) => void;
+  bottomPadding?: number;
 };
 
 const MONACO_LANGUAGE_BY_NOTE_LANGUAGE: Record<
@@ -46,7 +47,7 @@ export default function NoteFullscreenEditor({
       style={[
         styles.container,
         {
-          backgroundColor: theme.colors.tertiary,
+          backgroundColor: theme.colors.surfaceVariant,
         },
       ]}
     >
