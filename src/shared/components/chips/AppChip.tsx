@@ -90,7 +90,7 @@ function AppChip({
                 pointerEvents="none"
                 style={[
                   styles.iconOnlySelectedOverlay,
-                  { borderColor: theme.colors.primary, borderWidth: 1 },
+                  
                 ]}
               />
             ) : null}
