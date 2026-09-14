@@ -23,8 +23,8 @@ export default function TabNavigator() {
       screenOptions={{
         headerShown: false,
         animation: "fade",
-        freezeOnBlur: Platform.OS !== "web",
-        lazy: true,
+        freezeOnBlur: false,
+        lazy: Platform.OS === "web",
         sceneStyle: width > 600 ? { marginLeft: 88 } : undefined,
       }}
       tabBar={(props) =>
@@ -35,7 +35,7 @@ export default function TabNavigator() {
         )
       }
       initialRouteName="HomeStack"
-      detachInactiveScreens={Platform.OS !== "web"}
+      detachInactiveScreens={false}
     >
       <Tab.Screen
         name="HomeStack"

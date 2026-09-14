@@ -107,6 +107,7 @@ const de: TranslationSchema = {
     selectFolderDescription: "Wähle aus, wo dieser Eintrag liegen soll.",
     manageFoldersDescription:
       "Hier kannst du Ordner anlegen, sortieren und löschen.",
+    foldersEmpty: "Noch keine Ordner hinzugefügt.",
     selectedItem: "Ausgewählter Eintrag",
     edit: "Bearbeiten",
     fastAccess: "Fast Access",
@@ -189,6 +190,16 @@ const de: TranslationSchema = {
     moduleFilterText:
       "Wähle Modultypen aus, die in der Liste sichtbar sein sollen.",
     editFolders: "Ordner bearbeiten",
+    emptyVaultTitle: "Dein Vault ist bereit",
+    emptyVaultText:
+      "Lege deinen ersten Eintrag an. Du kannst mit einem Passwort starten und später Notizen, Karten, 2FA-Codes oder eigene Felder ergänzen.",
+    emptyVaultCreate: "Ersten Eintrag erstellen",
+    emptyVaultTipCreate:
+      "Wähle eine Vorlage oder starte mit einem leeren Eintrag.",
+    emptyVaultTipOrganize:
+      "Ordner, Favoriten und Pins kannst du jederzeit nachziehen.",
+    emptyVaultTipAnalyze:
+      "Sobald Passwörter drin sind, hilft dir die Analyse beim Aufräumen.",
     systemAuthPromptTitle: "Systemauthentifizierung nutzen?",
     systemAuthPromptText:
       "Du kannst ClavisPass künftig mit Fingerabdruck, Gesichtserkennung oder deiner Gerätesperre entsperren.",

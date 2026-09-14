@@ -27,6 +27,10 @@ export default defineConfig({
         __dirname,
         "tests/mocks/expoStatusBar.ts",
       ),
+      "@expo/vector-icons": path.resolve(
+        __dirname,
+        "tests/mocks/expoVectorIcons.tsx",
+      ),
       "react-i18next": path.resolve(__dirname, "tests/mocks/reactI18next.ts"),
       "react-native-paper": path.resolve(
         __dirname,

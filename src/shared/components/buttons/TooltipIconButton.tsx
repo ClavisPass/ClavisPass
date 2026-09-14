@@ -9,12 +9,16 @@ type TooltipIconButtonProps = React.ComponentProps<typeof IconButton> & {
 };
 
 function TooltipIconButton({ tooltip, ...props }: TooltipIconButtonProps) {
-  const icon =
-    typeof props.icon === "string"
-      ? ({ color, size }: { color: string; size: number }) => (
-          <AppIcon name={props.icon as string} size={size} color={color} />
-        )
-      : props.icon;
+  const { icon: iconProp } = props;
+  const icon = React.useMemo(
+    () =>
+      typeof iconProp === "string"
+        ? ({ color, size }: { color: string; size: number }) => (
+            <AppIcon name={iconProp} size={size} color={color} />
+          )
+        : iconProp,
+    [iconProp],
+  );
 
   return (
     <AppTooltip title={tooltip}>

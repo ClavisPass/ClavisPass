@@ -88,7 +88,7 @@ function AddressModule(props: AddressModuleType & Props) {
   ) => (
     <View style={moduleFormStyles.inputShell}>
       <TextInput
-        autoFocus={autoFocus}
+        autoFocus={props.autoFocus !== false && autoFocus}
         outlineStyle={globalStyles.outlineStyle}
         style={[globalStyles.textInputStyle, moduleFormStyles.input]}
         contentStyle={{ textAlignVertical: "center", paddingVertical: 0 }}

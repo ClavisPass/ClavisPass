@@ -103,6 +103,7 @@ function DraggableModulesListWeb(props: DraggableModulesListProps) {
                         props.fastAccess,
                         props.navigation,
                         props.value.title,
+                        props.moduleAutoFocus ?? true,
                       )}
                     </WebDragHandlePropsProvider>
                   </div>

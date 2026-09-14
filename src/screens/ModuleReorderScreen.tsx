@@ -124,6 +124,7 @@ export default function ModuleReorderScreen({
         null,
         navigation as any,
         "",
+        false,
       );
 
       const content = (

@@ -167,7 +167,7 @@ function EmailModule(props: EmailModuleType & Props) {
           >
             <View style={{ height: 40, flex: 1 }}>
               <TextInput
-                autoFocus={value === "" ? true : false}
+                autoFocus={props.autoFocus !== false && value === ""}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => {
                   setTimeout(() => {

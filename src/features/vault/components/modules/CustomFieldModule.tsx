@@ -67,7 +67,7 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
         <View style={{ height: 40, flex: 1 }}>
           {inputType === "secret" ? (
             <PasswordTextbox
-              autofocus={props.value === ""}
+              autofocus={props.autoFocus !== false && props.value === ""}
               setValue={(nextValue) => changeCustomField({ value: nextValue })}
               value={props.value}
               placeholder=""
@@ -75,7 +75,7 @@ function CustomFieldModule(props: CustomFieldModuleType & Props) {
             />
           ) : (
             <TextInput
-              autoFocus={props.value === ""}
+              autoFocus={props.autoFocus !== false && props.value === ""}
               outlineStyle={globalStyles.outlineStyle}
               style={globalStyles.textInputStyle}
               value={props.value}

@@ -251,7 +251,7 @@ function NoteModule(props: NoteModuleType & Props & NoteModuleNavigationProps) {
 
   const editor = (
     <TextInput
-      autoFocus={value === ""}
+      autoFocus={props.autoFocus !== false && value === ""}
       outlineStyle={[globalStyles.outlineStyle, styles.outline]}
       contentStyle={styles.inputContent}
       style={[

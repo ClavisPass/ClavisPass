@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, StyleSheet, Platform, useWindowDimensions } from "react-native";
-import { Button, Divider, Text } from "react-native-paper";
+import { Button, Divider, Icon, Text } from "react-native-paper";
 import ValuesType from "../../model/ValuesType";
 import ModulesEnum from "../../model/ModulesEnum";
 
@@ -627,9 +627,9 @@ function ListItem(props: Props) {
       ]}
     >
       <View style={[styles.swipeAction, styles.swipeActionLeft]}>
-        <AppIcon
+        <Icon
           color={props.item.fav ? theme.colors.primary : theme.colors.onPrimary}
-          name={props.item.fav ? "star-off-outline" : "star-outline"}
+          source={props.item.fav ? "star-off" : "star"}
           size={24}
         />
       </View>
@@ -659,9 +659,13 @@ function ListItem(props: Props) {
 
   const dragHandleIcon = (
     <AppIcon
-      color={darkmode ? theme.colors?.outline : theme.colors?.outlineVariant}
+      color={
+        dragHandlePressed || dragHandleHovered
+          ? theme.colors.primary
+          : theme.colors.onSurfaceVariant
+      }
       name="drag"
-      size={20}
+      size={22}
     />
   );
 
@@ -726,15 +730,15 @@ function ListItem(props: Props) {
             dragHandleHovered
               ? {
                   backgroundColor: darkmode
-                    ? "rgba(255, 255, 255, .04)"
-                    : "rgba(0, 0, 0, .035)",
+                    ? "rgba(255, 255, 255, .08)"
+                    : "rgba(0, 0, 0, .06)",
                 }
               : null,
             dragHandlePressed
               ? {
                   backgroundColor: darkmode
-                    ? "rgba(255, 255, 255, .08)"
-                    : "rgba(0, 0, 0, .07)",
+                    ? "rgba(255, 255, 255, .12)"
+                    : "rgba(0, 0, 0, .10)",
                 }
               : null,
           ]}
@@ -757,8 +761,8 @@ function ListItem(props: Props) {
           dragHandlePressed
             ? {
                 backgroundColor: darkmode
-                  ? "rgba(255, 255, 255, .08)"
-                  : "rgba(0, 0, 0, .07)",
+                  ? "rgba(255, 255, 255, .12)"
+                  : "rgba(0, 0, 0, .10)",
               }
             : null,
         ]}

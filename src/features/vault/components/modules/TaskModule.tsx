@@ -120,7 +120,7 @@ function TaskModule(props: TaskModuleType & Props) {
             >
               <textarea
                 ref={webTextareaRef}
-                autoFocus={value === ""}
+                autoFocus={props.autoFocus !== false && value === ""}
                 value={value}
                 onChange={(event) => setValue(event.currentTarget.value)}
                 placeholder={t("modules:task")}
@@ -153,7 +153,7 @@ function TaskModule(props: TaskModuleType & Props) {
           ) : (
             <View style={{ flex: 1, minWidth: 0 }}>
               <NativeTextInput
-                autoFocus={value === "" ? true : false}
+                autoFocus={props.autoFocus !== false && value === ""}
                 multiline
                 scrollEnabled={false}
                 onContentSizeChange={(e) => {

@@ -12,7 +12,7 @@ import ModulesEnum from "../features/vault/model/ModulesEnum";
 
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import { Text } from "react-native-paper";
+import { Icon, Text } from "react-native-paper";
 import Header from "../shared/components/Header";
 import ValuesType from "../features/vault/model/ValuesType";
 import getModuleData from "../features/vault/utils/getModuleData";
@@ -148,6 +148,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     useState<FastAccessType | null>(
       extractFastAccessObject(value.modules, value.title),
     );
+  const moduleAutoFocus = useRef(routeValue.title.trim().length > 0).current;
 
   const currentFolder = React.useMemo(() => {
     if (!value.folder) return null;
@@ -1068,7 +1069,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           ? t("common:removeFavorite")
           : t("common:addFavorite"),
         children: (
-          <AppIcon name={favIcon} color={theme.colors.primary} size={20} />
+          <Icon source={favIcon} color={theme.colors.primary} size={20} />
         ),
       })}
       {renderControlDivider()}
@@ -1206,6 +1207,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           fastAccess={fastAccessObject}
           navigation={navigation}
           bottomPadding={width > 600 ? 12 : 96}
+          moduleAutoFocus={moduleAutoFocus}
         />
       </PerfProfiler>
       {!(width > 600) && (

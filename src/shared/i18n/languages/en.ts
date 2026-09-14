@@ -106,6 +106,7 @@ const en: TranslationSchema = {
     selectFolder: "Select Folder",
     selectFolderDescription: "Choose where this entry should live.",
     manageFoldersDescription: "Create, reorder, and remove folders here.",
+    foldersEmpty: "No folders added yet.",
     selectedItem: "Selected item",
     edit: "Edit",
     fastAccess: "Fast Access",
@@ -186,6 +187,14 @@ const en: TranslationSchema = {
     moduleFilterTitle: "Module filters",
     moduleFilterText: "Select module types that should be visible in the list.",
     editFolders: "Edit folders",
+    emptyVaultTitle: "Your vault is ready",
+    emptyVaultText:
+      "Create your first entry. You can start with a password and add notes, cards, two-factor codes, or custom fields later.",
+    emptyVaultCreate: "Create first entry",
+    emptyVaultTipCreate: "Choose a template or start with an empty entry.",
+    emptyVaultTipOrganize: "Folders, favorites, and pins can be added anytime.",
+    emptyVaultTipAnalyze:
+      "Once passwords are inside, the analysis view helps you clean things up.",
     systemAuthPromptTitle: "Use system authentication?",
     systemAuthPromptText:
       "You can unlock ClavisPass with fingerprint, face recognition, or your device lock next time.",

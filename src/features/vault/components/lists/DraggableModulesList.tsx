@@ -94,6 +94,7 @@ function DraggableModulesList(props: DraggableModulesListProps) {
         props.fastAccess,
         props.navigation,
         props.value.title,
+        props.moduleAutoFocus ?? true,
       ),
     [
       props.changeModule,
@@ -101,6 +102,7 @@ function DraggableModulesList(props: DraggableModulesListProps) {
       props.fastAccess,
       props.navigation,
       props.value.title,
+      props.moduleAutoFocus,
     ],
   );
 

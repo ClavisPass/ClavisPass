@@ -7,6 +7,7 @@ type Props = {
   deleteModule?: (id: string) => void;
   changeModule: (module: ModuleType) => void;
   fastAccess: FastAccessType | null;
+  autoFocus?: boolean;
 };
 
 export default Props;

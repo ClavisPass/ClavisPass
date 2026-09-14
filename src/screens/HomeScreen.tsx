@@ -1100,6 +1100,104 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     </ScrollView>
   );
 
+  const openAddValueModal = useCallback(() => {
+    closeCompactSearchIfEmpty();
+    setValueModalVisible(true);
+  }, [closeCompactSearchIfEmpty]);
+
+  const renderEmptyVault = () => {
+    const tips = [
+      t("home:emptyVaultTipCreate"),
+      t("home:emptyVaultTipOrganize"),
+      t("home:emptyVaultTipAnalyze"),
+    ];
+
+    return (
+      <ScrollView
+        refreshControl={refreshControl}
+        contentContainerStyle={[
+          styles.emptyVaultScrollContent,
+          { paddingHorizontal: width > 600 ? 32 : 18 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View
+          style={styles.emptyVaultPanel}
+        >
+          <View
+            style={[
+              styles.emptyVaultIcon,
+              { backgroundColor: theme.colors.secondaryContainer },
+            ]}
+          >
+            <Icon
+              source="shield-plus-outline"
+              size={34}
+              color={theme.colors.primary}
+            />
+          </View>
+          <Text
+            variant={width > 600 ? "headlineSmall" : "titleLarge"}
+            style={[styles.emptyVaultTitle, { color: theme.colors.onSurface }]}
+          >
+            {t("home:emptyVaultTitle")}
+          </Text>
+          <Text
+            variant="bodyMedium"
+            style={[
+              styles.emptyVaultText,
+              { color: theme.colors.onSurfaceVariant },
+            ]}
+          >
+            {t("home:emptyVaultText")}
+          </Text>
+          <Button
+            mode="contained"
+            icon="plus"
+            onPress={openAddValueModal}
+            style={styles.emptyVaultButton}
+            contentStyle={styles.emptyVaultButtonContent}
+          >
+            {t("home:emptyVaultCreate")}
+          </Button>
+          <View style={styles.emptyVaultTips}>
+            {tips.map((tip, index) => (
+              <View
+                key={tip}
+                style={[
+                  styles.emptyVaultTip,
+                  {
+                    borderColor: theme.colors.outlineVariant,
+                    backgroundColor: theme.colors.surfaceVariant,
+                  },
+                ]}
+              >
+                <Text
+                  variant="labelMedium"
+                  style={[
+                    styles.emptyVaultTipNumber,
+                    { color: theme.colors.primary },
+                  ]}
+                >
+                  {index + 1}
+                </Text>
+                <Text
+                  variant="bodySmall"
+                  style={[
+                    styles.emptyVaultTipText,
+                    { color: theme.colors.onSurfaceVariant },
+                  ]}
+                >
+                  {tip}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+    );
+  };
+
   const openHeaderSearch = useCallback(() => {
     if (suppressNextCompactSearchOpenRef.current) {
       suppressNextCompactSearchOpenRef.current = false;
@@ -1176,6 +1274,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   ]);
 
   function renderFlashList() {
+    const isFreshVault =
+      (vaultData?.values?.length ?? 0) === 0 &&
+      searchQuery.trim() === "" &&
+      !selectedFav &&
+      !selectedFolder &&
+      !selectedCard &&
+      !selected2FA &&
+      selectedModuleFilters.length === 0;
+
+    if (isFreshVault) return renderEmptyVault();
+
     if (selectedCard && searchQuery === "") {
       let cardEntries: any[] = [];
       if (vaultData?.values) {
@@ -1720,5 +1829,74 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     </AnimatedContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  emptyVaultScrollContent: {
+    flexGrow: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 18,
+    paddingBottom: 28,
+  },
+  emptyVaultPanel: {
+    width: "100%",
+    maxWidth: 520,
+    alignItems: "center",
+    paddingHorizontal: 18,
+    paddingVertical: 22,
+  },
+  emptyVaultIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 14,
+  },
+  emptyVaultTitle: {
+    textAlign: "center",
+    userSelect: "none",
+  },
+  emptyVaultText: {
+    maxWidth: 390,
+    textAlign: "center",
+    marginTop: 8,
+    marginBottom: 16,
+    userSelect: "none",
+  },
+  emptyVaultButton: {
+    borderRadius: 8,
+    marginBottom: 18,
+  },
+  emptyVaultButtonContent: {
+    minHeight: 42,
+    paddingHorizontal: 8,
+  },
+  emptyVaultTips: {
+    width: "100%",
+    gap: 8,
+  },
+  emptyVaultTip: {
+    minHeight: 44,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 10,
+  },
+  emptyVaultTipNumber: {
+    width: 18,
+    textAlign: "center",
+    fontWeight: "700",
+    userSelect: "none",
+  },
+  emptyVaultTipText: {
+    flex: 1,
+    lineHeight: 18,
+    userSelect: "none",
+  },
+});
 
 export default HomeScreen;

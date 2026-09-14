@@ -117,15 +117,15 @@ export function EditRowControlsContainer({
         dragHovered
           ? {
               backgroundColor: darkmode
-                ? "rgba(255, 255, 255, .04)"
-                : "rgba(0, 0, 0, .035)",
+                ? "rgba(255, 255, 255, .08)"
+                : "rgba(0, 0, 0, .06)",
             }
           : null,
         dragPressed
           ? {
               backgroundColor: darkmode
-                ? "rgba(255, 255, 255, .08)"
-                : "rgba(0, 0, 0, .07)",
+                ? "rgba(255, 255, 255, .12)"
+                : "rgba(0, 0, 0, .10)",
             }
           : null,
       ]}
@@ -139,8 +139,12 @@ export function EditRowControlsContainer({
     >
       <Icon
         source="drag"
-        size={20}
-        color={darkmode ? theme.colors?.outline : theme.colors?.outlineVariant}
+        size={22}
+        color={
+          dragPressed || dragHovered
+            ? theme.colors.primary
+            : theme.colors.onSurfaceVariant
+        }
       />
     </AnimatedPressable>
   );

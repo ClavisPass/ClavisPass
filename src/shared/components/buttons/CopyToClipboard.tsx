@@ -72,4 +72,4 @@ function CopyToClipboard({
   );
 }
 
-export default CopyToClipboard;
+export default React.memo(CopyToClipboard);

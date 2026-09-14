@@ -20,6 +20,7 @@ export type DraggableModulesListProps = {
   fastAccess: FastAccessType | null;
   navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>;
   bottomPadding?: number;
+  moduleAutoFocus?: boolean;
 };
 
 export const draggableModulesListStyles = StyleSheet.create({

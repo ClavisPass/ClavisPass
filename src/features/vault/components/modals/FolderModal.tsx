@@ -33,7 +33,7 @@ type Props = {
 
 function FolderModal(props: Props) {
   const vault = useVault();
-  const { theme, darkmode } = useTheme();
+  const { theme, darkmode, globalStyles } = useTheme();
   const { t } = useTranslation();
   const { height } = useWindowDimensions();
 
@@ -194,12 +194,7 @@ function FolderModal(props: Props) {
         <View
           style={{
             alignSelf: "stretch",
-            paddingHorizontal: 8,
-            paddingVertical: 8,
-            borderRadius: 12,
-            borderWidth: StyleSheet.hairlineWidth,
-            borderColor: theme.colors.outlineVariant,
-            backgroundColor: theme.colors.background,
+            paddingVertical: 2,
           }}
         >
           <View
@@ -209,9 +204,8 @@ function FolderModal(props: Props) {
               alignItems: "center",
               backgroundColor: "transparent",
               opacity: draggableDisabled ? 0.98 : 1,
-              borderRadius: 12,
               paddingHorizontal: 0,
-              minHeight: 36,
+              minHeight: 40,
               gap: 8,
             }}
           >
@@ -219,9 +213,12 @@ function FolderModal(props: Props) {
               borderless={false}
               onPress={() => setAppearanceTarget({ kind: "new" })}
               style={{
-                width: 32,
-                height: 32,
-                borderRadius: 8,
+                width: 36,
+                height: 36,
+                borderRadius: 12,
+                borderWidth: StyleSheet.hairlineWidth,
+                borderColor: theme.colors.outlineVariant,
+                backgroundColor: theme.colors.surfaceVariant,
                 alignItems: "center",
                 justifyContent: "center",
               }}
@@ -236,28 +233,17 @@ function FolderModal(props: Props) {
             <View style={{ flex: 1, minWidth: 0 }}>
               <TextInput
                 placeholder={t("common:addFolder")}
-                style={{
-                  borderRadius: 10,
-                  borderBottomWidth: 0,
-                  backgroundColor: "transparent",
-                  paddingHorizontal: 0,
-                  margin: 0,
-                  height: 36,
-                }}
+                outlineStyle={globalStyles.outlineStyle}
+                style={[globalStyles.textInputStyle, { minWidth: 0 }]}
                 value={searchQuery}
                 mode="outlined"
                 onChangeText={(text) => setSearchQuery(text)}
                 autoCapitalize="sentences"
                 returnKeyType="done"
                 onSubmitEditing={addFolder}
-                outlineColor="transparent"
-                activeOutlineColor="transparent"
                 contentStyle={{
-                  paddingLeft: 0,
-                  paddingRight: 0,
-                  paddingTop: 0,
-                  paddingBottom: 0,
-                  minHeight: 32,
+                  textAlignVertical: "center",
+                  paddingVertical: 0,
                 }}
               />
             </View>
@@ -303,7 +289,27 @@ function FolderModal(props: Props) {
             overflow: "hidden",
           }}
         >
-          {Platform.OS === "web" ? (
+          {props.folder.length === 0 ? (
+            <View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+                paddingHorizontal: 16,
+              }}
+            >
+              <Text
+                variant="bodyMedium"
+                style={{
+                  color: theme.colors.onSurfaceVariant,
+                  textAlign: "center",
+                  userSelect: "none",
+                }}
+              >
+                {t("common:foldersEmpty")}
+              </Text>
+            </View>
+          ) : Platform.OS === "web" ? (
             <DraggableFolderListWeb
               folder={props.folder}
               setSelectedFolder={props.setSelectedFolder}

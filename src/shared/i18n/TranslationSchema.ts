@@ -102,6 +102,7 @@ export type TranslationSchema = {
     selectFolder: string;
     selectFolderDescription: string;
     manageFoldersDescription: string;
+    foldersEmpty: string;
     selectedItem: string;
     edit: string;
     fastAccess: string;
@@ -178,6 +179,12 @@ export type TranslationSchema = {
     moduleFilterTitle: string;
     moduleFilterText: string;
     editFolders: string;
+    emptyVaultTitle: string;
+    emptyVaultText: string;
+    emptyVaultCreate: string;
+    emptyVaultTipCreate: string;
+    emptyVaultTipOrganize: string;
+    emptyVaultTipAnalyze: string;
     systemAuthPromptTitle: string;
     systemAuthPromptText: string;
     systemAuthPromptEnable: string;

@@ -61,6 +61,7 @@ function ModulesList(props: Props) {
         props.fastAccess,
         props.navigation,
         props.value.title,
+        props.moduleAutoFocus ?? true,
       ),
     [
       props.changeModule,
@@ -68,6 +69,7 @@ function ModulesList(props: Props) {
       props.fastAccess,
       props.navigation,
       props.value.title,
+      props.moduleAutoFocus,
     ],
   );
 

@@ -83,6 +83,7 @@ type GetModuleArgs = {
   fastAccess: FastAccessType | null;
   navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>;
   title: string;
+  autoFocus: boolean;
 };
 
 type Renderer = (module: ModuleType, args: GetModuleArgs) => ReactNode;
@@ -104,6 +105,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -119,6 +121,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -136,6 +139,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -158,6 +162,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -175,6 +180,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -192,6 +198,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -207,6 +214,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -222,6 +230,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -242,6 +251,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
         navigation={args.navigation}
         title={args.title}
       />
@@ -259,6 +269,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -279,6 +290,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -294,6 +306,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -309,6 +322,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -324,6 +338,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -342,6 +357,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -358,6 +374,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
         navigation={args.navigation}
         title={args.title}
       />
@@ -376,6 +393,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -391,6 +409,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -406,6 +425,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
         navigation={args.navigation}
       />
     );
@@ -423,6 +443,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
       />
     );
   },
@@ -438,6 +459,7 @@ const MODULE_RENDERERS = {
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}
         fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
         codes={m.codes}
       />
     );
@@ -452,6 +474,7 @@ function getModule(
   fastAccess: FastAccessType | null,
   navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>,
   title: string,
+  allowAutoFocus = true,
 ): ReactNode {
   const args: GetModuleArgs = {
     onDragStart,
@@ -460,6 +483,7 @@ function getModule(
     fastAccess,
     navigation,
     title,
+    autoFocus: allowAutoFocus,
   };
 
   const kind = (module as any).module as ModulesEnum;

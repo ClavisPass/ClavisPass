@@ -78,7 +78,7 @@ function PasswordModule(props: PasswordModuleType & Props) {
       <View style={globalStyles.moduleView}>
         <View style={{ height: 40, flex: 1 }}>
           <PasswordTextbox
-            autofocus={value === "" ? true : false}
+            autofocus={props.autoFocus !== false && value === ""}
             setValue={setValue}
             value={value}
             placeholder=""

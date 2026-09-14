@@ -49,7 +49,7 @@ function PinModule(props: PinModuleType & Props) {
       <View style={globalStyles.moduleView}>
         <View style={{ height: 40, flex: 1 }}>
           <TextInput
-            autoFocus={value === "" ? true : false}
+            autoFocus={props.autoFocus !== false && value === ""}
             placeholder="0000"
             outlineStyle={globalStyles.outlineStyle}
             style={globalStyles.textInputStyle}
