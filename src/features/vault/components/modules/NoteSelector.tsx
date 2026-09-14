@@ -1,9 +1,10 @@
 import React, { useRef, useState } from "react";
 import { Keyboard, StyleSheet, View } from "react-native";
-import { Chip, Divider } from "react-native-paper";
+import { Divider } from "react-native-paper";
 
 import AdaptiveMenu from "../../../../shared/components/menus/AdaptiveMenu";
 import { MenuItem } from "../../../../shared/components/menus/MenuItem";
+import AppChip from "../../../../shared/components/chips/AppChip";
 
 export type NoteSelectorOption<T extends string> = {
   label: string;
@@ -47,14 +48,14 @@ function NoteSelector<T extends string>({
 
   return (
     <View ref={triggerRef} collapsable={false} style={styles.selectorWrap}>
-      <Chip
+      <AppChip
         mode="flat"
         icon={selected?.icon}
         onPress={open}
         style={styles.selectorChip}
       >
         {selected?.label}
-      </Chip>
+      </AppChip>
       <AdaptiveMenu
         visible={visible}
         setVisible={setVisible}

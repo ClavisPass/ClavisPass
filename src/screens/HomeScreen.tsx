@@ -16,7 +16,7 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
-import { Button, Chip, Icon, IconButton, Searchbar } from "react-native-paper";
+import { Button, Icon, IconButton, Searchbar } from "react-native-paper";
 
 import { Text } from "react-native-paper";
 
@@ -38,6 +38,7 @@ import Constants from "expo-constants";
 import getColors from "../shared/ui/linearGradient";
 import HomeFilterMenu from "../features/vault/components/menus/HomeFilterMenu";
 import Blur from "../shared/components/Blur";
+import AppChip from "../shared/components/chips/AppChip";
 import FolderFilter from "../features/vault/components/FolderFilter";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import {
@@ -182,30 +183,6 @@ const webDragRegionProps =
   Platform.OS === "web"
     ? ({ dataSet: { tauriDragRegion: "" } } as any)
     : null;
-
-const VerticalReorderIcon = ({
-  color,
-  size = 18,
-}: {
-  color?: string;
-  size?: number;
-}) => (
-  <View
-    style={{
-      width: size,
-      height: size,
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-  >
-    <View style={{ height: size / 2, marginBottom: -2 }}>
-      <Icon source="chevron-up" size={size * 0.72} color={color} />
-    </View>
-    <View style={{ height: size / 2, marginTop: -2 }}>
-      <Icon source="chevron-down" size={size * 0.72} color={color} />
-    </View>
-  </View>
-);
 
 type HomeValueListItemProps = {
   item: ValuesType;
@@ -1072,7 +1049,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       }}
       style={{ flexGrow: 0, width: "100%" }}
     >
-      <Chip
+      <AppChip
         compact
         icon="refresh"
         disabled={!isOnline || refreshing}
@@ -1081,20 +1058,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         textStyle={actionChipTextStyle}
       >
         {t("common:reload")}
-      </Chip>
-      <Chip
+      </AppChip>
+      <AppChip
         compact
-        icon={({ color, size }) => (
-          <VerticalReorderIcon color={color} size={size} />
-        )}
+        icon="drag"
         disabled={reorderValues.length < 2}
         onPress={openReorderScreen}
         style={actionChipStyle}
         textStyle={actionChipTextStyle}
       >
         {t("home:reorderChip")}
-      </Chip>
-      <Chip
+      </AppChip>
+      <AppChip
         compact
         icon="folder-outline"
         onPress={() => setFolderModalVisible(true)}
@@ -1102,8 +1077,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         textStyle={actionChipTextStyle}
       >
         {t("home:editFolders")}
-      </Chip>
-      <Chip
+      </AppChip>
+      <AppChip
         compact
         icon="sort-variant"
         onPress={() => setShowMenu(true)}
@@ -1111,9 +1086,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         textStyle={actionChipTextStyle}
       >
         {t("home:sort")}
-      </Chip>
+      </AppChip>
       {expiryEntries.length > 0 ? (
-        <Chip
+        <AppChip
           compact
           icon="calendar-clock-outline"
           onPress={() => setExpiryModalVisible(true)}
@@ -1121,7 +1096,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           textStyle={actionChipTextStyle}
         >
           {`${t("home:expiries")} ${expiryEntries.length}`}
-        </Chip>
+        </AppChip>
       ) : null}
     </ScrollView>
   );

@@ -3,7 +3,7 @@ import { StyleSheet, View, useWindowDimensions } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
-import { Button, Chip, IconButton, Text } from "react-native-paper";
+import { Button, IconButton, Text } from "react-native-paper";
 import Animated, {
   FadeIn,
   FadeOut,
@@ -16,6 +16,7 @@ import NoteMarkdownPreview from "../features/vault/components/modules/NoteMarkdo
 import NoteFullscreenEditor from "../features/vault/components/modules/NoteFullscreenEditor";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import Header from "../shared/components/Header";
+import AppChip from "../shared/components/chips/AppChip";
 import { useTranslation } from "react-i18next";
 import NoteSelector, {
   NoteSelectorOption,
@@ -379,7 +380,7 @@ const NoteEditorScreen: React.FC<NoteEditorScreenProps> = ({
               </>
             ) : null}
             {isSnippet && languageLocal === "json" ? (
-              <Chip
+              <AppChip
                 compact
                 icon="format-align-left"
                 onPress={formatJson}
@@ -388,7 +389,7 @@ const NoteEditorScreen: React.FC<NoteEditorScreenProps> = ({
                 textStyle={styles.formatJsonChipText}
               >
                 {t("modules:noteFormatJson")}
-              </Chip>
+              </AppChip>
             ) : null}
           </View>
           <View style={styles.toolbarActions}>

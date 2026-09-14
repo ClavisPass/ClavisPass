@@ -1,8 +1,9 @@
 import { ReactNode } from "react";
 import { View } from "react-native";
-import { Text, Icon } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import AnimatedPressable from "../AnimatedPressable";
+import AppIcon from "../icons/AppIcon";
 
 type Props = {
   children: ReactNode;
@@ -54,10 +55,10 @@ export function MenuItem(props: Props) {
             }}
           >
             {props.leading ?? (props.leadingIcon && (
-              <Icon
+              <AppIcon
                 size={20}
                 color={props.leadingIconColor ?? theme.colors.primary}
-                source={props.leadingIcon}
+                name={props.leadingIcon}
               />
             ))}
             {props.label ? (
@@ -110,10 +111,10 @@ export function MenuItem(props: Props) {
               </Text>
             )}
             {props.rightIcon ? (
-              <Icon
+              <AppIcon
                 size={20}
                 color={theme.colors.primary}
-                source={props.rightIcon}
+                name={props.rightIcon}
               />
             ) : null}
           </View>

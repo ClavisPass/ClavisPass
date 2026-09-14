@@ -10,12 +10,13 @@ import {
 } from "@hello-pangea/dnd";
 
 import { View } from "react-native";
-import { Icon, IconButton, Text } from "react-native-paper";
+import { IconButton, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import FolderType from "../../model/FolderType";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import { getFolderIcon } from "../../utils/folderAppearance";
+import AppIcon from "../../../../shared/components/icons/AppIcon";
 
 type Props = {
   folder: FolderType[];
@@ -81,7 +82,7 @@ function DraggableFolderListWeb(props: Props) {
           >
             {props.setSelectedFolder && (
               <View style={[globalStyles.folderContainer, { marginBottom: 4 }]}>
-                <Icon source="minus" size={20} />
+                <AppIcon name="minus" size={20} />
 
                 <AnimatedPressable
                   style={{
@@ -97,8 +98,8 @@ function DraggableFolderListWeb(props: Props) {
                   onPress={() => props.setSelectedFolder?.(null)}
                 >
                   <>
-                    <Icon
-                      source="folder-outline"
+                    <AppIcon
+                      name="folder-outline"
                       size={20}
                       color={theme.colors.primary}
                     />
@@ -149,7 +150,7 @@ function DraggableFolderListWeb(props: Props) {
                       }}
                     >
                       <View style={globalStyles.folderContainer}>
-                        <Icon source="drag" size={20} />
+                        <AppIcon name="drag" size={20} />
 
                         <AnimatedPressable
                           borderless={false}
@@ -162,8 +163,8 @@ function DraggableFolderListWeb(props: Props) {
                           }}
                           onPress={() => props.openAppearance(item)}
                         >
-                          <Icon
-                            source={getFolderIcon(item)}
+                          <AppIcon
+                            name={getFolderIcon(item)}
                             size={20}
                             color={item.color ?? theme.colors.primary}
                           />

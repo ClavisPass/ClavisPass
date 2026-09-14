@@ -9,10 +9,11 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { Chip, Divider } from "react-native-paper";
+import { Divider } from "react-native-paper";
 import { MenuItem } from "../../../shared/components/menus/MenuItem";
 import QuickSelectItem from "../model/QuickSelectItem";
 import { logger } from "../../../infrastructure/logging/logger";
+import AppChip from "../../../shared/components/chips/AppChip";
 
 const styles = StyleSheet.create({
   chip: {
@@ -283,7 +284,7 @@ function SettingsQuickSelect(props: Props) {
 
                 if (!shouldRender) return null;
                 return (
-                  <Chip
+                  <AppChip
                     key={index}
                     icon={item.icon}
                     showSelectedOverlay={true}
@@ -294,7 +295,7 @@ function SettingsQuickSelect(props: Props) {
                     textStyle={styles.chipText}
                   >
                     {item.title}
-                  </Chip>
+                  </AppChip>
                 );
               }}
             />

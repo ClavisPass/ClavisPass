@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { Button, Chip, Text, TextInput } from "react-native-paper";
+import { Button, Text, TextInput } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
 import Animated, {
@@ -22,6 +22,7 @@ import ModulesEnum from "../../model/ModulesEnum";
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import { useClipboardCopy } from "../../../../shared/hooks/useClipboardCopy";
 import { emitClipboardCopied } from "../../../../infrastructure/events/clipboardBus";
+import AppChip from "../../../../shared/components/chips/AppChip";
 
 const COLLAPSED_CODES_LIMIT = 8;
 
@@ -250,7 +251,7 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
                   exiting={FadeOut.duration(120)}
                   layout={LinearTransition.duration(160)}
                 >
-                  <Chip
+                  <AppChip
                     compact
                     selected={c.used}
                     icon={() => null}
@@ -266,7 +267,7 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
                     delayLongPress={300}
                   >
                     {c.code}
-                  </Chip>
+                  </AppChip>
                 </Animated.View>
               ))}
 
@@ -276,7 +277,7 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
                   exiting={FadeOut.duration(120)}
                   layout={LinearTransition.duration(160)}
                 >
-                  <Chip
+                  <AppChip
                     compact
                     icon="chevron-down"
                     style={[styles.chip, styles.moreChip]}
@@ -286,7 +287,7 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
                     {t("modules:recoveryCodesShowMore", {
                       count: hiddenCodesCount,
                     })}
-                  </Chip>
+                  </AppChip>
                 </Animated.View>
               ) : null}
 

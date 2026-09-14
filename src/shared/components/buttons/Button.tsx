@@ -8,13 +8,13 @@ import {
 } from "react-native";
 import {
   ActivityIndicator,
-  Icon,
   Text,
 } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import getColors from "../../ui/linearGradient";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import AnimatedPressable from "../AnimatedPressable";
+import AppIcon from "../icons/AppIcon";
 
 const styles = StyleSheet.create({
   container: {
@@ -115,8 +115,8 @@ function Content({ white = true, ...props }: Props) {
         {}
         <>
           {props.icon && (
-            <Icon
-              source={props.icon}
+            <AppIcon
+              name={props.icon}
               size={24}
               color={white ? "white" : undefined}
             />

@@ -7,7 +7,7 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from "react-native";
-import { Divider, Icon, Text, TextInput } from "react-native-paper";
+import { Divider, Text, TextInput } from "react-native-paper";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import FolderType from "../../model/FolderType";
 import createUniqueID from "../../../../shared/utils/createUniqueID";
@@ -22,6 +22,7 @@ import {
   FOLDER_ICON_OPTIONS,
 } from "../../utils/folderAppearance";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
+import AppIcon from "../../../../shared/components/icons/AppIcon";
 
 type Props = {
   visible: boolean;
@@ -225,8 +226,8 @@ function FolderModal(props: Props) {
                 justifyContent: "center",
               }}
             >
-              <Icon
-                source={newFolderIcon ?? DEFAULT_FOLDER_ICON}
+              <AppIcon
+                name={newFolderIcon ?? DEFAULT_FOLDER_ICON}
                 size={20}
                 color={newFolderColor ?? theme.colors.primary}
               />
@@ -276,8 +277,8 @@ function FolderModal(props: Props) {
                 opacity: addButtonDisabled ? 0.7 : 1,
               }}
             >
-              <Icon
-                source="plus"
+              <AppIcon
+                name="plus"
                 size={20}
                 color={
                   addButtonDisabled ? theme.colors.onSurfaceDisabled : theme.colors.onPrimary
@@ -354,8 +355,8 @@ function FolderModal(props: Props) {
                 backgroundColor: theme.colors.secondaryContainer,
               }}
             >
-              <Icon
-                source={appearanceIcon ?? DEFAULT_FOLDER_ICON}
+              <AppIcon
+                name={appearanceIcon ?? DEFAULT_FOLDER_ICON}
                 size={22}
                 color={appearanceColor ?? theme.colors.primary}
               />
@@ -397,8 +398,8 @@ function FolderModal(props: Props) {
                         : "transparent",
                     }}
                   >
-                    <Icon
-                      source={icon}
+                    <AppIcon
+                      name={icon}
                       size={20}
                       color={
                         selected
@@ -431,8 +432,8 @@ function FolderModal(props: Props) {
                 backgroundColor: theme.colors.background,
               }}
             >
-              <Icon
-                source="minus"
+              <AppIcon
+                name="minus"
                 size={16}
                 color={
                   appearanceColor

@@ -21,7 +21,6 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import {
   ActivityIndicator,
-  Chip,
   Divider,
   Icon,
   Searchbar,
@@ -31,6 +30,7 @@ import {
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
 import Header from "../shared/components/Header";
+import AppChip from "../shared/components/chips/AppChip";
 
 import { useAuthMaster } from "../app/providers/AuthProvider";
 import { useOnline } from "../app/providers/OnlineProvider";
@@ -466,7 +466,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                   justifyContent: "flex-end",
                 }}
               >
-                <Chip
+                <AppChip
                   compact
                   style={{ borderRadius: 12, backgroundColor: strengthColor }}
                   textStyle={{ color: "white", fontWeight: "800" }}
@@ -475,11 +475,11 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                   )}
                 >
                   {t(`analysis:${String(strength).toLowerCase()}`)}
-                </Chip>
+                </AppChip>
                 {compromised ? (
-                  <Chip compact style={{ borderRadius: 12 }}>
+                  <AppChip compact style={{ borderRadius: 12 }}>
                     {t("analysis:badge.compromised")}
-                  </Chip>
+                  </AppChip>
                 ) : null}
               </View>
             </View>
@@ -577,34 +577,34 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                 }}
               >
                 {risk.compromised ? (
-                  <Chip compact style={{ borderRadius: 12 }}>
+                  <AppChip compact style={{ borderRadius: 12 }}>
                     {t("analysis:badge.compromised")}
-                  </Chip>
+                  </AppChip>
                 ) : null}
                 {risk.reused ? (
-                  <Chip compact style={{ borderRadius: 12 }}>
+                  <AppChip compact style={{ borderRadius: 12 }}>
                     {t("analysis:badge.reused")}
-                  </Chip>
+                  </AppChip>
                 ) : null}
                 {risk.similar ? (
-                  <Chip compact style={{ borderRadius: 12 }}>
+                  <AppChip compact style={{ borderRadius: 12 }}>
                     {t("analysis:badge.similar")}
-                  </Chip>
+                  </AppChip>
                 ) : null}
                 {risk.tooShort ? (
-                  <Chip compact style={{ borderRadius: 12 }}>
+                  <AppChip compact style={{ borderRadius: 12 }}>
                     {t("analysis:badge.short")}
-                  </Chip>
+                  </AppChip>
                 ) : null}
                 {risk.sequential ? (
-                  <Chip compact style={{ borderRadius: 12 }}>
+                  <AppChip compact style={{ borderRadius: 12 }}>
                     {t("analysis:badge.sequential")}
-                  </Chip>
+                  </AppChip>
                 ) : null}
                 {risk.repeated ? (
-                  <Chip compact style={{ borderRadius: 12 }}>
+                  <AppChip compact style={{ borderRadius: 12 }}>
                     {t("analysis:badge.repeated")}
-                  </Chip>
+                  </AppChip>
                 ) : null}
               </View>
             </View>

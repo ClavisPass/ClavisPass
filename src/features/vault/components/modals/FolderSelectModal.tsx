@@ -5,7 +5,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { Icon, Text } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
 import { useTheme } from "../../../../app/providers/ThemeProvider";
@@ -17,6 +17,7 @@ import {
   getFolderColor,
   getFolderIcon,
 } from "../../utils/folderAppearance";
+import AppIcon from "../../../../shared/components/icons/AppIcon";
 
 type Props = {
   visible: boolean;
@@ -65,8 +66,8 @@ function FolderSelectModal(props: Props) {
     >
       <View style={styles.itemContent}>
         <View style={styles.itemLabelWrap}>
-          <Icon
-            source={folder ? getFolderIcon(folder) : DEFAULT_FOLDER_ICON}
+          <AppIcon
+            name={folder ? getFolderIcon(folder) : DEFAULT_FOLDER_ICON}
             size={20}
             color={folder ? getFolderColor(folder) ?? theme.colors.primary : theme.colors.primary}
           />
@@ -75,7 +76,7 @@ function FolderSelectModal(props: Props) {
           </Text>
         </View>
         {selected ? (
-          <Icon source="check" size={20} color={theme.colors.primary} />
+          <AppIcon name="check" size={20} color={theme.colors.primary} />
         ) : null}
       </View>
     </AnimatedPressable>

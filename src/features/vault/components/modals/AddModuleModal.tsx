@@ -7,10 +7,12 @@ import {
   StyleSheet,
   Platform,
 } from "react-native";
-import { Searchbar, Text, Icon, IconButton, Chip } from "react-native-paper";
+import { Searchbar, Text, IconButton } from "react-native-paper";
 import Modal from "../../../../shared/components/modals/Modal";
 import ModulesEnum from "../../model/ModulesEnum";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
+import AppIcon from "../../../../shared/components/icons/AppIcon";
+import AppChip from "../../../../shared/components/chips/AppChip";
 
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
@@ -74,15 +76,15 @@ function TinyFilterChip({
   onPress: () => void;
 }) {
   return (
-    <Chip
-      icon={() => null}
+    <AppChip
+      icon={icon}
       selected={selected}
       showSelectedOverlay={true}
       onPress={onPress}
       style={{ borderRadius: 12, marginRight: 4 }}
     >
       {label}
-    </Chip>
+    </AppChip>
   );
 }
 
@@ -146,7 +148,7 @@ function ModuleTile({
               minHeight: 68,
             }}
           >
-            <Icon size={20} color={theme.colors.primary} source={icon} />
+            <AppIcon size={20} color={theme.colors.primary} name={icon} />
             <Text
               variant="bodyLarge"
               style={{ userSelect: "none" }}

@@ -1,7 +1,8 @@
 import React, { ReactNode } from "react";
 import { View, StyleSheet } from "react-native";
-import { Divider, Icon, Text } from "react-native-paper";
+import { Divider, Text } from "react-native-paper";
 import { useTheme } from "../../../app/providers/ThemeProvider";
+import AppIcon from "../../../shared/components/icons/AppIcon";
 
 const styles = StyleSheet.create({
   container: {
@@ -37,7 +38,7 @@ export function SubItem(props: Props) {
         }}
       >
         {props.icon && (
-          <Icon color={theme.colors?.primary} source={props.icon} size={16} />
+          <AppIcon color={theme.colors?.primary} name={props.icon} size={16} />
         )}
         <Text>{props.title}</Text>
       </View>

@@ -3,13 +3,14 @@ import { Pressable, View } from "react-native";
 import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
-import { Icon, IconButton, Text } from "react-native-paper";
+import { IconButton, Text } from "react-native-paper";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import FolderType from "../../model/FolderType";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import { useTranslation } from "react-i18next";
 import { getFolderIcon } from "../../utils/folderAppearance";
 import { useDeferredDragStart } from "../../../../shared/hooks/useDeferredDragStart";
+import AppIcon from "../../../../shared/components/icons/AppIcon";
 
 type Props = {
   folder: FolderType[];
@@ -48,7 +49,7 @@ function FolderDragHandle({
 
   return (
     <Pressable disabled={disabled} {...deferredDragStartProps}>
-      <Icon source="drag" size={20} />
+      <AppIcon name="drag" size={20} />
     </Pressable>
   );
 }
@@ -94,8 +95,8 @@ function DraggableFolderList(props: Props) {
               }}
               onPress={() => props.openAppearance(item)}
             >
-              <Icon
-                source={getFolderIcon(item)}
+              <AppIcon
+                name={getFolderIcon(item)}
                 color={item.color ?? theme.colors.primary}
                 size={20}
               />
@@ -164,7 +165,7 @@ function DraggableFolderList(props: Props) {
           }}
         >
           <View style={[globalStyles.folderContainer]}>
-            <Icon source="minus" size={20} />
+            <AppIcon name="minus" size={20} />
 
             <AnimatedPressable
               style={{
@@ -180,8 +181,8 @@ function DraggableFolderList(props: Props) {
               onPress={() => props.setSelectedFolder?.(null)}
             >
               <>
-                <Icon
-                  source="folder-outline"
+                <AppIcon
+                  name="folder-outline"
                   size={20}
                   color={theme.colors.primary}
                 />

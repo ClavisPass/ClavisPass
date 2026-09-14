@@ -9,7 +9,6 @@ import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import {
   ActivityIndicator,
   Button,
-  Chip,
   Divider,
   Icon,
   List,
@@ -20,6 +19,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import Header from "../shared/components/Header";
+import AppChip from "../shared/components/chips/AppChip";
 
 import { useTheme } from "../app/providers/ThemeProvider";
 import { useTranslation } from "react-i18next";
@@ -558,33 +558,33 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
 
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
             {resolved ? (
-              <Chip
+              <AppChip
                 icon={() => <Icon source={resolved.typeIcon} size={18} color={theme.colors.primary} />}
                 style={{ borderRadius: 12}}
               >
                 {secretTypeLabel}
-              </Chip>
+              </AppChip>
             ) : null}
 
             {strength ? (
-              <Chip
+              <AppChip
                 style={{ borderRadius: 12, backgroundColor: strengthPillBg }}
                 textStyle={{ color: "white", fontWeight: "800" }}
                 icon={() => <Icon source={getPasswordStrengthIcon(strength as any)} size={18} color="white" />}
               >
                 {t(strengthLabelKey(strength), { defaultValue: String(strength) })}
-              </Chip>
+              </AppChip>
             ) : null}
 
             {riskSeverity ? (
-              <Chip
+              <AppChip
                 style={{
                   borderRadius: 12,
                   
                 }}
               >
                 {t(riskSeverityLabelKey(riskSeverity), { defaultValue: String(riskSeverity) })}
-              </Chip>
+              </AppChip>
             ) : null}
           </View>
 
@@ -651,36 +651,36 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
             {/* Findings badges */}
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
               {showReused ? (
-                <Chip compact style={{ borderRadius: 12 }}>
+                <AppChip compact style={{ borderRadius: 12 }}>
                   {t("analysis:badge.reused", { defaultValue: "Reused" })}
-                </Chip>
+                </AppChip>
               ) : null}
               {showCompromised ? (
-                <Chip compact style={{ borderRadius: 12 }}>
+                <AppChip compact style={{ borderRadius: 12 }}>
                   {t("analysis:badge.compromised", {
                     defaultValue: "Compromised",
                   })}
-                </Chip>
+                </AppChip>
               ) : null}
               {showSimilar ? (
-                <Chip compact style={{ borderRadius: 12 }}>
+                <AppChip compact style={{ borderRadius: 12 }}>
                   {t("analysis:badge.similar", { defaultValue: "Similar" })}
-                </Chip>
+                </AppChip>
               ) : null}
               {showShort ? (
-                <Chip compact style={{ borderRadius: 12 }}>
+                <AppChip compact style={{ borderRadius: 12 }}>
                   {t("analysis:badge.short", { defaultValue: "Too short" })}
-                </Chip>
+                </AppChip>
               ) : null}
               {showSequential ? (
-                <Chip compact style={{ borderRadius: 12 }}>
+                <AppChip compact style={{ borderRadius: 12 }}>
                   {t("analysis:badge.sequential", { defaultValue: "Sequential" })}
-                </Chip>
+                </AppChip>
               ) : null}
               {showRepeated ? (
-                <Chip compact style={{ borderRadius: 12 }}>
+                <AppChip compact style={{ borderRadius: 12 }}>
                   {t("analysis:badge.repeated", { defaultValue: "Repeated" })}
-                </Chip>
+                </AppChip>
               ) : null}
             </View>
 
@@ -717,9 +717,9 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
                 <View key={w.key}>
                   {idx !== 0 ? <Divider /> : null}
                   <View style={{ paddingVertical: 10, flexDirection: "row", gap: 10, alignItems: "flex-start" }}>
-                    <Chip compact style={{ borderRadius: 12 }}>
+                    <AppChip compact style={{ borderRadius: 12 }}>
                       {t(severityLabelKey(w.severity), { defaultValue: w.severity })}
-                    </Chip>
+                    </AppChip>
                     <Text style={{ flex: 1, opacity: 0.85 }}>{w.text}</Text>
                   </View>
                 </View>

@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform, View } from "react-native";
 import {
   ActivityIndicator,
-  Chip,
   Icon,
   Portal,
   Text,
@@ -33,6 +32,7 @@ import Divider from "../../../shared/components/Divider";
 import SettingsItem from "../../settings/components/SettingsItem";
 import * as Linking from "expo-linking";
 import { detectTauriEnvironment } from "../../../infrastructure/platform/isTauri";
+import AppChip from "../../../shared/components/chips/AppChip";
 
 const CLAVISPASS_HUB_REPO_URL = "https://github.com/ClavisPass/ClavisPass-Hub";
 
@@ -306,7 +306,7 @@ function ClavisPassHubLoginButton() {
             <Text variant="titleMedium">{t("login:hubConnect")}</Text>
 
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-              <Chip
+              <AppChip
                 icon={"github"}
                 showSelectedOverlay={true}
                 onPress={() => {
@@ -315,7 +315,7 @@ function ClavisPassHubLoginButton() {
                 style={{ borderRadius: 12 }}
               >
                 ClavisPass Hub
-              </Chip>
+              </AppChip>
             </View>
 
             <View style={{ height: 40, position: "relative" }}>

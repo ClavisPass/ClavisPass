@@ -1,8 +1,9 @@
 import React, { memo, useRef } from "react";
 import { View, FlatList, Dimensions, StyleSheet, Platform } from "react-native";
-import { Chip, Divider, IconButton } from "react-native-paper";
+import { Divider, IconButton } from "react-native-paper";
 import WebSpecific from "../../../infrastructure/platform/WebSpecific";
 import { MenuItem } from "../../../shared/components/menus/MenuItem";
+import AppChip from "../../../shared/components/chips/AppChip";
 
 type FilterItem = { key: string; title: string };
 
@@ -70,7 +71,7 @@ export const FiltersNarrow = memo(function FiltersNarrow({
           onScrollEndDrag={onFilterScrollEnd}
           onMomentumScrollEnd={onFilterScrollEnd}
           renderItem={({ item }) => (
-            <Chip
+            <AppChip
               icon={() => null}
               selected={bucket === item.key}
               showSelectedOverlay
@@ -78,7 +79,7 @@ export const FiltersNarrow = memo(function FiltersNarrow({
               style={styles.chip}
             >
               {item.title}
-            </Chip>
+            </AppChip>
           )}
         />
       </View>

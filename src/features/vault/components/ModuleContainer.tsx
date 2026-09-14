@@ -1,10 +1,11 @@
 import React, { ReactNode } from "react";
 import { View, StyleSheet } from "react-native";
-import { Divider, Icon, Text } from "react-native-paper";
+import { Divider, Text } from "react-native-paper";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import FastAccessType from "../../fastaccess/model/FastAccessType";
 import { EditRowControlsContainer } from "./EditRowControlsContainer";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
+import AppIcon from "../../../shared/components/icons/AppIcon";
 
 const MODULE_SPACING = 4;
 
@@ -104,15 +105,15 @@ export default function ModuleContainer({
               }}
             >
               {icon ? (
-                <Icon source={icon} size={18} color={headerColor} />
+                <AppIcon name={icon} size={18} color={headerColor} />
               ) : null}
 
               <Text style={{ color: headerColor }}>{title}</Text>
 
               {id === fastAccess?.usernameId ||
               id === fastAccess?.passwordId ? (
-                <Icon
-                  source={"tooltip-account"}
+                <AppIcon
+                  name={"tooltip-account"}
                   size={14}
                   color={theme.colors?.primary}
                 />

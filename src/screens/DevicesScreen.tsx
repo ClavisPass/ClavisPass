@@ -7,13 +7,14 @@ import {
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { Chip, Divider, Text, Icon } from "react-native-paper";
+import { Divider, Text, Icon } from "react-native-paper";
 import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import Header from "../shared/components/Header";
+import AppChip from "../shared/components/chips/AppChip";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
 
 import { useTheme } from "../app/providers/ThemeProvider";
@@ -165,9 +166,9 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
       }}
     >
       <Text style={{ fontWeight: "800", userSelect: "none" }}>{label}</Text>
-      <Chip compact style={styles.chip}>
+      <AppChip compact style={styles.chip}>
         {count}
-      </Chip>
+      </AppChip>
     </View>
   );
 
@@ -239,21 +240,21 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
                 }}
               >
                 {isSelf ? (
-                  <Chip compact style={styles.chip}>
+                  <AppChip compact style={styles.chip}>
                     {t("devices:you", { defaultValue: "You" })}
-                  </Chip>
+                  </AppChip>
                 ) : null}
 
-                <Chip compact style={styles.chip}>
+                <AppChip compact style={styles.chip}>
                   {labelForStatus(status)}
-                </Chip>
+                </AppChip>
 
                 {!stacked ? (
-                  <Chip compact style={styles.chip}>
+                  <AppChip compact style={styles.chip}>
                     {last
                       ? formatAbsoluteLocal(last, dateFormat, timeFormat)
                       : "—"}
-                  </Chip>
+                  </AppChip>
                 ) : null}
 
                 <Icon
@@ -405,7 +406,7 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
                 justifyContent: "flex-end",
               }}
             >
-              <Chip
+              <AppChip
                 icon={() => null}
                 selected={showArchived}
                 compact
@@ -413,7 +414,7 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
                 style={styles.chip}
               >
                 {showArchived ? toggleOn : toggleOff}
-              </Chip>
+              </AppChip>
             </View>
             {showArchived ? (
               <>

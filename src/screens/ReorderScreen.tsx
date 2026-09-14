@@ -3,7 +3,7 @@ import { Platform, View, useWindowDimensions } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import type { RenderItemParams } from "react-native-draggable-flatlist";
-import { Button, Icon, Text } from "react-native-paper";
+import { Button, Text } from "react-native-paper";
 import Constants from "expo-constants";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
@@ -22,6 +22,7 @@ import {
 import getColors from "../shared/ui/linearGradient";
 import { useSetting } from "../app/providers/SettingsProvider";
 import { resolveWindowControlsSide } from "../infrastructure/platform/windowControls";
+import AppIcon from "../shared/components/icons/AppIcon";
 
 type ReorderScreenProps = NativeStackScreenProps<HomeStackParamList, "Reorder">;
 
@@ -45,30 +46,6 @@ const webDragRegionProps =
   Platform.OS === "web"
     ? ({ dataSet: { tauriDragRegion: "" } } as any)
     : null;
-
-const VerticalReorderIcon = ({
-  color,
-  size = 20,
-}: {
-  color?: string;
-  size?: number;
-}) => (
-  <View
-    style={{
-      width: size,
-      height: size,
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-  >
-    <View style={{ height: size / 2, marginBottom: -2 }}>
-      <Icon source="chevron-up" size={size * 0.72} color={color} />
-    </View>
-    <View style={{ height: size / 2, marginTop: -2 }}>
-      <Icon source="chevron-down" size={size * 0.72} color={color} />
-    </View>
-  </View>
-);
 
 function moveEntryAfterPreviousVisibleId(
   values: ValuesType[],
@@ -319,7 +296,7 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
               gap: 8,
             }}
           >
-            <VerticalReorderIcon size={20} color="white" />
+            <AppIcon name="drag" size={20} color="white" />
             <Text
               variant="titleMedium"
               numberOfLines={1}

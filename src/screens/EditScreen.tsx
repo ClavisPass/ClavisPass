@@ -12,7 +12,7 @@ import ModulesEnum from "../features/vault/model/ModulesEnum";
 
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import { Chip, Icon, Text } from "react-native-paper";
+import { Text } from "react-native-paper";
 import Header from "../shared/components/Header";
 import ValuesType from "../features/vault/model/ValuesType";
 import getModuleData from "../features/vault/utils/getModuleData";
@@ -59,6 +59,8 @@ import AdaptiveMenu, {
   AdaptiveMenuItem,
 } from "../shared/components/menus/AdaptiveMenu";
 import AppTooltip from "../shared/components/tooltips/AppTooltip";
+import AppChip from "../shared/components/chips/AppChip";
+import AppIcon from "../shared/components/icons/AppIcon";
 import PerfProfiler from "../shared/performance/PerfProfiler";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
 import {
@@ -72,30 +74,6 @@ import {
 } from "../features/vault/utils/vcardExport";
 
 type EditScreenProps = NativeStackScreenProps<HomeStackParamList, "Edit">;
-
-const VerticalReorderIcon = ({
-  color,
-  size = 18,
-}: {
-  color?: string;
-  size?: number;
-}) => (
-  <View
-    style={{
-      width: size,
-      height: size,
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-  >
-    <View style={{ height: size / 2, marginBottom: -2 }}>
-      <Icon source="chevron-up" size={size * 0.72} color={color} />
-    </View>
-    <View style={{ height: size / 2, marginTop: -2 }}>
-      <Icon source="chevron-down" size={size * 0.72} color={color} />
-    </View>
-  </View>
-);
 
 const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const {
@@ -675,7 +653,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   }, [value, value.fav]);
 
   type EditToolbarAction = AdaptiveMenuItem & {
-    chipIcon?: React.ComponentProps<typeof Chip>["icon"];
+    chipIcon?: React.ComponentProps<typeof AppChip>["icon"];
   };
 
   const editSectionSpacing = 4;
@@ -705,10 +683,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       },
       {
         key: "reorderModules",
-        icon: "sort",
-        chipIcon: ({ color, size }) => (
-          <VerticalReorderIcon color={color} size={size} />
-        ),
+        icon: "drag",
         disabled: value.modules.length < 2,
         label: t("home:reorderChip"),
         onPress: openModuleReorderScreen,
@@ -871,7 +846,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     action: EditToolbarAction,
     options?: { measureOnly?: boolean },
   ) => (
-    <Chip
+    <AppChip
       key={action.key}
       compact
       disabled={action.disabled}
@@ -886,7 +861,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       textStyle={actionChipTextStyle}
     >
       {action.label}
-    </Chip>
+    </AppChip>
   );
 
   const renderEditActionChips = () => (
@@ -919,7 +894,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         {editToolbarActions.map((action) =>
           renderActionChip(action, { measureOnly: true }),
         )}
-        <Chip
+        <AppChip
           compact
           icon="dots-horizontal"
           onLayout={(event) => {
@@ -932,7 +907,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           textStyle={actionChipTextStyle}
         >
           {t("common:more")}
-        </Chip>
+        </AppChip>
       </View>
       <View
         style={{
@@ -946,7 +921,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         {visibleEditActions.map((action) => renderActionChip(action))}
         {editOverflowItems.length > 0 ? (
           <View ref={moreChipRef} collapsable={false}>
-            <Chip
+            <AppChip
               compact
               icon="dots-horizontal"
               onPress={openOverflowMenu}
@@ -954,7 +929,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
               textStyle={actionChipTextStyle}
             >
               {t("common:more")}
-            </Chip>
+            </AppChip>
           </View>
         ) : null}
       </View>
@@ -1062,8 +1037,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         roundedStart: true,
         tooltip: t("common:undo"),
         children: (
-          <Icon
-            source="undo-variant"
+          <AppIcon
+            name="undo-variant"
             color={
               canUndo ? theme.colors.primary : theme.colors.onSurfaceDisabled
             }
@@ -1077,8 +1052,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         onPress: redo,
         tooltip: t("common:redo"),
         children: (
-          <Icon
-            source="redo-variant"
+          <AppIcon
+            name="redo-variant"
             color={
               canRedo ? theme.colors.primary : theme.colors.onSurfaceDisabled
             }
@@ -1093,7 +1068,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           ? t("common:removeFavorite")
           : t("common:addFavorite"),
         children: (
-          <Icon source={favIcon} color={theme.colors.primary} size={20} />
+          <AppIcon name={favIcon} color={theme.colors.primary} size={20} />
         ),
       })}
       {renderControlDivider()}
@@ -1117,8 +1092,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
               width: "100%",
             }}
           >
-            <Icon
-              source={
+            <AppIcon
+              name={
                 currentFolder
                   ? getFolderIcon(currentFolder)
                   : DEFAULT_FOLDER_ICON
@@ -1203,8 +1178,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         fastAccessObject.password === "" ? null : (
           <AppTooltip title={t("common:fastAccess")}>
             <SquaredContainerButton onPress={openFastAccessFeature}>
-              <Icon
-                source={"tooltip-account"}
+              <AppIcon
+                name={"tooltip-account"}
                 color={theme.colors.primary}
                 size={20}
               />

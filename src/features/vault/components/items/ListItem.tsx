@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, StyleSheet, Platform, useWindowDimensions } from "react-native";
-import { Button, Divider, Icon, Text } from "react-native-paper";
+import { Button, Divider, Text } from "react-native-paper";
 import ValuesType from "../../model/ValuesType";
 import ModulesEnum from "../../model/ModulesEnum";
 
@@ -31,6 +31,7 @@ import AppTooltip from "../../../../shared/components/tooltips/AppTooltip";
 import { useDeferredDragStart } from "../../../../shared/hooks/useDeferredDragStart";
 import { buildFaviconUrl, normalizeUrl } from "../../utils/digitalCardTheme";
 import { detectTauriEnvironment } from "../../../../infrastructure/platform/isTauri";
+import AppIcon from "../../../../shared/components/icons/AppIcon";
 
 const failedFaviconUrls = new Set<string>();
 const nonSelectableImageStyle =
@@ -444,7 +445,7 @@ function ListItem(props: Props) {
         />
       ) : (
         <View style={styles.iconBox}>
-          <Icon color={"lightgray"} source={menuPreviewIcon} size={24} />
+          <AppIcon color={"lightgray"} name={menuPreviewIcon ?? icon} size={24} />
         </View>
       )}
       <View style={styles.menuPreviewTextWrap}>
@@ -626,9 +627,9 @@ function ListItem(props: Props) {
       ]}
     >
       <View style={[styles.swipeAction, styles.swipeActionLeft]}>
-        <Icon
+        <AppIcon
           color={props.item.fav ? theme.colors.primary : theme.colors.onPrimary}
-          source={props.item.fav ? "star-off-outline" : "star-outline"}
+          name={props.item.fav ? "star-off-outline" : "star-outline"}
           size={24}
         />
       </View>
@@ -647,9 +648,9 @@ function ListItem(props: Props) {
       ]}
     >
       <View style={[styles.swipeAction, styles.swipeActionRight]}>
-        <Icon
+        <AppIcon
           color={theme.colors.onError}
-          source="trash-can-outline"
+          name="trash-can-outline"
           size={24}
         />
       </View>
@@ -657,9 +658,9 @@ function ListItem(props: Props) {
   );
 
   const dragHandleIcon = (
-    <Icon
+    <AppIcon
       color={darkmode ? theme.colors?.outline : theme.colors?.outlineVariant}
-      source="drag"
+      name="drag"
       size={20}
     />
   );
@@ -855,7 +856,7 @@ function ListItem(props: Props) {
               />
             ) : (
               <View style={styles.iconBox}>
-                <Icon color={"lightgray"} source={icon} size={26} />
+                <AppIcon color={"lightgray"} name={icon} size={26} />
               </View>
             )}
 
@@ -876,7 +877,9 @@ function ListItem(props: Props) {
                   <Button
                     mode="contained-tonal"
                     compact
-                    icon={usernameIcon}
+                    icon={({ color, size }) => (
+                      <AppIcon name={usernameIcon} color={color} size={size} />
+                    )}
                     onPress={() =>
                       copyToClipboard(fastAccessObject.username, "username")
                     }
@@ -894,7 +897,9 @@ function ListItem(props: Props) {
                   <Button
                     mode="contained-tonal"
                     compact
-                    icon={passwordIcon}
+                    icon={({ color, size }) => (
+                      <AppIcon name={passwordIcon} color={color} size={size} />
+                    )}
                     onPress={() =>
                       copyToClipboard(fastAccessObject.password, "password")
                     }
@@ -911,17 +916,17 @@ function ListItem(props: Props) {
             )}
 
             {props.item.pinnedAt ? (
-              <Icon
+              <AppIcon
                 color={theme.colors.primary}
-                source="pin-outline"
+                name="pin-outline"
                 size={16}
               />
             ) : null}
 
             {!props.hideChevron ? (
-              <Icon
+              <AppIcon
                 color={theme.colors?.primary}
-                source={"chevron-right"}
+                name={"chevron-right"}
                 size={20}
               />
             ) : null}

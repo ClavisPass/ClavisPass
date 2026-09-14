@@ -6,7 +6,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { Chip, Divider, IconButton, Text } from "react-native-paper";
+import { Divider, IconButton, Text } from "react-native-paper";
 import { MenuItem } from "../../../shared/components/menus/MenuItem";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 import { useTheme } from "../../../app/providers/ThemeProvider";
@@ -23,8 +23,9 @@ import Animated, {
 import { DraggableHandle } from "../../../shared/components/DraggableHandle";
 import { get, set } from "../../../infrastructure/storage/store";
 import { useTranslation } from "react-i18next";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { getFolderColor, getFolderIcon } from "../utils/folderAppearance";
+import AppIcon from "../../../shared/components/icons/AppIcon";
+import AppChip from "../../../shared/components/chips/AppChip";
 
 const styles = StyleSheet.create({
   chip: {
@@ -270,7 +271,7 @@ function FolderFilter(props: Props) {
                   minWidth: 0,
                 }}
               >
-                <MaterialCommunityIcons
+                <AppIcon
                   name={MODULE_ICON[module]}
                   size={20}
                   color={theme.colors.primary}
@@ -492,8 +493,8 @@ function FolderFilter(props: Props) {
               ListHeaderComponent={
                 <View style={{ display: "flex", flexDirection: "row" }}>
                   {props.hasTwoFactorEntries ? (
-                    <Chip
-                      icon={() => null}
+                    <AppChip
+                      icon="two-factor-authentication"
                       selected={props.selected2FA}
                       showSelectedOverlay={true}
                       onPress={
@@ -509,16 +510,12 @@ function FolderFilter(props: Props) {
                       style={styles.chip}
                       textStyle={styles.chipText}
                     >
-                      <MaterialCommunityIcons
-                        name="two-factor-authentication"
-                        size={18}
-                        color={theme.colors.primary}
-                      />
-                    </Chip>
+                      {""}
+                    </AppChip>
                   ) : null}
                   {props.hasCardEntries ? (
-                    <Chip
-                      icon={() => null}
+                    <AppChip
+                      icon="credit-card-multiple-outline"
                       selected={props.selectedCard}
                       showSelectedOverlay={true}
                       onPress={
@@ -534,15 +531,11 @@ function FolderFilter(props: Props) {
                       style={styles.chip}
                       textStyle={styles.chipText}
                     >
-                      <MaterialCommunityIcons
-                        name="credit-card-multiple-outline"
-                        size={18}
-                        color={theme.colors.primary}
-                      />
-                    </Chip>
+                      {""}
+                    </AppChip>
                   ) : null}
-                  <Chip
-                    icon={() => null}
+                  <AppChip
+                    icon="star-outline"
                     selected={props.selectedFav}
                     showSelectedOverlay={true}
                     onPress={
@@ -557,22 +550,12 @@ function FolderFilter(props: Props) {
                     style={styles.chip}
                     textStyle={styles.chipText}
                   >
-                    <MaterialCommunityIcons
-                      name="star-outline"
-                      size={18}
-                      color={theme.colors.primary}
-                    />
-                  </Chip>
+                    {""}
+                  </AppChip>
                   {props.moduleFilters.map((module) => (
-                    <Chip
+                    <AppChip
                       key={module}
-                      icon={() => (
-                        <MaterialCommunityIcons
-                          name={MODULE_ICON[module]}
-                          size={18}
-                          color={theme.colors.primary}
-                        />
-                      )}
+                      icon={MODULE_ICON[module]}
                       selected={props.selectedModuleFilters.includes(module)}
                       showSelectedOverlay={true}
                       onPress={
@@ -589,18 +572,18 @@ function FolderFilter(props: Props) {
                       textStyle={styles.chipText}
                     >
                       {getModuleNameByEnum(module, t)}
-                    </Chip>
+                    </AppChip>
                   ))}
                 </View>
               }
               renderItem={({ item, index }) => (
                 <Animated.View layout={LinearTransition.duration(120)}>
-                  <Chip
+                  <AppChip
                     key={index}
-                    icon={() => (
-                      <MaterialCommunityIcons
+                    icon={({ size }) => (
+                      <AppIcon
                         name={getFolderIcon(item)}
-                        size={18}
+                        size={size}
                         color={getFolderColor(item) ?? theme.colors.primary}
                       />
                     )}
@@ -623,7 +606,7 @@ function FolderFilter(props: Props) {
                     textStyle={styles.chipText}
                   >
                     {item.name}
-                  </Chip>
+                  </AppChip>
                 </Animated.View>
               )}
               ListFooterComponent={
@@ -634,7 +617,7 @@ function FolderFilter(props: Props) {
                     alignItems: "center",
                   }}
                 >
-                  <Chip
+                  <AppChip
                     icon="filter-variant-plus"
                     selected={props.selectedModuleFilters.length > 0}
                     showSelectedOverlay={true}
@@ -645,7 +628,7 @@ function FolderFilter(props: Props) {
                     textStyle={styles.chipText}
                   >
                     {t("home:moduleFilterTitle")}
-                  </Chip>
+                  </AppChip>
                 </View>
               }
             />

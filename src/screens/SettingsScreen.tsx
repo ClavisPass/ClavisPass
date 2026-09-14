@@ -51,7 +51,6 @@ import SettingsDropdownItem from "../features/settings/components/SettingsDropdo
 import { useTranslation } from "react-i18next";
 import {
   Button as PaperButton,
-  Chip,
   IconButton,
   Searchbar,
   Text,
@@ -83,6 +82,7 @@ import {
 } from "../shared/utils/distribution";
 import { checkMobileBinaryUpdate } from "../shared/utils/mobileUpdater";
 import { publishUpdateCheck } from "../infrastructure/events/updateBus";
+import AppChip from "../shared/components/chips/AppChip";
 import { logger } from "../infrastructure/logging/logger";
 import {
   detectTauriEnvironment,
@@ -1836,7 +1836,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 marginBottom: 4,
               }}
             >
-              <Chip
+              <AppChip
                 icon={"web"}
                 showSelectedOverlay={true}
                 onPress={() => {
@@ -1846,8 +1846,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 textStyle={styles.chipText}
               >
                 {t("settings:website")}
-              </Chip>
-              <Chip
+              </AppChip>
+              <AppChip
                 icon={"github"}
                 showSelectedOverlay={true}
                 onPress={() => {
@@ -1857,8 +1857,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 textStyle={styles.chipText}
               >
                 Github
-              </Chip>
-              <Chip
+              </AppChip>
+              <AppChip
                 icon={"email-outline"}
                 showSelectedOverlay={true}
                 onPress={() => {
@@ -1868,7 +1868,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 textStyle={styles.chipText}
               >
                 {t("settings:contact")}
-              </Chip>
+              </AppChip>
             </View>
           </ScrollView>
         </View>

@@ -1,6 +1,5 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Chip } from "react-native-paper";
 import { TFunction } from "i18next";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -10,6 +9,7 @@ import ModulesEnum from "../../model/ModulesEnum";
 import ModulesType, { ModuleType } from "../../model/ModulesType";
 import ValuesType from "../../model/ValuesType";
 import getModuleNameByEnum from "../../utils/getModuleNameByEnum";
+import AppChip from "../../../../shared/components/chips/AppChip";
 
 export type DraggableModulesListProps = {
   value: ValuesType;
@@ -68,7 +68,7 @@ export function DraggableModulesFooter({
   return (
     <View style={draggableModulesListStyles.footer}>
       {modulePrediction && (
-        <Chip
+        <AppChip
           icon={"plus"}
           onPress={onAddPredictedModule}
           style={draggableModulesListStyles.predictionChip}
@@ -76,7 +76,7 @@ export function DraggableModulesFooter({
           compact
         >
           {getModuleNameByEnum(modulePrediction, t)}
-        </Chip>
+        </AppChip>
       )}
     </View>
   );

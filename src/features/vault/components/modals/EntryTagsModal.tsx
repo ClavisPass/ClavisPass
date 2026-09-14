@@ -7,11 +7,12 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { Button, Chip, Divider, Text, TextInput } from "react-native-paper";
+import { Button, Divider, Text, TextInput } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import Modal from "../../../../shared/components/modals/Modal";
+import AppChip from "../../../../shared/components/chips/AppChip";
 
 type Props = {
   visible: boolean;
@@ -170,7 +171,7 @@ function EntryTagsModal(props: Props) {
             {props.tags.length > 0 ? (
               <View style={styles.chipWrap}>
                 {props.tags.map((tag) => (
-                  <Chip
+                  <AppChip
                     key={tag}
                     compact
                     closeIcon="close"
@@ -179,7 +180,7 @@ function EntryTagsModal(props: Props) {
                     textStyle={styles.chipText}
                   >
                     {tag}
-                  </Chip>
+                  </AppChip>
                 ))}
               </View>
             ) : (
@@ -197,14 +198,14 @@ function EntryTagsModal(props: Props) {
               <View style={styles.chipWrap}>
                 {filteredSuggestions.map((tag) => (
                   <Pressable key={tag} onPress={() => addTags([tag])}>
-                    <Chip
+                    <AppChip
                       compact
                       icon="plus"
                       style={[styles.chip, styles.suggestionChip]}
                       textStyle={styles.chipText}
                     >
                       {tag}
-                    </Chip>
+                    </AppChip>
                   </Pressable>
                 ))}
               </View>

@@ -1,8 +1,9 @@
 import { ReactNode } from "react";
 import { View } from "react-native";
-import { Text, Icon } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
+import AppIcon from "../../../../shared/components/icons/AppIcon";
 
 type Props = {
   children: ReactNode;
@@ -36,10 +37,10 @@ function CategoryItem(props: Props) {
             justifyContent: "center",
           }}
         >
-          <Icon
+          <AppIcon
             size={20}
             color={theme.colors.primary}
-            source={props.leadingIcon}
+            name={props.leadingIcon}
           />
           <Text
             variant="bodyLarge"

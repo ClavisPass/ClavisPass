@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import QRCode from "react-qr-code";
-import { Chip, Portal, Text } from "react-native-paper";
+import { Portal, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
 import Modal from "../../../../shared/components/modals/Modal";
@@ -11,6 +11,7 @@ import { useTheme } from "../../../../app/providers/ThemeProvider";
 import getColors from "../../../../shared/ui/linearGradient";
 import SessionQrPayload from "../../../../infrastructure/cloud/model/SessionQrPayload";
 import { getClavisPassHubHostUrl } from "../../../../infrastructure/cloud/clients/ClavisPassHubConfig";
+import AppChip from "../../../../shared/components/chips/AppChip";
 
 type Props = {
   visible: boolean;
@@ -138,13 +139,13 @@ function TokenQRCodeModal(props: Props) {
               />
             </View>
 
-            <Chip
+            <AppChip
               icon={"cloud-outline"}
               showSelectedOverlay={true}
               style={{ borderRadius: 12 }}
             >
               {providerLabel}
-            </Chip>
+            </AppChip>
           </View>
         </LinearGradient>
       </Modal>

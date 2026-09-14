@@ -2,12 +2,13 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View, StyleSheet } from "react-native";
-import { Chip, Portal, Text } from "react-native-paper";
+import { Portal, Text } from "react-native-paper";
 import QRCode from "react-qr-code";
 
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import Modal from "../../../../shared/components/modals/Modal";
 import getColors from "../../../../shared/ui/linearGradient";
+import AppChip from "../../../../shared/components/chips/AppChip";
 
 type Props = {
   visible: boolean;
@@ -105,9 +106,9 @@ function WifiQRCodeModal(props: Props) {
               />
             </View>
 
-            <Chip icon="wifi" showSelectedOverlay style={{ borderRadius: 12 }}>
+            <AppChip icon="wifi" showSelectedOverlay style={{ borderRadius: 12 }}>
               {typeLabel}
-            </Chip>
+            </AppChip>
           </View>
         </LinearGradient>
       </Modal>
