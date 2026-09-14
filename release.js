@@ -67,6 +67,27 @@ function tauriConfigHasVersion(path, version) {
   return readJson(path).version === version;
 }
 
+function androidGradleHasVersionName(path, version) {
+  if (!fs.existsSync(path)) return true;
+  const gradle = fs.readFileSync(path, "utf-8");
+  const escapedVersion = version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`^\\s*versionName\\s+"${escapedVersion}"`, "m").test(
+    gradle,
+  );
+}
+
+function androidStringsHasRuntimeVersion(path, runtimeVersion) {
+  if (!fs.existsSync(path)) return true;
+  const stringsXml = fs.readFileSync(path, "utf-8");
+  const escapedRuntimeVersion = runtimeVersion.replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&",
+  );
+  return new RegExp(
+    `<string\\s+name="expo_runtime_version">${escapedRuntimeVersion}</string>`,
+  ).test(stringsXml);
+}
+
 function versionTargetsMatch(version, runtimeVersion) {
   const packageOk =
     !fs.existsSync("package.json") || readJson("package.json").version === version;
@@ -82,8 +103,25 @@ function versionTargetsMatch(version, runtimeVersion) {
     "src-tauri/tauri.config.json",
     version,
   );
+  const androidGradleOk = androidGradleHasVersionName(
+    "android/app/build.gradle",
+    version,
+  );
+  const androidRuntimeOk = androidStringsHasRuntimeVersion(
+    "android/app/src/main/res/values/strings.xml",
+    runtimeVersion,
+  );
 
-  return packageOk && appOk && cargoOk && cargoLockOk && tauriConfOk && tauriConfigOk;
+  return (
+    packageOk &&
+    appOk &&
+    cargoOk &&
+    cargoLockOk &&
+    tauriConfOk &&
+    tauriConfigOk &&
+    androidGradleOk &&
+    androidRuntimeOk
+  );
 }
 
 function syncCargoLock() {
@@ -106,6 +144,46 @@ function runReleaseChecks() {
     console.log(`Running release check: ${check.label}...`);
     execSync(check.command, { stdio: "inherit" });
   }
+}
+
+function updateAndroidGradleVersionName(path, version) {
+  if (!fs.existsSync(path)) return false;
+
+  const gradle = fs.readFileSync(path, "utf-8");
+  const nextGradle = gradle.replace(
+    /^(\s*versionName\s+)".*?"/m,
+    `$1"${version}"`,
+  );
+
+  if (nextGradle === gradle) {
+    console.warn(`Could not find a versionName field to replace in ${path}`);
+    return false;
+  }
+
+  fs.writeFileSync(path, nextGradle);
+  console.log(`Updated ${path} (versionName)`);
+  return true;
+}
+
+function updateAndroidExpoRuntimeVersion(path, runtimeVersion) {
+  if (!fs.existsSync(path)) return false;
+
+  const stringsXml = fs.readFileSync(path, "utf-8");
+  const nextStringsXml = stringsXml.replace(
+    /(<string\s+name="expo_runtime_version">).*?(<\/string>)/,
+    `$1${runtimeVersion}$2`,
+  );
+
+  if (nextStringsXml === stringsXml) {
+    console.warn(
+      `Could not find an expo_runtime_version string to replace in ${path}`,
+    );
+    return false;
+  }
+
+  fs.writeFileSync(path, nextStringsXml);
+  console.log(`Updated ${path} (expo_runtime_version)`);
+  return true;
 }
 
 function waitForVersionTargetsToSettle(version, runtimeVersion, paths, options = {}) {
@@ -205,6 +283,12 @@ if (fs.existsSync(cargoTomlPath)) {
   console.warn("src-tauri/Cargo.toml not found; skipping Cargo version sync.");
 }
 
+updateAndroidGradleVersionName("android/app/build.gradle", version);
+updateAndroidExpoRuntimeVersion(
+  "android/app/src/main/res/values/strings.xml",
+  runtimeVersion,
+);
+
 try {
   execSync("node scripts/check-tauri-version-sync.js", { stdio: "inherit" });
 } catch (e) {
@@ -227,6 +311,8 @@ waitForVersionTargetsToSettle(version, runtimeVersion, [
   "src-tauri/Cargo.lock",
   "src-tauri/tauri.conf.json",
   "src-tauri/tauri.config.json",
+  "android/app/build.gradle",
+  "android/app/src/main/res/values/strings.xml",
 ]);
 
 try {
