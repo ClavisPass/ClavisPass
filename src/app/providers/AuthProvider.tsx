@@ -13,6 +13,7 @@ import { useSetting } from "./SettingsProvider";
 import { initScreenLockLogout } from "../../features/auth/utils/screenLockLogout";
 import ScreenLockLogoutController from "../../features/auth/model/ScreenLockLogoutController";
 import { clipboardClearScheduler } from "../../infrastructure/clipboard/clipboardClearScheduler";
+import { VaultCryptoSession } from "../../infrastructure/crypto/vault/VaultCryptoSession";
 
 export interface AuthContextType {
   isLoggedIn: boolean;
@@ -80,6 +81,7 @@ export const AuthProvider = ({ children }: Props) => {
 
   const logout = useCallback(() => {
     masterRef.current = null;
+    VaultCryptoSession.clear();
     void clipboardClearScheduler.forceClearSensitive();
 
     clearTimers();
@@ -197,6 +199,7 @@ export const AuthProvider = ({ children }: Props) => {
   useEffect(() => {
     return () => {
       masterRef.current = null;
+      VaultCryptoSession.clear();
       clearTimers();
     };
   }, [clearTimers]);

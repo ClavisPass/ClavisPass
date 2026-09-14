@@ -117,7 +117,9 @@ function ChangeMasterPasswordModal(props: Props) {
     try {
       const data = vault.exportFullData();
 
-      const enc = await encryptVaultContent(data, newPassword);
+      const enc = await encryptVaultContent(data, newPassword, {
+        forceRewrap: true,
+      });
 
       if (!enc.ok) {
         throw enc.error;

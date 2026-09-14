@@ -1,6 +1,8 @@
 # Vault V2 Key Envelope Roadmap
 
-This note captures the planned crypto architecture change for moving Argon2id out of the normal sync hot path.
+This note captures the crypto architecture change for moving Argon2id out of the normal sync hot path.
+
+Status: implemented as the default write path. V1 remains readable for migration.
 
 ## Goal
 
@@ -39,7 +41,7 @@ The current V1 settings are intentionally expensive:
 
 Those parameters are good for offline attack resistance, but they are a poor fit for repeated work inside an already-unlocked session.
 
-## Proposed V2 Behavior
+## V2 Behavior
 
 V2 should split password verification/key wrapping from vault payload encryption:
 
@@ -210,4 +212,3 @@ Security-sensitive manual checks:
 - Do not add provider metadata conflict checks as part of this change.
 - Do not weaken Argon2id parameters merely to improve perceived sync speed.
 - Do not expose vault data keys through React state, props, logs, context values, or browser-extension IPC.
-

@@ -111,33 +111,46 @@ For planned KeePass/KDBX compatibility work, including tags, attachments, custom
 
 ## Crypto State Of The Repo
 
-The active vault encryption path is now the V1 format.
+The active vault encryption write path is now the V2 key-envelope format.
+V1 remains readable for migration and compatibility with existing vault files.
 
 ### Active vault format
 
-The V1 implementation lives in:
+The V2 implementation lives in:
+
+- [src/infrastructure/crypto/vault/v2/VaultV2.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v2/VaultV2.ts)
+- [src/infrastructure/crypto/vault/v2/VaultV2Schema.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v2/VaultV2Schema.ts)
+- [src/infrastructure/crypto/vault/VaultCryptoSession.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/VaultCryptoSession.ts)
+
+The V1 compatibility implementation lives in:
 
 - [src/infrastructure/crypto/vault/v1/VaultV1.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v1/VaultV1.ts)
 - [src/infrastructure/crypto/vault/v1/VaultV1Schema.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v1/VaultV1Schema.ts)
 
-The V1 design uses:
+The V2 design uses:
 
-- Argon2id-style password hashing parameters
-- XChaCha20-Poly1305 AEAD
+- Argon2id-style password hashing parameters for deriving a wrapping key at unlock/rewrap time
+- A random vault data key for payload encryption during the unlocked session
+- XChaCha20-Poly1305 AEAD for both key wrapping and payload encryption
 - Structured vault envelope metadata
 
 Important runtime facts:
 
-- [src/infrastructure/crypto/encryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/encryptVaultContent.ts) writes V1 only.
-- [src/infrastructure/crypto/decryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/decryptVaultContent.ts) reads V1 only.
-- Web and native now use platform-specific crypto providers with the same V1 envelope contract, so cross-platform vaults are expected to roundtrip identically.
+- [src/infrastructure/crypto/encryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/encryptVaultContent.ts) writes V2 by default and can still write V1 explicitly for compatibility tooling.
+- [src/infrastructure/crypto/decryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/decryptVaultContent.ts) reads V1 and V2.
+- A successful V1 unlock clears V2 session crypto material; the next default save migrates the vault to V2.
+- A successful V2 unlock seeds `VaultCryptoSession` with the unwrapped vault data key and existing key-wrap metadata.
+- Normal V2 saves during an unlocked session reuse the in-memory vault data key and existing key-wrap block, so Argon2id is not rerun.
+- Master-password change must call `encryptVaultContent(..., { forceRewrap: true })` so the vault data key is wrapped with the new password-derived key.
+- Lock/logout/session expiry must clear `VaultCryptoSession`.
+- Web and native use platform-specific crypto providers with the same envelope contract, so cross-platform vaults are expected to roundtrip identically.
 - In development, provider loading runs a small V1 self-test to catch provider drift early.
 
 Legacy vault crypto has been removed from the main ClavisPass vault flow. Any remaining separate crypto helpers, such as third-party importers, should not be confused with the vault format itself.
 
-Planned follow-up:
+Design background:
 
-- [docs/vault-v2-key-envelope-roadmap.md](/e:/Projects/ClavisPass/docs/vault-v2-key-envelope-roadmap.md) captures the intended V2 key-envelope architecture for moving Argon2id out of the unlocked-session sync hot path. This is a future crypto migration and should be handled deliberately with V1 read compatibility and coordinated device updates.
+- [docs/vault-v2-key-envelope-roadmap.md](/e:/Projects/ClavisPass/docs/vault-v2-key-envelope-roadmap.md) captures the V2 key-envelope architecture for moving Argon2id out of the unlocked-session sync hot path. Old app versions are not expected to read V2, so active devices should be updated before editing a migrated shared vault.
 
 ## Sync And Storage Model
 

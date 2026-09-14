@@ -23,10 +23,12 @@ Use this file as the fast-start context for future work, then open [docs/project
 
 ## Important Reality Check
 
-- The active vault format is now the V1 envelope under [src/infrastructure/crypto/vault/v1](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v1).
-- Vault encryption uses `argon2id` for key derivation and `xchacha20poly1305-ietf` for AEAD in [src/infrastructure/crypto/vault/v1/VaultV1.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v1/VaultV1.ts).
-- [src/infrastructure/crypto/encryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/encryptVaultContent.ts) now writes V1 only.
-- [src/infrastructure/crypto/decryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/decryptVaultContent.ts) now accepts V1 only.
+- The active vault write format is now the V2 key-envelope under [src/infrastructure/crypto/vault/v2](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v2).
+- V2 uses `argon2id` to wrap a random vault data key, then uses `xchacha20poly1305-ietf` for payload encryption in [src/infrastructure/crypto/vault/v2/VaultV2.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v2/VaultV2.ts).
+- [src/infrastructure/crypto/vault/VaultCryptoSession.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/VaultCryptoSession.ts) keeps the unwrapped V2 vault data key in memory during an unlocked session.
+- [src/infrastructure/crypto/encryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/encryptVaultContent.ts) now writes V2 by default.
+- [src/infrastructure/crypto/decryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/decryptVaultContent.ts) now accepts V1 and V2.
+- V1 remains readable for migration; the next default save after a V1 unlock writes V2.
 - The old vault legacy crypto path has been removed; remaining non-V1 crypto usage such as pCloud import is separate from the ClavisPass vault format.
 - Crypto changes are still security-sensitive, so verify provider parity and real runtime call paths before changing KDF, AEAD, or envelope behavior.
 

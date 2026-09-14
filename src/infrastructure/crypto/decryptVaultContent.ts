@@ -1,11 +1,18 @@
 import { VaultDataTypeSchema } from "../../features/vault/model/VaultDataType";
 import getEmptyData from "../../features/vault/utils/getEmptyData";
 import { getCryptoProvider } from "./provider";
+import { VaultCryptoSession } from "./vault/VaultCryptoSession";
 import { decryptVaultV1 } from "./vault/v1/VaultV1";
 import { VaultV1Schema } from "./vault/v1/VaultV1Schema";
+import { decryptVaultV2 } from "./vault/v2/VaultV2";
+import { VaultV2Schema } from "./vault/v2/VaultV2Schema";
 
 export type DecryptVaultContentResult =
-  | { ok: true; payload: ReturnType<typeof VaultDataTypeSchema.parse>; format: "v1" }
+  | {
+      ok: true;
+      payload: ReturnType<typeof VaultDataTypeSchema.parse>;
+      format: "v1" | "v2";
+    }
   | { ok: false; reason: "FORMAT" | "AUTH_FAILED"; error?: unknown };
 
 export const decryptVaultContent = async (
@@ -29,8 +36,27 @@ export const decryptVaultContent = async (
         v1.data,
         masterPassword,
       );
-      const payload = VaultDataTypeSchema.parse(decryptedVault) ?? getEmptyData();
+      VaultCryptoSession.clear();
+      const payload =
+        VaultDataTypeSchema.parse(decryptedVault) ?? getEmptyData();
       return { ok: true, payload, format: "v1" };
+    } catch (e) {
+      return { ok: false, reason: "AUTH_FAILED", error: e };
+    }
+  }
+
+  const v2 = VaultV2Schema.safeParse(parsedJson);
+  if (v2.success) {
+    try {
+      const cryptoProvider = await getCryptoProvider();
+      const decryptedVault = await decryptVaultV2(
+        cryptoProvider,
+        v2.data,
+        masterPassword,
+      );
+      const payload =
+        VaultDataTypeSchema.parse(decryptedVault) ?? getEmptyData();
+      return { ok: true, payload, format: "v2" };
     } catch (e) {
       return { ok: false, reason: "AUTH_FAILED", error: e };
     }
