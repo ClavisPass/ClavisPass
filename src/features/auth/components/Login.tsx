@@ -34,6 +34,7 @@ import {
   fetchRemoteVaultFile,
   uploadRemoteVaultFile,
 } from "../../../infrastructure/cloud/clients/CloudStorageClient";
+import * as DeviceStorageClient from "../../../infrastructure/cloud/clients/DeviceStorageClient";
 
 import { decryptVaultContent } from "../../../infrastructure/crypto/decryptVaultContent";
 import { encryptVaultContent } from "../../../infrastructure/crypto/encryptVaultContent";
@@ -54,6 +55,7 @@ function Login(props: Props) {
   const [showNewData, setShowNewData] = useState(false);
 
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const uploadLocalVaultAfterUnlockRef = useRef(false);
 
   const [capsLock, setCapsLock] = useState(false);
   const [error, setError] = useState(false);
@@ -108,6 +110,24 @@ function Login(props: Props) {
           const failure = result;
           throw failure.error ?? new Error(failure.reason);
         }
+
+        if (
+          uploadLocalVaultAfterUnlockRef.current &&
+          provider === "clavispassHub"
+        ) {
+          try {
+            await writeVaultJson(content, result.payload.vaultId);
+            uploadLocalVaultAfterUnlockRef.current = false;
+          } catch (uploadError) {
+            logger.error(
+              "[Login] Failed to upload initial Hub vault:",
+              uploadError,
+            );
+            setFetchError("Failed to upload vault.");
+            return;
+          }
+        }
+
         vault.unlockWithDecryptedVault(result.payload);
         auth.login(masterPasswordToUse);
       } catch (err) {
@@ -118,7 +138,7 @@ function Login(props: Props) {
         setTimeout(() => setError(false), 1000);
       }
     },
-    [auth, vault, writeVaultJson],
+    [auth, provider, vault, writeVaultJson],
   );
 
   const authenticate = useCallback(async () => {
@@ -127,6 +147,7 @@ function Login(props: Props) {
       setFetchError(null);
       setShowNewData(false);
       setVaultFileContent(null);
+      uploadLocalVaultAfterUnlockRef.current = false;
 
       const hasAuthentication = await isUsingAuthentication();
       setIsUsingAuthenticationButtonVisible(hasAuthentication);
@@ -155,6 +176,39 @@ function Login(props: Props) {
       });
 
       if (res.status === "not_found") {
+        if (provider === "clavispassHub") {
+          const local = await DeviceStorageClient.fetchFile();
+
+          if (local.status === "ok") {
+            setVaultFileContent(local.content);
+            uploadLocalVaultAfterUnlockRef.current = true;
+            setLoading(false);
+
+            if (hasAuthentication) {
+              const ok = await authenticateUser();
+              if (ok) {
+                const storedPassword = await loadAuthentication();
+                if (storedPassword) {
+                  await loginWithMasterPassword(storedPassword, local.content);
+                  return;
+                }
+              }
+            }
+
+            setAutofocus(true);
+            setTimeout(() => textInputRef.current?.focus?.(), 50);
+            return;
+          }
+
+          if (local.status === "error") {
+            logger.warn(
+              "[Login] Hub vault not found and local backup fetch failed:",
+              local.message,
+              local.cause,
+            );
+          }
+        }
+
         setShowNewData(true);
         setLoading(false);
         setTimeout(() => textInputNewRef.current?.focus?.(), 50);

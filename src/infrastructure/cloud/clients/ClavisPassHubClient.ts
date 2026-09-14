@@ -58,6 +58,8 @@ type LoginParams = {
   deviceId?: string;
 };
 
+let lastVaultFetchState: "ok" | "not_found" | null = null;
+
 function createHubError(
   message: string,
   extras?: { code?: string; status?: number; cause?: unknown }
@@ -128,17 +130,35 @@ function getFriendlyErrorMessage(
   return payload?.message || payload?.error || fallback;
 }
 
+function getHubErrorCode(
+  payload: HubApiErrorPayload | null
+): string | undefined {
+  return payload?.code || payload?.error;
+}
+
+function isVaultNotFoundPayload(payload: HubApiErrorPayload | null): boolean {
+  return getHubErrorCode(payload) === "VAULT_NOT_FOUND";
+}
+
+function createHubErrorFromPayload(
+  response: Response,
+  payload: HubApiErrorPayload | null,
+  fallbackMessage: string
+): HubClientError {
+  const message = getFriendlyErrorMessage(payload, fallbackMessage);
+  return createHubError(message, {
+    code: getHubErrorCode(payload),
+    status: response.status,
+    cause: payload,
+  });
+}
+
 async function parseHubError(
   response: Response,
   fallbackMessage: string
 ): Promise<HubClientError> {
   const payload = await readJsonSafe<HubApiErrorPayload>(response);
-  const message = getFriendlyErrorMessage(payload, fallbackMessage);
-  return createHubError(message, {
-    code: payload?.code,
-    status: response.status,
-    cause: payload,
-  });
+  return createHubErrorFromPayload(response, payload, fallbackMessage);
 }
 
 function triggerHubError(title: string, message: string, code: string): void {
@@ -235,6 +255,15 @@ async function fetchVaultMeta(
   });
 
   if (response.status === 404) {
+    const payload = await readJsonSafe<HubApiErrorPayload>(response);
+    if (!isVaultNotFoundPayload(payload)) {
+      throw createHubErrorFromPayload(
+        response,
+        payload,
+        "Failed to load vault metadata from ClavisPass Hub."
+      );
+    }
+
     await clearClavisPassHubVaultEtag();
     logger.info("[ClavisPassHub] fetchVaultMeta: vault not found.");
     return { exists: false, etag: null };
@@ -278,6 +307,13 @@ async function ensureVaultEtagForUpload(
       etag: storedEtag,
     });
     return { exists: true, etag: storedEtag };
+  }
+
+  if (lastVaultFetchState === "not_found") {
+    logger.info(
+      "[ClavisPassHub] Previous vault fetch returned not_found; uploading initial vault without If-Match."
+    );
+    return { exists: false, etag: null };
   }
 
   logger.info(
@@ -328,6 +364,7 @@ export async function login(
   await setClavisPassHubHostUrl(normalizedHostUrl);
   await setClavisPassHubLastUsername(params.username);
   await clearClavisPassHubVaultEtag();
+  lastVaultFetchState = null;
 
   return data;
 }
@@ -350,6 +387,7 @@ export const logout = async (
     logger.warn("[ClavisPassHub] Logout request failed:", error);
   } finally {
     await clearClavisPassHubVaultEtag();
+    lastVaultFetchState = null;
   }
 };
 
@@ -438,11 +476,34 @@ export const fetchFile = async (
         etag,
         ...summarizeVaultText(content),
       });
+      lastVaultFetchState = "ok";
       return { status: "ok", content };
     }
 
     if (response.status === 404) {
+      const payload = await readJsonSafe<HubApiErrorPayload>(response);
+
+      if (!isVaultNotFoundPayload(payload)) {
+        const hubError = createHubErrorFromPayload(
+          response,
+          payload,
+          "Failed to load vault from ClavisPass Hub."
+        );
+        logger.warn(
+          "[ClavisPassHub] fetchFile failed:",
+          response.status,
+          hubError.code,
+          hubError.message
+        );
+        return {
+          status: "error",
+          message: hubError.message,
+          cause: hubError,
+        };
+      }
+
       await clearClavisPassHubVaultEtag();
+      lastVaultFetchState = "not_found";
       logger.info("[ClavisPassHub] fetchFile: vault not found, cleared ETag.");
       return { status: "not_found" };
     }
@@ -504,6 +565,15 @@ export const uploadFile = async (
       typeof content === "string"
         ? "text/plain; charset=utf-8"
         : "application/json; charset=utf-8";
+
+    if (remoteState.exists && !etag) {
+      throw createHubError(
+        "Cannot upload to an existing ClavisPass Hub vault without an ETag.",
+        {
+          code: "ETAG_MISSING",
+        }
+      );
+    }
 
     const headers: Record<string, string> = {
       Authorization: `Bearer ${accessToken}`,
@@ -591,6 +661,7 @@ export const uploadFile = async (
     if (nextEtag) {
       await setClavisPassHubVaultEtag(nextEtag);
     }
+    lastVaultFetchState = "ok";
 
     logger.info("[ClavisPassHub] uploadFile completed:", {
       status: response.status,
