@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Chip } from "react-native-paper";
+import { Chip, TouchableRipple } from "react-native-paper";
 
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import AppIcon from "../icons/AppIcon";
@@ -17,14 +17,20 @@ const styles = StyleSheet.create({
   iconOnlyChip: {
     width: 46,
     minWidth: 46,
+    height: 30,
+    borderRadius: 12,
+    overflow: "hidden",
   },
-  iconOnlyIconWrap: {
-    marginLeft: 6,
+  iconOnlyTouchable: {
+    flex: 1,
   },
-  iconOnlyText: {
-    width: 0,
-    margin: 0,
-    padding: 0,
+  iconOnlyContent: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconOnlySelectedOverlay: {
+    ...StyleSheet.absoluteFillObject,
   },
 });
 
@@ -43,29 +49,59 @@ function AppChip({
   iconOnly,
   iconOnlyColor,
   iconOnlySize = 18,
+  selected,
+  disabled,
+  onPress,
+  showSelectedOverlay,
   ...props
 }: Props) {
   const { theme } = useTheme();
 
   if (iconOnly && typeof icon === "string") {
+    const selectedBackgroundColor = showSelectedOverlay
+      ? "rgba(120, 127, 246, 0.18)"
+      : theme.colors.secondaryContainer;
+
     return (
-      <Chip
-        {...props}
-        icon={() => (
-          <View style={styles.iconOnlyIconWrap}>
+      <View
+        style={[
+          styles.iconOnlyChip,
+          {
+            backgroundColor: selected
+              ? selectedBackgroundColor
+              : theme.colors.secondaryContainer,
+            opacity: disabled ? 0.38 : 1,
+          },
+          props.style as any,
+        ]}
+      >
+        <TouchableRipple
+          borderless
+          disabled={disabled}
+          onPress={onPress}
+          style={styles.iconOnlyTouchable}
+          accessibilityRole="button"
+          accessibilityState={{ selected, disabled }}
+          accessibilityLabel={props.accessibilityLabel}
+        >
+          <View style={styles.iconOnlyContent}>
+            {selected && showSelectedOverlay ? (
+              <View
+                pointerEvents="none"
+                style={[
+                  styles.iconOnlySelectedOverlay,
+                  { borderColor: theme.colors.primary, borderWidth: 1 },
+                ]}
+              />
+            ) : null}
             <AppIcon
               name={icon}
               size={iconOnlySize}
               color={iconOnlyColor ?? theme.colors.primary}
             />
           </View>
-        )}
-        closeIcon={normalizeIcon(closeIcon)}
-        style={[styles.iconOnlyChip, props.style]}
-        textStyle={[styles.iconOnlyText, props.textStyle]}
-      >
-        {""}
-      </Chip>
+        </TouchableRipple>
+      </View>
     );
   }
 
@@ -74,6 +110,10 @@ function AppChip({
       {...props}
       icon={normalizeIcon(icon)}
       closeIcon={normalizeIcon(closeIcon)}
+      selected={selected}
+      disabled={disabled}
+      onPress={onPress}
+      showSelectedOverlay={showSelectedOverlay}
     >
       {children ?? ""}
     </Chip>
