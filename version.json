@@ -1,4 +1,5 @@
 {
   "version": "1.9.2",
-  "runtimeVersion": "1.9.0"
+  "runtimeVersion": "1.9.0",
+  "androidVersionCode": 2
 }

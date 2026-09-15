@@ -76,6 +76,14 @@ function androidGradleHasVersionName(path, version) {
   );
 }
 
+function androidGradleHasVersionCode(path, androidVersionCode) {
+  if (!fs.existsSync(path) || !androidVersionCode) return true;
+  const gradle = fs.readFileSync(path, "utf-8");
+  return new RegExp(`^\\s*versionCode\\s+${androidVersionCode}\\s*$`, "m").test(
+    gradle,
+  );
+}
+
 function androidStringsHasRuntimeVersion(path, runtimeVersion) {
   if (!fs.existsSync(path)) return true;
   const stringsXml = fs.readFileSync(path, "utf-8");
@@ -88,7 +96,7 @@ function androidStringsHasRuntimeVersion(path, runtimeVersion) {
   ).test(stringsXml);
 }
 
-function versionTargetsMatch(version, runtimeVersion) {
+function versionTargetsMatch(version, runtimeVersion, androidVersionCode) {
   const packageOk =
     !fs.existsSync("package.json") || readJson("package.json").version === version;
   const appJson = fs.existsSync("app.json") ? readJson("app.json") : null;
@@ -107,6 +115,10 @@ function versionTargetsMatch(version, runtimeVersion) {
     "android/app/build.gradle",
     version,
   );
+  const androidVersionCodeOk = androidGradleHasVersionCode(
+    "android/app/build.gradle",
+    androidVersionCode,
+  );
   const androidRuntimeOk = androidStringsHasRuntimeVersion(
     "android/app/src/main/res/values/strings.xml",
     runtimeVersion,
@@ -120,6 +132,7 @@ function versionTargetsMatch(version, runtimeVersion) {
     tauriConfOk &&
     tauriConfigOk &&
     androidGradleOk &&
+    androidVersionCodeOk &&
     androidRuntimeOk
   );
 }
@@ -165,6 +178,25 @@ function updateAndroidGradleVersionName(path, version) {
   return true;
 }
 
+function updateAndroidGradleVersionCode(path, androidVersionCode) {
+  if (!fs.existsSync(path) || !androidVersionCode) return false;
+
+  const gradle = fs.readFileSync(path, "utf-8");
+  const nextGradle = gradle.replace(
+    /^(\s*versionCode\s+)\d+/m,
+    `$1${androidVersionCode}`,
+  );
+
+  if (nextGradle === gradle) {
+    console.warn(`Could not find a versionCode field to replace in ${path}`);
+    return false;
+  }
+
+  fs.writeFileSync(path, nextGradle);
+  console.log(`Updated ${path} (versionCode)`);
+  return true;
+}
+
 function updateAndroidExpoRuntimeVersion(path, runtimeVersion) {
   if (!fs.existsSync(path)) return false;
 
@@ -196,7 +228,11 @@ function waitForVersionTargetsToSettle(version, runtimeVersion, paths, options =
 
   while (Date.now() < deadline) {
     const fingerprint = paths.map(readFileSnapshot).join("\n---\n");
-    const targetsMatch = versionTargetsMatch(version, runtimeVersion);
+    const targetsMatch = versionTargetsMatch(
+      version,
+      runtimeVersion,
+      options.androidVersionCode,
+    );
 
     if (targetsMatch && fingerprint === lastFingerprint) {
       if (stableSince === null) {
@@ -225,6 +261,7 @@ if (!fs.existsSync(versionPath)) {
 const versionData = readJson(versionPath);
 const version = versionData.version;
 const runtimeVersion = versionData.runtimeVersion;
+const androidVersionCode = versionData.androidVersionCode;
 
 if (!version) {
   console.error("version.json is missing 'version'");
@@ -234,11 +271,21 @@ if (!runtimeVersion) {
   console.error("version.json is missing 'runtimeVersion' (required)");
   process.exit(1);
 }
+if (
+  androidVersionCode !== undefined &&
+  (!Number.isInteger(androidVersionCode) || androidVersionCode < 1)
+) {
+  console.error("version.json 'androidVersionCode' must be a positive integer");
+  process.exit(1);
+}
 
 const tag = `v${version}`;
 
 console.log(`Preparing release for version ${tag}...`);
 console.log(`Expo runtimeVersion: ${runtimeVersion}`);
+if (androidVersionCode) {
+  console.log(`Android versionCode: ${androidVersionCode}`);
+}
 
 const filesToUpdate = [
   { path: "package.json", keyPath: ["version"], value: version },
@@ -284,6 +331,7 @@ if (fs.existsSync(cargoTomlPath)) {
 }
 
 updateAndroidGradleVersionName("android/app/build.gradle", version);
+updateAndroidGradleVersionCode("android/app/build.gradle", androidVersionCode);
 updateAndroidExpoRuntimeVersion(
   "android/app/src/main/res/values/strings.xml",
   runtimeVersion,
@@ -313,7 +361,9 @@ waitForVersionTargetsToSettle(version, runtimeVersion, [
   "src-tauri/tauri.config.json",
   "android/app/build.gradle",
   "android/app/src/main/res/values/strings.xml",
-]);
+], {
+  androidVersionCode,
+});
 
 try {
   runReleaseChecks();
