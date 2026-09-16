@@ -79,6 +79,7 @@ import { checkForDesktopUpdate } from "../shared/utils/desktopUpdater";
 import {
   isDemoDistribution,
   shouldUseDesktopUpdater,
+  shouldUseMobileBinaryUpdater,
 } from "../shared/utils/distribution";
 import { checkMobileBinaryUpdate } from "../shared/utils/mobileUpdater";
 import { publishUpdateCheck } from "../infrastructure/events/updateBus";
@@ -400,7 +401,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ]),
       updates:
         !isDemoDistribution() &&
-        (!isTauri || shouldUseDesktopUpdater()) &&
+        (isTauri
+          ? shouldUseDesktopUpdater()
+          : shouldUseMobileBinaryUpdater()) &&
         matchesSettingsSearch([
           t("settings:updates"),
           t("settings:checkForUpdates"),
@@ -781,6 +784,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             ? t("settings:updateAvailable")
             : t("settings:noUpdatesAvailable"),
         );
+        return;
+      }
+
+      if (!shouldUseMobileBinaryUpdater()) {
+        setManualUpdateLabel(t("settings:noUpdatesAvailable"));
         return;
       }
 

@@ -1,5 +1,6 @@
 import Constants from "expo-constants";
 import { Platform } from "react-native";
+import { shouldUseMobileBinaryUpdater } from "./distribution";
 
 const DEFAULT_MOBILE_UPDATE_MANIFEST_URL =
   "https://github.com/ClavisPass/ClavisPass/releases/latest/download/mobile-version.json";
@@ -79,6 +80,8 @@ const getManifestDownloadUrl = (
 export async function checkMobileBinaryUpdate(
   language?: string,
 ): Promise<MobileBinaryUpdate | null> {
+  if (!shouldUseMobileBinaryUpdater()) return null;
+
   const manifestUrl = getMobileUpdateManifestUrl();
   if (!manifestUrl) return null;
 

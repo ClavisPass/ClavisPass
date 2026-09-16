@@ -17,14 +17,20 @@
       "distribution": "store",
       "channel": "production",
       "environment": "production",
-      "env": { "APP_VARIANT": "production" }
+      "env": {
+        "APP_VARIANT": "production",
+        "EXPO_PUBLIC_CLAVISPASS_MOBILE_BINARY_UPDATES": "false"
+      }
     },
     "production-apk": {
       "developmentClient": false,
       "distribution": "store",
       "channel": "production",
       "environment": "production",
-      "env": { "APP_VARIANT": "production" },
+      "env": {
+        "APP_VARIANT": "production",
+        "EXPO_PUBLIC_CLAVISPASS_MOBILE_BINARY_UPDATES": "true"
+      },
       "android": { "buildType": "apk" }
     }
   },

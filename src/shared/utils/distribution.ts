@@ -22,3 +22,7 @@ export function isDemoDistribution() {
 export function shouldUseDesktopUpdater() {
   return getAppDistribution() === "direct";
 }
+
+export function shouldUseMobileBinaryUpdater() {
+  return process.env.EXPO_PUBLIC_CLAVISPASS_MOBILE_BINARY_UPDATES !== "false";
+}

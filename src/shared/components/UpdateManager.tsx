@@ -16,7 +16,10 @@ import {
   checkForDesktopUpdate,
   installDesktopUpdate,
 } from "../utils/desktopUpdater";
-import { shouldUseDesktopUpdater } from "../utils/distribution";
+import {
+  shouldUseDesktopUpdater,
+  shouldUseMobileBinaryUpdater,
+} from "../utils/distribution";
 import {
   checkMobileBinaryUpdate,
   type MobileBinaryUpdate,
@@ -59,6 +62,10 @@ const UpdateManager = () => {
 
       checkTauriUpdate();
     } else {
+      if (!shouldUseMobileBinaryUpdater()) {
+        return;
+      }
+
       checkMobileUpdates();
     }
   }, [ready]);
