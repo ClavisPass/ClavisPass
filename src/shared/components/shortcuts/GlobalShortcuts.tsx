@@ -45,7 +45,6 @@ function GlobalShortcuts() {
               "=",
               "+",
               "-",
-              "c",
               "i",
               "j",
               "l",

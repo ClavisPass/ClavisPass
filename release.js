@@ -103,7 +103,9 @@ function versionTargetsMatch(version, runtimeVersion, androidVersionCode) {
   const appOk =
     !appJson ||
     (appJson.expo?.version === version &&
-      appJson.expo?.runtimeVersion === runtimeVersion);
+      appJson.expo?.runtimeVersion === runtimeVersion &&
+      (!androidVersionCode ||
+        appJson.expo?.android?.versionCode === androidVersionCode));
   const cargoOk = cargoTomlHasVersion("src-tauri/Cargo.toml", version);
   const cargoLockOk = cargoLockHasVersion("src-tauri/Cargo.lock", "ClavisPass", version);
   const tauriConfOk = tauriConfigHasVersion("src-tauri/tauri.conf.json", version);
@@ -292,6 +294,14 @@ const filesToUpdate = [
   { path: "app.json", keyPath: ["expo", "version"], value: version },
   { path: "app.json", keyPath: ["expo", "runtimeVersion"], value: runtimeVersion },
 ];
+
+if (androidVersionCode) {
+  filesToUpdate.push({
+    path: "app.json",
+    keyPath: ["expo", "android", "versionCode"],
+    value: androidVersionCode,
+  });
+}
 
 for (const f of filesToUpdate) {
   if (!fs.existsSync(f.path)) continue;
