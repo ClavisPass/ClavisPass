@@ -1,7 +1,10 @@
-import { InteractionManager, View, StyleSheet } from "react-native";
+import { InteractionManager, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import { Dropdown, DropdownInputProps } from "react-native-paper-dropdown";
 import Modal from "../../../../shared/components/modals/Modal";
+import ModalSurface, {
+  ModalActions,
+} from "../../../../shared/components/modals/ModalSurface";
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { useTranslation } from "react-i18next";
@@ -72,20 +75,22 @@ function EditCustomFieldModal(props: Props) {
         props.setVisible(false);
       }}
     >
-      <View
-        style={{
-          backgroundColor: "transparent",
-          padding: 14,
-          display: "flex",
-          width: 300,
-          gap: 12,
-          borderRadius: 12,
-          borderWidth: StyleSheet.hairlineWidth,
-          borderColor: theme.colors.outlineVariant,
-        }}
+      <ModalSurface
+        width={300}
+        title={t("modules:customField")}
+        contentStyle={{ gap: 12 }}
+        footer={
+          <ModalActions>
+            <Button
+              mode="contained"
+              style={{ borderRadius: 12 }}
+              onPress={() => props.setVisible(false)}
+            >
+              {t("common:done")}
+            </Button>
+          </ModalActions>
+        }
       >
-        <Text variant="titleMedium">{t("modules:customField")}</Text>
-
         <View style={{ gap: 8 }}>
           <Text variant="bodyMedium" style={{ opacity: 0.72 }}>
             {t("modules:customFieldTitle")}
@@ -141,17 +146,7 @@ function EditCustomFieldModal(props: Props) {
             </Text>
           ) : null}
         </View>
-
-        <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-          <Button
-            mode="contained"
-            style={{ borderRadius: 12 }}
-            onPress={() => props.setVisible(false)}
-          >
-            {t("common:done")}
-          </Button>
-        </View>
-      </View>
+      </ModalSurface>
     </Modal>
   );
 }

@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
-import { IconButton, Text } from "react-native-paper";
+import { Divider, IconButton, Text } from "react-native-paper";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import FolderType from "../../model/FolderType";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
@@ -28,6 +28,12 @@ const dragDropAnimationConfig = {
   restDisplacementThreshold: 1,
   restSpeedThreshold: 1,
   stiffness: 420,
+};
+
+const fullWidthDividerStyle = {
+  marginLeft: 0,
+  marginRight: 0,
+  width: "100%" as const,
 };
 
 function FolderDragHandle({
@@ -59,6 +65,7 @@ function DraggableFolderList(props: Props) {
   const { t } = useTranslation();
   const [localFolders, setLocalFolders] = useState(props.folder);
   const [nativeScrollEnabled, setNativeScrollEnabled] = useState(true);
+  const [dragging, setDragging] = useState(false);
 
   useEffect(() => {
     setLocalFolders(props.folder);
@@ -71,12 +78,20 @@ function DraggableFolderList(props: Props) {
           style={{
             width: "100%",
             backgroundColor: theme.colors.background,
-            borderRadius: 12,
-            marginBottom: 4,
             opacity: isActive ? 0.9 : 1,
           }}
         >
-          <View style={[globalStyles.folderContainer]}>
+          <View
+            style={[
+              globalStyles.folderContainer,
+              {
+                height: 48,
+                paddingHorizontal: 10,
+                backgroundColor: "transparent",
+                gap: 8,
+              },
+            ]}
+          >
             <FolderDragHandle
               disabled={props.draggableDisabled}
               onPendingStart={() => setNativeScrollEnabled(false)}
@@ -87,11 +102,14 @@ function DraggableFolderList(props: Props) {
             <AnimatedPressable
               borderless={false}
               style={{
-                width: 30,
-                height: 30,
-                borderRadius: 8,
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                borderWidth: StyleSheet.hairlineWidth,
+                borderColor: theme.colors.outlineVariant,
                 alignItems: "center",
                 justifyContent: "center",
+                backgroundColor: theme.colors.surfaceVariant,
               }}
               onPress={() => props.openAppearance(item)}
             >
@@ -105,7 +123,8 @@ function DraggableFolderList(props: Props) {
             <AnimatedPressable
               style={{
                 borderRadius: 12,
-                padding: 10,
+                paddingVertical: 10,
+                paddingHorizontal: 2,
                 flex: 1,
                 display: "flex",
                 flexDirection: "row",
@@ -122,7 +141,7 @@ function DraggableFolderList(props: Props) {
                 <Text
                   style={{
                     userSelect: "none",
-                    fontWeight: "bold",
+                    fontWeight: "600",
                     fontSize: 15,
                   }}
                   variant="bodyMedium"
@@ -134,8 +153,9 @@ function DraggableFolderList(props: Props) {
 
             <IconButton
               icon="close"
-              size={14}
-              style={{ margin: 0 }}
+              size={16}
+              iconColor={theme.colors.onSurfaceVariant}
+              style={{ margin: 0, width: 30, height: 30 }}
               onPress={() => props.deleteFolder(item)}
             />
           </View>
@@ -149,7 +169,10 @@ function DraggableFolderList(props: Props) {
       props.openAppearance,
       props.setSelectedFolder,
       theme.colors.background,
+      theme.colors.onSurfaceVariant,
+      theme.colors.outlineVariant,
       theme.colors.primary,
+      theme.colors.surfaceVariant,
     ],
   );
 
@@ -160,11 +183,19 @@ function DraggableFolderList(props: Props) {
           style={{
             width: "100%",
             backgroundColor: theme.colors.background,
-            borderRadius: 12,
-            marginBottom: 4,
           }}
         >
-          <View style={[globalStyles.folderContainer]}>
+          <View
+            style={[
+              globalStyles.folderContainer,
+              {
+                height: 48,
+                paddingHorizontal: 10,
+                backgroundColor: "transparent",
+                gap: 8,
+              },
+            ]}
+          >
             <AppIcon name="minus" size={20} />
 
             <AnimatedPressable
@@ -189,7 +220,7 @@ function DraggableFolderList(props: Props) {
                 <Text
                   style={{
                     userSelect: "none",
-                    fontWeight: "bold",
+                    fontWeight: "600",
                     fontSize: 15,
                   }}
                   variant="bodyMedium"
@@ -199,6 +230,9 @@ function DraggableFolderList(props: Props) {
               </>
             </AnimatedPressable>
           </View>
+          {localFolders.length > 0 ? (
+            <Divider style={fullWidthDividerStyle} />
+          ) : null}
         </View>
       )}
       <DraggableFlatList
@@ -206,10 +240,15 @@ function DraggableFolderList(props: Props) {
         extraData={localFolders}
         renderItem={renderItem}
         keyExtractor={(item) => `drag-item-${item.id}`}
+        ItemSeparatorComponent={
+          dragging ? undefined : () => <Divider style={fullWidthDividerStyle} />
+        }
         activationDistance={props.draggableDisabled ? 10_000 : 0}
         animationConfig={dragDropAnimationConfig}
         scrollEnabled={!props.draggableDisabled && nativeScrollEnabled}
+        onDragBegin={() => setDragging(true)}
         onDragEnd={(event) => {
+          setDragging(false);
           if (props.draggableDisabled) return;
           if (!event?.data) return;
           setLocalFolders(event.data);

@@ -84,7 +84,10 @@ export function AppWithNavigation() {
             const { invoke } = await import("@tauri-apps/api/core");
             await invoke("focus_main_window");
           } catch (focusError) {
-            logger.warn("Failed to focus main window from deep link:", focusError);
+            logger.warn(
+              "Failed to focus main window from deep link:",
+              focusError,
+            );
           }
         })();
         try {
@@ -270,9 +273,7 @@ function AppShell() {
                   <View style={{ flex: 1, backgroundColor: "transparent" }}>
                     <View
                       style={{
-                        borderColor: isTauri ? theme.colors.primary : undefined,
                         borderRadius: windowCornerRadius,
-                        borderWidth: isTauri ? 1 : 0,
                         backgroundColor: theme.colors.background,
                         overflow: "hidden",
                         flex: 1,

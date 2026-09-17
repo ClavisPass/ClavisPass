@@ -1,14 +1,14 @@
 import Modal from "../../../../shared/components/modals/Modal";
-import { ScrollView, View, StyleSheet, useWindowDimensions } from "react-native";
+import { ScrollView, View, useWindowDimensions } from "react-native";
 import ValueIconsEnum from "../../model/ValueIconsEnum";
 import TemplateEnum from "../../model/TemplateEnum";
 import getTemplate from "../../utils/getTemplate";
 import CategoryItem from "../items/CategoryItem";
 import FolderType from "../../model/FolderType";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeStackParamList } from "../../../../app/navigation/model/types";
+import ModalSurface from "../../../../shared/components/modals/ModalSurface";
 
 type Props = {
   visible: boolean;
@@ -21,7 +21,6 @@ type Props = {
 
 function AddValueModal(props: Props) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
   const { height } = useWindowDimensions();
   const modalMaxHeight = Math.max(220, Math.min(440, height * 0.8));
   const hideModal = () => props.setVisible(false);
@@ -36,18 +35,11 @@ function AddValueModal(props: Props) {
   };
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
-      <View
-        style={{
-          maxHeight: modalMaxHeight,
-          width: 280,
-          display: "flex",
-          flexDirection: "column",
-          padding: 8,
-          gap: 8,
-          borderWidth: StyleSheet.hairlineWidth,
-          borderColor: theme.colors.outlineVariant,
-          borderRadius: 12,
-        }}
+      <ModalSurface
+        width={300}
+        maxHeight={modalMaxHeight}
+        padded={false}
+        contentStyle={{ padding: 8 }}
       >
         <ScrollView
           style={{ maxHeight: modalMaxHeight - 16 }}
@@ -59,7 +51,12 @@ function AddValueModal(props: Props) {
           showsVerticalScrollIndicator={false}
         >
           <View
-            style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
+            style={{
+              height: 64,
+              display: "flex",
+              flexDirection: "row",
+              gap: 8,
+            }}
           >
             <CategoryItem
               leadingIcon={ValueIconsEnum.BLANK}
@@ -79,7 +76,12 @@ function AddValueModal(props: Props) {
             </CategoryItem>
           </View>
           <View
-            style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
+            style={{
+              height: 64,
+              display: "flex",
+              flexDirection: "row",
+              gap: 8,
+            }}
           >
             <CategoryItem
               leadingIcon={ValueIconsEnum.WIFI}
@@ -99,7 +101,12 @@ function AddValueModal(props: Props) {
             </CategoryItem>
           </View>
           <View
-            style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
+            style={{
+              height: 64,
+              display: "flex",
+              flexDirection: "row",
+              gap: 8,
+            }}
           >
             <CategoryItem
               leadingIcon={ValueIconsEnum.IDENTITY}
@@ -119,7 +126,12 @@ function AddValueModal(props: Props) {
             </CategoryItem>
           </View>
           <View
-            style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
+            style={{
+              height: 64,
+              display: "flex",
+              flexDirection: "row",
+              gap: 8,
+            }}
           >
             <CategoryItem
               leadingIcon={ValueIconsEnum.CREDIT_CARD}
@@ -139,7 +151,12 @@ function AddValueModal(props: Props) {
             </CategoryItem>
           </View>
           <View
-            style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
+            style={{
+              height: 64,
+              display: "flex",
+              flexDirection: "row",
+              gap: 8,
+            }}
           >
             <CategoryItem
               leadingIcon={ValueIconsEnum.TASKLIST}
@@ -159,7 +176,12 @@ function AddValueModal(props: Props) {
             </CategoryItem>
           </View>
           <View
-            style={{ height: 64, display: "flex", flexDirection: "row", gap: 8 }}
+            style={{
+              height: 64,
+              display: "flex",
+              flexDirection: "row",
+              gap: 8,
+            }}
           >
             <CategoryItem
               leadingIcon={ValueIconsEnum.TWO_FACTOR}
@@ -179,7 +201,7 @@ function AddValueModal(props: Props) {
             </CategoryItem>
           </View>
         </ScrollView>
-      </View>
+      </ModalSurface>
     </Modal>
   );
 }

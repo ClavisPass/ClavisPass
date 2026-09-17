@@ -35,9 +35,16 @@ describe("getTemplate", () => {
 
   it("creates bank account template modules", () => {
     expect(modules(TemplateEnum.BANK_ACCOUNT)).toEqual([
-      ModulesEnum.URL,
-      ModulesEnum.USERNAME,
-      ModulesEnum.PASSWORD,
+      ModulesEnum.CUSTOM_FIELD,
+      ModulesEnum.CUSTOM_FIELD,
+      ModulesEnum.CUSTOM_FIELD,
+      ModulesEnum.CUSTOM_FIELD,
+      ModulesEnum.NOTE,
     ]);
+    expect(
+      getTemplate(TemplateEnum.BANK_ACCOUNT)
+        .modules.filter((module) => module.module === ModulesEnum.CUSTOM_FIELD)
+        .map((module) => module.title),
+    ).toEqual(["Bank", "Account holder", "IBAN", "BIC"]);
   });
 });

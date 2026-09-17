@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import QRCode from "react-qr-code";
-import { Portal, Text } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
 import Modal from "../../../../shared/components/modals/Modal";
 import { useToken } from "../../../../app/providers/CloudProvider";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
-import getColors from "../../../../shared/ui/linearGradient";
 import SessionQrPayload from "../../../../infrastructure/cloud/model/SessionQrPayload";
 import { getClavisPassHubHostUrl } from "../../../../infrastructure/cloud/clients/ClavisPassHubConfig";
 import AppChip from "../../../../shared/components/chips/AppChip";
+import ModalSurface from "../../../../shared/components/modals/ModalSurface";
 
 type Props = {
   visible: boolean;
@@ -72,84 +71,68 @@ function TokenQRCodeModal(props: Props) {
   }, [refreshToken, props.visible]);
 
   return (
-    <Portal>
-      <Modal visible={props.visible} onDismiss={hideModal}>
-        <LinearGradient
-          colors={getColors()}
+    <Modal visible={props.visible} onDismiss={hideModal}>
+      <ModalSurface width={320}>
+        <View
           style={{
-            width: 320,
-            maxWidth: "100%",
-            padding: 1,
-            borderRadius: 12,
-            borderWidth: StyleSheet.hairlineWidth,
-            borderColor: theme.colors.outlineVariant,
+            width: "100%",
+            gap: 14,
+            alignItems: "center",
           }}
-          end={{ x: 0.1, y: 0.2 }}
-          dither={true}
         >
           <View
             style={{
-              backgroundColor: theme.colors.background,
-              padding: 18,
-              borderRadius: 11,
-              gap: 14,
+              width: "100%",
+              gap: 6,
               alignItems: "center",
             }}
           >
-            <View
+            <Text variant="titleLarge" style={{ color: theme.colors.primary }}>
+              {t("settings:showqrcode")}
+            </Text>
+            <Text
+              variant="bodyMedium"
               style={{
-                width: "100%",
-                gap: 6,
-                alignItems: "center",
+                color: theme.colors.onSurfaceVariant,
+                textAlign: "center",
               }}
             >
-              <Text variant="titleLarge" style={{ color: theme.colors.primary }}>
-                {t("settings:showqrcode")}
-              </Text>
-              <Text
-                variant="bodyMedium"
-                style={{
-                  color: theme.colors.onSurfaceVariant,
-                  textAlign: "center",
-                }}
-              >
-                {t("settings:scanqrcode")}
-              </Text>
-            </View>
-
-            <View
-              style={{
-                backgroundColor: "white",
-                padding: 18,
-                borderRadius: 12,
-                borderWidth: StyleSheet.hairlineWidth,
-                borderColor: theme.colors.outlineVariant,
-                shadowColor: "#000",
-                shadowOpacity: 0.12,
-                shadowRadius: 14,
-                shadowOffset: { width: 0, height: 6 },
-                elevation: 5,
-              }}
-            >
-              <QRCode
-                size={208}
-                style={{ height: "auto", width: "auto" }}
-                value={value || " "}
-                viewBox="0 0 200 200"
-              />
-            </View>
-
-            <AppChip
-              icon={"cloud-outline"}
-              showSelectedOverlay={true}
-              style={{ borderRadius: 12 }}
-            >
-              {providerLabel}
-            </AppChip>
+              {t("settings:scanqrcode")}
+            </Text>
           </View>
-        </LinearGradient>
-      </Modal>
-    </Portal>
+
+          <View
+            style={{
+              backgroundColor: "white",
+              padding: 18,
+              borderRadius: 12,
+              borderWidth: StyleSheet.hairlineWidth,
+              borderColor: theme.colors.outlineVariant,
+              shadowColor: "#000",
+              shadowOpacity: 0.12,
+              shadowRadius: 14,
+              shadowOffset: { width: 0, height: 6 },
+              elevation: 5,
+            }}
+          >
+            <QRCode
+              size={208}
+              style={{ height: "auto", width: "auto" }}
+              value={value || " "}
+              viewBox="0 0 200 200"
+            />
+          </View>
+
+          <AppChip
+            icon={"cloud-outline"}
+            showSelectedOverlay={true}
+            style={{ borderRadius: 12 }}
+          >
+            {providerLabel}
+          </AppChip>
+        </View>
+      </ModalSurface>
+    </Modal>
   );
 }
 

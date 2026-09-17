@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import Modal from "../../../../shared/components/modals/Modal";
+import ModalSurface from "../../../../shared/components/modals/ModalSurface";
 import { formatAbsoluteTime } from "../../../../shared/utils/Timestamp";
 import {
   EditHistoryActionType,
@@ -68,33 +69,14 @@ function EditHistoryModal(props: Props) {
 
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
-      <View
-        style={{
-          width: 320,
-          minHeight: 220,
-          maxHeight: 440,
-          display: "flex",
-          flexDirection: "column",
-          padding: 14,
-          gap: 12,
-          borderRadius: 12,
-          borderWidth: StyleSheet.hairlineWidth,
-          borderColor: theme.colors.outlineVariant,
-          backgroundColor: theme.colors.background,
-        }}
+      <ModalSurface
+        width={340}
+        minHeight={220}
+        maxHeight={440}
+        title={t("common:editHistory")}
+        description={t("common:editHistoryDescription")}
+        contentStyle={{ gap: 12 }}
       >
-        <View style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          <Text variant="headlineSmall" style={{ userSelect: "none" }}>
-            {t("common:editHistory")}
-          </Text>
-          <Text
-            variant="bodyMedium"
-            style={{ userSelect: "none", opacity: 0.72 }}
-          >
-            {t("common:editHistoryDescription")}
-          </Text>
-        </View>
-
         {items.length === 0 ? (
           <View style={styles.emptyState}>
             <Text variant="bodyMedium" style={{ opacity: 0.72 }}>
@@ -131,7 +113,7 @@ function EditHistoryModal(props: Props) {
             ))}
           </ScrollView>
         )}
-      </View>
+      </ModalSurface>
     </Modal>
   );
 }

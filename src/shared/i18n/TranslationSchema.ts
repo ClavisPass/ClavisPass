@@ -103,6 +103,8 @@ export type TranslationSchema = {
     selectFolderDescription: string;
     manageFoldersDescription: string;
     foldersEmpty: string;
+    folderIcon: string;
+    folderColor: string;
     selectedItem: string;
     edit: string;
     fastAccess: string;
@@ -124,6 +126,10 @@ export type TranslationSchema = {
     masterPassword: string;
     newMasterPassword: string;
     confirmMasterPassword: string;
+    masterPasswordStrength: string;
+    masterPasswordWeakHint: string;
+    masterPasswordStrongEnoughHint: string;
+    masterPasswordMismatch: string;
     login: string;
     setNewPassword: string;
     noBackupFound: string;
@@ -234,6 +240,7 @@ export type TranslationSchema = {
     windowControlsRight: string;
     windowCornerStyle: string;
     windowCornerRounded: string;
+    windowCornerSoft: string;
     windowCornerSquare: string;
     dateFormat: string;
     timeFormat: string;
@@ -295,6 +302,8 @@ export type TranslationSchema = {
     encryption: string;
     keyDerivation: string;
     browserExtensions: string;
+    browserExtensionOpenOptions: string;
+    browserExtensionModalHint: string;
     browserExtensionSettingsItem: string;
     browserExtensionChromeStore: string;
     browserExtensionFirefoxStore: string;

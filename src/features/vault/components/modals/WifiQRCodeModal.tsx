@@ -1,13 +1,12 @@
-import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View, StyleSheet } from "react-native";
-import { Portal, Text } from "react-native-paper";
+import { Text } from "react-native-paper";
 import QRCode from "react-qr-code";
 
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import Modal from "../../../../shared/components/modals/Modal";
-import getColors from "../../../../shared/ui/linearGradient";
+import ModalSurface from "../../../../shared/components/modals/ModalSurface";
 import AppChip from "../../../../shared/components/chips/AppChip";
 
 type Props = {
@@ -42,77 +41,61 @@ function WifiQRCodeModal(props: Props) {
     setValue(wifiString);
   }, [props.hidden, props.wifitype, props.wifiname, props.wifipassword]);
   return (
-    <Portal>
-      <Modal visible={props.visible} onDismiss={hideModal}>
-        <LinearGradient
-          colors={getColors()}
+    <Modal visible={props.visible} onDismiss={hideModal}>
+      <ModalSurface width={320}>
+        <View
           style={{
-            width: 320,
-            maxWidth: "100%",
-            padding: 1,
-            borderRadius: 12,
-            borderWidth: StyleSheet.hairlineWidth,
-            borderColor: theme.colors.outlineVariant,
+            width: "100%",
+            gap: 14,
+            alignItems: "center",
           }}
-          end={{ x: 0.1, y: 0.2 }}
-          dither
         >
           <View
             style={{
-              backgroundColor: theme.colors.background,
-              padding: 18,
-              borderRadius: 11,
-              gap: 14,
+              width: "100%",
+              gap: 6,
               alignItems: "center",
             }}
           >
-            <View
+            <Text
+              variant="bodyMedium"
               style={{
-                width: "100%",
-                gap: 6,
-                alignItems: "center",
+                color: theme.colors.onSurfaceVariant,
+                textAlign: "center",
               }}
             >
-              <Text
-                variant="bodyMedium"
-                style={{
-                  color: theme.colors.onSurfaceVariant,
-                  textAlign: "center",
-                }}
-              >
-                {networkLabel}
-              </Text>
-            </View>
-
-            <View
-              style={{
-                backgroundColor: "white",
-                padding: 18,
-                borderRadius: 12,
-                borderWidth: StyleSheet.hairlineWidth,
-                borderColor: theme.colors.outlineVariant,
-                shadowColor: "#000",
-                shadowOpacity: 0.12,
-                shadowRadius: 14,
-                shadowOffset: { width: 0, height: 6 },
-                elevation: 5,
-              }}
-            >
-              <QRCode
-                size={208}
-                style={{ height: "auto", width: "auto" }}
-                value={value || " "}
-                viewBox="0 0 200 200"
-              />
-            </View>
-
-            <AppChip icon="wifi" showSelectedOverlay style={{ borderRadius: 12 }}>
-              {typeLabel}
-            </AppChip>
+              {networkLabel}
+            </Text>
           </View>
-        </LinearGradient>
-      </Modal>
-    </Portal>
+
+          <View
+            style={{
+              backgroundColor: "white",
+              padding: 18,
+              borderRadius: 12,
+              borderWidth: StyleSheet.hairlineWidth,
+              borderColor: theme.colors.outlineVariant,
+              shadowColor: "#000",
+              shadowOpacity: 0.12,
+              shadowRadius: 14,
+              shadowOffset: { width: 0, height: 6 },
+              elevation: 5,
+            }}
+          >
+            <QRCode
+              size={208}
+              style={{ height: "auto", width: "auto" }}
+              value={value || " "}
+              viewBox="0 0 200 200"
+            />
+          </View>
+
+          <AppChip icon="wifi" showSelectedOverlay style={{ borderRadius: 12 }}>
+            {typeLabel}
+          </AppChip>
+        </View>
+      </ModalSurface>
+    </Modal>
   );
 }
 

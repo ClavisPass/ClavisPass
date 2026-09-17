@@ -9,6 +9,16 @@ function getModules(...modules: ModulesEnum[]) {
   return modules.map((module) => getModuleData(module));
 }
 
+function getCustomField(title: string) {
+  const module = getModuleData(ModulesEnum.CUSTOM_FIELD);
+  if (module.module !== ModulesEnum.CUSTOM_FIELD) return module;
+
+  return {
+    ...module,
+    title,
+  };
+}
+
 function getTemplate(template: TemplateEnum) {
   const dateTime = getDateTime();
   let value: ValuesType = {
@@ -71,18 +81,17 @@ function getTemplate(template: TemplateEnum) {
     return value;
   }
   if (template == TemplateEnum.CREDIT_CARD) {
-    value.modules = getModules(
-      ModulesEnum.CREDIT_CARD,
-      ModulesEnum.EXPIRY,
-    );
+    value.modules = getModules(ModulesEnum.CREDIT_CARD, ModulesEnum.EXPIRY);
     return value;
   }
   if (template == TemplateEnum.BANK_ACCOUNT) {
-    value.modules = getModules(
-      ModulesEnum.URL,
-      ModulesEnum.USERNAME,
-      ModulesEnum.PASSWORD,
-    );
+    value.modules = [
+      getCustomField("Bank"),
+      getCustomField("Account holder"),
+      getCustomField("IBAN"),
+      getCustomField("BIC"),
+      ...getModules(ModulesEnum.NOTE),
+    ];
     return value;
   }
   return value;

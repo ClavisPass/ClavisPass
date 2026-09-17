@@ -57,7 +57,7 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
   const moduleIdRef = useRef(props.id);
 
   const { t } = useTranslation();
-  const { theme } = useTheme();
+  const { globalStyles, theme } = useTheme();
 
   const { copy } = useClipboardCopy();
 
@@ -235,8 +235,9 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
         <Pressable onPress={handleWrapperPress}>
           <Animated.View
             style={[
+              globalStyles.outlineStyle,
               styles.outlined,
-              { backgroundColor: "transparent" },
+              { backgroundColor: globalStyles.textInputStyle.backgroundColor },
               animatedContainerStyle,
             ]}
           >
@@ -316,7 +317,10 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
                     underlineColor="transparent"
                     activeUnderlineColor="transparent"
                     style={styles.inlineInput}
-                    contentStyle={styles.inlineInputContent}
+                    contentStyle={[
+                      styles.inlineInputContent,
+                      { color: theme.colors.onSurface },
+                    ]}
                     theme={{ colors: { background: "transparent" } }}
                     outlineStyle={{ borderWidth: 0 }}
                   />
@@ -356,15 +360,19 @@ function RecoveryCodesModule(props: RecoveryCodesModuleType & Props) {
 
 const styles = StyleSheet.create({
   outlined: {
-    borderRadius: 8,
-    paddingHorizontal: 10,
+    alignItems: "flex-start",
+    justifyContent: "center",
+    width: "100%",
+    minHeight: 40,
+    paddingHorizontal: 12,
     paddingVertical: 6,
-    minHeight: 46,
+    overflow: "hidden",
   },
   inlineWrap: {
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
+    width: "100%",
     gap: 6,
   },
   chip: {
@@ -396,6 +404,7 @@ const styles = StyleSheet.create({
   },
   inlineInput: {
     minWidth: 110,
+    flexGrow: 1,
     backgroundColor: "transparent",
     paddingHorizontal: 0,
     paddingVertical: 0,

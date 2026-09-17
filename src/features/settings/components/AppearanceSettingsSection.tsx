@@ -104,7 +104,9 @@ const AppearanceSettingsSection: React.FC<Props> = ({
           <SettingsDropdownItem
             value={windowCornerStyle}
             setValue={(style) => {
-              setWindowCornerStyleSetting(style as "rounded" | "square");
+              setWindowCornerStyleSetting(
+                style as "rounded" | "soft" | "square",
+              );
             }}
             label={t("settings:windowCornerStyle")}
             info={{
@@ -116,6 +118,10 @@ const AppearanceSettingsSection: React.FC<Props> = ({
               {
                 label: t("settings:windowCornerRounded"),
                 value: "rounded",
+              },
+              {
+                label: t("settings:windowCornerSoft"),
+                value: "soft",
               },
               {
                 label: t("settings:windowCornerSquare"),

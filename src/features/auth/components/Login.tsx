@@ -1,6 +1,13 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
+import * as Progress from "react-native-progress";
 import { useTranslation } from "react-i18next";
 import Animated, {
   Easing,
@@ -23,6 +30,12 @@ import Logo from "../../../shared/ui/Logo";
 
 import getEmptyData from "../../vault/utils/getEmptyData";
 import { logger } from "../../../infrastructure/logging/logger";
+import PasswordStrengthLevel from "../../analysis/model/PasswordStrengthLevel";
+import {
+  computeEntropyBitsForUi,
+  entropyToProgress,
+  entropyToStrength,
+} from "../../vault/utils/entropyUi";
 
 import {
   authenticateUser,
@@ -67,6 +80,41 @@ function Login(props: Props) {
 
   const [masterPassword, setMasterPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
+
+  const masterPasswordStrength = useMemo(() => {
+    const entropyBits = computeEntropyBitsForUi(masterPassword);
+    const strength = entropyToStrength(entropyBits);
+
+    return {
+      entropyBits,
+      progress: entropyToProgress(entropyBits),
+      strength,
+    };
+  }, [masterPassword]);
+
+  const getStrengthColor = useCallback(
+    (strength: PasswordStrengthLevel) => {
+      if (strength === PasswordStrengthLevel.WEAK) return theme.colors.error;
+      if (strength === PasswordStrengthLevel.MEDIUM)
+        return theme.colors.warning;
+      return theme.colors.success;
+    },
+    [theme.colors.error, theme.colors.success, theme.colors.warning],
+  );
+
+  const masterPasswordStrengthColor = getStrengthColor(
+    masterPasswordStrength.strength,
+  );
+  const masterPasswordEntered = masterPassword.length > 0;
+  const masterPasswordIsStrongEnough =
+    masterPasswordEntered &&
+    masterPasswordStrength.strength !== PasswordStrengthLevel.WEAK;
+  const masterPasswordConfirmMismatch =
+    newPasswordConfirm.length > 0 && masterPassword !== newPasswordConfirm;
+  const canCreateVault =
+    masterPasswordIsStrongEnough &&
+    newPasswordConfirm.length > 0 &&
+    !masterPasswordConfirmMismatch;
 
   const [
     isUsingAuthenticationButtonVisible,
@@ -255,6 +303,10 @@ function Login(props: Props) {
 
   const newMasterPassword = useCallback(async () => {
     try {
+      if (!canCreateVault) {
+        return;
+      }
+
       if (
         !(
           masterPassword === newPasswordConfirm &&
@@ -293,6 +345,7 @@ function Login(props: Props) {
     auth,
     masterPassword,
     newPasswordConfirm,
+    canCreateVault,
     provider,
     vault,
     writeVaultJson,
@@ -373,17 +426,84 @@ function Login(props: Props) {
                   textInputNewConfirmRef.current?.focus?.()
                 }
               />
+              {masterPasswordEntered ? (
+                <Animated.View
+                  layout={contentTransition}
+                  style={{ width: "100%", gap: 6, paddingHorizontal: 2 }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: 10,
+                    }}
+                  >
+                    <Text
+                      variant="bodySmall"
+                      style={{ color: theme.colors.onSurfaceVariant }}
+                    >
+                      {t("login:masterPasswordStrength")}
+                    </Text>
+                    <Text
+                      variant="bodySmall"
+                      style={{
+                        color: masterPasswordStrengthColor,
+                        fontWeight: "600",
+                      }}
+                    >
+                      {t(
+                        `analysis:${masterPasswordStrength.strength.toLowerCase()}`,
+                      )}
+                    </Text>
+                  </View>
+                  <Progress.Bar
+                    progress={masterPasswordStrength.progress}
+                    color={masterPasswordStrengthColor}
+                    width={null}
+                    borderWidth={0}
+                    unfilledColor={theme.colors.outlineVariant}
+                    height={4}
+                  />
+                  <Text
+                    variant="bodySmall"
+                    style={{
+                      color: masterPasswordIsStrongEnough
+                        ? theme.colors.onSurfaceVariant
+                        : theme.colors.error,
+                    }}
+                  >
+                    {masterPasswordIsStrongEnough
+                      ? t("login:masterPasswordStrongEnoughHint")
+                      : t("login:masterPasswordWeakHint")}
+                  </Text>
+                </Animated.View>
+              ) : null}
               <PasswordTextbox
                 textInputRef={textInputNewConfirmRef}
                 setCapsLock={setCapsLock}
                 setValue={setNewPasswordConfirm}
                 value={newPasswordConfirm}
                 placeholder={t("login:confirmMasterPassword")}
+                onSubmitEditing={() => {
+                  if (canCreateVault) void newMasterPassword();
+                }}
               />
+              {masterPasswordConfirmMismatch ? (
+                <Animated.View layout={contentTransition}>
+                  <Text
+                    variant="bodySmall"
+                    style={{ color: theme.colors.error }}
+                  >
+                    {t("login:masterPasswordMismatch")}
+                  </Text>
+                </Animated.View>
+              ) : null}
             </Animated.View>
             <Button
               text={t("login:setNewPassword")}
               onPress={newMasterPassword}
+              disabled={!canCreateVault}
             />
           </>
         ) : !fetchError ? (

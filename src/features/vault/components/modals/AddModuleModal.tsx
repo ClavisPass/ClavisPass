@@ -4,7 +4,6 @@ import {
   View,
   ScrollView,
   Dimensions,
-  StyleSheet,
   Platform,
 } from "react-native";
 import { Searchbar, Text, IconButton } from "react-native-paper";
@@ -13,6 +12,7 @@ import ModulesEnum from "../../model/ModulesEnum";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import AppIcon from "../../../../shared/components/icons/AppIcon";
 import AppChip from "../../../../shared/components/chips/AppChip";
+import ModalSurface from "../../../../shared/components/modals/ModalSurface";
 
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
@@ -613,16 +613,12 @@ export default function AddModuleModalCompactFav(props: Props) {
 
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
-      <View
-        style={{
-          width: containerWidth,
-          height: containerMaxHeight,
-          padding: 8,
-          gap: 8,
-          borderWidth: StyleSheet.hairlineWidth,
-          borderColor: theme.colors.outlineVariant,
-          borderRadius: 12,
-        }}
+      <ModalSurface
+        width={containerWidth}
+        height={containerMaxHeight}
+        maxHeight={containerMaxHeight}
+        padded={false}
+        contentStyle={{ flex: 1, padding: 8, gap: 8 }}
       >
         <Searchbar
           inputStyle={{ height: 40, minHeight: 40 }}
@@ -709,7 +705,7 @@ export default function AddModuleModalCompactFav(props: Props) {
             );
           })}
         </ScrollView>
-      </View>
+      </ModalSurface>
     </Modal>
   );
 }

@@ -3,7 +3,6 @@ import { StyleSheet, View } from "react-native";
 import {
   Divider,
   IconButton,
-  Portal,
   Switch,
   Text,
   TextInput,
@@ -13,6 +12,7 @@ import { Slider } from "@react-native-assets/slider";
 import generatePassword from "../../utils/generatePassword";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
 import Modal from "../../../../shared/components/modals/Modal";
+import ModalSurface from "../../../../shared/components/modals/ModalSurface";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import Button from "../../../../shared/components/buttons/Button";
 import { useTranslation } from "react-i18next";
@@ -38,7 +38,7 @@ type Props = {
 
 function PasswordGeneratorModal(props: Props) {
   const { globalStyles, theme } = useTheme();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [valueSlider, setvalueSlider] = useState(20);
 
   const [upperInclude, setupperInclude] = useState(true);
@@ -47,12 +47,12 @@ function PasswordGeneratorModal(props: Props) {
 
   const generate = () => {
     setGenPassword(
-      generatePassword(valueSlider, upperInclude, numberInclude, symbolInclude)
+      generatePassword(valueSlider, upperInclude, numberInclude, symbolInclude),
     );
   };
 
   const [genPassword, setGenPassword] = useState(
-    generatePassword(valueSlider, upperInclude, numberInclude, symbolInclude)
+    generatePassword(valueSlider, upperInclude, numberInclude, symbolInclude),
   );
 
   useEffect(() => {
@@ -61,124 +61,117 @@ function PasswordGeneratorModal(props: Props) {
 
   const hideModal = () => props.setVisible(false);
   return (
-    <Portal>
-      <Modal visible={props.visible} onDismiss={hideModal}>
-          <View
-            style={{
-              backgroundColor: theme.colors?.background,
-              padding: 8,
-              borderRadius: 12,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderWidth: StyleSheet.hairlineWidth,
-              borderColor: theme.colors.outlineVariant,
-              width: 300,
+    <Modal visible={props.visible} onDismiss={hideModal}>
+      <ModalSurface
+        width={320}
+        contentStyle={{
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 0,
+        }}
+      >
+        <View style={{ width: "100%", height: 40, marginBottom: 8 }}>
+          <TextInput
+            outlineStyle={[globalStyles.outlineStyle]}
+            style={[globalStyles.textInputStyle, { textAlign: "center" }]}
+            value={genPassword}
+            mode="outlined"
+            autoCapitalize="none"
+            readOnly={true}
+          />
+        </View>
+        <Divider
+          style={{ marginBottom: 0, marginTop: 0, height: 1, width: "100%" }}
+        />
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            height: 40,
+          }}
+        >
+          <IconButton
+            iconColor={theme.colors.primary}
+            icon="autorenew"
+            size={20}
+            onPress={generate}
+          />
+          <Slider
+            value={valueSlider}
+            onValueChange={setvalueSlider}
+            onSlidingComplete={generate}
+            style={{ width: 200, height: 40 }}
+            minimumValue={1}
+            maximumValue={50}
+            step={1}
+            minimumTrackTintColor="lightgray"
+            maximumTrackTintColor="lightgray"
+            thumbTintColor={theme.colors.primary}
+          />
+          <CopyToClipboard value={genPassword} />
+        </View>
+        <Divider
+          style={{ marginBottom: 0, marginTop: 0, height: 1, width: "100%" }}
+        />
+        <View style={styles.container}>
+          <Text style={{ userSelect: "none" }} variant="bodyLarge">
+            {t("common:passwordLength")}
+          </Text>
+          <Text style={{ userSelect: "none" }} variant="bodyLarge">
+            {valueSlider}
+          </Text>
+        </View>
+        <Divider
+          style={{ marginBottom: 0, marginTop: 0, height: 1, width: "100%" }}
+        />
+        <View style={styles.container}>
+          <Text variant="bodyLarge">{t("common:includeUppercase")}</Text>
+          <Switch
+            value={upperInclude}
+            onValueChange={() => {
+              setupperInclude(!upperInclude);
             }}
-          >
-            <View style={{ width: "100%", height: 40, marginBottom: 8 }}>
-              <TextInput
-                outlineStyle={[globalStyles.outlineStyle]}
-                style={[globalStyles.textInputStyle, { textAlign: "center" }]}
-                value={genPassword}
-                mode="outlined"
-                autoCapitalize="none"
-                readOnly={true}
-              />
-            </View>
-            <Divider
-              style={{ marginBottom: 0, marginTop: 0, height: 1, width: 270 }}
-            />
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                height: 40,
-              }}
-            >
-              <IconButton
-                iconColor={theme.colors.primary}
-                icon="autorenew"
-                size={20}
-                onPress={generate}
-              />
-              <Slider
-                value={valueSlider}
-                onValueChange={setvalueSlider}
-                onSlidingComplete={generate}
-                style={{ width: 200, height: 40 }}
-                minimumValue={1}
-                maximumValue={50}
-                step={1}
-                minimumTrackTintColor="lightgray"
-                maximumTrackTintColor="lightgray"
-                thumbTintColor={theme.colors.primary}
-              />
-              <CopyToClipboard value={genPassword} />
-            </View>
-            <Divider
-              style={{ marginBottom: 0, marginTop: 0, height: 1, width: 270 }}
-            />
-            <View style={styles.container}>
-              <Text style={{ userSelect: "none" }} variant="bodyLarge">
-                {t("common:passwordLength")}
-              </Text>
-              <Text style={{ userSelect: "none" }} variant="bodyLarge">
-                {valueSlider}
-              </Text>
-            </View>
-            <Divider
-              style={{ marginBottom: 0, marginTop: 0, height: 1, width: 270 }}
-            />
-            <View style={styles.container}>
-              <Text variant="bodyLarge">{t("common:includeUppercase")}</Text>
-              <Switch
-                value={upperInclude}
-                onValueChange={() => {
-                  setupperInclude(!upperInclude);
-                }}
-              />
-            </View>
-            <Divider
-              style={{ marginBottom: 0, marginTop: 0, height: 1, width: 270 }}
-            />
-            <View style={styles.container}>
-              <Text style={{ userSelect: "none" }} variant="bodyLarge">
-                {t("common:includeNumbers")}
-              </Text>
-              <Switch
-                value={numberInclude}
-                onValueChange={() => setNumberInclude(!numberInclude)}
-              />
-            </View>
-            <Divider
-              style={{ marginBottom: 0, marginTop: 0, height: 1, width: 270 }}
-            />
-            <View style={styles.container}>
-              <Text style={{ userSelect: "none" }} variant="bodyLarge">
-                {t("common:includeSymbols")}
-              </Text>
-              <Switch
-                value={symbolInclude}
-                onValueChange={() => setSymbolInclude(!symbolInclude)}
-              />
-            </View>
-            <Divider
-              style={{ marginBottom: 8, marginTop: 0, height: 1, width: 270 }}
-            />
-            <Button
-              maxWidth={300}
-              text={t("common:use")}
-              onPress={() => {
-                props.changePassword(genPassword);
-                hideModal();
-              }}
-              color={theme.colors.primary}
-            />
-          </View>
-      </Modal>
-    </Portal>
+          />
+        </View>
+        <Divider
+          style={{ marginBottom: 0, marginTop: 0, height: 1, width: "100%" }}
+        />
+        <View style={styles.container}>
+          <Text style={{ userSelect: "none" }} variant="bodyLarge">
+            {t("common:includeNumbers")}
+          </Text>
+          <Switch
+            value={numberInclude}
+            onValueChange={() => setNumberInclude(!numberInclude)}
+          />
+        </View>
+        <Divider
+          style={{ marginBottom: 0, marginTop: 0, height: 1, width: "100%" }}
+        />
+        <View style={styles.container}>
+          <Text style={{ userSelect: "none" }} variant="bodyLarge">
+            {t("common:includeSymbols")}
+          </Text>
+          <Switch
+            value={symbolInclude}
+            onValueChange={() => setSymbolInclude(!symbolInclude)}
+          />
+        </View>
+        <Divider
+          style={{ marginBottom: 8, marginTop: 0, height: 1, width: "100%" }}
+        />
+        <Button
+          maxWidth={300}
+          text={t("common:use")}
+          onPress={() => {
+            props.changePassword(genPassword);
+            hideModal();
+          }}
+          color={theme.colors.primary}
+        />
+      </ModalSurface>
+    </Modal>
   );
 }
 

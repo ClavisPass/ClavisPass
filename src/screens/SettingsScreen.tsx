@@ -36,6 +36,7 @@ import {
 } from "../features/auth/utils/authenticateUser";
 import { useAuth } from "../app/providers/AuthProvider";
 import ChangeMasterPasswordModal from "../features/settings/components/modals/ChangeMasterPasswordModal";
+import BrowserExtensionsModal from "../features/settings/components/modals/BrowserExtensionsModal";
 import SettingsDivider from "../features/settings/components/SettingsDivider";
 import SettingsContainer from "../features/settings/components/SettingsContainer";
 import SettingsItem from "../features/settings/components/SettingsItem";
@@ -179,9 +180,7 @@ const webDragStyle =
       } as any)
     : null;
 const webDragRegionProps =
-  Platform.OS === "web"
-    ? ({ dataSet: { tauriDragRegion: "" } } as any)
-    : null;
+  Platform.OS === "web" ? ({ dataSet: { tauriDragRegion: "" } } as any) : null;
 
 const normalizeSettingsSearch = (value: string) =>
   value
@@ -324,6 +323,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const [showChangeMasterPasswordModal, setShowChangeMasterPasswordModal] =
     useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showBrowserExtensionsModal, setShowBrowserExtensionsModal] =
+    useState(false);
   const [resetAction, setResetAction] = useState<ResetAction | null>(null);
 
   const scrollRef = useRef<ScrollView>(null);
@@ -1109,9 +1110,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               ? TITLEBAR_CONTROLS_WIDTH
               : 0) + (isCompactHeader && searchHeaderVisible ? 4 : 0),
           paddingRight:
-            (Platform.OS === "web" &&
-            TITLEBAR_HEIGHT > 0 &&
-            !controlsLeft
+            (Platform.OS === "web" && TITLEBAR_HEIGHT > 0 && !controlsLeft
               ? 104
               : 0) + (isCompactHeader && searchHeaderVisible ? 4 : 0),
           gap: 8,
@@ -1200,9 +1199,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ) : (
           <Animated.View
             id="settings-header-title-drag-region"
-            {...(isFocused && !searchHeaderVisible
-              ? webDragRegionProps
-              : null)}
+            {...(isFocused && !searchHeaderVisible ? webDragRegionProps : null)}
             entering={FadeInLeft.duration(180).easing(settingsSearchTransition)}
             exiting={FadeOutLeft.duration(120).easing(settingsSearchTransition)}
             layout={Layout.duration(180).easing(settingsSearchTransition)}
@@ -1604,30 +1601,18 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               >
                 <SettingsItem
                   onPress={() => {
+                    setShowBrowserExtensionsModal(true);
+                  }}
+                >
+                  {t("settings:browserExtensionOpenOptions")}
+                </SettingsItem>
+                <SettingsDivider />
+                <SettingsItem
+                  onPress={() => {
                     navigation.navigate("BrowserExtensions");
                   }}
                 >
                   {t("settings:browserExtensionSettingsItem")}
-                </SettingsItem>
-                <SettingsDivider />
-                <SettingsItem
-                  leadingIcon="google-chrome"
-                  rightIcon="open-in-new"
-                  onPress={() => {
-                    openURL(CHROME_EXTENSION_URL);
-                  }}
-                >
-                  {t("settings:browserExtensionChromeStore")}
-                </SettingsItem>
-                <SettingsDivider />
-                <SettingsItem
-                  leadingIcon="firefox"
-                  rightIcon="open-in-new"
-                  onPress={() => {
-                    openURL(FIREFOX_EXTENSION_URL);
-                  }}
-                >
-                  {t("settings:browserExtensionFirefoxStore")}
                 </SettingsItem>
               </SettingsContainer>
             ) : null}
@@ -1846,6 +1831,16 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         <ChangeMasterPasswordModal
           visible={showChangeMasterPasswordModal}
           setVisible={setShowChangeMasterPasswordModal}
+        />
+        <BrowserExtensionsModal
+          visible={showBrowserExtensionsModal}
+          onDismiss={() => setShowBrowserExtensionsModal(false)}
+          onOpenChromeStore={() => {
+            openURL(CHROME_EXTENSION_URL);
+          }}
+          onOpenFirefoxStore={() => {
+            openURL(FIREFOX_EXTENSION_URL);
+          }}
         />
         <Modal
           visible={showImportModal}

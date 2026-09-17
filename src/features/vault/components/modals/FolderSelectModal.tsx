@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import Modal from "../../../../shared/components/modals/Modal";
+import ModalSurface from "../../../../shared/components/modals/ModalSurface";
 import FolderType from "../../model/FolderType";
 import {
   DEFAULT_FOLDER_ICON,
@@ -33,17 +34,20 @@ function FolderSelectModal(props: Props) {
   const { height } = useWindowDimensions();
   const hasMatchingSelectedFolder = Boolean(
     props.selectedFolder &&
-      props.folders.some((folder) => folder.id === props.selectedFolder?.id),
+    props.folders.some((folder) => folder.id === props.selectedFolder?.id),
   );
 
   const hideModal = () => props.setVisible(false);
-  const modalHeight = height > 760 ? 420 : 320;
+  const modalHeight = Math.min(
+    height > 760 ? 420 : 320,
+    Math.max(260, height - 96),
+  );
 
   const renderFolderItem = (
     label: string,
     onPress: () => void,
     selected: boolean,
-    folder?: FolderType | null
+    folder?: FolderType | null,
   ) => (
     <AnimatedPressable
       onPress={() => {
@@ -69,7 +73,11 @@ function FolderSelectModal(props: Props) {
           <AppIcon
             name={folder ? getFolderIcon(folder) : DEFAULT_FOLDER_ICON}
             size={20}
-            color={folder ? getFolderColor(folder) ?? theme.colors.primary : theme.colors.primary}
+            color={
+              folder
+                ? (getFolderColor(folder) ?? theme.colors.primary)
+                : theme.colors.primary
+            }
           />
           <Text variant="bodyLarge" numberOfLines={1}>
             {label}
@@ -84,23 +92,13 @@ function FolderSelectModal(props: Props) {
 
   return (
     <Modal visible={props.visible} onDismiss={hideModal}>
-      <View
-        style={[
-          styles.container,
-          {
-            height: modalHeight,
-            backgroundColor: theme.colors.elevation.level2,
-            borderColor: theme.colors.outlineVariant,
-          },
-        ]}
+      <ModalSurface
+        width={340}
+        height={modalHeight}
+        title={t("common:selectFolder")}
+        description={t("common:selectFolderDescription")}
+        contentStyle={styles.surfaceContent}
       >
-        <View style={styles.header}>
-          <Text variant="titleLarge">{t("common:selectFolder")}</Text>
-          <Text variant="bodyMedium" style={{ opacity: 0.72 }}>
-            {t("common:selectFolderDescription")}
-          </Text>
-        </View>
-
         <ScrollView
           style={{ width: "100%" }}
           contentContainerStyle={[
@@ -113,36 +111,26 @@ function FolderSelectModal(props: Props) {
             t("common:none"),
             () => props.onSelectFolder(null),
             !hasMatchingSelectedFolder,
-            null
+            null,
           )}
           {props.folders.map((folder) =>
             renderFolderItem(
               folder.name,
               () => props.onSelectFolder(folder),
               props.selectedFolder?.id === folder.id,
-              folder
-            )
+              folder,
+            ),
           )}
         </ScrollView>
-      </View>
+      </ModalSurface>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 18,
-    alignItems: "stretch",
-    justifyContent: "center",
-    flexDirection: "column",
-    width: 340,
-    gap: 12,
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  header: {
-    gap: 4,
-    paddingBottom: 2,
+  surfaceContent: {
+    flex: 1,
+    paddingTop: 0,
   },
   listContent: {
     gap: 8,

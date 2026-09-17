@@ -108,6 +108,8 @@ const de: TranslationSchema = {
     manageFoldersDescription:
       "Hier kannst du Ordner anlegen, sortieren und löschen.",
     foldersEmpty: "Noch keine Ordner hinzugefügt.",
+    folderIcon: "Icon",
+    folderColor: "Farbe",
     selectedItem: "Ausgewählter Eintrag",
     edit: "Bearbeiten",
     fastAccess: "Fast Access",
@@ -129,6 +131,11 @@ const de: TranslationSchema = {
     masterPassword: "Master Passwort",
     newMasterPassword: "Neues Passwort",
     confirmMasterPassword: "Bestätigen",
+    masterPasswordStrength: "Stärke des Master-Passworts",
+    masterPasswordWeakHint:
+      "Wähle ein stärkeres Master-Passwort, bevor du den Vault erstellst.",
+    masterPasswordStrongEnoughHint: "Stark genug zum Fortfahren.",
+    masterPasswordMismatch: "Die Bestätigung stimmt nicht überein.",
     login: "Anmelden",
     setNewPassword: "Neues Passwort festlegen",
     noBackupFound: "Kein lokales Backup gefunden",
@@ -251,6 +258,7 @@ const de: TranslationSchema = {
     windowControlsRight: "Klassisch",
     windowCornerStyle: "Fensterecken",
     windowCornerRounded: "Abgerundet",
+    windowCornerSoft: "Stärker abgerundet",
     windowCornerSquare: "Eckig",
     dateFormat: "Datumsformat",
     timeFormat: "Zeitformat",
@@ -320,6 +328,9 @@ const de: TranslationSchema = {
     encryption: "Verschlüsselung",
     keyDerivation: "Schlüsselableitung",
     browserExtensions: "Browser-Erweiterungen",
+    browserExtensionOpenOptions: "Browser-Erweiterungen einrichten",
+    browserExtensionModalHint:
+      "Installiere die Erweiterung für deinen Browser.",
     browserExtensionSettingsItem: "Browser-Zugriff verwalten",
     browserExtensionChromeStore: "Chrome-Erweiterung installieren",
     browserExtensionFirefoxStore: "Firefox-Erweiterung installieren",
