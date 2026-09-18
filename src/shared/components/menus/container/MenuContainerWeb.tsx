@@ -6,7 +6,7 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from "react-native";
-import { Portal } from "react-native-paper";
+import { createPortal } from "react-dom";
 import Animated, {
   Easing,
   Extrapolate,
@@ -17,6 +17,7 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
+import type { MenuAnchorRect } from "../Menu";
 
 type Props = {
   children: ReactNode;
@@ -26,6 +27,7 @@ type Props = {
   positionY: number;
   /** Optional: X-Position; wenn nicht gesetzt, wird right: 4 verwendet */
   positionX?: number;
+  anchorRect?: MenuAnchorRect | null;
   /** Optional: Menübreite */
   width?: number;
   /** Abstand unter dem Button */
@@ -38,6 +40,7 @@ function MenuContainerWeb({
   onDismiss,
   positionY,
   positionX,
+  anchorRect,
   width,
   offsetY = 6,
 }: Props) {
@@ -45,25 +48,40 @@ function MenuContainerWeb({
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
   const opensUpward = offsetY < 0;
   const viewportPadding = 8;
+  const portalContainer =
+    typeof document !== "undefined"
+      ? (document.getElementById("dropdown-layer") ?? document.body)
+      : null;
   const [menuSize, setMenuSize] = useState({ width: width ?? 180, height: 0 });
   const resolvedWidth = width ?? menuSize.width;
   const resolvedLeft = useMemo(() => {
-    if (typeof positionX !== "number") return undefined;
+    const anchorX = anchorRect?.x ?? positionX;
+    if (typeof anchorX !== "number") return undefined;
 
-    return Math.min(
-      Math.max(viewportPadding, positionX),
-      Math.max(viewportPadding, windowWidth - resolvedWidth - viewportPadding),
-    );
-  }, [positionX, resolvedWidth, windowWidth]);
+    const desiredLeft = Math.max(viewportPadding, anchorX);
+    const maxLeft = windowWidth - resolvedWidth - viewportPadding;
+    if (desiredLeft + resolvedWidth <= windowWidth - viewportPadding) {
+      return desiredLeft;
+    }
+
+    return Math.max(viewportPadding, maxLeft);
+  }, [anchorRect?.x, positionX, resolvedWidth, windowWidth]);
   const resolvedTop = useMemo(() => {
-    const desiredTop = positionY + offsetY;
+    const anchorBottom =
+      anchorRect && typeof anchorRect.y === "number"
+        ? anchorRect.y + anchorRect.height
+        : positionY;
+    const desiredTop = anchorBottom + offsetY;
     if (menuSize.height <= 0) return Math.max(viewportPadding, desiredTop);
 
     return Math.min(
       Math.max(viewportPadding, desiredTop),
-      Math.max(viewportPadding, windowHeight - menuSize.height - viewportPadding),
+      Math.max(
+        viewportPadding,
+        windowHeight - menuSize.height - viewportPadding,
+      ),
     );
-  }, [menuSize.height, offsetY, positionY, windowHeight]);
+  }, [anchorRect, menuSize.height, offsetY, positionY, windowHeight]);
 
   const handleLayout = (event: LayoutChangeEvent) => {
     const { height, width: measuredWidth } = event.nativeEvent.layout;
@@ -96,7 +114,7 @@ function MenuContainerWeb({
         { duration: 140, easing: Easing.bezier(0.2, 0.8, 0.2, 1) },
         (finished) => {
           if (finished) runOnJS(setMounted)(false);
-        }
+        },
       );
     }
   }, [visible]);
@@ -107,13 +125,13 @@ function MenuContainerWeb({
       progress.value,
       [0, 1],
       [hiddenTranslateY, 0],
-      Extrapolate.CLAMP
+      Extrapolate.CLAMP,
     );
     const opacity = interpolate(
       progress.value,
       [0, 1],
       [0, 1],
-      Extrapolate.CLAMP
+      Extrapolate.CLAMP,
     );
     return {
       transform: [{ translateY }],
@@ -121,10 +139,10 @@ function MenuContainerWeb({
     };
   });
 
-  if (!mounted) return null;
+  if (!mounted || !portalContainer) return null;
 
-  return (
-    <Portal>
+  return createPortal(
+    <>
       <View style={StyleSheet.absoluteFill} pointerEvents="auto">
         <Pressable style={{ flex: 1 }} onPress={onDismiss} />
       </View>
@@ -147,11 +165,13 @@ function MenuContainerWeb({
           onLayout={handleLayout}
           style={{
             overflow: "hidden",
-            backgroundColor: theme.colors?.elevation?.level3 ?? "white",
-            borderRadius: 20,
+            backgroundColor: theme.colors.background,
+            borderRadius: 12,
             minWidth: 180,
+            maxWidth: Math.min(340, windowWidth - viewportPadding * 2),
+            maxHeight: Math.max(120, windowHeight - viewportPadding * 2),
             ...(width ? { width } : null),
-            boxShadow: theme.colors?.shadow ?? "0px 6px 18px rgba(0,0,0,0.15)",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
             elevation: 6,
             display: "flex",
             flexDirection: "column",
@@ -159,10 +179,13 @@ function MenuContainerWeb({
             borderColor: theme.colors.outlineVariant,
           }}
         >
-          {children}
+          <View style={{ maxHeight: "100%" as any, overflow: "auto" as any }}>
+            {children}
+          </View>
         </View>
       </Animated.View>
-    </Portal>
+    </>,
+    portalContainer,
   );
 }
 

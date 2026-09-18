@@ -1,10 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View, Keyboard } from "react-native";
-import { Button, IconButton, Portal, Text, TextInput } from "react-native-paper";
-import { Dropdown, DropdownInputProps } from "react-native-paper-dropdown";
+import {
+  Button,
+  IconButton,
+  Portal,
+  Text,
+  TextInput,
+} from "react-native-paper";
 
 import { useTheme } from "../../../../app/providers/ThemeProvider";
+import AdaptiveDropdown from "../../../../shared/components/dropdowns/AdaptiveDropdown";
+import DropdownTextInputTrigger from "../../../../shared/components/dropdowns/DropdownTextInputTrigger";
 import CopyToClipboard from "../../../../shared/components/buttons/CopyToClipboard";
 import Modal from "../../../../shared/components/modals/Modal";
 import { useExclusiveSecretReveal } from "../../../../shared/hooks/useExclusiveSecretReveal";
@@ -31,19 +38,6 @@ function WifiModule(props: WifiModuleType & Props) {
     { label: t("common:none"), value: "visible" },
     { label: t("modules:wifiHidden"), value: "hidden" },
   ];
-
-  const CustomDropdownInput = ({
-    selectedLabel,
-    rightIcon,
-  }: DropdownInputProps) => (
-    <TextInput
-      outlineStyle={[globalStyles.outlineStyle]}
-      style={[globalStyles.textInputStyle, { minWidth: 0, width: "100%" }]}
-      mode="outlined"
-      value={selectedLabel}
-      right={rightIcon}
-    />
-  );
 
   const [visible, setVisible] = useState(false);
 
@@ -216,23 +210,23 @@ function WifiModule(props: WifiModuleType & Props) {
               <Text variant="bodyMedium" style={{ opacity: 0.72 }}>
                 {t("modules:wifiSecurity")}
               </Text>
-              <Dropdown
-                CustomDropdownInput={CustomDropdownInput}
-                menuContentStyle={{
-                  borderRadius: 12,
-                  backgroundColor: theme.colors.background,
-                  boxShadow: theme.colors.shadow,
-                  overflow: "hidden",
-                }}
-                mode="flat"
-                hideMenuHeader
+              <AdaptiveDropdown
                 options={OPTIONS}
                 value={wifiType}
-                onSelect={(value?: string) => {
+                setValue={(value) => {
                   if (value === "WPA" || value === "WEP" || value === "blank") {
                     setWifiType(value);
                   }
                 }}
+                dropdownMaxWidth={300}
+                renderTrigger={({ selectedLabel, open }) => (
+                  <DropdownTextInputTrigger
+                    value={selectedLabel}
+                    onPress={open}
+                    outlineStyle={[globalStyles.outlineStyle]}
+                    inputStyle={globalStyles.textInputStyle}
+                  />
+                )}
               />
             </View>
 
@@ -240,19 +234,10 @@ function WifiModule(props: WifiModuleType & Props) {
               <Text variant="bodyMedium" style={{ opacity: 0.72 }}>
                 {t("modules:wifiVisibility")}
               </Text>
-              <Dropdown
-                CustomDropdownInput={CustomDropdownInput}
-                menuContentStyle={{
-                  borderRadius: 12,
-                  backgroundColor: theme.colors.background,
-                  boxShadow: theme.colors.shadow,
-                  overflow: "hidden",
-                }}
-                mode="flat"
-                hideMenuHeader
+              <AdaptiveDropdown
                 options={HIDDEN_OPTIONS}
                 value={hidden ? "hidden" : "visible"}
-                onSelect={(next?: string) => {
+                setValue={(next) => {
                   if (next === "hidden") {
                     setHidden(true);
                     return;
@@ -261,6 +246,15 @@ function WifiModule(props: WifiModuleType & Props) {
                     setHidden(false);
                   }
                 }}
+                dropdownMaxWidth={300}
+                renderTrigger={({ selectedLabel, open }) => (
+                  <DropdownTextInputTrigger
+                    value={selectedLabel}
+                    onPress={open}
+                    outlineStyle={[globalStyles.outlineStyle]}
+                    inputStyle={globalStyles.textInputStyle}
+                  />
+                )}
               />
             </View>
 

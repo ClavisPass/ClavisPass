@@ -29,7 +29,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { getAppScheme } from "./src/shared/utils/appScheme";
 import MobileFastAccessOverlay from "./src/features/fastaccess/components/MobileFastAccessOverlay";
 import FastAccessSessionBridge from "./src/features/fastaccess/components/FastAccessSessionBridge";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import BrowserBridgeSessionSync from "./src/features/browserBridge/components/BrowserBridgeSessionSync";
 import BrowserBridgeWriteSync from "./src/features/browserBridge/components/BrowserBridgeWriteSync";
 import BrowserBridgePairingPrompt from "./src/features/browserBridge/components/BrowserBridgePairingPrompt";
@@ -265,27 +264,25 @@ function AppShell() {
               <BrowserBridgeWriteSync />
               <ExpiryNotificationScheduler />
               <DevModeProvider>
-                <BottomSheetModalProvider>
-                  <GlobalErrorSnackbar />
-                  <GlobalClipboardSnackbar />
-                  <VaultFileOpenHandler />
-                  <MobileFastAccessOverlay />
-                  <View style={{ flex: 1, backgroundColor: "transparent" }}>
-                    <View
-                      style={{
-                        borderRadius: windowCornerRadius,
-                        backgroundColor: theme.colors.background,
-                        overflow: "hidden",
-                        flex: 1,
-                      }}
-                    >
-                      <GlobalShortcuts />
-                      <CustomTitlebar />
-                      <NavigationContainer />
-                      <BrowserBridgePairingPrompt />
-                    </View>
+                <GlobalErrorSnackbar />
+                <GlobalClipboardSnackbar />
+                <VaultFileOpenHandler />
+                <MobileFastAccessOverlay />
+                <View style={{ flex: 1, backgroundColor: "transparent" }}>
+                  <View
+                    style={{
+                      borderRadius: windowCornerRadius,
+                      backgroundColor: theme.colors.background,
+                      overflow: "hidden",
+                      flex: 1,
+                    }}
+                  >
+                    <GlobalShortcuts />
+                    <CustomTitlebar />
+                    <NavigationContainer />
+                    <BrowserBridgePairingPrompt />
                   </View>
-                </BottomSheetModalProvider>
+                </View>
               </DevModeProvider>
             </VaultProvider>
           </CloudProvider>

@@ -1,5 +1,12 @@
-import React, { createContext, useState, useContext, ReactNode, useMemo } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useMemo,
+} from "react";
 import { PaperProvider } from "react-native-paper";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import lightTheme from "../../shared/ui/theme";
 import darkTheme from "../../shared/ui/theme-darkmode";
 import styles, { GlobalStyles } from "../../shared/ui/globalStyles";
@@ -69,7 +76,7 @@ export const ThemeProvider = ({ children }: Props) => {
     theme.colors.secondaryContainer,
     theme.colors.surfaceVariant,
     theme.colors.outlineVariant,
-    theme.colors.onSurface
+    theme.colors.onSurface,
   );
 
   const setDarkmode = (value: boolean) => {
@@ -96,7 +103,9 @@ export const ThemeProvider = ({ children }: Props) => {
         setTitlebarOverlayDragEnabled,
       }}
     >
-      <PaperProvider theme={theme}>{children}</PaperProvider>
+      <BottomSheetModalProvider>
+        <PaperProvider theme={theme}>{children}</PaperProvider>
+      </BottomSheetModalProvider>
     </ThemeContext.Provider>
   );
 };

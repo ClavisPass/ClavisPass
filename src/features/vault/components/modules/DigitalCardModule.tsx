@@ -1,16 +1,9 @@
 import Barcode from "@kichiyaki/react-native-barcode-generator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-  useCallback,
-} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View, StyleSheet } from "react-native";
-import { Button, TextInput } from "react-native-paper";
-import { DropdownInputProps } from "react-native-paper-dropdown";
+import { Button } from "react-native-paper";
 import QRCode from "react-qr-code";
 
 import { HomeStackParamList } from "../../../../app/navigation/model/types";
@@ -22,7 +15,6 @@ import DigitalCardType, {
 import { MODULE_ICON } from "../../model/ModuleIconsEnum";
 import Props from "../../model/ModuleProps";
 import DigitalCardModuleType from "../../model/modules/DigitalCardModuleType";
-
 
 import ModulesEnum from "../../model/ModulesEnum";
 import ModuleContainer from "../ModuleContainer";
@@ -71,24 +63,6 @@ function DigitalCardModule(
   const didMount = useRef(false);
   const { globalStyles, theme } = useTheme();
   const { t } = useTranslation();
-
-  const OPTIONS = useMemo(
-    () => DIGITAL_CARD_TYPES.map((t) => ({ label: t, value: t })),
-    [],
-  );
-
-  const CustomDropdownInput = useCallback(
-    ({ selectedLabel, rightIcon }: DropdownInputProps) => (
-      <TextInput
-        outlineStyle={[globalStyles.outlineStyle]}
-        style={globalStyles.textInputStyle}
-        mode="outlined"
-        value={selectedLabel}
-        right={rightIcon}
-      />
-    ),
-    [globalStyles],
-  );
 
   const [value, setValue] = useState(props.value);
   const [type, setType] = useState<DigitalCardType>(

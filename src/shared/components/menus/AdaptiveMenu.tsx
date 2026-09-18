@@ -9,7 +9,7 @@ import {
 } from "@gorhom/bottom-sheet";
 
 import { useTheme } from "../../../app/providers/ThemeProvider";
-import Menu from "./Menu";
+import Menu, { MenuAnchorRect } from "./Menu";
 import { MenuItem } from "./MenuItem";
 
 const ITEM_HEIGHT = 44;
@@ -28,6 +28,7 @@ type Props = {
   setVisible: (visible: boolean) => void;
   positionY: number;
   positionX?: number;
+  anchorRect?: MenuAnchorRect | null;
   offsetY?: number;
   items: AdaptiveMenuItem[];
   topContent?: React.ReactNode;
@@ -51,7 +52,7 @@ function AdaptiveMenu(props: Props) {
 
   const enabledItems = React.useMemo(
     () => props.items.filter((item) => !item.disabled).length,
-    [props.items]
+    [props.items],
   );
 
   const snapPoints = React.useMemo<(string | number)[]>(() => {
@@ -83,7 +84,7 @@ function AdaptiveMenu(props: Props) {
         pressBehavior="close"
       />
     ),
-    []
+    [],
   );
 
   React.useEffect(() => {
@@ -100,6 +101,7 @@ function AdaptiveMenu(props: Props) {
         onDismiss={close}
         positionY={props.positionY}
         positionX={props.positionX}
+        anchorRect={props.anchorRect}
         offsetY={props.offsetY}
       >
         <>
@@ -122,7 +124,9 @@ function AdaptiveMenu(props: Props) {
               >
                 {item.label}
               </MenuItem>
-              {(item.withDivider ?? index < props.items.length - 1) ? <Divider /> : null}
+              {(item.withDivider ?? index < props.items.length - 1) ? (
+                <Divider />
+              ) : null}
             </View>
           ))}
         </>
@@ -179,7 +183,9 @@ function AdaptiveMenu(props: Props) {
               {item.label}
             </MenuItem>
             {(item.withDivider ?? index < props.items.length - 1) ? (
-              <Divider style={{ backgroundColor: theme.colors.outlineVariant }} />
+              <Divider
+                style={{ backgroundColor: theme.colors.outlineVariant }}
+              />
             ) : null}
           </View>
         ))}

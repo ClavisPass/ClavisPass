@@ -1,6 +1,5 @@
 import { InteractionManager, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
-import { Dropdown, DropdownInputProps } from "react-native-paper-dropdown";
 import Modal from "../../../../shared/components/modals/Modal";
 import ModalSurface, {
   ModalActions,
@@ -9,6 +8,8 @@ import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import { useTranslation } from "react-i18next";
 import type CustomFieldModuleType from "../../model/modules/CustomFieldModuleType";
+import AdaptiveDropdown from "../../../../shared/components/dropdowns/AdaptiveDropdown";
+import DropdownTextInputTrigger from "../../../../shared/components/dropdowns/DropdownTextInputTrigger";
 
 type CustomFieldInputType = NonNullable<CustomFieldModuleType["inputType"]>;
 
@@ -34,19 +35,6 @@ function EditCustomFieldModal(props: Props) {
     { label: t("modules:customFieldTypeNumber"), value: "number" },
     { label: t("modules:customFieldTypeDate"), value: "date" },
   ];
-
-  const CustomDropdownInput = ({
-    selectedLabel,
-    rightIcon,
-  }: DropdownInputProps) => (
-    <TextInput
-      outlineStyle={[globalStyles.outlineStyle]}
-      style={[globalStyles.textInputStyle, { minWidth: 0, width: "100%" }]}
-      mode="outlined"
-      value={selectedLabel}
-      right={rightIcon}
-    />
-  );
 
   useEffect(() => {
     if (!props.visible) return;
@@ -112,19 +100,10 @@ function EditCustomFieldModal(props: Props) {
           <Text variant="bodyMedium" style={{ opacity: 0.72 }}>
             {t("modules:customFieldType")}
           </Text>
-          <Dropdown
-            CustomDropdownInput={CustomDropdownInput}
-            menuContentStyle={{
-              borderRadius: 12,
-              backgroundColor: theme.colors.background,
-              boxShadow: theme.colors.shadow,
-              overflow: "hidden",
-            }}
-            mode="flat"
-            hideMenuHeader
+          <AdaptiveDropdown
             options={options}
             value={props.inputType}
-            onSelect={(next?: string) => {
+            setValue={(next) => {
               if (
                 next === "text" ||
                 next === "secret" ||
@@ -133,12 +112,21 @@ function EditCustomFieldModal(props: Props) {
               ) {
                 if (next === "number" && !/^\d*$/.test(props.value)) {
                   setTypeError(t("modules:customFieldNumberOnly"));
-                  return;
+                  return false;
                 }
                 setTypeError(null);
                 props.setInputType(next);
               }
             }}
+            dropdownMaxWidth={300}
+            renderTrigger={({ selectedLabel, open }) => (
+              <DropdownTextInputTrigger
+                value={selectedLabel}
+                onPress={open}
+                outlineStyle={[globalStyles.outlineStyle]}
+                inputStyle={globalStyles.textInputStyle}
+              />
+            )}
           />
           {typeError ? (
             <Text variant="bodySmall" style={{ color: theme.colors.error }}>

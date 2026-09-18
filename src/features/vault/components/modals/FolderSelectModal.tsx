@@ -44,12 +44,14 @@ function FolderSelectModal(props: Props) {
   );
 
   const renderFolderItem = (
+    key: string,
     label: string,
     onPress: () => void,
     selected: boolean,
     folder?: FolderType | null,
   ) => (
     <AnimatedPressable
+      key={key}
       onPress={() => {
         onPress();
         hideModal();
@@ -108,6 +110,7 @@ function FolderSelectModal(props: Props) {
           showsVerticalScrollIndicator={Platform.OS !== "web"}
         >
           {renderFolderItem(
+            "__none__",
             t("common:none"),
             () => props.onSelectFolder(null),
             !hasMatchingSelectedFolder,
@@ -115,6 +118,7 @@ function FolderSelectModal(props: Props) {
           )}
           {props.folders.map((folder) =>
             renderFolderItem(
+              folder.id,
               folder.name,
               () => props.onSelectFolder(folder),
               props.selectedFolder?.id === folder.id,

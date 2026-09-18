@@ -106,6 +106,7 @@ import {
 import PerfProfiler from "../shared/performance/PerfProfiler";
 import { triggerGlobalError } from "../infrastructure/events/errorBus";
 import { detectTauriEnvironment } from "../infrastructure/platform/isTauri";
+import type { MenuAnchorRect } from "../shared/components/menus/Menu";
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
@@ -180,9 +181,7 @@ const webDragStyle =
       } as any)
     : null;
 const webDragRegionProps =
-  Platform.OS === "web"
-    ? ({ dataSet: { tauriDragRegion: "" } } as any)
-    : null;
+  Platform.OS === "web" ? ({ dataSet: { tauriDragRegion: "" } } as any) : null;
 
 type HomeValueListItemProps = {
   item: ValuesType;
@@ -265,6 +264,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const [pullRefreshing, setPullRefreshing] = useState(false);
 
   const [showMenu, setShowMenu] = useState(false);
+  const sortChipRef = useRef<View>(null);
+  const expiryChipRef = useRef<View>(null);
+  const [sortMenuAnchor, setSortMenuAnchor] = useState<MenuAnchorRect | null>(
+    null,
+  );
+  const [expiryMenuAnchor, setExpiryMenuAnchor] =
+    useState<MenuAnchorRect | null>(null);
 
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [moduleFilterModalVisible, setModuleFilterModalVisible] =
@@ -278,6 +284,32 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const [systemAuthPromptVisible, setSystemAuthPromptVisible] = useState(false);
   const [homeContentVisible, setHomeContentVisible] = useState(true);
   const { provider, accessToken, ensureFreshAccessToken } = useToken();
+
+  const measureAnchor = (
+    ref: React.RefObject<View | null>,
+    setAnchor: (anchor: MenuAnchorRect | null) => void,
+    open: () => void,
+  ) => {
+    if (Platform.OS !== "web") {
+      open();
+      return;
+    }
+
+    ref.current?.measureInWindow?.((x, y, width, height) => {
+      setAnchor({ x, y, width, height });
+      open();
+    });
+  };
+
+  const openSortMenu = () => {
+    measureAnchor(sortChipRef, setSortMenuAnchor, () => setShowMenu(true));
+  };
+
+  const openExpiryMenu = () => {
+    measureAnchor(expiryChipRef, setExpiryMenuAnchor, () =>
+      setExpiryModalVisible(true),
+    );
+  };
 
   const saveSelectedFavState = useCallback(
     (fav: boolean) => {
@@ -1077,25 +1109,29 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       >
         {t("home:editFolders")}
       </AppChip>
-      <AppChip
-        compact
-        icon="sort-variant"
-        onPress={() => setShowMenu(true)}
-        style={actionChipStyle}
-        textStyle={actionChipTextStyle}
-      >
-        {t("home:sort")}
-      </AppChip>
-      {expiryEntries.length > 0 ? (
+      <View ref={sortChipRef} collapsable={false}>
         <AppChip
           compact
-          icon="calendar-clock-outline"
-          onPress={() => setExpiryModalVisible(true)}
+          icon="sort-variant"
+          onPress={openSortMenu}
           style={actionChipStyle}
           textStyle={actionChipTextStyle}
         >
-          {`${t("home:expiries")} ${expiryEntries.length}`}
+          {t("home:sort")}
         </AppChip>
+      </View>
+      {expiryEntries.length > 0 ? (
+        <View ref={expiryChipRef} collapsable={false}>
+          <AppChip
+            compact
+            icon="calendar-clock-outline"
+            onPress={openExpiryMenu}
+            style={actionChipStyle}
+            textStyle={actionChipTextStyle}
+          >
+            {`${t("home:expiries")} ${expiryEntries.length}`}
+          </AppChip>
+        </View>
       ) : null}
     </ScrollView>
   );
@@ -1121,9 +1157,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <View
-          style={styles.emptyVaultPanel}
-        >
+        <View style={styles.emptyVaultPanel}>
           <View
             style={[
               styles.emptyVaultIcon,
@@ -1455,9 +1489,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                     ? TITLEBAR_CONTROLS_WIDTH
                     : 0,
                 paddingRight:
-                  Platform.OS === "web" &&
-                  TITLEBAR_HEIGHT > 0 &&
-                  !controlsLeft
+                  Platform.OS === "web" && TITLEBAR_HEIGHT > 0 && !controlsLeft
                     ? 104
                     : 0,
               }}
@@ -1730,6 +1762,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               TITLEBAR_HEIGHT +
               (Platform.OS === "web" ? 48 : 90)
             }
+            anchorRect={sortMenuAnchor}
           />
 
           <FolderModal
@@ -1751,6 +1784,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               TITLEBAR_HEIGHT +
               (Platform.OS === "web" ? 48 : 90)
             }
+            anchorRect={expiryMenuAnchor}
             items={expiryOverviewItems}
           />
           <Modal

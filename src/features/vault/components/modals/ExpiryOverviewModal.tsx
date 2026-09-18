@@ -4,6 +4,7 @@ import { Divider, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
 import AdaptiveMenu from "../../../../shared/components/menus/AdaptiveMenu";
+import type { MenuAnchorRect } from "../../../../shared/components/menus/Menu";
 import { MenuItem } from "../../../../shared/components/menus/MenuItem";
 import ExpiryOverviewItem, {
   type ExpiryOverviewEntry,
@@ -14,6 +15,7 @@ type Props = {
   setVisible: (visible: boolean) => void;
   items: ExpiryOverviewEntry[];
   positionY: number;
+  anchorRect?: MenuAnchorRect | null;
   nativeSnapPoints?: (string | number)[];
 };
 
@@ -58,7 +60,7 @@ export default function ExpiryOverviewModal(props: Props) {
             const showDivider =
               index < props.items.length - 1 || Platform.OS !== "web";
             return (
-              <View style={{width: "100%"}} key={key}>
+              <View style={{ width: "100%" }} key={key}>
                 <ExpiryOverviewItem {...rest} key={key} />
                 {showDivider ? <Divider /> : null}
               </View>
@@ -73,6 +75,7 @@ export default function ExpiryOverviewModal(props: Props) {
       visible={props.visible}
       setVisible={props.setVisible}
       positionY={props.positionY}
+      anchorRect={props.anchorRect}
       nativeSnapPoints={props.nativeSnapPoints}
       topContent={topContent}
       customContent={customContent}

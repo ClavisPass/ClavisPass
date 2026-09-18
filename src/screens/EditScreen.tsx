@@ -129,6 +129,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const [overflowMenuAnchor, setOverflowMenuAnchor] = useState<{
     x: number;
     y: number;
+    width: number;
+    height: number;
   } | null>(null);
   const [pendingModuleDeleteId, setPendingModuleDeleteId] = useState<
     string | null
@@ -164,6 +166,10 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       setHeaderWhite(false);
       setTitlebarCenterGap(0);
       setTitlebarOverlayDragEnabled(false);
+
+      return () => {
+        Keyboard.dismiss();
+      };
     }, [
       setHeaderSpacing,
       setHeaderWhite,
@@ -200,6 +206,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      Keyboard.dismiss();
+
       if (allowNextBeforeRemoveRef.current) {
         allowNextBeforeRemoveRef.current = false;
         return;
@@ -327,6 +335,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   };
 
   const saveValue = () => {
+    Keyboard.dismiss();
+
     const updated: ValuesType = {
       ...value,
       lastUpdated: getDateTime(),
@@ -338,6 +348,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   };
 
   const goBack = () => {
+    Keyboard.dismiss();
     setDiscardChangesVisible(false);
     allowNextBeforeRemoveRef.current = true;
     navigation.goBack();
@@ -551,6 +562,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   const openModuleReorderScreen = () => {
     if (value.modules.length < 2) return;
+
+    Keyboard.dismiss();
 
     navigation.navigate("ModuleReorder", {
       modules: [...value.modules] as ModulesType,
@@ -837,8 +850,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       return;
     }
 
-    moreChipRef.current?.measureInWindow?.((x, y, _chipWidth, chipHeight) => {
-      setOverflowMenuAnchor({ x, y: y + chipHeight });
+    moreChipRef.current?.measureInWindow?.((x, y, width, height) => {
+      setOverflowMenuAnchor({ x, y, width, height });
       setOverflowMenuVisible(true);
     });
   };
@@ -1192,10 +1205,12 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         visible={overflowMenuVisible}
         setVisible={setOverflowMenuVisible}
         positionY={
-          overflowMenuAnchor?.y ??
-          Constants.statusBarHeight + (width > 600 ? 126 : 120)
+          overflowMenuAnchor
+            ? overflowMenuAnchor.y + overflowMenuAnchor.height
+            : Constants.statusBarHeight + (width > 600 ? 126 : 120)
         }
         positionX={overflowMenuAnchor?.x}
+        anchorRect={overflowMenuAnchor}
         items={editOverflowItems}
       />
       <PerfProfiler id="EditScreen.ModulesList">

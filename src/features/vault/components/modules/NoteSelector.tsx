@@ -25,7 +25,12 @@ function NoteSelector<T extends string>({
 }: Props<T>) {
   const triggerRef = useRef<View>(null);
   const [visible, setVisible] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  });
   const selected =
     options.find((option) => option.value === value) ?? options[0];
 
@@ -35,8 +40,8 @@ function NoteSelector<T extends string>({
     const node = triggerRef.current as any;
     if (node?.measureInWindow) {
       node.measureInWindow(
-        (x: number, y: number, _width: number, height: number) => {
-          setPosition({ x, y: y + height });
+        (x: number, y: number, width: number, height: number) => {
+          setPosition({ x, y, width, height });
           setVisible(true);
         },
       );
@@ -59,8 +64,9 @@ function NoteSelector<T extends string>({
       <AdaptiveMenu
         visible={visible}
         setVisible={setVisible}
-        positionY={position.y}
+        positionY={position.y + position.height}
         positionX={position.x}
+        anchorRect={position}
         offsetY={4}
         items={[]}
         nativeSnapPoints={[Math.min(320, options.length * 44 + 80)]}

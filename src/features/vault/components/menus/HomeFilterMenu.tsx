@@ -7,6 +7,7 @@ import { useVault } from "../../../../app/providers/VaultProvider";
 import AdaptiveMenu, {
   AdaptiveMenuItem,
 } from "../../../../shared/components/menus/AdaptiveMenu";
+import type { MenuAnchorRect } from "../../../../shared/components/menus/Menu";
 import { MenuItem } from "../../../../shared/components/menus/MenuItem";
 import { sortPinnedFirst } from "../../utils/pinnedEntries";
 
@@ -16,6 +17,7 @@ type Props = {
 
   // Web: Menu positioning
   positionY: number;
+  anchorRect?: MenuAnchorRect | null;
 
   // Native sizing
   nativeSnapPoints?: (string | number)[];
@@ -166,6 +168,7 @@ function HomeFilterMenu(props: Props) {
       visible={props.visible}
       setVisible={props.setVisible}
       positionY={props.positionY}
+      anchorRect={props.anchorRect}
       nativeSnapPoints={props.nativeSnapPoints}
       topContent={topContent}
       items={items}
