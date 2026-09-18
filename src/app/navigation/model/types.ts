@@ -7,6 +7,8 @@ import AnalysisRef from "../../../features/analysis/model/AnalysisRef";
 
 export type HomeStackParamList = {
   Home: { triggerAdd?: boolean | number } | undefined;
+  Analysis: undefined;
+  AnalysisDetail: { ref: AnalysisRef };
   Edit: {
     value: ValuesType;
     favorite?: boolean;
@@ -58,6 +60,11 @@ export type AnalysisStackParamList = {
   AnalysisDetail: { ref: AnalysisRef };
 };
 
+export type IdentityStackParamList = {
+  Identities: undefined;
+  IdentityDetail: { identityId: string };
+};
+
 export type SettingsStackParamList = {
   Settings: undefined;
   Scan: undefined;
@@ -80,7 +87,7 @@ export type AddTriggerStackParamList = {
 
 export type AppTabsParamList = {
   HomeStack: NavigatorScreenParams<HomeStackParamList>;
-  AnalysisStack: NavigatorScreenParams<AnalysisStackParamList>;
+  IdentityStack: NavigatorScreenParams<IdentityStackParamList>;
   AddTriggerStack: NavigatorScreenParams<AddTriggerStackParamList>;
   SettingsStack: NavigatorScreenParams<SettingsStackParamList>;
   LogoutStack: NavigatorScreenParams<LogoutStackParamList>;

@@ -41,11 +41,11 @@ import { getPwnedCountForPassword } from "../features/analysis/utils/hibp";
 import getPasswordStrengthColor from "../features/analysis/utils/getPasswordStrengthColor";
 import getPasswordStrengthIcon from "../features/analysis/utils/getPasswordStrengthIcon";
 import { MODULE_ICON } from "../features/vault/model/ModuleIconsEnum";
-import { AnalysisStackParamList, AppTabsParamList } from "../app/navigation/model/types";
+import { AppTabsParamList, HomeStackParamList } from "../app/navigation/model/types";
 
 import { evaluatePasswordForDetail } from "../features/analysis/utils/riskModel";
 
-type AnalysisDetailScreenProps = NativeStackScreenProps<AnalysisStackParamList, "AnalysisDetail">;
+type AnalysisDetailScreenProps = NativeStackScreenProps<HomeStackParamList, "AnalysisDetail">;
 
 type CharacterAnalysis = {
   letters: number;

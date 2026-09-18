@@ -5,6 +5,7 @@ export type TranslationSchema = {
   bar: {
     Home: string;
     Analysis: string;
+    Identities: string;
     Settings: string;
     Logout: string;
   };
@@ -173,6 +174,7 @@ export type TranslationSchema = {
     card: string;
     twofa: string;
     expiries: string;
+    analysis: string;
     noExpiries: string;
     entries: string;
     sort: string;
@@ -477,6 +479,45 @@ export type TranslationSchema = {
     riskScoreValue: string;
     bitsValue: string;
     countPercent: string;
+  };
+  identities: {
+    summaryTitle: string;
+    summaryHint: string;
+    overviewHint: string;
+    emptyHint: string;
+    detailMissing: string;
+    renameTitle: string;
+    displayNamePlaceholder: string;
+    searchHint: string;
+    noMatches: string;
+    metricIdentities: string;
+    metricAccounts: string;
+    metricWebsites: string;
+    metricRisks: string;
+    accountsCount: string;
+    websitesCount: string;
+    identityUsageSummary: string;
+    infoTypesCount: string;
+    risksCount: string;
+    emailIdentity: string;
+    likelySameIdentity: string;
+    possiblyConnected: string;
+    primarySignals: string;
+    websitesTitle: string;
+    informationTitle: string;
+    usernamesTitle: string;
+    insightsTitle: string;
+    insightAccounts: string;
+    insightDomains: string;
+    insightInformation: string;
+    insightRisks: string;
+    linkedEntries: string;
+    noDomain: string;
+    noWebsites: string;
+    entryInfoCount: string;
+    showMore: string;
+    showLess: string;
+    openAnalysis: string;
   };
   devices: {
     title: string;

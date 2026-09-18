@@ -32,8 +32,6 @@ export default function DropdownTextInputTrigger({
   return (
     <AnimatedPressable
       onPress={onPress}
-      hoverBackgroundColor="rgba(120, 127, 246, 0.12)"
-      rippleColor="rgba(120, 127, 246, 0.22)"
       style={{
         width: "100%",
         borderRadius: 12,

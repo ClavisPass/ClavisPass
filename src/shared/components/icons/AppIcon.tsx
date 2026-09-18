@@ -140,6 +140,7 @@ const FEATHER_ICON_MAP: Record<string, React.ComponentProps<typeof Feather>["nam
   web: "globe",
   "web-remove": "globe",
   wifi: "wifi",
+  activity: "activity",
 };
 
 function AppIcon({ name, size = 20, color }: Props) {

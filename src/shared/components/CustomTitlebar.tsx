@@ -69,6 +69,7 @@ function WindowControls(props: WindowControlsProps) {
     >
       <AnimatedPressable
         onPress={props.closeWindow}
+        hoverBackgroundColor={null}
         style={[
           styles.windowControlButton,
           {
@@ -82,6 +83,7 @@ function WindowControls(props: WindowControlsProps) {
       </AnimatedPressable>
       <AnimatedPressable
         onPress={props.minimizeWindow}
+        hoverBackgroundColor={null}
         style={[
           styles.windowControlButton,
           {

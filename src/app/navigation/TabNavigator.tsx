@@ -4,7 +4,7 @@ import { Platform, useWindowDimensions } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
 import HomeStack from "./stacks/HomeStack";
-import AnalysisStack from "./stacks/AnalysisStack";
+import IdentityStack from "./stacks/IdentityStack";
 import AddTriggerStack from "./stacks/AddTriggerStack";
 import SettingsStack from "./stacks/SettingsStack";
 import LogoutStack from "./stacks/LogoutStack";
@@ -50,13 +50,13 @@ export default function TabNavigator() {
       />
 
       <Tab.Screen
-        name="AnalysisStack"
-        component={AnalysisStack}
+        name="IdentityStack"
+        component={IdentityStack}
         options={{
-          tabBarLabel: "Analysis",
-          title: "Analysis",
+          tabBarLabel: "Identities",
+          title: "Identities",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="search" size={size} color={color} />
+            <Feather name="users" size={size} color={color} />
           ),
         }}
       />

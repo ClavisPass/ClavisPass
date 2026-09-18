@@ -5,6 +5,8 @@ import { View } from "react-native";
 import type { StyleProp, ViewStyle } from "react-native";
 
 type TouchableRippleProps = ComponentProps<typeof TouchableRipple>;
+const DEFAULT_HOVER_BACKGROUND_COLOR = "rgba(120, 127, 246, 0.12)";
+const DEFAULT_RIPPLE_COLOR = "rgba(120, 127, 246, 0.22)";
 
 export type AnimatedPressableProps = Omit<
   TouchableRippleProps,
@@ -12,7 +14,7 @@ export type AnimatedPressableProps = Omit<
 > & {
   style?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
-  hoverBackgroundColor?: string;
+  hoverBackgroundColor?: string | null;
 };
 
 const AnimatedPressable = React.forwardRef<any, AnimatedPressableProps>(
@@ -20,9 +22,9 @@ const AnimatedPressable = React.forwardRef<any, AnimatedPressableProps>(
     {
       children,
       style,
-      rippleColor = "rgba(0, 0, 0, .32)",
+      rippleColor = DEFAULT_RIPPLE_COLOR,
       borderless = true,
-      hoverBackgroundColor,
+      hoverBackgroundColor = DEFAULT_HOVER_BACKGROUND_COLOR,
       onHoverIn,
       onHoverOut,
       ...rest

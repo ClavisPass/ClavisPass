@@ -23,14 +23,13 @@ import {
   ActivityIndicator,
   Divider,
   Icon,
-  Searchbar,
   Text,
 } from "react-native-paper";
 
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
-import Header from "../shared/components/Header";
 import AppChip from "../shared/components/chips/AppChip";
+import SearchHeader from "../shared/components/SearchHeader";
 
 import { useAuthMaster } from "../app/providers/AuthProvider";
 import { useOnline } from "../app/providers/OnlineProvider";
@@ -52,11 +51,11 @@ import getPasswordStrengthIcon from "../features/analysis/utils/getPasswordStren
 import PasswordStrengthLevel from "../features/analysis/model/PasswordStrengthLevel";
 import ModulesEnum from "../features/vault/model/ModulesEnum";
 import WifiModuleType from "../features/vault/model/modules/WifiModuleType";
-import { AnalysisStackParamList } from "../app/navigation/model/types";
+import { HomeStackParamList } from "../app/navigation/model/types";
 import { FiltersNarrow } from "../features/analysis/components/Filter";
 
 type AnalysisScreenProps = NativeStackScreenProps<
-  AnalysisStackParamList,
+  HomeStackParamList,
   "Analysis"
 >;
 
@@ -174,8 +173,15 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   const vault = useVault();
   const { getMaster } = useAuthMaster();
   const { isCloudOnline } = useOnline();
-  const { theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
-    useTheme();
+  const {
+    theme,
+    headerWhite,
+    setHeaderWhite,
+    darkmode,
+    setHeaderSpacing,
+    setTitlebarCenterGap,
+    setTitlebarOverlayDragEnabled,
+  } = useTheme();
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
 
@@ -204,7 +210,18 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
     React.useCallback(() => {
       setHeaderSpacing(0);
       setHeaderWhite(false);
-    }, [setHeaderSpacing, setHeaderWhite])
+      setTitlebarCenterGap(0);
+      setTitlebarOverlayDragEnabled(false);
+
+      return () => {
+        setTitlebarCenterGap(0);
+      };
+    }, [
+      setHeaderSpacing,
+      setHeaderWhite,
+      setTitlebarCenterGap,
+      setTitlebarOverlayDragEnabled,
+    ])
   );
 
   useEffect(() => {
@@ -743,7 +760,21 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
         translucent
       />
 
-      <Header title={t("bar:Analysis")} />
+      <SearchHeader
+        idPrefix="analysis"
+        title={t("bar:Analysis")}
+        placeholder={t("analysis:searchHint")}
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        resetLabel={t("common:reset")}
+        onBack={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+            return;
+          }
+          navigation.navigate("Home");
+        }}
+      />
 
       <ScrollView
         ref={scrollRef}
@@ -757,29 +788,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
           maxWidth: 1100,
         }}
       >
-        <View
-          style={{
-            borderRadius: 12,
-            backgroundColor: theme.colors.background,
-            borderWidth: StyleSheet.hairlineWidth,
-            borderColor: darkmode ? theme.colors.outlineVariant : "white",
-            padding: 6,
-            boxShadow: theme.colors.shadow as any,
-          }}
-        >
-          <Searchbar
-            inputStyle={{ height: 40, minHeight: 40 }}
-            style={{
-              height: 40,
-              borderRadius: 10,
-              backgroundColor: theme.colors.background,
-            }}
-            placeholder={t("analysis:searchHint")}
-            onChangeText={(txt) => setSearchQuery(txt)}
-            value={searchQuery}
-          />
-        </View>
-
         {isLoading ? (
           <LoadingCard />
         ) : (
@@ -791,9 +799,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                   onPress={() => setActiveTab(tab.key)}
                   borderless={false}
                   hoverBackgroundColor={
-                    activeTab === tab.key
-                      ? undefined
-                      : theme.colors.surfaceVariant ?? theme.colors.background
+                    activeTab === tab.key ? null : undefined
                   }
                   style={[
                     pillCardStyle(activeTab === tab.key) as any,

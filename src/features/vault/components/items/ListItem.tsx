@@ -466,22 +466,16 @@ function ListItem(props: Props) {
         tooltip={
           props.item.fav ? t("common:removeFavorite") : t("common:addFavorite")
         }
-        icon={props.item.fav ? "star" : "star-outline"}
+        icon={({ color, size }) => (
+          <Icon
+            source={props.item.fav ? "star" : "star-outline"}
+            color={color}
+            size={size}
+          />
+        )}
         size={18}
         onPress={() => {
           toggleFavorite();
-        }}
-        style={styles.menuPreviewAction}
-        iconColor={theme.colors.primary}
-      />
-      <TooltipIconButton
-        tooltip={
-          props.item.pinnedAt ? t("common:removePin") : t("common:addPin")
-        }
-        icon="pin-outline"
-        size={18}
-        onPress={() => {
-          togglePinned();
         }}
         style={styles.menuPreviewAction}
         iconColor={theme.colors.primary}

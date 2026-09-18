@@ -265,8 +265,6 @@ function EmailModule(props: EmailModuleType & Props) {
           <View key={item.id}>
             <AnimatedPressable
               borderless={false}
-              hoverBackgroundColor="rgba(120, 127, 246, 0.12)"
-              rippleColor="rgba(120, 127, 246, 0.22)"
               onPressIn={() => {
                 interactingListRef.current = true;
               }}

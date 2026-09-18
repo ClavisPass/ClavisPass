@@ -1054,6 +1054,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     [openEditScreen],
   );
 
+  const openAnalysisScreen = useCallback(() => {
+    closeCompactSearchIfEmpty();
+    setHomeContentVisible(false);
+    navigation.navigate("Analysis");
+  }, [closeCompactSearchIfEmpty, navigation]);
+
   const actionChipStyle = {
     height: 30,
     borderRadius: 12,
@@ -1089,6 +1095,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         textStyle={actionChipTextStyle}
       >
         {t("common:reload")}
+      </AppChip>
+      <AppChip
+        compact
+        icon="activity"
+        onPress={openAnalysisScreen}
+        style={actionChipStyle}
+        textStyle={actionChipTextStyle}
+      >
+        {t("home:analysis")}
       </AppChip>
       <AppChip
         compact

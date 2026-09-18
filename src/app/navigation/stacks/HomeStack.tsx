@@ -9,6 +9,8 @@ import TotpScanScreen from "../../../screens/TotpScanScreen";
 import CardDetailsScreen from "../../../screens/CardDetailsScreen";
 import AttachmentPreviewScreen from "../../../screens/AttachmentPreviewScreen";
 import NoteEditorScreen from "../../../screens/NoteEditorScreen";
+import AnalysisScreen from "../../../screens/AnalysisScreen";
+import AnalysisDetailScreen from "../../../screens/AnalysisDetailScreen";
 import { HomeStackParamList } from "../model/types";
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
@@ -23,6 +25,8 @@ export default function HomeStack() {
       }}
     >
       <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Analysis" component={AnalysisScreen} />
+      <Stack.Screen name="AnalysisDetail" component={AnalysisDetailScreen} />
       <Stack.Screen name="Edit" component={EditScreen} />
       <Stack.Screen name="Reorder" component={ReorderScreen} />
       <Stack.Screen name="ModuleReorder" component={ModuleReorderScreen} />
