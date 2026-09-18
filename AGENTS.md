@@ -1,67 +1,38 @@
 # ClavisPass Agent Context
 
-This repository is a cross-platform password manager with a React Native + Expo UI and a Tauri desktop shell.
-Use this file as the fast-start context for future work, then open [docs/project-context.md](/e:/Projects/ClavisPass/docs/project-context.md) for deeper details.
+ClavisPass is a privacy-focused password manager with a React Native + Expo UI and a Tauri desktop shell.
 
-## Product Summary
+Keep this file small. Do not read large docs by default. Pick only the context file that matches the task.
 
-- ClavisPass is a privacy-focused password manager.
+## Always Know
+
 - Vault data is encrypted locally before sync.
-- Sync targets are provider-based: `device`, `dropbox`, `googleDrive`, and `clavispassHub`.
-- Desktop runs through Tauri; mobile runs through Expo / React Native.
+- Sync providers are `device`, `dropbox`, `googleDrive`, and `clavispassHub`.
+- Desktop runs the Expo web bundle inside Tauri, so desktop-only JS often appears behind `Platform.OS === "web"`.
+- User-facing text belongs in the typed i18n contract: `src/shared/i18n/TranslationSchema.ts`, plus both `src/shared/i18n/languages/de.ts` and `src/shared/i18n/languages/en.ts`.
 
-## Core Architecture
+## Context Routing
 
-- [App.tsx](/e:/Projects/ClavisPass/App.tsx) wires the provider stack and switches between the main app window and the desktop fast-access popup.
-- [src/app/providers/AuthProvider.tsx](/e:/Projects/ClavisPass/src/app/providers/AuthProvider.tsx) keeps the master password in a `useRef`, not in React state.
-- [src/app/providers/VaultProvider.tsx](/e:/Projects/ClavisPass/src/app/providers/VaultProvider.tsx) exposes UI-safe metadata and fetches secrets only on demand.
-- [src/features/vault/utils/VaultSession.ts](/e:/Projects/ClavisPass/src/features/vault/utils/VaultSession.ts) is the authoritative in-memory vault session outside React.
-- [src/features/vault/utils/modulePolicy.ts](/e:/Projects/ClavisPass/src/features/vault/utils/modulePolicy.ts) is the central module classification and secret/meta policy registry.
-- [src/app/providers/CloudProvider.tsx](/e:/Projects/ClavisPass/src/app/providers/CloudProvider.tsx) stores refresh tokens securely and refreshes access tokens per provider.
-- [src/infrastructure/storage/store.ts](/e:/Projects/ClavisPass/src/infrastructure/storage/store.ts) defines the typed settings schema.
-- [src/infrastructure/storage/secureStore.ts](/e:/Projects/ClavisPass/src/infrastructure/storage/secureStore.ts) uses Expo Secure Store on mobile and Tauri keytar commands on desktop.
+- Security, auth, vault state, module metadata/secrets: read [docs/context/security.md](/e:/Projects/ClavisPass/docs/context/security.md).
+- Vault crypto formats, V1/V2 envelope behavior, KDF/AEAD rules: read [docs/context/crypto.md](/e:/Projects/ClavisPass/docs/context/crypto.md).
+- UI work, React Native/Web/Tauri layout, menus, dropdowns, titlebar drag regions, i18n: read [docs/context/ui.md](/e:/Projects/ClavisPass/docs/context/ui.md).
+- Sync, cloud providers, tokens, storage settings, secure store: read [docs/context/sync-storage.md](/e:/Projects/ClavisPass/docs/context/sync-storage.md).
+- Tauri host, tray, desktop windows, fast access popup, native commands: read [docs/context/desktop.md](/e:/Projects/ClavisPass/docs/context/desktop.md).
+- Build, release, updates, store/package surface: read [docs/context/build-release.md](/e:/Projects/ClavisPass/docs/context/build-release.md).
 
-## Important Reality Check
+## High-Risk Rules
 
-- The active vault write format is now the V2 key-envelope under [src/infrastructure/crypto/vault/v2](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v2).
-- V2 uses `argon2id` to wrap a random vault data key, then uses `xchacha20poly1305-ietf` for payload encryption in [src/infrastructure/crypto/vault/v2/VaultV2.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v2/VaultV2.ts).
-- [src/infrastructure/crypto/vault/VaultCryptoSession.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/VaultCryptoSession.ts) keeps the unwrapped V2 vault data key in memory during an unlocked session.
-- [src/infrastructure/crypto/encryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/encryptVaultContent.ts) now writes V2 by default.
-- [src/infrastructure/crypto/decryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/decryptVaultContent.ts) now accepts V1 and V2.
-- V1 remains readable for migration; the next default save after a V1 unlock writes V2.
-- The old vault legacy crypto path has been removed; remaining non-V1 crypto usage such as pCloud import is separate from the ClavisPass vault format.
-- Crypto changes are still security-sensitive, so verify provider parity and real runtime call paths before changing KDF, AEAD, or envelope behavior.
+- Do not put secrets, especially the master password, into React state.
+- Do not bypass `VaultSession` / `VaultProvider` boundaries casually.
+- Do not add or change a vault module without checking `src/features/vault/utils/modulePolicy.ts`.
+- Do not change crypto, KDF, AEAD, envelope, or provider parity without reading the live code path end to end.
+- When changing app chrome, titlebars, compact headers, search placement, or window controls, verify draggable regions in `src/shared/components/CustomTitlebar.tsx`.
 
-## Folder Guide
+## Fast Map
 
 - `src/app`: app shell, providers, navigation.
 - `src/screens`: screen-level containers.
-- `src/features`: feature-specific UI, models, and utilities.
+- `src/features`: feature-specific UI, models, utilities.
 - `src/infrastructure`: storage, crypto, cloud clients, logging, platform helpers.
-- `src/shared`: reusable UI, hooks, i18n, shared utilities.
-- `src-tauri`: Rust/Tauri desktop host, key storage commands, tray, window handling, device identity.
-- `plugins`: Expo config plugins for platform identifiers.
-- `patches`: local package patches, currently including `react-native-sodium-jsi`.
-
-## Working Rules For Future Changes
-
-- Be careful with anything that touches `AuthProvider`, `VaultProvider`, `VaultSession`, `modulePolicy`, or crypto code; those are security-sensitive.
-- Prefer derived metadata in React state and on-demand secret access.
-- When adding a vault module, update both the model/rendering side and the central `MODULE_POLICY`.
-- When changing sync behavior, inspect all provider implementations in `src/infrastructure/cloud/clients`.
-- Desktop-only behavior often hides behind `Platform.OS === "web"` because Expo web is used inside Tauri.
-- When changing headers, titlebars, compact header layouts, search placement, window controls, or anything near the app chrome, verify the Tauri draggable regions in [src/shared/components/CustomTitlebar.tsx](/e:/Projects/ClavisPass/src/shared/components/CustomTitlebar.tsx). Interactive controls must stay outside drag overlays, and empty header space should remain draggable on desktop.
-- When adding or changing user-facing text, update the typed i18n contract in src/shared/i18n/TranslationSchema.ts and add matching entries in both src/shared/i18n/languages/de.ts and src/shared/i18n/languages/en.ts.
-- Prefer real translation keys over local hardcoded fallbacks; use defaultValue only as a temporary bridge when needed during a change.
-- For icon-only buttons that are not immediately self-explanatory, consider using the shared tooltip components, especially [AppTooltip](/e:/Projects/ClavisPass/src/shared/components/tooltips/AppTooltip.tsx) or [TooltipIconButton](/e:/Projects/ClavisPass/src/shared/components/buttons/TooltipIconButton.tsx), when it improves discoverability without adding visual noise.
-
-## Suggested First Files To Read
-
-1. [README.md](/e:/Projects/ClavisPass/README.md)
-2. [docs/project-context.md](/e:/Projects/ClavisPass/docs/project-context.md)
-3. [App.tsx](/e:/Projects/ClavisPass/App.tsx)
-4. [src/app/providers/AuthProvider.tsx](/e:/Projects/ClavisPass/src/app/providers/AuthProvider.tsx)
-5. [src/app/providers/VaultProvider.tsx](/e:/Projects/ClavisPass/src/app/providers/VaultProvider.tsx)
-6. [src/features/vault/utils/VaultSession.ts](/e:/Projects/ClavisPass/src/features/vault/utils/VaultSession.ts)
-7. [src/features/vault/utils/modulePolicy.ts](/e:/Projects/ClavisPass/src/features/vault/utils/modulePolicy.ts)
-
+- `src/shared`: reusable UI, hooks, i18n, theme.
+- `src-tauri`: Rust/Tauri host and native desktop commands.

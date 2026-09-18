@@ -1,314 +1,49 @@
 # ClavisPass Project Context
 
-This file is the durable working context for future chats and contributors.
-It is meant to complement the README by focusing on actual code structure, runtime behavior, and practical orientation.
+This file is a compact index for future sessions and contributors. It intentionally does not duplicate the full project model.
 
-## What This Project Is
+Start with `AGENTS.md`, then read only the context file that matches the task.
 
-ClavisPass is a cross-platform password manager built around local encryption and provider-based sync.
-The same repository contains:
+## Context Files
 
-- The app UI for mobile, web, and desktop via React Native + Expo.
-- A Tauri desktop host for Windows, macOS, and Linux.
-- Native Rust commands for desktop-only capabilities such as secure key storage, content protection, and device identity.
+- `docs/context/security.md`: auth, vault state, session boundaries, module metadata, secret handling.
+- `docs/context/crypto.md`: V1/V2 vault formats, key envelope behavior, crypto provider rules.
+- `docs/context/ui.md`: screens, shared components, menus, dropdowns, titlebar/chrome, i18n.
+- `docs/context/sync-storage.md`: sync providers, cloud tokens, settings, storage layers.
+- `docs/context/desktop.md`: Tauri host, windows, tray, native commands, fast access.
+- `docs/context/build-release.md`: scripts, updates, release packaging, distribution flags.
 
-The public homepage is maintained in a separate repository and is no longer part of this app repo.
+## Core Mental Model
 
-## High-Level Runtime Model
+ClavisPass is a privacy-focused password manager with local encryption before sync.
 
-### Main app shell
+- UI: React Native + Expo.
+- Desktop: Tauri rendering the Expo web bundle.
+- Sync providers: `device`, `dropbox`, `googleDrive`, `clavispassHub`.
+- Security-sensitive state lives behind `AuthProvider`, `VaultProvider`, `VaultSession`, and the central module policy registry.
+- User-facing copy must stay in the typed i18n contract.
 
-The main runtime entry is [App.tsx](/e:/Projects/ClavisPass/App.tsx).
+## High-Risk Areas
 
-Important behaviors:
+Before editing these areas, read the matching context file and inspect the live runtime path:
 
-- Registers the `clavispass://` deep-link protocol for desktop.
-- On desktop, distinguishes between the main app window and a popup-style fast-access window.
-- Wraps the app in a provider chain that centralizes settings, theming, auth, sync tokens, vault state, content protection, and UX helpers.
+- Master password lifetime and vault session state.
+- Vault crypto, KDF, AEAD, envelope, migration, or provider parity.
+- Module policy / metadata derivation for vault entries.
+- Sync provider behavior and refresh-token storage.
+- Tauri window, tray, titlebar, close/minimize, and fast-access behavior.
+- Shared UI primitives used across mobile, web, and desktop.
 
-Provider order in the main app:
+## First Runtime Files
 
-1. `SettingsProvider`
-2. `ContentProtectionProvider`
-3. `ThemeProvider`
-4. `OnlineProvider`
-5. `AuthProvider`
-6. `CloudProvider`
-7. `VaultProvider`
-8. `DevModeProvider`
+Open only the files relevant to the task, but these are the usual anchors:
 
-This order matters. For example, `VaultProvider` relies on auth/cloud-adjacent state, and theme/settings are expected to be available globally.
-
-### Desktop host
-
-The Tauri side lives in [src-tauri/src/lib.rs](/e:/Projects/ClavisPass/src-tauri/src/lib.rs).
-
-Desktop responsibilities include:
-
-- Creating the main window and OAuth popup windows.
-- Handling system tray behavior.
-- Saving and restoring window size.
-- Intercepting close requests and hiding the app instead of exiting.
-- Exposing Rust commands to the JS layer.
-- Enabling updater, shell, dialog, fs, deep links, OAuth, shortcuts, and autostart plugins.
-
-Notable implementation detail:
-
-- In JS, desktop paths are usually detected with `Platform.OS === "web"` because the Tauri app renders the Expo web bundle.
-
-## Security-Critical Architecture
-
-### Auth and master password lifetime
-
-[src/app/providers/AuthProvider.tsx](/e:/Projects/ClavisPass/src/app/providers/AuthProvider.tsx) is one of the most important files in the project.
-
-Key rules enforced there:
-
-- The master password is stored only in a `useRef`.
-- React context exposes `getMaster()` and `requireMaster()`, not the secret value itself.
-- The session is time-limited via the `SESSION_DURATION` setting.
-- Logout clears the in-memory secret and timers.
-- Screen lock integration can force logout.
-
-Why this matters:
-
-- The code intentionally avoids putting the master password into React state, props, or subscribable context values.
-- Any future work should preserve that non-reactive handling.
-
-### Vault session boundary
-
-[src/app/providers/VaultProvider.tsx](/e:/Projects/ClavisPass/src/app/providers/VaultProvider.tsx) provides the React-facing vault API.
-[src/features/vault/utils/VaultSession.ts](/e:/Projects/ClavisPass/src/features/vault/utils/VaultSession.ts) is the authoritative vault state holder outside React.
-
-Practical mental model:
-
-- `VaultSession` holds the full decrypted vault and dirty state.
-- `VaultProvider` only projects UI-safe data into React state.
-- Secrets are accessed on demand through `getSecretValue` / `getSecretPayload`.
-- Writes go through explicit helpers such as `upsertEntry`, `deleteEntry`, `update`, and `setFolders`.
-
-This is an intentional trust boundary. Avoid bypassing it.
-
-### Module policy registry
-
-[src/features/vault/utils/modulePolicy.ts](/e:/Projects/ClavisPass/src/features/vault/utils/modulePolicy.ts) is the central registry that decides:
-
-- Which modules are metadata-only.
-- Which modules are secrets.
-- Which modules need structured or hybrid handling.
-- How entry metadata is derived for list/search/filter UI.
-
-When adding or changing a vault module:
-
-1. Update the module enum / type definitions.
-2. Update rendering components and form/edit behavior.
-3. Update `MODULE_POLICY`.
-4. Check search/filter/list behaviors that depend on derived metadata.
-
-If `MODULE_POLICY` is missed, you can create silent security or UX regressions.
-
-For planned KeePass/KDBX compatibility work, including tags, attachments, custom field metadata, and import/export order, see [docs/keepass-kdbx-roadmap.md](/e:/Projects/ClavisPass/docs/keepass-kdbx-roadmap.md).
-
-## Crypto State Of The Repo
-
-The active vault encryption write path is now the V2 key-envelope format.
-V1 remains readable for migration and compatibility with existing vault files.
-
-### Active vault format
-
-The V2 implementation lives in:
-
-- [src/infrastructure/crypto/vault/v2/VaultV2.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v2/VaultV2.ts)
-- [src/infrastructure/crypto/vault/v2/VaultV2Schema.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v2/VaultV2Schema.ts)
-- [src/infrastructure/crypto/vault/VaultCryptoSession.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/VaultCryptoSession.ts)
-
-The V1 compatibility implementation lives in:
-
-- [src/infrastructure/crypto/vault/v1/VaultV1.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v1/VaultV1.ts)
-- [src/infrastructure/crypto/vault/v1/VaultV1Schema.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/vault/v1/VaultV1Schema.ts)
-
-The V2 design uses:
-
-- Argon2id-style password hashing parameters for deriving a wrapping key at unlock/rewrap time
-- A random vault data key for payload encryption during the unlocked session
-- XChaCha20-Poly1305 AEAD for both key wrapping and payload encryption
-- Structured vault envelope metadata
-
-Important runtime facts:
-
-- [src/infrastructure/crypto/encryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/encryptVaultContent.ts) writes V2 by default and can still write V1 explicitly for compatibility tooling.
-- [src/infrastructure/crypto/decryptVaultContent.ts](/e:/Projects/ClavisPass/src/infrastructure/crypto/decryptVaultContent.ts) reads V1 and V2.
-- A successful V1 unlock clears V2 session crypto material; the next default save migrates the vault to V2.
-- A successful V2 unlock seeds `VaultCryptoSession` with the unwrapped vault data key and existing key-wrap metadata.
-- Normal V2 saves during an unlocked session reuse the in-memory vault data key and existing key-wrap block, so Argon2id is not rerun.
-- Master-password change must call `encryptVaultContent(..., { forceRewrap: true })` so the vault data key is wrapped with the new password-derived key.
-- Lock/logout/session expiry must clear `VaultCryptoSession`.
-- Web and native use platform-specific crypto providers with the same envelope contract, so cross-platform vaults are expected to roundtrip identically.
-- In development, provider loading runs a small V1 self-test to catch provider drift early.
-
-Legacy vault crypto has been removed from the main ClavisPass vault flow. Any remaining separate crypto helpers, such as third-party importers, should not be confused with the vault format itself.
-
-Design background:
-
-- [docs/vault-v2-key-envelope-roadmap.md](/e:/Projects/ClavisPass/docs/vault-v2-key-envelope-roadmap.md) captures the V2 key-envelope architecture for moving Argon2id out of the unlocked-session sync hot path. Old app versions are not expected to read V2, so active devices should be updated before editing a migrated shared vault.
-
-## Sync And Storage Model
-
-### Cloud/session tokens
-
-[src/app/providers/CloudProvider.tsx](/e:/Projects/ClavisPass/src/app/providers/CloudProvider.tsx) is the access-token / refresh-token coordinator.
-
-Responsibilities:
-
-- Persisting refresh-token state.
-- Restoring provider session information on startup.
-- Refreshing access tokens when needed.
-- Clearing provider state on logout.
-- Special cleanup behavior for `clavispassHub`.
-
-### Provider dispatch
-
-[src/infrastructure/cloud/clients/CloudStorageClient.ts](/e:/Projects/ClavisPass/src/infrastructure/cloud/clients/CloudStorageClient.ts) is the dispatch layer that routes to:
-
-- Dropbox
-- Google Drive
-- Device storage
-- ClavisPass Hub
-
-If sync behavior changes, check both:
-
-- The dispatcher
-- The concrete provider client
-
-### Local settings and secure secrets
-
-There are two distinct local storage layers:
-
-- [src/infrastructure/storage/store.ts](/e:/Projects/ClavisPass/src/infrastructure/storage/store.ts) for regular typed app settings in AsyncStorage.
-- [src/infrastructure/storage/secureStore.ts](/e:/Projects/ClavisPass/src/infrastructure/storage/secureStore.ts) for secure tokens/secrets.
-
-Current secure storage behavior:
-
-- Mobile uses Expo Secure Store.
-- Desktop uses Tauri invoke commands backed by Rust keytar helpers in [src-tauri/src/commands.rs](/e:/Projects/ClavisPass/src-tauri/src/commands.rs).
-
-## Settings That Influence Behavior
-
-The typed schema in [src/infrastructure/storage/store.ts](/e:/Projects/ClavisPass/src/infrastructure/storage/store.ts) is the source of truth for persisted app settings.
-
-Examples with architectural importance:
-
-- `SESSION_DURATION`
-- `COPY_DURATION`
-- `THEME_PREFERENCE`
-- `LANGUAGE`
-- `FAST_ACCESS`
-- `CLOSE_BEHAVIOR`
-- `START_BEHAVIOR`
-- `FAVORITE_MODULES`
-
-If a new setting is needed, it should usually be added to `storeSchema` first, not introduced ad hoc.
-
-## UI Structure And Feature Layout
-
-### Top-level code organization
-
-- `src/app`: app shell, navigation, providers.
-- `src/screens`: screen containers bound to navigation routes.
-- `src/features`: domain features such as auth, vault, analysis, settings, sync, onboarding, fast access.
-- `src/shared`: reusable components, i18n, hooks, theme utilities.
-- `src/infrastructure`: low-level integrations and platform abstractions.
-
-### Notable feature areas
-
-- `features/vault`: core credential/item editing, rendering, folders, modules, generators, QR helpers.
-- `features/analysis`: password strength and risk analysis.
-- `features/sync`: provider login buttons, backup/sync UI, user information.
-- `features/auth`: login/auth flow and screen-lock logout support.
-- `features/settings`: app settings UI and import/export helpers.
-- `features/fastaccess`: popup-oriented quick access behavior for desktop.
-
-### Example screen behavior
-
-[src/screens/HomeScreen.tsx](/e:/Projects/ClavisPass/src/screens/HomeScreen.tsx) is a good practical reference for how the app usually works:
-
-- Reads safe vault projections from `useVault()`.
-- Uses `auth.getMaster()` only when a real decrypt/sync operation is needed.
-- Refreshes remote data through `CloudProvider` token handling plus cloud fetch + decrypt.
-- Separates special list modes for cards and TOTP from generic item browsing.
-
-## Platform Notes
-
-### Desktop
-
-- Implemented via Tauri with a web bundle.
-- System tray integration is enabled.
-- Main-window close is intercepted and converted to hide-to-tray behavior in Rust.
-- Content protection is controllable via Tauri command.
-- Fast-access uses a separate popup-like window mode.
-
-### Mobile
-
-- Standard Expo / React Native runtime.
-- Secure storage uses Expo Secure Store.
-- Expo Updates handles OTA-style update checks.
-
-### Update handling
-
-[src/shared/components/UpdateManager.tsx](/e:/Projects/ClavisPass/src/shared/components/UpdateManager.tsx) splits update logic by platform:
-
-- Expo Updates on mobile.
-- Tauri updater on desktop.
-
-Because desktop is represented as `Platform.OS === "web"`, be careful when reading update code or other platform-conditional UI.
-
-## Build And Release Surface
-
-Important scripts from [package.json](/e:/Projects/ClavisPass/package.json):
-
-- `npm run web`
-- `npm run tauri:dev`
-- `npm run tauri:build`
-- `npm run android`
-- `npm run ios`
-- `npm run release`
-
-Other relevant files:
-
-- [release.js](/e:/Projects/ClavisPass/release.js)
-- [app.config.js](/e:/Projects/ClavisPass/app.config.js)
-- [app.json](/e:/Projects/ClavisPass/app.json)
-- [eas.json](/e:/Projects/ClavisPass/eas.json)
-- [src-tauri/tauri.conf.json](/e:/Projects/ClavisPass/src-tauri/tauri.conf.json)
-
-## Working Conventions For Future Sessions
-
-When opening a new chat, this is the quickest reliable path:
-
-1. Read [AGENTS.md](/e:/Projects/ClavisPass/AGENTS.md).
-2. Read this file.
-3. Verify the exact runtime files involved before trusting the README alone.
-4. For security-sensitive work, inspect the live code path end-to-end before editing.
-
-Recommended guardrails:
-
-- Do not put secrets into React state.
-- Do not bypass `VaultSession` / `VaultProvider` boundaries casually.
-- Do not add a new module without updating `MODULE_POLICY`.
-- Do not assume desktop is a separate JS codebase; it is usually the Expo web bundle running inside Tauri.
-- Do not assume non-vault crypto helpers follow the same format as the main vault; verify whether a code path is part of the ClavisPass vault or only an import/export adapter.
-- Do not add new user-facing copy in only one place; update TranslationSchema.ts plus both de.ts and en.ts together so the typed i18n contract stays in sync.
-
-## Good First Files For Orientation
-
-- [README.md](/e:/Projects/ClavisPass/README.md)
-- [App.tsx](/e:/Projects/ClavisPass/App.tsx)
-- [src/app/providers/AuthProvider.tsx](/e:/Projects/ClavisPass/src/app/providers/AuthProvider.tsx)
-- [src/app/providers/VaultProvider.tsx](/e:/Projects/ClavisPass/src/app/providers/VaultProvider.tsx)
-- [src/features/vault/utils/VaultSession.ts](/e:/Projects/ClavisPass/src/features/vault/utils/VaultSession.ts)
-- [src/features/vault/utils/modulePolicy.ts](/e:/Projects/ClavisPass/src/features/vault/utils/modulePolicy.ts)
-- [src/app/providers/CloudProvider.tsx](/e:/Projects/ClavisPass/src/app/providers/CloudProvider.tsx)
-- [src/infrastructure/storage/store.ts](/e:/Projects/ClavisPass/src/infrastructure/storage/store.ts)
-- [src/infrastructure/storage/secureStore.ts](/e:/Projects/ClavisPass/src/infrastructure/storage/secureStore.ts)
-- [src-tauri/src/lib.rs](/e:/Projects/ClavisPass/src-tauri/src/lib.rs)
-
+- `App.tsx`
+- `src/app/providers/AuthProvider.tsx`
+- `src/app/providers/VaultProvider.tsx`
+- `src/features/vault/utils/VaultSession.ts`
+- `src/features/vault/utils/modulePolicy.ts`
+- `src/app/providers/CloudProvider.tsx`
+- `src/infrastructure/storage/store.ts`
+- `src/infrastructure/storage/secureStore.ts`
+- `src-tauri/src/lib.rs`
