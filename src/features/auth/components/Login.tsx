@@ -42,6 +42,7 @@ import {
   isUsingAuthentication,
   loadAuthentication,
 } from "../utils/authenticateUser";
+import { consumeSystemAuthAutoUnlockSuppression } from "../utils/systemAuthAutoUnlock";
 
 import {
   fetchRemoteVaultFile,
@@ -198,6 +199,8 @@ function Login(props: Props) {
       uploadLocalVaultAfterUnlockRef.current = false;
 
       const hasAuthentication = await isUsingAuthentication();
+      const skipAutomaticSystemAuth =
+        consumeSystemAuthAutoUnlockSuppression();
       setIsUsingAuthenticationButtonVisible(hasAuthentication);
 
       if (!provider) {
@@ -232,7 +235,7 @@ function Login(props: Props) {
             uploadLocalVaultAfterUnlockRef.current = true;
             setLoading(false);
 
-            if (hasAuthentication) {
+            if (hasAuthentication && !skipAutomaticSystemAuth) {
               const ok = await authenticateUser();
               if (ok) {
                 const storedPassword = await loadAuthentication();
@@ -272,7 +275,7 @@ function Login(props: Props) {
       setVaultFileContent(res.content);
       setLoading(false);
 
-      if (hasAuthentication) {
+      if (hasAuthentication && !skipAutomaticSystemAuth) {
         const ok = await authenticateUser();
         if (ok) {
           const storedPassword = await loadAuthentication();

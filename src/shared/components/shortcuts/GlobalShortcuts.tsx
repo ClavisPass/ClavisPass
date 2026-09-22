@@ -9,6 +9,7 @@ import {
   detectTauriEnvironment,
   useIsTauriEnvironment,
 } from "../../../infrastructure/platform/isTauri";
+import { suppressNextSystemAuthAutoUnlock } from "../../../features/auth/utils/systemAuthAutoUnlock";
 
 function GlobalShortcuts() {
   const auth = useAuth();
@@ -108,6 +109,7 @@ function GlobalShortcuts() {
     const stateIsFocused = await appWindow.isFocused();
 
     if (stateIsVisible && stateIsFocused) {
+      suppressNextSystemAuthAutoUnlock();
       logoutRef.current();
       try {
         const { invoke } = await import("@tauri-apps/api/core");
@@ -124,6 +126,7 @@ function GlobalShortcuts() {
   };
 
   const lockVault = () => {
+    suppressNextSystemAuthAutoUnlock();
     logoutRef.current();
   };
 

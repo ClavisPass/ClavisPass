@@ -6,6 +6,7 @@ import { useSetting } from "../../app/providers/SettingsProvider";
 import type { AppTabsParamList } from "../../app/navigation/model/types";
 import { logger } from "../../infrastructure/logging/logger";
 import { detectTauriEnvironment } from "../../infrastructure/platform/isTauri";
+import { suppressNextSystemAuthAutoUnlock } from "../../features/auth/utils/systemAuthAutoUnlock";
 
 type Props = {
   navigationRef: NavigationContainerRefWithCurrent<AppTabsParamList>;
@@ -48,10 +49,12 @@ export default function TrayMenuBridge({ navigationRef }: Props) {
           "claim_pending_lock_request",
         );
         if (hadPendingLock && !cancelled) {
+          suppressNextSystemAuthAutoUnlock();
           logoutRef.current();
         }
 
         const unlistenLock = await listen<TauriEvent>("tray://lock-vault", () => {
+          suppressNextSystemAuthAutoUnlock();
           logoutRef.current();
           void (async () => {
             try {

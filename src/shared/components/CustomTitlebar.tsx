@@ -14,6 +14,7 @@ import {
 import { TITLEBAR_CONTROLS_WIDTH, TITLEBAR_HEIGHT } from "./titlebarMetrics";
 import { resolveWindowControlsSide } from "../../infrastructure/platform/windowControls";
 import { isDemoDistribution } from "../utils/distribution";
+import { suppressNextSystemAuthAutoUnlock } from "../../features/auth/utils/systemAuthAutoUnlock";
 
 export { TITLEBAR_CONTROLS_WIDTH, TITLEBAR_HEIGHT };
 
@@ -297,6 +298,7 @@ function CustomTitlebar() {
     if (!(await detectTauriEnvironment())) return;
 
     if (closeBehavior === "hide") {
+      suppressNextSystemAuthAutoUnlock();
       auth.logout();
     }
 
