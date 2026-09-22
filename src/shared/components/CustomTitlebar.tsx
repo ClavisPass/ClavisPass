@@ -208,7 +208,8 @@ function CustomTitlebar() {
   const { width } = useWindowDimensions();
 
   const { value: closeBehavior } = useSetting("CLOSE_BEHAVIOR");
-  const { value: startBehavior } = useSetting("START_BEHAVIOR");
+  const { value: startBehavior, isReady: settingsReady } =
+    useSetting("START_BEHAVIOR");
   const { value: windowControlsStyle } = useSetting("WINDOW_CONTROLS_STYLE");
   const isTauri = useIsTauriEnvironment() && !isDemoDistribution();
   const controlsSide = resolveWindowControlsSide(windowControlsStyle);
@@ -278,10 +279,10 @@ function CustomTitlebar() {
   }, [isTauri, width]);
 
   useEffect(() => {
-    if (isTauri) {
+    if (isTauri && settingsReady) {
       showMainWindow(startBehavior);
     }
-  }, [isTauri, startBehavior]);
+  }, [isTauri, settingsReady, startBehavior]);
 
   const minimizeWindow = async () => {
     if (!(await detectTauriEnvironment())) return;

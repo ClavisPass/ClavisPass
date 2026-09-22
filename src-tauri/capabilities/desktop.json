@@ -14,8 +14,6 @@
     "global-shortcut:allow-register",
     "global-shortcut:allow-unregister",
     "autostart:default",
-    "autostart:default",
-    "autostart:default",
     "process:default",
     "global-shortcut:default",
     "cli:default"

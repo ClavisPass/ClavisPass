@@ -732,13 +732,19 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     if (!(await detectTauriEnvironment())) {
       return;
     }
-    const { enable, disable } = await import("@tauri-apps/plugin-autostart");
-    if (startup) {
-      await enable();
-      setStartup(true);
-    } else {
-      await disable();
-      setStartup(false);
+    try {
+      const { enable, disable, isEnabled } = await import(
+        "@tauri-apps/plugin-autostart"
+      );
+      if (startup) {
+        await enable();
+      } else {
+        await disable();
+      }
+      setStartup(await isEnabled());
+    } catch (error) {
+      logger.warn("[Settings] Failed to change autostart:", error);
+      await getAutoStart();
     }
   };
 
@@ -747,9 +753,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
       setStartup(false);
       return;
     }
-    const { isEnabled } = await import("@tauri-apps/plugin-autostart");
-    const value = await isEnabled();
-    setStartup(value);
+    try {
+      const { isEnabled } = await import("@tauri-apps/plugin-autostart");
+      const value = await isEnabled();
+      setStartup(value);
+    } catch (error) {
+      logger.warn("[Settings] Failed to read autostart:", error);
+      setStartup(false);
+    }
   };
 
   const resetWindowSize = async () => {

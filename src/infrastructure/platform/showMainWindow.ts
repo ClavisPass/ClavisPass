@@ -16,7 +16,9 @@ async function showMainWindow(startBehavior?: StartBehavior) {
   try {
     const { getMatches } = await import("@tauri-apps/plugin-cli");
     const matches = await getMatches();
-    startedHidden = matches.args.hidden?.value === true;
+    const hiddenArg = matches.args.hidden;
+    startedHidden =
+      hiddenArg?.value === true || (hiddenArg?.occurrences ?? 0) > 0;
   } catch {
     startedHidden = false;
   }
