@@ -9,7 +9,6 @@ import {
   View,
   Pressable,
   StyleSheet,
-  ImageBackground,
   useWindowDimensions,
   Platform,
 } from "react-native";
@@ -56,6 +55,7 @@ import {
   TITLEBAR_HEIGHT,
 } from "../shared/components/titlebarMetrics";
 import { resolveWindowControlsSide } from "../infrastructure/platform/windowControls";
+import AmbientBackground from "../shared/components/AmbientBackground";
 
 type LoginScreenProps = NativeStackScreenProps<LoginStackParamList, "Login">;
 
@@ -97,7 +97,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [deviceSaveModalVisible, setDeviceSaveModalVisible] = useState(false);
   const [cloudProviderModalVisible, setCloudProviderModalVisible] =
     useState(false);
-  const [backgroundReady, setBackgroundReady] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -189,10 +188,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   useEffect(() => {
     handleDismissModalPress();
   }, [provider]);
-
-  useEffect(() => {
-    setBackgroundReady(false);
-  }, [darkmode]);
 
   useEffect(() => {
     if (Platform.OS !== "web") return;
@@ -290,15 +285,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
   return (
     <BottomSheetModalProvider>
-      <ImageBackground
-        key={darkmode ? "login-bg-dark" : "login-bg-light"}
-        source={
-          darkmode
-            ? require("../../assets/blurred-bg-dark.png")
-            : require("../../assets/blurred-bg.png")
-        }
-        onLoadEnd={() => setBackgroundReady(true)}
-        resizeMode="cover"
+      <View
         style={{
           flex: 1,
           width: "100%",
@@ -307,9 +294,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           justifyContent: "center",
         }}
       >
+        <AmbientBackground />
         <View
           id="clavispass-login-page"
-          pointerEvents={backgroundReady ? "auto" : "none"}
           style={{
             padding: 20,
             flex: 1,
@@ -317,7 +304,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            opacity: backgroundReady ? 1 : 0,
           }}
         >
           <FocusAwareStatusBar
@@ -595,7 +581,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             </BottomSheetModal>
           )}
         </View>
-      </ImageBackground>
+      </View>
     </BottomSheetModalProvider>
   );
 };

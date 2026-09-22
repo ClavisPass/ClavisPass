@@ -9,7 +9,6 @@ import {
   Platform,
   StyleSheet,
   ScrollView,
-  TextInput,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -53,7 +52,6 @@ import { useTranslation } from "react-i18next";
 import {
   Button as PaperButton,
   IconButton,
-  Searchbar,
   Text,
 } from "react-native-paper";
 import Animated, {
@@ -104,6 +102,7 @@ import {
   TITLEBAR_HEIGHT,
 } from "../shared/components/titlebarMetrics";
 import { resolveWindowControlsSide } from "../infrastructure/platform/windowControls";
+import SearchInput from "../shared/components/SearchInput";
 
 const settingsSearchTransition = Easing.out(Easing.cubic);
 const compactSearchEnter = () => {
@@ -1080,18 +1079,16 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         width: "100%",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: theme.colors?.background,
+        backgroundColor: "transparent",
         marginBottom: 4,
         borderRadius: 12,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
-        borderBottomLeftRadius: 12,
-        borderBottomRightRadius: 12,
-        boxShadow: theme.colors?.shadow,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
+        boxShadow: "none",
         justifyContent: "center",
-        borderWidth: StyleSheet.hairlineWidth,
-        borderTopWidth: 0,
-        borderColor: darkmode ? theme.colors.outlineVariant : "white",
+        borderWidth: 0,
       }}
     >
       <View
@@ -1141,59 +1138,20 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 height: 32,
                 maxHeight: 32,
                 flex: 1,
-                borderRadius: 10,
-                backgroundColor: darkmode
-                  ? theme.colors.surfaceVariant
-                  : theme.colors.surface,
-                flexDirection: "row",
-                alignItems: "center",
-                overflow: "hidden",
                 ...webNoDragStyle,
               }}
             >
-              <TextInput
+              <SearchInput
                 ref={searchRef}
                 placeholder={t("settings:search")}
-                placeholderTextColor={theme.colors.onSurfaceVariant}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 onBlur={handleCompactSearchBlur}
-                returnKeyType="search"
-                selectionColor={theme.colors.primary}
-                style={
-                  {
-                    flex: 1,
-                    height: 32,
-                    minHeight: 32,
-                    padding: 0,
-                    paddingHorizontal: 8,
-                    color: theme.colors.onSurface,
-                    fontSize: 16,
-                    lineHeight: 18,
-                    textAlignVertical: "center",
-                    includeFontPadding: false,
-                    outlineStyle: "none",
-                  } as any
-                }
+                resetLabel={t("common:reset")}
+                height={32}
+                fontSize={16}
+                compact
               />
-              {searchQuery ? (
-                <IconButton
-                  accessibilityLabel={t("common:reset")}
-                  icon="close"
-                  iconColor={theme.colors.onSurfaceVariant}
-                  size={20}
-                  onPress={() => {
-                    setSearchQuery("");
-                    searchRef.current?.focus?.();
-                  }}
-                  style={{
-                    margin: 0,
-                    width: 28,
-                    height: 32,
-                    ...webNoDragStyle,
-                  }}
-                />
-              ) : null}
             </View>
           </Animated.View>
         ) : (
@@ -1241,53 +1199,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               ...webNoDragStyle,
             }}
           >
-            <Searchbar
+            <SearchInput
               ref={searchRef}
-              inputStyle={{
-                height: 34,
-                minHeight: 34,
-                fontSize: 13,
-                color: theme.colors.onSurface,
-              }}
-              style={{
-                height: 34,
-                width: "100%",
-                borderRadius: 12,
-                backgroundColor: darkmode
-                  ? theme.colors.surfaceVariant
-                  : theme.colors.surface,
-                borderWidth: 1,
-                borderColor: darkmode
-                  ? theme.colors.outlineVariant
-                  : theme.colors.outline,
-                ...webNoDragStyle,
-              }}
               placeholder={t("settings:search")}
               onChangeText={setSearchQuery}
               value={searchQuery}
-              loading={false}
-              iconColor={theme.colors.onSurfaceVariant}
-              placeholderTextColor={theme.colors.onSurfaceVariant}
-              right={() =>
-                searchQuery ? (
-                  <IconButton
-                    accessibilityLabel={t("common:reset")}
-                    icon="close"
-                    iconColor={theme.colors.onSurfaceVariant}
-                    size={18}
-                    onPress={() => {
-                      setSearchQuery("");
-                      searchRef.current?.focus?.();
-                    }}
-                    style={{
-                      marginVertical: 0,
-                      marginLeft: 0,
-                      marginRight: 1,
-                      ...webNoDragStyle,
-                    }}
-                  />
-                ) : null
-              }
+              resetLabel={t("common:reset")}
+              height={34}
+              fontSize={13}
             />
           </View>
         ) : null}
@@ -1374,6 +1293,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 title={t("settings:security")}
               >
                 <SettingsItem
+                  subtitle={t("settings:changeMasterPasswordSubtitle")}
                   onPress={() => {
                     setShowChangeMasterPasswordModal(true);
                   }}
@@ -1385,6 +1305,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                     <SettingsDivider />
                     <SettingsSwitch
                       label={t("settings:useSystemAuth")}
+                      subtitle={t("settings:useSystemAuthSubtitle")}
                       value={useAuthentication}
                       info={settingInfo.systemAuth}
                       onValueChange={(checked) => {
@@ -1402,6 +1323,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                     <SettingsDivider />
                     <SettingsSwitch
                       label={t("settings:blurOnUnfocus")}
+                      subtitle={t("settings:blurOnUnfocusSubtitle")}
                       value={blurOnUnfocus}
                       info={settingInfo.blurOnUnfocus}
                       onValueChange={(checked) => {
@@ -1415,6 +1337,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                     <SettingsDivider />
                     <SettingsSwitch
                       label={t("settings:expiryReminders")}
+                      subtitle={t("settings:expiryRemindersSubtitle")}
                       value={expiryReminders}
                       info={settingInfo.expiryReminders}
                       onValueChange={(checked) => {
@@ -1425,6 +1348,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 ) : null}
                 <SettingsDivider />
                 <SettingsItem
+                  subtitle={t("settings:manageDevicesSubtitle")}
                   onPress={() => {
                     navigation.navigate("Devices");
                   }}
@@ -1436,6 +1360,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                   value={String(copyDurationSeconds ?? 0)}
                   setValue={(v) => setCopyDurationSeconds(Number(v))}
                   label={t("settings:copyDuration")}
+                  subtitle={t("settings:copyDurationSubtitle")}
                   info={settingInfo.copyDuration}
                   dropdownMaxWidth={260}
                   dropdownMinWidth={200}
@@ -1473,6 +1398,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                   value={String(autosaveDelaySeconds ?? 30)}
                   setValue={(v) => setAutosaveDelaySeconds(Number(v))}
                   label={t("settings:autosaveDelay")}
+                  subtitle={t("settings:autosaveDelaySubtitle")}
                   info={settingInfo.autosaveDelay}
                   dropdownMaxWidth={260}
                   dropdownMinWidth={200}
@@ -1502,6 +1428,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                   value={String(sessionDurationSeconds ?? 3600)}
                   setValue={(v) => setSessionDurationSeconds(Number(v))}
                   label={t("settings:sessionDuration")}
+                  subtitle={t("settings:sessionDurationSubtitle")}
                   info={settingInfo.sessionDuration}
                   dropdownMaxWidth={260}
                   dropdownMinWidth={200}
@@ -1584,6 +1511,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 title={t("settings:import")}
               >
                 <SettingsItem
+                  subtitle={t("settings:importDataHint")}
                   onPress={() => {
                     setShowImportModal(true);
                   }}
@@ -1600,6 +1528,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 title={t("settings:browserExtensions")}
               >
                 <SettingsItem
+                  subtitle={t("settings:browserExtensionOpenOptionsSubtitle")}
                   onPress={() => {
                     setShowBrowserExtensionsModal(true);
                   }}
@@ -1608,6 +1537,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 </SettingsItem>
                 <SettingsDivider />
                 <SettingsItem
+                  subtitle={t("settings:browserExtensionSettingsItemSubtitle")}
                   onPress={() => {
                     navigation.navigate("BrowserExtensions");
                   }}
@@ -1632,6 +1562,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                   <>
                     <SettingsDivider />
                     <SettingsItem
+                      subtitle={t("settings:subtitleMobileUpdateDownload")}
                       onPress={() => {
                         void Linking.openURL(manualMobileUpdateUrl);
                       }}
@@ -1642,6 +1573,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 ) : null}
                 <SettingsDivider />
                 <SettingsItem
+                  subtitle={t("settings:subtitleCheckForUpdates")}
                   onPress={() => {
                     void checkForUpdates();
                   }}
@@ -1659,6 +1591,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               >
                 <SettingsSwitch
                   label={t("settings:autostart")}
+                  subtitle={t("settings:subtitleAutostart")}
                   value={startup}
                   onValueChange={(checked) => {
                     void changeAutoStart(checked);
@@ -1667,6 +1600,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 <SettingsDivider />
                 <SettingsSwitch
                   label={t("settings:startMinimized")}
+                  subtitle={t("settings:subtitleStartMinimized")}
                   value={hideOnStartup}
                   onValueChange={(checked) => {
                     changeStartBehavior(checked);
@@ -1674,6 +1608,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 />
                 <SettingsDivider />
                 <SettingsItem
+                  subtitle={t("settings:subtitleResetWindowSize")}
                   onPress={() => {
                     resetWindowSize();
                   }}
@@ -1683,6 +1618,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 <SettingsDivider />
                 <SettingsSwitch
                   label={t("settings:minimizeToTray")}
+                  subtitle={t("settings:subtitleMinimizeToTray")}
                   value={closeBehavior}
                   onValueChange={(checked) => {
                     void changeCloseBehavior(checked);
@@ -1700,6 +1636,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 <HotkeyRecorderItem
                   action="toggleMainWindow"
                   label={t("settings:hotkeyAction_toggleMainWindow")}
+                  subtitle={t("settings:hotkeyAction_toggleMainWindowSubtitle")}
                   hotkeys={hotkeys}
                   onChange={(next: HotkeySettings) => {
                     void setHotkeys(next);
@@ -1709,6 +1646,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 <HotkeyRecorderItem
                   action="lockVault"
                   label={t("settings:hotkeyAction_lockVault")}
+                  subtitle={t("settings:hotkeyAction_lockVaultSubtitle")}
                   hotkeys={hotkeys}
                   onChange={(next: HotkeySettings) => {
                     void setHotkeys(next);
@@ -1718,6 +1656,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 <HotkeyRecorderItem
                   action="newEntry"
                   label={t("settings:hotkeyAction_newEntry")}
+                  subtitle={t("settings:hotkeyAction_newEntrySubtitle")}
                   hotkeys={hotkeys}
                   onChange={(next: HotkeySettings) => {
                     void setHotkeys(next);
@@ -1732,11 +1671,17 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 icon="key-outline"
                 title={t("settings:cryptography")}
               >
-                <SettingsShortcutItem shortcut="XChaCha20">
+                <SettingsShortcutItem
+                  shortcut="XChaCha20"
+                  subtitle={t("settings:encryptionSubtitle")}
+                >
                   {t("settings:encryption")}
                 </SettingsShortcutItem>
                 <SettingsDivider />
-                <SettingsShortcutItem shortcut="Argon2id">
+                <SettingsShortcutItem
+                  shortcut="Argon2id"
+                  subtitle={t("settings:keyDerivationSubtitle")}
+                >
                   {t("settings:keyDerivation")}
                 </SettingsShortcutItem>
               </SettingsContainer>
@@ -1748,21 +1693,33 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 icon="alert-outline"
                 title={t("settings:dangerZone")}
               >
-                <SettingsItem onPress={() => setResetAction("settings")}>
+                <SettingsItem
+                  subtitle={t("settings:subtitleResetSettings")}
+                  onPress={() => setResetAction("settings")}
+                >
                   {t("settings:resetSettings")}
                 </SettingsItem>
                 <SettingsDivider />
-                <SettingsItem onPress={() => setResetAction("device")}>
+                <SettingsItem
+                  subtitle={t("settings:subtitleResetDevice")}
+                  onPress={() => setResetAction("device")}
+                >
                   {t("settings:resetDevice")}
                 </SettingsItem>
                 <SettingsDivider />
-                <SettingsItem onPress={() => setResetAction("vault")}>
+                <SettingsItem
+                  subtitle={t("settings:subtitleClearVault")}
+                  onPress={() => setResetAction("vault")}
+                >
                   {t("settings:clearVault")}
                 </SettingsItem>
                 {devMode ? (
                   <>
                     <SettingsDivider />
-                    <SettingsItem onPress={() => setResetAction("syncDevices")}>
+                    <SettingsItem
+                      subtitle={t("settings:subtitleClearSyncDevices")}
+                      onPress={() => setResetAction("syncDevices")}
+                    >
                       {t("settings:clearSyncDevices")}
                     </SettingsItem>
                   </>

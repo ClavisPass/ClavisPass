@@ -69,12 +69,24 @@ function TitleModule(props: Props) {
           },
         ]}
         contentStyle={[
-          { margin: 0, padding: 0, height: 36 },
+          {
+            margin: 0,
+            padding: 0,
+            height: 36,
+            backgroundColor: "transparent",
+          },
           Platform.OS === "web" ? ({ cursor: "text" } as any) : null,
         ]}
         underlineStyle={{ margin: 0, padding: 0 }}
         style={[
-          { flex: 1, width: "100%", margin: 0, padding: 0, height: 36 },
+          {
+            flex: 1,
+            width: "100%",
+            margin: 0,
+            padding: 0,
+            height: 36,
+            backgroundColor: "transparent",
+          },
           Platform.OS === "web" ? ({ cursor: "text" } as any) : null,
         ]}
         value={props.value.title}

@@ -1,7 +1,8 @@
-import { Pressable, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import { useMemo, useState } from "react";
-import { RadioButton } from "react-native-paper";
+import { RadioButton, Text } from "react-native-paper";
+import { useTranslation } from "react-i18next";
 import theme from "../../../shared/ui/theme";
 import darkTheme from "../../../shared/ui/theme-darkmode";
 
@@ -55,7 +56,8 @@ function DarkModeSwitchPreview({ value, checked, onSelect, theme, size }: Previe
 type Props = { size?: Size };
 
 export default function DarkModeSwitch({ size = "large" }: Props) {
-  const { darkmode, setDarkmode } = useTheme();
+  const { darkmode, setDarkmode, theme: appTheme } = useTheme();
+  const { t } = useTranslation();
   const [checked, setChecked] = useState<CheckedType>(darkmode ? "dark" : "light");
 
   const onSelect = (v: CheckedType) => {
@@ -63,7 +65,7 @@ export default function DarkModeSwitch({ size = "large" }: Props) {
     setDarkmode(v === "dark");
   };
 
-  return (
+  const picker = (
     <View
       style={{
         flexDirection: "row",
@@ -76,6 +78,46 @@ export default function DarkModeSwitch({ size = "large" }: Props) {
     >
       <DarkModeSwitchPreview value="light" checked={checked} onSelect={onSelect} theme={theme} size={size} />
       <DarkModeSwitchPreview value="dark" checked={checked} onSelect={onSelect} theme={darkTheme} size={size} />
+    </View>
+  );
+
+  if (size === "small") return picker;
+
+  return (
+    <View
+      style={{
+        marginVertical: 4,
+        borderRadius: 12,
+        overflow: "hidden",
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: darkmode
+          ? "rgba(255, 255, 255, 0.08)"
+          : "rgba(255, 255, 255, 0.72)",
+        backgroundColor: darkmode
+          ? "rgba(36, 36, 36, 0.52)"
+          : "rgba(255, 255, 255, 0.58)",
+        boxShadow: darkmode
+          ? "rgba(0, 0, 0, 0.10) 0px 2px 10px 0px"
+          : "rgba(99, 99, 99, 0.06) 0px 2px 10px 0px",
+        paddingHorizontal: 14,
+        paddingTop: 12,
+        paddingBottom: 10,
+      }}
+    >
+      <Text variant="bodyLarge" style={{ userSelect: "none" }}>
+        {t("settings:themeMode")}
+      </Text>
+      <Text
+        variant="bodySmall"
+        style={{
+          color: appTheme.colors.onSurfaceVariant,
+          marginTop: 2,
+          userSelect: "none",
+        }}
+      >
+        {t("settings:themeModeSubtitle")}
+      </Text>
+      {picker}
     </View>
   );
 }

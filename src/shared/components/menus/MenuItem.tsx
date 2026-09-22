@@ -18,6 +18,7 @@ type Props = {
   minWidth?: number;
   rightText?: string;
   rightIcon?: string;
+  rounded?: boolean;
 };
 export function MenuItem(props: Props) {
   const { theme } = useTheme();
@@ -25,7 +26,7 @@ export function MenuItem(props: Props) {
 
   return (
     <View style={{ height: 44 }}>
-      <Ripple onPress={props.onPress}>
+      <Ripple onPress={props.onPress} rounded={props.rounded}>
         <View
           style={{
             flex: 1,
@@ -43,6 +44,8 @@ export function MenuItem(props: Props) {
               : "transparent",
             borderLeftWidth: props.selected ? 3 : 0,
             borderLeftColor: props.selectedColor ?? theme.colors.primary,
+            borderRadius: props.rounded ? 12 : 0,
+            overflow: props.rounded ? "hidden" : "visible",
           }}
         >
           <View
@@ -124,14 +127,21 @@ export function MenuItem(props: Props) {
   );
 }
 
-function Ripple(props: { onPress?: () => void; children: ReactNode }) {
+function Ripple(props: {
+  onPress?: () => void;
+  children: ReactNode;
+  rounded?: boolean;
+}) {
   if (props.onPress) {
     return (
       <AnimatedPressable
         onPress={props.onPress}
+        borderless={!props.rounded}
         style={{
           cursor: "pointer",
           flex: 1,
+          borderRadius: props.rounded ? 12 : 0,
+          overflow: props.rounded ? "hidden" : "visible",
         }}
       >
         {props.children}

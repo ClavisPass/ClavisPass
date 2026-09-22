@@ -19,6 +19,7 @@ export function ContentProtectionSettingsToggle(props: Props) {
   return (
       <SettingsSwitch
         label={t("settings:contentProtection")}
+        subtitle={t("settings:contentProtectionSubtitle")}
         value={enabled}
         disabled={busy}
         info={props.info}

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import * as WebBrowser from "expo-web-browser";
 import { Icon, IconButton, Text, useTheme } from "react-native-paper";
 import { Skeleton } from "moti/skeleton";
-import { Image, Platform, View } from "react-native";
+import { Image, Platform, StyleSheet, View } from "react-native";
 import { MotiView } from "moti";
 
 import DropboxLoginButton from "./DropboxLoginButton";
@@ -10,7 +10,10 @@ import GoogleDriveLoginButton from "./GoogleDriveLoginButton";
 import ClavisPassHubLoginButton from "./ClavisPassHubLoginButton";
 import LocalFileLoginButton from "./LocalFileLoginButton";
 import SettingsDivider from "../../settings/components/SettingsDivider";
+import SettingsItem from "../../settings/components/SettingsItem";
 import TooltipIconButton from "../../../shared/components/buttons/TooltipIconButton";
+import Modal from "../../../shared/components/modals/Modal";
+import ModalSurface from "../../../shared/components/modals/ModalSurface";
 
 import UserInfoType from "../model/UserInfoType";
 import { useToken } from "../../../app/providers/CloudProvider";
@@ -44,6 +47,7 @@ function UserInformation(props: Props) {
   const [userInfo, setUserInfoState] = useState<UserInfoType | null>(null);
   const [loading, setLoading] = useState(false);
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
+  const [providerModalVisible, setProviderModalVisible] = useState(false);
 
   const hasCloudSession = useMemo(
     () => provider !== "device" && !!refreshToken,
@@ -101,6 +105,10 @@ function UserInformation(props: Props) {
   useEffect(() => {
     setAvatarLoadFailed(false);
   }, [userInfo?.avatar]);
+
+  useEffect(() => {
+    if (hasCloudSession) setProviderModalVisible(false);
+  }, [hasCloudSession]);
 
   const avatarSource = useMemo(
     () => (userInfo?.avatar ? { uri: userInfo.avatar } : undefined),
@@ -165,6 +173,16 @@ function UserInformation(props: Props) {
             style={{
               width: "100%",
               borderRadius: 12,
+              borderWidth: StyleSheet.hairlineWidth,
+              borderColor: darkmode
+                ? "rgba(255, 255, 255, 0.08)"
+                : "rgba(255, 255, 255, 0.72)",
+              backgroundColor: darkmode
+                ? "rgba(36, 36, 36, 0.52)"
+                : "rgba(255, 255, 255, 0.58)",
+              boxShadow: darkmode
+                ? "rgba(0, 0, 0, 0.10) 0px 2px 10px 0px"
+                : "rgba(99, 99, 99, 0.06) 0px 2px 10px 0px",
               padding: 8,
               flexDirection: "row",
               alignItems: "center",
@@ -351,17 +369,33 @@ function UserInformation(props: Props) {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: "timing", duration: 220 }}
         >
-          {Platform.OS === "web" ? (
-            <>
-              <LocalFileLoginButton />
-              <SettingsDivider />
-            </>
-          ) : null}
-          <DropboxLoginButton />
-          <SettingsDivider />
-          <GoogleDriveLoginButton />
-          <SettingsDivider />
-          <ClavisPassHubLoginButton />
+          <SettingsItem
+            leadingIcon="cloud-outline"
+            subtitle={t("login:cloudSaveSubtitle")}
+            onPress={() => setProviderModalVisible(true)}
+          >
+            {t("login:cloudSave")}
+          </SettingsItem>
+          <Modal
+            visible={providerModalVisible}
+            onDismiss={() => setProviderModalVisible(false)}
+          >
+            <ModalSurface width={340} padded={false}>
+              <View style={{ overflow: "hidden", borderRadius: 12 }}>
+                {Platform.OS === "web" ? (
+                  <>
+                    <LocalFileLoginButton />
+                    <SettingsDivider />
+                  </>
+                ) : null}
+                <DropboxLoginButton />
+                <SettingsDivider />
+                <GoogleDriveLoginButton />
+                <SettingsDivider />
+                <ClavisPassHubLoginButton />
+              </View>
+            </ModalSurface>
+          </Modal>
         </MotiView>
       )}
     </View>

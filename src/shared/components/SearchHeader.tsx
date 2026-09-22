@@ -2,12 +2,11 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Platform,
   StyleSheet,
-  TextInput,
   View,
   useWindowDimensions,
 } from "react-native";
 import Constants from "expo-constants";
-import { IconButton, Searchbar, Text } from "react-native-paper";
+import { IconButton, Text } from "react-native-paper";
 import { useIsFocused } from "@react-navigation/native";
 import Animated, {
   Easing,
@@ -24,6 +23,7 @@ import {
   TITLEBAR_HEIGHT,
 } from "./titlebarMetrics";
 import { resolveWindowControlsSide } from "../../infrastructure/platform/windowControls";
+import SearchInput from "./SearchInput";
 
 const searchTransition = Easing.out(Easing.cubic);
 
@@ -327,59 +327,20 @@ export default function SearchHeader({
                 height: 32,
                 maxHeight: 32,
                 flex: 1,
-                borderRadius: 10,
-                backgroundColor: darkmode
-                  ? theme.colors.surfaceVariant
-                  : theme.colors.surface,
-                flexDirection: "row",
-                alignItems: "center",
-                overflow: "hidden",
                 ...webNoDragStyle,
               }}
             >
-              <TextInput
+              <SearchInput
                 ref={searchRef}
                 placeholder={placeholder}
-                placeholderTextColor={theme.colors.onSurfaceVariant}
                 value={value}
                 onChangeText={onChangeText}
                 onBlur={closeCompactSearchIfEmpty}
-                returnKeyType="search"
-                selectionColor={theme.colors.primary}
-                style={
-                  {
-                    flex: 1,
-                    height: 32,
-                    minHeight: 32,
-                    padding: 0,
-                    paddingHorizontal: 8,
-                    color: theme.colors.onSurface,
-                    fontSize: 16,
-                    lineHeight: 18,
-                    textAlignVertical: "center",
-                    includeFontPadding: false,
-                    outlineStyle: "none",
-                  } as any
-                }
+                resetLabel={resetLabel}
+                height={32}
+                fontSize={16}
+                compact
               />
-              {value ? (
-                <IconButton
-                  accessibilityLabel={resetLabel}
-                  icon="close"
-                  iconColor={theme.colors.onSurfaceVariant}
-                  size={20}
-                  onPress={() => {
-                    onChangeText("");
-                    searchRef.current?.focus?.();
-                  }}
-                  style={{
-                    margin: 0,
-                    width: 28,
-                    height: 32,
-                    ...webNoDragStyle,
-                  }}
-                />
-              ) : null}
             </View>
           </Animated.View>
         ) : (
@@ -441,53 +402,14 @@ export default function SearchHeader({
               ...webNoDragStyle,
             }}
           >
-            <Searchbar
+            <SearchInput
               ref={searchRef}
-              inputStyle={{
-                height: 34,
-                minHeight: 34,
-                fontSize: 13,
-                color: theme.colors.onSurface,
-              }}
-              style={{
-                height: 34,
-                width: "100%",
-                borderRadius: 12,
-                backgroundColor: darkmode
-                  ? theme.colors.surfaceVariant
-                  : theme.colors.surface,
-                borderWidth: 1,
-                borderColor: darkmode
-                  ? theme.colors.outlineVariant
-                  : theme.colors.outline,
-                ...webNoDragStyle,
-              }}
               placeholder={placeholder}
               onChangeText={onChangeText}
               value={value}
-              loading={false}
-              iconColor={theme.colors.onSurfaceVariant}
-              placeholderTextColor={theme.colors.onSurfaceVariant}
-              right={() =>
-                value ? (
-                  <IconButton
-                    accessibilityLabel={resetLabel}
-                    icon="close"
-                    iconColor={theme.colors.onSurfaceVariant}
-                    size={18}
-                    onPress={() => {
-                      onChangeText("");
-                      searchRef.current?.focus?.();
-                    }}
-                    style={{
-                      marginVertical: 0,
-                      marginLeft: 0,
-                      marginRight: 1,
-                      ...webNoDragStyle,
-                    }}
-                  />
-                ) : null
-              }
+              resetLabel={resetLabel}
+              height={34}
+              fontSize={13}
             />
           </View>
         ) : null}

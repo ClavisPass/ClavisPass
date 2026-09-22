@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import {
   View,
-  TextInput,
   Platform,
   useWindowDimensions,
   InteractionManager,
@@ -16,7 +15,7 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
-import { Button, Icon, IconButton, Searchbar } from "react-native-paper";
+import { Button, Icon, IconButton } from "react-native-paper";
 
 import { Text } from "react-native-paper";
 
@@ -31,16 +30,15 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { LinearGradient } from "expo-linear-gradient";
 import ListItem from "../features/vault/components/items/ListItem";
 import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import Constants from "expo-constants";
-import getColors from "../shared/ui/linearGradient";
 import HomeFilterMenu from "../features/vault/components/menus/HomeFilterMenu";
 import Blur from "../shared/components/Blur";
 import AppChip from "../shared/components/chips/AppChip";
 import FolderFilter from "../features/vault/components/FolderFilter";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
+import SearchInput from "../shared/components/SearchInput";
 import {
   useFocusEffect,
   useIsFocused,
@@ -56,7 +54,7 @@ import AddValueModal from "../features/vault/components/modals/AddValueModal";
 import { useAuth } from "../app/providers/AuthProvider";
 import { useTheme } from "../app/providers/ThemeProvider";
 
-import LogoColored from "../shared/ui/LogoColored";
+import Logo from "../shared/ui/Logo";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import FolderType from "../features/vault/model/FolderType";
 import ValuesType from "../features/vault/model/ValuesType";
@@ -237,6 +235,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     setTitlebarCenterGap,
     setTitlebarOverlayDragEnabled,
     theme,
+    darkmode,
   } = useTheme();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
@@ -509,7 +508,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       setHomeContentVisible(true);
       let task = InteractionManager.runAfterInteractions(() => {
         setHeaderSpacing(0);
-        setHeaderWhite(true);
+        setHeaderWhite(false);
       });
       return () => {
         task?.cancel?.();
@@ -596,7 +595,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   );
 
   useEffect(() => {
-    setHeaderWhite(true);
+    setHeaderWhite(false);
   }, [vault.dirty]);
 
   const vaultData = useMemo(() => {
@@ -1452,12 +1451,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         <View style={{ flex: 1 }}>
           <FocusAwareStatusBar
             animated={true}
-            style="light"
+            style={darkmode ? "light" : "dark"}
             translucent={true}
           />
-          <LinearGradient
-            colors={getColors()}
-            dither={true}
+          <View
             style={{
               width: "100%",
               display: "flex",
@@ -1473,15 +1470,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 Constants.statusBarHeight + (TITLEBAR_HEIGHT > 0 ? 4 : 6),
               paddingBottom: TITLEBAR_HEIGHT > 0 ? 4 : 6,
               marginBottom: 4,
-              borderBottomLeftRadius: 12,
-              borderBottomRightRadius: 12,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 0 },
-              shadowOpacity: 0.4,
-              shadowRadius: 6,
-              elevation: 5,
+              borderBottomLeftRadius: 0,
+              borderBottomRightRadius: 0,
+              backgroundColor: "transparent",
+              borderWidth: 0,
+              shadowOpacity: 0,
+              elevation: 0,
             }}
-            end={{ x: 0.1, y: 0.2 }}
           >
             <Animated.View
               layout={Layout.duration(180).easing(headerSearchTransition)}
@@ -1532,57 +1527,20 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                       height: 32,
                       maxHeight: 32,
                       flex: 1,
-                      borderRadius: 10,
-                      backgroundColor: "rgba(217, 217, 217, 0.21)",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      overflow: "hidden",
                       ...webNoDragStyle,
                     }}
                   >
-                    <TextInput
+                    <SearchInput
                       ref={searchRef}
                       placeholder={t("home:search")}
-                      placeholderTextColor="#ffffff80"
                       value={searchQuery}
                       onChangeText={setSearchQuery}
                       onBlur={handleCompactSearchBlur}
-                      returnKeyType="search"
-                      selectionColor={theme.colors.primary}
-                      style={
-                        {
-                          flex: 1,
-                          height: 32,
-                          minHeight: 32,
-                          padding: 0,
-                          paddingHorizontal: 8,
-                          color: "white",
-                          fontSize: 16,
-                          lineHeight: 18,
-                          textAlignVertical: "center",
-                          includeFontPadding: false,
-                          outlineStyle: "none",
-                        } as any
-                      }
+                      resetLabel={t("common:reset")}
+                      height={32}
+                      fontSize={16}
+                      compact
                     />
-                    {searchQuery ? (
-                      <IconButton
-                        accessibilityLabel={t("common:reset")}
-                        icon="close"
-                        iconColor="#ffffff80"
-                        size={20}
-                        onPress={() => {
-                          setSearchQuery("");
-                          searchRef.current?.focus?.();
-                        }}
-                        style={{
-                          margin: 0,
-                          width: 28,
-                          height: 32,
-                          ...webNoDragStyle,
-                        }}
-                      />
-                    ) : null}
                   </View>
                 </Animated.View>
               ) : (
@@ -1612,13 +1570,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                     isFocused && !searchHeaderVisible ? webDragStyle : null,
                   ]}
                 >
-                  <LogoColored width={20} height={20} />
+                  <Logo width={20} height={20} />
                   <Text
                     style={{
                       fontFamily: "LexendExa_400Regular",
                       fontSize: 16,
                       lineHeight: 16,
-                      color: "white",
+                      color: theme.colors.onSurface,
                       userSelect: "none",
                       includeFontPadding: false,
                       paddingRight: 6,
@@ -1640,49 +1598,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                     ...webNoDragStyle,
                   }}
                 >
-                  <Searchbar
+                  <SearchInput
                     ref={searchRef}
-                    inputStyle={{
-                      height: 34,
-                      minHeight: 34,
-                      fontSize: 13,
-                      color: "white",
-                    }}
-                    style={{
-                      height: 34,
-                      width: "100%",
-                      borderRadius: 12,
-                      backgroundColor: "rgba(217, 217, 217, 0.18)",
-                      borderWidth: 1,
-                      borderColor: "rgba(255, 255, 255, 0.14)",
-                      ...webNoDragStyle,
-                    }}
                     placeholder={t("home:search")}
                     onChangeText={setSearchQuery}
                     value={searchQuery}
-                    loading={false}
-                    iconColor={"#ffffff80"}
-                    placeholderTextColor={"#ffffff80"}
-                    right={() =>
-                      searchQuery ? (
-                        <IconButton
-                          accessibilityLabel={t("common:reset")}
-                          icon="close"
-                          iconColor="#ffffff80"
-                          size={18}
-                          onPress={() => {
-                            setSearchQuery("");
-                            searchRef.current?.focus?.();
-                          }}
-                          style={{
-                            marginVertical: 0,
-                            marginLeft: 0,
-                            marginRight: 1,
-                            ...webNoDragStyle,
-                          }}
-                        />
-                      ) : null
-                    }
+                    resetLabel={t("common:reset")}
+                    height={34}
+                    fontSize={13}
                   />
                 </View>
               ) : null}
@@ -1691,7 +1614,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                   <IconButton
                     accessibilityLabel={t("home:search")}
                     icon="magnify"
-                    iconColor="white"
+                    iconColor={theme.colors.primary}
                     size={22}
                     onPress={openHeaderSearch}
                     style={{
@@ -1720,7 +1643,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 />
               )}
             </Animated.View>
-          </LinearGradient>
+          </View>
           {!isCompactHeader ? syncBar : null}
           <View
             onStartShouldSetResponderCapture={handleHomeContentResponderCapture}

@@ -12,10 +12,12 @@ import {
   HotkeySettings,
 } from "../../../infrastructure/platform/hotkeys";
 import { beginHotkeyRecording } from "../../../infrastructure/events/hotkeyRecordingBus";
+import SettingsItem from "./SettingsItem";
 
 type Props = {
   action: HotkeyAction;
   label: string;
+  subtitle?: string;
   hotkeys: HotkeySettings;
   onChange: (next: HotkeySettings) => void;
 };
@@ -23,6 +25,7 @@ type Props = {
 export default function HotkeyRecorderItem({
   action,
   label,
+  subtitle,
   hotkeys,
   onChange,
 }: Props) {
@@ -107,30 +110,11 @@ export default function HotkeyRecorderItem({
   }, []);
 
   return (
-    <View
-      style={{
-        height: error ? undefined : 44,
-        minHeight: error ? 62 : 44,
-        paddingLeft: 10,
-        paddingRight: 10,
-        justifyContent: "center",
-        overflow: "hidden",
-      }}
-    >
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 8,
-        }}
-      >
-        <Text
-          variant="bodyLarge"
-          numberOfLines={1}
-          style={{ flex: 1, userSelect: "none" }}
-        >
-          {label}
-        </Text>
+    <SettingsItem
+      subtitle={error ?? subtitle}
+      rightIcon={null}
+      trailing={
+        <>
         <View style={{ width: 28, height: 30, justifyContent: "center" }}>
           {value !== defaultValue ? (
             <AnimatedPressable
@@ -185,15 +169,10 @@ export default function HotkeyRecorderItem({
             </Text>
           </View>
         </AnimatedPressable>
-      </View>
-      {error ? (
-        <Text
-          variant="bodySmall"
-          style={{ color: theme.colors.error, marginTop: 2 }}
-        >
-          {error}
-        </Text>
-      ) : null}
-    </View>
+        </>
+      }
+    >
+      {label}
+    </SettingsItem>
   );
 }

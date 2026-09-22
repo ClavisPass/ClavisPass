@@ -17,6 +17,7 @@ import {
 } from "../features/fastaccess/constants";
 import { detectTauriEnvironment } from "../infrastructure/platform/isTauri";
 import { logger } from "../infrastructure/logging/logger";
+import AmbientBackground from "../shared/components/AmbientBackground";
 
 export default function FastAccessScreen() {
   const [title, setTitle] = useState("");
@@ -112,6 +113,7 @@ export default function FastAccessScreen() {
         height: "100%",
       }}
     >
+      <AmbientBackground />
       <Header
         leftNode={
           <AnimatedPressable

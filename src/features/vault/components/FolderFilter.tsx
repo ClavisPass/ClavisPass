@@ -235,7 +235,6 @@ function FolderFilter(props: Props) {
 
     return (
       <Animated.View key={module} layout={LinearTransition.duration(120)}>
-        <Divider />
         <View style={{ height: 44 }}>
           <View
             style={{
@@ -247,6 +246,8 @@ function FolderFilter(props: Props) {
                 : "transparent",
               borderLeftWidth: selected ? 3 : 0,
               borderLeftColor: theme.colors.primary,
+              borderRadius: 12,
+              overflow: "hidden",
             }}
           >
             <AnimatedPressable
@@ -323,7 +324,6 @@ function FolderFilter(props: Props) {
             style={{ flexShrink: 1 }}
             renderItem={({ item, index }) => (
               <Animated.View layout={LinearTransition.duration(120)}>
-                <Divider />
                 <MenuItem
                   key={index}
                   leadingIcon={getFolderIcon(item)}
@@ -332,6 +332,7 @@ function FolderFilter(props: Props) {
                   }
                   selectedColor={getFolderColor(item) ?? undefined}
                   selected={props.selectedFolder?.id === item.id ? true : false}
+                  rounded
                   onPress={
                     props.disabled
                       ? undefined
@@ -357,6 +358,7 @@ function FolderFilter(props: Props) {
                     <MenuItem
                       leadingIcon={"two-factor-authentication"}
                       selected={props.selected2FA}
+                      rounded
                       onPress={
                         props.disabled
                           ? undefined
@@ -370,7 +372,6 @@ function FolderFilter(props: Props) {
                     >
                       {t("home:twofa")}
                     </MenuItem>
-                    <Divider />
                   </>
                 ) : null}
                 {props.hasCardEntries ? (
@@ -378,6 +379,7 @@ function FolderFilter(props: Props) {
                     <MenuItem
                       leadingIcon={"credit-card-multiple-outline"}
                       selected={props.selectedCard}
+                      rounded
                       onPress={
                         props.disabled
                           ? undefined
@@ -391,12 +393,12 @@ function FolderFilter(props: Props) {
                     >
                       {t("home:card")}
                     </MenuItem>
-                    <Divider />
                   </>
                 ) : null}
                 <MenuItem
                   leadingIcon={"star-outline"}
                   selected={props.selectedFav}
+                  rounded
                   onPress={
                     props.disabled
                       ? undefined
@@ -414,10 +416,10 @@ function FolderFilter(props: Props) {
             }
             ListFooterComponent={
               <>
-                <Divider />
                 <MenuItem
                   leadingIcon={"filter-variant-plus"}
                   selected={props.selectedModuleFilters.length > 0}
+                  rounded
                   onPress={
                     props.disabled ? undefined : props.openModuleFilterModal
                   }

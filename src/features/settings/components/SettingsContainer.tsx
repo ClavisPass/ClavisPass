@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { View, StyleSheet } from "react-native";
-import { Divider, Text } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import AppIcon from "../../../shared/components/icons/AppIcon";
 
@@ -8,10 +8,9 @@ const styles = StyleSheet.create({
   container: {
     marginLeft: 8,
     marginRight: 8,
-    marginBottom: 4,
-    borderRadius: 12,
-    overflow: "hidden",
-    //padding: 16,
+    marginBottom: 14,
+    borderRadius: 0,
+    overflow: "visible",
   },
 });
 
@@ -30,38 +29,36 @@ export function SubItem(props: Props) {
         style={{
           display: "flex",
           flexDirection: "row",
-          gap: 4,
+          gap: 8,
           alignItems: "center",
-          padding: 8,
-          paddingLeft: 8,
-          paddingRight: 8,
+          paddingTop: 8,
+          paddingBottom: 8,
+          paddingLeft: 12,
+          paddingRight: 12,
         }}
       >
         {props.icon && (
-          <AppIcon color={theme.colors?.primary} name={props.icon} size={16} />
+          <AppIcon color={theme.colors?.primary} name={props.icon} size={24} />
         )}
-        <Text>{props.title}</Text>
+        <Text variant="titleMedium" style={{ fontWeight: "600" }}>
+          {props.title}
+        </Text>
       </View>
-      <Divider style={{ marginBottom: 0 }} />
       {props.children}
     </>
   );
 }
 
 function SettingsContainer(props: Props) {
-  const { theme, darkmode } = useTheme();
   return (
     <View
       ref={props.ref}
       style={[
         styles.container,
         {
-          backgroundColor: theme.colors?.background,
-          borderRadius: 12,
-          borderWidth: StyleSheet.hairlineWidth,
-          borderColor: darkmode ? theme.colors.outlineVariant : "white",
-          overflow: "hidden",
-          boxShadow: theme.colors?.shadow,
+          backgroundColor: "transparent",
+          borderWidth: 0,
+          boxShadow: "none",
         },
       ]}
     >

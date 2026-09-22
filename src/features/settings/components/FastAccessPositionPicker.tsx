@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { RadioButton, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
@@ -71,7 +71,7 @@ function CornerOption({
 
 export default function FastAccessPositionPicker({ value, setValue }: Props) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
+  const { darkmode, theme } = useTheme();
 
   const corners = useMemo<Corner[]>(
     () => [
@@ -100,13 +100,36 @@ export default function FastAccessPositionPicker({ value, setValue }: Props) {
   );
 
   return (
-    <View style={{ paddingHorizontal: 10, paddingTop: 10, paddingBottom: 10 }}>
+    <View
+      style={{
+        marginVertical: 4,
+        borderRadius: 12,
+        overflow: "hidden",
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: darkmode
+          ? "rgba(255, 255, 255, 0.08)"
+          : "rgba(255, 255, 255, 0.72)",
+        backgroundColor: darkmode
+          ? "rgba(36, 36, 36, 0.52)"
+          : "rgba(255, 255, 255, 0.58)",
+        boxShadow: darkmode
+          ? "rgba(0, 0, 0, 0.10) 0px 2px 10px 0px"
+          : "rgba(99, 99, 99, 0.06) 0px 2px 10px 0px",
+        paddingHorizontal: 14,
+        paddingTop: 12,
+        paddingBottom: 12,
+      }}
+    >
       <Text variant="bodyMedium">{t("settings:fastAccessPosition")}</Text>
       <Text
         variant="bodySmall"
-        style={{ opacity: 0.7, marginTop: 2, marginBottom: 10 }}
+        style={{
+          color: theme.colors.onSurfaceVariant,
+          marginTop: 2,
+          marginBottom: 10,
+        }}
       >
-        {t("settings:fastAccessPositionHint")}
+        {t("settings:fastAccessPositionSubtitle")}
       </Text>
 
       <View style={{ alignItems: "flex-start", gap: 10 }}>

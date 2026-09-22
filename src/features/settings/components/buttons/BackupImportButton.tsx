@@ -44,7 +44,10 @@ function BackupImportButton() {
 };
 
   return (
-    <SettingsItem onPress={importBackup}>
+    <SettingsItem
+      onPress={importBackup}
+      subtitle={t("settings:importBackupSubtitle")}
+    >
       {t("settings:importBackup")}
     </SettingsItem>
   );

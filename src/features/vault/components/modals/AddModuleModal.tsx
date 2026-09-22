@@ -6,13 +6,14 @@ import {
   Dimensions,
   Platform,
 } from "react-native";
-import { Searchbar, Text, IconButton } from "react-native-paper";
+import { Text, IconButton } from "react-native-paper";
 import Modal from "../../../../shared/components/modals/Modal";
 import ModulesEnum from "../../model/ModulesEnum";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import AppIcon from "../../../../shared/components/icons/AppIcon";
 import AppChip from "../../../../shared/components/chips/AppChip";
 import ModalSurface from "../../../../shared/components/modals/ModalSurface";
+import SearchInput from "../../../../shared/components/SearchInput";
 
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
@@ -28,8 +29,11 @@ type ModuleCategory =
   | "NetworkTechnical"
   | "Custom";
 
-// UI shows only these modules (exclude internal/structural ones)
-type UiModules = Exclude<ModulesEnum, ModulesEnum.UNKNOWN | ModulesEnum.TITLE>;
+// UI shows only these modules (exclude internal/structural/sensitive-first-run ones)
+type UiModules = Exclude<
+  ModulesEnum,
+  ModulesEnum.UNKNOWN | ModulesEnum.TITLE | ModulesEnum.CREDIT_CARD
+>;
 
 type ModuleMeta = {
   id: UiModules;
@@ -260,23 +264,6 @@ export default function AddModuleModalCompactFav(props: Props) {
       ],
     },
     {
-      id: ModulesEnum.CREDIT_CARD,
-      label: t("modules:creditCard"),
-      icon: MODULE_ICON[ModulesEnum.CREDIT_CARD],
-      category: "PaymentDocuments",
-      keywords: [
-        "credit",
-        "kreditkarte",
-        "card",
-        "karte",
-        "payment",
-        "zahlung",
-        "bank",
-        "cvv",
-        "cvc",
-      ],
-    },
-    {
       id: ModulesEnum.PASSWORD,
       label: t("modules:password"),
       icon: MODULE_ICON[ModulesEnum.PASSWORD],
@@ -339,7 +326,7 @@ export default function AddModuleModalCompactFav(props: Props) {
       id: ModulesEnum.KEY,
       label: t("modules:key"),
       icon: MODULE_ICON[ModulesEnum.KEY],
-      category: "NetworkTechnical",
+      category: "Custom",
       keywords: [
         "ssh",
         "api",
@@ -534,7 +521,13 @@ export default function AddModuleModalCompactFav(props: Props) {
       s.push({ title: t("common:recentlyUsed"), data: recentItems });
 
     categories.forEach((category) => {
-      const data = allItems.filter((m) => m.category === category);
+      const data = allItems
+        .filter((m) => m.category === category)
+        .sort((a, b) => {
+          if (a.id === ModulesEnum.KEY) return 1;
+          if (b.id === ModulesEnum.KEY) return -1;
+          return 0;
+        });
       if (data.length) s.push({ title: categoryLabels[category], data });
     });
     return s.filter((sec) => sec.data.length > 0);
@@ -620,16 +613,12 @@ export default function AddModuleModalCompactFav(props: Props) {
         padded={false}
         contentStyle={{ flex: 1, padding: 8, gap: 8 }}
       >
-        <Searchbar
-          inputStyle={{ height: 40, minHeight: 40 }}
-          style={{
-            height: 40,
-            borderRadius: 10,
-            backgroundColor: "rgba(217, 217, 217, 0.21)",
-          }}
-          placeholder="Search"
+        <SearchInput
+          height={40}
+          placeholder={t("home:search")}
           onChangeText={setQuery}
           value={query}
+          resetLabel={t("common:reset")}
         />
 
         <ScrollView

@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
 import { StyleProp, View, ViewStyle } from "react-native";
 import { useTheme } from "../../../app/providers/ThemeProvider";
+import AmbientBackground from "../AmbientBackground";
 
 type Props = {
   children: ReactNode;
@@ -17,6 +18,7 @@ export default function AnimatedContainer({ children, style }: Props) {
         style,
       ]}
     >
+      <AmbientBackground />
       {children}
     </View>
   );

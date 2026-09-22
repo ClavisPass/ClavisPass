@@ -216,10 +216,10 @@ function SettingsQuickSelect(props: Props) {
               if (!shouldRender) return null;
               return (
                 <>
-                  {index !== 0 ? <Divider /> : null}
                   <MenuItem
                     key={index}
                     leadingIcon={item.icon}
+                    rounded
                     onPress={() => {
                       scrollToRef(item.ref);
                     }}

@@ -92,12 +92,12 @@ function AddValueModal(props: Props) {
               {t("moduleTemplates:wifi")}
             </CategoryItem>
             <CategoryItem
-              leadingIcon={ValueIconsEnum.KEY}
+              leadingIcon={ValueIconsEnum.DIGITAL_CARD}
               onPress={() => {
-                navigateToAddValue(TemplateEnum.KEY);
+                navigateToAddValue(TemplateEnum.DIGITAL_CARD);
               }}
             >
-              {t("moduleTemplates:key")}
+              {t("moduleTemplates:digitalCard")}
             </CategoryItem>
           </View>
           <View
@@ -123,31 +123,6 @@ function AddValueModal(props: Props) {
               }}
             >
               {t("moduleTemplates:document")}
-            </CategoryItem>
-          </View>
-          <View
-            style={{
-              height: 64,
-              display: "flex",
-              flexDirection: "row",
-              gap: 8,
-            }}
-          >
-            <CategoryItem
-              leadingIcon={ValueIconsEnum.CREDIT_CARD}
-              onPress={() => {
-                navigateToAddValue(TemplateEnum.CREDIT_CARD);
-              }}
-            >
-              {t("moduleTemplates:creditCard")}
-            </CategoryItem>
-            <CategoryItem
-              leadingIcon={ValueIconsEnum.BANK_ACCOUNT}
-              onPress={() => {
-                navigateToAddValue(TemplateEnum.BANK_ACCOUNT);
-              }}
-            >
-              {t("moduleTemplates:bankAccount")}
             </CategoryItem>
           </View>
           <View
@@ -192,12 +167,12 @@ function AddValueModal(props: Props) {
               {t("moduleTemplates:twoFactor")}
             </CategoryItem>
             <CategoryItem
-              leadingIcon={ValueIconsEnum.DIGITAL_CARD}
+              leadingIcon={ValueIconsEnum.KEY}
               onPress={() => {
-                navigateToAddValue(TemplateEnum.DIGITAL_CARD);
+                navigateToAddValue(TemplateEnum.KEY);
               }}
             >
-              {t("moduleTemplates:digitalCard")}
+              {t("moduleTemplates:key")}
             </CategoryItem>
           </View>
         </ScrollView>

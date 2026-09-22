@@ -86,7 +86,10 @@ function BackupExportButton() {
   };
 
   return (
-    <SettingsItem onPress={exportBackup}>
+    <SettingsItem
+      onPress={exportBackup}
+      subtitle={t("settings:exportBackupSubtitle")}
+    >
       {t("settings:exportBackup")}
     </SettingsItem>
   );

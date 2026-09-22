@@ -32,6 +32,8 @@ export type AdaptiveDropdownOption = {
 type RenderTriggerParams = {
   selectedLabel: string;
   open: () => void;
+  close: () => void;
+  toggle: () => void;
   value: string;
 };
 
@@ -65,6 +67,8 @@ export default function AdaptiveDropdown({
   const { theme } = useTheme();
   const { height: winH } = useWindowDimensions();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const webTriggerRef = useRef<any>(null);
+  const webContentRef = useRef<any>(null);
   const [openWeb, setOpenWeb] = useState(false);
 
   const selectedLabel = useMemo(
@@ -102,6 +106,26 @@ export default function AdaptiveDropdown({
     bottomSheetModalRef.current?.present();
   }, []);
 
+  const close = useCallback(() => {
+    if (Platform.OS === "web") {
+      setOpenWeb(false);
+      return;
+    }
+
+    closeNativeSheet();
+  }, [closeNativeSheet]);
+
+  const toggle = useCallback(() => {
+    Keyboard.dismiss();
+
+    if (Platform.OS === "web") {
+      setOpenWeb((current) => !current);
+      return;
+    }
+
+    bottomSheetModalRef.current?.present();
+  }, []);
+
   const selectValue = useCallback(
     (nextValue: string) => {
       const shouldClose = setValue(nextValue);
@@ -127,17 +151,40 @@ export default function AdaptiveDropdown({
   useEffect(() => {
     if (Platform.OS !== "web" || !openWeb) return;
 
-    const close = () => setOpenWeb(false);
-    window.addEventListener("resize", close);
+    const closePopover = () => setOpenWeb(false);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closePopover();
+    };
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+
+      const triggerNode = webTriggerRef.current as HTMLElement | null;
+      const contentNode = webContentRef.current as HTMLElement | null;
+      if (triggerNode?.contains(target)) return;
+      if (contentNode?.contains(target)) return;
+
+      closePopover();
+    };
+
+    window.addEventListener("resize", closePopover);
+    window.addEventListener("scroll", closePopover, true);
+    window.addEventListener("wheel", closePopover, true);
+    document.addEventListener("keydown", handleKeyDown, true);
+    document.addEventListener("pointerdown", handlePointerDown, true);
 
     return () => {
-      window.removeEventListener("resize", close);
+      window.removeEventListener("resize", closePopover);
+      window.removeEventListener("scroll", closePopover, true);
+      window.removeEventListener("wheel", closePopover, true);
+      document.removeEventListener("keydown", handleKeyDown, true);
+      document.removeEventListener("pointerdown", handlePointerDown, true);
     };
   }, [openWeb]);
 
   const trigger = (
-    <View collapsable={false}>
-      {renderTrigger({ selectedLabel, open, value })}
+    <View ref={webTriggerRef} collapsable={false}>
+      {renderTrigger({ selectedLabel, open, close, toggle, value })}
     </View>
   );
 
@@ -147,6 +194,7 @@ export default function AdaptiveDropdown({
         <Popover.Trigger asChild>{trigger}</Popover.Trigger>
         <Popover.Portal container={portalContainer as any}>
           <Popover.Content
+            ref={webContentRef}
             side="bottom"
             align="end"
             sideOffset={yOffset}

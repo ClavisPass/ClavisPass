@@ -1,9 +1,8 @@
 import React from "react";
 import type { AdaptiveDropdownOption } from "../../../shared/components/dropdowns/AdaptiveDropdown";
 import AdaptiveDropdown from "../../../shared/components/dropdowns/AdaptiveDropdown";
-import { MenuItem } from "../../../shared/components/menus/MenuItem";
-import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 import SettingInfoButton, { SettingInfo } from "./SettingInfoButton";
+import SettingsItem from "./SettingsItem";
 
 type Props = {
   value: string;
@@ -12,6 +11,7 @@ type Props = {
   label?: string;
   leadingIcon?: string;
   info?: SettingInfo;
+  subtitle?: string;
 
   // Web sizing
   dropdownMaxWidth?: number;
@@ -29,6 +29,7 @@ export default function SettingsDropdownItem({
   label,
   leadingIcon,
   info,
+  subtitle,
   dropdownMaxWidth = 260,
   dropdownMinWidth = 200,
   yOffset = 6,
@@ -44,18 +45,17 @@ export default function SettingsDropdownItem({
       yOffset={yOffset}
       nativeSnapPoints={nativeSnapPoints}
       itemTextAlign="right"
-      renderTrigger={({ selectedLabel, open }) => (
-        <AnimatedPressable onPress={open}>
-          <MenuItem
-            leadingIcon={leadingIcon}
-            rightText={String(selectedLabel)}
-            afterLabel={
-              info ? <SettingInfoButton {...info} compact /> : undefined
-            }
-          >
-            {label}
-          </MenuItem>
-        </AnimatedPressable>
+      renderTrigger={({ selectedLabel, toggle }) => (
+        <SettingsItem
+          leadingIcon={leadingIcon}
+          rightText={String(selectedLabel)}
+          subtitle={subtitle}
+          afterLabel={info ? <SettingInfoButton {...info} compact /> : undefined}
+          rightIcon="chevron-down"
+          onPress={toggle}
+        >
+          {label}
+        </SettingsItem>
       )}
     />
   );

@@ -1,7 +1,7 @@
-import { Divider } from "react-native-paper";
+import { View } from "react-native";
 
 const SettingsDivider = () => {
-  return <Divider style={{ marginBottom: 0, marginTop: 0 }} />;
+  return <View style={{ height: 0 }} />;
 };
 
 export default SettingsDivider;

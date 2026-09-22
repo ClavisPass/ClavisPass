@@ -60,6 +60,7 @@ const AppearanceSettingsSection: React.FC<Props> = ({
           setLanguageSetting(lang as AppLanguage);
         }}
         label={t("settings:language")}
+        subtitle={t("settings:languageSubtitle")}
         options={[
           { label: "Deutsch", value: "de" },
           { label: "English", value: "en" },
@@ -78,6 +79,7 @@ const AppearanceSettingsSection: React.FC<Props> = ({
               );
             }}
             label={t("settings:windowControlsStyle")}
+            subtitle={t("settings:windowControlsSubtitle")}
             info={{
               title: t("settings:infoWindowControlsTitle"),
               body: t("settings:infoWindowControlsBody"),
@@ -109,6 +111,7 @@ const AppearanceSettingsSection: React.FC<Props> = ({
               );
             }}
             label={t("settings:windowCornerStyle")}
+            subtitle={t("settings:windowCornersSubtitle")}
             info={{
               title: t("settings:infoWindowCornersTitle"),
               body: t("settings:infoWindowCornersBody"),
@@ -140,6 +143,7 @@ const AppearanceSettingsSection: React.FC<Props> = ({
           setDateFormatSetting(df as "de-DE" | "en-US");
         }}
         label={t("settings:dateFormat")}
+        subtitle={t("settings:dateFormatSubtitle")}
         dropdownMaxWidth={dropdownMaxWidth}
         options={[
           {
@@ -161,6 +165,7 @@ const AppearanceSettingsSection: React.FC<Props> = ({
           setTimeFormatSetting(tf as "de-DE" | "en-US");
         }}
         label={t("settings:timeFormat")}
+        subtitle={t("settings:timeFormatSubtitle")}
         options={[
           {
             label: formatAbsoluteTime(new Date().toISOString(), "de-DE"),

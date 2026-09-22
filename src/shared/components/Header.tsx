@@ -49,18 +49,16 @@ function Header(props: Props) {
         width: "100%",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: theme.colors?.background,
+        backgroundColor: "transparent",
         marginBottom: props.marginBottom ?? 8,
         borderRadius: 12,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
         borderBottomLeftRadius: 12,
         borderBottomRightRadius: 12,
-        boxShadow: theme.colors?.shadow,
+        boxShadow: "none",
         justifyContent: "center",
-        borderWidth: StyleSheet.hairlineWidth,
-        borderTopWidth: 0,
-        borderColor: darkmode ? theme.colors.outlineVariant : "white",
+        borderWidth: 0,
       }}
     >
       <View

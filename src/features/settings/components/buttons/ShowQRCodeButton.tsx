@@ -18,6 +18,7 @@ function ShowQRCodeButton() {
         <SettingsDivider />
         <SettingsItem
           leadingIcon={"qrcode"}
+          subtitle={t("settings:showqrcodeSubtitle")}
           onPress={() => setQrCodeVisible(true)}
         >
           {t("settings:showqrcode")}

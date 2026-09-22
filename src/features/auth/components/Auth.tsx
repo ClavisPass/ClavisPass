@@ -1,7 +1,5 @@
 import React from "react";
 
-import { Divider } from "react-native-paper";
-
 import ShowQRCodeButton from "../../settings/components/buttons/ShowQRCodeButton";
 import UserInformation from "../../sync/components/UserInformation";
 import UserInfoType from "../../sync/model/UserInfoType";
@@ -32,9 +30,10 @@ function Auth(props: Props) {
       <UserInformation setUserInfo={props.setUserInfo} />
       {canScanSessionQr ? (
         <>
-          <Divider />
+          <SettingsDivider />
           <SettingsItem
             leadingIcon={"qrcode-scan"}
+            subtitle={t("settings:scanqrcodeSubtitle")}
             onPress={() => props.navigation.navigate("Scan")}
           >
             {t("settings:scanqrcode")}
