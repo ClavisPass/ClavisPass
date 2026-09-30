@@ -1,9 +1,9 @@
 import { Pressable, StyleSheet, View } from "react-native";
 import { useTheme } from "../../../app/providers/ThemeProvider";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { RadioButton, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
-import theme from "../../../shared/ui/theme";
+import lightTheme from "../../../shared/ui/theme";
 import darkTheme from "../../../shared/ui/theme-darkmode";
 
 type CheckedType = "light" | "dark";
@@ -12,72 +12,205 @@ type Size = "large" | "small";
 type PreviewProps = {
   value: CheckedType;
   checked: CheckedType;
+  label: string;
   onSelect: (checked: CheckedType) => void;
-  theme: any;
+  previewTheme: any;
   size: Size;
 };
 
-function DarkModeSwitchPreview({ value, checked, onSelect, theme, size }: PreviewProps) {
-  const dimensions = useMemo(() => {
-    if (size === "small") {
-      return { container: { width: 88, height: 58, padding: 6, radius: 8 }, blockRadius: 6 };
-    }
-    return { container: { width: 120, height: 80, padding: 8, radius: 10 }, blockRadius: 10 };
-  }, [size]);
+function ThemePreviewCard({
+  value,
+  checked,
+  label,
+  onSelect,
+  previewTheme,
+  size,
+}: PreviewProps) {
+  const { theme: appTheme, darkmode } = useTheme();
+  const selected = checked === value;
+  const compact = size === "small";
+
+  const dimensions = useMemo(
+    () =>
+      compact
+        ? {
+            cardHeight: 84,
+            mockWidth: 82,
+            mockHeight: 48,
+            dot: 5,
+            radius: 10,
+          }
+        : {
+            cardHeight: 136,
+            mockWidth: 154,
+            mockHeight: 72,
+            dot: 7,
+            radius: 12,
+          },
+    [compact],
+  );
+
+  const mockIsDark = value === "dark";
+  const surface = mockIsDark ? "#171717" : "rgba(255, 255, 255, 0.82)";
+  const line = mockIsDark
+    ? "rgba(255, 255, 255, 0.12)"
+    : "rgba(120, 127, 246, 0.10)";
+  const cardBackground = darkmode
+    ? "rgba(36, 36, 36, 0.52)"
+    : "rgba(255, 255, 255, 0.58)";
 
   return (
-    <View style={{ alignItems: "center", justifyContent: "center", gap: size === "small" ? 2 : 4 }}>
-      <Pressable
-        onPress={() => onSelect(value)}
+    <Pressable
+      onPress={() => onSelect(value)}
+      style={{
+        flex: compact ? undefined : 1,
+        minWidth: compact ? dimensions.mockWidth + 18 : 0,
+        height: dimensions.cardHeight,
+        borderRadius: 12,
+        borderWidth: selected ? 2 : StyleSheet.hairlineWidth,
+        borderColor: selected
+          ? appTheme.colors.primary
+          : darkmode
+            ? "rgba(255, 255, 255, 0.08)"
+            : "rgba(255, 255, 255, 0.72)",
+        backgroundColor: cardBackground,
+        overflow: "hidden",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        gap: compact ? 4 : 8,
+        paddingTop: compact ? 7 : 12,
+        paddingBottom: compact ? 6 : 10,
+        paddingHorizontal: compact ? 8 : 14,
+        boxShadow: selected
+          ? `${appTheme.colors.primary}24 0px 8px 22px 0px`
+          : darkmode
+            ? "rgba(0, 0, 0, 0.10) 0px 2px 10px 0px"
+            : "rgba(99, 99, 99, 0.06) 0px 2px 10px 0px",
+      }}
+    >
+      <View
         style={{
-          width: dimensions.container.width,
-          height: dimensions.container.height,
-          backgroundColor: theme.colors.elevation.level2,
-          borderRadius: dimensions.container.radius,
-          padding: dimensions.container.padding,
-          borderWidth: 2,
-          borderColor: checked === value ? theme.colors.primary : "transparent",
-          gap: size === "small" ? 4 : 6,
+          width: dimensions.mockWidth,
+          height: dimensions.mockHeight,
+          borderRadius: dimensions.radius,
+          backgroundColor: surface,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: mockIsDark
+            ? "rgba(255, 255, 255, 0.12)"
+            : "rgba(120, 127, 246, 0.14)",
+          padding: compact ? 8 : 12,
+          boxShadow: darkmode
+            ? "rgba(0, 0, 0, 0.24) 0px 8px 20px 0px"
+            : "rgba(31, 41, 55, 0.12) 0px 8px 20px 0px",
         }}
       >
-        <View style={{ backgroundColor: theme.colors.background, flex: 1, borderRadius: dimensions.blockRadius }} />
-        <View style={{ backgroundColor: theme.colors.background, flex: 1, borderRadius: dimensions.blockRadius }} />
-      </Pressable>
+        <View style={{ flexDirection: "row", gap: 4, marginBottom: compact ? 7 : 10 }}>
+          {[0, 1, 2].map((dot) => (
+            <View
+              key={dot}
+              style={{
+                width: dimensions.dot,
+                height: dimensions.dot,
+                borderRadius: 999,
+                backgroundColor:
+                  dot === 0
+                    ? previewTheme.colors.primary
+                    : `${previewTheme.colors.primary}80`,
+              }}
+            />
+          ))}
+        </View>
+        <View
+          style={{
+            width: "82%",
+            height: compact ? 9 : 12,
+            borderRadius: 999,
+            backgroundColor: line,
+            marginBottom: compact ? 6 : 8,
+          }}
+        />
+        <View
+          style={{
+            width: "64%",
+            height: compact ? 9 : 12,
+            borderRadius: 999,
+            backgroundColor: line,
+          }}
+        />
+      </View>
 
-      <RadioButton
-        value={value}
-        status={checked === value ? "checked" : "unchecked"}
-        onPress={() => onSelect(value)}
-      />
-    </View>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 6,
+          minHeight: compact ? 26 : 34,
+        }}
+      >
+        <RadioButton
+          value={value}
+          status={selected ? "checked" : "unchecked"}
+          onPress={() => onSelect(value)}
+          color={appTheme.colors.primary}
+          uncheckedColor={appTheme.colors.onSurfaceVariant}
+        />
+        <Text
+          variant={compact ? "bodySmall" : "bodyLarge"}
+          style={{ userSelect: "none", color: appTheme.colors.onSurface }}
+          numberOfLines={1}
+        >
+          {label}
+        </Text>
+      </View>
+    </Pressable>
   );
 }
 
 type Props = { size?: Size };
 
 export default function DarkModeSwitch({ size = "large" }: Props) {
-  const { darkmode, setDarkmode, theme: appTheme } = useTheme();
+  const { darkmode, setDarkmode } = useTheme();
   const { t } = useTranslation();
-  const [checked, setChecked] = useState<CheckedType>(darkmode ? "dark" : "light");
+  const [checked, setChecked] = useState<CheckedType>(
+    darkmode ? "dark" : "light",
+  );
 
-  const onSelect = (v: CheckedType) => {
-    setChecked(v);
-    setDarkmode(v === "dark");
+  useEffect(() => {
+    setChecked(darkmode ? "dark" : "light");
+  }, [darkmode]);
+
+  const onSelect = (value: CheckedType) => {
+    setChecked(value);
+    setDarkmode(value === "dark");
   };
 
   const picker = (
     <View
       style={{
         flexDirection: "row",
-        gap: size === "small" ? 8 : 6,
-        marginTop: size === "small" ? 6 : 10,
-        marginLeft: size === "small" ? 0 : 10,
-        marginBottom: size === "small" ? 0 : 4,
-        justifyContent: size === "small" ? "center" : "flex-start",
+        gap: size === "small" ? 8 : 12,
+        marginTop: size === "small" ? 6 : 0,
+        justifyContent: "center",
+        width: "100%",
       }}
     >
-      <DarkModeSwitchPreview value="light" checked={checked} onSelect={onSelect} theme={theme} size={size} />
-      <DarkModeSwitchPreview value="dark" checked={checked} onSelect={onSelect} theme={darkTheme} size={size} />
+      <ThemePreviewCard
+        value="light"
+        checked={checked}
+        label={t("settings:themeLight")}
+        onSelect={onSelect}
+        previewTheme={lightTheme}
+        size={size}
+      />
+      <ThemePreviewCard
+        value="dark"
+        checked={checked}
+        label={t("settings:themeDark")}
+        onSelect={onSelect}
+        previewTheme={darkTheme}
+        size={size}
+      />
     </View>
   );
 
@@ -100,23 +233,9 @@ export default function DarkModeSwitch({ size = "large" }: Props) {
           ? "rgba(0, 0, 0, 0.10) 0px 2px 10px 0px"
           : "rgba(99, 99, 99, 0.06) 0px 2px 10px 0px",
         paddingHorizontal: 14,
-        paddingTop: 12,
-        paddingBottom: 10,
+        padding: 14,
       }}
     >
-      <Text variant="bodyLarge" style={{ userSelect: "none" }}>
-        {t("settings:themeMode")}
-      </Text>
-      <Text
-        variant="bodySmall"
-        style={{
-          color: appTheme.colors.onSurfaceVariant,
-          marginTop: 2,
-          userSelect: "none",
-        }}
-      >
-        {t("settings:themeModeSubtitle")}
-      </Text>
       {picker}
     </View>
   );

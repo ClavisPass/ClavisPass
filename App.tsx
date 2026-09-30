@@ -113,9 +113,13 @@ export function AppWithNavigation() {
         <AutocompleteDropdownContextProvider>
           <SettingsProvider>
             <ContentProtectionProvider defaultEnabled={true}>
-              <ThemeProvider>
-                <AppShell />
-              </ThemeProvider>
+              <CloudProvider>
+                <VaultProvider>
+                  <ThemeProvider>
+                    <AppShell />
+                  </ThemeProvider>
+                </VaultProvider>
+              </CloudProvider>
             </ContentProtectionProvider>
           </SettingsProvider>
         </AutocompleteDropdownContextProvider>
@@ -257,35 +261,31 @@ function AppShell() {
         <AuthProvider>
           <ClipboardLifecycleCleanup />
           <FastAccessSessionBridge />
-          <CloudProvider>
-            <VaultProvider>
-              <DemoBootstrap />
-              <BrowserBridgeSessionSync />
-              <BrowserBridgeWriteSync />
-              <ExpiryNotificationScheduler />
-              <DevModeProvider>
-                <GlobalErrorSnackbar />
-                <GlobalClipboardSnackbar />
-                <VaultFileOpenHandler />
-                <MobileFastAccessOverlay />
-                <View style={{ flex: 1, backgroundColor: "transparent" }}>
-                  <View
-                    style={{
-                      borderRadius: windowCornerRadius,
-                      backgroundColor: theme.colors.background,
-                      overflow: "hidden",
-                      flex: 1,
-                    }}
-                  >
-                    <GlobalShortcuts />
-                    <CustomTitlebar />
-                    <NavigationContainer />
-                    <BrowserBridgePairingPrompt />
-                  </View>
-                </View>
-              </DevModeProvider>
-            </VaultProvider>
-          </CloudProvider>
+          <DemoBootstrap />
+          <BrowserBridgeSessionSync />
+          <BrowserBridgeWriteSync />
+          <ExpiryNotificationScheduler />
+          <DevModeProvider>
+            <GlobalErrorSnackbar />
+            <GlobalClipboardSnackbar />
+            <VaultFileOpenHandler />
+            <MobileFastAccessOverlay />
+            <View style={{ flex: 1, backgroundColor: "transparent" }}>
+              <View
+                style={{
+                  borderRadius: windowCornerRadius,
+                  backgroundColor: theme.colors.background,
+                  overflow: "hidden",
+                  flex: 1,
+                }}
+              >
+                <GlobalShortcuts />
+                <CustomTitlebar />
+                <NavigationContainer />
+                <BrowserBridgePairingPrompt />
+              </View>
+            </View>
+          </DevModeProvider>
         </AuthProvider>
       </OnlineProvider>
     </>

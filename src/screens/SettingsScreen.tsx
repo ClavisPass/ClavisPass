@@ -1204,9 +1204,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             id="settings-wide-search"
             style={{
               height: 34,
+              left: "50%",
+              marginLeft: -wideSearchWidth / 2,
+              position: "absolute",
               width: wideSearchWidth,
-              position: "relative",
-              zIndex: 5,
+              zIndex: 6,
               ...webNoDragStyle,
             }}
           >

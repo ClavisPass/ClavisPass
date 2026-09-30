@@ -24,8 +24,8 @@ type Props = {
 function SettingsItem(props: Props) {
   const { theme, darkmode } = useTheme();
   const compactSubtitle =
-    props.subtitle && props.subtitle.length > 42
-      ? `${props.subtitle.slice(0, 39).trim()}...`
+    props.subtitle && props.subtitle.length > 72
+      ? `${props.subtitle.slice(0, 69).trim()}...`
       : props.subtitle;
   const hasSubtitle = !!compactSubtitle;
   const surface = props.surface ?? true;

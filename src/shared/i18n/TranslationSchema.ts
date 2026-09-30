@@ -208,6 +208,8 @@ export type TranslationSchema = {
     appearance: string;
     themeMode: string;
     themeModeSubtitle: string;
+    themeLight: string;
+    themeDark: string;
     security: string;
     fastAccess: string;
     backup: string;

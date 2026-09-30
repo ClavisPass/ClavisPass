@@ -55,6 +55,17 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
   const { width } = useWindowDimensions();
   const [searchQuery, setSearchQuery] = React.useState("");
   const inlineIdentityStats = width >= 760;
+  const surfaceStyle = {
+    backgroundColor: darkmode ? "rgba(28, 28, 34, 0.58)" : "rgba(255, 255, 255, 0.68)",
+    borderColor: darkmode ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.82)",
+    boxShadow: darkmode
+      ? ("rgba(0, 0, 0, 0.14) 0px 8px 24px 0px" as any)
+      : ("rgba(64, 76, 120, 0.08) 0px 8px 26px 0px" as any),
+  };
+  const subtleSurfaceStyle = {
+    backgroundColor: darkmode ? "rgba(255, 255, 255, 0.04)" : "rgba(255, 255, 255, 0.48)",
+    borderColor: darkmode ? "rgba(255, 255, 255, 0.07)" : "rgba(255, 255, 255, 0.72)",
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -106,20 +117,22 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
       entering={FadeInDown.delay(Math.min(index, 8) * 35).duration(220)}
       style={[
         styles.identityCard,
-        {
-          backgroundColor: theme.colors.background,
-          borderColor: darkmode ? theme.colors.outlineVariant : "white",
-          boxShadow: theme.colors.shadow as any,
-        },
+        surfaceStyle,
       ]}
     >
       <AnimatedPressable
         onPress={() =>
           navigation.navigate("IdentityDetail", { identityId: identity.id })
         }
+        style={styles.identityPressable}
+        hoverBackgroundColor={
+          darkmode ? "rgba(120, 127, 246, 0.12)" : "rgba(120, 127, 246, 0.08)"
+        }
       >
         <View style={styles.identityCardInner}>
-          <IdentityEmailLogo email={identity.email} />
+          <View style={styles.logoShell}>
+            <IdentityEmailLogo email={identity.email} size={44} />
+          </View>
           <View style={styles.identityBody}>
             <View
               style={[
@@ -178,7 +191,9 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
               </View>
             </View>
           </View>
-          <Icon source="chevron-right" size={22} color={theme.colors.primary} />
+          <View style={[styles.chevronBubble, { backgroundColor: `${theme.colors.primary}12` }]}>
+            <Icon source="chevron-right" size={20} color={theme.colors.primary} />
+          </View>
         </View>
       </AnimatedPressable>
     </Animated.View>
@@ -210,10 +225,11 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
           alignSelf: "center",
           width: "100%",
           maxWidth: 920,
+          paddingBottom: 18,
         }}
       >
         <View style={styles.metricRow}>
-          <View style={styles.metric}>
+          <View style={[styles.metric, subtleSurfaceStyle]}>
             <View style={[styles.metricIcon, { backgroundColor: `${theme.colors.primary}18` }]}>
               <Icon source="email-multiple-outline" size={20} color={theme.colors.primary} />
             </View>
@@ -224,7 +240,7 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
               <Text style={styles.metricLabel}>{t("identities:metricIdentities")}</Text>
             </View>
           </View>
-          <View style={styles.metric}>
+          <View style={[styles.metric, subtleSurfaceStyle]}>
             <View style={[styles.metricIcon, { backgroundColor: `${theme.colors.primary}18` }]}>
               <Icon source="key-chain" size={20} color={theme.colors.primary} />
             </View>
@@ -235,7 +251,7 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
               <Text style={styles.metricLabel}>{t("identities:metricAccounts")}</Text>
             </View>
           </View>
-          <View style={styles.metric}>
+          <View style={[styles.metric, subtleSurfaceStyle]}>
             <View style={[styles.metricIcon, { backgroundColor: `${theme.colors.primary}18` }]}>
               <Icon source="web" size={20} color={theme.colors.primary} />
             </View>
@@ -246,7 +262,7 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
               <Text style={styles.metricLabel}>{t("identities:metricWebsites")}</Text>
             </View>
           </View>
-          <View style={styles.metric}>
+          <View style={[styles.metric, subtleSurfaceStyle]}>
             <View style={[styles.metricIcon, { backgroundColor: "rgba(236, 72, 103, 0.12)" }]}>
               <Icon source="alert-circle-outline" size={20} color={theme.colors.error} />
             </View>
@@ -260,13 +276,16 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
         </View>
 
         {visibleIdentities.length === 0 ? (
-          <View style={{ padding: 18 }}>
-            <Text style={{ opacity: 0.72, textAlign: "center", userSelect: "none" }}>
+          <View style={[styles.emptyState, surfaceStyle]}>
+            <View style={[styles.emptyIcon, { backgroundColor: `${theme.colors.primary}14` }]}>
+              <Icon source="account-search-outline" size={28} color={theme.colors.primary} />
+            </View>
+            <Text style={styles.emptyText}>
               {t("identities:noMatches")}
             </Text>
           </View>
         ) : (
-          <View style={{ gap: 8 }}>{visibleIdentities.map(renderIdentityCard)}</View>
+          <View style={{ gap: 10 }}>{visibleIdentities.map(renderIdentityCard)}</View>
         )}
       </ScrollView>
     </AnimatedContainer>
@@ -274,23 +293,30 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  panel: {
-    borderRadius: 8,
-    borderWidth: StyleSheet.hairlineWidth,
-    padding: 12,
-  },
   identityCard: {
-    borderRadius: 10,
+    borderRadius: 14,
     borderWidth: StyleSheet.hairlineWidth,
     overflow: "hidden",
   },
+  identityPressable: {
+    borderRadius: 14,
+    overflow: "hidden",
+  },
   identityCardInner: {
-    minHeight: 76,
+    minHeight: 82,
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    gap: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  logoShell: {
+    width: 54,
+    height: 54,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.32)",
   },
   identityBody: {
     flex: 1,
@@ -309,7 +335,7 @@ const styles = StyleSheet.create({
   identityTextBlock: {
     flex: 1,
     minWidth: 0,
-    gap: 3,
+    gap: 4,
   },
   identityTextBlockStacked: {
     flex: 0,
@@ -330,7 +356,7 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
   },
   chip: {
-    borderRadius: 8,
+    borderRadius: 10,
   },
   statChip: {
     borderRadius: 10,
@@ -342,7 +368,7 @@ const styles = StyleSheet.create({
   metricRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: 10,
   },
   metric: {
     minWidth: 132,
@@ -353,19 +379,47 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    borderRadius: 8,
-    backgroundColor: "rgba(120, 120, 120, 0.08)",
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   metricIcon: {
     width: 36,
     height: 36,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
   },
   metricLabel: {
     opacity: 0.68,
     fontSize: 12,
+    userSelect: "none",
+  },
+  chevronBubble: {
+    width: 34,
+    height: 34,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyState: {
+    minHeight: 150,
+    borderRadius: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    padding: 18,
+  },
+  emptyIcon: {
+    width: 54,
+    height: 54,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyText: {
+    opacity: 0.72,
+    textAlign: "center",
     userSelect: "none",
   },
 });
