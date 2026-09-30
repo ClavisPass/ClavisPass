@@ -3,10 +3,13 @@ import { TouchableRipple } from "react-native-paper";
 import type { ComponentProps } from "react";
 import { View } from "react-native";
 import type { StyleProp, ViewStyle } from "react-native";
+import { useTheme } from "../../app/providers/ThemeProvider";
 
 type TouchableRippleProps = ComponentProps<typeof TouchableRipple>;
-const DEFAULT_HOVER_BACKGROUND_COLOR = "rgba(120, 127, 246, 0.12)";
-const DEFAULT_RIPPLE_COLOR = "rgba(120, 127, 246, 0.22)";
+const DEFAULT_HOVER_BACKGROUND_COLOR_LIGHT = "rgba(17, 24, 39, 0.06)";
+const DEFAULT_HOVER_BACKGROUND_COLOR_DARK = "rgba(255, 255, 255, 0.08)";
+const DEFAULT_RIPPLE_COLOR_LIGHT = "rgba(17, 24, 39, 0.12)";
+const DEFAULT_RIPPLE_COLOR_DARK = "rgba(255, 255, 255, 0.16)";
 
 export type AnimatedPressableProps = Omit<
   TouchableRippleProps,
@@ -22,27 +25,37 @@ const AnimatedPressable = React.forwardRef<any, AnimatedPressableProps>(
     {
       children,
       style,
-      rippleColor = DEFAULT_RIPPLE_COLOR,
+      rippleColor,
       borderless = true,
-      hoverBackgroundColor = DEFAULT_HOVER_BACKGROUND_COLOR,
+      hoverBackgroundColor,
       onHoverIn,
       onHoverOut,
       ...rest
     },
     ref
   ) => {
+    const { darkmode } = useTheme();
     const [hovered, setHovered] = React.useState(false);
+    const effectiveHoverBackgroundColor =
+      hoverBackgroundColor === undefined
+        ? darkmode
+          ? DEFAULT_HOVER_BACKGROUND_COLOR_DARK
+          : DEFAULT_HOVER_BACKGROUND_COLOR_LIGHT
+        : hoverBackgroundColor;
+    const effectiveRippleColor =
+      rippleColor ??
+      (darkmode ? DEFAULT_RIPPLE_COLOR_DARK : DEFAULT_RIPPLE_COLOR_LIGHT);
 
     return (
       <TouchableRipple
         ref={ref}
         style={[
           style,
-          hovered && hoverBackgroundColor
-            ? { backgroundColor: hoverBackgroundColor }
+          hovered && effectiveHoverBackgroundColor
+            ? { backgroundColor: effectiveHoverBackgroundColor }
             : undefined,
         ]}
-        rippleColor={rippleColor}
+        rippleColor={effectiveRippleColor}
         borderless={borderless}
         onHoverIn={(event) => {
           setHovered(true);
