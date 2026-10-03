@@ -19,8 +19,12 @@ export type DraggableModulesListProps = {
   addModule: (module: ModulesEnum) => void;
   fastAccess: FastAccessType | null;
   navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>;
+  topPadding?: number;
   bottomPadding?: number;
   moduleAutoFocus?: boolean;
+  footer?: React.ReactNode;
+  stickyFooter?: React.ReactNode;
+  stickyFooterBottomInset?: number;
 };
 
 export const draggableModulesListStyles = StyleSheet.create({

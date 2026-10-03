@@ -69,63 +69,88 @@ function DraggableModulesListWeb(props: DraggableModulesListProps) {
   }, [props.value.modules.length, scrollToBottom]);
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <Droppable droppableId="modules-droppable">
-        {(provided: DroppableProvided) => (
+    <div style={{ flex: 1, width: "100%", position: "relative" }}>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="modules-droppable">
+          {(provided: DroppableProvided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                flex: 1,
+                minHeight: "100%",
+                width: "100%",
+                overflow: "auto",
+                paddingBottom: props.footer ? 0 : undefined,
+                boxSizing: "border-box",
+              }}
+            >
+              {props.value.modules.map((item: ModuleType, index: number) => (
+                <Draggable key={item.id} draggableId={item.id} index={index}>
+                  {(draggableProvided: DraggableProvided) => (
+                    <div
+                      ref={draggableProvided.innerRef}
+                      {...draggableProvided.draggableProps}
+                      style={{
+                        ...getItemStyle(draggableProvided.draggableProps.style),
+                      }}
+                    >
+                      <WebDragHandlePropsProvider
+                        dragHandleProps={draggableProvided.dragHandleProps}
+                      >
+                        {getModule(
+                          item,
+                          () => {},
+                          props.deleteModule,
+                          props.changeModule,
+                          props.fastAccess,
+                          props.navigation,
+                          props.value.title,
+                          props.moduleAutoFocus ?? true,
+                        )}
+                      </WebDragHandlePropsProvider>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+
+              {provided.placeholder}
+              <div ref={bottomRef} style={{ height: 1 }} />
+
+              <DraggableModulesFooter
+                modulePrediction={modulePrediction}
+                onAddPredictedModule={() => {
+                  if (!modulePrediction) return;
+                  props.addModule(modulePrediction);
+                  setTimeout(scrollToBottom, 0);
+                }}
+                t={t}
+              />
+              {props.footer ? (
+                <div style={{ marginTop: "auto", paddingTop: 8 }}>
+                  {props.footer}
+                </div>
+              ) : null}
+            </div>
+          )}
+        </Droppable>
+        {props.stickyFooter ? (
           <div
-            {...provided.droppableProps}
-            ref={provided.innerRef}
             style={{
-              flex: 1,
-              width: "100%",
-              overflow: "auto",
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: props.stickyFooterBottomInset ?? 0,
+              zIndex: 10,
             }}
           >
-            {props.value.modules.map((item: ModuleType, index: number) => (
-              <Draggable key={item.id} draggableId={item.id} index={index}>
-                {(draggableProvided: DraggableProvided) => (
-                  <div
-                    ref={draggableProvided.innerRef}
-                    {...draggableProvided.draggableProps}
-                    style={{
-                      ...getItemStyle(draggableProvided.draggableProps.style),
-                    }}
-                  >
-                    <WebDragHandlePropsProvider
-                      dragHandleProps={draggableProvided.dragHandleProps}
-                    >
-                      {getModule(
-                        item,
-                        () => {},
-                        props.deleteModule,
-                        props.changeModule,
-                        props.fastAccess,
-                        props.navigation,
-                        props.value.title,
-                        props.moduleAutoFocus ?? true,
-                      )}
-                    </WebDragHandlePropsProvider>
-                  </div>
-                )}
-              </Draggable>
-            ))}
-
-            {provided.placeholder}
-            <div ref={bottomRef} style={{ height: 1 }} />
-
-            <DraggableModulesFooter
-              modulePrediction={modulePrediction}
-              onAddPredictedModule={() => {
-                if (!modulePrediction) return;
-                props.addModule(modulePrediction);
-                setTimeout(scrollToBottom, 0);
-              }}
-              t={t}
-            />
+            {props.stickyFooter}
           </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+        ) : null}
+      </DragDropContext>
+    </div>
   );
 }
 

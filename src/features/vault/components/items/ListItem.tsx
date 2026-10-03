@@ -219,6 +219,7 @@ type Props = {
   hideChevron?: boolean;
   pressDisabled?: boolean;
   denseSpacing?: boolean;
+  denseHorizontalInset?: number;
   onDragStart?: () => void;
   onDragHandlePressIn?: () => void;
   onDragHandleRelease?: () => void;
@@ -787,6 +788,7 @@ function ListItem(props: Props) {
       : FadeInDown.delay(props.index * 50).duration(250);
   const animateContentDirectly = Platform.OS === "web" || props.reorderMode;
   const isNativeSwipeItem = Platform.OS !== "web" && !props.reorderMode;
+  const denseHorizontalInset = props.denseHorizontalInset ?? 8;
 
   const listItemContent = (
     <Animated.View
@@ -796,7 +798,11 @@ function ListItem(props: Props) {
       style={[
         styles.container,
         props.denseSpacing
-          ? { marginLeft: 8, marginRight: 0, marginBottom: 4 }
+          ? {
+              marginLeft: denseHorizontalInset,
+              marginRight: 0,
+              marginBottom: 4,
+            }
           : null,
         Platform.OS !== "web"
           ? { marginLeft: 0, marginRight: 0, marginBottom: 0 }
@@ -956,7 +962,11 @@ function ListItem(props: Props) {
             containerStyle={[
               styles.swipeContainer,
               props.denseSpacing
-                ? { marginLeft: 8, marginRight: 0, marginBottom: 4 }
+                ? {
+                    marginLeft: denseHorizontalInset,
+                    marginRight: 0,
+                    marginBottom: 4,
+                  }
                 : null,
               props.reorderMode ? { marginBottom: 4, height: 44 } : null,
             ]}

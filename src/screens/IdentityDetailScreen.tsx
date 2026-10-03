@@ -599,15 +599,15 @@ const styles = StyleSheet.create({
   heroPanel: {
     borderRadius: 16,
     borderWidth: StyleSheet.hairlineWidth,
-    padding: 16,
+    padding: 8,
   },
   panel: {
     borderRadius: 14,
     borderWidth: StyleSheet.hairlineWidth,
-    padding: 14,
+    padding: 8,
   },
   grid: {
-    gap: 10,
+    gap: 8,
   },
   gridWide: {
     flexDirection: "row",
@@ -632,13 +632,13 @@ const styles = StyleSheet.create({
   chipWrap: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 6,
-    marginTop: 10,
+    gap: 8,
+    marginTop: 8,
   },
   heroTopRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
+    gap: 8,
   },
   heroLogoShell: {
     width: 68,
@@ -652,17 +652,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    marginTop: 14,
+    marginTop: 8,
   },
   heroMetric: {
     minHeight: 38,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
     flexDirection: "row",
     alignItems: "center",
-    gap: 7,
+    gap: 8,
   },
   heroMetricText: {
     fontWeight: "700",
@@ -671,7 +671,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 8,
     minWidth: 0,
   },
   sectionIcon: {
@@ -687,8 +687,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   insightList: {
-    gap: 4,
-    marginTop: 10,
+    gap: 8,
+    marginTop: 8,
   },
   insightText: {
     opacity: 0.76,
@@ -699,25 +699,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     flexWrap: "wrap",
-    gap: 10,
+    gap: 8,
   },
   analysisButton: {
     borderRadius: 10,
     flexShrink: 0,
   },
   entryList: {
-    gap: 4,
-    marginTop: 12,
+    gap: 8,
+    marginTop: 8,
   },
   entryRow: {
     minHeight: 58,
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 9,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 8,
     overflow: "hidden",
   },
   entryIcon: {
@@ -730,7 +730,7 @@ const styles = StyleSheet.create({
   showLessRow: {
     alignItems: "center",
     marginTop: 8,
-    marginBottom: -2,
+    marginBottom: 8,
   },
   showLessButton: {
     minWidth: 0,
@@ -749,8 +749,8 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
-    padding: 18,
+    gap: 8,
+    padding: 8,
   },
   emptyIcon: {
     width: 54,

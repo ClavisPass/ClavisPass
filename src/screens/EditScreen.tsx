@@ -36,6 +36,8 @@ import EditHistoryModal from "../features/vault/components/modals/EditHistoryMod
 import EntryTagsModal, {
   normalizeTags,
 } from "../features/vault/components/modals/EntryTagsModal";
+import MaskedView from "@react-native-masked-view/masked-view";
+import { LinearGradient } from "expo-linear-gradient";
 
 import useAppLifecycle from "../shared/hooks/useAppLifecycle";
 import {
@@ -74,6 +76,33 @@ import {
 } from "../features/vault/utils/vcardExport";
 
 type EditScreenProps = NativeStackScreenProps<HomeStackParamList, "Edit">;
+
+const styles = StyleSheet.create({
+  editListWrap: {
+    flex: 1,
+    width: "100%",
+    position: "relative",
+  },
+  editControlsOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 8,
+  },
+  editListMask: {
+    flex: 1,
+    width: "100%",
+  },
+  editListMaskMiddle: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: "100%",
+    backgroundColor: "black",
+  },
+});
 
 const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const {
@@ -671,6 +700,9 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   };
 
   const editSectionSpacing = 8;
+  const editControlOverlayHeight = 40 + editSectionSpacing;
+  const editListTopFadeStart = 28;
+  const editListTopFadeEnd = editControlOverlayHeight + 28;
   const actionChipHorizontalPadding = 16;
   const moreActionKey = "__more";
 
@@ -1150,6 +1182,105 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     </View>
   );
 
+  const webEditListFadeMaskStyle =
+    Platform.OS === "web"
+      ? ({
+          WebkitMaskImage: `linear-gradient(to bottom, transparent 0px, transparent ${editListTopFadeStart}px, black ${editListTopFadeEnd}px, black 100%)`,
+          maskImage: `linear-gradient(to bottom, transparent 0px, transparent ${editListTopFadeStart}px, black ${editListTopFadeEnd}px, black 100%)`,
+        } as any)
+      : null;
+
+  const modulesList = (
+    <PerfProfiler id="EditScreen.ModulesList">
+      <ModulesList
+        value={value}
+        deleteModule={requestDeleteModule}
+        changeModule={changeModule}
+        addModule={addModule}
+        fastAccess={fastAccessObject}
+        navigation={navigation}
+        topPadding={editControlOverlayHeight}
+        bottomPadding={width > 600 ? 12 : 96}
+        moduleAutoFocus={moduleAutoFocus}
+        footer={
+          <MetaInformationModule
+            lastUpdated={value.lastUpdated}
+            created={value.created}
+          />
+        }
+        stickyFooter={
+          width > 600 || !canUndo ? undefined : (
+            <View
+              style={{
+                paddingHorizontal: 8,
+                paddingBottom: editSectionSpacing,
+                width: "100%",
+              }}
+            >
+              <Button
+                icon="content-save"
+                onPress={saveValue}
+                disabled={value.title === ""}
+                style={{
+                  boxShadow: theme.colors?.shadow,
+                }}
+              />
+            </View>
+          )
+        }
+      />
+    </PerfProfiler>
+  );
+
+  const renderFadedModulesList = () => {
+    if (Platform.OS === "web") {
+      return (
+        <View
+          style={[
+            {
+              flex: 1,
+              width: "100%",
+            },
+            webEditListFadeMaskStyle,
+          ]}
+        >
+          {modulesList}
+        </View>
+      );
+    }
+
+    return (
+      <MaskedView
+        style={{
+          flex: 1,
+          width: "100%",
+        }}
+        maskElement={
+          <View style={styles.editListMask}>
+            <LinearGradient
+              colors={[
+                "rgba(0, 0, 0, 0)",
+                "rgba(0, 0, 0, 0)",
+                "rgba(0, 0, 0, 0.92)",
+                "#000000",
+              ]}
+              locations={[0, 0.32, 0.88, 1]}
+              style={{ height: editListTopFadeEnd + 2, width: "100%" }}
+            />
+            <View
+              style={[
+                styles.editListMaskMiddle,
+                { top: editListTopFadeEnd - 2 },
+              ]}
+            />
+          </View>
+        }
+      >
+        {modulesList}
+      </MaskedView>
+    );
+  };
+
   return (
     <AnimatedContainer style={globalStyles.container}>
       <FocusAwareStatusBar
@@ -1177,43 +1308,50 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       />
       {renderEditActionChips()}
       <View
-        style={{
-          width: "100%",
-          paddingHorizontal: 8,
-          paddingTop: 0,
-          paddingBottom: editSectionSpacing,
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: editSectionSpacing,
-        }}
+        style={styles.editListWrap}
       >
-        {width > 600 && (
-          <View style={{}}>
-            <Button
-              icon="content-save"
-              onPress={saveValue}
-              disabled={!canUndo || value.title === ""}
-              style={{
-                boxShadow: theme.colors?.shadow,
-              }}
-            />
+        {renderFadedModulesList()}
+        <View pointerEvents="box-none" style={styles.editControlsOverlay}>
+          <View
+            style={{
+              width: "100%",
+              paddingHorizontal: 8,
+              paddingTop: 0,
+              paddingBottom: editSectionSpacing,
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: editSectionSpacing,
+            }}
+          >
+            {width > 600 && (
+              <View style={{}}>
+                <Button
+                  icon="content-save"
+                  onPress={saveValue}
+                  disabled={!canUndo || value.title === ""}
+                  style={{
+                    boxShadow: theme.colors?.shadow,
+                  }}
+                />
+              </View>
+            )}
+            {renderEditControlGroup()}
+            {fastAccessObject === null ||
+            fastAccessObject.username === "" ||
+            fastAccessObject.password === "" ? null : (
+              <AppTooltip title={t("common:fastAccess")}>
+                <SquaredContainerButton onPress={openFastAccessFeature}>
+                  <AppIcon
+                    name={"tooltip-account"}
+                    color={theme.colors.primary}
+                    size={20}
+                  />
+                </SquaredContainerButton>
+              </AppTooltip>
+            )}
           </View>
-        )}
-        {renderEditControlGroup()}
-        {fastAccessObject === null ||
-        fastAccessObject.username === "" ||
-        fastAccessObject.password === "" ? null : (
-          <AppTooltip title={t("common:fastAccess")}>
-            <SquaredContainerButton onPress={openFastAccessFeature}>
-              <AppIcon
-                name={"tooltip-account"}
-                color={theme.colors.primary}
-                size={20}
-              />
-            </SquaredContainerButton>
-          </AppTooltip>
-        )}
+        </View>
       </View>
       <AdaptiveMenu
         visible={overflowMenuVisible}
@@ -1226,41 +1364,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         positionX={overflowMenuAnchor?.x}
         anchorRect={overflowMenuAnchor}
         items={editOverflowItems}
-      />
-      <PerfProfiler id="EditScreen.ModulesList">
-        <ModulesList
-          value={value}
-          deleteModule={requestDeleteModule}
-          changeModule={changeModule}
-          addModule={addModule}
-          fastAccess={fastAccessObject}
-          navigation={navigation}
-          bottomPadding={width > 600 ? 12 : 96}
-          moduleAutoFocus={moduleAutoFocus}
-        />
-      </PerfProfiler>
-      {!(width > 600) && (
-        <View
-          style={{
-            paddingHorizontal: 8,
-            paddingTop: 0,
-            paddingBottom: editSectionSpacing,
-            width: "100%",
-          }}
-        >
-          <Button
-            icon="content-save"
-            onPress={saveValue}
-            disabled={!canUndo || value.title === ""}
-            style={{
-              boxShadow: theme.colors?.shadow,
-            }}
-          />
-        </View>
-      )}
-      <MetaInformationModule
-        lastUpdated={value.lastUpdated}
-        created={value.created}
       />
       <AddModuleModal
         addModule={addModule}

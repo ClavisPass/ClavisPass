@@ -14,17 +14,19 @@ function ShowQRCodeButton() {
   if (provider !== "dropbox" || !refreshToken) return null;
 
   return (
-    <View style={{ marginTop: 8 }}>
-      <SettingsDivider />
-      <SettingsItem
-        leadingIcon={"qrcode"}
-        subtitle={t("settings:showqrcodeSubtitle")}
-        onPress={() => setQrCodeVisible(true)}
-      >
-        {t("settings:showqrcode")}
-      </SettingsItem>
+    <>
+      <View style={{ marginTop: 4 }}>
+        <SettingsDivider />
+        <SettingsItem
+          leadingIcon={"qrcode"}
+          subtitle={t("settings:showqrcodeSubtitle")}
+          onPress={() => setQrCodeVisible(true)}
+        >
+          {t("settings:showqrcode")}
+        </SettingsItem>
+      </View>
       <TokenQRCodeModal visible={qrCodeVisible} setVisible={setQrCodeVisible} />
-    </View>
+    </>
   );
 }
 

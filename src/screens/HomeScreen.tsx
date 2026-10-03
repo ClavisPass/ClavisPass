@@ -122,13 +122,22 @@ const homeSpacing = {
 };
 const mobileFolderFilterOverlayHeight = 72;
 const mobileFolderFilterFadeHeight = 34;
+const homeToolChipHeight = 30;
+const homeToolChipBottomPadding = homeSpacing.xs;
+const homeToolsTopPadding = TITLEBAR_HEIGHT > 0 ? homeSpacing.xs : 0;
 const homeToolsOverlayHeight = 40;
 const homeListEdgeGap = homeSpacing.sm;
+const homeListTopGap = 6;
+const homeListTopInset =
+  homeToolsTopPadding +
+  homeToolChipHeight +
+  homeToolChipBottomPadding +
+  homeListTopGap;
 const webListTopFadeStart = 24;
-const webListTopFadeEnd = homeToolsOverlayHeight + 20;
+const webListTopFadeEnd = homeListTopInset + 12;
 const webListBottomFadeStart = mobileFolderFilterOverlayHeight + 0;
 const webListBottomFadeEnd = 24;
-const nativeListTopFadeClear = homeToolsOverlayHeight + 20;
+const nativeListTopFadeClear = homeListTopInset + 12;
 const nativeListBottomFadeClear =
   mobileFolderFilterOverlayHeight + homeListEdgeGap;
 const homeListDrawDistance = Platform.OS === "web" ? 120 : 600;
@@ -207,6 +216,7 @@ type HomeValueListItemProps = {
   item: ValuesType;
   index: number;
   onPress: (item: ValuesType) => void;
+  denseHorizontalInset: number;
 };
 
 const areHomeValueListItemPropsEqual = (
@@ -219,6 +229,7 @@ const areHomeValueListItemPropsEqual = (
   return (
     prev.index === next.index &&
     prev.onPress === next.onPress &&
+    prev.denseHorizontalInset === next.denseHorizontalInset &&
     prev.item.id === next.item.id &&
     prev.item.title === next.item.title &&
     prev.item.fav === next.item.fav &&
@@ -236,6 +247,7 @@ const HomeValueListItem = React.memo(function HomeValueListItem({
   item,
   index,
   onPress,
+  denseHorizontalInset,
 }: HomeValueListItemProps) {
   const handlePress = useCallback(() => {
     onPress(item);
@@ -243,7 +255,13 @@ const HomeValueListItem = React.memo(function HomeValueListItem({
 
   return (
     <PerfProfiler id="HomeScreen.ValueListItem" minDurationMs={20}>
-      <ListItem item={item} index={index} onPress={handlePress} denseSpacing />
+      <ListItem
+        item={item}
+        index={index}
+        onPress={handlePress}
+        denseSpacing
+        denseHorizontalInset={denseHorizontalInset}
+      />
     </PerfProfiler>
   );
 }, areHomeValueListItemPropsEqual);
@@ -371,10 +389,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const homeGutter = isCompactHeader
     ? homeSpacing.mobileGutter
     : homeSpacing.desktopGutter;
+  const homeListItemHorizontalInset = isCompactHeader ? 0 : homeSpacing.sm;
   const homeListContentContainerStyle = useMemo(
     () => ({
       paddingRight: 0,
-      paddingTop: homeToolsOverlayHeight + homeListEdgeGap,
+      paddingTop: homeListTopInset,
       paddingBottom: isCompactHeader
         ? Platform.OS === "web"
           ? mobileFolderFilterOverlayHeight + homeListEdgeGap
@@ -385,7 +404,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   );
   const homeScrollIndicatorInsets = useMemo(
     () => ({
-      top: homeToolsOverlayHeight + homeListEdgeGap,
+      top: homeListTopInset,
       bottom: isCompactHeader
         ? mobileFolderFilterOverlayHeight + homeListEdgeGap
         : homeSpacing.sm,
@@ -422,7 +441,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     const existingStyle = document.getElementById(HOME_SCROLLBAR_STYLE_ID);
     const css = `
       [data-clavispass-home-list-scroll] *::-webkit-scrollbar-track {
-        margin-top: ${homeToolsOverlayHeight + homeListEdgeGap}px;
+        margin-top: ${homeListTopInset}px;
       }
 
       [data-clavispass-home-list-scroll][data-compact="true"] *::-webkit-scrollbar-track {
@@ -1139,9 +1158,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   const renderValueItem = useCallback(
     ({ item, index }: { item: ValuesType; index: number }) => (
-      <HomeValueListItem item={item} index={index} onPress={openEditScreen} />
+      <HomeValueListItem
+        item={item}
+        index={index}
+        onPress={openEditScreen}
+        denseHorizontalInset={homeListItemHorizontalInset}
+      />
     ),
-    [openEditScreen],
+    [homeListItemHorizontalInset, openEditScreen],
   );
 
   const openAnalysisScreen = useCallback(() => {
@@ -1170,10 +1194,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         alignItems: "center",
         flexDirection: "row",
         flexGrow: 1,
-        gap: homeSpacing.xs,
+        gap: homeSpacing.sm,
         justifyContent: "flex-start",
-        paddingLeft: homeSpacing.sm,
-        paddingRight: homeGutter,
+        paddingLeft: isCompactHeader ? 0 : homeSpacing.sm,
+        paddingRight: isCompactHeader ? 0 : homeGutter,
         paddingTop: 0,
         paddingBottom: homeSpacing.xs,
       }}
@@ -1478,6 +1502,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 sourceUrl={item.sourceUrl}
                 index={index}
                 denseSpacing
+                denseHorizontalInset={homeListItemHorizontalInset}
                 onPressEdit={() => {
                   openEditScreen(item.item);
                 }}
@@ -1529,6 +1554,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 item={item.item}
                 index={index}
                 denseSpacing
+                denseHorizontalInset={homeListItemHorizontalInset}
                 onPress={() => {
                   openEditScreen(item.item);
                 }}
@@ -2065,7 +2091,7 @@ const styles = StyleSheet.create({
     position: "relative",
     zIndex: 1,
     minHeight: mobileFolderFilterOverlayHeight - mobileFolderFilterFadeHeight,
-    paddingBottom: homeSpacing.xs,
+    paddingBottom: homeSpacing.sm,
   },
   homeToolsOverlay: {
     position: "absolute",
@@ -2074,7 +2100,7 @@ const styles = StyleSheet.create({
     right: 0,
     height: homeToolsOverlayHeight,
     zIndex: 8,
-    paddingTop: homeSpacing.sm,
+    paddingTop: homeToolsTopPadding,
   },
   homeToolsSurface: {
     position: "relative",

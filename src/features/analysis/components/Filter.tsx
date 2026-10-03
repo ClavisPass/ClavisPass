@@ -1,7 +1,6 @@
-import React, { memo, useRef } from "react";
-import { View, FlatList, Dimensions, StyleSheet, Platform } from "react-native";
-import { Divider, IconButton } from "react-native-paper";
-import WebSpecific from "../../../infrastructure/platform/WebSpecific";
+import React, { memo } from "react";
+import { View, FlatList, StyleSheet, Platform } from "react-native";
+import { Divider } from "react-native-paper";
 import { MenuItem } from "../../../shared/components/menus/MenuItem";
 import AppChip from "../../../shared/components/chips/AppChip";
 
@@ -9,9 +8,20 @@ type FilterItem = { key: string; title: string };
 
 const styles = StyleSheet.create({
   chip: {
-    marginRight: 8,
     borderRadius: 12,
     overflow: "hidden",
+  },
+  filterList: {
+    flexGrow: 0,
+    minWidth: 0,
+    width: "100%",
+  },
+  filterListContent: {
+    alignItems: "center",
+    paddingHorizontal: 8,
+  },
+  filterSeparator: {
+    width: 8,
   },
 });
 
@@ -26,67 +36,32 @@ export const FiltersNarrow = memo(function FiltersNarrow({
   bucket,
   setBucket,
 }: FiltersNarrowProps) {
-  const filterListRef = useRef<FlatList<FilterItem>>(null);
-  const filterOffsetRef = useRef(0);
-
-  const onFilterScrollEnd = (event: any) => {
-    const x = event?.nativeEvent?.contentOffset?.x ?? 0;
-    filterOffsetRef.current = x;
-  };
-
-  const scrollFiltersTo = (offset: number) => {
-    const next = Math.max(0, offset);
-    filterOffsetRef.current = next;
-    filterListRef.current?.scrollToOffset({ animated: true, offset: next });
-  };
-
-  const change = (direction: "+" | "-") => {
-    const { width } = Dimensions.get("window");
-    const step = Math.max(120, width - 140);
-    const cur = filterOffsetRef.current ?? 0;
-    const next = direction === "+" ? cur + step : cur - step;
-    scrollFiltersTo(next);
-  };
-
   return (
     <View
       style={{
-        marginHorizontal: 8,
-        flexDirection: "row",
-        alignItems: "center",
+        width: "100%",
       }}
     >
-      <WebSpecific>
-        <IconButton icon="chevron-left" style={{ margin: 0 }} onPress={() => change("-")} size={12} />
-      </WebSpecific>
-
-      <View style={{ flexShrink: 1, overflow: "hidden" }}>
-        <FlatList
-          ref={filterListRef}
-          data={filterItems}
-          horizontal
-          keyExtractor={(it) => it.key}
-          showsHorizontalScrollIndicator={false}
-          scrollEventThrottle={16}
-          onScrollEndDrag={onFilterScrollEnd}
-          onMomentumScrollEnd={onFilterScrollEnd}
-          renderItem={({ item }) => (
-            <AppChip
-              icon={() => null}
-              selected={bucket === item.key}
-              showSelectedOverlay
-              onPress={() => setBucket(item.key)}
-              style={styles.chip}
-            >
-              {item.title}
-            </AppChip>
-          )}
-        />
-      </View>
-
-      <WebSpecific>
-        <IconButton icon="chevron-right" style={{ margin: 0 }} onPress={() => change("+")} size={12} />
-      </WebSpecific>
+      <FlatList
+        data={filterItems}
+        horizontal
+        keyExtractor={(it) => it.key}
+        showsHorizontalScrollIndicator={Platform.OS === "web"}
+        style={styles.filterList}
+        contentContainerStyle={styles.filterListContent}
+        ItemSeparatorComponent={() => <View style={styles.filterSeparator} />}
+        renderItem={({ item }) => (
+          <AppChip
+            icon={() => null}
+            selected={bucket === item.key}
+            showSelectedOverlay
+            onPress={() => setBucket(item.key)}
+            style={styles.chip}
+          >
+            {item.title}
+          </AppChip>
+        )}
+      />
     </View>
   );
 });

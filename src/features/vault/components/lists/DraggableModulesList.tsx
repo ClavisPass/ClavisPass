@@ -160,7 +160,7 @@ function DraggableModulesList(props: DraggableModulesListProps) {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, width: "100%" }}
+      style={{ flex: 1, width: "100%", position: "relative" }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={40}
     >
@@ -185,25 +185,47 @@ function DraggableModulesList(props: DraggableModulesListProps) {
             keyboardShouldPersistTaps="always"
             keyboardDismissMode="on-drag"
             contentContainerStyle={{
-              paddingBottom: props.bottomPadding ?? 12,
+              flexGrow: 1,
+              paddingBottom: props.footer ? 0 : (props.bottomPadding ?? 12),
             }}
             onContentSizeChange={(_, height) => {
               contentHeightRef.current = height;
             }}
             ListFooterComponent={
-              <DraggableModulesFooter
-                modulePrediction={modulePrediction}
-                onAddPredictedModule={() => {
-                  if (!modulePrediction) return;
-                  props.addModule(modulePrediction);
-                  setTimeout(scheduleKeyboardAwareScroll, 0);
-                }}
-                t={t}
-              />
+              <>
+                <DraggableModulesFooter
+                  modulePrediction={modulePrediction}
+                  onAddPredictedModule={() => {
+                    if (!modulePrediction) return;
+                    props.addModule(modulePrediction);
+                    setTimeout(scheduleKeyboardAwareScroll, 0);
+                  }}
+                  t={t}
+                />
+                {props.footer ? (
+                  <View style={{ marginTop: "auto" as any, paddingTop: 8 }}>
+                    {props.footer}
+                  </View>
+                ) : null}
+              </>
             }
           />
         </NativeDragHandleScrollLockProvider>
       </View>
+      {props.stickyFooter ? (
+        <View
+          pointerEvents="box-none"
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: props.stickyFooterBottomInset ?? 0,
+            zIndex: 10,
+          }}
+        >
+          {props.stickyFooter}
+        </View>
+      ) : null}
     </KeyboardAvoidingView>
   );
 }

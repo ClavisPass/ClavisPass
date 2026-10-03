@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next";
 
 const TASK_LINE_HEIGHT = 18;
 const SINGLE_LINE_GROWTH_THRESHOLD = 80;
-const TASK_MODULE_SPACING = 4;
+const TASK_MODULE_SPACING = 8;
 const TASK_NATIVE_HEIGHT_PADDING = 12;
 
 function TaskModule(props: TaskModuleType & Props) {

@@ -32,6 +32,7 @@ type Props = {
   key?: React.Key;
   index: number;
   denseSpacing?: boolean;
+  denseHorizontalInset?: number;
 };
 
 function TotpItem(props: Props) {
@@ -41,6 +42,8 @@ function TotpItem(props: Props) {
     return null;
   }
 
+  const denseHorizontalInset = props.denseHorizontalInset ?? 8;
+
   return (
     <Animated.View
       entering={FadeInDown.delay(props.index * 50).duration(250)}
@@ -48,7 +51,11 @@ function TotpItem(props: Props) {
       style={[
         styles.container,
         props.denseSpacing
-          ? { marginLeft: 8, marginRight: 0, marginBottom: 4 }
+          ? {
+              marginLeft: denseHorizontalInset,
+              marginRight: 0,
+              marginBottom: 4,
+            }
           : null,
         {
           backgroundColor: theme.colors?.background,

@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import { Text } from "react-native-paper";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import AppIcon from "../../../shared/components/icons/AppIcon";
@@ -19,6 +19,7 @@ type Props = {
   title: string;
   icon?: string;
   ref?: React.RefObject<View | null>;
+  style?: StyleProp<ViewStyle>;
 };
 
 export function SubItem(props: Props) {
@@ -60,6 +61,7 @@ function SettingsContainer(props: Props) {
           borderWidth: 0,
           boxShadow: "none",
         },
+        props.style,
       ]}
     >
       <SubItem icon={props.icon} title={props.title}>

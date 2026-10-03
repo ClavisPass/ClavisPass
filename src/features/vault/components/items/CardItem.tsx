@@ -57,6 +57,7 @@ type Props = {
   key?: React.Key;
   index: number;
   denseSpacing?: boolean;
+  denseHorizontalInset?: number;
 };
 
 function CardItem(props: Props) {
@@ -97,6 +98,7 @@ function CardItem(props: Props) {
   const secondaryTextColor = accentColor
     ? withAlpha(titleColor === "#ffffff" ? "#ffffff" : "#111111", 0.72)
     : theme.colors.onSurfaceVariant;
+  const denseHorizontalInset = props.denseHorizontalInset ?? 8;
 
   return (
     <Animated.View
@@ -105,7 +107,11 @@ function CardItem(props: Props) {
       style={[
         styles.container,
         props.denseSpacing
-          ? { marginLeft: 8, marginRight: 0, marginBottom: 4 }
+          ? {
+              marginLeft: denseHorizontalInset,
+              marginRight: 0,
+              marginBottom: 4,
+            }
           : null,
         {
           backgroundColor: cardBase,

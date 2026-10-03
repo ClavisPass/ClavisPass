@@ -221,7 +221,7 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
         contentContainerStyle={{
           padding: 8,
           paddingTop: 0,
-          gap: 4,
+          gap: 8,
           alignSelf: "center",
           width: "100%",
           maxWidth: 920,
@@ -285,7 +285,7 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
             </Text>
           </View>
         ) : (
-          <View style={{ gap: 4 }}>{visibleIdentities.map(renderIdentityCard)}</View>
+          <View style={{ gap: 8 }}>{visibleIdentities.map(renderIdentityCard)}</View>
         )}
       </ScrollView>
     </AnimatedContainer>
@@ -306,9 +306,9 @@ const styles = StyleSheet.create({
     minHeight: 82,
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    gap: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
   },
   logoShell: {
     width: 54,
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   identityContent: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 8,
   },
   identityContentStacked: {
     flexDirection: "column",
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
   identityTextBlock: {
     flex: 1,
     minWidth: 0,
-    gap: 4,
+    gap: 8,
   },
   identityTextBlockStacked: {
     flex: 0,
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
   metricRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 10,
+    gap: 8,
   },
   metric: {
     minWidth: 132,
@@ -376,9 +376,9 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    gap: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
   },
@@ -407,8 +407,8 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
-    padding: 18,
+    gap: 8,
+    padding: 8,
   },
   emptyIcon: {
     width: 54,

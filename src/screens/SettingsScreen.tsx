@@ -1788,6 +1788,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 ref={dataResetRef}
                 icon="alert-outline"
                 title={t("settings:dangerZone")}
+                style={{ marginBottom: 4 }}
               >
                 <SettingsItem
                   subtitle={t("settings:subtitleResetSettings")}

@@ -25,15 +25,12 @@ function MetaInformationModule(props: MetaInformationModuleType) {
         flexDirection: "row",
         alignItems: "center",
         padding: 4,
-        paddingBottom: 0,
         backgroundColor: theme.colors.background,
         boxShadow: theme.colors?.shadow,
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12,
+        borderRadius: 12,
         width: "100%",
         borderWidth: StyleSheet.hairlineWidth,
         borderColor: darkmode ? theme.colors.outlineVariant : "white",
-        borderBottomWidth: 0,
       }}
     >
       <View style={{ flex: 1, justifyContent: "flex-start" }}>
