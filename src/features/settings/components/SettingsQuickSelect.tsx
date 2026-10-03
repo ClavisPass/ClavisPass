@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   findNodeHandle,
   FlatList,
@@ -15,6 +15,16 @@ import QuickSelectItem from "../model/QuickSelectItem";
 import { logger } from "../../../infrastructure/logging/logger";
 import AppChip from "../../../shared/components/chips/AppChip";
 import { useTheme } from "../../../app/providers/ThemeProvider";
+import { DraggableHandle } from "../../../shared/components/DraggableHandle";
+import { get, set } from "../../../infrastructure/storage/store";
+
+const SETTINGS_QUICK_SELECT_WIDTH_KEY = "SETTINGS_QUICK_SELECT_WIDTH";
+const MIN_W = 20;
+const MAX_W = 420;
+
+function clampWidth(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
 
 const styles = StyleSheet.create({
   chip: {
@@ -69,6 +79,18 @@ function SettingsQuickSelect(props: Props) {
   const horizontalAnimationFrameRef = useRef<number | null>(null);
   const horizontalContentWidthRef = useRef(0);
   const horizontalViewportWidthRef = useRef(0);
+  const [sidebarWidth, setSidebarWidth] = useState(180);
+
+  const maxSidebarWidth = Math.min(MAX_W, Math.max(MIN_W, width * 0.6));
+
+  const handleResize = useCallback(
+    (dx: number) => {
+      setSidebarWidth((current) =>
+        clampWidth(current + dx, MIN_W, maxSidebarWidth)
+      );
+    },
+    [maxSidebarWidth]
+  );
 
   const getMaxHorizontalOffset = useCallback(
     () =>
@@ -164,6 +186,40 @@ function SettingsQuickSelect(props: Props) {
     []
   );
 
+  useEffect(() => {
+    let isMounted = true;
+
+    (async () => {
+      try {
+        const saved = await get(SETTINGS_QUICK_SELECT_WIDTH_KEY);
+        const nextWidth = clampWidth(
+          typeof saved === "number" ? saved : 180,
+          MIN_W,
+          maxSidebarWidth
+        );
+        if (isMounted) setSidebarWidth(nextWidth);
+      } catch (error) {
+        logger.warn("[SettingsQuickSelect] Failed to read width:", error);
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [maxSidebarWidth]);
+
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      set(SETTINGS_QUICK_SELECT_WIDTH_KEY, sidebarWidth);
+    }, 150);
+
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, [sidebarWidth]);
+
   const scrollToRef = (ref: React.RefObject<View | null>) => {
     if (!ref.current || !props.scrollRef.current) return;
 
@@ -200,8 +256,9 @@ function SettingsQuickSelect(props: Props) {
       {width > 600 ? (
         <View
           style={{
-            maxWidth: 280,
-            width: 180,
+            maxWidth: maxSidebarWidth,
+            width: sidebarWidth,
+            minWidth: MIN_W,
             flexDirection: "row",
             overflow: "hidden",
           }}
@@ -237,7 +294,26 @@ function SettingsQuickSelect(props: Props) {
               );
             }}
           />
-          <Divider style={{ width: 1, height: "100%", margin: 0 }} />
+          <View
+            style={{
+              width: 1,
+              height: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Divider style={{ width: 1, height: "100%", margin: 0 }} />
+            <DraggableHandle
+              onDeltaX={handleResize}
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                right: 0,
+                bottom: 0,
+              }}
+            />
+          </View>
         </View>
       ) : (
         <View

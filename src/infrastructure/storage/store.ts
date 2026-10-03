@@ -114,6 +114,10 @@ export const storeSchema = {
     type: "number",
     default: 180,
   },
+  SETTINGS_QUICK_SELECT_WIDTH: {
+    type: "number",
+    default: 180,
+  },
   FAVORITE_FILTER: {
     type: "boolean",
     default: false,
@@ -241,6 +245,7 @@ const SETTINGS_RESET_KEYS = [
   "FAST_ACCESS",
   "FAST_ACCESS_POSITION",
   "SIDEBAR_WIDTH",
+  "SETTINGS_QUICK_SELECT_WIDTH",
   "FAVORITE_FILTER",
   "TWOFA_FILTER",
   "CARD_FILTER",
