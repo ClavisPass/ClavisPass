@@ -85,7 +85,7 @@ function TinyFilterChip({
       selected={selected}
       showSelectedOverlay={true}
       onPress={onPress}
-      style={{ borderRadius: 12, marginRight: 4 }}
+      style={{ borderRadius: 12, marginRight: 8 }}
     >
       {label}
     </AppChip>

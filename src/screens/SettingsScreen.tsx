@@ -61,6 +61,8 @@ import Animated, {
   Layout,
   withTiming,
 } from "react-native-reanimated";
+import MaskedView from "@react-native-masked-view/masked-view";
+import { LinearGradient } from "expo-linear-gradient";
 import { siBitwarden, siKeepassxc } from "simple-icons";
 import { useSetting } from "../app/providers/SettingsProvider";
 import { useToken } from "../app/providers/CloudProvider";
@@ -104,6 +106,10 @@ import {
 import { resolveWindowControlsSide } from "../infrastructure/platform/windowControls";
 import SearchInput from "../shared/components/SearchInput";
 
+const settingsQuickSelectOverlayHeight = 36;
+const settingsWebListTopFadeStart = 0;
+const settingsWebListTopFadeEnd = settingsQuickSelectOverlayHeight + 22;
+const settingsNativeListTopFadeClear = settingsQuickSelectOverlayHeight + 16;
 const settingsSearchTransition = Easing.out(Easing.cubic);
 const compactSearchEnter = () => {
   "worklet";
@@ -196,10 +202,43 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 10,
+    marginBottom: 8,
   },
   scrollView: {
     width: "100%",
+    backgroundColor: "transparent",
+  },
+  settingsScrollArea: {
+    flex: 1,
+    width: "100%",
+    position: "relative",
+    backgroundColor: "transparent",
+  },
+  quickSelectOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: settingsQuickSelectOverlayHeight,
+    zIndex: 8,
+  },
+  quickSelectOverlaySurface: {
+    position: "relative",
+    zIndex: 1,
+  },
+  nativeListMask: {
+    flex: 1,
+    width: "100%",
+    backgroundColor: "transparent",
+  },
+  nativeListMaskTop: {
+    height: settingsNativeListTopFadeClear,
+    width: "100%",
+  },
+  nativeListMaskMiddle: {
+    flex: 1,
+    width: "100%",
+    backgroundColor: "black",
   },
   container: {
     width: 250,
@@ -272,6 +311,39 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 
   const [startup, setStartup] = React.useState(false);
   const { height, width } = useWindowDimensions();
+  const isCompactSettingsLayout = width <= 600;
+  const settingsScrollContentStyle = useMemo(
+    () => ({
+      paddingTop: isCompactSettingsLayout
+        ? settingsQuickSelectOverlayHeight
+        : 0,
+    }),
+    [isCompactSettingsLayout],
+  );
+  const settingsWebListFadeMaskStyle =
+    Platform.OS === "web" && isCompactSettingsLayout
+      ? ({
+          WebkitMaskImage: `linear-gradient(to bottom, transparent 0px, transparent ${settingsWebListTopFadeStart}px, black ${settingsWebListTopFadeEnd}px, black 100%)`,
+          maskImage: `linear-gradient(to bottom, transparent 0px, transparent ${settingsWebListTopFadeStart}px, black ${settingsWebListTopFadeEnd}px, black 100%)`,
+        } as any)
+      : null;
+  const SettingsScrollMask: any =
+    Platform.OS !== "web" && isCompactSettingsLayout ? MaskedView : View;
+  const settingsScrollMaskProps =
+    Platform.OS !== "web" && isCompactSettingsLayout
+      ? {
+          maskElement: (
+            <View style={styles.nativeListMask}>
+              <LinearGradient
+                colors={["transparent", "transparent", "black"]}
+                locations={[0, 0.42, 1]}
+                style={styles.nativeListMaskTop}
+              />
+              <View style={styles.nativeListMaskMiddle} />
+            </View>
+          ),
+        }
+      : {};
   const isFocused = useIsFocused();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchHeaderVisible, setSearchHeaderVisible] = useState(false);
@@ -1091,7 +1163,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         display: "flex",
         flexDirection: "column",
         backgroundColor: "transparent",
-        marginBottom: 4,
+        marginBottom: 8,
         borderRadius: 12,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
@@ -1277,8 +1349,19 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             flexDirection: width > 600 ? "row" : "column",
           }}
         >
-          <SettingsQuickSelect scrollRef={scrollRef} items={quickSelectItems} />
-          <ScrollView ref={scrollRef} style={styles.scrollView}>
+          {!isCompactSettingsLayout ? (
+            <SettingsQuickSelect scrollRef={scrollRef} items={quickSelectItems} />
+          ) : null}
+          <View style={styles.settingsScrollArea}>
+            <SettingsScrollMask
+              style={{ flex: 1, width: "100%" }}
+              {...settingsScrollMaskProps}
+            >
+          <ScrollView
+            ref={scrollRef}
+            style={[styles.scrollView, settingsWebListFadeMaskStyle]}
+            contentContainerStyle={settingsScrollContentStyle}
+          >
             {visibleSettingsSections.sync ? (
               <SettingsContainer
                 ref={authRef}
@@ -1754,11 +1837,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               style={{
                 display: "flex",
                 flexDirection: "row",
-                gap: 4,
+                gap: 8,
                 flexWrap: "wrap",
                 margin: 8,
                 marginTop: 0,
-                marginBottom: 4,
+                marginBottom: 8,
               }}
             >
               <AppChip
@@ -1796,6 +1879,18 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               </AppChip>
             </View>
           </ScrollView>
+            </SettingsScrollMask>
+            {isCompactSettingsLayout ? (
+              <View pointerEvents="box-none" style={styles.quickSelectOverlay}>
+                <View style={styles.quickSelectOverlaySurface}>
+                  <SettingsQuickSelect
+                    scrollRef={scrollRef}
+                    items={quickSelectItems}
+                  />
+                </View>
+              </View>
+            ) : null}
+          </View>
         </View>
 
         <ChangeMasterPasswordModal

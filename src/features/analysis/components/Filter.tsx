@@ -9,7 +9,7 @@ type FilterItem = { key: string; title: string };
 
 const styles = StyleSheet.create({
   chip: {
-    marginRight: 4,
+    marginRight: 8,
     borderRadius: 12,
     overflow: "hidden",
   },

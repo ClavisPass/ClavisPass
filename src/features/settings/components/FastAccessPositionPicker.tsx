@@ -126,13 +126,13 @@ export default function FastAccessPositionPicker({ value, setValue }: Props) {
         style={{
           color: theme.colors.onSurfaceVariant,
           marginTop: 2,
-          marginBottom: 10,
+          marginBottom: 8,
         }}
       >
         {t("settings:fastAccessPositionSubtitle")}
       </Text>
 
-      <View style={{ alignItems: "flex-start", gap: 10 }}>
+      <View style={{ alignItems: "flex-start", gap: 8 }}>
         <View
           style={{
             width: 180,

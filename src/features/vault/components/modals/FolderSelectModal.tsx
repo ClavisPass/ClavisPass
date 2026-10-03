@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   listContent: {
-    gap: 8,
+    gap: 4,
   },
   item: {
     borderRadius: 12,

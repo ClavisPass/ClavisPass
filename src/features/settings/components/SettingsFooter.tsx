@@ -49,7 +49,7 @@ function SettingsFooter() {
         padding: 16,
         margin: 8,
         marginTop: 0,
-        marginBottom: 4,
+        marginBottom: 8,
 
         display: "flex",
         justifyContent: "center",

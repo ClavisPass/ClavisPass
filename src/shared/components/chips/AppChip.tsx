@@ -53,6 +53,8 @@ function AppChip({
   disabled,
   onPress,
   showSelectedOverlay,
+  style,
+  textStyle,
   ...props
 }: Props) {
   const { theme } = useTheme();
@@ -72,7 +74,7 @@ function AppChip({
               : theme.colors.secondaryContainer,
             opacity: disabled ? 0.38 : 1,
           },
-          props.style as any,
+          style as any,
         ]}
       >
         <TouchableRipple
@@ -114,6 +116,14 @@ function AppChip({
       disabled={disabled}
       onPress={onPress}
       showSelectedOverlay={showSelectedOverlay}
+      style={[
+        {
+          backgroundColor: theme.colors.secondaryContainer,
+          borderRadius: 12,
+        },
+        style as any,
+      ]}
+      textStyle={[{ color: theme.colors.primary }, textStyle as any]}
     >
       {children ?? ""}
     </Chip>

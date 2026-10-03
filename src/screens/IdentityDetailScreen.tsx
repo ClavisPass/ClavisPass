@@ -254,7 +254,7 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
           alignSelf: "center",
           width: "100%",
           maxWidth: 980,
-          paddingBottom: 18,
+          paddingBottom: 8,
         }}
       >
         {!identity ? (
@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   insightList: {
-    gap: 8,
+    gap: 4,
     marginTop: 10,
   },
   insightText: {
@@ -706,7 +706,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   entryList: {
-    gap: 8,
+    gap: 4,
     marginTop: 12,
   },
   entryRow: {

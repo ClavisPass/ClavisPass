@@ -130,6 +130,7 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
         item={item}
         index={index}
         reorderMode
+        denseSpacing
         disableFastAccessPreview
         hideChevron
         pressDisabled

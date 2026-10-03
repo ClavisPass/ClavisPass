@@ -221,11 +221,11 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
         contentContainerStyle={{
           padding: 8,
           paddingTop: 0,
-          gap: 8,
+          gap: 4,
           alignSelf: "center",
           width: "100%",
           maxWidth: 920,
-          paddingBottom: 18,
+          paddingBottom: 8,
         }}
       >
         <View style={styles.metricRow}>
@@ -285,7 +285,7 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
             </Text>
           </View>
         ) : (
-          <View style={{ gap: 10 }}>{visibleIdentities.map(renderIdentityCard)}</View>
+          <View style={{ gap: 4 }}>{visibleIdentities.map(renderIdentityCard)}</View>
         )}
       </ScrollView>
     </AnimatedContainer>
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "flex-end",
     alignItems: "center",
-    gap: 6,
+    gap: 8,
     flexShrink: 1,
     maxWidth: "58%",
   },

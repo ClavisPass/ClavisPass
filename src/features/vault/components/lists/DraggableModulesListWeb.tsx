@@ -89,7 +89,6 @@ function DraggableModulesListWeb(props: DraggableModulesListProps) {
                     {...draggableProvided.draggableProps}
                     style={{
                       ...getItemStyle(draggableProvided.draggableProps.style),
-                      marginBottom: 8,
                     }}
                   >
                     <WebDragHandlePropsProvider

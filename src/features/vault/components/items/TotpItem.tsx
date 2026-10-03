@@ -31,6 +31,7 @@ type Props = {
   onPress: () => void;
   key?: React.Key;
   index: number;
+  denseSpacing?: boolean;
 };
 
 function TotpItem(props: Props) {
@@ -46,6 +47,9 @@ function TotpItem(props: Props) {
       key={props.key}
       style={[
         styles.container,
+        props.denseSpacing
+          ? { marginLeft: 8, marginRight: 0, marginBottom: 4 }
+          : null,
         {
           backgroundColor: theme.colors?.background,
           boxShadow: theme.colors?.shadow,

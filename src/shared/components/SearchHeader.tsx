@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Platform,
-  StyleSheet,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -122,7 +121,7 @@ export default function SearchHeader({
   resetLabel = "Reset",
   marginBottom = 4,
 }: SearchHeaderProps) {
-  const { theme, darkmode } = useTheme();
+  const { theme } = useTheme();
   const { width } = useWindowDimensions();
   const isFocused = useIsFocused();
   const searchRef = useRef<any>(null);
@@ -266,18 +265,18 @@ export default function SearchHeader({
         width: "100%",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: theme.colors?.background,
+        backgroundColor: "transparent",
         marginBottom,
         borderRadius: 12,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
         borderBottomLeftRadius: 12,
         borderBottomRightRadius: 12,
-        boxShadow: theme.colors?.shadow,
+        boxShadow: "none",
         justifyContent: "center",
-        borderWidth: StyleSheet.hairlineWidth,
+        borderWidth: 0,
         borderTopWidth: 0,
-        borderColor: darkmode ? theme.colors.outlineVariant : "white",
+        borderColor: "transparent",
       }}
     >
       <View

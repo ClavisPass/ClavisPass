@@ -218,6 +218,7 @@ type Props = {
   disableFastAccessPreview?: boolean;
   hideChevron?: boolean;
   pressDisabled?: boolean;
+  denseSpacing?: boolean;
   onDragStart?: () => void;
   onDragHandlePressIn?: () => void;
   onDragHandleRelease?: () => void;
@@ -794,6 +795,9 @@ function ListItem(props: Props) {
       ref={itemRef}
       style={[
         styles.container,
+        props.denseSpacing
+          ? { marginLeft: 8, marginRight: 0, marginBottom: 4 }
+          : null,
         Platform.OS !== "web"
           ? { marginLeft: 0, marginRight: 0, marginBottom: 0 }
           : null,
@@ -951,6 +955,9 @@ function ListItem(props: Props) {
             overshootRight={false}
             containerStyle={[
               styles.swipeContainer,
+              props.denseSpacing
+                ? { marginLeft: 8, marginRight: 0, marginBottom: 4 }
+                : null,
               props.reorderMode ? { marginBottom: 4, height: 44 } : null,
             ]}
             renderLeftActions={renderFavoriteSwipeAction}

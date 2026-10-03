@@ -56,6 +56,7 @@ type Props = {
   sourceUrl?: string | null;
   key?: React.Key;
   index: number;
+  denseSpacing?: boolean;
 };
 
 function CardItem(props: Props) {
@@ -103,6 +104,9 @@ function CardItem(props: Props) {
       key={props.key}
       style={[
         styles.container,
+        props.denseSpacing
+          ? { marginLeft: 8, marginRight: 0, marginBottom: 4 }
+          : null,
         {
           backgroundColor: cardBase,
           boxShadow: theme.colors?.shadow,

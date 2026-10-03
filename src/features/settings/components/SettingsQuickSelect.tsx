@@ -14,12 +14,18 @@ import { MenuItem } from "../../../shared/components/menus/MenuItem";
 import QuickSelectItem from "../model/QuickSelectItem";
 import { logger } from "../../../infrastructure/logging/logger";
 import AppChip from "../../../shared/components/chips/AppChip";
+import { useTheme } from "../../../app/providers/ThemeProvider";
 
 const styles = StyleSheet.create({
   chip: {
     height: 30,
-    marginRight: 4,
+    marginRight: 0,
     borderRadius: 12,
+  },
+  mobileChipShell: {
+    marginRight: 8,
+    borderRadius: 12,
+    overflow: "hidden",
   },
   chipText: {
     fontSize: 12,
@@ -55,6 +61,7 @@ type Props = {
 
 function SettingsQuickSelect(props: Props) {
   const { width } = useWindowDimensions();
+  const mobileChipShellStyle = styles.mobileChipShell;
 
   const flatListRef: any = useRef<FlatList>(null);
   const horizontalOffsetRef = useRef(0);
@@ -237,8 +244,8 @@ function SettingsQuickSelect(props: Props) {
           style={{
             paddingHorizontal: 8,
             paddingTop: 0,
-            paddingBottom: 4,
-            maxHeight: 50,
+            paddingBottom: 8,
+            maxHeight: 36,
             width: "100%",
             display: "flex",
             flexDirection: "row",
@@ -284,18 +291,20 @@ function SettingsQuickSelect(props: Props) {
 
                 if (!shouldRender) return null;
                 return (
-                  <AppChip
-                    key={index}
-                    icon={item.icon}
-                    showSelectedOverlay={true}
-                    onPress={() => {
-                      scrollToRef(item.ref);
-                    }}
-                    style={styles.chip}
-                    textStyle={styles.chipText}
-                  >
-                    {item.title}
-                  </AppChip>
+                  <View style={mobileChipShellStyle}>
+                    <AppChip
+                      key={index}
+                      icon={item.icon}
+                      showSelectedOverlay={true}
+                      onPress={() => {
+                        scrollToRef(item.ref);
+                      }}
+                      style={styles.chip}
+                      textStyle={styles.chipText}
+                    >
+                      {item.title}
+                    </AppChip>
+                  </View>
                 );
               }}
             />

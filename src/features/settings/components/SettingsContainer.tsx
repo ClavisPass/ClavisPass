@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
   container: {
     marginLeft: 8,
     marginRight: 8,
-    marginBottom: 14,
+    marginBottom: 8,
     borderRadius: 0,
     overflow: "visible",
   },
@@ -32,7 +32,7 @@ export function SubItem(props: Props) {
           gap: 8,
           alignItems: "center",
           paddingTop: 8,
-          paddingBottom: 8,
+          paddingBottom: 4,
           paddingLeft: 12,
           paddingRight: 12,
         }}

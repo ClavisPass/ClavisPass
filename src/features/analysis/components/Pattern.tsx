@@ -45,7 +45,7 @@ function Pattern(props: Props) {
             <View
               key={index}
               style={{
-                marginRight: 4,
+                marginRight: 8,
                 padding: 6,
                 borderRadius: 10,
                 backgroundColor: theme.colors.primary,

@@ -30,7 +30,12 @@ import AppChip from "../../../shared/components/chips/AppChip";
 const styles = StyleSheet.create({
   chip: {
     height: 30,
-    marginRight: 4,
+    marginRight: 0,
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  mobileChipShell: {
+    marginRight: 8,
     borderRadius: 12,
     overflow: "hidden",
   },
@@ -85,6 +90,7 @@ function FolderFilter(props: Props) {
   const { width } = useWindowDimensions();
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const mobileChipShellStyle = styles.mobileChipShell;
 
   const flatListRef: any = useRef<FlatList>(null);
   const horizontalOffsetRef = useRef(0);
@@ -313,7 +319,7 @@ function FolderFilter(props: Props) {
             width: sidebarWidth,
             minWidth: MIN_W,
             flexDirection: "row",
-            paddingRight: 4,
+            paddingRight: 0,
             overflow: "hidden",
           }}
         >
@@ -453,9 +459,8 @@ function FolderFilter(props: Props) {
       ) : (
         <View
           style={{
-            padding: 4,
-            paddingTop: 4,
-            paddingBottom: 0,
+            paddingHorizontal: 0,
+            paddingVertical: 2,
             maxHeight: 34,
             width: "100%",
             display: "flex",
@@ -495,117 +500,126 @@ function FolderFilter(props: Props) {
               ListHeaderComponent={
                 <View style={{ display: "flex", flexDirection: "row" }}>
                   {props.hasTwoFactorEntries ? (
-                    <AppChip
-                      icon="two-factor-authentication"
-                      iconOnly
-                      selected={props.selected2FA}
-                      showSelectedOverlay={true}
-                      onPress={
-                        props.disabled
-                          ? undefined
-                          : () => {
-                              props.setSelected2FA(!props.selected2FA);
-                              props.setSelectedCard(false);
-                              props.setSelectedFav(false);
-                              props.setSelectedFolder(null);
-                            }
-                      }
-                      style={styles.chip}
-                      textStyle={styles.chipText}
-                    />
+                    <View style={mobileChipShellStyle}>
+                      <AppChip
+                        icon="two-factor-authentication"
+                        iconOnly
+                        selected={props.selected2FA}
+                        showSelectedOverlay={true}
+                        onPress={
+                          props.disabled
+                            ? undefined
+                            : () => {
+                                props.setSelected2FA(!props.selected2FA);
+                                props.setSelectedCard(false);
+                                props.setSelectedFav(false);
+                                props.setSelectedFolder(null);
+                              }
+                        }
+                        style={styles.chip}
+                        textStyle={styles.chipText}
+                      />
+                    </View>
                   ) : null}
                   {props.hasCardEntries ? (
+                    <View style={mobileChipShellStyle}>
+                      <AppChip
+                        icon="credit-card-multiple-outline"
+                        iconOnly
+                        selected={props.selectedCard}
+                        showSelectedOverlay={true}
+                        onPress={
+                          props.disabled
+                            ? undefined
+                            : () => {
+                                props.setSelectedCard(!props.selectedCard);
+                                props.setSelected2FA(false);
+                                props.setSelectedFav(false);
+                                props.setSelectedFolder(null);
+                              }
+                        }
+                        style={styles.chip}
+                        textStyle={styles.chipText}
+                      />
+                    </View>
+                  ) : null}
+                  <View style={mobileChipShellStyle}>
                     <AppChip
-                      icon="credit-card-multiple-outline"
+                      icon="star-outline"
                       iconOnly
-                      selected={props.selectedCard}
+                      selected={props.selectedFav}
                       showSelectedOverlay={true}
                       onPress={
                         props.disabled
                           ? undefined
                           : () => {
-                              props.setSelectedCard(!props.selectedCard);
+                              props.setSelectedFav(!props.selectedFav);
                               props.setSelected2FA(false);
-                              props.setSelectedFav(false);
-                              props.setSelectedFolder(null);
+                              props.setSelectedCard(false);
                             }
                       }
                       style={styles.chip}
                       textStyle={styles.chipText}
                     />
-                  ) : null}
-                  <AppChip
-                    icon="star-outline"
-                    iconOnly
-                    selected={props.selectedFav}
-                    showSelectedOverlay={true}
-                    onPress={
-                      props.disabled
-                        ? undefined
-                        : () => {
-                            props.setSelectedFav(!props.selectedFav);
-                            props.setSelected2FA(false);
-                            props.setSelectedCard(false);
-                          }
-                    }
-                    style={styles.chip}
-                    textStyle={styles.chipText}
-                  />
+                  </View>
                   {props.moduleFilters.map((module) => (
-                    <AppChip
-                      key={module}
-                      icon={MODULE_ICON[module]}
-                      selected={props.selectedModuleFilters.includes(module)}
-                      showSelectedOverlay={true}
-                      onPress={
-                        props.disabled
-                          ? undefined
-                          : () => props.toggleModuleFilter(module)
-                      }
-                      onClose={
-                        props.disabled
-                          ? undefined
-                          : () => props.removeModuleFilter(module)
-                      }
-                      style={styles.chip}
-                      textStyle={styles.chipText}
-                    >
-                      {getModuleNameByEnum(module, t)}
-                    </AppChip>
+                    <View key={module} style={mobileChipShellStyle}>
+                      <AppChip
+                        icon={MODULE_ICON[module]}
+                        selected={props.selectedModuleFilters.includes(module)}
+                        showSelectedOverlay={true}
+                        onPress={
+                          props.disabled
+                            ? undefined
+                            : () => props.toggleModuleFilter(module)
+                        }
+                        onClose={
+                          props.disabled
+                            ? undefined
+                            : () => props.removeModuleFilter(module)
+                        }
+                        style={styles.chip}
+                        textStyle={styles.chipText}
+                      >
+                        {getModuleNameByEnum(module, t)}
+                      </AppChip>
+                    </View>
                   ))}
                 </View>
               }
               renderItem={({ item, index }) => (
                 <Animated.View layout={LinearTransition.duration(120)}>
-                  <AppChip
-                    key={index}
-                    icon={({ size }) => (
-                      <AppIcon
-                        name={getFolderIcon(item)}
-                        size={size}
-                        color={getFolderColor(item) ?? theme.colors.primary}
-                      />
-                    )}
-                    selected={props.selectedFolder == item ? true : false}
-                    showSelectedOverlay={true}
-                    onPress={
-                      props.disabled
-                        ? undefined
-                        : () => {
-                            props.setSelected2FA(false);
-                            props.setSelectedCard(false);
-                            if (props.selectedFolder != item) {
-                              props.setSelectedFolder(item);
-                            } else {
-                              props.setSelectedFolder(null);
+                  <View style={mobileChipShellStyle}>
+                    <AppChip
+                      key={index}
+                      icon={({ size }) => (
+                        <AppIcon
+                          name={getFolderIcon(item)}
+                          size={size}
+                          color={getFolderColor(item) ?? theme.colors.primary}
+                        />
+                      )}
+                      selected={props.selectedFolder == item ? true : false}
+                      showSelectedOverlay={true}
+                      onPress={
+                        props.disabled
+                          ? undefined
+                          : () => {
+                              props.setSelected2FA(false);
+                              props.setSelectedCard(false);
+                              if (props.selectedFolder != item) {
+                                props.setSelectedFolder(item);
+                              } else {
+                                props.setSelectedFolder(null);
+                              }
                             }
-                          }
-                    }
-                    style={styles.chip}
-                    textStyle={styles.chipText}
-                  >
-                    {item.name}
-                  </AppChip>
+                      }
+                      style={styles.chip}
+                      textStyle={styles.chipText}
+                    >
+                      {item.name}
+                    </AppChip>
+                  </View>
                 </Animated.View>
               )}
               ListFooterComponent={
@@ -616,18 +630,20 @@ function FolderFilter(props: Props) {
                     alignItems: "center",
                   }}
                 >
-                  <AppChip
-                    icon="filter-variant-plus"
-                    selected={props.selectedModuleFilters.length > 0}
-                    showSelectedOverlay={true}
-                    onPress={
-                      props.disabled ? undefined : props.openModuleFilterModal
-                    }
-                    style={styles.chip}
-                    textStyle={styles.chipText}
-                  >
-                    {t("home:moduleFilterTitle")}
-                  </AppChip>
+                  <View style={mobileChipShellStyle}>
+                    <AppChip
+                      icon="filter-variant-plus"
+                      selected={props.selectedModuleFilters.length > 0}
+                      showSelectedOverlay={true}
+                      onPress={
+                        props.disabled ? undefined : props.openModuleFilterModal
+                      }
+                      style={styles.chip}
+                      textStyle={styles.chipText}
+                    >
+                      {t("home:moduleFilterTitle")}
+                    </AppChip>
+                  </View>
                 </View>
               }
             />

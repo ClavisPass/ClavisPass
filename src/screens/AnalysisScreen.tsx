@@ -697,7 +697,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
         setBucket={setBucket}
       />
 
-      <View style={{ gap: 8 }}>
+      <View style={{ gap: 4 }}>
         {data.length > 0 ? (
           data.map((item, index) => renderItem(item, index))
         ) : (

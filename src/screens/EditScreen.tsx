@@ -670,7 +670,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     chipIcon?: React.ComponentProps<typeof AppChip>["icon"];
   };
 
-  const editSectionSpacing = 4;
+  const editSectionSpacing = 8;
   const actionChipHorizontalPadding = 16;
   const moreActionKey = "__more";
 
@@ -859,24 +859,38 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const renderActionChip = (
     action: EditToolbarAction,
     options?: { measureOnly?: boolean },
-  ) => (
-    <AppChip
-      key={action.key}
-      compact
-      disabled={action.disabled}
-      icon={action.chipIcon ?? action.icon}
-      onLayout={(event) => {
-        if (options?.measureOnly) {
-          recordActionChipWidth(action.key, event.nativeEvent.layout.width);
+  ) => {
+    const isPrimaryAction = action.key === "addModule";
+
+    return (
+      <AppChip
+        key={action.key}
+        compact
+        disabled={action.disabled}
+        icon={
+          isPrimaryAction
+            ? ({ size }) => <AppIcon name="plus" size={size} color="white" />
+            : (action.chipIcon ?? action.icon)
         }
-      }}
-      onPress={action.onPress}
-      style={actionChipStyle}
-      textStyle={actionChipTextStyle}
-    >
-      {action.label}
-    </AppChip>
-  );
+        onLayout={(event) => {
+          if (options?.measureOnly) {
+            recordActionChipWidth(action.key, event.nativeEvent.layout.width);
+          }
+        }}
+        onPress={action.onPress}
+        style={[
+          actionChipStyle,
+          isPrimaryAction ? { backgroundColor: theme.colors.primary } : null,
+        ]}
+        textStyle={[
+          actionChipTextStyle,
+          isPrimaryAction ? { color: "white", fontWeight: "700" } : null,
+        ]}
+      >
+        {action.label}
+      </AppChip>
+    );
+  };
 
   const renderEditActionChips = () => (
     <View

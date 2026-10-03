@@ -82,7 +82,9 @@ function ModulesList(props: Props) {
       <ScrollView
         ref={scrollRef}
         style={{ flex: 1, width: "100%" }}
-        contentContainerStyle={{ paddingBottom: props.bottomPadding ?? 12 }}
+        contentContainerStyle={{
+          paddingBottom: props.bottomPadding ?? 12,
+        }}
         keyboardShouldPersistTaps="always"
         keyboardDismissMode="on-drag"
       >

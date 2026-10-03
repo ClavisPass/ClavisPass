@@ -624,7 +624,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
               },
             ]}
           >
-            <Text variant="labelSmall" style={{ opacity: 0.7, marginBottom: 6 }}>
+            <Text variant="labelSmall" style={{ opacity: 0.7, marginBottom: 8 }}>
               {t("analysisDetail:yourPassword", { defaultValue: "Your password" })}
             </Text>
 
@@ -745,7 +745,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
                 },
               ]}
             >
-              <Text style={{ fontWeight: "900", marginBottom: 6 }}>
+              <Text style={{ fontWeight: "900", marginBottom: 8 }}>
                 {t("analysisDetail:strengthVsRiskTitle", { defaultValue: "Strength vs. Risk" })}
               </Text>
 

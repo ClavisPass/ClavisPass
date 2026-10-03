@@ -20,6 +20,8 @@ import { Button, Icon, IconButton } from "react-native-paper";
 import { Text } from "react-native-paper";
 
 import { FlashList } from "@shopify/flash-list";
+import MaskedView from "@react-native-masked-view/masked-view";
+import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
   Easing,
   FadeInLeft,
@@ -108,7 +110,27 @@ import type { MenuAnchorRect } from "../shared/components/menus/Menu";
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
-const listContentContainerStyle = { paddingRight: 4 };
+const HOME_SCROLLBAR_STYLE_ID = "clavispass-home-scrollbar-style";
+const homeSpacing = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
+  desktopGutter: 12,
+  mobileGutter: 8,
+};
+const mobileFolderFilterOverlayHeight = 72;
+const mobileFolderFilterFadeHeight = 34;
+const homeToolsOverlayHeight = 40;
+const homeListEdgeGap = homeSpacing.sm;
+const webListTopFadeStart = 24;
+const webListTopFadeEnd = homeToolsOverlayHeight + 20;
+const webListBottomFadeStart = mobileFolderFilterOverlayHeight + 0;
+const webListBottomFadeEnd = 24;
+const nativeListTopFadeClear = homeToolsOverlayHeight + 20;
+const nativeListBottomFadeClear =
+  mobileFolderFilterOverlayHeight + homeListEdgeGap;
 const homeListDrawDistance = Platform.OS === "web" ? 120 : 600;
 const headerSearchTransition = Easing.out(Easing.cubic);
 const compactSearchEnter = () => {
@@ -221,7 +243,7 @@ const HomeValueListItem = React.memo(function HomeValueListItem({
 
   return (
     <PerfProfiler id="HomeScreen.ValueListItem" minDurationMs={20}>
-      <ListItem item={item} index={index} onPress={handlePress} />
+      <ListItem item={item} index={index} onPress={handlePress} denseSpacing />
     </PerfProfiler>
   );
 }, areHomeValueListItemPropsEqual);
@@ -346,9 +368,78 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   }, []);
 
   const isCompactHeader = width < 600;
+  const homeGutter = isCompactHeader
+    ? homeSpacing.mobileGutter
+    : homeSpacing.desktopGutter;
+  const homeListContentContainerStyle = useMemo(
+    () => ({
+      paddingRight: 0,
+      paddingTop: homeToolsOverlayHeight + homeListEdgeGap,
+      paddingBottom: isCompactHeader
+        ? Platform.OS === "web"
+          ? mobileFolderFilterOverlayHeight + homeListEdgeGap
+          : nativeListBottomFadeClear
+        : homeSpacing.sm,
+    }),
+    [isCompactHeader],
+  );
+  const homeScrollIndicatorInsets = useMemo(
+    () => ({
+      top: homeToolsOverlayHeight + homeListEdgeGap,
+      bottom: isCompactHeader
+        ? mobileFolderFilterOverlayHeight + homeListEdgeGap
+        : homeSpacing.sm,
+    }),
+    [isCompactHeader],
+  );
+  const webHomeListScrollProps =
+    Platform.OS === "web"
+      ? ({
+          dataSet: {
+            clavispassHomeListScroll: "",
+            compact: isCompactHeader ? "true" : "false",
+          },
+        } as any)
+      : null;
+  const webListFadeMaskStyle =
+    Platform.OS === "web"
+      ? ({
+          WebkitMaskImage: isCompactHeader
+            ? `linear-gradient(to bottom, transparent 0px, transparent ${webListTopFadeStart}px, black ${webListTopFadeEnd}px, black calc(100% - ${webListBottomFadeStart}px), transparent calc(100% - ${webListBottomFadeEnd}px), transparent 100%)`
+            : `linear-gradient(to bottom, transparent 0px, transparent ${webListTopFadeStart}px, black ${webListTopFadeEnd}px, black 100%)`,
+          maskImage: isCompactHeader
+            ? `linear-gradient(to bottom, transparent 0px, transparent ${webListTopFadeStart}px, black ${webListTopFadeEnd}px, black calc(100% - ${webListBottomFadeStart}px), transparent calc(100% - ${webListBottomFadeEnd}px), transparent 100%)`
+            : `linear-gradient(to bottom, transparent 0px, transparent ${webListTopFadeStart}px, black ${webListTopFadeEnd}px, black 100%)`,
+        } as any)
+      : null;
   const controlsLeft =
     resolveWindowControlsSide(windowControlsStyle) === "left";
   const wideSearchWidth = Math.min(340, Math.max(200, width * 0.32));
+
+  useEffect(() => {
+    if (Platform.OS !== "web" || typeof document === "undefined") return;
+
+    const existingStyle = document.getElementById(HOME_SCROLLBAR_STYLE_ID);
+    const css = `
+      [data-clavispass-home-list-scroll] *::-webkit-scrollbar-track {
+        margin-top: ${homeToolsOverlayHeight + homeListEdgeGap}px;
+      }
+
+      [data-clavispass-home-list-scroll][data-compact="true"] *::-webkit-scrollbar-track {
+        margin-bottom: ${mobileFolderFilterOverlayHeight + homeListEdgeGap}px;
+      }
+    `;
+
+    if (existingStyle) {
+      existingStyle.textContent = css;
+      return;
+    }
+
+    const style = document.createElement("style");
+    style.id = HOME_SCROLLBAR_STYLE_ID;
+    style.textContent = css;
+    document.head.appendChild(style);
+  }, []);
 
   useEffect(() => {
     if (!isCompactHeader) {
@@ -1069,6 +1160,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     fontSize: 12,
     lineHeight: 16,
   };
+  const actionChipShellStyle = styles.homeToolChipShell;
 
   const renderHomeActionChips = () => (
     <ScrollView
@@ -1078,52 +1170,62 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         alignItems: "center",
         flexDirection: "row",
         flexGrow: 1,
-        gap: 4,
+        gap: homeSpacing.xs,
         justifyContent: "flex-start",
-        paddingHorizontal: 8,
-        paddingBottom: 4,
+        paddingLeft: homeSpacing.sm,
+        paddingRight: homeGutter,
+        paddingTop: 0,
+        paddingBottom: homeSpacing.xs,
       }}
       style={{ flexGrow: 0, width: "100%" }}
     >
-      <AppChip
-        compact
-        icon="refresh"
-        disabled={!isOnline || refreshing}
-        onPress={refreshData}
-        style={actionChipStyle}
-        textStyle={actionChipTextStyle}
-      >
-        {t("common:reload")}
-      </AppChip>
-      <AppChip
-        compact
-        icon="activity"
-        onPress={openAnalysisScreen}
-        style={actionChipStyle}
-        textStyle={actionChipTextStyle}
-      >
-        {t("home:analysis")}
-      </AppChip>
-      <AppChip
-        compact
-        icon="arrow-split-horizontal"
-        disabled={reorderValues.length < 2}
-        onPress={openReorderScreen}
-        style={actionChipStyle}
-        textStyle={actionChipTextStyle}
-      >
-        {t("home:reorderChip")}
-      </AppChip>
-      <AppChip
-        compact
-        icon="folder-outline"
-        onPress={() => setFolderModalVisible(true)}
-        style={actionChipStyle}
-        textStyle={actionChipTextStyle}
-      >
-        {t("home:editFolders")}
-      </AppChip>
-      <View ref={sortChipRef} collapsable={false}>
+      <View style={actionChipShellStyle}>
+        <AppChip
+          compact
+          icon="refresh"
+          disabled={!isOnline || refreshing}
+          onPress={refreshData}
+          style={actionChipStyle}
+          textStyle={actionChipTextStyle}
+        >
+          {t("common:reload")}
+        </AppChip>
+      </View>
+      <View style={actionChipShellStyle}>
+        <AppChip
+          compact
+          icon="activity"
+          onPress={openAnalysisScreen}
+          style={actionChipStyle}
+          textStyle={actionChipTextStyle}
+        >
+          {t("home:analysis")}
+        </AppChip>
+      </View>
+      <View style={actionChipShellStyle}>
+        <AppChip
+          compact
+          icon="arrow-split-horizontal"
+          disabled={reorderValues.length < 2}
+          onPress={openReorderScreen}
+          style={actionChipStyle}
+          textStyle={actionChipTextStyle}
+        >
+          {t("home:reorderChip")}
+        </AppChip>
+      </View>
+      <View style={actionChipShellStyle}>
+        <AppChip
+          compact
+          icon="folder-outline"
+          onPress={() => setFolderModalVisible(true)}
+          style={actionChipStyle}
+          textStyle={actionChipTextStyle}
+        >
+          {t("home:editFolders")}
+        </AppChip>
+      </View>
+      <View ref={sortChipRef} collapsable={false} style={actionChipShellStyle}>
         <AppChip
           compact
           icon="sort-variant"
@@ -1135,7 +1237,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         </AppChip>
       </View>
       {expiryEntries.length > 0 ? (
-        <View ref={expiryChipRef} collapsable={false}>
+        <View
+          ref={expiryChipRef}
+          collapsable={false}
+          style={actionChipShellStyle}
+        >
           <AppChip
             compact
             icon="calendar-clock-outline"
@@ -1167,7 +1273,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         refreshControl={refreshControl}
         contentContainerStyle={[
           styles.emptyVaultScrollContent,
-          { paddingHorizontal: width > 600 ? 32 : 18 },
+          { paddingHorizontal: width > 600 ? homeSpacing.xl : homeSpacing.lg },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -1357,7 +1463,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           <FlashList
             ref={setActiveListRef}
             refreshControl={refreshControl}
-            contentContainerStyle={{ paddingRight: 4 }}
+            contentContainerStyle={homeListContentContainerStyle}
+            scrollIndicatorInsets={homeScrollIndicatorInsets}
             drawDistance={homeListDrawDistance}
             data={cardEntries}
             keyExtractor={(item) => item.key}
@@ -1370,6 +1477,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 item={item.item}
                 sourceUrl={item.sourceUrl}
                 index={index}
+                denseSpacing
                 onPressEdit={() => {
                   openEditScreen(item.item);
                 }}
@@ -1410,7 +1518,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           <FlashList
             ref={setActiveListRef}
             refreshControl={refreshControl}
-            contentContainerStyle={{ paddingRight: 4 }}
+            contentContainerStyle={homeListContentContainerStyle}
+            scrollIndicatorInsets={homeScrollIndicatorInsets}
             drawDistance={homeListDrawDistance}
             data={totpEntries}
             keyExtractor={(item) => item.key}
@@ -1419,6 +1528,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 value={item.value}
                 item={item.item}
                 index={index}
+                denseSpacing
                 onPress={() => {
                   openEditScreen(item.item);
                 }}
@@ -1433,7 +1543,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         <FlashList
           ref={setActiveListRef}
           refreshControl={refreshControl}
-          contentContainerStyle={listContentContainerStyle}
+          contentContainerStyle={homeListContentContainerStyle}
+          scrollIndicatorInsets={homeScrollIndicatorInsets}
           drawDistance={homeListDrawDistance}
           data={filteredValues}
           keyExtractor={keyExtractor}
@@ -1444,6 +1555,69 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     if (Platform.OS === "web") return <Blur>{flashList}</Blur>;
     else return flashList;
   }
+
+  const renderFadedHomeList = () => {
+    const list = renderFlashList();
+
+    if (Platform.OS === "web") {
+      return (
+        <View
+          {...webHomeListScrollProps}
+          style={[{ flex: 1, width: "100%" }, webListFadeMaskStyle]}
+        >
+          {list}
+        </View>
+      );
+    }
+
+    return (
+      <MaskedView
+        style={{ flex: 1, width: "100%" }}
+        maskElement={
+          <View style={styles.nativeListMask}>
+            <LinearGradient
+              colors={["transparent", "transparent", "black"]}
+              locations={[0, 0.42, 1]}
+              style={styles.nativeListMaskTop}
+            />
+            <View style={styles.nativeListMaskMiddle} />
+            {isCompactHeader ? (
+              <LinearGradient
+                colors={["black", "transparent", "transparent"]}
+                locations={[0, 0.58, 1]}
+                style={styles.nativeListMaskBottom}
+              />
+            ) : null}
+          </View>
+        }
+      >
+        {list}
+      </MaskedView>
+    );
+  };
+
+  const folderFilter = (
+    <PerfProfiler id="HomeScreen.FolderFilter" minDurationMs={8}>
+      <FolderFilter
+        folder={vaultData?.folder}
+        selectedFav={selectedFav}
+        setSelectedFav={saveSelectedFavState}
+        selectedFolder={selectedFolder}
+        setSelectedFolder={saveSelectedFolderState}
+        selected2FA={selected2FA}
+        setSelected2FA={saveSelected2FAState}
+        selectedCard={selectedCard}
+        setSelectedCard={saveSelectedCardState}
+        hasTwoFactorEntries={hasTwoFactorEntries}
+        hasCardEntries={hasCardEntries}
+        moduleFilters={moduleFilters}
+        selectedModuleFilters={selectedModuleFilters}
+        toggleModuleFilter={toggleModuleFilter}
+        removeModuleFilter={removeModuleFilter}
+        openModuleFilterModal={openModuleFilterModal}
+      />
+    </PerfProfiler>
+  );
 
   return (
     <AnimatedContainer style={{ display: "flex", justifyContent: "center" }}>
@@ -1463,13 +1637,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               paddingHorizontal:
                 isCompactHeader && searchHeaderVisible
                   ? TITLEBAR_HEIGHT > 0
-                    ? 4
-                    : 6
-                  : 10,
+                    ? homeSpacing.xs
+                    : homeSpacing.sm
+                  : homeGutter,
               paddingTop:
-                Constants.statusBarHeight + (TITLEBAR_HEIGHT > 0 ? 4 : 6),
-              paddingBottom: TITLEBAR_HEIGHT > 0 ? 4 : 6,
-              marginBottom: 4,
+                Constants.statusBarHeight +
+                (TITLEBAR_HEIGHT > 0 ? homeSpacing.xs : homeSpacing.sm),
+              paddingBottom: TITLEBAR_HEIGHT > 0 ? homeSpacing.xs : homeSpacing.sm,
+              marginBottom: 0,
               borderBottomLeftRadius: 0,
               borderBottomRightRadius: 0,
               backgroundColor: "transparent",
@@ -1488,7 +1663,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 marginTop: 0,
                 marginBottom: 0,
                 width: "100%",
-                gap: 8,
+                gap: homeSpacing.sm,
                 position: "relative",
                 zIndex: 4,
                 paddingLeft:
@@ -1561,7 +1736,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                       display: "flex",
                       flexDirection: "row",
                       alignItems: "center",
-                      gap: 8,
+                      gap: homeSpacing.sm,
                       flex: 1,
                       minWidth: 0,
                       position: "relative",
@@ -1579,7 +1754,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                       color: theme.colors.onSurface,
                       userSelect: "none",
                       includeFontPadding: false,
-                      paddingRight: 6,
+                      paddingRight: homeSpacing.sm,
                     }}
                     numberOfLines={1}
                   >
@@ -1653,41 +1828,47 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               flex: 1,
               width: "100%",
               paddingTop: 0,
-              paddingBottom: 4,
-              paddingRight: 0,
-              paddingLeft: width > 600 ? 0 : 4,
+              paddingBottom: isCompactHeader ? 0 : homeSpacing.sm,
+              paddingRight: isCompactHeader ? homeGutter : 0,
+              paddingLeft: isCompactHeader ? homeGutter : 0,
               flexDirection: width > 600 ? "row-reverse" : "column",
+              gap: 0,
+              position: "relative",
             }}
           >
             {isFocused && homeContentVisible ? (
               <>
                 <View style={{ flex: 1, width: "100%" }}>
-                  {renderHomeActionChips()}
-                  <View style={{ flex: 1, width: "100%" }}>
-                    {renderFlashList()}
+                  <View
+                    style={{
+                      flex: 1,
+                      width: "100%",
+                      position: "relative",
+                    }}
+                  >
+                    {renderFadedHomeList()}
+                    <View
+                      pointerEvents="box-none"
+                      style={styles.homeToolsOverlay}
+                    >
+                      <View style={styles.homeToolsSurface}>
+                        {renderHomeActionChips()}
+                      </View>
+                    </View>
+                    {isCompactHeader ? (
+                      <View
+                        pointerEvents="box-none"
+                        style={styles.mobileFolderFilterOverlay}
+                      >
+                        <View style={styles.mobileFolderFilterSurface}>
+                          {folderFilter}
+                        </View>
+                      </View>
+                    ) : null}
                   </View>
                   {isCompactHeader ? syncBar : null}
                 </View>
-                <PerfProfiler id="HomeScreen.FolderFilter" minDurationMs={8}>
-                  <FolderFilter
-                    folder={vaultData?.folder}
-                    selectedFav={selectedFav}
-                    setSelectedFav={saveSelectedFavState}
-                    selectedFolder={selectedFolder}
-                    setSelectedFolder={saveSelectedFolderState}
-                    selected2FA={selected2FA}
-                    setSelected2FA={saveSelected2FAState}
-                    selectedCard={selectedCard}
-                    setSelectedCard={saveSelectedCardState}
-                    hasTwoFactorEntries={hasTwoFactorEntries}
-                    hasCardEntries={hasCardEntries}
-                    moduleFilters={moduleFilters}
-                    selectedModuleFilters={selectedModuleFilters}
-                    toggleModuleFilter={toggleModuleFilter}
-                    removeModuleFilter={removeModuleFilter}
-                    openModuleFilterModal={openModuleFilterModal}
-                  />
-                </PerfProfiler>
+                {isCompactHeader ? null : folderFilter}
               </>
             ) : (
               <View style={{ flex: 1, width: "100%" }} />
@@ -1745,7 +1926,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               }}
             >
               <View style={{ gap: 8, alignItems: "center" }}>
-                <View style={{ marginTop: 8, marginBottom: 10 }}>
+                <View style={{ marginTop: 8, marginBottom: 8 }}>
                   <Icon
                     source="fingerprint"
                     size={56}
@@ -1809,15 +1990,15 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: 18,
-    paddingBottom: 28,
+    paddingTop: homeSpacing.lg,
+    paddingBottom: homeSpacing.xl,
   },
   emptyVaultPanel: {
     width: "100%",
     maxWidth: 520,
     alignItems: "center",
-    paddingHorizontal: 18,
-    paddingVertical: 22,
+    paddingHorizontal: homeSpacing.lg,
+    paddingVertical: homeSpacing.xl,
   },
   emptyVaultIcon: {
     width: 64,
@@ -1825,7 +2006,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 14,
+    marginBottom: homeSpacing.lg,
   },
   emptyVaultTitle: {
     textAlign: "center",
@@ -1834,13 +2015,13 @@ const styles = StyleSheet.create({
   emptyVaultText: {
     maxWidth: 390,
     textAlign: "center",
-    marginTop: 8,
-    marginBottom: 16,
+    marginTop: homeSpacing.sm,
+    marginBottom: homeSpacing.lg,
     userSelect: "none",
   },
   emptyVaultButton: {
     borderRadius: 8,
-    marginBottom: 18,
+    marginBottom: homeSpacing.lg,
   },
   emptyVaultButtonContent: {
     minHeight: 42,
@@ -1848,7 +2029,7 @@ const styles = StyleSheet.create({
   },
   emptyVaultTips: {
     width: "100%",
-    gap: 8,
+    gap: homeSpacing.sm,
   },
   emptyVaultTip: {
     minHeight: 44,
@@ -1856,9 +2037,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    gap: 10,
+    paddingHorizontal: homeSpacing.md,
+    paddingVertical: homeSpacing.sm,
+    gap: homeSpacing.sm,
   },
   emptyVaultTipNumber: {
     width: 18,
@@ -1870,6 +2051,55 @@ const styles = StyleSheet.create({
     flex: 1,
     lineHeight: 18,
     userSelect: "none",
+  },
+  mobileFolderFilterOverlay: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: -2,
+    height: mobileFolderFilterOverlayHeight + 2,
+    justifyContent: "flex-end",
+    zIndex: 8,
+  },
+  mobileFolderFilterSurface: {
+    position: "relative",
+    zIndex: 1,
+    minHeight: mobileFolderFilterOverlayHeight - mobileFolderFilterFadeHeight,
+    paddingBottom: homeSpacing.xs,
+  },
+  homeToolsOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: homeToolsOverlayHeight,
+    zIndex: 8,
+    paddingTop: homeSpacing.sm,
+  },
+  homeToolsSurface: {
+    position: "relative",
+    zIndex: 1,
+  },
+  homeToolChipShell: {
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  nativeListMask: {
+    flex: 1,
+    width: "100%",
+  },
+  nativeListMaskTop: {
+    height: nativeListTopFadeClear,
+    width: "100%",
+  },
+  nativeListMaskMiddle: {
+    flex: 1,
+    width: "100%",
+    backgroundColor: "black",
+  },
+  nativeListMaskBottom: {
+    height: nativeListBottomFadeClear,
+    width: "100%",
   },
 });
 

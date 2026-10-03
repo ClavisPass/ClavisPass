@@ -187,7 +187,7 @@ const BrowserExtensionsScreen: React.FC<BrowserExtensionsScreenProps> = ({
         style={{ flex: 1, width: "100%" }}
         contentContainerStyle={{
           paddingHorizontal: H_PAD,
-          paddingBottom: 20,
+          paddingBottom: 8,
           gap: 8,
         }}
         refreshControl={
@@ -722,7 +722,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     gap: 8,
-    marginTop: 4,
+    marginTop: 8,
   },
   countPill: {
     alignItems: "center",

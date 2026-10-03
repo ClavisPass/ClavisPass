@@ -1,5 +1,6 @@
 import TokenQRCodeModal from "../modals/TokenQRCodeModal";
 import { useState } from "react";
+import { View } from "react-native";
 import SettingsItem from "../SettingsItem";
 import { useToken } from "../../../../app/providers/CloudProvider";
 import { useTranslation } from "react-i18next";
@@ -13,22 +14,17 @@ function ShowQRCodeButton() {
   if (provider !== "dropbox" || !refreshToken) return null;
 
   return (
-    <>
-      <>
-        <SettingsDivider />
-        <SettingsItem
-          leadingIcon={"qrcode"}
-          subtitle={t("settings:showqrcodeSubtitle")}
-          onPress={() => setQrCodeVisible(true)}
-        >
-          {t("settings:showqrcode")}
-        </SettingsItem>
-        <TokenQRCodeModal
-          visible={qrCodeVisible}
-          setVisible={setQrCodeVisible}
-        />
-      </>
-    </>
+    <View style={{ marginTop: 8 }}>
+      <SettingsDivider />
+      <SettingsItem
+        leadingIcon={"qrcode"}
+        subtitle={t("settings:showqrcodeSubtitle")}
+        onPress={() => setQrCodeVisible(true)}
+      >
+        {t("settings:showqrcode")}
+      </SettingsItem>
+      <TokenQRCodeModal visible={qrCodeVisible} setVisible={setQrCodeVisible} />
+    </View>
   );
 }
 

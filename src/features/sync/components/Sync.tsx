@@ -2,6 +2,7 @@ import { Animated, View } from "react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Icon, Text } from "react-native-paper";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import { useAuth } from "../../../app/providers/AuthProvider";
@@ -32,6 +33,7 @@ import {
 import VaultDataType from "../../vault/model/VaultDataType";
 import { VaultIdentityMismatchError } from "../../vault/utils/vaultIdentity";
 import { triggerGlobalError } from "../../../infrastructure/events/errorBus";
+import getColors from "../../../shared/ui/linearGradient";
 
 type Props = {
   refreshing: boolean;
@@ -329,9 +331,11 @@ const Sync = (props: Props) => {
             paddingRight: 8,
           }}
         >
-          <View
+          <LinearGradient
+            colors={getColors()}
+            end={{ x: 0.1, y: 0.2 }}
+            dither
             style={{
-              backgroundColor: theme.colors.primary,
               borderRadius: 8,
               flex: 1,
               display: "flex",
@@ -392,7 +396,7 @@ const Sync = (props: Props) => {
                 )}
               </>
             )}
-          </View>
+          </LinearGradient>
         </View>
       )}
     </Animated.View>

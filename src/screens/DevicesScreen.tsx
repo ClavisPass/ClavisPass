@@ -193,7 +193,7 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
       <Animated.View
         key={item.id}
         entering={FadeInDown.delay(index * 35).duration(180)}
-        style={[containerCardStyle, { width: "100%", marginBottom: 6 }]}
+        style={[containerCardStyle, { width: "100%", marginBottom: 8 }]}
       >
         <AnimatedPressable
           onPress={() =>
@@ -370,7 +370,7 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
         style={{ flex: 1, width: "100%" }}
         contentContainerStyle={{
           paddingHorizontal: H_PAD,
-          paddingBottom: 20,
+          paddingBottom: 8,
         }}
       >
         <HintCard hintLine={t("devices:hintLine")} />
@@ -382,7 +382,7 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
           <View style={{ marginTop: 0 }}>
             {sectionHeader(newLabel, newDevices.length)}
             {newDevices.length === 0 ? (
-              <View style={{ marginBottom: 6 }}>
+              <View style={{ marginBottom: 8 }}>
                 <Text style={{ opacity: 0.75 }}>{emptyNew}</Text>
               </View>
             ) : (
@@ -391,7 +391,7 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
 
             {sectionHeader(activeLabel, activeDevices.length)}
             {activeDevices.length === 0 ? (
-              <View style={{ marginBottom: 6 }}>
+              <View style={{ marginBottom: 8 }}>
                 <Text style={{ opacity: 0.75 }}>{emptyActive}</Text>
               </View>
             ) : (
@@ -420,7 +420,7 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
               <>
                 {sectionHeader(archivedLabel, archivedDevices.length)}
                 {archivedDevices.length === 0 ? (
-                  <View style={{ marginBottom: 6 }}>
+                  <View style={{ marginBottom: 8 }}>
                     <Text style={{ opacity: 0.75 }}>{emptyArchived}</Text>
                   </View>
                 ) : (

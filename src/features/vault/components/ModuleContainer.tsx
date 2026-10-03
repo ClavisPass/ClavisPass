@@ -7,7 +7,7 @@ import { EditRowControlsContainer } from "./EditRowControlsContainer";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 import AppIcon from "../../../shared/components/icons/AppIcon";
 
-const MODULE_SPACING = 4;
+const MODULE_SPACING = 8;
 
 const moduleStyles = StyleSheet.create({
   container: {
