@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import {
+  Keyboard,
   Platform,
   StyleSheet,
   ScrollView,
@@ -1080,12 +1081,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 
     if (Platform.OS === "web" && searchHeaderVisible) {
       suppressNextCompactSearchOpenRef.current = true;
-      requestAnimationFrame(() => {
+      window.setTimeout(() => {
         suppressNextCompactSearchOpenRef.current = false;
-      });
+      }, 250);
     }
 
     searchRef.current?.blur?.();
+    Keyboard.dismiss();
     setSearchHeaderVisible(false);
   }, [isCompactHeader, isFocused, searchHeaderVisible, searchQuery]);
 
@@ -1230,6 +1232,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 onBlur={handleCompactSearchBlur}
+                onSubmitEditing={handleCompactSearchBlur}
                 resetLabel={t("common:reset")}
                 height={32}
                 fontSize={16}

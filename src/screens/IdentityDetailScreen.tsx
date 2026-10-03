@@ -2,8 +2,8 @@ import React, { useMemo, useState } from "react";
 import { CommonActions, useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Platform, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
-import { Button, Icon, Text, TextInput } from "react-native-paper";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Button, Divider, Icon, IconButton, Text, TextInput } from "react-native-paper";
 import { Image } from "expo-image";
 import { useTranslation } from "react-i18next";
 
@@ -23,7 +23,6 @@ import ModalSurface, {
   ModalActions,
 } from "../shared/components/modals/ModalSurface";
 import { deriveIdentityClusters } from "../features/identity/utils/deriveIdentityClusters";
-import ModulesEnum from "../features/vault/model/ModulesEnum";
 import {
   buildFaviconUrl,
   normalizeUrl,
@@ -36,44 +35,6 @@ type IdentityDetailScreenProps = NativeStackScreenProps<
   IdentityStackParamList,
   "IdentityDetail"
 >;
-
-const moduleLabelKey: Partial<Record<ModulesEnum, string>> = {
-  [ModulesEnum.ADDRESS]: "address",
-  [ModulesEnum.ATTACHMENT]: "attachment",
-  [ModulesEnum.COMPANY]: "company",
-  [ModulesEnum.CREDIT_CARD]: "creditCard",
-  [ModulesEnum.CUSTOM_FIELD]: "customField",
-  [ModulesEnum.DOCUMENT]: "document",
-  [ModulesEnum.KEY]: "key",
-  [ModulesEnum.NOTE]: "note",
-  [ModulesEnum.PASSWORD]: "password",
-  [ModulesEnum.PERSON]: "person",
-  [ModulesEnum.PIN]: "pin",
-  [ModulesEnum.PHONE_NUMBER]: "phoneNumber",
-  [ModulesEnum.TOTP]: "totp",
-  [ModulesEnum.URL]: "url",
-  [ModulesEnum.USERNAME]: "username",
-  [ModulesEnum.WIFI]: "wifi",
-};
-
-const moduleIconByType: Partial<Record<ModulesEnum, string>> = {
-  [ModulesEnum.ADDRESS]: "map-marker-outline",
-  [ModulesEnum.ATTACHMENT]: "paperclip",
-  [ModulesEnum.COMPANY]: "office-building-outline",
-  [ModulesEnum.CREDIT_CARD]: "credit-card-outline",
-  [ModulesEnum.CUSTOM_FIELD]: "card-text-outline",
-  [ModulesEnum.DOCUMENT]: "card-account-details-outline",
-  [ModulesEnum.KEY]: "key-variant",
-  [ModulesEnum.NOTE]: "note-outline",
-  [ModulesEnum.PASSWORD]: "form-textbox-password",
-  [ModulesEnum.PERSON]: "account-details-outline",
-  [ModulesEnum.PIN]: "dialpad",
-  [ModulesEnum.PHONE_NUMBER]: "phone-outline",
-  [ModulesEnum.TOTP]: "two-factor-authentication",
-  [ModulesEnum.URL]: "web",
-  [ModulesEnum.USERNAME]: "account-outline",
-  [ModulesEnum.WIFI]: "wifi",
-};
 
 const failedFaviconUrls = new Set<string>();
 const WEBSITE_COLLAPSED_LIMIT = 10;
@@ -138,13 +99,11 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
   const { t } = useTranslation();
   const { globalStyles, theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
     useTheme();
-  const { width } = useWindowDimensions();
   const [displayName, setDisplayName] = useState("");
   const [draftDisplayName, setDraftDisplayName] = useState("");
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [websitesExpanded, setWebsitesExpanded] = useState(false);
   const [entriesExpanded, setEntriesExpanded] = useState(false);
-  const wideLayout = width >= 820;
   const surfaceStyle = {
     backgroundColor: darkmode ? "rgba(28, 28, 34, 0.58)" : "rgba(255, 255, 255, 0.68)",
     borderColor: darkmode ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.82)",
@@ -190,8 +149,6 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
     ? getDefaultIdentityName(identity.email)
     : t("bar:Identities");
   const title = displayName.trim() || defaultIdentityName;
-  const getModuleLabel = (module: ModulesEnum) =>
-    t(`modules:${moduleLabelKey[module]}`, { defaultValue: module });
   const visibleDomains =
     identity && !websitesExpanded && identity.domains.length > WEBSITE_COLLAPSED_LIMIT
       ? identity.domains.slice(0, WEBSITE_COLLAPSED_LIMIT)
@@ -286,15 +243,17 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
                     {identity.email}
                   </Text>
                 </View>
-                <Button
-                  compact
-                  mode="contained-tonal"
+                <IconButton
                   icon="pencil-outline"
+                  size={19}
                   onPress={openRenameModal}
-                  style={styles.renameButton}
-                >
-                  {t("common:edit")}
-                </Button>
+                  accessibilityLabel={t("common:edit")}
+                  style={[
+                    styles.renameButton,
+                    { backgroundColor: `${theme.colors.primary}10` },
+                  ]}
+                  iconColor={theme.colors.primary}
+                />
               </View>
 
               <View style={styles.heroMetricRow}>
@@ -310,89 +269,17 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
                     {t("identities:websitesCount", { count: identity.domains.length })}
                   </Text>
                 </View>
-                <View style={[styles.heroMetric, softSurfaceStyle]}>
+                <View
+                  style={[
+                    styles.heroMetric,
+                    styles.entryRiskPill,
+                    { borderColor: `${theme.colors.error}30` },
+                  ]}
+                >
                   <Icon source="alert-circle-outline" size={19} color={theme.colors.error} />
-                  <Text style={styles.heroMetricText}>
+                  <Text style={[styles.heroMetricText, { color: theme.colors.error }]}>
                     {t("identities:risksCount", { count: identity.riskCount })}
                   </Text>
-                </View>
-              </View>
-            </View>
-
-            <View style={[styles.grid, wideLayout && styles.gridWide]}>
-              <View
-                style={[
-                  styles.panel,
-                  wideLayout && styles.gridPanel,
-                  surfaceStyle,
-                ]}
-              >
-                <View style={styles.sectionHeader}>
-                  <View style={[styles.sectionIcon, { backgroundColor: `${theme.colors.primary}14` }]}>
-                    <Icon source="web" size={20} color={theme.colors.primary} />
-                  </View>
-                  <Text style={styles.sectionTitle}>{t("identities:websitesTitle")}</Text>
-                </View>
-                <View style={styles.chipWrap}>
-                  {identity.domains.length > 0 ? (
-                    visibleDomains.map((domain) => (
-                      <WebsiteChip key={domain} domain={domain} />
-                    ))
-                  ) : (
-                    <Text style={styles.insightText}>{t("identities:noWebsites")}</Text>
-                  )}
-                  {hiddenDomainsCount > 0 ? (
-                    <AppChip
-                      compact
-                      icon="chevron-down"
-                      style={[styles.chip, styles.moreChip]}
-                      onPress={() => setWebsitesExpanded(true)}
-                    >
-                      {t("identities:showMore", { count: hiddenDomainsCount })}
-                    </AppChip>
-                  ) : null}
-                </View>
-                {websitesExpanded && identity.domains.length > WEBSITE_COLLAPSED_LIMIT ? (
-                  <Button
-                    compact
-                    icon="chevron-up"
-                    mode="text"
-                    onPress={() => setWebsitesExpanded(false)}
-                    labelStyle={styles.showLessText}
-                    style={styles.showLessButton}
-                  >
-                    {t("identities:showLess")}
-                  </Button>
-                ) : null}
-              </View>
-
-              <View
-                style={[
-                  styles.panel,
-                  wideLayout && styles.gridPanel,
-                  surfaceStyle,
-                ]}
-              >
-                <View style={styles.sectionHeader}>
-                  <View style={[styles.sectionIcon, { backgroundColor: `${theme.colors.primary}14` }]}>
-                    <Icon source="card-text-outline" size={20} color={theme.colors.primary} />
-                  </View>
-                  <Text style={styles.sectionTitle}>{t("identities:informationTitle")}</Text>
-                </View>
-                <View style={styles.chipWrap}>
-                  <AppChip compact icon="email-outline" style={styles.chip}>
-                    {identity.email}
-                  </AppChip>
-                  {identity.moduleTypes.map((module) => (
-                    <AppChip
-                      key={module}
-                      compact
-                      icon={moduleIconByType[module] ?? "card-text-outline"}
-                      style={styles.chip}
-                    >
-                      {getModuleLabel(module)}
-                    </AppChip>
-                  ))}
                 </View>
               </View>
             </View>
@@ -428,33 +315,41 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
             >
               <View style={styles.sectionHeader}>
                 <View style={[styles.sectionIcon, { backgroundColor: `${theme.colors.primary}14` }]}>
-                  <Icon source="lightbulb-outline" size={20} color={theme.colors.primary} />
+                  <Icon source="web" size={20} color={theme.colors.primary} />
                 </View>
-                <Text style={styles.sectionTitle}>{t("identities:insightsTitle")}</Text>
+                <Text style={styles.sectionTitle}>{t("identities:websitesTitle")}</Text>
               </View>
-              <View style={styles.insightList}>
-                <Text style={styles.insightText}>
-                  {t("identities:insightAccounts", {
-                    email: identity.email,
-                    count: identity.entries.length,
-                  })}
-                </Text>
-                <Text style={styles.insightText}>
-                  {t("identities:insightDomains", {
-                    count: identity.domains.length,
-                  })}
-                </Text>
-                <Text style={styles.insightText}>
-                  {t("identities:insightInformation", {
-                    count: identity.moduleTypes.length,
-                  })}
-                </Text>
-                <Text style={styles.insightText}>
-                  {t("identities:insightRisks", {
-                    count: identity.riskCount,
-                  })}
-                </Text>
+              <View style={styles.chipWrap}>
+                {identity.domains.length > 0 ? (
+                  visibleDomains.map((domain) => (
+                    <WebsiteChip key={domain} domain={domain} />
+                  ))
+                ) : (
+                  <Text style={styles.insightText}>{t("identities:noWebsites")}</Text>
+                )}
+                {hiddenDomainsCount > 0 ? (
+                  <AppChip
+                    compact
+                    icon="chevron-down"
+                    style={[styles.chip, styles.moreChip]}
+                    onPress={() => setWebsitesExpanded(true)}
+                  >
+                    {t("identities:showMore", { count: hiddenDomainsCount })}
+                  </AppChip>
+                ) : null}
               </View>
+              {websitesExpanded && identity.domains.length > WEBSITE_COLLAPSED_LIMIT ? (
+                <Button
+                  compact
+                  icon="chevron-up"
+                  mode="text"
+                  onPress={() => setWebsitesExpanded(false)}
+                  labelStyle={styles.showLessText}
+                  style={styles.showLessButton}
+                >
+                  {t("identities:showLess")}
+                </Button>
+              ) : null}
             </View>
 
             <View
@@ -470,57 +365,62 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
                   </View>
                   <Text style={styles.sectionTitle}>{t("identities:linkedEntries")}</Text>
                 </View>
-                <Button
-                  compact
-                  mode="contained-tonal"
-                  icon="shield-search"
-                  onPress={() =>
-                    tabNav.dispatch(
-                      CommonActions.navigate({
-                        name: "HomeStack",
-                        params: { screen: "Analysis" },
-                      }),
-                    )
-                  }
-                  style={styles.analysisButton}
-                >
-                  {t("identities:openAnalysis")}
-                </Button>
               </View>
               <View style={styles.entryList}>
-                {visibleEntries.map((entry) => (
-                  <AnimatedPressable
-                    key={entry.id}
-                    onPress={() => openEntry(entry.id)}
-                    style={[
-                      styles.entryRow,
-                      softSurfaceStyle,
-                    ]}
-                    hoverBackgroundColor={
-                      darkmode ? "rgba(120, 127, 246, 0.12)" : "rgba(120, 127, 246, 0.08)"
-                    }
-                  >
-                    <View style={[styles.entryIcon, { backgroundColor: `${theme.colors.primary}12` }]}>
-                      <Icon source="card-account-details-outline" size={20} color={theme.colors.primary} />
-                    </View>
-                    <View style={{ flex: 1, minWidth: 0 }}>
-                      <Text style={{ fontWeight: "800" }} numberOfLines={1}>
-                        {entry.title}
-                      </Text>
-                      <Text style={{ opacity: 0.62 }} numberOfLines={1}>
-                        {entry.domains.join(", ") || t("identities:noDomain")}
-                      </Text>
-                    </View>
-                    <Text style={{ opacity: 0.62, fontSize: 12, userSelect: "none" }}>
-                      {t("identities:entryInfoCount", {
-                        count: entry.moduleTypes.length,
-                      })}
-                    </Text>
-                    {entry.hasRisk ? (
-                      <Icon source="alert-circle-outline" size={20} color={theme.colors.error} />
-                    ) : null}
-                    <Icon source="chevron-right" size={18} color={theme.colors.primary} />
-                  </AnimatedPressable>
+                {visibleEntries.map((entry, index) => (
+                  <React.Fragment key={entry.id}>
+                    {index > 0 ? <Divider style={styles.entryDivider} /> : null}
+                    <AnimatedPressable
+                      onPress={() => openEntry(entry.id)}
+                      style={[
+                        styles.entryRow,
+                        softSurfaceStyle,
+                      ]}
+                      hoverBackgroundColor={
+                        darkmode ? "rgba(120, 127, 246, 0.12)" : "rgba(120, 127, 246, 0.08)"
+                      }
+                    >
+                      <View style={styles.entryMainRow}>
+                        <View style={[styles.entryIcon, { backgroundColor: `${theme.colors.primary}12` }]}>
+                          <Icon source="card-account-details-outline" size={20} color={theme.colors.primary} />
+                        </View>
+                        <View style={styles.entryTitleBlock}>
+                          <Text style={styles.entryTitle} numberOfLines={1}>
+                            {entry.title}
+                          </Text>
+                          <View style={styles.entryInlineMetaRow}>
+                          <View style={styles.entryMetaItem}>
+                              <Icon source="web" size={13} color={theme.colors.primary} />
+                              <Text style={styles.entryMetaText} numberOfLines={1}>
+                                {entry.domains[0] ?? t("identities:noDomain")}
+                              </Text>
+                            </View>
+                          <View style={styles.entryMetaDot} />
+                          <View style={styles.entryMetaItem}>
+                              <Icon source="card-text-outline" size={13} color={theme.colors.primary} />
+                              <Text style={styles.entryMetaText}>
+                                {t("identities:entryInfoCount", {
+                                  count: entry.moduleTypes.length,
+                                })}
+                              </Text>
+                            </View>
+                            {entry.hasRisk ? (
+                            <>
+                              <View style={styles.entryMetaDot} />
+                              <View style={styles.entryMetaItem}>
+                                <Icon source="alert-circle-outline" size={13} color={theme.colors.error} />
+                                <Text style={[styles.entryMetaText, { color: theme.colors.error }]}>
+                                  {t("identities:risksCount", { count: 1 })}
+                                </Text>
+                              </View>
+                            </>
+                            ) : null}
+                          </View>
+                        </View>
+                        <Icon source="chevron-right" size={18} color={theme.colors.primary} />
+                      </View>
+                    </AnimatedPressable>
+                  </React.Fragment>
                 ))}
                 {hiddenEntriesCount > 0 ? (
                   <AppChip
@@ -606,21 +506,14 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     padding: 8,
   },
-  grid: {
-    gap: 8,
-  },
-  gridWide: {
-    flexDirection: "row",
-    alignItems: "stretch",
-  },
-  gridPanel: {
-    flex: 1,
-  },
   chip: {
     borderRadius: 10,
   },
   renameButton: {
-    borderRadius: 10,
+    width: 36,
+    height: 36,
+    margin: 0,
+    borderRadius: 12,
     flexShrink: 0,
   },
   modalButton: {
@@ -686,10 +579,6 @@ const styles = StyleSheet.create({
     userSelect: "none",
     fontSize: 16,
   },
-  insightList: {
-    gap: 8,
-    marginTop: 8,
-  },
   insightText: {
     opacity: 0.76,
     userSelect: "none",
@@ -701,24 +590,27 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 8,
   },
-  analysisButton: {
-    borderRadius: 10,
-    flexShrink: 0,
-  },
   entryList: {
     gap: 8,
     marginTop: 8,
   },
+  entryDivider: {
+    opacity: 0.5,
+    marginHorizontal: 8,
+  },
   entryRow: {
-    minHeight: 58,
+    minHeight: 64,
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 8,
+    overflow: "hidden",
+  },
+  entryMainRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    overflow: "hidden",
+    minWidth: 0,
   },
   entryIcon: {
     width: 38,
@@ -726,6 +618,44 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     alignItems: "center",
     justifyContent: "center",
+  },
+  entryTitleBlock: {
+    flex: 1,
+    minWidth: 0,
+    gap: 6,
+  },
+  entryTitle: {
+    fontWeight: "800",
+    userSelect: "none",
+  },
+  entryInlineMetaRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    columnGap: 6,
+    rowGap: 3,
+  },
+  entryMetaItem: {
+    minHeight: 18,
+    maxWidth: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  entryRiskPill: {
+    backgroundColor: "rgba(244, 67, 54, 0.08)",
+  },
+  entryMetaDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: "rgba(120, 127, 246, 0.38)",
+  },
+  entryMetaText: {
+    opacity: 0.66,
+    fontSize: 11,
+    lineHeight: 14,
+    userSelect: "none",
   },
   showLessRow: {
     alignItems: "center",

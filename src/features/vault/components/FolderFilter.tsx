@@ -91,6 +91,16 @@ function FolderFilter(props: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const mobileChipShellStyle = styles.mobileChipShell;
+  const getMobileSelectedChipStyle = (accentColor?: string | null) =>
+    ({
+      backgroundColor: "rgba(120, 127, 246, 0.22)",
+      borderColor: accentColor ?? theme.colors.primary,
+      borderWidth: StyleSheet.hairlineWidth,
+      boxShadow:
+        Platform.OS === "web"
+          ? "rgba(120, 127, 246, 0.16) 0px 4px 14px 0px"
+          : undefined,
+    }) as const;
 
   const flatListRef: any = useRef<FlatList>(null);
   const horizontalOffsetRef = useRef(0);
@@ -310,6 +320,52 @@ function FolderFilter(props: Props) {
     );
   };
 
+  const renderMobileFolderChip = ({
+    item,
+    index,
+  }: {
+    item: FolderType;
+    index: number;
+  }) => {
+    const selected = props.selectedFolder?.id === item.id;
+    const folderColor = getFolderColor(item) ?? theme.colors.primary;
+
+    return (
+      <Animated.View layout={LinearTransition.duration(120)}>
+        <View style={mobileChipShellStyle}>
+          <AppChip
+            key={index}
+            icon={({ size }) => (
+              <AppIcon name={getFolderIcon(item)} size={size} color={folderColor} />
+            )}
+            selected={selected}
+            showSelectedOverlay={true}
+            onPress={
+              props.disabled
+                ? undefined
+                : () => {
+                    props.setSelected2FA(false);
+                    props.setSelectedCard(false);
+                    if (!selected) {
+                      props.setSelectedFolder(item);
+                    } else {
+                      props.setSelectedFolder(null);
+                    }
+                  }
+            }
+            style={[
+              styles.chip,
+              selected ? getMobileSelectedChipStyle(folderColor) : null,
+            ]}
+            textStyle={styles.chipText}
+          >
+            {item.name}
+          </AppChip>
+        </View>
+      </Animated.View>
+    );
+  };
+
   return (
     <>
       {width > 600 ? (
@@ -516,7 +572,12 @@ function FolderFilter(props: Props) {
                                 props.setSelectedFolder(null);
                               }
                         }
-                        style={styles.chip}
+                        style={[
+                          styles.chip,
+                          props.selected2FA
+                            ? getMobileSelectedChipStyle(theme.colors.primary)
+                            : null,
+                        ]}
                         textStyle={styles.chipText}
                       />
                     </View>
@@ -538,7 +599,12 @@ function FolderFilter(props: Props) {
                                 props.setSelectedFolder(null);
                               }
                         }
-                        style={styles.chip}
+                        style={[
+                          styles.chip,
+                          props.selectedCard
+                            ? getMobileSelectedChipStyle(theme.colors.primary)
+                            : null,
+                        ]}
                         textStyle={styles.chipText}
                       />
                     </View>
@@ -558,7 +624,12 @@ function FolderFilter(props: Props) {
                               props.setSelectedCard(false);
                             }
                       }
-                      style={styles.chip}
+                      style={[
+                        styles.chip,
+                        props.selectedFav
+                          ? getMobileSelectedChipStyle(theme.colors.primary)
+                          : null,
+                      ]}
                       textStyle={styles.chipText}
                     />
                   </View>
@@ -578,7 +649,12 @@ function FolderFilter(props: Props) {
                             ? undefined
                             : () => props.removeModuleFilter(module)
                         }
-                        style={styles.chip}
+                        style={[
+                          styles.chip,
+                          props.selectedModuleFilters.includes(module)
+                            ? getMobileSelectedChipStyle(theme.colors.primary)
+                            : null,
+                        ]}
                         textStyle={styles.chipText}
                       >
                         {getModuleNameByEnum(module, t)}
@@ -587,41 +663,7 @@ function FolderFilter(props: Props) {
                   ))}
                 </View>
               }
-              renderItem={({ item, index }) => (
-                <Animated.View layout={LinearTransition.duration(120)}>
-                  <View style={mobileChipShellStyle}>
-                    <AppChip
-                      key={index}
-                      icon={({ size }) => (
-                        <AppIcon
-                          name={getFolderIcon(item)}
-                          size={size}
-                          color={getFolderColor(item) ?? theme.colors.primary}
-                        />
-                      )}
-                      selected={props.selectedFolder == item ? true : false}
-                      showSelectedOverlay={true}
-                      onPress={
-                        props.disabled
-                          ? undefined
-                          : () => {
-                              props.setSelected2FA(false);
-                              props.setSelectedCard(false);
-                              if (props.selectedFolder != item) {
-                                props.setSelectedFolder(item);
-                              } else {
-                                props.setSelectedFolder(null);
-                              }
-                            }
-                      }
-                      style={styles.chip}
-                      textStyle={styles.chipText}
-                    >
-                      {item.name}
-                    </AppChip>
-                  </View>
-                </Animated.View>
-              )}
+              renderItem={renderMobileFolderChip}
               ListFooterComponent={
                 <View
                   style={{
@@ -638,7 +680,12 @@ function FolderFilter(props: Props) {
                       onPress={
                         props.disabled ? undefined : props.openModuleFilterModal
                       }
-                      style={styles.chip}
+                      style={[
+                        styles.chip,
+                        props.selectedModuleFilters.length > 0
+                          ? getMobileSelectedChipStyle(theme.colors.primary)
+                          : null,
+                      ]}
                       textStyle={styles.chipText}
                     >
                       {t("home:moduleFilterTitle")}

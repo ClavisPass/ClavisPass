@@ -606,7 +606,7 @@ const en: TranslationSchema = {
     primarySignals: "Primary signals",
     websitesTitle: "Websites",
     informationTitle: "Stored information",
-    usernamesTitle: "Usernames",
+    usernamesTitle: "Aliases",
     insightsTitle: "Insights",
     insightAccounts: "{{email}} is used by {{count}} accounts.",
     insightDomains: "{{count}} domains share this identity.",

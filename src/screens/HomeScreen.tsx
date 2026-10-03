@@ -305,6 +305,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const [showMenu, setShowMenu] = useState(false);
   const sortChipRef = useRef<View>(null);
   const expiryChipRef = useRef<View>(null);
+  const toolChipScrollRef = useRef<ScrollView>(null);
+  const toolChipHorizontalOffsetRef = useRef(0);
+  const toolChipHorizontalTargetOffsetRef = useRef(0);
+  const toolChipHorizontalAnimationFrameRef = useRef<number | null>(null);
+  const toolChipContentWidthRef = useRef(0);
+  const toolChipViewportWidthRef = useRef(0);
   const [sortMenuAnchor, setSortMenuAnchor] = useState<MenuAnchorRect | null>(
     null,
   );
@@ -349,6 +355,106 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       setExpiryModalVisible(true),
     );
   };
+
+  const getMaxToolChipHorizontalOffset = useCallback(
+    () =>
+      Math.max(
+        0,
+        toolChipContentWidthRef.current - toolChipViewportWidthRef.current,
+      ),
+    [],
+  );
+
+  const animateToolChipHorizontalScroll = useCallback(() => {
+    const current = toolChipHorizontalOffsetRef.current;
+    const target = Math.min(
+      toolChipHorizontalTargetOffsetRef.current,
+      getMaxToolChipHorizontalOffset(),
+    );
+    const distance = target - current;
+
+    if (Math.abs(distance) < 0.5) {
+      toolChipHorizontalOffsetRef.current = target;
+      toolChipHorizontalTargetOffsetRef.current = target;
+      toolChipHorizontalAnimationFrameRef.current = null;
+      toolChipScrollRef.current?.scrollTo({ animated: false, x: target });
+      return;
+    }
+
+    const next = current + distance * 0.28;
+    toolChipHorizontalOffsetRef.current = next;
+    toolChipScrollRef.current?.scrollTo({ animated: false, x: next });
+    toolChipHorizontalAnimationFrameRef.current = window.requestAnimationFrame(
+      animateToolChipHorizontalScroll,
+    );
+  }, [getMaxToolChipHorizontalOffset]);
+
+  const startToolChipHorizontalScroll = useCallback(
+    (targetOffset: number) => {
+      toolChipHorizontalTargetOffsetRef.current = Math.min(
+        Math.max(0, targetOffset),
+        getMaxToolChipHorizontalOffset(),
+      );
+
+      if (toolChipHorizontalAnimationFrameRef.current === null) {
+        toolChipHorizontalAnimationFrameRef.current =
+          window.requestAnimationFrame(animateToolChipHorizontalScroll);
+      }
+    },
+    [animateToolChipHorizontalScroll, getMaxToolChipHorizontalOffset],
+  );
+
+  const handleToolChipHorizontalScroll = useCallback((event: any) => {
+    const offset = event?.nativeEvent?.contentOffset?.x ?? 0;
+    toolChipHorizontalOffsetRef.current = offset;
+    if (toolChipHorizontalAnimationFrameRef.current === null) {
+      toolChipHorizontalTargetOffsetRef.current = offset;
+    }
+  }, []);
+
+  const handleToolChipHorizontalWheel = useCallback(
+    (event: any) => {
+      if (Platform.OS !== "web") return;
+
+      const nativeEvent = event?.nativeEvent ?? event;
+      const deltaX = nativeEvent?.deltaX ?? 0;
+      const deltaY = nativeEvent?.deltaY ?? 0;
+      const rawDelta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
+      const deltaMode = nativeEvent?.deltaMode ?? 0;
+      const delta =
+        deltaMode === 1
+          ? rawDelta * 16
+          : deltaMode === 2
+            ? rawDelta * toolChipViewportWidthRef.current
+            : rawDelta;
+      if (!delta) return;
+
+      nativeEvent?.preventDefault?.();
+      startToolChipHorizontalScroll(
+        toolChipHorizontalTargetOffsetRef.current + delta,
+      );
+    },
+    [startToolChipHorizontalScroll],
+  );
+
+  const toolChipHorizontalWheelProps =
+    Platform.OS === "web"
+      ? ({ onWheel: handleToolChipHorizontalWheel } as any)
+      : {};
+
+  useEffect(
+    () => () => {
+      if (
+        Platform.OS === "web" &&
+        toolChipHorizontalAnimationFrameRef.current !== null
+      ) {
+        window.cancelAnimationFrame(
+          toolChipHorizontalAnimationFrameRef.current,
+        );
+      }
+    },
+    [],
+  );
 
   const saveSelectedFavState = useCallback(
     (fav: boolean) => {
@@ -1188,8 +1294,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   const renderHomeActionChips = () => (
     <ScrollView
+      ref={toolChipScrollRef}
+      {...toolChipHorizontalWheelProps}
       horizontal
       showsHorizontalScrollIndicator={false}
+      onLayout={(event) => {
+        toolChipViewportWidthRef.current = event.nativeEvent.layout.width;
+      }}
+      onContentSizeChange={(contentWidth) => {
+        toolChipContentWidthRef.current = contentWidth;
+      }}
+      onScroll={handleToolChipHorizontalScroll}
+      scrollEventThrottle={16}
       contentContainerStyle={{
         alignItems: "center",
         flexDirection: "row",
@@ -1737,6 +1853,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                       value={searchQuery}
                       onChangeText={setSearchQuery}
                       onBlur={handleCompactSearchBlur}
+                      onSubmitEditing={handleCompactSearchBlur}
                       resetLabel={t("common:reset")}
                       height={32}
                       fontSize={16}

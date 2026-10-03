@@ -20,6 +20,7 @@ type SearchInputProps = {
   fontSize?: number;
   compact?: boolean;
   onBlur?: () => void;
+  onSubmitEditing?: () => void;
   style?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<TextStyle>;
 };
@@ -49,6 +50,7 @@ const SearchInput = forwardRef<any, SearchInputProps>(
       fontSize = 14,
       compact = false,
       onBlur,
+      onSubmitEditing,
       style,
       inputStyle,
     },
@@ -89,6 +91,7 @@ const SearchInput = forwardRef<any, SearchInputProps>(
             value={value}
             onChangeText={onChangeText}
             onBlur={onBlur}
+            onSubmitEditing={onSubmitEditing}
             returnKeyType="search"
             selectionColor={theme.colors.primary}
             style={[

@@ -625,7 +625,7 @@ const de: TranslationSchema = {
     primarySignals: "Primäre Signale",
     websitesTitle: "Webseiten",
     informationTitle: "Gespeicherte Informationen",
-    usernamesTitle: "Benutzernamen",
+    usernamesTitle: "Alias",
     insightsTitle: "Einblicke",
     insightAccounts: "{{email}} wird von {{count}} Accounts verwendet.",
     insightDomains: "{{count}} Domains teilen diese Identität.",

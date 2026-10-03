@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+  Keyboard,
   Platform,
   View,
   useWindowDimensions,
@@ -186,12 +187,13 @@ export default function SearchHeader({
 
     if (Platform.OS === "web" && searchHeaderVisible) {
       suppressNextCompactSearchOpenRef.current = true;
-      requestAnimationFrame(() => {
+      window.setTimeout(() => {
         suppressNextCompactSearchOpenRef.current = false;
-      });
+      }, 250);
     }
 
     searchRef.current?.blur?.();
+    Keyboard.dismiss();
     setSearchHeaderVisible(false);
   }, [isCompactHeader, isFocused, searchHeaderVisible, value]);
 
@@ -335,6 +337,7 @@ export default function SearchHeader({
                 value={value}
                 onChangeText={onChangeText}
                 onBlur={closeCompactSearchIfEmpty}
+                onSubmitEditing={closeCompactSearchIfEmpty}
                 resetLabel={resetLabel}
                 height={32}
                 fontSize={16}

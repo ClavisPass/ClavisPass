@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { Icon, Text } from "react-native-paper";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
@@ -11,7 +11,6 @@ import { useTheme } from "../app/providers/ThemeProvider";
 import { useVault } from "../app/providers/VaultProvider";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
-import AppChip from "../shared/components/chips/AppChip";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
 import SearchHeader from "../shared/components/SearchHeader";
 import { deriveIdentityClusters } from "../features/identity/utils/deriveIdentityClusters";
@@ -52,9 +51,7 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
     setTitlebarCenterGap,
     setTitlebarOverlayDragEnabled,
   } = useTheme();
-  const { width } = useWindowDimensions();
   const [searchQuery, setSearchQuery] = React.useState("");
-  const inlineIdentityStats = width >= 760;
   const surfaceStyle = {
     backgroundColor: darkmode ? "rgba(28, 28, 34, 0.58)" : "rgba(255, 255, 255, 0.68)",
     borderColor: darkmode ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.82)",
@@ -101,16 +98,6 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
     [identities, query],
   );
 
-  const totalAccounts = identities.reduce(
-    (sum, identity) => sum + identity.entries.length,
-    0,
-  );
-  const totalWebsites = identities.reduce(
-    (sum, identity) => sum + identity.domains.length,
-    0,
-  );
-  const totalRisks = identities.reduce((sum, identity) => sum + identity.riskCount, 0);
-
   const renderIdentityCard = (identity: IdentityCluster, index: number) => (
     <Animated.View
       key={identity.id}
@@ -130,69 +117,65 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
         }
       >
         <View style={styles.identityCardInner}>
-          <View style={styles.logoShell}>
-            <IdentityEmailLogo email={identity.email} size={44} />
-          </View>
-          <View style={styles.identityBody}>
-            <View
-              style={[
-                styles.identityContent,
-                !inlineIdentityStats && styles.identityContentStacked,
-              ]}
-            >
-              <View
-                style={[
-                  styles.identityTextBlock,
-                  !inlineIdentityStats && styles.identityTextBlockStacked,
-                ]}
+          <View style={styles.identityHeaderRow}>
+            <View style={styles.logoShell}>
+              <IdentityEmailLogo email={identity.email} size={44} />
+            </View>
+            <View style={styles.identityTextBlock}>
+              <Text
+                variant="bodyLarge"
+                style={{ fontWeight: "900", userSelect: "none" }}
+                numberOfLines={1}
               >
-                <Text
-                  variant="bodyLarge"
-                  style={{ fontWeight: "900", userSelect: "none" }}
-                  numberOfLines={1}
-                >
-                  {getDefaultIdentityName(identity.email)}
-                </Text>
-                <Text
-                  style={{ opacity: 0.7, userSelect: "none" }}
-                  numberOfLines={1}
-                >
-                  {identity.email}
-                </Text>
-              </View>
-              <View
-                style={[
-                  styles.identityStats,
-                  !inlineIdentityStats && styles.identityStatsStacked,
-                ]}
+                {getDefaultIdentityName(identity.email)}
+              </Text>
+              <Text
+                style={{ opacity: 0.7, userSelect: "none" }}
+                numberOfLines={1}
               >
+                {identity.email}
+              </Text>
+              <View style={styles.identityMetaRow}>
+                <View style={[styles.identityMetaBadge, subtleSurfaceStyle]}>
+                  <Icon source="key-chain" size={13} color={theme.colors.primary} />
+                  <Text style={styles.identityMetaText}>
+                    {identity.entries.length}
+                  </Text>
+                </View>
+                <View style={[styles.identityMetaBadge, subtleSurfaceStyle]}>
+                  <Icon source="web" size={13} color={theme.colors.primary} />
+                  <Text style={styles.identityMetaText}>
+                    {identity.domains.length}
+                  </Text>
+                </View>
                 {identity.riskCount > 0 ? (
-                  <AppChip
-                    compact
-                    icon={({ size }) => (
-                      <Icon
-                        source="alert-circle-outline"
-                        size={size}
-                        color={theme.colors.error}
-                      />
-                    )}
-                    style={styles.riskChip}
-                    textStyle={{ color: theme.colors.onSurface, fontWeight: "700" }}
+                  <View
+                    style={[
+                      styles.identityMetaBadge,
+                      styles.identityRiskBadge,
+                      { borderColor: `${theme.colors.error}30` },
+                    ]}
                   >
-                    {t("identities:risksCount", { count: identity.riskCount })}
-                  </AppChip>
+                    <Icon
+                      source="alert-circle-outline"
+                      size={13}
+                      color={theme.colors.error}
+                    />
+                    <Text
+                      style={[
+                        styles.identityMetaText,
+                        { color: theme.colors.error },
+                      ]}
+                    >
+                      {identity.riskCount}
+                    </Text>
+                  </View>
                 ) : null}
-                <AppChip compact icon="key-chain" style={styles.statChip}>
-                  {t("identities:accountsCount", { count: identity.entries.length })}
-                </AppChip>
-                <AppChip compact icon="web" style={styles.statChip}>
-                  {t("identities:websitesCount", { count: identity.domains.length })}
-                </AppChip>
               </View>
             </View>
-          </View>
-          <View style={[styles.chevronBubble, { backgroundColor: `${theme.colors.primary}12` }]}>
-            <Icon source="chevron-right" size={20} color={theme.colors.primary} />
+            <View style={[styles.chevronBubble, { backgroundColor: `${theme.colors.primary}12` }]}>
+              <Icon source="chevron-right" size={20} color={theme.colors.primary} />
+            </View>
           </View>
         </View>
       </AnimatedPressable>
@@ -230,47 +213,12 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
       >
         <View style={styles.metricRow}>
           <View style={[styles.metric, subtleSurfaceStyle]}>
-            <View style={[styles.metricIcon, { backgroundColor: `${theme.colors.primary}18` }]}>
-              <Icon source="email-multiple-outline" size={20} color={theme.colors.primary} />
-            </View>
-            <View style={{ minWidth: 0 }}>
-              <Text style={{ fontWeight: "900", color: theme.colors.onSurface }}>
+            <Icon source="email-multiple-outline" size={16} color={theme.colors.primary} />
+            <View style={styles.identityStatTextBlock}>
+              <Text style={styles.identityStatValue}>
                 {identities.length}
               </Text>
               <Text style={styles.metricLabel}>{t("identities:metricIdentities")}</Text>
-            </View>
-          </View>
-          <View style={[styles.metric, subtleSurfaceStyle]}>
-            <View style={[styles.metricIcon, { backgroundColor: `${theme.colors.primary}18` }]}>
-              <Icon source="key-chain" size={20} color={theme.colors.primary} />
-            </View>
-            <View style={{ minWidth: 0 }}>
-              <Text style={{ fontWeight: "900", color: theme.colors.onSurface }}>
-                {totalAccounts}
-              </Text>
-              <Text style={styles.metricLabel}>{t("identities:metricAccounts")}</Text>
-            </View>
-          </View>
-          <View style={[styles.metric, subtleSurfaceStyle]}>
-            <View style={[styles.metricIcon, { backgroundColor: `${theme.colors.primary}18` }]}>
-              <Icon source="web" size={20} color={theme.colors.primary} />
-            </View>
-            <View style={{ minWidth: 0 }}>
-              <Text style={{ fontWeight: "900", color: theme.colors.onSurface }}>
-                {totalWebsites}
-              </Text>
-              <Text style={styles.metricLabel}>{t("identities:metricWebsites")}</Text>
-            </View>
-          </View>
-          <View style={[styles.metric, subtleSurfaceStyle]}>
-            <View style={[styles.metricIcon, { backgroundColor: "rgba(236, 72, 103, 0.12)" }]}>
-              <Icon source="alert-circle-outline" size={20} color={theme.colors.error} />
-            </View>
-            <View style={{ minWidth: 0 }}>
-              <Text style={{ fontWeight: "900", color: theme.colors.onSurface }}>
-                {totalRisks}
-              </Text>
-              <Text style={styles.metricLabel}>{t("identities:metricRisks")}</Text>
             </View>
           </View>
         </View>
@@ -310,6 +258,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 8,
   },
+  identityHeaderRow: {
+    flex: 1,
+    minWidth: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   logoShell: {
     width: 54,
     height: 54,
@@ -318,52 +273,50 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "rgba(255, 255, 255, 0.32)",
   },
-  identityBody: {
-    flex: 1,
-    minWidth: 0,
-  },
-  identityContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  identityContentStacked: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: 8,
-  },
   identityTextBlock: {
     flex: 1,
     minWidth: 0,
-    gap: 8,
+    gap: 5,
   },
-  identityTextBlockStacked: {
-    flex: 0,
-    alignSelf: "stretch",
-  },
-  identityStats: {
+  identityMetaRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "flex-end",
+    gap: 6,
     alignItems: "center",
-    gap: 8,
-    flexShrink: 1,
-    maxWidth: "58%",
   },
-  identityStatsStacked: {
-    justifyContent: "flex-start",
-    alignSelf: "stretch",
-    maxWidth: "100%",
+  identityMetaBadge: {
+    minHeight: 22,
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
   },
-  chip: {
-    borderRadius: 10,
+  identityRiskBadge: {
+    backgroundColor: "rgba(236, 72, 103, 0.10)",
   },
-  statChip: {
-    borderRadius: 10,
+  identityMetaText: {
+    opacity: 0.74,
+    fontSize: 11,
+    lineHeight: 14,
+    fontWeight: "800",
+    userSelect: "none",
   },
-  riskChip: {
-    borderRadius: 10,
-    backgroundColor: "rgba(236, 72, 103, 0.12)",
+  identityStatTextBlock: {
+    minWidth: 0,
+  },
+  identityStatValue: {
+    fontWeight: "900",
+    lineHeight: 16,
+    userSelect: "none",
+  },
+  identityStatLabel: {
+    opacity: 0.68,
+    fontSize: 12,
+    lineHeight: 16,
+    userSelect: "none",
   },
   metricRow: {
     flexDirection: "row",
@@ -371,7 +324,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   metric: {
-    minWidth: 132,
+    minHeight: 42,
+    minWidth: 120,
     flexGrow: 1,
     flexBasis: 0,
     flexDirection: "row",
@@ -381,13 +335,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
-  },
-  metricIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
   },
   metricLabel: {
     opacity: 0.68,

@@ -10,12 +10,10 @@ import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import QRCode from "react-qr-code";
 import Barcode from "@kichiyaki/react-native-barcode-generator";
 import { HomeStackParamList } from "../app/navigation/model/types";
-import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
 import {
   buildFaviconUrl,
   getHostnameLabel,
-  getReadableTextColor,
-  mixColors,
   resolveDigitalCardPaletteFromUrl,
   withAlpha,
 } from "../features/vault/utils/digitalCardTheme";
@@ -80,15 +78,8 @@ const CardDetailsScreen: React.FC<CardDetailsScreenProps> = ({
     navigation.goBack();
   };
 
-  const cardBase = accentColor
-    ? mixColors(accentColor, darkmode ? "#0D0D0D" : "#FFFFFF", darkmode ? 0.72 : 0.85)
-    : theme.colors.elevation.level2;
-  const titleColor = accentColor
-    ? getReadableTextColor(accentColor)
-    : theme.colors.onBackground;
-  const secondaryTextColor = accentColor
-    ? withAlpha(titleColor === "#ffffff" ? "#ffffff" : "#111111", 0.72)
-    : theme.colors.onSurfaceVariant;
+  const titleColor = theme.colors.onBackground;
+  const secondaryTextColor = theme.colors.onSurfaceVariant;
   const faviconUrl = routeFaviconUrl ?? buildFaviconUrl(sourceUrl ?? null);
   const hostname = getHostnameLabel(sourceUrl ?? null);
 
@@ -100,14 +91,7 @@ const CardDetailsScreen: React.FC<CardDetailsScreenProps> = ({
         translucent={true}
       />
       <Header onPress={goBack} title={title}></Header>
-      <LinearGradient
-        colors={[
-          theme.colors.elevation.level2,
-          theme.colors.elevation.level2,
-          theme.colors.elevation.level2,
-        ]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+      <View
         style={{
           flex: 1,
           width: "100%",
@@ -115,20 +99,25 @@ const CardDetailsScreen: React.FC<CardDetailsScreenProps> = ({
           paddingTop: 0,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: theme.colors.elevation.level2,
         }}
       >
-        <View
+        <BlurView
+          intensity={80}
+          tint={darkmode ? "dark" : undefined}
           style={{
             width: "100%",
             maxWidth: 420,
             borderRadius: 28,
             overflow: "hidden",
-            borderWidth: 1,
+            borderWidth: StyleSheet.hairlineWidth,
             borderColor: accentColor
               ? withAlpha(accentColor, darkmode ? 0.5 : 0.24)
-              : theme.colors.outlineVariant,
-            backgroundColor: cardBase,
+              : darkmode
+                ? theme.colors.outlineVariant
+                : "white",
+            backgroundColor: darkmode
+              ? "rgba(28, 28, 34, 0.42)"
+              : "rgba(255, 255, 255, 0.38)",
             boxShadow: theme.colors.shadow as any,
           }}
         >
@@ -218,8 +207,8 @@ const CardDetailsScreen: React.FC<CardDetailsScreenProps> = ({
               ) : null}
             </View>
           </View>
-        </View>
-      </LinearGradient>
+        </BlurView>
+      </View>
     </AnimatedContainer>
   );
 };
