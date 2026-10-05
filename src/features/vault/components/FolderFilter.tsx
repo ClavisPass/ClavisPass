@@ -64,6 +64,11 @@ const styles = StyleSheet.create({
   narrowListContentWeb: {
     alignItems: "center",
   },
+  mobileListContent: {
+    alignItems: "center",
+    paddingLeft: 8,
+    paddingRight: 8,
+  },
 });
 
 type Props = {
@@ -546,7 +551,9 @@ function FolderFilter(props: Props) {
                 Platform.OS === "web" && styles.narrowListWeb,
               ]}
               contentContainerStyle={
-                Platform.OS === "web" ? styles.narrowListContentWeb : undefined
+                Platform.OS === "web"
+                  ? [styles.narrowListContentWeb, styles.mobileListContent]
+                  : styles.mobileListContent
               }
               onContentSizeChange={(contentWidth) => {
                 horizontalContentWidthRef.current = contentWidth;

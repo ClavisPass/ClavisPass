@@ -7,6 +7,7 @@ import {
   type ViewStyle,
 } from "react-native";
 import { useTheme } from "../../app/providers/ThemeProvider";
+import { useIsTauriEnvironment } from "../../infrastructure/platform/isTauri";
 
 function withAlpha(color: string, alpha: number) {
   const hex = color.trim().replace("#", "");
@@ -74,8 +75,15 @@ function AmbientWash({
 
 function AmbientBackground({}: Props) {
   const { darkmode, theme } = useTheme();
+  const isTauri = useIsTauriEnvironment();
   const primary = theme.colors.primary;
   const secondary = theme.colors.secondary;
+  const appBackground = isTauri
+    ? withAlpha(theme.colors.background, darkmode ? 0.24 : 0.58)
+    : darkmode
+      ? theme.colors.background
+      : "#F7FAFF";
+  const mobileBackground = darkmode ? theme.colors.background : "#E8EAE8";
 
   if (Platform.OS !== "web") {
     return (
@@ -85,18 +93,38 @@ function AmbientBackground({}: Props) {
           StyleSheet.absoluteFill,
           {
             overflow: "hidden",
-            backgroundColor: darkmode ? theme.colors.background : "#F7FAFF",
+            backgroundColor: mobileBackground,
           },
         ]}
       >
-        <AmbientWash
-          style={styles.mobileBlueTop}
-          backgroundColor={withAlpha(secondary, darkmode ? 0.04 : 0.075)}
-        />
-        <AmbientWash
-          style={styles.mobileBlueBottom}
-          backgroundColor={withAlpha(secondary, darkmode ? 0.025 : 0.045)}
-        />
+        {darkmode ? (
+          <>
+            <View
+              style={[
+                StyleSheet.absoluteFill,
+                { backgroundColor: "rgba(255, 255, 255, 0.02)" },
+              ]}
+            />
+            <View
+              style={[
+                StyleSheet.absoluteFill,
+                { backgroundColor: withAlpha(primary, 0.035) },
+              ]}
+            />
+            <View
+              style={[
+                StyleSheet.absoluteFill,
+                { backgroundColor: withAlpha(secondary, 0.025) },
+              ]}
+            />
+            <View
+              style={[
+                StyleSheet.absoluteFill,
+                { backgroundColor: "rgba(12, 12, 16, 0.18)" },
+              ]}
+            />
+          </>
+        ) : null}
       </View>
     );
   }
@@ -108,7 +136,7 @@ function AmbientBackground({}: Props) {
         StyleSheet.absoluteFill,
         {
           overflow: "hidden",
-          backgroundColor: darkmode ? theme.colors.background : "#F7FAFF",
+          backgroundColor: appBackground,
         },
       ]}
     >
@@ -116,28 +144,28 @@ function AmbientBackground({}: Props) {
         style={styles.topRight}
         backgroundColor={withAlpha(
           primary,
-          darkmode ? 0.05 : 0.055,
+          darkmode ? 0.05 : 0.038,
         )}
       />
       <AmbientWash
         style={styles.left}
         backgroundColor={withAlpha(
           secondary,
-          darkmode ? 0.045 : 0.07,
+          darkmode ? 0.045 : 0.048,
         )}
       />
       <AmbientWash
         style={styles.bottom}
         backgroundColor={withAlpha(
           primary,
-          darkmode ? 0.03 : 0.032,
+          darkmode ? 0.03 : 0.026,
         )}
       />
       <AmbientWash
         style={styles.lowerLeft}
         backgroundColor={withAlpha(
           secondary,
-          darkmode ? 0.028 : 0.038,
+          darkmode ? 0.028 : 0.032,
         )}
       />
     </View>
@@ -188,17 +216,33 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 380,
   },
   mobileBlueTop: {
-    width: "120%",
-    height: "48%",
-    top: -190,
-    left: -150,
+    width: "124%",
+    height: "50%",
+    top: -210,
+    left: -160,
     borderBottomRightRadius: 520,
   },
+  mobilePinkLeft: {
+    width: "78%",
+    height: "72%",
+    top: "10%",
+    left: -190,
+    borderTopRightRadius: 520,
+    borderBottomRightRadius: 520,
+  },
+  mobileVioletRight: {
+    width: "72%",
+    height: "58%",
+    top: "2%",
+    right: -190,
+    borderTopLeftRadius: 520,
+    borderBottomLeftRadius: 520,
+  },
   mobileBlueBottom: {
-    width: "110%",
-    height: "36%",
-    right: -170,
-    bottom: -190,
+    width: "118%",
+    height: "40%",
+    right: -190,
+    bottom: -210,
     borderTopLeftRadius: 520,
   },
 });

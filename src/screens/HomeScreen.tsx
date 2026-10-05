@@ -498,7 +498,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const homeListItemHorizontalInset = isCompactHeader ? 0 : homeSpacing.sm;
   const homeListContentContainerStyle = useMemo(
     () => ({
-      paddingRight: 0,
+      paddingLeft: isCompactHeader ? homeSpacing.sm : 0,
+      paddingRight: isCompactHeader ? homeSpacing.sm : 0,
       paddingTop: homeListTopInset,
       paddingBottom: isCompactHeader
         ? Platform.OS === "web"
@@ -1312,8 +1313,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         flexGrow: 1,
         gap: homeSpacing.sm,
         justifyContent: "flex-start",
-        paddingLeft: isCompactHeader ? 0 : homeSpacing.sm,
-        paddingRight: isCompactHeader ? 0 : homeGutter,
+        paddingLeft: homeSpacing.sm,
+        paddingRight: isCompactHeader ? homeSpacing.sm : homeGutter,
         paddingTop: 0,
         paddingBottom: homeSpacing.xs,
       }}
@@ -1972,8 +1973,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               width: "100%",
               paddingTop: 0,
               paddingBottom: isCompactHeader ? 0 : homeSpacing.sm,
-              paddingRight: isCompactHeader ? homeGutter : 0,
-              paddingLeft: isCompactHeader ? homeGutter : 0,
+              paddingRight: 0,
+              paddingLeft: 0,
               flexDirection: width > 600 ? "row-reverse" : "column",
               gap: 0,
               position: "relative",

@@ -27,6 +27,9 @@ const styles = StyleSheet.create({
     marginRight: 4,
     marginBottom: 8,
     borderRadius: 12,
+  },
+  cardClip: {
+    borderRadius: 12,
     overflow: "hidden",
   },
   ripple: {
@@ -99,6 +102,17 @@ function CardItem(props: Props) {
     ? withAlpha(titleColor === "#ffffff" ? "#ffffff" : "#111111", 0.72)
     : theme.colors.onSurfaceVariant;
   const denseHorizontalInset = props.denseHorizontalInset ?? 8;
+  const identitySurfaceStyle = {
+    backgroundColor: darkmode
+      ? "rgba(28, 28, 34, 0.58)"
+      : "rgba(255, 255, 255, 0.68)",
+    borderColor: darkmode
+      ? "rgba(255, 255, 255, 0.08)"
+      : "rgba(255, 255, 255, 0.82)",
+    boxShadow: darkmode
+      ? ("rgba(0, 0, 0, 0.14) 0px 8px 24px 0px" as any)
+      : ("rgba(64, 76, 120, 0.08) 0px 8px 26px 0px" as any),
+  };
 
   return (
     <Animated.View
@@ -113,19 +127,14 @@ function CardItem(props: Props) {
               marginBottom: 4,
             }
           : null,
+        identitySurfaceStyle,
         {
-          backgroundColor: cardBase,
-          boxShadow: theme.colors?.shadow,
           borderWidth: StyleSheet.hairlineWidth,
-          borderColor: accentColor
-            ? withAlpha(accentColor, darkmode ? 0.5 : 0.24)
-            : darkmode
-              ? theme.colors.outlineVariant
-              : "white",
         },
       ]}
     >
       <LinearGradient
+        style={styles.cardClip}
         colors={[
           accentColor ? withAlpha(accentColor, darkmode ? 0.26 : 0.18) : cardBase,
           cardBase,

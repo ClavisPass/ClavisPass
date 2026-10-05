@@ -701,8 +701,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   const editSectionSpacing = 8;
   const editControlOverlayHeight = 40 + editSectionSpacing;
-  const editListTopFadeStart = 28;
-  const editListTopFadeEnd = editControlOverlayHeight + 28;
+  const editListTopFadeStart = 34;
+  const editListTopFadeEnd = editControlOverlayHeight + 0;
   const actionChipHorizontalPadding = 16;
   const moreActionKey = "__more";
 
@@ -1003,11 +1003,26 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         height: 24,
         alignSelf: "center",
         backgroundColor: darkmode
-          ? theme.colors.outlineVariant
-          : "rgba(0, 0, 0, 0.12)",
+          ? "rgba(255, 255, 255, 0.1)"
+          : "rgba(24, 28, 38, 0.1)",
       }}
     />
   );
+
+  const editControlSurfaceStyle = {
+    backgroundColor: darkmode
+      ? "rgba(28, 28, 34, 0.58)"
+      : "rgba(255, 255, 255, 0.72)",
+    borderColor: darkmode
+      ? "rgba(255, 255, 255, 0.08)"
+      : "rgba(255, 255, 255, 0.82)",
+    boxShadow: darkmode
+      ? ("rgba(0, 0, 0, 0.14) 0px 8px 24px 0px" as any)
+      : ("rgba(64, 76, 120, 0.08) 0px 8px 26px 0px" as any),
+  };
+  const editControlContentColor = darkmode
+    ? "rgba(255, 255, 255, 0.82)"
+    : "rgba(24, 28, 38, 0.76)";
 
   const renderControlSegment = ({
     children,
@@ -1085,10 +1100,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         paddingHorizontal: editSectionSpacing,
         margin: 0,
         overflow: "hidden",
-        backgroundColor: theme.colors.background,
-        boxShadow: theme.colors.shadow,
+        ...editControlSurfaceStyle,
         borderWidth: StyleSheet.hairlineWidth,
-        borderColor: darkmode ? theme.colors.outlineVariant : "white",
       }}
     >
       {renderControlSegment({
@@ -1100,7 +1113,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           <AppIcon
             name="undo-variant"
             color={
-              canUndo ? theme.colors.primary : theme.colors.onSurfaceDisabled
+              canUndo ? editControlContentColor : theme.colors.onSurfaceDisabled
             }
             size={20}
           />
@@ -1115,7 +1128,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           <AppIcon
             name="redo-variant"
             color={
-              canRedo ? theme.colors.primary : theme.colors.onSurfaceDisabled
+              canRedo ? editControlContentColor : theme.colors.onSurfaceDisabled
             }
             size={20}
           />
@@ -1128,7 +1141,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           ? t("common:removeFavorite")
           : t("common:addFavorite"),
         children: (
-          <Icon source={favIcon} color={theme.colors.primary} size={20} />
+          <Icon source={favIcon} color={editControlContentColor} size={20} />
         ),
       })}
       {renderControlDivider()}
@@ -1162,13 +1175,17 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
               color={
                 currentFolder
                   ? (getFolderColor(currentFolder) ?? theme.colors.primary)
-                  : theme.colors.primary
+                  : editControlContentColor
               }
             />
             <Text
               numberOfLines={1}
               ellipsizeMode="tail"
-              style={{ userSelect: "none", flexShrink: 1 }}
+              style={{
+                color: editControlContentColor,
+                userSelect: "none",
+                flexShrink: 1,
+              }}
             >
               {currentFolder === null ||
               currentFolder.name === "" ||
@@ -1344,7 +1361,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
                 <SquaredContainerButton onPress={openFastAccessFeature}>
                   <AppIcon
                     name={"tooltip-account"}
-                    color={theme.colors.primary}
+                    color={editControlContentColor}
                     size={20}
                   />
                 </SquaredContainerButton>

@@ -20,17 +20,22 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 12,
     overflow: "hidden",
+    position: "relative",
   },
   iconOnlyTouchable: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
   },
   iconOnlyContent: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
   },
-  iconOnlySelectedOverlay: {
+  iconOnlyIcon: {
     ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
+    elevation: 1,
   },
 });
 
@@ -57,12 +62,38 @@ function AppChip({
   textStyle,
   ...props
 }: Props) {
-  const { theme } = useTheme();
+  const { darkmode, theme } = useTheme();
+  const chipBackgroundColor = darkmode
+    ? "rgba(255, 255, 255, 0.08)"
+    : "rgba(255, 255, 255, 0.82)";
+  const chipBorderColor = darkmode
+    ? "rgba(255, 255, 255, 0.1)"
+    : "rgba(255, 255, 255, 0.82)";
+  const chipLabelColor = darkmode
+    ? "rgba(255, 255, 255, 0.82)"
+    : "rgba(24, 28, 38, 0.76)";
 
-  if (iconOnly && typeof icon === "string") {
+  if (iconOnly && icon) {
     const selectedBackgroundColor = showSelectedOverlay
       ? "rgba(120, 127, 246, 0.18)"
-      : theme.colors.secondaryContainer;
+      : chipBackgroundColor;
+    const iconColor = iconOnlyColor ?? chipLabelColor;
+    const iconKey = `${typeof icon === "string" ? icon : "custom"}-${
+      selected ? "selected" : "idle"
+    }`;
+    const resolvedIcon =
+      typeof icon === "string" ? (
+        <AppIcon
+          key={iconKey}
+          name={icon}
+          size={iconOnlySize}
+          color={iconColor}
+        />
+      ) : typeof icon === "function" ? (
+        <React.Fragment key={iconKey}>
+          {icon({ color: iconColor, size: iconOnlySize })}
+        </React.Fragment>
+      ) : null;
 
     return (
       <View
@@ -71,7 +102,9 @@ function AppChip({
           {
             backgroundColor: selected
               ? selectedBackgroundColor
-              : theme.colors.secondaryContainer,
+              : chipBackgroundColor,
+            borderColor: chipBorderColor,
+            borderWidth: StyleSheet.hairlineWidth,
             opacity: disabled ? 0.38 : 1,
           },
           style as any,
@@ -86,23 +119,11 @@ function AppChip({
           accessibilityState={{ selected, disabled }}
           accessibilityLabel={props.accessibilityLabel}
         >
-          <View style={styles.iconOnlyContent}>
-            {selected && showSelectedOverlay ? (
-              <View
-                pointerEvents="none"
-                style={[
-                  styles.iconOnlySelectedOverlay,
-                  
-                ]}
-              />
-            ) : null}
-            <AppIcon
-              name={icon}
-              size={iconOnlySize}
-              color={iconOnlyColor ?? theme.colors.primary}
-            />
-          </View>
+          <View style={styles.iconOnlyContent} />
         </TouchableRipple>
+        <View pointerEvents="none" style={styles.iconOnlyIcon}>
+          {resolvedIcon}
+        </View>
       </View>
     );
   }
@@ -118,12 +139,14 @@ function AppChip({
       showSelectedOverlay={showSelectedOverlay}
       style={[
         {
-          backgroundColor: theme.colors.secondaryContainer,
+          backgroundColor: chipBackgroundColor,
+          borderColor: chipBorderColor,
+          borderWidth: StyleSheet.hairlineWidth,
           borderRadius: 12,
         },
         style as any,
       ]}
-      textStyle={[{ color: theme.colors.primary }, textStyle as any]}
+      textStyle={[{ color: chipLabelColor }, textStyle as any]}
     >
       {children ?? ""}
     </Chip>

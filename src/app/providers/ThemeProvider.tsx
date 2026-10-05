@@ -17,6 +17,7 @@ import {
 } from "@react-navigation/native";
 import { AppTheme } from "../../shared/ui/appTheme";
 import StartupScreen from "../../shared/components/StartupScreen";
+import { useIsTauriEnvironment } from "../../infrastructure/platform/isTauri";
 
 import { useSetting } from "./SettingsProvider";
 
@@ -57,6 +58,8 @@ export const ThemeProvider = ({ children }: Props) => {
 
   const darkmode = themePref === "dark";
   const theme = darkmode ? darkTheme : lightTheme;
+  const isTauri = useIsTauriEnvironment();
+  const rootBackground = isTauri ? "transparent" : theme.colors.elevation.level2;
 
   const navigationTheme: NavigationTheme = useMemo(() => {
     const base = darkmode ? NavigationDarkTheme : NavigationLightTheme;
@@ -66,13 +69,14 @@ export const ThemeProvider = ({ children }: Props) => {
       colors: {
         ...base.colors,
         primary: theme.colors.primary,
-        background: theme.colors.elevation.level2,
+        background: rootBackground,
+        card: rootBackground,
       },
     };
-  }, [darkmode, theme]);
+  }, [darkmode, rootBackground, theme]);
 
   const globalStyles = styles(
-    theme.colors.elevation.level2,
+    rootBackground,
     theme.colors.secondaryContainer,
     theme.colors.surfaceVariant,
     theme.colors.outlineVariant,

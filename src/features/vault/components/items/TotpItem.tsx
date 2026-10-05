@@ -43,6 +43,17 @@ function TotpItem(props: Props) {
   }
 
   const denseHorizontalInset = props.denseHorizontalInset ?? 8;
+  const identitySurfaceStyle = {
+    backgroundColor: darkmode
+      ? "rgba(28, 28, 34, 0.58)"
+      : "rgba(255, 255, 255, 0.68)",
+    borderColor: darkmode
+      ? "rgba(255, 255, 255, 0.08)"
+      : "rgba(255, 255, 255, 0.82)",
+    boxShadow: darkmode
+      ? ("rgba(0, 0, 0, 0.14) 0px 8px 24px 0px" as any)
+      : ("rgba(64, 76, 120, 0.08) 0px 8px 26px 0px" as any),
+  };
 
   return (
     <Animated.View
@@ -57,11 +68,9 @@ function TotpItem(props: Props) {
               marginBottom: 4,
             }
           : null,
+        identitySurfaceStyle,
         {
-          backgroundColor: theme.colors?.background,
-          boxShadow: theme.colors?.shadow,
           borderWidth: StyleSheet.hairlineWidth,
-          borderColor: darkmode ? theme.colors.outlineVariant : "white",
           overflow: "hidden",
         },
       ]}

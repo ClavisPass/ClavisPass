@@ -9,9 +9,9 @@ use std::{fs, path::PathBuf, time::Duration};
 use tauri::{
     menu::{Menu, MenuItem, PredefinedMenuItem},
     tray::{TrayIconBuilder, TrayIconEvent},
-    utils::config::Color,
     // Wichtig: diese Typen so importieren
     webview::NewWindowResponse,
+    window::{Color, Effect, EffectsBuilder},
     AppHandle,
     Emitter,
     Manager,
@@ -45,6 +45,23 @@ const DEFAULT_WINDOW_WIDTH: f64 = 601.0;
 const DEFAULT_WINDOW_HEIGHT: f64 = 400.0;
 const MIN_WINDOW_WIDTH: f64 = 350.0;
 const MIN_WINDOW_HEIGHT: f64 = 350.0;
+
+#[cfg(target_os = "windows")]
+fn glass_window_effects() -> tauri::utils::config::WindowEffectsConfig {
+    EffectsBuilder::new()
+        .effect(Effect::Acrylic)
+        .color(Color(245, 248, 255, 64))
+        .build()
+}
+
+#[cfg(target_os = "macos")]
+fn glass_window_effects() -> tauri::utils::config::WindowEffectsConfig {
+    EffectsBuilder::new()
+        .effect(Effect::UnderWindowBackground)
+        .state(tauri::window::EffectState::Active)
+        .radius(18.0)
+        .build()
+}
 
 fn clamp_window_size(size: WindowSize) -> WindowSize {
     WindowSize {
@@ -284,10 +301,7 @@ pub fn run() {
                 height: DEFAULT_WINDOW_HEIGHT,
             });
             let initial_size = clamp_window_size(requested_size);
-            #[cfg(target_os = "macos")]
             let startup_background = Color(13, 13, 13, 0);
-            #[cfg(not(target_os = "macos"))]
-            let startup_background = Color(13, 13, 13, 255);
 
             let builder = WebviewWindowBuilder::new(
                 &app_handle,
@@ -305,6 +319,9 @@ pub fn run() {
             #[cfg(any(target_os = "windows", target_os = "linux", target_os = "macos"))]
             let builder = builder.transparent(true);
 
+            #[cfg(any(target_os = "windows", target_os = "macos"))]
+            let builder = builder.effects(glass_window_effects());
+
             let builder = builder
                 .content_protected(true)
                 .maximizable(false)
@@ -319,6 +336,11 @@ pub fn run() {
                     NewWindowResponse::Deny
                 })
                 .build()?;
+
+            #[cfg(any(target_os = "windows", target_os = "macos"))]
+            if let Err(error) = main_window.set_effects(glass_window_effects()) {
+                eprintln!("Failed to apply glass window effects: {error}");
+            }
 
             let size = clamp_window_size_to_monitor(&main_window, initial_size);
             let _ = main_window.set_size(Size::Logical(tauri::LogicalSize::new(

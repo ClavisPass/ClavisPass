@@ -56,6 +56,19 @@ import showMainWindow from "./src/infrastructure/platform/showMainWindow";
 
 applyStartupDocumentBackground();
 
+function withAlpha(color: string, alpha: number) {
+  const hex = color.trim().replace("#", "");
+
+  if (hex.length === 6) {
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  return color;
+}
+
 export function AppWithNavigation() {
   useEffect(() => {
     void (async () => {
@@ -245,12 +258,15 @@ export default function App() {
 }
 
 function AppShell() {
-  const { theme } = useTheme();
+  const { theme, darkmode } = useTheme();
   const isTauri = useIsTauriEnvironment();
   const { value: windowCornerStyle } = useSetting("WINDOW_CORNER_STYLE");
   const windowCornerRadius = isTauri
     ? resolveWindowCornerRadius(windowCornerStyle)
     : 0;
+  const shellBackgroundColor = isTauri
+    ? withAlpha(theme.colors.background, darkmode ? 0.54 : 0.82)
+    : theme.colors.background;
 
   return (
     <>
@@ -274,7 +290,7 @@ function AppShell() {
               <View
                 style={{
                   borderRadius: windowCornerRadius,
-                  backgroundColor: theme.colors.background,
+                  backgroundColor: shellBackgroundColor,
                   overflow: "hidden",
                   flex: 1,
                 }}

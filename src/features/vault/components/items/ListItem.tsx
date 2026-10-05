@@ -48,18 +48,10 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     marginRight: 4,
     marginBottom: 4,
-    borderRadius: 12,
-    overflow: "hidden",
+    borderRadius: 14,
+    overflow: "visible",
     height: 44,
     flexDirection: "row",
-  },
-  folderColorStrip: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 3,
-    zIndex: 2,
   },
   dragHandle: {
     width: 32,
@@ -174,8 +166,8 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     marginRight: 4,
     marginBottom: 4,
-    borderRadius: 12,
-    overflow: "hidden",
+    borderRadius: 14,
+    overflow: "visible",
   },
   swipeAction: {
     width: 78,
@@ -789,6 +781,17 @@ function ListItem(props: Props) {
   const animateContentDirectly = Platform.OS === "web" || props.reorderMode;
   const isNativeSwipeItem = Platform.OS !== "web" && !props.reorderMode;
   const denseHorizontalInset = props.denseHorizontalInset ?? 8;
+  const identitySurfaceStyle = {
+    backgroundColor: darkmode
+      ? "rgba(28, 28, 34, 0.58)"
+      : "rgba(255, 255, 255, 0.68)",
+    borderColor: darkmode
+      ? "rgba(255, 255, 255, 0.08)"
+      : "rgba(255, 255, 255, 0.82)",
+    boxShadow: darkmode
+      ? ("rgba(0, 0, 0, 0.14) 0px 8px 24px 0px" as any)
+      : ("rgba(64, 76, 120, 0.08) 0px 8px 26px 0px" as any),
+  };
 
   const listItemContent = (
     <Animated.View
@@ -807,23 +810,17 @@ function ListItem(props: Props) {
         Platform.OS !== "web"
           ? { marginLeft: 0, marginRight: 0, marginBottom: 0 }
           : null,
-        isNativeSwipeItem ? { borderRadius: 0, borderWidth: 0 } : null,
         props.reorderMode && Platform.OS !== "web" ? { marginBottom: 4 } : null,
+        identitySurfaceStyle,
         {
-          backgroundColor: theme.colors?.background,
-          boxShadow: theme.colors?.shadow,
           borderWidth: StyleSheet.hairlineWidth,
-          borderColor: darkmode ? theme.colors.outlineVariant : "white",
+          borderLeftWidth: folderColor ? 3 : StyleSheet.hairlineWidth,
+          borderLeftColor: folderColor ?? undefined,
+          overflow: "visible",
         },
       ]}
       {...webInteractionProps}
     >
-      {folderColor ? (
-        <View
-          pointerEvents="none"
-          style={[styles.folderColorStrip, { backgroundColor: folderColor }]}
-        />
-      ) : null}
       {dragHandle}
       {dragDivider}
       <AnimatedPressable

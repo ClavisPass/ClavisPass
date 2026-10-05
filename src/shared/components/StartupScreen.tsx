@@ -14,6 +14,21 @@ export function applyStartupDocumentBackground() {
   doc.body.style.margin = "0";
   doc.body.style.overflow = "hidden";
 
+  const styleId = "clavispass-transparent-root-style";
+  if (!doc.getElementById(styleId)) {
+    const style = doc.createElement("style");
+    style.id = styleId;
+    style.textContent = `
+      html,
+      body,
+      #root,
+      #root > div {
+        background: transparent !important;
+      }
+    `;
+    doc.head.appendChild(style);
+  }
+
   const root = doc.getElementById("root");
   if (root) {
     root.style.backgroundColor = STARTUP_BACKGROUND;
