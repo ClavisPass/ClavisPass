@@ -15,7 +15,7 @@
     "name": "ClavisPass",
     "scheme": "clavispass",
     "slug": "clavispass",
-    "version": "1.9.5",
+    "version": "1.9.6",
     "owner": "clavispass",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -34,7 +34,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.clavispass.app",
-      "versionCode": 5,
+      "versionCode": 6,
       "permissions": [
         "android.permission.CAMERA"
       ],
