@@ -4,6 +4,7 @@ import {
   Platform,
   StyleSheet,
   View,
+  type ColorValue,
   useWindowDimensions,
 } from "react-native";
 import ModulesType, { ModuleType } from "../features/vault/model/ModulesType";
@@ -36,7 +37,6 @@ import EditHistoryModal from "../features/vault/components/modals/EditHistoryMod
 import EntryTagsModal, {
   normalizeTags,
 } from "../features/vault/components/modals/EntryTagsModal";
-import MaskedView from "@react-native-masked-view/masked-view";
 import { LinearGradient } from "expo-linear-gradient";
 
 import useAppLifecycle from "../shared/hooks/useAppLifecycle";
@@ -1206,6 +1206,13 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           maskImage: `linear-gradient(to bottom, transparent 0px, transparent ${editListTopFadeStart}px, black ${editListTopFadeEnd}px, black 100%)`,
         } as any)
       : null;
+  const nativeEditListFadeColors: readonly [
+    ColorValue,
+    ColorValue,
+    ColorValue,
+  ] = darkmode
+    ? [theme.colors.background, theme.colors.background, "rgba(13, 13, 13, 0)"]
+    : ["#E8EAE8", "#E8EAE8", "rgba(232, 234, 232, 0)"];
 
   const modulesList = (
     <PerfProfiler id="EditScreen.ModulesList">
@@ -1267,34 +1274,27 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     }
 
     return (
-      <MaskedView
+      <View
         style={{
           flex: 1,
           width: "100%",
+          position: "relative",
         }}
-        maskElement={
-          <View style={styles.editListMask}>
-            <LinearGradient
-              colors={[
-                "rgba(0, 0, 0, 0)",
-                "rgba(0, 0, 0, 0)",
-                "rgba(0, 0, 0, 0.92)",
-                "#000000",
-              ]}
-              locations={[0, 0.32, 0.88, 1]}
-              style={{ height: editListTopFadeEnd + 2, width: "100%" }}
-            />
-            <View
-              style={[
-                styles.editListMaskMiddle,
-                { top: editListTopFadeEnd - 2 },
-              ]}
-            />
-          </View>
-        }
       >
         {modulesList}
-      </MaskedView>
+        <LinearGradient
+          pointerEvents="none"
+          colors={nativeEditListFadeColors}
+          locations={[0, 0.35, 1]}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: editListTopFadeEnd,
+          }}
+        />
+      </View>
     );
   };
 

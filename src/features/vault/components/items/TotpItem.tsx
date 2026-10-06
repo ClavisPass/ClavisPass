@@ -65,7 +65,7 @@ function TotpItem(props: Props) {
           ? {
               marginLeft: denseHorizontalInset,
               marginRight: 0,
-              marginBottom: 4,
+              marginBottom: 8,
             }
           : null,
         identitySurfaceStyle,

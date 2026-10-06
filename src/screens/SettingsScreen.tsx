@@ -111,6 +111,7 @@ const settingsQuickSelectOverlayHeight = 36;
 const settingsWebListTopFadeStart = 0;
 const settingsWebListTopFadeEnd = settingsQuickSelectOverlayHeight + 22;
 const settingsNativeListTopFadeClear = settingsQuickSelectOverlayHeight + 16;
+const settingsWideListTopFadeEnd = 24;
 const settingsSearchTransition = Easing.out(Easing.cubic);
 const compactSearchEnter = () => {
   "worklet";
@@ -322,24 +323,40 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     [isCompactSettingsLayout],
   );
   const settingsWebListFadeMaskStyle =
-    Platform.OS === "web" && isCompactSettingsLayout
-      ? ({
-          WebkitMaskImage: `linear-gradient(to bottom, transparent 0px, transparent ${settingsWebListTopFadeStart}px, black ${settingsWebListTopFadeEnd}px, black 100%)`,
-          maskImage: `linear-gradient(to bottom, transparent 0px, transparent ${settingsWebListTopFadeStart}px, black ${settingsWebListTopFadeEnd}px, black 100%)`,
-        } as any)
+    Platform.OS === "web"
+      ? isCompactSettingsLayout
+        ? ({
+            WebkitMaskImage: `linear-gradient(to bottom, transparent 0px, transparent ${settingsWebListTopFadeStart}px, black ${settingsWebListTopFadeEnd}px, black 100%)`,
+            maskImage: `linear-gradient(to bottom, transparent 0px, transparent ${settingsWebListTopFadeStart}px, black ${settingsWebListTopFadeEnd}px, black 100%)`,
+          } as any)
+        : ({
+            WebkitMaskImage: `linear-gradient(to bottom, transparent 0px, rgba(0, 0, 0, 0.55) 12px, black ${settingsWideListTopFadeEnd}px, black 100%)`,
+            maskImage: `linear-gradient(to bottom, transparent 0px, rgba(0, 0, 0, 0.55) 12px, black ${settingsWideListTopFadeEnd}px, black 100%)`,
+          } as any)
       : null;
   const SettingsScrollMask: any =
-    Platform.OS !== "web" && isCompactSettingsLayout ? MaskedView : View;
+    Platform.OS !== "web" ? MaskedView : View;
   const settingsScrollMaskProps =
-    Platform.OS !== "web" && isCompactSettingsLayout
+    Platform.OS !== "web"
       ? {
           maskElement: (
             <View style={styles.nativeListMask}>
-              <LinearGradient
-                colors={["transparent", "transparent", "black"]}
-                locations={[0, 0.42, 1]}
-                style={styles.nativeListMaskTop}
-              />
+              {isCompactSettingsLayout ? (
+                <LinearGradient
+                  colors={["transparent", "transparent", "black"]}
+                  locations={[0, 0.42, 1]}
+                  style={styles.nativeListMaskTop}
+                />
+              ) : (
+                <LinearGradient
+                  colors={["transparent", "rgba(0, 0, 0, 0.55)", "black"]}
+                  locations={[0, 0.5, 1]}
+                  style={{
+                    height: settingsWideListTopFadeEnd,
+                    width: "100%",
+                  }}
+                />
+              )}
               <View style={styles.nativeListMaskMiddle} />
             </View>
           ),

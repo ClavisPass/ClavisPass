@@ -65,6 +65,11 @@ const styles = StyleSheet.create({
     width: StyleSheet.hairlineWidth,
     height: "100%",
   },
+  rippleClip: {
+    flex: 1,
+    borderRadius: 14,
+    overflow: "hidden",
+  },
   ripple: {
     padding: 0,
     paddingLeft: 8,
@@ -74,7 +79,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flex: 1,
-    overflow: "hidden",
   },
   left: {
     display: "flex",
@@ -178,14 +182,15 @@ const styles = StyleSheet.create({
   swipeActionBackground: {
     height: 44,
     justifyContent: "center",
+    overflow: "hidden",
   },
   swipeActionLeft: {
-    borderTopLeftRadius: 11,
-    borderBottomLeftRadius: 11,
+    borderTopLeftRadius: 14,
+    borderBottomLeftRadius: 14,
   },
   swipeActionRight: {
-    borderTopRightRadius: 11,
-    borderBottomRightRadius: 11,
+    borderTopRightRadius: 14,
+    borderBottomRightRadius: 14,
   },
 });
 
@@ -606,6 +611,7 @@ function ListItem(props: Props) {
     <View
       style={[
         styles.swipeActionBackground,
+        styles.swipeActionLeft,
         {
           width: 156,
           backgroundColor: props.item.fav
@@ -628,6 +634,7 @@ function ListItem(props: Props) {
     <View
       style={[
         styles.swipeActionBackground,
+        styles.swipeActionRight,
         {
           width: 156,
           backgroundColor: theme.colors.error,
@@ -783,8 +790,8 @@ function ListItem(props: Props) {
   const denseHorizontalInset = props.denseHorizontalInset ?? 8;
   const identitySurfaceStyle = {
     backgroundColor: darkmode
-      ? "rgba(28, 28, 34, 0.58)"
-      : "rgba(255, 255, 255, 0.68)",
+      ? "rgba(28, 28, 34, 0.98)"
+      : "rgba(255, 255, 255, 0.98)",
     borderColor: darkmode
       ? "rgba(255, 255, 255, 0.08)"
       : "rgba(255, 255, 255, 0.82)",
@@ -823,121 +830,131 @@ function ListItem(props: Props) {
     >
       {dragHandle}
       {dragDivider}
-      <AnimatedPressable
-        key={props.key}
-        disabled={props.pressDisabled}
-        rippleColor={props.pressDisabled ? "transparent" : undefined}
-        style={[
-          styles.ripple,
-          props.pressDisabled && Platform.OS === "web"
-            ? ({ cursor: "default" } as any)
-            : null,
-        ]}
-        onPress={() => {
-          if (props.pressDisabled) return;
-          if (suppressNextPressRef.current) {
-            suppressNextPressRef.current = false;
-            return;
+      <View style={styles.rippleClip}>
+        <AnimatedPressable
+          key={props.key}
+          disabled={props.pressDisabled}
+          rippleColor={props.pressDisabled ? "transparent" : undefined}
+          style={[
+            styles.ripple,
+            props.pressDisabled && Platform.OS === "web"
+              ? ({ cursor: "default" } as any)
+              : null,
+          ]}
+          onPress={() => {
+            if (props.pressDisabled) return;
+            if (suppressNextPressRef.current) {
+              suppressNextPressRef.current = false;
+              return;
+            }
+            props.onPress();
+          }}
+          onLongPress={
+            props.pressDisabled ? undefined : () => measureAndOpenMenu()
           }
-          props.onPress();
-        }}
-        onLongPress={
-          props.pressDisabled ? undefined : () => measureAndOpenMenu()
-        }
-      >
-        <>
-          <View style={styles.left}>
-            {showFavicon ? (
-              <Image
-                style={[
-                  { width: 30, height: 30, margin: 0, borderRadius: 8 },
-                  nonSelectableImageStyle,
-                ]}
-                source={url}
-                contentFit="cover"
-                transition={250}
-                pointerEvents="none"
-                onError={handleFaviconError}
-              />
-            ) : (
-              <View style={styles.iconBox}>
-                <AppIcon color={"lightgray"} name={icon} size={26} />
-              </View>
-            )}
+        >
+          <>
+            <View style={styles.left}>
+              {showFavicon ? (
+                <Image
+                  style={[
+                    { width: 30, height: 30, margin: 0, borderRadius: 8 },
+                    nonSelectableImageStyle,
+                  ]}
+                  source={url}
+                  contentFit="cover"
+                  transition={250}
+                  pointerEvents="none"
+                  onError={handleFaviconError}
+                />
+              ) : (
+                <View style={styles.iconBox}>
+                  <AppIcon color={"lightgray"} name={icon} size={26} />
+                </View>
+              )}
 
-            <Text
-              variant="bodyMedium"
-              style={styles.title}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {props.item.title}
-            </Text>
-          </View>
+              <Text
+                variant="bodyMedium"
+                style={styles.title}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {props.item.title}
+              </Text>
+            </View>
 
-          <View style={styles.right}>
-            {hovered && fastAccessObject && (
-              <View style={styles.chipRow}>
-                <AppTooltip title={t("common:copyUsername")}>
-                  <Button
-                    mode="contained-tonal"
-                    compact
-                    icon={({ color, size }) => (
-                      <AppIcon name={usernameIcon} color={color} size={size} />
-                    )}
-                    onPress={() =>
-                      copyToClipboard(fastAccessObject.username, "username")
-                    }
-                    style={[styles.chip, styles.chipLeft, styles.chipUser]}
-                    contentStyle={styles.chipContent}
-                    textColor={theme.colors.primary}
-                  >
-                    <Text numberOfLines={1} style={styles.chipText}>
-                      {ellipsize(fastAccessObject.username, 18)}
-                    </Text>
-                  </Button>
-                </AppTooltip>
+            <View style={styles.right}>
+              {hovered && fastAccessObject && (
+                <View style={styles.chipRow}>
+                  <AppTooltip title={t("common:copyUsername")}>
+                    <Button
+                      mode="contained-tonal"
+                      compact
+                      icon={({ color, size }) => (
+                        <AppIcon
+                          name={usernameIcon}
+                          color={color}
+                          size={size}
+                        />
+                      )}
+                      onPress={() =>
+                        copyToClipboard(fastAccessObject.username, "username")
+                      }
+                      style={[styles.chip, styles.chipLeft, styles.chipUser]}
+                      contentStyle={styles.chipContent}
+                      textColor={theme.colors.primary}
+                    >
+                      <Text numberOfLines={1} style={styles.chipText}>
+                        {ellipsize(fastAccessObject.username, 18)}
+                      </Text>
+                    </Button>
+                  </AppTooltip>
 
-                <AppTooltip title={t("common:copyPassword")}>
-                  <Button
-                    mode="contained-tonal"
-                    compact
-                    icon={({ color, size }) => (
-                      <AppIcon name={passwordIcon} color={color} size={size} />
-                    )}
-                    onPress={() =>
-                      copyToClipboard(fastAccessObject.password, "password")
-                    }
-                    style={[styles.chip, styles.chipRight, styles.chipPass]}
-                    contentStyle={styles.chipContent}
-                    textColor={theme.colors.primary}
-                  >
-                    <Text numberOfLines={1} style={styles.chipText}>
-                      {maskPassword(fastAccessObject.password)}
-                    </Text>
-                  </Button>
-                </AppTooltip>
-              </View>
-            )}
+                  <AppTooltip title={t("common:copyPassword")}>
+                    <Button
+                      mode="contained-tonal"
+                      compact
+                      icon={({ color, size }) => (
+                        <AppIcon
+                          name={passwordIcon}
+                          color={color}
+                          size={size}
+                        />
+                      )}
+                      onPress={() =>
+                        copyToClipboard(fastAccessObject.password, "password")
+                      }
+                      style={[styles.chip, styles.chipRight, styles.chipPass]}
+                      contentStyle={styles.chipContent}
+                      textColor={theme.colors.primary}
+                    >
+                      <Text numberOfLines={1} style={styles.chipText}>
+                        {maskPassword(fastAccessObject.password)}
+                      </Text>
+                    </Button>
+                  </AppTooltip>
+                </View>
+              )}
 
-            {props.item.pinnedAt ? (
-              <AppIcon
-                color={theme.colors.primary}
-                name="pin-outline"
-                size={16}
-              />
-            ) : null}
+              {props.item.pinnedAt ? (
+                <AppIcon
+                  color={theme.colors.primary}
+                  name="pin-outline"
+                  size={16}
+                />
+              ) : null}
 
-            {!props.hideChevron ? (
-              <AppIcon
-                color={theme.colors?.primary}
-                name={"chevron-right"}
-                size={20}
-              />
-            ) : null}
-          </View>
-        </>
-      </AnimatedPressable>
+              {!props.hideChevron ? (
+                <AppIcon
+                  color={theme.colors?.primary}
+                  name={"chevron-right"}
+                  size={20}
+                />
+              ) : null}
+            </View>
+          </>
+        </AnimatedPressable>
+      </View>
     </Animated.View>
   );
 

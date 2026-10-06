@@ -25,7 +25,10 @@ export default function TabNavigator() {
         animation: "fade",
         freezeOnBlur: false,
         lazy: Platform.OS === "web",
-        sceneStyle: width > 600 ? { marginLeft: 88 } : undefined,
+        sceneStyle:
+          width > 600
+            ? { marginLeft: 88, backgroundColor: "transparent" }
+            : { backgroundColor: "transparent" },
       }}
       tabBar={(props) =>
         width > 600 ? (
