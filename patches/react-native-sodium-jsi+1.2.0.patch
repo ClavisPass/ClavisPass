@@ -327,9 +327,9 @@ index 7adc99e..66db34f 100644
    implementation 'de.undercouch:gradle-download-task:5.0.2'
 -  // From node_modules
 +
-   extractHeaders("com.facebook.fbjni:fbjni:+:headers")
-   //noinspection GradleDynamicVersion
-   extractJNI("com.facebook.fbjni:fbjni:+")
+   def fbjniVersion = "0.7.0"
+   extractHeaders("com.facebook.fbjni:fbjni:${fbjniVersion}:headers")
+   extractJNI("com.facebook.fbjni:fbjni:${fbjniVersion}")
  
    if (!sourceBuild) {
 -    def rnAAR = fileTree("${defaultDir.toString()}").matching({ it.include "**/**/*.aar" }).singleFile
