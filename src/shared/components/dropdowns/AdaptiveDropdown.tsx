@@ -17,8 +17,8 @@ import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetView,
-  type BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
+import type { BottomSheetBackdropProps } from "@gorhom/bottom-sheet";
 import * as Popover from "@radix-ui/react-popover";
 
 import { useTheme } from "../../../app/providers/ThemeProvider";

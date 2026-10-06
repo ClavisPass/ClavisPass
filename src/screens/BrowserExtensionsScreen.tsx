@@ -21,8 +21,10 @@ import {
   buildBrowserClientKey,
   listBrowserExtensionPairings,
   subscribeBrowserExtensionPairingChanges,
-  type PairedClient,
-  type PendingPairing,
+} from "../features/settings/utils/browserExtensionPairings";
+import type {
+  PairedClient,
+  PendingPairing,
 } from "../features/settings/utils/browserExtensionPairings";
 
 const H_PAD = 8;

@@ -28,8 +28,8 @@ import {
   DEFAULT_DEVICE_UI_POLICY,
   deriveDeviceUiStatus,
   sortByLastSeenDesc,
-  type DeviceUiStatus,
 } from "../features/vault/utils/vaultDevices";
+import type { DeviceUiStatus } from "../features/vault/utils/vaultDevices";
 
 import { getCurrentVaultDeviceId } from "../features/vault/utils/deviceInfo";
 import HintCard from "../shared/components/HintCard";

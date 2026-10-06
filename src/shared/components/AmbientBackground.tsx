@@ -3,9 +3,8 @@ import {
   Platform,
   StyleSheet,
   View,
-  type StyleProp,
-  type ViewStyle,
 } from "react-native";
+import type { StyleProp, ViewStyle } from "react-native";
 import { useTheme } from "../../app/providers/ThemeProvider";
 import { useIsTauriEnvironment } from "../../infrastructure/platform/isTauri";
 

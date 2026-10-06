@@ -1,6 +1,6 @@
 [package]
 name = "ClavisPass"
-version = "1.9.2"
+version = "1.9.4"
 description = "ClavisPass"
 authors = ["Arratel"]
 license = ""

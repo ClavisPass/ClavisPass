@@ -165,6 +165,12 @@ function updateAndroidGradleVersionName(path, version) {
   if (!fs.existsSync(path)) return false;
 
   const gradle = fs.readFileSync(path, "utf-8");
+  const currentMatch = gradle.match(/^\s*versionName\s+"(.*?)"/m);
+  if (currentMatch?.[1] === version) {
+    console.log(`${path} already has versionName ${version}`);
+    return true;
+  }
+
   const nextGradle = gradle.replace(
     /^(\s*versionName\s+)".*?"/m,
     `$1"${version}"`,
@@ -184,6 +190,12 @@ function updateAndroidGradleVersionCode(path, androidVersionCode) {
   if (!fs.existsSync(path) || !androidVersionCode) return false;
 
   const gradle = fs.readFileSync(path, "utf-8");
+  const currentMatch = gradle.match(/^\s*versionCode\s+(\d+)\s*$/m);
+  if (currentMatch?.[1] === String(androidVersionCode)) {
+    console.log(`${path} already has versionCode ${androidVersionCode}`);
+    return true;
+  }
+
   const nextGradle = gradle.replace(
     /^(\s*versionCode\s+)\d+/m,
     `$1${androidVersionCode}`,
@@ -203,6 +215,14 @@ function updateAndroidExpoRuntimeVersion(path, runtimeVersion) {
   if (!fs.existsSync(path)) return false;
 
   const stringsXml = fs.readFileSync(path, "utf-8");
+  const currentMatch = stringsXml.match(
+    /<string\s+name="expo_runtime_version">(.*?)<\/string>/,
+  );
+  if (currentMatch?.[1] === runtimeVersion) {
+    console.log(`${path} already has expo_runtime_version ${runtimeVersion}`);
+    return true;
+  }
+
   const nextStringsXml = stringsXml.replace(
     /(<string\s+name="expo_runtime_version">).*?(<\/string>)/,
     `$1${runtimeVersion}$2`,

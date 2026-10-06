@@ -4,9 +4,9 @@ import {
   Platform,
   StyleSheet,
   View,
-  type ColorValue,
   useWindowDimensions,
 } from "react-native";
+import type { ColorValue } from "react-native";
 import ModulesType, { ModuleType } from "../features/vault/model/ModulesType";
 
 import ModulesEnum from "../features/vault/model/ModulesEnum";

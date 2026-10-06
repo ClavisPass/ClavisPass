@@ -22,8 +22,8 @@ import {
 } from "../utils/distribution";
 import {
   checkMobileBinaryUpdate,
-  type MobileBinaryUpdate,
 } from "../utils/mobileUpdater";
+import type { MobileBinaryUpdate } from "../utils/mobileUpdater";
 
 function formatUpdateErrorMessage(fallback: string, error: unknown) {
   if (error instanceof Error && error.message) {

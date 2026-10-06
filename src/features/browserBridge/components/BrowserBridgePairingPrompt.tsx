@@ -10,8 +10,8 @@ import {
   actOnBrowserExtensionPairing,
   buildBrowserClientKey,
   listBrowserExtensionPairings,
-  type PendingPairing,
 } from "../../settings/utils/browserExtensionPairings";
+import type { PendingPairing } from "../../settings/utils/browserExtensionPairings";
 
 const POLL_INTERVAL_MS = 2500;
 const DISMISS_INTERVAL_MS = 60000;

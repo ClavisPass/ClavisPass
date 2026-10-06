@@ -40,6 +40,10 @@ export default defineConfig({
         __dirname,
         "tests/mocks/reactNativeReanimated.tsx",
       ),
+      "@gorhom/bottom-sheet": path.resolve(
+        __dirname,
+        "tests/mocks/gorhomBottomSheet.tsx",
+      ),
       "react-qr-code": path.resolve(__dirname, "tests/mocks/reactQrCode.tsx"),
       "@react-navigation/native": path.resolve(
         __dirname,

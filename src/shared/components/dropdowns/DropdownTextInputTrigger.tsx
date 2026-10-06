@@ -2,10 +2,8 @@ import React from "react";
 import {
   StyleSheet,
   View,
-  type StyleProp,
-  type TextStyle,
-  type ViewStyle,
 } from "react-native";
+import type { StyleProp, TextStyle, ViewStyle } from "react-native";
 import { TextInput } from "react-native-paper";
 
 import { useTheme } from "../../../app/providers/ThemeProvider";

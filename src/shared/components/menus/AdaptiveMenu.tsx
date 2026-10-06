@@ -5,8 +5,8 @@ import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetView,
-  type BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
+import type { BottomSheetBackdropProps } from "@gorhom/bottom-sheet";
 
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import Menu, { MenuAnchorRect } from "./Menu";

@@ -1,13 +1,11 @@
 import React, { forwardRef, useImperativeHandle, useRef } from "react";
 import {
   Platform,
-  StyleProp,
   StyleSheet,
   TextInput as NativeTextInput,
-  type TextStyle,
   View,
-  type ViewStyle,
 } from "react-native";
+import type { StyleProp, TextStyle, ViewStyle } from "react-native";
 import { IconButton, Searchbar } from "react-native-paper";
 import { useTheme } from "../../app/providers/ThemeProvider";
 
