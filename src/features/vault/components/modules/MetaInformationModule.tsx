@@ -6,6 +6,7 @@ import { MenuItem } from "../../../../shared/components/menus/MenuItem";
 import { useTranslation } from "react-i18next";
 import { useSetting } from "../../../../app/providers/SettingsProvider";
 import { formatAbsoluteLocal } from "../../../../shared/utils/Timestamp";
+import { getItemSurfaceStyle } from "../../../../shared/ui/glass";
 
 type MetaInformationModuleType = {
   lastUpdated: string;
@@ -13,8 +14,9 @@ type MetaInformationModuleType = {
 };
 
 function MetaInformationModule(props: MetaInformationModuleType) {
-  const { theme, darkmode } = useTheme();
+  const { theme } = useTheme();
   const { t } = useTranslation();
+  const itemSurfaceStyle = getItemSurfaceStyle(theme);
 
   const { value: dateFormat } = useSetting("DATE_FORMAT");
   const { value: timeFormat } = useSetting("TIME_FORMAT");
@@ -22,15 +24,13 @@ function MetaInformationModule(props: MetaInformationModuleType) {
   return (
     <View
       style={{
+        ...itemSurfaceStyle,
         flexDirection: "row",
         alignItems: "center",
         padding: 4,
-        backgroundColor: theme.colors.background,
-        boxShadow: theme.colors?.shadow,
         borderRadius: 12,
         width: "100%",
         borderWidth: StyleSheet.hairlineWidth,
-        borderColor: darkmode ? theme.colors.outlineVariant : "white",
       }}
     >
       <View style={{ flex: 1, justifyContent: "flex-start" }}>

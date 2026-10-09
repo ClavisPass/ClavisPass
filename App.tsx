@@ -36,6 +36,7 @@ import ExpiryNotificationScheduler from "./src/features/vault/components/ExpiryN
 import { useTheme } from "./src/app/providers/ThemeProvider";
 import ClipboardLifecycleCleanup from "./src/shared/components/ClipboardLifecycleCleanup";
 import VaultFileOpenHandler from "./src/shared/components/VaultFileOpenHandler";
+import AmbientBackground from "./src/shared/components/AmbientBackground";
 import {
   detectTauriEnvironment,
   useIsTauriEnvironment,
@@ -265,7 +266,7 @@ function AppShell() {
     ? resolveWindowCornerRadius(windowCornerStyle)
     : 0;
   const shellBackgroundColor = isTauri
-    ? withAlpha(theme.colors.background, darkmode ? 0.54 : 0.82)
+    ? withAlpha(theme.colors.background, darkmode ? 0.54 : 0.74)
     : theme.colors.background;
 
   return (
@@ -297,6 +298,7 @@ function AppShell() {
               >
                 <GlobalShortcuts />
                 <CustomTitlebar />
+                <AmbientBackground />
                 <NavigationContainer />
                 <BrowserBridgePairingPrompt />
               </View>

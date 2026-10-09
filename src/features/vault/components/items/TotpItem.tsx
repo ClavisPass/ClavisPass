@@ -6,6 +6,7 @@ import { useTheme } from "../../../../app/providers/ThemeProvider";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Totp } from "../modules/TotpModule";
+import { getItemSurfaceStyle } from "../../../../shared/ui/glass";
 
 const styles = StyleSheet.create({
   container: {
@@ -36,24 +37,14 @@ type Props = {
 };
 
 function TotpItem(props: Props) {
-  const { theme, darkmode } = useTheme();
+  const { theme } = useTheme();
 
   if(props.value === "") {
     return null;
   }
 
   const denseHorizontalInset = props.denseHorizontalInset ?? 8;
-  const identitySurfaceStyle = {
-    backgroundColor: darkmode
-      ? "rgba(28, 28, 34, 0.58)"
-      : "rgba(255, 255, 255, 0.68)",
-    borderColor: darkmode
-      ? "rgba(255, 255, 255, 0.08)"
-      : "rgba(255, 255, 255, 0.82)",
-    boxShadow: darkmode
-      ? ("rgba(0, 0, 0, 0.14) 0px 8px 24px 0px" as any)
-      : ("rgba(64, 76, 120, 0.08) 0px 8px 26px 0px" as any),
-  };
+  const itemSurfaceStyle = getItemSurfaceStyle(theme);
 
   return (
     <Animated.View
@@ -68,7 +59,7 @@ function TotpItem(props: Props) {
               marginBottom: 8,
             }
           : null,
-        identitySurfaceStyle,
+        itemSurfaceStyle,
         {
           borderWidth: StyleSheet.hairlineWidth,
           overflow: "hidden",

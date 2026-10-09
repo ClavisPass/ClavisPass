@@ -68,6 +68,10 @@ import { siBitwarden, siKeepassxc } from "simple-icons";
 import { useSetting } from "../app/providers/SettingsProvider";
 import { useToken } from "../app/providers/CloudProvider";
 import { useVault } from "../app/providers/VaultProvider";
+import {
+  getGlassChromeStyle,
+  getScreenContentStyle,
+} from "../shared/ui/glass";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import BackupImportButton from "../features/settings/components/buttons/BackupImportButton";
 import BackupExportButton from "../features/settings/components/buttons/BackupExportButton";
@@ -1174,23 +1178,30 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     searchQuery,
   ]);
 
+  const glassChromeStyle = getGlassChromeStyle(darkmode);
+  const screenContentStyle = getScreenContentStyle(theme);
+
   const settingsHeader = (
     <View
       style={{
-        height: 40 + Constants.statusBarHeight,
+        ...glassChromeStyle,
+        minHeight: 37 + Constants.statusBarHeight,
         width: "100%",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "transparent",
-        marginBottom: 8,
+        marginBottom: 0,
+        paddingTop: Constants.statusBarHeight + 4,
+        paddingBottom: 3,
         borderRadius: 12,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
-        boxShadow: "none",
         justifyContent: "center",
-        borderWidth: 0,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderTopWidth: 0,
+        borderLeftWidth: 0,
+        borderRightWidth: 0,
       }}
     >
       <View
@@ -1200,7 +1211,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          paddingTop: Constants.statusBarHeight,
+          minHeight: 34,
           paddingLeft:
             (Platform.OS === "web" &&
             TITLEBAR_HEIGHT > 0 &&
@@ -1279,7 +1290,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           >
             <Text
               style={{
-                color: theme.colors?.primary,
+                color: theme.colors.onSurfaceVariant,
                 userSelect: "none",
                 fontSize: 15,
                 marginLeft: 16,
@@ -1367,6 +1378,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             width: "100%",
             padding: 0,
             flexDirection: width > 600 ? "row" : "column",
+            ...screenContentStyle,
           }}
         >
           {!isCompactSettingsLayout ? (

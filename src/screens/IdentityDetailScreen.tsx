@@ -30,6 +30,10 @@ import {
 import AppIcon from "../shared/components/icons/AppIcon";
 import IdentityEmailLogo from "../features/identity/components/IdentityEmailLogo";
 import { getDefaultIdentityName } from "../features/identity/utils/identityDisplayName";
+import {
+  getItemSurfaceStyle,
+  getScreenContentStyle,
+} from "../shared/ui/glass";
 
 type IdentityDetailScreenProps = NativeStackScreenProps<
   IdentityStackParamList,
@@ -99,21 +103,16 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
   const { t } = useTranslation();
   const { globalStyles, theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
     useTheme();
+  const screenContentStyle = getScreenContentStyle(theme);
   const [displayName, setDisplayName] = useState("");
   const [draftDisplayName, setDraftDisplayName] = useState("");
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [websitesExpanded, setWebsitesExpanded] = useState(false);
   const [entriesExpanded, setEntriesExpanded] = useState(false);
-  const surfaceStyle = {
-    backgroundColor: darkmode ? "rgba(28, 28, 34, 0.58)" : "rgba(255, 255, 255, 0.68)",
-    borderColor: darkmode ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.82)",
-    boxShadow: darkmode
-      ? ("rgba(0, 0, 0, 0.14) 0px 8px 24px 0px" as any)
-      : ("rgba(64, 76, 120, 0.08) 0px 8px 26px 0px" as any),
-  };
+  const surfaceStyle = getItemSurfaceStyle(theme);
   const softSurfaceStyle = {
-    backgroundColor: darkmode ? "rgba(255, 255, 255, 0.04)" : "rgba(255, 255, 255, 0.46)",
-    borderColor: darkmode ? "rgba(255, 255, 255, 0.07)" : "rgba(255, 255, 255, 0.72)",
+    backgroundColor: darkmode ? "rgba(255, 255, 255, 0.05)" : "rgba(120, 127, 246, 0.055)",
+    borderColor: darkmode ? "rgba(255, 255, 255, 0.08)" : "rgba(120, 127, 246, 0.12)",
   };
 
   useFocusEffect(
@@ -203,7 +202,7 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
       />
 
       <ScrollView
-        style={{ width: "100%" }}
+        style={{ width: "100%", ...screenContentStyle }}
         contentContainerStyle={{
           padding: 8,
           paddingTop: 0,
@@ -374,7 +373,7 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
                       onPress={() => openEntry(entry.id)}
                       style={[
                         styles.entryRow,
-                        softSurfaceStyle,
+                        surfaceStyle,
                       ]}
                       hoverBackgroundColor={
                         darkmode ? "rgba(120, 127, 246, 0.12)" : "rgba(120, 127, 246, 0.08)"

@@ -15,6 +15,7 @@ import {
 import Animated, { Easing, FadeIn, FadeOut } from "react-native-reanimated";
 import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import { BlurView } from "expo-blur";
+import Constants from "expo-constants";
 
 import { Icon, Text } from "react-native-paper";
 import { Button } from "react-native-paper";
@@ -55,7 +56,10 @@ import {
   TITLEBAR_HEIGHT,
 } from "../shared/components/titlebarMetrics";
 import { resolveWindowControlsSide } from "../infrastructure/platform/windowControls";
-import AmbientBackground from "../shared/components/AmbientBackground";
+import {
+  getGlassChromeStyle,
+  getScreenContentStyle,
+} from "../shared/ui/glass";
 
 type LoginScreenProps = NativeStackScreenProps<LoginStackParamList, "Login">;
 
@@ -83,6 +87,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     resolveWindowControlsSide(windowControlsStyle) === "left";
   const isWideLoginLayout = width >= 600;
   const loginCardWidth = isWideLoginLayout ? Math.min(width - 220, 760) : 300;
+  const glassChromeStyle = getGlassChromeStyle(darkmode);
+  const screenContentStyle = getScreenContentStyle(theme);
 
   const {
     provider,
@@ -289,15 +295,52 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         style={{
           flex: 1,
           width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
         }}
       >
-        <AmbientBackground />
+        <FocusAwareStatusBar
+          animated={true}
+          style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+          translucent={true}
+        />
+        <View
+          style={{
+            ...glassChromeStyle,
+            minHeight: 37 + Constants.statusBarHeight,
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            marginBottom: 0,
+            paddingTop: Constants.statusBarHeight + 4,
+            paddingBottom: 3,
+            borderRadius: 12,
+            borderTopLeftRadius: 0,
+            borderTopRightRadius: 0,
+            borderBottomLeftRadius: 12,
+            borderBottomRightRadius: 12,
+            justifyContent: "center",
+          }}
+        >
+          <View
+            {...webDragRegionProps}
+            style={{
+              minHeight: 34,
+              width: "100%",
+              paddingLeft:
+                Platform.OS === "web" && TITLEBAR_HEIGHT > 0 && controlsLeft
+                  ? TITLEBAR_CONTROLS_WIDTH
+                  : 0,
+              paddingRight:
+                Platform.OS === "web" && TITLEBAR_HEIGHT > 0 && !controlsLeft
+                  ? 104
+                  : 0,
+              cursor: Platform.OS === "web" ? "default" : undefined,
+            } as any}
+          />
+        </View>
         <View
           id="clavispass-login-page"
           style={{
+            ...screenContentStyle,
             padding: 20,
             flex: 1,
             width: "100%",
@@ -306,26 +349,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             justifyContent: "center",
           }}
         >
-          <FocusAwareStatusBar
-            animated={true}
-            style={headerWhite ? "light" : darkmode ? "light" : "dark"}
-            translucent={true}
-          />
-          {Platform.OS === "web" && TITLEBAR_HEIGHT > 0 ? (
-            <View
-              {...webDragRegionProps}
-              style={{
-                position: "absolute",
-                top: 0,
-                left: controlsLeft ? TITLEBAR_CONTROLS_WIDTH : 0,
-                right: controlsLeft ? 0 : 104,
-                height: TITLEBAR_HEIGHT,
-                cursor: "default",
-                zIndex: 1,
-              } as any}
-            />
-          ) : null}
-          <View style={{ height: 17 }}></View>
           <BlurView
             intensity={80}
             tint={darkmode ? "dark" : undefined}

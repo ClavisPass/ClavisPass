@@ -63,8 +63,6 @@ export default function ModuleContainer({
         moduleStyles.container,
         moduleStyles.inner,
         {
-          backgroundColor: theme.colors?.background,
-          boxShadow: (theme.colors as any)?.shadow,
           marginBottom: MODULE_SPACING,
           borderRadius: 12,
           overflow: "hidden",

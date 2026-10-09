@@ -16,6 +16,7 @@ import Animated, { FadeOutUp } from "react-native-reanimated";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 import TooltipIconButton from "../../../shared/components/buttons/TooltipIconButton";
 import { useDeferredDragStart } from "../../../shared/hooks/useDeferredDragStart";
+import { getItemSurfaceStyle } from "../../../shared/ui/glass";
 
 export type EditRowControlsContainerProps = {
   id: string;
@@ -84,6 +85,7 @@ export function EditRowControlsContainer({
 }: EditRowControlsContainerProps) {
   const { t } = useTranslation();
   const { theme, darkmode } = useTheme();
+  const itemSurfaceStyle = getItemSurfaceStyle(theme);
   const webDragHandleProps = React.useContext(WebDragHandlePropsContext);
   const nativeDragHandleScrollLock = React.useContext(
     NativeDragHandleScrollLockContext,
@@ -183,11 +185,10 @@ export function EditRowControlsContainer({
       exiting={FadeOutUp.duration(150)}
       style={[
         {
+          ...itemSurfaceStyle,
           flexDirection: "row",
           flex: 1,
-          backgroundColor: theme.colors.background,
           borderRadius: 12,
-          borderColor: darkmode ? theme.colors.outlineVariant : "white",
           borderWidth: StyleSheet.hairlineWidth,
           overflow: "hidden",
           position: "relative",

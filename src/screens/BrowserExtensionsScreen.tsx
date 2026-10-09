@@ -17,6 +17,10 @@ import { SettingsStackParamList } from "../app/navigation/model/types";
 import { useSetting } from "../app/providers/SettingsProvider";
 import { formatAbsoluteLocal } from "../shared/utils/Timestamp";
 import {
+  getItemSurfaceStyle,
+  getScreenContentStyle,
+} from "../shared/ui/glass";
+import {
   actOnBrowserExtensionPairing,
   buildBrowserClientKey,
   listBrowserExtensionPairings,
@@ -75,6 +79,7 @@ const BrowserExtensionsScreen: React.FC<BrowserExtensionsScreenProps> = ({
   const { t } = useTranslation();
   const { value: dateFormat } = useSetting("DATE_FORMAT");
   const { value: timeFormat } = useSetting("TIME_FORMAT");
+  const screenContentStyle = getScreenContentStyle(theme);
 
   const [pending, setPending] = useState<PendingPairing[]>([]);
   const [paired, setPaired] = useState<PairedClient[]>([]);
@@ -186,7 +191,7 @@ const BrowserExtensionsScreen: React.FC<BrowserExtensionsScreenProps> = ({
       />
 
       <ScrollView
-        style={{ flex: 1, width: "100%" }}
+        style={{ flex: 1, width: "100%", ...screenContentStyle }}
         contentContainerStyle={{
           paddingHorizontal: H_PAD,
           paddingBottom: 8,
@@ -315,6 +320,7 @@ function StatusPanel(props: {
   onRefresh: () => void;
 }) {
   const { theme, darkmode } = useTheme();
+  const itemSurfaceStyle = getItemSurfaceStyle(theme);
   const { t } = useTranslation();
   const color =
     props.state === "attention"
@@ -334,9 +340,7 @@ function StatusPanel(props: {
       style={[
         styles.panel,
         {
-          backgroundColor: theme.colors.background,
-          borderColor: darkmode ? theme.colors.outlineVariant : "white",
-          boxShadow: theme.colors.shadow as any,
+          ...itemSurfaceStyle,
         },
       ]}
     >
@@ -424,15 +428,15 @@ function EmptyState(props: {
   title: string;
   description: string;
 }) {
-  const { theme, darkmode } = useTheme();
+  const { theme } = useTheme();
+  const itemSurfaceStyle = getItemSurfaceStyle(theme);
 
   return (
     <View
       style={[
         styles.emptyState,
         {
-          backgroundColor: theme.colors.background,
-          borderColor: darkmode ? theme.colors.outlineVariant : "white",
+          ...itemSurfaceStyle,
         },
       ]}
     >
@@ -457,6 +461,7 @@ function BrowserClientCard(props: {
   onDisconnect?: () => void;
 }) {
   const { theme, darkmode } = useTheme();
+  const itemSurfaceStyle = getItemSurfaceStyle(theme);
   const { t } = useTranslation();
   const title =
     props.item.clientName?.trim() ||
@@ -499,9 +504,7 @@ function BrowserClientCard(props: {
       style={[
         styles.clientCard,
         {
-          backgroundColor: theme.colors.background,
-          borderColor: darkmode ? theme.colors.outlineVariant : "white",
-          boxShadow: theme.colors.shadow as any,
+          ...itemSurfaceStyle,
         },
       ]}
     >

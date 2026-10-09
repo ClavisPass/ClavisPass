@@ -1,7 +1,7 @@
 import * as React from "react";
 import { View, StyleSheet, Animated, Easing } from "react-native";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { IconButton, Text } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../providers/ThemeProvider";
 import { useAuth } from "../providers/AuthProvider";
@@ -29,7 +29,7 @@ export default function LeftSideTabBar({
   descriptors,
   navigation,
 }: BottomTabBarProps) {
-  const { theme } = useTheme();
+  const { theme, darkmode } = useTheme();
   const auth = useAuth();
   const { isOnline } = useOnline();
   const { t } = useTranslation();
@@ -46,7 +46,6 @@ export default function LeftSideTabBar({
     activeRouteName === "Edit" || activeRouteName === "EditScreen";
   const isAddDisabled = isInEditScreen;
   const reserveWindowControlsSpace = TITLEBAR_HEIGHT > 0 && controlsLeft;
-
   const goAdd = () => {
     if (isAddDisabled) return;
     emitOpenAddValue();
@@ -65,8 +64,24 @@ export default function LeftSideTabBar({
     }
     return r;
   }, [state.routes]);
+  const mainRoutes = React.useMemo(
+    () => orderedRoutes.filter((route) => route.name !== "LogoutStack"),
+    [orderedRoutes],
+  );
+  const logoutRoute = React.useMemo(
+    () => orderedRoutes.find((route) => route.name === "LogoutStack"),
+    [orderedRoutes],
+  );
 
   const focusedKey = state.routes[state.index]?.key;
+  const chipBackgroundColor = darkmode
+    ? "rgba(120, 127, 246, 0.16)"
+    : "rgba(120, 127, 246, 0.10)";
+  const chipBorderColor = darkmode
+    ? "rgba(120, 127, 246, 0.26)"
+    : "rgba(120, 127, 246, 0.18)";
+  const inactiveContentColor = theme.colors.onSurfaceVariant;
+  const activeLabelColor = theme.colors.onSurfaceVariant;
 
   React.useEffect(() => {
     const easing = Easing.bezier(0.2, 0.7, 0.3, 1);
@@ -94,18 +109,23 @@ export default function LeftSideTabBar({
           left: 0,
           top: 0,
           bottom: 0,
+          zIndex: 50,
+          elevation: 50,
           width: SIDEBAR_WIDTH,
-          borderRightWidth: 1,
-          paddingTop: reserveWindowControlsSpace ? TITLEBAR_HEIGHT + 4 : 8,
-          borderColor: theme.colors.outlineVariant,
-          backgroundColor: theme.colors.background,
+          paddingTop: reserveWindowControlsSpace ? TITLEBAR_HEIGHT + 8 : 8,
+          paddingHorizontal: 8,
+          paddingBottom: 8,
+          borderTopWidth: 0,
+          borderBottomWidth: 0,
+          borderLeftWidth: 0,
+          borderRightWidth: 0,
+          backgroundColor: "transparent",
           justifyContent: "space-between",
-          paddingBottom: 0,
         },
       ]}
     >
-      <View>
-        {orderedRoutes.map((route, _index) => {
+      <View style={styles.routeGroup}>
+        {mainRoutes.map((route) => {
           const isFocused = route.key === focusedKey;
           const name = route.name;
 
@@ -120,28 +140,31 @@ export default function LeftSideTabBar({
           let iconEl: React.ReactNode = null;
           if (name === "AddTriggerStack") {
             iconEl = (
-              <IconButton
-                icon="plus"
-                size={30}
-                mode="contained-tonal"
-                selected={true}
-                iconColor={theme.colors.primary}
-                onPress={goAdd}
-              />
+              <View
+                style={[
+                  styles.addChip,
+                  {
+                    backgroundColor: chipBackgroundColor,
+                    borderColor: chipBorderColor,
+                  },
+                ]}
+              >
+                <Feather name="plus" size={24} color={theme.colors.primary} />
+              </View>
             );
           } else if (name === "LogoutStack") {
             iconEl = (
               <Feather
                 name="log-out"
                 size={26}
-                color={isFocused ? theme.colors.primary : "#777"}
+                color={isFocused ? theme.colors.primary : inactiveContentColor}
               />
             );
           } else {
             iconEl =
               options.tabBarIcon?.({
                 focused: isFocused,
-                color: isFocused ? theme.colors.primary : "#777",
+                color: isFocused ? theme.colors.primary : inactiveContentColor,
                 size: 26,
               }) ?? null;
           }
@@ -166,29 +189,45 @@ export default function LeftSideTabBar({
             }
           };
 
-          const isAction = name === "AddTriggerStack" || name === "LogoutStack";
           const bgActive =
             name === "AddTriggerStack"
-              ? theme.colors.background
+              ? "transparent"
               : isFocused
                 ? theme.colors.secondaryContainer
                 : "transparent";
 
+          if (name === "AddTriggerStack") {
+            return (
+              <View
+                key={route.key}
+                style={[
+                  styles.item,
+                  { opacity: isAddDisabled ? 0.45 : isOnline ? 1 : 0.85 },
+                ]}
+              >
+                <AnimatedPressable
+                  onPress={onPress}
+                  borderless={false}
+                  style={styles.addItem}
+                  disabled={isAddDisabled}
+                >
+                  {iconEl}
+                </AnimatedPressable>
+              </View>
+            );
+          }
+
           return (
             <AnimatedPressable
               key={route.key}
-              onPress={name === "AddTriggerStack" ? undefined : onPress}
+              onPress={onPress}
               style={[
                 styles.item,
                 {
                   backgroundColor: bgActive,
                   opacity: isOnline ? 1 : 0.85,
                 },
-                isAction && styles.itemAction,
-                name === "AddTriggerStack" &&
-                  isAddDisabled && { opacity: 0.45 },
               ]}
-              disabled={(name === "AddTriggerStack" && isAddDisabled) || false}
             >
               <View style={styles.itemInner}>
                 {iconEl}
@@ -196,7 +235,11 @@ export default function LeftSideTabBar({
                   <Text
                     style={[
                       styles.label,
-                      { color: isFocused ? theme.colors.onSurface : "#777" },
+                      {
+                        color: isFocused
+                          ? activeLabelColor
+                          : inactiveContentColor,
+                      },
                     ]}
                     numberOfLines={1}
                   >
@@ -208,12 +251,60 @@ export default function LeftSideTabBar({
           );
         })}
       </View>
-      <Animated.View
-        style={{
-          height: offlineHeight,
-          overflow: "hidden",
-        }}
-      >
+      <View style={styles.bottomGroup}>
+        {logoutRoute ? (() => {
+          const isFocused = logoutRoute.key === focusedKey;
+          const { options } = descriptors[logoutRoute.key];
+          const label =
+            options.tabBarLabel ??
+            options.title ??
+            (logoutRoute.name as string);
+
+          return (
+            <AnimatedPressable
+              key={logoutRoute.key}
+              onPress={handleLogout}
+              style={[
+                styles.item,
+                {
+                  backgroundColor: isFocused
+                    ? theme.colors.secondaryContainer
+                    : "transparent",
+                  opacity: isOnline ? 1 : 0.85,
+                },
+                styles.itemAction,
+              ]}
+            >
+              <View style={styles.itemInner}>
+                <Feather
+                  name="log-out"
+                  size={26}
+                  color={isFocused ? theme.colors.primary : inactiveContentColor}
+                />
+                <Text
+                  style={[
+                    styles.label,
+                    {
+                      color: isFocused
+                        ? activeLabelColor
+                        : inactiveContentColor,
+                    },
+                  ]}
+                  numberOfLines={1}
+                >
+                  {t(`bar:${label}`)}
+                </Text>
+              </View>
+            </AnimatedPressable>
+          );
+        })() : null}
+        <Animated.View
+          style={{
+            height: offlineHeight,
+            overflow: "hidden",
+            marginTop: isOnline ? 0 : 8,
+          }}
+        >
         <Animated.View
           style={{
             flex: 1,
@@ -228,7 +319,8 @@ export default function LeftSideTabBar({
             </Text>
           ) : null}
         </Animated.View>
-      </Animated.View>
+        </Animated.View>
+      </View>
     </View>
   );
 }
@@ -236,14 +328,36 @@ export default function LeftSideTabBar({
 const styles = StyleSheet.create({
   item: {
     height: 64,
-    marginHorizontal: 8,
-    marginVertical: 3,
     borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
   },
+  addItem: {
+    width: 46,
+    height: 46,
+    borderRadius: 999,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+  },
+  routeGroup: {
+    gap: 8,
+  },
+  bottomGroup: {
+    gap: 0,
+  },
   itemAction: {
     borderWidth: 0,
+  },
+  addChip: {
+    width: 46,
+    minWidth: 46,
+    height: 46,
+    borderRadius: 999,
+    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: "center",
+    justifyContent: "center",
   },
   itemInner: {
     alignItems: "center",

@@ -24,6 +24,7 @@ import {
 } from "./titlebarMetrics";
 import { resolveWindowControlsSide } from "../../infrastructure/platform/windowControls";
 import SearchInput from "./SearchInput";
+import { getGlassChromeStyle } from "../ui/glass";
 
 const searchTransition = Easing.out(Easing.cubic);
 
@@ -120,9 +121,9 @@ export default function SearchHeader({
   onChangeText,
   onBack,
   resetLabel = "Reset",
-  marginBottom = 4,
+  marginBottom = 0,
 }: SearchHeaderProps) {
-  const { theme } = useTheme();
+  const { theme, darkmode } = useTheme();
   const { width } = useWindowDimensions();
   const isFocused = useIsFocused();
   const searchRef = useRef<any>(null);
@@ -134,6 +135,7 @@ export default function SearchHeader({
   const controlsLeft =
     resolveWindowControlsSide(windowControlsStyle) === "left";
   const wideSearchWidth = Math.min(340, Math.max(200, width * 0.32));
+  const glassChromeStyle = getGlassChromeStyle(darkmode);
 
   useEffect(() => {
     if (!isCompactHeader) {
@@ -263,22 +265,21 @@ export default function SearchHeader({
   return (
     <View
       style={{
-        height: 40 + Constants.statusBarHeight,
+        ...glassChromeStyle,
+        minHeight: 37 + Constants.statusBarHeight,
         width: "100%",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "transparent",
         marginBottom,
+        paddingTop: Constants.statusBarHeight + 4,
+        paddingBottom: 3,
         borderRadius: 12,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
         borderBottomLeftRadius: 12,
         borderBottomRightRadius: 12,
-        boxShadow: "none",
         justifyContent: "center",
-        borderWidth: 0,
         borderTopWidth: 0,
-        borderColor: "transparent",
       }}
     >
       <View
@@ -288,7 +289,7 @@ export default function SearchHeader({
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          paddingTop: Constants.statusBarHeight,
+          minHeight: 34,
           paddingLeft:
             (Platform.OS === "web" &&
             TITLEBAR_HEIGHT > 0 &&
@@ -380,7 +381,7 @@ export default function SearchHeader({
             ) : null}
             <Text
               style={{
-                color: theme.colors?.primary,
+                color: theme.colors.onSurfaceVariant,
                 userSelect: "none",
                 fontSize: 15,
                 marginLeft: onBack ? 0 : 16,

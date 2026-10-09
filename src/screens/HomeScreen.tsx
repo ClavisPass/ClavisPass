@@ -55,6 +55,10 @@ import FolderModal from "../features/vault/components/modals/FolderModal";
 import AddValueModal from "../features/vault/components/modals/AddValueModal";
 import { useAuth } from "../app/providers/AuthProvider";
 import { useTheme } from "../app/providers/ThemeProvider";
+import {
+  getGlassChromeStyle,
+  getScreenContentStyle,
+} from "../shared/ui/glass";
 
 import Logo from "../shared/ui/Logo";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -124,7 +128,7 @@ const mobileFolderFilterOverlayHeight = 72;
 const mobileFolderFilterFadeHeight = 34;
 const homeToolChipHeight = 30;
 const homeToolChipBottomPadding = homeSpacing.xs;
-const homeToolsTopPadding = TITLEBAR_HEIGHT > 0 ? homeSpacing.xs : 0;
+const homeToolsTopPadding = homeSpacing.sm;
 const homeToolsOverlayHeight = 40;
 const homeListEdgeGap = homeSpacing.sm;
 const homeListTopGap = 6;
@@ -283,6 +287,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const auth = useAuth();
   const vault = useVault();
   const { isOnline } = useOnline();
+  const glassChromeStyle = getGlassChromeStyle(darkmode);
+  const screenContentStyle = getScreenContentStyle(theme);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchHeaderVisible, setSearchHeaderVisible] = useState(false);
@@ -1773,6 +1779,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           />
           <View
             style={{
+              ...glassChromeStyle,
               width: "100%",
               display: "flex",
               flexDirection: "column",
@@ -1785,15 +1792,23 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                   : homeGutter,
               paddingTop:
                 Constants.statusBarHeight +
-                (TITLEBAR_HEIGHT > 0 ? homeSpacing.xs : homeSpacing.sm),
-              paddingBottom: TITLEBAR_HEIGHT > 0 ? homeSpacing.xs : homeSpacing.sm,
+                (!isCompactHeader
+                  ? homeSpacing.xs
+                  : TITLEBAR_HEIGHT > 0
+                    ? homeSpacing.xs
+                    : homeSpacing.sm),
+              paddingBottom: !isCompactHeader
+                ? 3
+                : TITLEBAR_HEIGHT > 0
+                  ? homeSpacing.xs
+                  : homeSpacing.sm,
               marginBottom: 0,
               borderBottomLeftRadius: 0,
               borderBottomRightRadius: 0,
-              backgroundColor: "transparent",
-              borderWidth: 0,
-              shadowOpacity: 0,
-              elevation: 0,
+              borderBottomWidth: StyleSheet.hairlineWidth,
+              borderTopWidth: 0,
+              borderLeftWidth: 0,
+              borderRightWidth: 0,
             }}
           >
             <Animated.View
@@ -1806,6 +1821,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 marginTop: 0,
                 marginBottom: 0,
                 width: "100%",
+                minHeight: isCompactHeader ? undefined : 34,
                 gap: homeSpacing.sm,
                 position: "relative",
                 zIndex: 4,
@@ -1895,7 +1911,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                       fontFamily: "LexendExa_400Regular",
                       fontSize: 16,
                       lineHeight: 16,
-                      color: theme.colors.onSurface,
+                      color: theme.colors.onSurfaceVariant,
                       userSelect: "none",
                       includeFontPadding: false,
                       paddingRight: homeSpacing.sm,
@@ -1914,6 +1930,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                     left: "50%",
                     marginLeft: -wideSearchWidth / 2,
                     position: "absolute",
+                    top: 0,
                     width: wideSearchWidth,
                     zIndex: 6,
                     ...webNoDragStyle,
@@ -1978,6 +1995,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               flexDirection: width > 600 ? "row-reverse" : "column",
               gap: 0,
               position: "relative",
+              ...screenContentStyle,
             }}
           >
             {isFocused && homeContentVisible ? (

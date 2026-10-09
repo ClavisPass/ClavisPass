@@ -4,6 +4,7 @@ import { Text } from "react-native-paper";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import AnimatedPressable from "../../../shared/components/AnimatedPressable";
 import AppIcon from "../../../shared/components/icons/AppIcon";
+import { getItemSurfaceStyle } from "../../../shared/ui/glass";
 
 type Props = {
   children: ReactNode;
@@ -22,7 +23,7 @@ type Props = {
 };
 
 function SettingsItem(props: Props) {
-  const { theme, darkmode } = useTheme();
+  const { theme } = useTheme();
   const compactSubtitle =
     props.subtitle && props.subtitle.length > 72
       ? `${props.subtitle.slice(0, 69).trim()}...`
@@ -30,6 +31,7 @@ function SettingsItem(props: Props) {
   const hasSubtitle = !!compactSubtitle;
   const surface = props.surface ?? true;
   const selectedBackgroundColor = "rgba(120, 127, 246, 0.18)";
+  const itemSurfaceStyle = getItemSurfaceStyle(theme);
 
   const content = (
     <View
@@ -135,16 +137,8 @@ function SettingsItem(props: Props) {
         },
         surface
           ? {
+              ...itemSurfaceStyle,
               borderWidth: StyleSheet.hairlineWidth,
-              borderColor: darkmode
-                ? "rgba(255, 255, 255, 0.08)"
-                : "rgba(255, 255, 255, 0.72)",
-              backgroundColor: darkmode
-                ? "rgba(36, 36, 36, 0.52)"
-                : "rgba(255, 255, 255, 0.58)",
-              boxShadow: darkmode
-                ? "rgba(0, 0, 0, 0.10) 0px 2px 10px 0px"
-                : "rgba(99, 99, 99, 0.06) 0px 2px 10px 0px",
             }
           : null,
       ]}

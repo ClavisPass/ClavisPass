@@ -4,10 +4,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import type { RenderItemParams } from "react-native-draggable-flatlist";
 import { Button, Text } from "react-native-paper";
-import Constants from "expo-constants";
 import { useTranslation } from "react-i18next";
-import { LinearGradient } from "expo-linear-gradient";
-import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 
 import { useTheme } from "../app/providers/ThemeProvider";
 import { useVault } from "../app/providers/VaultProvider";
@@ -15,14 +12,8 @@ import { HomeStackParamList } from "../app/navigation/model/types";
 import ValuesType from "../features/vault/model/ValuesType";
 import ListItem from "../features/vault/components/items/ListItem";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
-import {
-  TITLEBAR_CONTROLS_WIDTH,
-  TITLEBAR_HEIGHT,
-} from "../shared/components/titlebarMetrics";
-import getColors from "../shared/ui/linearGradient";
-import { useSetting } from "../app/providers/SettingsProvider";
-import { resolveWindowControlsSide } from "../infrastructure/platform/windowControls";
-import AppIcon from "../shared/components/icons/AppIcon";
+import Header from "../shared/components/Header";
+import { getScreenContentStyle } from "../shared/ui/glass";
 
 type ReorderScreenProps = NativeStackScreenProps<HomeStackParamList, "Reorder">;
 
@@ -41,10 +32,6 @@ const webNoDragStyle =
         WebkitAppRegion: "no-drag",
         appRegion: "no-drag",
       } as any)
-    : null;
-const webDragRegionProps =
-  Platform.OS === "web"
-    ? ({ dataSet: { tauriDragRegion: "" } } as any)
     : null;
 
 function moveEntryAfterPreviousVisibleId(
@@ -87,6 +74,7 @@ function applyVisibleOrder(values: ValuesType[], orderedVisible: ValuesType[]) {
 export default function ReorderScreen({ route, navigation }: ReorderScreenProps) {
   const {
     theme,
+    darkmode,
     globalStyles,
     setHeaderSpacing,
     setHeaderWhite,
@@ -95,20 +83,15 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
   } = useTheme();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
-  const { value: windowControlsStyle } = useSetting("WINDOW_CONTROLS_STYLE");
-  const controlsLeft =
-    resolveWindowControlsSide(windowControlsStyle) === "left";
+  const screenContentStyle = getScreenContentStyle(theme);
   const vault = useVault();
   const [items, setItems] = useState<ValuesType[]>(route.params.values ?? []);
   const [nativeScrollEnabled, setNativeScrollEnabled] = useState(true);
 
-  const headerTop =
-    Constants.statusBarHeight + (TITLEBAR_HEIGHT > 0 ? 4 : 6);
-
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(0);
-      setHeaderWhite(true);
+      setHeaderWhite(false);
       setTitlebarCenterGap(0);
       setTitlebarOverlayDragEnabled(false);
     }, [
@@ -245,146 +228,63 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
 
   return (
     <AnimatedContainer style={globalStyles.container}>
-      <FocusAwareStatusBar animated={true} style="light" translucent={true} />
-      <LinearGradient
-        colors={getColors()}
-        dither
-        style={{
-          paddingTop: headerTop,
-          paddingHorizontal: 10,
-          paddingBottom: TITLEBAR_HEIGHT > 0 ? 4 : 6,
-          width: "100%",
-          borderBottomLeftRadius: 12,
-          borderBottomRightRadius: 12,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.4,
-          shadowRadius: 6,
-          elevation: 5,
-        }}
-        end={{ x: 0.1, y: 0.2 }}
+      <Header
+        title={t("home:reorderChip")}
+        onPress={() => navigation.goBack()}
       >
         <View
           style={{
+            height: 24,
+            minWidth: 24,
+            paddingHorizontal: 8,
+            borderRadius: 12,
+            backgroundColor: `${theme.colors.primary}18`,
             alignItems: "center",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            gap: 8,
-            paddingLeft:
-              Platform.OS === "web" &&
-              TITLEBAR_HEIGHT > 0 &&
-              width < 600 &&
-              controlsLeft
-                ? TITLEBAR_CONTROLS_WIDTH
-                : 0,
-            paddingRight:
-              Platform.OS === "web" &&
-              TITLEBAR_HEIGHT > 0 &&
-              !controlsLeft
-                ? 104
-                : 0,
+            justifyContent: "center",
           }}
         >
-          <View
-            id="reorder-header-drag-region"
-            {...webDragRegionProps}
-            style={{
-              flex: 1,
-              minWidth: 0,
-              height: 36,
+          <Text
+            variant="labelMedium"
+            style={{ color: theme.colors.primary, userSelect: "none" }}
+          >
+            {items.length}
+          </Text>
+        </View>
+        <View
+          style={[
+            {
               flexDirection: "row",
               alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <AppIcon name="arrow-split-horizontal" size={20} color="white" />
-            <Text
-              variant="titleMedium"
-              numberOfLines={1}
-              style={{
-                color: "white",
-                flexShrink: 1,
-                fontWeight: "700",
-                userSelect: "none",
-              }}
-            >
-              {t("home:reorderChip")}
-            </Text>
-            <View
-              style={{
-                height: 24,
-                minWidth: 24,
-                paddingHorizontal: 8,
-                borderRadius: 12,
-                backgroundColor: "rgba(255, 255, 255, 0.18)",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Text
-                variant="labelMedium"
-                style={{ color: "white", userSelect: "none" }}
-              >
-                {items.length}
-              </Text>
-            </View>
-          </View>
-
-          <View
+              gap: 6,
+              zIndex: 10,
+            },
+            webNoDragStyle,
+          ]}
+        >
+          <Button
+            accessibilityLabel={t("common:apply")}
+            mode="contained-tonal"
+            compact
+            textColor={theme.colors.primary}
+            onPress={applyChanges}
             style={[
               {
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 6,
-                zIndex: 10,
-              },
+                margin: 0,
+                zIndex: 11,
+                borderRadius: 12,
+                cursor: "pointer",
+              } as any,
               webNoDragStyle,
             ]}
+            labelStyle={{ marginHorizontal: 10, marginVertical: 4 }}
           >
-            <Button
-              accessibilityLabel={t("common:cancel")}
-              mode="text"
-              compact
-              textColor="white"
-              onPress={() => navigation.goBack()}
-              style={[
-                {
-                  margin: 0,
-                  borderRadius: 12,
-                  zIndex: 11,
-                  cursor: "pointer",
-                } as any,
-                webNoDragStyle,
-              ]}
-              labelStyle={{ marginHorizontal: 8, marginVertical: 4 }}
-            >
-              {t("common:cancel")}
-            </Button>
-            <Button
-              accessibilityLabel={t("common:apply")}
-              mode="contained-tonal"
-              compact
-              textColor="white"
-              onPress={applyChanges}
-              style={[
-                {
-                  margin: 0,
-                  zIndex: 11,
-                  backgroundColor: "rgba(255, 255, 255, 0.18)",
-                  borderRadius: 12,
-                  cursor: "pointer",
-                } as any,
-                webNoDragStyle,
-              ]}
-              labelStyle={{ marginHorizontal: 10, marginVertical: 4 }}
-            >
-              {t("common:save")}
-            </Button>
-          </View>
+            {t("common:save")}
+          </Button>
         </View>
-      </LinearGradient>
+      </Header>
       <View
         style={{
+          ...screenContentStyle,
           flex: 1,
           width: "100%",
           padding: 4,

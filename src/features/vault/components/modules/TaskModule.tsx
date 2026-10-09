@@ -86,8 +86,6 @@ function TaskModule(props: TaskModuleType & Props) {
         marginRight: 8,
         marginBottom: TASK_MODULE_SPACING,
         borderRadius: 12,
-        backgroundColor: theme.colors.background,
-        boxShadow: theme.colors.shadow,
         alignSelf: "stretch",
       }}
     >

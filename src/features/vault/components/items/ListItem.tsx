@@ -32,6 +32,7 @@ import { useDeferredDragStart } from "../../../../shared/hooks/useDeferredDragSt
 import { buildFaviconUrl, normalizeUrl } from "../../utils/digitalCardTheme";
 import { detectTauriEnvironment } from "../../../../infrastructure/platform/isTauri";
 import AppIcon from "../../../../shared/components/icons/AppIcon";
+import { getItemSurfaceStyle } from "../../../../shared/ui/glass";
 
 const failedFaviconUrls = new Set<string>();
 const nonSelectableImageStyle =
@@ -788,17 +789,7 @@ function ListItem(props: Props) {
   const animateContentDirectly = Platform.OS === "web" || props.reorderMode;
   const isNativeSwipeItem = Platform.OS !== "web" && !props.reorderMode;
   const denseHorizontalInset = props.denseHorizontalInset ?? 8;
-  const identitySurfaceStyle = {
-    backgroundColor: darkmode
-      ? "rgba(28, 28, 34, 0.98)"
-      : "rgba(255, 255, 255, 0.98)",
-    borderColor: darkmode
-      ? "rgba(255, 255, 255, 0.08)"
-      : "rgba(255, 255, 255, 0.82)",
-    boxShadow: darkmode
-      ? ("rgba(0, 0, 0, 0.14) 0px 8px 24px 0px" as any)
-      : ("rgba(64, 76, 120, 0.08) 0px 8px 26px 0px" as any),
-  };
+  const itemSurfaceStyle = getItemSurfaceStyle(theme);
 
   const listItemContent = (
     <Animated.View
@@ -818,7 +809,7 @@ function ListItem(props: Props) {
           ? { marginLeft: 0, marginRight: 0, marginBottom: 0 }
           : null,
         props.reorderMode && Platform.OS !== "web" ? { marginBottom: 4 } : null,
-        identitySurfaceStyle,
+        itemSurfaceStyle,
         {
           borderWidth: StyleSheet.hairlineWidth,
           borderLeftWidth: folderColor ? 3 : StyleSheet.hairlineWidth,

@@ -64,18 +64,20 @@ function AppChip({
 }: Props) {
   const { darkmode, theme } = useTheme();
   const chipBackgroundColor = darkmode
-    ? "rgba(255, 255, 255, 0.08)"
-    : "rgba(255, 255, 255, 0.82)";
+    ? "rgba(120, 127, 246, 0.16)"
+    : "rgba(120, 127, 246, 0.10)";
   const chipBorderColor = darkmode
-    ? "rgba(255, 255, 255, 0.1)"
-    : "rgba(255, 255, 255, 0.82)";
+    ? "rgba(120, 127, 246, 0.26)"
+    : "rgba(120, 127, 246, 0.18)";
   const chipLabelColor = darkmode
     ? "rgba(255, 255, 255, 0.82)"
     : "rgba(24, 28, 38, 0.76)";
 
   if (iconOnly && icon) {
     const selectedBackgroundColor = showSelectedOverlay
-      ? "rgba(120, 127, 246, 0.18)"
+      ? darkmode
+        ? "rgba(120, 127, 246, 0.28)"
+        : "rgba(120, 127, 246, 0.18)"
       : chipBackgroundColor;
     const iconColor = iconOnlyColor ?? chipLabelColor;
     const iconKey = `${typeof icon === "string" ? icon : "custom"}-${

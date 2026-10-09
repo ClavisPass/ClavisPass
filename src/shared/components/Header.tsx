@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Platform, View, StyleSheet, useWindowDimensions } from "react-native";
+import { Platform, View, useWindowDimensions } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import Constants from "expo-constants";
 import FocusAwareStatusBar from "./FocusAwareStatusBar";
@@ -9,6 +9,7 @@ import { useSetting } from "../../app/providers/SettingsProvider";
 import { isTauriEnvironment } from "../../infrastructure/platform/isTauri";
 import { resolveWindowControlsSide } from "../../infrastructure/platform/windowControls";
 import { isDemoDistribution } from "../utils/distribution";
+import { getGlassChromeStyle } from "../ui/glass";
 
 const webDragRegionProps =
   Platform.OS === "web"
@@ -41,24 +42,25 @@ function Header(props: Props) {
     controlsLeft;
   const contentDraggable =
     props.leftContentDraggable ?? props.leftNode === undefined;
+  const glassChromeStyle = getGlassChromeStyle(darkmode);
 
   return (
     <View
       style={{
-        height: 40 + Constants.statusBarHeight,
+        ...glassChromeStyle,
+        minHeight: 37 + Constants.statusBarHeight,
         width: "100%",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "transparent",
-        marginBottom: props.marginBottom ?? 8,
+        marginBottom: props.marginBottom ?? 0,
+        paddingTop: Constants.statusBarHeight + 4,
+        paddingBottom: 3,
         borderRadius: 12,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
         borderBottomLeftRadius: 12,
         borderBottomRightRadius: 12,
-        boxShadow: "none",
         justifyContent: "center",
-        borderWidth: 0,
       }}
     >
       <View
@@ -67,7 +69,7 @@ function Header(props: Props) {
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-          paddingTop: Constants.statusBarHeight,
+          minHeight: 34,
           paddingLeft: reserveMacControlsSpace ? TITLEBAR_CONTROLS_WIDTH : 0,
         }}
       >
@@ -103,7 +105,7 @@ function Header(props: Props) {
           {props.title ? (
             <Text
               style={{
-                color: theme.colors?.primary,
+                color: theme.colors.onSurfaceVariant,
                 userSelect: "none",
                 fontSize: 15,
                 marginLeft: props.leftNode ? 0 : 16,

@@ -30,6 +30,10 @@ import AnimatedContainer from "../shared/components/container/AnimatedContainer"
 import AnimatedPressable from "../shared/components/AnimatedPressable";
 import AppChip from "../shared/components/chips/AppChip";
 import SearchHeader from "../shared/components/SearchHeader";
+import {
+  getItemSurfaceStyle,
+  getScreenContentStyle,
+} from "../shared/ui/glass";
 
 import { useAuthMaster } from "../app/providers/AuthProvider";
 import { useOnline } from "../app/providers/OnlineProvider";
@@ -184,6 +188,8 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   } = useTheme();
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
+  const screenContentStyle = getScreenContentStyle(theme);
+  const itemSurfaceStyle = getItemSurfaceStyle(theme);
 
   const isWide = width > 720;
 
@@ -391,12 +397,10 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   }, [activeTab, isLoading, list, query, riskBucket]);
 
   const cardStyle: ViewStyle = {
-    backgroundColor: theme.colors.background,
+    ...itemSurfaceStyle,
     borderRadius: 12,
     padding: 12,
-    boxShadow: theme.colors.shadow as any,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: darkmode ? theme.colors.outlineVariant : "white",
   };
 
   const pillCardStyle = (selected: boolean): StyleProp<ViewStyle> => [
@@ -440,9 +444,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
         style={{
           borderRadius: 12,
           overflow: "hidden",
-          backgroundColor: theme.colors.background,
-          boxShadow: theme.colors.shadow,
-          borderColor: darkmode ? theme.colors.outlineVariant : "white",
+          ...itemSurfaceStyle,
           borderWidth: StyleSheet.hairlineWidth,
         }}
       >
@@ -550,9 +552,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
         style={{
           borderRadius: 12,
           overflow: "hidden",
-          backgroundColor: theme.colors.background,
-          boxShadow: theme.colors.shadow,
-          borderColor: darkmode ? theme.colors.outlineVariant : "white",
+          ...itemSurfaceStyle,
           borderWidth: StyleSheet.hairlineWidth,
         }}
       >
@@ -778,7 +778,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
 
       <ScrollView
         ref={scrollRef}
-        style={{ width: "100%" }}
+        style={{ width: "100%", ...screenContentStyle }}
         contentContainerStyle={{
           padding: 8,
           paddingTop: 0,

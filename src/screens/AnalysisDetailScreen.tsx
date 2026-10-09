@@ -20,6 +20,10 @@ import { useFocusEffect } from "@react-navigation/native";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import Header from "../shared/components/Header";
 import AppChip from "../shared/components/chips/AppChip";
+import {
+  getItemSurfaceStyle,
+  getScreenContentStyle,
+} from "../shared/ui/glass";
 
 import { useTheme } from "../app/providers/ThemeProvider";
 import { useTranslation } from "react-i18next";
@@ -372,6 +376,8 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
   const vault = useVault();
   const { getMaster } = useAuthMaster();
   const { globalStyles, theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } = useTheme();
+  const screenContentStyle = getScreenContentStyle(theme);
+  const itemSurfaceStyle = getItemSurfaceStyle(theme);
   const { t } = useTranslation();
 
   const values = useMemo(() => {
@@ -553,7 +559,10 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
         title={resolved?.title ?? t("analysisDetail:title", { defaultValue: "Analysis" })}
       />
 
-      <ScrollView style={{ width: "100%" }} contentContainerStyle={{ padding: 8, paddingTop: 0 }}>
+      <ScrollView
+        style={{ width: "100%", ...screenContentStyle }}
+        contentContainerStyle={{ padding: 8, paddingTop: 0 }}
+      >
         <View style={{ gap: 8 }}>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
@@ -593,8 +602,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
               style={[
                 styles.card,
                 {
-                  backgroundColor: theme.colors.background,
-                  borderColor: darkmode ? theme.colors.outlineVariant : "white",
+                  ...itemSurfaceStyle,
                   padding: 16,
                   alignItems: "center",
                   gap: 10,
@@ -618,8 +626,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
             style={[
               styles.card,
               {
-                backgroundColor: theme.colors.background,
-                borderColor: darkmode ? theme.colors.outlineVariant : "white",
+                ...itemSurfaceStyle,
                 padding: 10,
               },
             ]}
@@ -702,8 +709,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
             style={[
               styles.card,
               {
-                backgroundColor: theme.colors.background,
-                borderColor: darkmode ? theme.colors.outlineVariant : "white",
+                ...itemSurfaceStyle,
                 padding: 10,
               },
             ]}
@@ -739,8 +745,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
               style={[
                 styles.card,
                 {
-                  backgroundColor: theme.colors.background,
-                  borderColor: darkmode ? theme.colors.outlineVariant : "white",
+                  ...itemSurfaceStyle,
                   padding: 10,
                 },
               ]}
@@ -768,8 +773,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
             style={[
               styles.card,
               {
-                backgroundColor: theme.colors.background,
-                borderColor: darkmode ? theme.colors.outlineVariant : "white",
+                ...itemSurfaceStyle,
                 padding: 0,
                 overflow: "hidden",
               },

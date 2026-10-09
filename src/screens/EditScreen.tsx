@@ -74,6 +74,7 @@ import {
   canExportVCard,
   exportVCard,
 } from "../features/vault/utils/vcardExport";
+import { getScreenContentStyle } from "../shared/ui/glass";
 
 type EditScreenProps = NativeStackScreenProps<HomeStackParamList, "Edit">;
 
@@ -126,6 +127,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const isFocused = useIsFocused();
+  const screenContentStyle = getScreenContentStyle(theme);
 
   const { value: fastAccessBehavior } = useSetting("FAST_ACCESS");
 
@@ -700,6 +702,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   };
 
   const editSectionSpacing = 8;
+  const editActionChipsHeight = 30 + editSectionSpacing * 2;
   const editControlOverlayHeight = 40 + editSectionSpacing;
   const editListTopFadeStart = 34;
   const editListTopFadeEnd = editControlOverlayHeight + 0;
@@ -1011,14 +1014,14 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   const editControlSurfaceStyle = {
     backgroundColor: darkmode
-      ? "rgba(28, 28, 34, 0.58)"
-      : "rgba(255, 255, 255, 0.72)",
+      ? "rgba(255, 255, 255, 0.075)"
+      : "rgba(120, 127, 246, 0.075)",
     borderColor: darkmode
-      ? "rgba(255, 255, 255, 0.08)"
-      : "rgba(255, 255, 255, 0.82)",
+      ? "rgba(255, 255, 255, 0.11)"
+      : "rgba(120, 127, 246, 0.16)",
     boxShadow: darkmode
-      ? ("rgba(0, 0, 0, 0.14) 0px 8px 24px 0px" as any)
-      : ("rgba(64, 76, 120, 0.08) 0px 8px 26px 0px" as any),
+      ? ("rgba(0, 0, 0, 0.18) 0px 8px 22px 0px" as any)
+      : ("rgba(64, 76, 120, 0.10) 0px 8px 22px 0px" as any),
   };
   const editControlContentColor = darkmode
     ? "rgba(255, 255, 255, 0.82)"
@@ -1323,12 +1326,18 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           />
         }
       />
-      {renderEditActionChips()}
       <View
-        style={styles.editListWrap}
+        style={[
+          styles.editListWrap,
+          screenContentStyle,
+        ]}
       >
+        {renderEditActionChips()}
         {renderFadedModulesList()}
-        <View pointerEvents="box-none" style={styles.editControlsOverlay}>
+        <View
+          pointerEvents="box-none"
+          style={[styles.editControlsOverlay, { top: editActionChipsHeight }]}
+        >
           <View
             style={{
               width: "100%",

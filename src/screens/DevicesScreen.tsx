@@ -33,6 +33,10 @@ import type { DeviceUiStatus } from "../features/vault/utils/vaultDevices";
 
 import { getCurrentVaultDeviceId } from "../features/vault/utils/deviceInfo";
 import HintCard from "../shared/components/HintCard";
+import {
+  getItemSurfaceStyle,
+  getScreenContentStyle,
+} from "../shared/ui/glass";
 
 const GAP = 8;
 const ITEM_MIN_HEIGHT = 56;
@@ -72,6 +76,8 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
   } = useTheme();
 
   const { t } = useTranslation();
+  const screenContentStyle = getScreenContentStyle(theme);
+  const itemSurfaceStyle = getItemSurfaceStyle(theme);
 
   const vault = useVault();
   const { width } = useWindowDimensions();
@@ -147,11 +153,9 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
   }, [vault.devices, nowIso, selfId]);
 
   const containerCardStyle = {
+    ...itemSurfaceStyle,
     borderRadius: 12,
     overflow: "hidden" as const,
-    backgroundColor: theme.colors.background,
-    boxShadow: theme.colors.shadow as any,
-    borderColor: darkmode ? theme.colors.outlineVariant : "white",
     borderWidth: StyleSheet.hairlineWidth,
   };
 
@@ -367,7 +371,7 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
       <Header title={title} onPress={() => navigation.goBack()} />
 
       <ScrollView
-        style={{ flex: 1, width: "100%" }}
+        style={{ flex: 1, width: "100%", ...screenContentStyle }}
         contentContainerStyle={{
           paddingHorizontal: H_PAD,
           paddingBottom: 8,
