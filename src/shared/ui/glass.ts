@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import type { ViewStyle } from "react-native";
 import type { AppTheme } from "./appTheme";
 
@@ -13,13 +13,21 @@ export function getGlassChromeStyle(_darkmode: boolean): ViewStyle {
 
 export function getScreenContentStyle(theme: AppTheme): ViewStyle {
   return {
-    backgroundColor: theme.dark ? theme.colors.background : "#F7F9FF",
+    backgroundColor: theme.dark
+      ? theme.colors.background
+      : "rgba(248, 248, 248, 0.78)",
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.dark
       ? theme.colors.outlineVariant
-      : "rgba(76, 95, 142, 0.13)",
+      : "rgba(118, 118, 118, 0.13)",
     borderRadius: 8,
     overflow: "hidden",
+    ...(Platform.OS === "web" && !theme.dark
+      ? ({
+          backdropFilter: "blur(18px) saturate(1.08)",
+          WebkitBackdropFilter: "blur(18px) saturate(1.08)",
+        } as any)
+      : null),
   };
 }
 
@@ -29,17 +37,17 @@ export function getItemSurfaceStyle(theme: AppTheme): ViewStyle {
   return {
     backgroundColor: theme.dark
       ? "rgba(255, 255, 255, 0.075)"
-      : "#FFFFFF",
+      : "rgba(255, 255, 255, 0.98)",
     borderColor: theme.dark
       ? "rgba(255, 255, 255, 0.075)"
-      : "rgba(54, 72, 116, 0.06)",
+      : "rgba(118, 118, 118, 0.1)",
     shadowColor,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: theme.dark ? 2 : 3 },
     shadowOpacity: theme.dark ? 0.16 : 0.055,
-    shadowRadius: 5,
+    shadowRadius: theme.dark ? 5 : 7,
     elevation: 1,
     boxShadow: theme.dark
       ? ("rgba(0, 0, 0, 0.15) 0px 7px 18px -9px, rgba(0, 0, 0, 0.10) 0px 1px 5px -3px" as any)
-      : ("rgba(37, 55, 96, 0.055) 0px 7px 18px -12px, rgba(37, 55, 96, 0.04) 0px 1px 5px -4px" as any),
+      : ("rgba(48, 48, 48, 0.055) 0px 10px 24px -17px, rgba(48, 48, 48, 0.04) 0px 2px 7px -6px" as any),
   };
 }

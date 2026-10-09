@@ -5,6 +5,7 @@ import { RadioButton, Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import lightTheme from "../../../shared/ui/theme";
 import darkTheme from "../../../shared/ui/theme-darkmode";
+import { getItemSurfaceStyle } from "../../../shared/ui/glass";
 
 type CheckedType = "light" | "dark";
 type Size = "large" | "small";
@@ -170,11 +171,12 @@ function ThemePreviewCard({
 type Props = { size?: Size };
 
 export default function DarkModeSwitch({ size = "large" }: Props) {
-  const { darkmode, setDarkmode } = useTheme();
+  const { darkmode, setDarkmode, theme } = useTheme();
   const { t } = useTranslation();
   const [checked, setChecked] = useState<CheckedType>(
     darkmode ? "dark" : "light",
   );
+  const itemSurfaceStyle = getItemSurfaceStyle(theme);
 
   useEffect(() => {
     setChecked(darkmode ? "dark" : "light");
@@ -219,19 +221,11 @@ export default function DarkModeSwitch({ size = "large" }: Props) {
   return (
     <View
       style={{
+        ...itemSurfaceStyle,
         marginVertical: 4,
-        borderRadius: 12,
-        overflow: "hidden",
+        borderRadius: 14,
+        overflow: "visible",
         borderWidth: StyleSheet.hairlineWidth,
-        borderColor: darkmode
-          ? "rgba(255, 255, 255, 0.08)"
-          : "rgba(255, 255, 255, 0.72)",
-        backgroundColor: darkmode
-          ? "rgba(36, 36, 36, 0.52)"
-          : "rgba(255, 255, 255, 0.58)",
-        boxShadow: darkmode
-          ? "rgba(0, 0, 0, 0.10) 0px 2px 10px 0px"
-          : "rgba(99, 99, 99, 0.06) 0px 2px 10px 0px",
         paddingHorizontal: 14,
         padding: 14,
       }}

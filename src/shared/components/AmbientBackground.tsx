@@ -78,11 +78,11 @@ function AmbientBackground({}: Props) {
   const primary = theme.colors.primary;
   const secondary = theme.colors.secondary;
   const appBackground = isTauri
-    ? withAlpha(theme.colors.background, darkmode ? 0.24 : 0.12)
+    ? withAlpha(darkmode ? theme.colors.background : "#FFFFFF", darkmode ? 0.24 : 0.34)
     : darkmode
       ? theme.colors.background
-      : "#F7FAFF";
-  const mobileBackground = darkmode ? theme.colors.background : "#E8EAE8";
+      : "#F7F7F7";
+  const mobileBackground = darkmode ? theme.colors.background : "#F6F6F6";
 
   if (Platform.OS !== "web") {
     return (
@@ -143,28 +143,28 @@ function AmbientBackground({}: Props) {
         style={styles.topRight}
         backgroundColor={withAlpha(
           primary,
-          darkmode ? 0.05 : 0.038,
+          darkmode ? 0.05 : 0.01,
         )}
       />
       <AmbientWash
         style={styles.left}
         backgroundColor={withAlpha(
           secondary,
-          darkmode ? 0.045 : 0.048,
+          darkmode ? 0.045 : 0.012,
         )}
       />
       <AmbientWash
         style={styles.bottom}
         backgroundColor={withAlpha(
           primary,
-          darkmode ? 0.03 : 0.026,
+          darkmode ? 0.03 : 0.008,
         )}
       />
       <AmbientWash
         style={styles.lowerLeft}
         backgroundColor={withAlpha(
           secondary,
-          darkmode ? 0.028 : 0.032,
+          darkmode ? 0.028 : 0.01,
         )}
       />
     </View>

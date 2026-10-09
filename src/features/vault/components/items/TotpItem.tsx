@@ -13,7 +13,11 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     marginRight: 4,
     marginBottom: 8,
-    borderRadius: 12,
+    borderRadius: 14,
+  },
+  rippleClip: {
+    borderRadius: 14,
+    overflow: "hidden",
   },
   ripple: {
     display: "flex",
@@ -21,8 +25,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flex: 1,
-    overflow: "hidden",
-    borderRadius: 12,
   },
 });
 
@@ -62,17 +64,19 @@ function TotpItem(props: Props) {
         itemSurfaceStyle,
         {
           borderWidth: StyleSheet.hairlineWidth,
-          overflow: "hidden",
+          overflow: "visible",
         },
       ]}
     >
-      <AnimatedPressable
-        key={props.key}
-        style={styles.ripple}
-        onPress={props.onPress}
-      >
-        <Totp value={props.value} variant="list" />
-      </AnimatedPressable>
+      <Animated.View style={styles.rippleClip}>
+        <AnimatedPressable
+          key={props.key}
+          style={styles.ripple}
+          onPress={props.onPress}
+        >
+          <Totp value={props.value} variant="list" />
+        </AnimatedPressable>
+      </Animated.View>
     </Animated.View>
   );
 }

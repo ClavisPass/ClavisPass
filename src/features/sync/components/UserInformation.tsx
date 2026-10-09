@@ -23,6 +23,7 @@ import { logger } from "../../../infrastructure/logging/logger";
 import { useTheme as useAppTheme } from "../../../app/providers/ThemeProvider";
 import { useTranslation } from "react-i18next";
 import LogoColored from "../../../shared/ui/LogoColored";
+import { getItemSurfaceStyle } from "../../../shared/ui/glass";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -32,9 +33,10 @@ type Props = {
 
 function UserInformation(props: Props) {
   const paperTheme = useTheme();
-  const { darkmode } = useAppTheme();
+  const { darkmode, theme: appTheme } = useAppTheme();
   const { isOnline } = useOnline();
   const { t } = useTranslation();
+  const itemSurfaceStyle = getItemSurfaceStyle(appTheme);
 
   const {
     provider,
@@ -171,18 +173,11 @@ function UserInformation(props: Props) {
           {/* Account Card */}
           <View
             style={{
+              ...itemSurfaceStyle,
               width: "100%",
-              borderRadius: 12,
+              borderRadius: 14,
               borderWidth: StyleSheet.hairlineWidth,
-              borderColor: darkmode
-                ? "rgba(255, 255, 255, 0.08)"
-                : "rgba(255, 255, 255, 0.72)",
-              backgroundColor: darkmode
-                ? "rgba(36, 36, 36, 0.52)"
-                : "rgba(255, 255, 255, 0.58)",
-              boxShadow: darkmode
-                ? "rgba(0, 0, 0, 0.10) 0px 2px 10px 0px"
-                : "rgba(99, 99, 99, 0.06) 0px 2px 10px 0px",
+              overflow: "visible",
               padding: 8,
               flexDirection: "row",
               alignItems: "center",

@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import type { StoreValueMap } from "../../../infrastructure/storage/store";
+import { getItemSurfaceStyle } from "../../../shared/ui/glass";
 
 type FastAccessPosition = StoreValueMap["FAST_ACCESS_POSITION"];
 
@@ -71,7 +72,8 @@ function CornerOption({
 
 export default function FastAccessPositionPicker({ value, setValue }: Props) {
   const { t } = useTranslation();
-  const { darkmode, theme } = useTheme();
+  const { theme } = useTheme();
+  const itemSurfaceStyle = getItemSurfaceStyle(theme);
 
   const corners = useMemo<Corner[]>(
     () => [
@@ -102,19 +104,11 @@ export default function FastAccessPositionPicker({ value, setValue }: Props) {
   return (
     <View
       style={{
+        ...itemSurfaceStyle,
         marginVertical: 4,
-        borderRadius: 12,
-        overflow: "hidden",
+        borderRadius: 14,
+        overflow: "visible",
         borderWidth: StyleSheet.hairlineWidth,
-        borderColor: darkmode
-          ? "rgba(255, 255, 255, 0.08)"
-          : "rgba(255, 255, 255, 0.72)",
-        backgroundColor: darkmode
-          ? "rgba(36, 36, 36, 0.52)"
-          : "rgba(255, 255, 255, 0.58)",
-        boxShadow: darkmode
-          ? "rgba(0, 0, 0, 0.10) 0px 2px 10px 0px"
-          : "rgba(99, 99, 99, 0.06) 0px 2px 10px 0px",
         paddingHorizontal: 14,
         paddingTop: 12,
         paddingBottom: 12,

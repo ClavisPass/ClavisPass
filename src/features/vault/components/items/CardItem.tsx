@@ -11,12 +11,9 @@ import DigitalCardType from "../../model/DigitalCardType";
 
 import { Divider, Icon, Text } from "react-native-paper";
 import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import {
   buildFaviconUrl,
   getHostnameLabel,
-  getReadableTextColor,
-  mixColors,
   resolveDigitalCardPalette,
   withAlpha,
 } from "../../utils/digitalCardTheme";
@@ -27,10 +24,10 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     marginRight: 4,
     marginBottom: 8,
-    borderRadius: 12,
+    borderRadius: 14,
   },
   cardClip: {
-    borderRadius: 12,
+    borderRadius: 14,
     overflow: "hidden",
   },
   ripple: {
@@ -90,18 +87,11 @@ function CardItem(props: Props) {
   const sourceUrl = props.sourceUrl ?? null;
   const faviconUrl = useMemo(() => buildFaviconUrl(sourceUrl), [sourceUrl]);
   const hostname = useMemo(() => getHostnameLabel(sourceUrl), [sourceUrl]);
-  const cardBase = accentColor
-    ? mixColors(accentColor, darkmode ? "#0D0D0D" : "#FFFFFF", darkmode ? 0.7 : 0.82)
-    : theme.colors?.background;
   const cardAccentGlow = accentColor
     ? withAlpha(accentColor, darkmode ? 0.2 : 0.14)
     : "transparent";
-  const titleColor = accentColor
-    ? getReadableTextColor(accentColor)
-    : theme.colors.onBackground;
-  const secondaryTextColor = accentColor
-    ? withAlpha(titleColor === "#ffffff" ? "#ffffff" : "#111111", 0.72)
-    : theme.colors.onSurfaceVariant;
+  const titleColor = theme.colors.onSurface;
+  const secondaryTextColor = theme.colors.onSurfaceVariant;
   const denseHorizontalInset = props.denseHorizontalInset ?? 8;
   const itemSurfaceStyle = getItemSurfaceStyle(theme);
 
@@ -124,16 +114,7 @@ function CardItem(props: Props) {
         },
       ]}
     >
-      <LinearGradient
-        style={styles.cardClip}
-        colors={[
-          accentColor ? withAlpha(accentColor, darkmode ? 0.26 : 0.18) : cardBase,
-          cardBase,
-          accentColor ? withAlpha(accentColor, darkmode ? 0.18 : 0.08) : cardBase,
-        ]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
+      <View style={styles.cardClip}>
         <View
           style={{
             flex: 1,
@@ -256,7 +237,7 @@ function CardItem(props: Props) {
             </AnimatedPressable>
           </View>
         </View>
-      </LinearGradient>
+      </View>
     </Animated.View>
   );
 }

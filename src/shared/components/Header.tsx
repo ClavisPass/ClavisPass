@@ -54,7 +54,7 @@ function Header(props: Props) {
         flexDirection: "column",
         marginBottom: props.marginBottom ?? 0,
         paddingTop: Constants.statusBarHeight + 4,
-        paddingBottom: 3,
+        paddingBottom: 2,
         borderRadius: 12,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,

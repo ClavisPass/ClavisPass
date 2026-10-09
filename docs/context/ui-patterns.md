@@ -6,7 +6,7 @@ Use this for visual consistency, spacing, glass/background structure, item surfa
 
 - App-level ambient/glass background lives globally.
 - Header/sidebar areas are glassy/transparent.
-- Page content below the header uses a real background panel. In light mode this panel is a cool, pale blue rather than pure white.
+- Page content below the header uses a real background panel. In light mode this panel is a cool frosted blue rather than pure white.
 - Standard spacing is `8px` unless a component has a clear density reason.
 - Page titles and passive chrome text use `theme.colors.onSurfaceVariant`, not primary.
 
@@ -45,7 +45,7 @@ Typical order:
 ## Item Surfaces
 
 - Standard repeated items should use `getItemSurfaceStyle(theme)`.
-- Light mode item surfaces are solid white.
+- Light mode item surfaces are near-white frosted surfaces over the cool blue content panel.
 - Dark mode item surfaces are subtle translucent surfaces.
 - Borders should be relaxed; separation primarily comes from a very soft, low-contrast shared shadow.
 - Keep item overflow visible when shadows need to render. Clip only the inner ripple/content layer when needed.

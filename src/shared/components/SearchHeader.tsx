@@ -272,7 +272,7 @@ export default function SearchHeader({
         flexDirection: "column",
         marginBottom,
         paddingTop: Constants.statusBarHeight + 4,
-        paddingBottom: 3,
+        paddingBottom: 2,
         borderRadius: 12,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,

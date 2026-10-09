@@ -63,11 +63,13 @@ function AppChip({
   ...props
 }: Props) {
   const { darkmode, theme } = useTheme();
-  const chipBackgroundColor = theme.colors.secondaryContainer;
+  const chipBackgroundColor = darkmode
+    ? theme.colors.secondaryContainer
+    : "rgba(248, 248, 248, 0.72)";
   const chipLabelColor = theme.colors.onSecondaryContainer;
   const chipBorderColor = darkmode
     ? "rgba(120, 127, 246, 0.26)"
-    : "rgba(120, 127, 246, 0.18)";
+    : "rgba(120, 127, 246, 0.24)";
 
   if (iconOnly && icon) {
     const selectedBackgroundColor = showSelectedOverlay
@@ -137,6 +139,7 @@ function AppChip({
         {
           borderColor: chipBorderColor,
           borderWidth: StyleSheet.hairlineWidth,
+          backgroundColor: chipBackgroundColor,
           borderRadius: 12,
         },
         style as any,

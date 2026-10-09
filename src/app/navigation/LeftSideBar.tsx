@@ -76,10 +76,13 @@ export default function LeftSideTabBar({
   const focusedKey = state.routes[state.index]?.key;
   const chipBackgroundColor = darkmode
     ? "rgba(120, 127, 246, 0.16)"
-    : "rgba(120, 127, 246, 0.10)";
+    : "rgba(248, 248, 248, 0.72)";
   const chipBorderColor = darkmode
     ? "rgba(120, 127, 246, 0.26)"
-    : "rgba(120, 127, 246, 0.18)";
+    : "rgba(120, 127, 246, 0.24)";
+  const activeNavBackgroundColor = darkmode
+    ? theme.colors.secondaryContainer
+    : "rgba(120, 127, 246, 0.11)";
   const inactiveContentColor = theme.colors.onSurfaceVariant;
   const activeLabelColor = theme.colors.onSurfaceVariant;
 
@@ -193,7 +196,7 @@ export default function LeftSideTabBar({
             name === "AddTriggerStack"
               ? "transparent"
               : isFocused
-                ? theme.colors.secondaryContainer
+                ? activeNavBackgroundColor
                 : "transparent";
 
           if (name === "AddTriggerStack") {
@@ -268,7 +271,7 @@ export default function LeftSideTabBar({
                 styles.item,
                 {
                   backgroundColor: isFocused
-                    ? theme.colors.secondaryContainer
+                    ? activeNavBackgroundColor
                     : "transparent",
                   opacity: isOnline ? 1 : 0.85,
                 },

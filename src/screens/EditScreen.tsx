@@ -1022,6 +1022,10 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const editControlContentColor = darkmode
     ? "rgba(255, 255, 255, 0.82)"
     : "rgba(24, 28, 38, 0.76)";
+  const hasFastAccess =
+    fastAccessObject !== null &&
+    fastAccessObject.username !== "" &&
+    fastAccessObject.password !== "";
 
   const renderControlSegment = ({
     children,
@@ -1047,16 +1051,18 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         disabled={disabled}
         style={{
           flex: 1,
-          height: "100%",
-          padding: 6,
+          width: "100%",
+          height: 40,
+          minHeight: 40,
+          padding: 0,
           display: "flex",
           justifyContent,
           alignItems: "center",
           backgroundColor: "transparent",
-          borderTopLeftRadius: roundedStart ? 8 : 0,
-          borderBottomLeftRadius: roundedStart ? 8 : 0,
-          borderTopRightRadius: roundedEnd ? 8 : 0,
-          borderBottomRightRadius: roundedEnd ? 8 : 0,
+          borderTopLeftRadius: roundedStart ? 12 : 0,
+          borderBottomLeftRadius: roundedStart ? 12 : 0,
+          borderTopRightRadius: roundedEnd ? 12 : 0,
+          borderBottomRightRadius: roundedEnd ? 12 : 0,
           overflow: "hidden",
         }}
         onPress={onPress}
@@ -1075,6 +1081,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           overflow: "hidden",
           justifyContent: "center",
           alignSelf: "stretch",
+          height: "100%",
         }}
       >
         {Platform.OS === "web" ? (
@@ -1091,12 +1098,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       style={{
         height: 40,
         flexBasis: 220,
-        flexGrow: 5,
+        flexGrow: 1,
         flexShrink: 1,
         flexDirection: "row",
         alignItems: "stretch",
         borderRadius: 12,
-        paddingHorizontal: 6,
         margin: 0,
         overflow: "hidden",
         minWidth: 0,
@@ -1141,7 +1147,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           ? t("common:removeFavorite")
           : t("common:addFavorite"),
         children: (
-          <Icon source={favIcon} color={editControlContentColor} size={20} />
+          <Icon
+            source={favIcon}
+            color={value.fav ? theme.colors.primary : editControlContentColor}
+            size={20}
+          />
         ),
       })}
       {renderControlDivider()}
@@ -1360,19 +1370,24 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
               </View>
             )}
             {renderEditControlGroup()}
-            {fastAccessObject === null ||
-            fastAccessObject.username === "" ||
-            fastAccessObject.password === "" ? null : (
-              <AppTooltip title={t("common:fastAccess")}>
-                <SquaredContainerButton onPress={openFastAccessFeature}>
+            <AppTooltip title={t("common:fastAccess")}>
+              <View style={{ flexShrink: 0 }}>
+                <SquaredContainerButton
+                  disabled={!hasFastAccess}
+                  onPress={openFastAccessFeature}
+                >
                   <AppIcon
                     name={"tooltip-account"}
-                    color={editControlContentColor}
+                    color={
+                      hasFastAccess
+                        ? editControlContentColor
+                        : theme.colors.onSurfaceDisabled
+                    }
                     size={20}
                   />
                 </SquaredContainerButton>
-              </AppTooltip>
-            )}
+              </View>
+            </AppTooltip>
           </View>
         </View>
       </View>

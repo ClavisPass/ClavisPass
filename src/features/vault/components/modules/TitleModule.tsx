@@ -37,7 +37,7 @@ function TitleModule(props: Props) {
         ? ({ className: "clavispass-cursor-text" } as any)
         : null)}
       style={{
-        height: 40,
+        height: 34,
         width: 200,
         display: "flex",
         flexDirection: "row",
@@ -55,7 +55,7 @@ function TitleModule(props: Props) {
         outlineStyle={[
           {
             borderWidth: 0,
-            height: 40,
+            height: 34,
             borderRadius: 0,
             width: "100%",
             borderColor:
@@ -72,7 +72,7 @@ function TitleModule(props: Props) {
           {
             margin: 0,
             padding: 0,
-            height: 40,
+            height: 34,
             backgroundColor: "transparent",
           },
           Platform.OS === "web" ? ({ cursor: "text" } as any) : null,
@@ -84,7 +84,7 @@ function TitleModule(props: Props) {
             width: "100%",
             margin: 0,
             padding: 0,
-            height: 40,
+            height: 34,
             backgroundColor: "transparent",
           },
           Platform.OS === "web" ? ({ cursor: "text" } as any) : null,

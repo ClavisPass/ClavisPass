@@ -1798,7 +1798,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                     ? homeSpacing.xs
                     : homeSpacing.sm),
               paddingBottom: !isCompactHeader
-                ? 3
+                ? 2
                 : TITLEBAR_HEIGHT > 0
                   ? homeSpacing.xs
                   : homeSpacing.sm,

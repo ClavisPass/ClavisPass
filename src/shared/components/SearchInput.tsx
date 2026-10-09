@@ -72,8 +72,19 @@ const SearchInput = forwardRef<any, SearchInputProps>(
         borderRadius: 12,
         backgroundColor: darkmode
           ? "rgba(36, 36, 36, 0.52)"
-          : "rgba(255, 255, 255, 0.72)",
-        borderColor: theme.colors.outlineVariant,
+          : "rgba(248, 248, 248, 0.78)",
+        borderColor: darkmode
+          ? theme.colors.outlineVariant
+          : "rgba(118, 118, 118, 0.2)",
+        boxShadow: darkmode
+          ? "none"
+          : ("rgba(255, 255, 255, 0.42) 0px 1px 0px 0px inset, rgba(48, 48, 48, 0.035) 0px 8px 22px -16px" as any),
+        ...(Platform.OS === "web"
+          ? ({
+              backdropFilter: "blur(18px) saturate(1.15)",
+              WebkitBackdropFilter: "blur(18px) saturate(1.15)",
+            } as any)
+          : null),
       },
       webNoDragStyle,
       style,
