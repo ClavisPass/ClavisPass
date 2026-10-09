@@ -63,6 +63,7 @@ const en: TranslationSchema = {
     showPassword: "Show password",
     hidePassword: "Hide password",
     generatePassword: "Generate password",
+    openApp: "Open app",
     openUrl: "Open URL",
     callPhoneNumber: "Call phone number",
     copiedFor: "Copied for {{seconds}} seconds",
@@ -356,8 +357,7 @@ const en: TranslationSchema = {
     browserExtensionOpenOptionsSubtitle: "Install browser extension.",
     browserExtensionModalHint: "Install the extension for your browser.",
     browserExtensionSettingsItem: "Manage browser access",
-    browserExtensionSettingsItemSubtitle:
-      "Trusted browsers and requests.",
+    browserExtensionSettingsItemSubtitle: "Trusted browsers and requests.",
     browserExtensionChromeStore: "Install Chrome extension",
     browserExtensionFirefoxStore: "Install Firefox extension",
     browserPairingDescription:
@@ -610,7 +610,8 @@ const en: TranslationSchema = {
     insightsTitle: "Insights",
     insightAccounts: "{{email}} is used by {{count}} accounts.",
     insightDomains: "{{count}} domains share this identity.",
-    insightInformation: "{{count}} types of stored information are linked to it.",
+    insightInformation:
+      "{{count}} types of stored information are linked to it.",
     insightRisks: "{{count}} linked accounts have security issues.",
     linkedEntries: "Linked entries",
     noDomain: "No domain",

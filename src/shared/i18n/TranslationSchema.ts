@@ -60,6 +60,7 @@ export type TranslationSchema = {
     showPassword: string;
     hidePassword: string;
     generatePassword: string;
+    openApp: string;
     openUrl: string;
     callPhoneNumber: string;
     copiedFor: string;

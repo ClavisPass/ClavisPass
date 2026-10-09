@@ -74,10 +74,7 @@ import {
   canExportVCard,
   exportVCard,
 } from "../features/vault/utils/vcardExport";
-import {
-  getItemSurfaceStyle,
-  getScreenContentStyle,
-} from "../shared/ui/glass";
+import { getItemSurfaceStyle, getScreenContentStyle } from "../shared/ui/glass";
 
 type EditScreenProps = NativeStackScreenProps<HomeStackParamList, "Edit">;
 
@@ -1333,12 +1330,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           />
         }
       />
-      <View
-        style={[
-          styles.editListWrap,
-          screenContentStyle,
-        ]}
-      >
+      <View style={[styles.editListWrap, screenContentStyle]}>
         {renderEditActionChips()}
         {renderFadedModulesList()}
         <View
@@ -1370,24 +1362,19 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
               </View>
             )}
             {renderEditControlGroup()}
-            <AppTooltip title={t("common:fastAccess")}>
-              <View style={{ flexShrink: 0 }}>
-                <SquaredContainerButton
-                  disabled={!hasFastAccess}
-                  onPress={openFastAccessFeature}
-                >
-                  <AppIcon
-                    name={"tooltip-account"}
-                    color={
-                      hasFastAccess
-                        ? editControlContentColor
-                        : theme.colors.onSurfaceDisabled
-                    }
-                    size={20}
-                  />
-                </SquaredContainerButton>
-              </View>
-            </AppTooltip>
+            {hasFastAccess ? (
+              <AppTooltip title={t("common:fastAccess")}>
+                <View style={{ flexShrink: 0 }}>
+                  <SquaredContainerButton onPress={openFastAccessFeature}>
+                    <AppIcon
+                      name={"tooltip-account"}
+                      color={editControlContentColor}
+                      size={20}
+                    />
+                  </SquaredContainerButton>
+                </View>
+              </AppTooltip>
+            ) : null}
           </View>
         </View>
       </View>

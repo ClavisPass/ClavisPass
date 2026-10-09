@@ -2,7 +2,10 @@ import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 import { logger } from "../../../infrastructure/logging/logger";
 import { detectTauriEnvironment } from "../../../infrastructure/platform/isTauri";
-import { get as getSetting, set as setSetting } from "../../../infrastructure/storage/store";
+import {
+  get as getSetting,
+  set as setSetting,
+} from "../../../infrastructure/storage/store";
 import { copyWithAutoClear } from "../../../infrastructure/clipboard/copyWithAutoClear";
 import {
   FAST_ACCESS_NOTIFICATION_CATEGORY,
@@ -11,7 +14,10 @@ import {
   FAST_ACCESS_READY_EVENT,
   FAST_ACCESS_UPDATE_EVENT,
 } from "../constants";
-import { hideMobileFastAccess, showMobileFastAccess } from "./mobileFastAccessStore";
+import {
+  hideMobileFastAccess,
+  showMobileFastAccess,
+} from "./mobileFastAccessStore";
 
 let notificationListenerSet = false;
 let notificationCategorySet = false;
@@ -100,20 +106,22 @@ async function ensurePopupReadyListener() {
   popupReadyListenerSet = true;
 }
 
-async function waitForPopupReady(timeoutMs = 2000) {
+async function waitForPopupReady(timeoutMs = 2500) {
   if (popupReady) {
-    return;
+    return true;
   }
 
-  await new Promise<void>((resolve) => {
+  return new Promise<boolean>((resolve) => {
     const timer = setTimeout(() => {
-      popupReadyResolvers = popupReadyResolvers.filter((item) => item !== onReady);
-      resolve();
+      popupReadyResolvers = popupReadyResolvers.filter(
+        (item) => item !== onReady,
+      );
+      resolve(false);
     }, timeoutMs);
 
     const onReady = () => {
       clearTimeout(timer);
-      resolve();
+      resolve(true);
     };
 
     popupReadyResolvers.push(onReady);
@@ -134,18 +142,21 @@ async function configureMobileFastAccess() {
   }
 
   if (!notificationCategorySet) {
-    await Notifications.setNotificationCategoryAsync(FAST_ACCESS_NOTIFICATION_CATEGORY, [
-      {
-        identifier: "COPY_USERNAME",
-        buttonTitle: "Username",
-        options: { isDestructive: false, opensAppToForeground: false },
-      },
-      {
-        identifier: "COPY_PASSWORD",
-        buttonTitle: "Password",
-        options: { isDestructive: false, opensAppToForeground: false },
-      },
-    ]);
+    await Notifications.setNotificationCategoryAsync(
+      FAST_ACCESS_NOTIFICATION_CATEGORY,
+      [
+        {
+          identifier: "COPY_USERNAME",
+          buttonTitle: "Username",
+          options: { isDestructive: false, opensAppToForeground: false },
+        },
+        {
+          identifier: "COPY_PASSWORD",
+          buttonTitle: "Password",
+          options: { isDestructive: false, opensAppToForeground: false },
+        },
+      ],
+    );
     notificationCategorySet = true;
   }
 
@@ -161,8 +172,13 @@ async function configureMobileFastAccess() {
       switch (response.actionIdentifier) {
         case "COPY_USERNAME":
           if (data.username) {
-            const copyDurationSeconds = Number(getSetting("COPY_DURATION") ?? 0);
-            const durationMs = Math.max(0, Math.floor(copyDurationSeconds * 1000));
+            const copyDurationSeconds = Number(
+              getSetting("COPY_DURATION") ?? 0,
+            );
+            const durationMs = Math.max(
+              0,
+              Math.floor(copyDurationSeconds * 1000),
+            );
             void copyWithAutoClear(data.username, durationMs, {
               kind: "username",
             });
@@ -170,8 +186,13 @@ async function configureMobileFastAccess() {
           break;
         case "COPY_PASSWORD":
           if (data.password) {
-            const copyDurationSeconds = Number(getSetting("COPY_DURATION") ?? 0);
-            const durationMs = Math.max(0, Math.floor(copyDurationSeconds * 1000));
+            const copyDurationSeconds = Number(
+              getSetting("COPY_DURATION") ?? 0,
+            );
+            const durationMs = Math.max(
+              0,
+              Math.floor(copyDurationSeconds * 1000),
+            );
             void copyWithAutoClear(data.password, durationMs, {
               kind: "password",
             });
@@ -179,7 +200,10 @@ async function configureMobileFastAccess() {
           break;
         case Notifications.DEFAULT_ACTION_IDENTIFIER:
           showMobileFastAccess({
-            title: data.title ?? response.notification.request.content.title ?? "Fast Access",
+            title:
+              data.title ??
+              response.notification.request.content.title ??
+              "Fast Access",
             username: data.username ?? "",
             password: data.password ?? "",
           });
@@ -211,52 +235,81 @@ export async function prepareFastAccess() {
   }
 }
 
-async function ensurePopupWindow() {
-  if (!(await detectTauriEnvironment())) {
-    throw new Error("Fast access popup is only available in Tauri.");
-  }
+async function createPopupWindow() {
   const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
-  let win = await WebviewWindow.getByLabel(FAST_ACCESS_POPUP_LABEL);
-  if (win) return win;
-
   popupReady = false;
 
-  win = new WebviewWindow(FAST_ACCESS_POPUP_LABEL, {
-    width: 320,
-    height: 150,
+  const win = new WebviewWindow(FAST_ACCESS_POPUP_LABEL, {
+    url: "index.html",
+    width: FAST_ACCESS_WINDOW_WIDTH,
+    height: FAST_ACCESS_WINDOW_HEIGHT,
     decorations: false,
     resizable: false,
     alwaysOnTop: true,
+    transparent: true,
+    backgroundColor: [0, 0, 0, 0],
+    windowEffects: {
+      effects: ["acrylic", "blur"],
+      color: [250, 252, 255, 120],
+    } as any,
     visible: false,
-    focus: true,
+    focus: false,
     title: "Fast Access",
   });
 
   await new Promise<void>((resolve, reject) => {
-    win.once("tauri://created", async () => {
-      await positionPopup();
-      await win.show();
-      resolve();
-    });
+    win.once("tauri://created", () => resolve());
     win.once("tauri://error", (e) => reject(e));
   });
 
   return win;
 }
 
+async function ensurePopupWindow() {
+  if (!(await detectTauriEnvironment())) {
+    throw new Error("Fast access popup is only available in Tauri.");
+  }
+  const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
+  const win = await WebviewWindow.getByLabel(FAST_ACCESS_POPUP_LABEL);
+  if (win) return win;
+
+  return createPopupWindow();
+}
+
+async function recreatePopupWindow() {
+  const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
+  const existing = await WebviewWindow.getByLabel(FAST_ACCESS_POPUP_LABEL);
+  if (existing) {
+    try {
+      await existing.close();
+    } catch (error) {
+      logger.warn("[FastAccess] Failed to close stale popup:", error);
+    }
+  }
+
+  return createPopupWindow();
+}
+
 export async function openFastAccess(
   title: string,
   username: string,
-  password: string
+  password: string,
 ) {
   if (await detectTauriEnvironment()) {
     try {
       await prepareFastAccess();
-      const win = await ensurePopupWindow();
+      let win = await ensurePopupWindow();
+      const ready = await waitForPopupReady();
+      if (!ready) {
+        logger.warn("[FastAccess] Popup did not become ready; recreating it.");
+        win = await recreatePopupWindow();
+        await waitForPopupReady();
+      }
+
+      await win.emit(FAST_ACCESS_UPDATE_EVENT, { title, username, password });
       await positionPopup();
       await win.show();
-      await waitForPopupReady();
-      await win.emit(FAST_ACCESS_UPDATE_EVENT, { title, username, password });
+      await win.setFocus();
     } catch (err) {
       logger.error("Popup-Fenster konnte nicht erstellt/gezeigt werden:", err);
     }
@@ -272,7 +325,8 @@ export async function openFastAccess(
 
   const nextKey = buildFastAccessKey(title, username, password);
   if (lastNotificationId) {
-    const stillPresented = await isNotificationStillPresented(lastNotificationId);
+    const stillPresented =
+      await isNotificationStillPresented(lastNotificationId);
     if (!stillPresented) {
       lastNotificationId = null;
       activeFastAccessKey = null;
@@ -287,7 +341,10 @@ export async function openFastAccess(
     try {
       await Notifications.dismissNotificationAsync(lastNotificationId);
     } catch (error) {
-      logger.warn("[FastAccess] Failed to dismiss previous notification:", error);
+      logger.warn(
+        "[FastAccess] Failed to dismiss previous notification:",
+        error,
+      );
     }
     lastNotificationId = null;
   }
@@ -353,7 +410,10 @@ export async function syncFastAccessSession(sessionKey: string | null) {
       try {
         await win.hide();
       } catch (error) {
-        logger.warn("[FastAccess] Failed to hide popup for session sync:", error);
+        logger.warn(
+          "[FastAccess] Failed to hide popup for session sync:",
+          error,
+        );
       }
     }
     return;
@@ -363,7 +423,10 @@ export async function syncFastAccessSession(sessionKey: string | null) {
     try {
       await Notifications.dismissNotificationAsync(lastNotificationId);
     } catch (error) {
-      logger.warn("[FastAccess] Failed to dismiss session notification:", error);
+      logger.warn(
+        "[FastAccess] Failed to dismiss session notification:",
+        error,
+      );
     }
     lastNotificationId = null;
   }
@@ -385,7 +448,10 @@ export async function cleanupFastAccessOnStartup(hasActiveSession: boolean) {
       try {
         await win.hide();
       } catch (error) {
-        logger.warn("[FastAccess] Failed to hide popup during startup cleanup:", error);
+        logger.warn(
+          "[FastAccess] Failed to hide popup during startup cleanup:",
+          error,
+        );
       }
     }
     return;
@@ -430,7 +496,10 @@ export async function positionPopup() {
   const y =
     position === "top-left" || position === "top-right"
       ? screenY + FAST_ACCESS_MARGIN_TOP
-      : screenY + height - FAST_ACCESS_WINDOW_HEIGHT - FAST_ACCESS_MARGIN_BOTTOM;
+      : screenY +
+        height -
+        FAST_ACCESS_WINDOW_HEIGHT -
+        FAST_ACCESS_MARGIN_BOTTOM;
 
   await win.setPosition(new LogicalPosition(x, y));
 }
@@ -464,11 +533,12 @@ export async function snapPopupToNearestCorner() {
     return;
   }
 
-  const [{ getCurrentWindow, LogicalPosition }, { currentMonitor }, { emit }] = await Promise.all([
-    import("@tauri-apps/api/window"),
-    import("@tauri-apps/api/window"),
-    import("@tauri-apps/api/event"),
-  ]);
+  const [{ getCurrentWindow, LogicalPosition }, { currentMonitor }, { emit }] =
+    await Promise.all([
+      import("@tauri-apps/api/window"),
+      import("@tauri-apps/api/window"),
+      import("@tauri-apps/api/event"),
+    ]);
 
   const win = getCurrentWindow();
   const monitor = await currentMonitor();
@@ -496,11 +566,7 @@ export async function snapPopupToNearestCorner() {
     },
     {
       value: "top-right",
-      x:
-        screenX +
-        width -
-        FAST_ACCESS_MARGIN_X -
-        FAST_ACCESS_WINDOW_WIDTH / 2,
+      x: screenX + width - FAST_ACCESS_MARGIN_X - FAST_ACCESS_WINDOW_WIDTH / 2,
       y: screenY + FAST_ACCESS_MARGIN_TOP + FAST_ACCESS_WINDOW_HEIGHT / 2,
     },
     {
@@ -514,11 +580,7 @@ export async function snapPopupToNearestCorner() {
     },
     {
       value: "bottom-right",
-      x:
-        screenX +
-        width -
-        FAST_ACCESS_MARGIN_X -
-        FAST_ACCESS_WINDOW_WIDTH / 2,
+      x: screenX + width - FAST_ACCESS_MARGIN_X - FAST_ACCESS_WINDOW_WIDTH / 2,
       y:
         screenY +
         height -
@@ -528,7 +590,10 @@ export async function snapPopupToNearestCorner() {
   ] as const;
 
   const nearestCorner = corners.reduce((best, current) => {
-    const bestDistance = Math.hypot(best.x - windowCenterX, best.y - windowCenterY);
+    const bestDistance = Math.hypot(
+      best.x - windowCenterX,
+      best.y - windowCenterY,
+    );
     const currentDistance = Math.hypot(
       current.x - windowCenterX,
       current.y - windowCenterY,
@@ -544,9 +609,14 @@ export async function snapPopupToNearestCorner() {
   const targetY =
     nearestCorner.value === "top-left" || nearestCorner.value === "top-right"
       ? screenY + FAST_ACCESS_MARGIN_TOP
-      : screenY + height - FAST_ACCESS_WINDOW_HEIGHT - FAST_ACCESS_MARGIN_BOTTOM;
+      : screenY +
+        height -
+        FAST_ACCESS_WINDOW_HEIGHT -
+        FAST_ACCESS_MARGIN_BOTTOM;
 
   await animatePopupToPosition(targetX, targetY);
   await win.setPosition(new LogicalPosition(targetX, targetY));
-  await emit(FAST_ACCESS_POSITION_CHANGED_EVENT, { value: nearestCorner.value });
+  await emit(FAST_ACCESS_POSITION_CHANGED_EVENT, {
+    value: nearestCorner.value,
+  });
 }

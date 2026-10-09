@@ -63,6 +63,7 @@ const de: TranslationSchema = {
     showPassword: "Passwort anzeigen",
     hidePassword: "Passwort ausblenden",
     generatePassword: "Passwort generieren",
+    openApp: "App öffnen",
     openUrl: "URL öffnen",
     callPhoneNumber: "Telefonnummer anrufen",
     copiedFor: "Kopiert für {{seconds}} Sekunden",
@@ -252,7 +253,8 @@ const de: TranslationSchema = {
     showHide: "Anzeigen/Verbergen",
     hotkeys: "Tastenkürzel",
     hotkeyAction_toggleMainWindow: "App anzeigen/verbergen",
-    hotkeyAction_toggleMainWindowSubtitle: "App-Fenster anzeigen oder verbergen.",
+    hotkeyAction_toggleMainWindowSubtitle:
+      "App-Fenster anzeigen oder verbergen.",
     hotkeyAction_lockVault: "Vault sperren",
     hotkeyAction_lockVaultSubtitle: "Geöffneten Vault sofort sperren.",
     hotkeyAction_newEntry: "Neuen Eintrag erstellen",
@@ -276,8 +278,7 @@ const de: TranslationSchema = {
     timeFormat: "Zeitformat",
     timeFormatSubtitle: "Format für Uhrzeiten.",
     changeMasterPassword: "Master-Passwort ändern",
-    changeMasterPasswordSubtitle:
-      "Master-Passwort des Vaults ändern.",
+    changeMasterPasswordSubtitle: "Master-Passwort des Vaults ändern.",
     useSystemAuth: "Systemauthentifizierung",
     useSystemAuthSubtitle: "Mit Geräteentsperrung anmelden.",
     expiryReminders: "Ablauf-Erinnerungen",
@@ -354,11 +355,9 @@ const de: TranslationSchema = {
     manageDevices: "Geräte verwalten",
     encryption: "Verschlüsselung",
     keyDerivation: "Schlüsselableitung",
-    manageDevicesSubtitle:
-      "Gespeicherte und synchronisierte Geräte.",
+    manageDevicesSubtitle: "Gespeicherte und synchronisierte Geräte.",
     encryptionSubtitle: "Verschlüsselung des Vault-Inhalts.",
-    keyDerivationSubtitle:
-      "Master-Passwort zusätzlich härten.",
+    keyDerivationSubtitle: "Master-Passwort zusätzlich härten.",
     browserExtensions: "Browser-Erweiterungen",
     browserExtensionOpenOptions: "Browser-Erweiterungen einrichten",
     browserExtensionOpenOptionsSubtitle:
@@ -465,16 +464,13 @@ const de: TranslationSchema = {
     subtitleAutostart: "ClavisPass mit dem System starten.",
     subtitleStartMinimized: "Beim Start im Hintergrund öffnen.",
     subtitleResetWindowSize: "Standardgröße des Fensters wiederherstellen.",
-    subtitleMinimizeToTray:
-      "Beim Schließen im Tray weiterlaufen.",
+    subtitleMinimizeToTray: "Beim Schließen im Tray weiterlaufen.",
     subtitleCheckForUpdates: "Nach neuen Versionen suchen.",
     subtitleMobileUpdateDownload: "Neueste App-Version herunterladen.",
-    subtitleResetSettings:
-      "App-Einstellungen auf Standard zurücksetzen.",
+    subtitleResetSettings: "App-Einstellungen auf Standard zurücksetzen.",
     subtitleResetDevice: "Lokale Daten dieses Geräts entfernen.",
     subtitleClearVault: "Einträge und Ordner lokal entfernen.",
-    subtitleClearSyncDevices:
-      "Synchronisierte Geräteliste leeren.",
+    subtitleClearSyncDevices: "Synchronisierte Geräteliste leeren.",
   },
   analysis: {
     topFindings: "Top-Funde",
@@ -603,8 +599,7 @@ const de: TranslationSchema = {
     summaryHint: "{{email}} erscheint in {{count}} Accounts.",
     overviewHint:
       "{{accounts}} Accounts auf {{websites}} Webseiten sind mit gespeicherten E-Mails verknüpft.",
-    emptyHint:
-      "Füge E-Mails zu Einträgen hinzu, um Identitäten zu entdecken.",
+    emptyHint: "Füge E-Mails zu Einträgen hinzu, um Identitäten zu entdecken.",
     detailMissing: "Diese Identität ist nicht mehr verfügbar.",
     renameTitle: "Identitätsnamen bearbeiten",
     displayNamePlaceholder: "Anzeigename, z. B. Privat oder Arbeit",

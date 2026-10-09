@@ -245,12 +245,16 @@ export default function App() {
   if (view === "popup") {
     return (
       <SafeAreaProvider>
-        <SettingsProvider>
-          <ThemeProvider>
-            <I18nBridge />
-            <FastAccessScreen />
-          </ThemeProvider>
-        </SettingsProvider>
+        <GestureHandlerRootView
+          style={{ flex: 1, backgroundColor: "transparent" }}
+        >
+          <SettingsProvider>
+            <ThemeProvider>
+              <I18nBridge />
+              <FastAccessScreen />
+            </ThemeProvider>
+          </SettingsProvider>
+        </GestureHandlerRootView>
       </SafeAreaProvider>
     );
   }
