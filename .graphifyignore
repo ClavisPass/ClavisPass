@@ -1,0 +1,41 @@
+# Dependencies and package caches
+node_modules/
+.yarn/
+.pnpm-store/
+
+# Expo and web build output
+.expo/
+dist/
+dist-demo/
+dist-msix/
+artifacts/
+web-build/
+coverage/
+
+# Native build output
+android/.gradle/
+android/app/build/
+android/build/
+ios/build/
+src-tauri/target/
+
+# Generated extension output
+browser-extension/artifacts/
+browser-extension/.vite/
+
+# Local and generated graph data
+graphify-out/cache/
+graphify-out/.graphify_*
+graphify-out/needs_update
+
+# Secrets and local env
+.env
+.env*.local
+*.jks
+*.p8
+*.p12
+*.pfx
+*.key
+*.mobileprovision
+*.keystore
+keystore.txt

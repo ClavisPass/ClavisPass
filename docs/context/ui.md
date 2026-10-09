@@ -21,6 +21,13 @@ Use this for screens, components, layout, menus, dropdowns, titlebars, mobile/we
 - `src/shared/i18n/languages/de.ts`
 - `src/shared/i18n/languages/en.ts`
 
+## Related UI Context
+
+- For visual conventions, glass/background rules, chips, item surfaces, and compact search behavior, read [ui-patterns.md](/e:/Projects/ClavisPass/docs/context/ui-patterns.md).
+- For aligning screens to the shared header/content/item structure, read [screen-standardization.md](/e:/Projects/ClavisPass/docs/context/screen-standardization.md).
+- For vault module row UI and module reorder behavior, read [vault-modules.md](/e:/Projects/ClavisPass/docs/context/vault-modules.md).
+- For identity list/detail UI and clustering concepts, read [identity.md](/e:/Projects/ClavisPass/docs/context/identity.md).
+
 ## Titlebar And Chrome
 
 When changing headers, compact headers, search placement, titlebars, window controls, or app chrome:
