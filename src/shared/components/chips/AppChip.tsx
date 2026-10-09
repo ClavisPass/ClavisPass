@@ -63,21 +63,15 @@ function AppChip({
   ...props
 }: Props) {
   const { darkmode, theme } = useTheme();
-  const chipBackgroundColor = darkmode
-    ? "rgba(120, 127, 246, 0.16)"
-    : "rgba(120, 127, 246, 0.10)";
+  const chipBackgroundColor = theme.colors.secondaryContainer;
+  const chipLabelColor = theme.colors.onSecondaryContainer;
   const chipBorderColor = darkmode
     ? "rgba(120, 127, 246, 0.26)"
     : "rgba(120, 127, 246, 0.18)";
-  const chipLabelColor = darkmode
-    ? "rgba(255, 255, 255, 0.82)"
-    : "rgba(24, 28, 38, 0.76)";
 
   if (iconOnly && icon) {
     const selectedBackgroundColor = showSelectedOverlay
-      ? darkmode
-        ? "rgba(120, 127, 246, 0.28)"
-        : "rgba(120, 127, 246, 0.18)"
+      ? theme.colors.primaryContainer
       : chipBackgroundColor;
     const iconColor = iconOnlyColor ?? chipLabelColor;
     const iconKey = `${typeof icon === "string" ? icon : "custom"}-${
@@ -141,14 +135,13 @@ function AppChip({
       showSelectedOverlay={showSelectedOverlay}
       style={[
         {
-          backgroundColor: chipBackgroundColor,
           borderColor: chipBorderColor,
           borderWidth: StyleSheet.hairlineWidth,
           borderRadius: 12,
         },
         style as any,
       ]}
-      textStyle={[{ color: chipLabelColor }, textStyle as any]}
+      textStyle={textStyle}
     >
       {children ?? ""}
     </Chip>

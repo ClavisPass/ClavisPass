@@ -18,10 +18,10 @@
     "semantic_hash": "200e36d9e4fdc46ebc5c121e1f769a7c"
   },
   "App.tsx": {
-    "mtime": 1791451283.8030586,
-    "seen": 1791564566.803268,
-    "ast_hash": "2a33d24afa8e3eb227548929492fdeac",
-    "semantic_hash": "2a33d24afa8e3eb227548929492fdeac"
+    "mtime": 1791566175.1064537,
+    "seen": 1791566201.677086,
+    "ast_hash": "0521723912f8e07b71c6bfe6b1acf4fa",
+    "semantic_hash": ""
   },
   "android/app/build.gradle": {
     "mtime": 1791293700.6316078,
@@ -2490,10 +2490,10 @@
     "semantic_hash": "29269f47bca19e517ea83039c1c33622"
   },
   "src/screens/EditScreen.tsx": {
-    "mtime": 1791561600.710113,
-    "seen": 1791564566.803268,
-    "ast_hash": "109ceb5a78c5e1d65a0175b2969525e5",
-    "semantic_hash": "109ceb5a78c5e1d65a0175b2969525e5"
+    "mtime": 1791566716.185765,
+    "seen": 1791566804.175023,
+    "ast_hash": "c6efa7d6add74e3e99aaff901be81f8a",
+    "semantic_hash": ""
   },
   "src/screens/FastAccessScreen.tsx": {
     "mtime": 1790105651.3357697,
@@ -2586,10 +2586,10 @@
     "semantic_hash": "7b28383200a6478757f82b730b6e9df0"
   },
   "src/shared/components/AmbientBackground.tsx": {
-    "mtime": 1791451288.6473289,
-    "seen": 1791564566.803268,
-    "ast_hash": "f04e0b5252285f6ffa445a9a2de6b138",
-    "semantic_hash": "f04e0b5252285f6ffa445a9a2de6b138"
+    "mtime": 1791566179.2311318,
+    "seen": 1791566201.677086,
+    "ast_hash": "6fd35a9729cd1f8e38e89825f97a21da",
+    "semantic_hash": ""
   },
   "src/shared/components/AnimatedPressable.tsx": {
     "mtime": 1790793448.927619,
@@ -2742,10 +2742,10 @@
     "semantic_hash": "8f0d78596d8a42aef7121fa6ea8e1480"
   },
   "src/shared/components/buttons/SquaredContainerButton.tsx": {
-    "mtime": 1791361208.099625,
-    "seen": 1791564566.803268,
-    "ast_hash": "47a749bb04d1f8ab3b94889ee7051038",
-    "semantic_hash": "47a749bb04d1f8ab3b94889ee7051038"
+    "mtime": 1791566557.2441883,
+    "seen": 1791566581.2351851,
+    "ast_hash": "d675cf4b6a76cf3a1a39614a5c83c251",
+    "semantic_hash": ""
   },
   "src/shared/components/buttons/TooltipIconButton.tsx": {
     "mtime": 1789420752.3750844,
@@ -2754,10 +2754,10 @@
     "semantic_hash": "a54a5bd9151b79a8ac16ee8971897693"
   },
   "src/shared/components/chips/AppChip.tsx": {
-    "mtime": 1791361059.6028788,
-    "seen": 1791564566.803268,
-    "ast_hash": "8f6d710845a561a35d61ba32180046c9",
-    "semantic_hash": "8f6d710845a561a35d61ba32180046c9"
+    "mtime": 1791566776.135572,
+    "seen": 1791566804.175023,
+    "ast_hash": "80b2b3097844288123618ddd9dbf65f2",
+    "semantic_hash": ""
   },
   "src/shared/components/container/AnimatedContainer.tsx": {
     "mtime": 1791363961.018954,
@@ -3006,10 +3006,10 @@
     "semantic_hash": "82c4c48308198edf36e3e360df4a3cac"
   },
   "src/shared/ui/glass.ts": {
-    "mtime": 1791561661.962607,
-    "seen": 1791564566.8042684,
-    "ast_hash": "e1ee225ffdc487bc30913c6b5c2dde97",
-    "semantic_hash": "e1ee225ffdc487bc30913c6b5c2dde97"
+    "mtime": 1791566089.7250974,
+    "seen": 1791566201.677086,
+    "ast_hash": "3378cb4467ba50ed2279bbb84e0741b1",
+    "semantic_hash": ""
   },
   "src/shared/ui/globalStyles.ts": {
     "mtime": 1789406244.8264036,
@@ -3330,9 +3330,9 @@
     "semantic_hash": ""
   },
   "docs/context/ui-patterns.md": {
-    "mtime": 1791564877.0001633,
-    "seen": 1791564931.2506914,
-    "ast_hash": "1e5f42e8db1a1821b935118057583b8f",
+    "mtime": 1791566781.4221537,
+    "seen": 1791566804.175023,
+    "ast_hash": "2e0b8e87efd8f97fd6baa6c0b1ca3a95",
     "semantic_hash": ""
   },
   "docs/context/ui.md": {

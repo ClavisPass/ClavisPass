@@ -13,11 +13,11 @@ export function getGlassChromeStyle(_darkmode: boolean): ViewStyle {
 
 export function getScreenContentStyle(theme: AppTheme): ViewStyle {
   return {
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.dark ? theme.colors.background : "#F7F9FF",
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.dark
       ? theme.colors.outlineVariant
-      : "rgba(22, 28, 45, 0.18)",
+      : "rgba(76, 95, 142, 0.13)",
     borderRadius: 8,
     overflow: "hidden",
   };
@@ -32,14 +32,14 @@ export function getItemSurfaceStyle(theme: AppTheme): ViewStyle {
       : "#FFFFFF",
     borderColor: theme.dark
       ? "rgba(255, 255, 255, 0.075)"
-      : "rgba(22, 28, 45, 0.075)",
+      : "rgba(54, 72, 116, 0.06)",
     shadowColor,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: theme.dark ? 0.18 : 0.09,
-    shadowRadius: 7,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: theme.dark ? 0.16 : 0.055,
+    shadowRadius: 5,
+    elevation: 1,
     boxShadow: theme.dark
-      ? ("rgba(0, 0, 0, 0.17) 0px 8px 20px -8px, rgba(0, 0, 0, 0.12) 0px 1px 6px -3px" as any)
-      : ("rgba(32, 38, 58, 0.085) 0px 8px 20px -10px, rgba(32, 38, 58, 0.055) 0px 1px 6px -4px" as any),
+      ? ("rgba(0, 0, 0, 0.15) 0px 7px 18px -9px, rgba(0, 0, 0, 0.10) 0px 1px 5px -3px" as any)
+      : ("rgba(37, 55, 96, 0.055) 0px 7px 18px -12px, rgba(37, 55, 96, 0.04) 0px 1px 5px -4px" as any),
   };
 }

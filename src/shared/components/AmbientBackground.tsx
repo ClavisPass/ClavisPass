@@ -78,7 +78,7 @@ function AmbientBackground({}: Props) {
   const primary = theme.colors.primary;
   const secondary = theme.colors.secondary;
   const appBackground = isTauri
-    ? withAlpha(theme.colors.background, darkmode ? 0.24 : 0.5)
+    ? withAlpha(theme.colors.background, darkmode ? 0.24 : 0.12)
     : darkmode
       ? theme.colors.background
       : "#F7FAFF";

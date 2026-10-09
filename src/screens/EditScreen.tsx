@@ -74,7 +74,10 @@ import {
   canExportVCard,
   exportVCard,
 } from "../features/vault/utils/vcardExport";
-import { getScreenContentStyle } from "../shared/ui/glass";
+import {
+  getItemSurfaceStyle,
+  getScreenContentStyle,
+} from "../shared/ui/glass";
 
 type EditScreenProps = NativeStackScreenProps<HomeStackParamList, "Edit">;
 
@@ -128,6 +131,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const { width } = useWindowDimensions();
   const isFocused = useIsFocused();
   const screenContentStyle = getScreenContentStyle(theme);
+  const itemSurfaceStyle = getItemSurfaceStyle(theme);
 
   const { value: fastAccessBehavior } = useSetting("FAST_ACCESS");
 
@@ -1013,15 +1017,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   );
 
   const editControlSurfaceStyle = {
-    backgroundColor: darkmode
-      ? "rgba(255, 255, 255, 0.075)"
-      : "rgba(120, 127, 246, 0.075)",
-    borderColor: darkmode
-      ? "rgba(255, 255, 255, 0.11)"
-      : "rgba(120, 127, 246, 0.16)",
-    boxShadow: darkmode
-      ? ("rgba(0, 0, 0, 0.18) 0px 8px 22px 0px" as any)
-      : ("rgba(64, 76, 120, 0.10) 0px 8px 22px 0px" as any),
+    ...itemSurfaceStyle,
   };
   const editControlContentColor = darkmode
     ? "rgba(255, 255, 255, 0.82)"
@@ -1100,9 +1096,10 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         flexDirection: "row",
         alignItems: "stretch",
         borderRadius: 12,
-        paddingHorizontal: editSectionSpacing,
+        paddingHorizontal: 6,
         margin: 0,
         overflow: "hidden",
+        minWidth: 0,
         ...editControlSurfaceStyle,
         borderWidth: StyleSheet.hairlineWidth,
       }}

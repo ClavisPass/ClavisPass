@@ -266,7 +266,7 @@ function AppShell() {
     ? resolveWindowCornerRadius(windowCornerStyle)
     : 0;
   const shellBackgroundColor = isTauri
-    ? withAlpha(theme.colors.background, darkmode ? 0.54 : 0.74)
+    ? withAlpha(theme.colors.background, darkmode ? 0.54 : 0.46)
     : theme.colors.background;
 
   return (

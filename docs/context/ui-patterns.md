@@ -6,7 +6,7 @@ Use this for visual consistency, spacing, glass/background structure, item surfa
 
 - App-level ambient/glass background lives globally.
 - Header/sidebar areas are glassy/transparent.
-- Page content below the header uses a real background panel.
+- Page content below the header uses a real background panel. In light mode this panel is a cool, pale blue rather than pure white.
 - Standard spacing is `8px` unless a component has a clear density reason.
 - Page titles and passive chrome text use `theme.colors.onSurfaceVariant`, not primary.
 
@@ -47,7 +47,7 @@ Typical order:
 - Standard repeated items should use `getItemSurfaceStyle(theme)`.
 - Light mode item surfaces are solid white.
 - Dark mode item surfaces are subtle translucent surfaces.
-- Borders should be relaxed; separation primarily comes from the shared soft shadow.
+- Borders should be relaxed; separation primarily comes from a very soft, low-contrast shared shadow.
 - Keep item overflow visible when shadows need to render. Clip only the inner ripple/content layer when needed.
 
 Current expected users of item surfaces:
@@ -61,6 +61,7 @@ Current expected users of item surfaces:
 ## Chips
 
 - Chips use `AppChip`.
+- Chips should stay close to React Native Paper defaults: Paper container colors, compact local height/radius, and a subtle primary-tinted hairline border like the sidebar add button.
 - Horizontal chip rows should scroll naturally on web/mobile; avoid extra left/right buttons unless a screen has a specific reason.
 - Compact chip containers should use `8px` side padding.
 - Labels should usually be neutral text, not primary, unless the chip is selected or a primary action.

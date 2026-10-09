@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import AnimatedPressable from "../AnimatedPressable";
+import { getItemSurfaceStyle } from "../../ui/glass";
 
 const styles = StyleSheet.create({
   container: {
@@ -29,28 +30,19 @@ type Props = {
 };
 
 function SquaredContainerButton(props: Props) {
-  const { theme, darkmode } = useTheme();
-  const glassBackgroundColor = darkmode
-    ? "rgba(255, 255, 255, 0.075)"
-    : "rgba(120, 127, 246, 0.075)";
-  const glassBorderColor = darkmode
-    ? "rgba(255, 255, 255, 0.11)"
-    : "rgba(120, 127, 246, 0.16)";
-  const glassShadow = darkmode
-    ? ("rgba(0, 0, 0, 0.18) 0px 8px 22px 0px" as any)
-    : ("rgba(64, 76, 120, 0.10) 0px 8px 22px 0px" as any);
+  const { theme } = useTheme();
+  const itemSurfaceStyle = getItemSurfaceStyle(theme);
 
   return (
     <View
       style={[
         styles.container,
+        itemSurfaceStyle,
         {
           backgroundColor: props.disabled
             ? theme.colors.surfaceDisabled
-            : (props.backgroundColor ?? glassBackgroundColor),
-          boxShadow: glassShadow,
+            : (props.backgroundColor ?? itemSurfaceStyle.backgroundColor),
           borderWidth: StyleSheet.hairlineWidth,
-          borderColor: glassBorderColor,
         },
       ]}
     >
