@@ -31,7 +31,7 @@ function ConfirmationModal({
   const { theme } = useTheme();
 
   return (
-    <Modal visible={visible} onDismiss={onDismiss}>
+    <Modal visible={visible} onDismiss={onDismiss} avoidKeyboard>
       <ModalSurface
         width={300}
         minHeight={170}

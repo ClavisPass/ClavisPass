@@ -31,6 +31,7 @@ import AnimatedPressable from "../shared/components/AnimatedPressable";
 import AppChip from "../shared/components/chips/AppChip";
 import SearchHeader from "../shared/components/SearchHeader";
 import {
+  SCROLLBAR_CONTENT_GAP,
   getItemSurfaceStyle,
   getScreenContentStyle,
 } from "../shared/ui/glass";
@@ -179,8 +180,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   const { isCloudOnline } = useOnline();
   const {
     theme,
-    headerWhite,
-    setHeaderWhite,
     darkmode,
     setHeaderSpacing,
     setTitlebarCenterGap,
@@ -215,7 +214,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(0);
-      setHeaderWhite(false);
       setTitlebarCenterGap(0);
       setTitlebarOverlayDragEnabled(false);
 
@@ -224,7 +222,6 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
       };
     }, [
       setHeaderSpacing,
-      setHeaderWhite,
       setTitlebarCenterGap,
       setTitlebarOverlayDragEnabled,
     ])
@@ -756,7 +753,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
     <AnimatedContainer>
       <FocusAwareStatusBar
         animated
-        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        style={darkmode ? "light" : "dark"}
         translucent
       />
 
@@ -780,8 +777,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
         ref={scrollRef}
         style={{ width: "100%", ...screenContentStyle }}
         contentContainerStyle={{
-          padding: 8,
-          paddingTop: 0,
+          paddingRight: SCROLLBAR_CONTENT_GAP,
           gap: GAP,
           alignSelf: "center",
           width: "100%",

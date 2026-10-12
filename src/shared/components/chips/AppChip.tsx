@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { Chip, TouchableRipple } from "react-native-paper";
 
 import { useTheme } from "../../../app/providers/ThemeProvider";
@@ -47,6 +47,41 @@ function normalizeIcon(icon: IconSource): IconSource {
   );
 }
 
+export function getAppChipSurfaceStyle({
+  darkmode,
+  selected = false,
+}: {
+  darkmode: boolean;
+  selected?: boolean;
+}) {
+  const chipBackgroundColor = darkmode
+    ? "rgba(255, 255, 255, 0.075)"
+    : "rgba(120, 127, 246, 0.09)";
+  const selectedChipBackgroundColor = darkmode
+    ? "rgba(120, 127, 246, 0.18)"
+    : "rgba(120, 127, 246, 0.16)";
+  const chipBorderColor = darkmode
+    ? "rgba(120, 127, 246, 0.32)"
+    : "rgba(120, 127, 246, 0.28)";
+  const glassChipStyle =
+    Platform.OS === "web"
+      ? ({
+          backdropFilter: "blur(14px) saturate(1.08)",
+          WebkitBackdropFilter: "blur(14px) saturate(1.08)",
+        } as any)
+      : null;
+
+  return {
+    borderColor: chipBorderColor,
+    borderWidth: StyleSheet.hairlineWidth,
+    backgroundColor: selected
+      ? selectedChipBackgroundColor
+      : chipBackgroundColor,
+    borderRadius: 12,
+    ...glassChipStyle,
+  };
+}
+
 function AppChip({
   children,
   icon,
@@ -63,18 +98,9 @@ function AppChip({
   ...props
 }: Props) {
   const { darkmode, theme } = useTheme();
-  const chipBackgroundColor = darkmode
-    ? theme.colors.secondaryContainer
-    : "rgba(248, 248, 248, 0.72)";
-  const chipLabelColor = theme.colors.onSecondaryContainer;
-  const chipBorderColor = darkmode
-    ? "rgba(120, 127, 246, 0.26)"
-    : "rgba(120, 127, 246, 0.24)";
+  const chipLabelColor = theme.colors.onSurfaceVariant;
 
   if (iconOnly && icon) {
-    const selectedBackgroundColor = showSelectedOverlay
-      ? theme.colors.primaryContainer
-      : chipBackgroundColor;
     const iconColor = iconOnlyColor ?? chipLabelColor;
     const iconKey = `${typeof icon === "string" ? icon : "custom"}-${
       selected ? "selected" : "idle"
@@ -98,13 +124,12 @@ function AppChip({
         style={[
           styles.iconOnlyChip,
           {
-            backgroundColor: selected
-              ? selectedBackgroundColor
-              : chipBackgroundColor,
-            borderColor: chipBorderColor,
-            borderWidth: StyleSheet.hairlineWidth,
             opacity: disabled ? 0.38 : 1,
           },
+          getAppChipSurfaceStyle({
+            darkmode,
+            selected: selected && showSelectedOverlay,
+          }),
           style as any,
         ]}
       >
@@ -136,15 +161,10 @@ function AppChip({
       onPress={onPress}
       showSelectedOverlay={showSelectedOverlay}
       style={[
-        {
-          borderColor: chipBorderColor,
-          borderWidth: StyleSheet.hairlineWidth,
-          backgroundColor: chipBackgroundColor,
-          borderRadius: 12,
-        },
+        getAppChipSurfaceStyle({ darkmode, selected }),
         style as any,
       ]}
-      textStyle={textStyle}
+      textStyle={[{ color: chipLabelColor }, textStyle] as any}
     >
       {children ?? ""}
     </Chip>

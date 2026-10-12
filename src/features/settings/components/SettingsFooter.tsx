@@ -47,8 +47,6 @@ function SettingsFooter() {
         backgroundColor: theme.colors.background,
         borderRadius: 12,
         padding: 16,
-        margin: 8,
-        marginTop: 0,
         marginBottom: 8,
 
         display: "flex",

@@ -53,8 +53,16 @@ function CopyToClipboard({
     });
   };
 
+  const buttonSize = compact ? 32 : 40;
+
   return (
-    <View style={{ width: compact ? 32 : 48 }}>
+    <View
+      style={{
+        width: buttonSize,
+        height: buttonSize,
+        marginLeft: margin ?? 8,
+      }}
+    >
       <TooltipIconButton
         tooltip={t("common:copy")}
         animated
@@ -64,8 +72,9 @@ function CopyToClipboard({
         onPress={copyToClipboard}
         disabled={disabled}
         style={{
-          margin: margin ?? 6,
-          ...(compact ? { width: 32, height: 32 } : null),
+          margin: margin ?? 0,
+          width: buttonSize,
+          height: buttonSize,
         }}
       />
     </View>

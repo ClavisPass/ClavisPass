@@ -69,6 +69,7 @@ import { useSetting } from "../app/providers/SettingsProvider";
 import { useToken } from "../app/providers/CloudProvider";
 import { useVault } from "../app/providers/VaultProvider";
 import {
+  SCROLLBAR_CONTENT_GAP,
   getGlassChromeStyle,
   getScreenContentStyle,
 } from "../shared/ui/glass";
@@ -301,8 +302,6 @@ type ResetAction = "settings" | "device" | "vault" | "syncDevices";
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const {
-    headerWhite,
-    setHeaderWhite,
     darkmode,
     setHeaderSpacing,
     setTitlebarCenterGap,
@@ -320,6 +319,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const isCompactSettingsLayout = width <= 600;
   const settingsScrollContentStyle = useMemo(
     () => ({
+      paddingRight: SCROLLBAR_CONTENT_GAP,
       paddingTop: isCompactSettingsLayout
         ? settingsQuickSelectOverlayHeight
         : 0,
@@ -735,7 +735,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(0);
-      setHeaderWhite(false);
       setTitlebarCenterGap(0);
       setTitlebarOverlayDragEnabled(false);
 
@@ -744,7 +743,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
       };
     }, [
       setHeaderSpacing,
-      setHeaderWhite,
       setTitlebarCenterGap,
       setTitlebarOverlayDragEnabled,
     ]),
@@ -1368,7 +1366,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
       <BottomSheetModalProvider>
         <FocusAwareStatusBar
           animated={true}
-          style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+          style={darkmode ? "light" : "dark"}
           translucent={true}
         />
         {settingsHeader}
@@ -1376,7 +1374,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           style={{
             flex: 1,
             width: "100%",
-            padding: 0,
             flexDirection: width > 600 ? "row" : "column",
             ...screenContentStyle,
           }}
@@ -1872,8 +1869,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 flexDirection: "row",
                 gap: 8,
                 flexWrap: "wrap",
-                margin: 8,
-                marginTop: 0,
                 marginBottom: 8,
               }}
             >
@@ -2027,6 +2022,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         <Modal
           visible={resetAction !== null}
           onDismiss={() => setResetAction(null)}
+          avoidKeyboard
         >
           {resetModalConfig ? (
             <View style={styles.resetModal}>

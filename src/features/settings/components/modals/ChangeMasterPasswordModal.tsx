@@ -167,7 +167,7 @@ function ChangeMasterPasswordModal(props: Props) {
   };
 
   return (
-    <Modal visible={props.visible} onDismiss={hideModal}>
+    <Modal visible={props.visible} onDismiss={hideModal} avoidKeyboard>
       <View
         style={[
           styles.container,

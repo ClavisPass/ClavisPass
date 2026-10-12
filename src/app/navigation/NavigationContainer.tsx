@@ -18,7 +18,6 @@ import {
   unsubscribeOpenAddValueRequest,
 } from "../../infrastructure/events/openAddValueBus";
 
-const titlebarLightRoutes = new Set(["Home", "Reorder", "ModuleReorder"]);
 const titlebarContentDragRoutes = new Set([
   "HomeStack",
   "Home",
@@ -46,7 +45,6 @@ function getFocusedRouteName(
 function NavigationnContainer() {
   const {
     navigationTheme,
-    setHeaderWhite,
     setTitlebarCenterGap,
     setTitlebarOverlayDragEnabled,
   } = useTheme();
@@ -56,14 +54,12 @@ function NavigationnContainer() {
     if (!navigationRef.isReady()) return;
 
     const routeName = getFocusedRouteName(navigationRef.getRootState());
-    setHeaderWhite(titlebarLightRoutes.has(routeName ?? ""));
     setTitlebarCenterGap(0);
     setTitlebarOverlayDragEnabled(
       !titlebarContentDragRoutes.has(routeName ?? ""),
     );
   }, [
     navigationRef,
-    setHeaderWhite,
     setTitlebarCenterGap,
     setTitlebarOverlayDragEnabled,
   ]);

@@ -168,6 +168,10 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   swipeContainer: {
+    borderRadius: 14,
+    overflow: "visible",
+  },
+  nativeSwipeFrame: {
     marginLeft: 4,
     marginRight: 4,
     marginBottom: 4,
@@ -790,6 +794,13 @@ function ListItem(props: Props) {
   const isNativeSwipeItem = Platform.OS !== "web" && !props.reorderMode;
   const denseHorizontalInset = props.denseHorizontalInset ?? 8;
   const itemSurfaceStyle = getItemSurfaceStyle(theme);
+  const denseItemSpacingStyle = props.denseSpacing
+    ? {
+        marginLeft: denseHorizontalInset,
+        marginRight: 0,
+        marginBottom: 4,
+      }
+    : null;
 
   const listItemContent = (
     <Animated.View
@@ -798,14 +809,8 @@ function ListItem(props: Props) {
       ref={itemRef}
       style={[
         styles.container,
-        props.denseSpacing
-          ? {
-              marginLeft: denseHorizontalInset,
-              marginRight: 0,
-              marginBottom: 4,
-            }
-          : null,
-        Platform.OS !== "web"
+        isNativeSwipeItem ? null : denseItemSpacingStyle,
+        isNativeSwipeItem
           ? { marginLeft: 0, marginRight: 0, marginBottom: 0 }
           : null,
         props.reorderMode && Platform.OS !== "web" ? { marginBottom: 4 } : null,
@@ -954,7 +959,10 @@ function ListItem(props: Props) {
       {Platform.OS === "web" || props.reorderMode ? (
         listItemContent
       ) : (
-        <Animated.View entering={enterAnimation}>
+        <Animated.View
+          entering={enterAnimation}
+          style={[styles.nativeSwipeFrame, denseItemSpacingStyle]}
+        >
           <ReanimatedSwipeable
             ref={swipeableRef}
             friction={2}
@@ -964,17 +972,7 @@ function ListItem(props: Props) {
             dragOffsetFromRightEdge={18}
             overshootLeft={false}
             overshootRight={false}
-            containerStyle={[
-              styles.swipeContainer,
-              props.denseSpacing
-                ? {
-                    marginLeft: denseHorizontalInset,
-                    marginRight: 0,
-                    marginBottom: 4,
-                  }
-                : null,
-              props.reorderMode ? { marginBottom: 4, height: 44 } : null,
-            ]}
+            containerStyle={styles.swipeContainer}
             renderLeftActions={renderFavoriteSwipeAction}
             renderRightActions={renderDeleteSwipeAction}
             onSwipeableOpen={(direction) => {

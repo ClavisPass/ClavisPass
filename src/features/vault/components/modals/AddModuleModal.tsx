@@ -11,7 +11,9 @@ import Modal from "../../../../shared/components/modals/Modal";
 import ModulesEnum from "../../model/ModulesEnum";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
 import AppIcon from "../../../../shared/components/icons/AppIcon";
-import AppChip from "../../../../shared/components/chips/AppChip";
+import AppChip, {
+  getAppChipSurfaceStyle,
+} from "../../../../shared/components/chips/AppChip";
 import ModalSurface from "../../../../shared/components/modals/ModalSurface";
 import SearchInput from "../../../../shared/components/SearchInput";
 
@@ -85,7 +87,6 @@ function TinyFilterChip({
       selected={selected}
       showSelectedOverlay={true}
       onPress={onPress}
-      style={{ borderRadius: 12, marginRight: 8 }}
     >
       {label}
     </AppChip>
@@ -105,16 +106,17 @@ function ModuleTile({
   onToggleFavorite: () => void;
   isFavorite: boolean;
 }) {
-  const { theme } = useTheme();
+  const { darkmode, theme } = useTheme();
+  const contentColor = theme.colors.onSurfaceVariant;
 
   return (
     <View style={{ flex: 1, padding: 4 }}>
       <View
         style={{
+          ...getAppChipSurfaceStyle({ darkmode }),
           borderRadius: 12,
           overflow: "hidden",
           flex: 1,
-          backgroundColor: theme.colors?.secondaryContainer,
         }}
       >
         <IconButton
@@ -155,7 +157,7 @@ function ModuleTile({
             <AppIcon size={20} color={theme.colors.primary} name={icon} />
             <Text
               variant="bodyLarge"
-              style={{ userSelect: "none" }}
+              style={{ color: contentColor, userSelect: "none" }}
               ellipsizeMode="tail"
               numberOfLines={1}
             >
@@ -627,7 +629,7 @@ export default function AddModuleModalCompactFav(props: Props) {
           showsHorizontalScrollIndicator
           horizontal
           style={{ maxHeight: 36 }}
-          contentContainerStyle={{ gap: 6, paddingRight: 4 }}
+          contentContainerStyle={{ gap: 8, paddingRight: 4 }}
           {...(Platform.OS === "web" ? { onWheel: handleCategoryWheel } : {})}
         >
           {(categories as ModuleCategory[]).map((c) => {

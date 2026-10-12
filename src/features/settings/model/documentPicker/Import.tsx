@@ -325,6 +325,7 @@ function Import(props: Props) {
         props.type === DocumentTypeEnum.KDBX) && (
         <Modal
           visible={modalVisible}
+          avoidKeyboard
           onDismiss={() => {
             setModalVisible(false);
             setPendingKdbxFile(null);

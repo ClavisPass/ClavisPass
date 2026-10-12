@@ -7,8 +7,6 @@ import AppIcon from "../../../shared/components/icons/AppIcon";
 
 const styles = StyleSheet.create({
   container: {
-    marginLeft: 8,
-    marginRight: 8,
     marginBottom: 8,
     borderRadius: 0,
     overflow: "visible",

@@ -17,6 +17,7 @@ import { SettingsStackParamList } from "../app/navigation/model/types";
 import { useSetting } from "../app/providers/SettingsProvider";
 import { formatAbsoluteLocal } from "../shared/utils/Timestamp";
 import {
+  SCROLLBAR_CONTENT_GAP,
   getItemSurfaceStyle,
   getScreenContentStyle,
 } from "../shared/ui/glass";
@@ -30,8 +31,6 @@ import type {
   PairedClient,
   PendingPairing,
 } from "../features/settings/utils/browserExtensionPairings";
-
-const H_PAD = 8;
 
 type BrowserExtensionsScreenProps = NativeStackScreenProps<
   SettingsStackParamList,
@@ -71,9 +70,7 @@ const BrowserExtensionsScreen: React.FC<BrowserExtensionsScreenProps> = ({
   const {
     theme,
     globalStyles,
-    headerWhite,
     darkmode,
-    setHeaderWhite,
     setHeaderSpacing,
   } = useTheme();
   const { t } = useTranslation();
@@ -130,9 +127,8 @@ const BrowserExtensionsScreen: React.FC<BrowserExtensionsScreenProps> = ({
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(40);
-      setHeaderWhite(false);
       void loadPairings();
-    }, [loadPairings, setHeaderSpacing, setHeaderWhite]),
+    }, [loadPairings, setHeaderSpacing]),
   );
 
   const act = useCallback(
@@ -182,7 +178,7 @@ const BrowserExtensionsScreen: React.FC<BrowserExtensionsScreenProps> = ({
     <AnimatedContainer style={globalStyles.container}>
       <FocusAwareStatusBar
         animated
-        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        style={darkmode ? "light" : "dark"}
         translucent
       />
       <Header
@@ -193,7 +189,7 @@ const BrowserExtensionsScreen: React.FC<BrowserExtensionsScreenProps> = ({
       <ScrollView
         style={{ flex: 1, width: "100%", ...screenContentStyle }}
         contentContainerStyle={{
-          paddingHorizontal: H_PAD,
+          paddingRight: SCROLLBAR_CONTENT_GAP,
           paddingBottom: 8,
           gap: 8,
         }}

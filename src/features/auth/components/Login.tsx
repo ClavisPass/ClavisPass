@@ -5,7 +5,14 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { StyleSheet, useWindowDimensions, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
 import * as Progress from "react-native-progress";
 import { useTranslation } from "react-i18next";
@@ -199,8 +206,7 @@ function Login(props: Props) {
       uploadLocalVaultAfterUnlockRef.current = false;
 
       const hasAuthentication = await isUsingAuthentication();
-      const skipAutomaticSystemAuth =
-        consumeSystemAuthAutoUnlockSuppression();
+      const skipAutomaticSystemAuth = consumeSystemAuthAutoUnlockSuppression();
       setIsUsingAuthenticationButtonVisible(hasAuthentication);
 
       if (!provider) {
@@ -661,52 +667,61 @@ function Login(props: Props) {
   }
 
   return (
-    <View
-      style={{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "transparent",
-        width: "100%",
-        paddingHorizontal: 6,
-        paddingVertical: 20,
-        gap: 14,
-      }}
+    <KeyboardAvoidingView
+      style={{ flex: 1, width: "100%" }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={24}
     >
-      <Animated.View
-        entering={FadeInDown.delay(50).duration(340).easing(transitionEasing)}
-        style={{
-          width: "100%",
+      <ScrollView
+        style={{ flex: 1, width: "100%" }}
+        contentContainerStyle={{
+          flexGrow: 1,
           alignItems: "center",
           justifyContent: "center",
-          marginBottom: 8,
+          backgroundColor: "transparent",
+          paddingHorizontal: 6,
+          paddingVertical: 20,
+          gap: 14,
         }}
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        {brandingContent}
-      </Animated.View>
-
-      <Animated.View
-        entering={FadeInDown.delay(110).duration(360).easing(transitionEasing)}
-        layout={contentTransition}
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-        }}
-      >
-        <View
+        <Animated.View
+          entering={FadeInDown.delay(50).duration(340).easing(transitionEasing)}
           style={{
-            width: "92%",
-            maxWidth: 380,
-            alignSelf: "center",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: 8,
           }}
         >
-          {renderStageContent()}
-        </View>
-      </Animated.View>
-    </View>
+          {brandingContent}
+        </Animated.View>
+
+        <Animated.View
+          entering={FadeInDown.delay(110)
+            .duration(360)
+            .easing(transitionEasing)}
+          layout={contentTransition}
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+          }}
+        >
+          <View
+            style={{
+              width: "92%",
+              maxWidth: 380,
+              alignSelf: "center",
+            }}
+          >
+            {renderStageContent()}
+          </View>
+        </Animated.View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

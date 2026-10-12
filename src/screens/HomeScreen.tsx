@@ -56,6 +56,7 @@ import AddValueModal from "../features/vault/components/modals/AddValueModal";
 import { useAuth } from "../app/providers/AuthProvider";
 import { useTheme } from "../app/providers/ThemeProvider";
 import {
+  SCROLLBAR_CONTENT_GAP,
   getGlassChromeStyle,
   getScreenContentStyle,
 } from "../shared/ui/glass";
@@ -128,7 +129,7 @@ const mobileFolderFilterOverlayHeight = 72;
 const mobileFolderFilterFadeHeight = 34;
 const homeToolChipHeight = 30;
 const homeToolChipBottomPadding = homeSpacing.xs;
-const homeToolsTopPadding = homeSpacing.sm;
+const homeToolsTopPadding = 0;
 const homeToolsOverlayHeight = 40;
 const homeListEdgeGap = homeSpacing.sm;
 const homeListTopGap = 6;
@@ -274,7 +275,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const triggerAdd = route.params?.triggerAdd ?? false;
 
   const {
-    setHeaderWhite,
     setHeaderSpacing,
     setTitlebarCenterGap,
     setTitlebarOverlayDragEnabled,
@@ -501,11 +501,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const homeGutter = isCompactHeader
     ? homeSpacing.mobileGutter
     : homeSpacing.desktopGutter;
-  const homeListItemHorizontalInset = isCompactHeader ? 0 : homeSpacing.sm;
+  const homeListItemHorizontalInset = 0;
   const homeListContentContainerStyle = useMemo(
     () => ({
-      paddingLeft: isCompactHeader ? homeSpacing.sm : 0,
-      paddingRight: isCompactHeader ? homeSpacing.sm : 0,
+      paddingLeft: 0,
+      paddingRight: SCROLLBAR_CONTENT_GAP,
       paddingTop: homeListTopInset,
       paddingBottom: isCompactHeader
         ? Platform.OS === "web"
@@ -518,6 +518,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
   const homeScrollIndicatorInsets = useMemo(
     () => ({
       top: homeListTopInset,
+      right: SCROLLBAR_CONTENT_GAP,
       bottom: isCompactHeader
         ? mobileFolderFilterOverlayHeight + homeListEdgeGap
         : homeSpacing.sm,
@@ -731,7 +732,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
       setHomeContentVisible(true);
       let task = InteractionManager.runAfterInteractions(() => {
         setHeaderSpacing(0);
-        setHeaderWhite(false);
       });
       return () => {
         task?.cancel?.();
@@ -816,10 +816,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     },
     [closeCompactSearchIfEmpty, navigation],
   );
-
-  useEffect(() => {
-    setHeaderWhite(false);
-  }, [vault.dirty]);
 
   const vaultData = useMemo(() => {
     try {
@@ -1319,8 +1315,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         flexGrow: 1,
         gap: homeSpacing.sm,
         justifyContent: "flex-start",
-        paddingLeft: homeSpacing.sm,
-        paddingRight: isCompactHeader ? homeSpacing.sm : homeGutter,
+        paddingLeft: 0,
+        paddingRight: 0,
         paddingTop: 0,
         paddingBottom: homeSpacing.xs,
       }}
@@ -1988,10 +1984,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
             style={{
               flex: 1,
               width: "100%",
-              paddingTop: 0,
-              paddingBottom: isCompactHeader ? 0 : homeSpacing.sm,
-              paddingRight: 0,
-              paddingLeft: 0,
               flexDirection: width > 600 ? "row-reverse" : "column",
               gap: 0,
               position: "relative",

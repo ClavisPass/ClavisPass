@@ -102,6 +102,7 @@ function URLModule(props: URLModuleType & Props) {
           icon="open-in-new"
           iconColor={theme.colors.primary}
           size={20}
+          style={{ margin: 0, marginLeft: 8, width: 40, height: 40 }}
           disabled={!normalizedUrl}
           onPress={async () => {
             if (!normalizedUrl) return;

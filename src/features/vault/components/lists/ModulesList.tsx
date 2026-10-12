@@ -6,10 +6,14 @@ import React, {
   useState,
 } from "react";
 import {
+  findNodeHandle,
   InteractionManager,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  TextInput,
+  UIManager,
   View,
 } from "react-native";
 import Animated, {
@@ -27,8 +31,37 @@ import {
   DraggableModulesFooter,
   DraggableModulesListProps,
 } from "./DraggableModulesList.shared";
+import { SCROLLBAR_CONTENT_GAP } from "../../../../shared/ui/glass";
 
 type Props = Omit<DraggableModulesListProps, "changeModules">;
+const KEYBOARD_FOCUSED_INPUT_CLEARANCE = 96;
+
+function getFocusedInput() {
+  const textInputState = (TextInput as any).State;
+  return (
+    textInputState?.currentlyFocusedInput?.() ??
+    textInputState?.currentlyFocusedField?.() ??
+    null
+  );
+}
+
+function measureInWindow(
+  target: any,
+  callback: (x: number, y: number, width: number, height: number) => void,
+) {
+  if (!target) return false;
+
+  if (typeof target.measureInWindow === "function") {
+    target.measureInWindow(callback);
+    return true;
+  }
+
+  const node = typeof target === "number" ? target : findNodeHandle(target);
+  if (!node) return false;
+
+  UIManager.measureInWindow(node, callback);
+  return true;
+}
 
 function ModulesList(props: Props) {
   const { t } = useTranslation();
@@ -40,7 +73,12 @@ function ModulesList(props: Props) {
   const viewportHeightRef = useRef(0);
   const contentHeightRef = useRef(0);
   const scrollOffsetRef = useRef(0);
+  const keyboardTopRef = useRef<number | null>(null);
+  const keyboardRetryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const [visibleFooterHeight, setVisibleFooterHeight] = useState(0);
+  const [keyboardBottomInset, setKeyboardBottomInset] = useState(0);
   const stickyFooterBottom = useSharedValue(0);
   const stickyFooterAnimatedStyle = useAnimatedStyle(() => ({
     bottom: stickyFooterBottom.value,
@@ -95,6 +133,60 @@ function ModulesList(props: Props) {
     });
   }, []);
 
+  const ensureFocusedInputVisible = useCallback(() => {
+    if (Platform.OS === "web") return;
+
+    requestAnimationFrame(() => {
+      InteractionManager.runAfterInteractions(() => {
+        const focusedInput = getFocusedInput();
+        const scrollView = scrollRef.current as any;
+        if (!focusedInput || !scrollView) return;
+
+        measureInWindow(scrollView, (_sx, scrollY, _sw, scrollHeight) => {
+          measureInWindow(focusedInput, (_ix, inputY, _iw, inputHeight) => {
+            const keyboardTop = keyboardTopRef.current;
+            const visibleTop = scrollY + 8;
+            const visibleBottom =
+              (keyboardTop === null
+                ? scrollY + scrollHeight
+                : Math.min(scrollY + scrollHeight, keyboardTop)) -
+              KEYBOARD_FOCUSED_INPUT_CLEARANCE;
+            const inputTop = inputY;
+            const inputBottom = inputY + inputHeight;
+
+            if (inputBottom > visibleBottom) {
+              scrollRef.current?.scrollTo({
+                y: scrollOffsetRef.current + inputBottom - visibleBottom,
+                animated: true,
+              });
+              return;
+            }
+
+            if (inputTop < visibleTop) {
+              scrollRef.current?.scrollTo({
+                y: Math.max(0, scrollOffsetRef.current - (visibleTop - inputTop)),
+                animated: true,
+              });
+            }
+          });
+        });
+      });
+    });
+  }, []);
+
+  const scheduleFocusedInputVisibilityCheck = useCallback(() => {
+    ensureFocusedInputVisible();
+
+    if (keyboardRetryTimeoutRef.current) {
+      clearTimeout(keyboardRetryTimeoutRef.current);
+    }
+
+    keyboardRetryTimeoutRef.current = setTimeout(() => {
+      ensureFocusedInputVisible();
+      keyboardRetryTimeoutRef.current = null;
+    }, 180);
+  }, [ensureFocusedInputVisible]);
+
   useEffect(() => {
     const nextLength = props.value.modules.length;
     if (nextLength > previousLengthRef.current) {
@@ -102,6 +194,42 @@ function ModulesList(props: Props) {
     }
     previousLengthRef.current = nextLength;
   }, [props.value.modules.length, scrollToBottom]);
+
+  useEffect(() => {
+    if (Platform.OS === "web") return undefined;
+
+    const handleKeyboardShown = (event: any) => {
+      keyboardTopRef.current = event.endCoordinates?.screenY ?? null;
+      setKeyboardBottomInset(Math.max(0, event.endCoordinates?.height ?? 0));
+      scheduleFocusedInputVisibilityCheck();
+    };
+
+    const handleKeyboardHidden = () => {
+      keyboardTopRef.current = null;
+      setKeyboardBottomInset(0);
+      if (keyboardRetryTimeoutRef.current) {
+        clearTimeout(keyboardRetryTimeoutRef.current);
+        keyboardRetryTimeoutRef.current = null;
+      }
+    };
+
+    const showSubscription = Keyboard.addListener(
+      "keyboardDidShow",
+      handleKeyboardShown,
+    );
+    const hideSubscription = Keyboard.addListener(
+      "keyboardDidHide",
+      handleKeyboardHidden,
+    );
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+      if (keyboardRetryTimeoutRef.current) {
+        clearTimeout(keyboardRetryTimeoutRef.current);
+      }
+    };
+  }, [scheduleFocusedInputVisibilityCheck]);
 
   const renderModule = useCallback(
     (item: ModuleType) =>
@@ -140,12 +268,19 @@ function ModulesList(props: Props) {
         }}
         contentContainerStyle={{
           flexGrow: 1,
+          paddingRight: props.rightPadding ?? SCROLLBAR_CONTENT_GAP,
           paddingTop: props.topPadding ?? 0,
-          paddingBottom: props.footer ? 0 : (props.bottomPadding ?? 12),
+          paddingBottom:
+            (props.footer ? 0 : (props.bottomPadding ?? 12)) +
+            keyboardBottomInset +
+            (keyboardBottomInset > 0 ? KEYBOARD_FOCUSED_INPUT_CLEARANCE : 0),
         }}
         onContentSizeChange={(_, height) => {
           contentHeightRef.current = height;
           updateVisibleFooterHeight();
+          if (keyboardTopRef.current !== null) {
+            scheduleFocusedInputVisibilityCheck();
+          }
         }}
         onScroll={(event) => {
           scrollOffsetRef.current = event.nativeEvent.contentOffset.y;

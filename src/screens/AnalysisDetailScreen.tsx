@@ -21,6 +21,7 @@ import AnimatedContainer from "../shared/components/container/AnimatedContainer"
 import Header from "../shared/components/Header";
 import AppChip from "../shared/components/chips/AppChip";
 import {
+  SCROLLBAR_CONTENT_GAP,
   getItemSurfaceStyle,
   getScreenContentStyle,
 } from "../shared/ui/glass";
@@ -375,7 +376,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
 
   const vault = useVault();
   const { getMaster } = useAuthMaster();
-  const { globalStyles, theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } = useTheme();
+  const { globalStyles, theme, darkmode, setHeaderSpacing } = useTheme();
   const screenContentStyle = getScreenContentStyle(theme);
   const itemSurfaceStyle = getItemSurfaceStyle(theme);
   const { t } = useTranslation();
@@ -407,7 +408,6 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(40);
-      setHeaderWhite(false);
 
       return () => {
         setSecureTextEntry(true);
@@ -415,7 +415,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
         setComputed(null);
         setIsLoading(false);
       };
-    }, [setHeaderSpacing, setHeaderWhite])
+    }, [setHeaderSpacing])
   );
 
   useEffect(() => {
@@ -552,7 +552,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
 
   return (
     <AnimatedContainer style={globalStyles.container}>
-      <FocusAwareStatusBar animated style={headerWhite ? "light" : darkmode ? "light" : "dark"} translucent />
+      <FocusAwareStatusBar animated style={darkmode ? "light" : "dark"} translucent />
 
       <Header
         onPress={() => navigation.goBack()}
@@ -561,7 +561,7 @@ const AnalysisDetailScreen: React.FC<AnalysisDetailScreenProps> = ({ route, navi
 
       <ScrollView
         style={{ width: "100%", ...screenContentStyle }}
-        contentContainerStyle={{ padding: 8, paddingTop: 0 }}
+        contentContainerStyle={{ gap: 8, paddingRight: SCROLLBAR_CONTENT_GAP }}
       >
         <View style={{ gap: 8 }}>
 

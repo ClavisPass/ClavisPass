@@ -1,7 +1,7 @@
 import React from "react";
 import { TouchableRipple } from "react-native-paper";
 import type { ComponentProps } from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import type { StyleProp, ViewStyle } from "react-native";
 import { useTheme } from "../../app/providers/ThemeProvider";
 
@@ -45,12 +45,18 @@ const AnimatedPressable = React.forwardRef<any, AnimatedPressableProps>(
     const effectiveRippleColor =
       rippleColor ??
       (darkmode ? DEFAULT_RIPPLE_COLOR_DARK : DEFAULT_RIPPLE_COLOR_LIGHT);
+    const flattenedStyle = StyleSheet.flatten(style);
+    const neutralHoverBackgroundColor =
+      flattenedStyle?.backgroundColor ?? "transparent";
 
     return (
       <TouchableRipple
         ref={ref}
         style={[
           style,
+          hoverBackgroundColor === null
+            ? { backgroundColor: neutralHoverBackgroundColor }
+            : undefined,
           hovered && effectiveHoverBackgroundColor
             ? { backgroundColor: effectiveHoverBackgroundColor }
             : undefined,

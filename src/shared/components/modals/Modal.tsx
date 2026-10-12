@@ -7,6 +7,7 @@ type Props = {
   children: ReactNode;
   visible: boolean;
   onDismiss: () => void;
+  avoidKeyboard?: boolean;
   top?: number;
 };
 function Modal(props: Props) {
@@ -18,7 +19,11 @@ function Modal(props: Props) {
     );
 
   return (
-    <ModalContainer visible={props.visible} onDismiss={props.onDismiss}>
+    <ModalContainer
+      visible={props.visible}
+      onDismiss={props.onDismiss}
+      avoidKeyboard={props.avoidKeyboard}
+    >
       {props.children}
     </ModalContainer>
   );

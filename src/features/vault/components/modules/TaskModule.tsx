@@ -82,8 +82,6 @@ function TaskModule(props: TaskModuleType & Props) {
   return (
     <View
       style={{
-        marginLeft: 8,
-        marginRight: 8,
         marginBottom: TASK_MODULE_SPACING,
         borderRadius: 12,
         alignSelf: "stretch",

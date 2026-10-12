@@ -364,8 +364,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
     minHeight: 40,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
     overflow: "hidden",
   },
   inlineWrap: {
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     alignItems: "center",
     width: "100%",
-    gap: 6,
+    gap: 8,
   },
   chip: {
     margin: 0,

@@ -17,8 +17,6 @@ const moduleStyles = StyleSheet.create({
   },
   inner: {
     paddingTop: 0,
-    marginLeft: 8,
-    marginRight: 8,
     borderRadius: 12,
     display: "flex",
     flexDirection: "row",
@@ -121,7 +119,7 @@ export default function ModuleContainer({
           {modal}
         </View>
         <Divider />
-        <View style={{ flex: 1, padding: 8 }}>{children}</View>
+        <View style={{ width: "100%", padding: 8, gap: 8 }}>{children}</View>
       </View>
     </EditRowControlsContainer>
   );

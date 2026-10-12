@@ -59,6 +59,7 @@ function EditCustomFieldModal(props: Props) {
     <Modal
       top={-6}
       visible={props.visible}
+      avoidKeyboard
       onDismiss={() => {
         props.setVisible(false);
       }}

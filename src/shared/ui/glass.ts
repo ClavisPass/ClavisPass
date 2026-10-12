@@ -2,6 +2,8 @@ import { Platform, StyleSheet } from "react-native";
 import type { ViewStyle } from "react-native";
 import type { AppTheme } from "./appTheme";
 
+export const SCROLLBAR_CONTENT_GAP = 8;
+
 export function getGlassChromeStyle(_darkmode: boolean): ViewStyle {
   return {
     backgroundColor: "transparent",
@@ -21,6 +23,10 @@ export function getScreenContentStyle(theme: AppTheme): ViewStyle {
       ? theme.colors.outlineVariant
       : "rgba(118, 118, 118, 0.13)",
     borderRadius: 8,
+    paddingTop: 8,
+    paddingLeft: 8,
+    paddingRight: 0,
+    paddingBottom: 0,
     overflow: "hidden",
     ...(Platform.OS === "web" && !theme.dark
       ? ({
@@ -43,9 +49,9 @@ export function getItemSurfaceStyle(theme: AppTheme): ViewStyle {
       : "rgba(118, 118, 118, 0.1)",
     shadowColor,
     shadowOffset: { width: 0, height: theme.dark ? 2 : 3 },
-    shadowOpacity: theme.dark ? 0.16 : 0.055,
-    shadowRadius: theme.dark ? 5 : 7,
-    elevation: 1,
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
     boxShadow: theme.dark
       ? ("rgba(0, 0, 0, 0.15) 0px 7px 18px -9px, rgba(0, 0, 0, 0.10) 0px 1px 5px -3px" as any)
       : ("rgba(48, 48, 48, 0.055) 0px 10px 24px -17px, rgba(48, 48, 48, 0.04) 0px 2px 7px -6px" as any),

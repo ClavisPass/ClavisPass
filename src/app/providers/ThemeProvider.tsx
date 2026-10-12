@@ -27,8 +27,6 @@ interface ThemeContextType {
   theme: AppTheme;
   navigationTheme: NavigationTheme;
   globalStyles: GlobalStyles;
-  headerWhite: boolean;
-  setHeaderWhite: (headerWhite: boolean) => void;
   headerSpacing: number;
   setHeaderSpacing: (headerSpacing: number) => void;
   titlebarCenterGap: number;
@@ -50,7 +48,6 @@ export const ThemeProvider = ({ children }: Props) => {
     isReady,
   } = useSetting("THEME_PREFERENCE");
 
-  const [headerWhite, setHeaderWhite] = useState(false);
   const [headerSpacing, setHeaderSpacing] = useState(0);
   const [titlebarCenterGap, setTitlebarCenterGap] = useState(0);
   const [titlebarOverlayDragEnabled, setTitlebarOverlayDragEnabled] =
@@ -97,8 +94,6 @@ export const ThemeProvider = ({ children }: Props) => {
         theme,
         navigationTheme,
         globalStyles,
-        headerWhite,
-        setHeaderWhite,
         headerSpacing,
         setHeaderSpacing,
         titlebarCenterGap,

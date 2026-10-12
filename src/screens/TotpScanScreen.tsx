@@ -95,8 +95,6 @@ const TotpScanScreen: React.FC<TotpScanScreenProps> = ({
   const { setOtpauth } = route.params;
   const {
     globalStyles,
-    headerWhite,
-    setHeaderWhite,
     darkmode,
     setHeaderSpacing,
   } = useTheme();
@@ -109,7 +107,6 @@ const TotpScanScreen: React.FC<TotpScanScreenProps> = ({
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(40);
-      setHeaderWhite(false);
     }, [])
   );
 
@@ -145,7 +142,7 @@ const TotpScanScreen: React.FC<TotpScanScreenProps> = ({
     <AnimatedContainer style={globalStyles.container}>
       <FocusAwareStatusBar
         animated
-        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        style={darkmode ? "light" : "dark"}
         translucent
       />
       <Header onPress={() => navigation.goBack()} />

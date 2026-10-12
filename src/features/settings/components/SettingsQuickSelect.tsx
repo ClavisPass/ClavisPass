@@ -21,6 +21,7 @@ import { get, set } from "../../../infrastructure/storage/store";
 const SETTINGS_QUICK_SELECT_WIDTH_KEY = "SETTINGS_QUICK_SELECT_WIDTH";
 const MIN_W = 20;
 const MAX_W = 420;
+const SPLIT_DIVIDER_HIT_WIDTH = 17;
 
 function clampWidth(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -296,7 +297,7 @@ function SettingsQuickSelect(props: Props) {
           />
           <View
             style={{
-              width: 1,
+              width: SPLIT_DIVIDER_HIT_WIDTH,
               height: "100%",
               alignItems: "center",
               justifyContent: "center",

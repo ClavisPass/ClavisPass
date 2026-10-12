@@ -27,6 +27,8 @@ import { getFolderColor, getFolderIcon } from "../utils/folderAppearance";
 import AppIcon from "../../../shared/components/icons/AppIcon";
 import AppChip from "../../../shared/components/chips/AppChip";
 
+const SPLIT_DIVIDER_HIT_WIDTH = 17;
+
 const styles = StyleSheet.create({
   chip: {
     height: 30,
@@ -66,7 +68,7 @@ const styles = StyleSheet.create({
   },
   mobileListContent: {
     alignItems: "center",
-    paddingLeft: 8,
+    paddingLeft: 0,
     paddingRight: 8,
   },
 });
@@ -98,13 +100,8 @@ function FolderFilter(props: Props) {
   const mobileChipShellStyle = styles.mobileChipShell;
   const getMobileSelectedChipStyle = (accentColor?: string | null) =>
     ({
-      backgroundColor: "rgba(120, 127, 246, 0.22)",
       borderColor: accentColor ?? theme.colors.primary,
       borderWidth: StyleSheet.hairlineWidth,
-      boxShadow:
-        Platform.OS === "web"
-          ? "rgba(120, 127, 246, 0.16) 0px 4px 14px 0px"
-          : undefined,
     }) as const;
 
   const flatListRef: any = useRef<FlatList>(null);
@@ -498,7 +495,7 @@ function FolderFilter(props: Props) {
           />
           <View
             style={{
-              width: 1,
+              width: SPLIT_DIVIDER_HIT_WIDTH,
               height: "100%",
               alignItems: "center",
               justifyContent: "center",
@@ -567,6 +564,7 @@ function FolderFilter(props: Props) {
                       <AppChip
                         icon="two-factor-authentication"
                         iconOnly
+                        iconOnlyColor={theme.colors.primary}
                         selected={props.selected2FA}
                         showSelectedOverlay={true}
                         onPress={
@@ -594,6 +592,7 @@ function FolderFilter(props: Props) {
                       <AppChip
                         icon="credit-card-multiple-outline"
                         iconOnly
+                        iconOnlyColor={theme.colors.primary}
                         selected={props.selectedCard}
                         showSelectedOverlay={true}
                         onPress={
@@ -620,6 +619,7 @@ function FolderFilter(props: Props) {
                     <AppChip
                       icon="star-outline"
                       iconOnly
+                      iconOnlyColor={theme.colors.primary}
                       selected={props.selectedFav}
                       showSelectedOverlay={true}
                       onPress={

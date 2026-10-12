@@ -93,8 +93,6 @@ type ScanScreenProps = NativeStackScreenProps<RootStackParamList, "Scan">;
 const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
   const {
     globalStyles,
-    headerWhite,
-    setHeaderWhite,
     darkmode,
     setHeaderSpacing,
   } = useTheme();
@@ -109,8 +107,7 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(40);
-      setHeaderWhite(false);
-    }, [setHeaderSpacing, setHeaderWhite])
+    }, [setHeaderSpacing])
   );
 
   const handleScannedValue = useCallback(
@@ -191,7 +188,7 @@ const ScanScreen: React.FC<ScanScreenProps> = ({ navigation }) => {
     <AnimatedContainer style={globalStyles.container}>
       <FocusAwareStatusBar
         animated={true}
-        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        style={darkmode ? "light" : "dark"}
         translucent={true}
       />
       <Header onPress={() => navigation.goBack()} />

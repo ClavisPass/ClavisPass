@@ -18,6 +18,7 @@ import type { IdentityCluster } from "../features/identity/utils/deriveIdentityC
 import IdentityEmailLogo from "../features/identity/components/IdentityEmailLogo";
 import { getDefaultIdentityName } from "../features/identity/utils/identityDisplayName";
 import {
+  SCROLLBAR_CONTENT_GAP,
   getItemSurfaceStyle,
   getScreenContentStyle,
 } from "../shared/ui/glass";
@@ -42,14 +43,23 @@ function includesQuery(identity: IdentityCluster, query: string) {
   return haystack.includes(query);
 }
 
+function sumIdentityEntries(identities: IdentityCluster[]) {
+  return identities.reduce(
+    (total, identity) => total + identity.entries.length,
+    0,
+  );
+}
+
+function countIdentityDomains(identities: IdentityCluster[]) {
+  return new Set(identities.flatMap((identity) => identity.domains)).size;
+}
+
 const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
   const vault = useVault();
   const { t } = useTranslation();
   const {
     globalStyles,
     theme,
-    headerWhite,
-    setHeaderWhite,
     darkmode,
     setHeaderSpacing,
     setTitlebarCenterGap,
@@ -59,14 +69,17 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
   const screenContentStyle = getScreenContentStyle(theme);
   const surfaceStyle = getItemSurfaceStyle(theme);
   const subtleSurfaceStyle = {
-    backgroundColor: darkmode ? "rgba(255, 255, 255, 0.04)" : "rgba(255, 255, 255, 0.48)",
-    borderColor: darkmode ? "rgba(255, 255, 255, 0.07)" : "rgba(255, 255, 255, 0.72)",
+    backgroundColor: darkmode
+      ? "rgba(255, 255, 255, 0.04)"
+      : "rgba(255, 255, 255, 0.48)",
+    borderColor: darkmode
+      ? "rgba(255, 255, 255, 0.07)"
+      : "rgba(255, 255, 255, 0.72)",
   };
 
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(0);
-      setHeaderWhite(false);
       setTitlebarCenterGap(0);
       setTitlebarOverlayDragEnabled(false);
 
@@ -75,7 +88,6 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
       };
     }, [
       setHeaderSpacing,
-      setHeaderWhite,
       setTitlebarCenterGap,
       setTitlebarOverlayDragEnabled,
     ]),
@@ -95,6 +107,26 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
   const visibleIdentities = useMemo(
     () => identities.filter((identity) => includesQuery(identity, query)),
     [identities, query],
+  );
+  const totalAccounts = useMemo(
+    () => sumIdentityEntries(identities),
+    [identities],
+  );
+  const totalWebsites = useMemo(
+    () => countIdentityDomains(identities),
+    [identities],
+  );
+  const identitiesWithRisks = useMemo(
+    () => identities.filter((identity) => identity.riskCount > 0).length,
+    [identities],
+  );
+  const totalAliases = useMemo(
+    () =>
+      identities.reduce(
+        (total, identity) => total + identity.usernames.length,
+        0,
+      ),
+    [identities],
   );
 
   const renderIdentityCard = (identity: IdentityCluster, index: number) => (
@@ -116,65 +148,51 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
         }
       >
         <View style={styles.identityCardInner}>
-          <View style={styles.identityHeaderRow}>
-            <View style={styles.logoShell}>
-              <IdentityEmailLogo email={identity.email} size={44} />
-            </View>
-            <View style={styles.identityTextBlock}>
+          <View style={styles.logoShell}>
+            <IdentityEmailLogo email={identity.email} size={40} />
+          </View>
+          <View style={styles.identityTextBlock}>
+            <Text
+              variant="bodyLarge"
+              style={[styles.identityTitle, { color: theme.colors.onSurface }]}
+              numberOfLines={1}
+            >
+              {getDefaultIdentityName(identity.email)}
+            </Text>
+            <Text
+              style={[
+                styles.identitySubtitle,
+                { color: theme.colors.onSurfaceVariant },
+              ]}
+              numberOfLines={1}
+            >
+              {identity.email}
+            </Text>
+          </View>
+          <View style={styles.identityTrailing}>
+            {identity.riskCount > 0 ? (
+              <Icon
+                source="alert-circle-outline"
+                size={18}
+                color={theme.colors.error}
+              />
+            ) : null}
+            <View style={styles.identityCount}>
+              <Icon source="key-chain" size={15} color={theme.colors.primary} />
               <Text
-                variant="bodyLarge"
-                style={{ fontWeight: "900", userSelect: "none" }}
-                numberOfLines={1}
+                style={[
+                  styles.identityCountText,
+                  { color: theme.colors.onSurfaceVariant },
+                ]}
               >
-                {getDefaultIdentityName(identity.email)}
+                {identity.entries.length}
               </Text>
-              <Text
-                style={{ opacity: 0.7, userSelect: "none" }}
-                numberOfLines={1}
-              >
-                {identity.email}
-              </Text>
-              <View style={styles.identityMetaRow}>
-                <View style={[styles.identityMetaBadge, subtleSurfaceStyle]}>
-                  <Icon source="key-chain" size={13} color={theme.colors.primary} />
-                  <Text style={styles.identityMetaText}>
-                    {identity.entries.length}
-                  </Text>
-                </View>
-                <View style={[styles.identityMetaBadge, subtleSurfaceStyle]}>
-                  <Icon source="web" size={13} color={theme.colors.primary} />
-                  <Text style={styles.identityMetaText}>
-                    {identity.domains.length}
-                  </Text>
-                </View>
-                {identity.riskCount > 0 ? (
-                  <View
-                    style={[
-                      styles.identityMetaBadge,
-                      styles.identityRiskBadge,
-                      { borderColor: `${theme.colors.error}30` },
-                    ]}
-                  >
-                    <Icon
-                      source="alert-circle-outline"
-                      size={13}
-                      color={theme.colors.error}
-                    />
-                    <Text
-                      style={[
-                        styles.identityMetaText,
-                        { color: theme.colors.error },
-                      ]}
-                    >
-                      {identity.riskCount}
-                    </Text>
-                  </View>
-                ) : null}
-              </View>
             </View>
-            <View style={[styles.chevronBubble, { backgroundColor: `${theme.colors.primary}12` }]}>
-              <Icon source="chevron-right" size={20} color={theme.colors.primary} />
-            </View>
+            <Icon
+              source="chevron-right"
+              size={20}
+              color={theme.colors.primary}
+            />
           </View>
         </View>
       </AnimatedPressable>
@@ -185,7 +203,7 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
     <AnimatedContainer style={globalStyles.container}>
       <FocusAwareStatusBar
         animated
-        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        style={darkmode ? "light" : "dark"}
         translucent
       />
 
@@ -198,79 +216,147 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
         resetLabel={t("common:reset")}
       />
 
-      <ScrollView
+      <View
         style={{
+          flex: 1,
           width: "100%",
           ...screenContentStyle,
         }}
-        contentContainerStyle={{
-          padding: 8,
-          paddingTop: 0,
-          gap: 8,
-          alignSelf: "center",
-          width: "100%",
-          maxWidth: 920,
-          paddingBottom: 8,
-        }}
       >
-        <View style={styles.metricRow}>
-          <View style={[styles.metric, subtleSurfaceStyle]}>
-            <Icon source="email-multiple-outline" size={16} color={theme.colors.primary} />
-            <View style={styles.identityStatTextBlock}>
-              <Text style={styles.identityStatValue}>
-                {identities.length}
-              </Text>
-              <Text style={styles.metricLabel}>{t("identities:metricIdentities")}</Text>
+        <ScrollView
+          style={{ flex: 1, width: "100%" }}
+          contentContainerStyle={{
+            gap: 8,
+            paddingRight: SCROLLBAR_CONTENT_GAP,
+            alignSelf: "center",
+            width: "100%",
+            maxWidth: 920,
+          }}
+        >
+          <View style={styles.metricRow}>
+            <View style={[styles.metric, subtleSurfaceStyle]}>
+              <Icon
+                source="email-multiple-outline"
+                size={16}
+                color={theme.colors.primary}
+              />
+              <View style={styles.identityStatTextBlock}>
+                <Text style={styles.identityStatValue}>
+                  {identities.length}
+                </Text>
+                <Text style={styles.metricLabel}>
+                  {t("identities:metricIdentities")}
+                </Text>
+              </View>
+            </View>
+            <View style={[styles.metric, subtleSurfaceStyle]}>
+              <Icon source="key-chain" size={16} color={theme.colors.primary} />
+              <View style={styles.identityStatTextBlock}>
+                <Text style={styles.identityStatValue}>{totalAccounts}</Text>
+                <Text style={styles.metricLabel}>
+                  {t("identities:metricAccounts")}
+                </Text>
+              </View>
+            </View>
+            <View style={[styles.metric, subtleSurfaceStyle]}>
+              <Icon source="web" size={16} color={theme.colors.primary} />
+              <View style={styles.identityStatTextBlock}>
+                <Text style={styles.identityStatValue}>{totalWebsites}</Text>
+                <Text style={styles.metricLabel}>
+                  {t("identities:metricWebsites")}
+                </Text>
+              </View>
+            </View>
+            <View style={[styles.metric, subtleSurfaceStyle]}>
+              <Icon
+                source="alert-circle-outline"
+                size={16}
+                color={
+                  identitiesWithRisks > 0
+                    ? theme.colors.error
+                    : theme.colors.primary
+                }
+              />
+              <View style={styles.identityStatTextBlock}>
+                <Text
+                  style={[
+                    styles.identityStatValue,
+                    identitiesWithRisks > 0
+                      ? { color: theme.colors.error }
+                      : null,
+                  ]}
+                >
+                  {identitiesWithRisks}
+                </Text>
+                <Text style={styles.metricLabel}>
+                  {t("identities:metricAtRisk")}
+                </Text>
+              </View>
+            </View>
+            <View style={[styles.metric, subtleSurfaceStyle]}>
+              <Icon
+                source="account-outline"
+                size={16}
+                color={theme.colors.primary}
+              />
+              <View style={styles.identityStatTextBlock}>
+                <Text style={styles.identityStatValue}>{totalAliases}</Text>
+                <Text style={styles.metricLabel}>
+                  {t("identities:metricAliases")}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        {visibleIdentities.length === 0 ? (
-          <View style={[styles.emptyState, surfaceStyle]}>
-            <View style={[styles.emptyIcon, { backgroundColor: `${theme.colors.primary}14` }]}>
-              <Icon source="account-search-outline" size={28} color={theme.colors.primary} />
+          {visibleIdentities.length === 0 ? (
+            <View style={[styles.emptyState, surfaceStyle]}>
+              <View
+                style={[
+                  styles.emptyIcon,
+                  { backgroundColor: `${theme.colors.primary}14` },
+                ]}
+              >
+                <Icon
+                  source="account-search-outline"
+                  size={28}
+                  color={theme.colors.primary}
+                />
+              </View>
+              <Text style={styles.emptyText}>{t("identities:noMatches")}</Text>
             </View>
-            <Text style={styles.emptyText}>
-              {t("identities:noMatches")}
-            </Text>
-          </View>
-        ) : (
-          <View style={{ gap: 8 }}>{visibleIdentities.map(renderIdentityCard)}</View>
-        )}
-      </ScrollView>
+          ) : (
+            <View style={{ gap: 8 }}>
+              {visibleIdentities.map(renderIdentityCard)}
+            </View>
+          )}
+        </ScrollView>
+      </View>
     </AnimatedContainer>
   );
 };
 
 const styles = StyleSheet.create({
   identityCard: {
-    borderRadius: 14,
+    borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
-    overflow: "hidden",
+    overflow: "visible",
   },
   identityPressable: {
-    borderRadius: 14,
+    borderRadius: 12,
     overflow: "hidden",
   },
   identityCardInner: {
-    minHeight: 82,
+    minHeight: 64,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
     paddingHorizontal: 8,
     paddingVertical: 8,
   },
-  identityHeaderRow: {
-    flex: 1,
-    minWidth: 0,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
   logoShell: {
-    width: 54,
-    height: 54,
-    borderRadius: 14,
+    width: 48,
+    height: 48,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(255, 255, 255, 0.32)",
@@ -278,32 +364,34 @@ const styles = StyleSheet.create({
   identityTextBlock: {
     flex: 1,
     minWidth: 0,
-    gap: 5,
+    gap: 2,
   },
-  identityMetaRow: {
+  identityTitle: {
+    fontWeight: "500",
+    userSelect: "none",
+  },
+  identitySubtitle: {
+    opacity: 0.72,
+    fontSize: 13,
+    lineHeight: 17,
+    userSelect: "none",
+  },
+  identityTrailing: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
     alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 8,
+    flexShrink: 0,
   },
-  identityMetaBadge: {
-    minHeight: 22,
-    borderRadius: 8,
-    borderWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 7,
-    paddingVertical: 2,
+  identityCount: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    gap: 4,
   },
-  identityRiskBadge: {
-    backgroundColor: "rgba(236, 72, 103, 0.10)",
-  },
-  identityMetaText: {
-    opacity: 0.74,
-    fontSize: 11,
-    lineHeight: 14,
-    fontWeight: "800",
+  identityCountText: {
+    opacity: 0.82,
+    fontSize: 13,
+    lineHeight: 17,
     userSelect: "none",
   },
   identityStatTextBlock: {
@@ -343,16 +431,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     userSelect: "none",
   },
-  chevronBubble: {
-    width: 34,
-    height: 34,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   emptyState: {
     minHeight: 150,
-    borderRadius: 14,
+    borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
     alignItems: "center",
     justifyContent: "center",

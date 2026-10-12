@@ -1,9 +1,20 @@
 import React, { useMemo, useState } from "react";
-import { CommonActions, useFocusEffect, useNavigation } from "@react-navigation/native";
+import {
+  CommonActions,
+  useFocusEffect,
+  useNavigation,
+} from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Platform, ScrollView, StyleSheet, View } from "react-native";
-import { Button, Divider, Icon, IconButton, Text, TextInput } from "react-native-paper";
+import {
+  Button,
+  Divider,
+  Icon,
+  IconButton,
+  Text,
+  TextInput,
+} from "react-native-paper";
 import { Image } from "expo-image";
 import { useTranslation } from "react-i18next";
 
@@ -31,6 +42,7 @@ import AppIcon from "../shared/components/icons/AppIcon";
 import IdentityEmailLogo from "../features/identity/components/IdentityEmailLogo";
 import { getDefaultIdentityName } from "../features/identity/utils/identityDisplayName";
 import {
+  SCROLLBAR_CONTENT_GAP,
   getItemSurfaceStyle,
   getScreenContentStyle,
 } from "../shared/ui/glass";
@@ -84,7 +96,11 @@ function WebsiteChip({ domain }: { domain: string }) {
             }}
           />
         ) : (
-          <AppIcon name="web" size={size} color={color ?? theme.colors.primary} />
+          <AppIcon
+            name="web"
+            size={size}
+            color={color ?? theme.colors.primary}
+          />
         )
       }
       style={styles.chip}
@@ -101,8 +117,12 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
   const vault = useVault();
   const tabNav = useNavigation<BottomTabNavigationProp<AppTabsParamList>>();
   const { t } = useTranslation();
-  const { globalStyles, theme, headerWhite, setHeaderWhite, darkmode, setHeaderSpacing } =
-    useTheme();
+  const {
+    globalStyles,
+    theme,
+    darkmode,
+    setHeaderSpacing,
+  } = useTheme();
   const screenContentStyle = getScreenContentStyle(theme);
   const [displayName, setDisplayName] = useState("");
   const [draftDisplayName, setDraftDisplayName] = useState("");
@@ -111,15 +131,18 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
   const [entriesExpanded, setEntriesExpanded] = useState(false);
   const surfaceStyle = getItemSurfaceStyle(theme);
   const softSurfaceStyle = {
-    backgroundColor: darkmode ? "rgba(255, 255, 255, 0.05)" : "rgba(120, 127, 246, 0.055)",
-    borderColor: darkmode ? "rgba(255, 255, 255, 0.08)" : "rgba(120, 127, 246, 0.12)",
+    backgroundColor: darkmode
+      ? "rgba(255, 255, 255, 0.05)"
+      : "rgba(120, 127, 246, 0.055)",
+    borderColor: darkmode
+      ? "rgba(255, 255, 255, 0.08)"
+      : "rgba(120, 127, 246, 0.12)",
   };
 
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(0);
-      setHeaderWhite(false);
-    }, [setHeaderSpacing, setHeaderWhite]),
+    }, [setHeaderSpacing]),
   );
 
   const values = useMemo(() => {
@@ -149,18 +172,28 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
     : t("bar:Identities");
   const title = displayName.trim() || defaultIdentityName;
   const visibleDomains =
-    identity && !websitesExpanded && identity.domains.length > WEBSITE_COLLAPSED_LIMIT
+    identity &&
+    !websitesExpanded &&
+    identity.domains.length > WEBSITE_COLLAPSED_LIMIT
       ? identity.domains.slice(0, WEBSITE_COLLAPSED_LIMIT)
       : (identity?.domains ?? []);
   const hiddenDomainsCount = identity
     ? identity.domains.length - visibleDomains.length
     : 0;
   const visibleEntries =
-    identity && !entriesExpanded && identity.entries.length > ENTRIES_COLLAPSED_LIMIT
+    identity &&
+    !entriesExpanded &&
+    identity.entries.length > ENTRIES_COLLAPSED_LIMIT
       ? identity.entries.slice(0, ENTRIES_COLLAPSED_LIMIT)
       : (identity?.entries ?? []);
   const hiddenEntriesCount = identity
     ? identity.entries.length - visibleEntries.length
+    : 0;
+  const dataPointCount = identity
+    ? 1 +
+      identity.usernames.length +
+      identity.domains.length +
+      identity.moduleTypes.length
     : 0;
 
   const openEntry = (entryId: string) => {
@@ -192,50 +225,54 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
     <AnimatedContainer style={globalStyles.container}>
       <FocusAwareStatusBar
         animated
-        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        style={darkmode ? "light" : "dark"}
         translucent
       />
 
-      <Header
-        title={title}
-        onPress={() => navigation.goBack()}
-      />
+      <Header title={title} onPress={() => navigation.goBack()} />
 
-      <ScrollView
-        style={{ width: "100%", ...screenContentStyle }}
-        contentContainerStyle={{
-          padding: 8,
-          paddingTop: 0,
-          gap: 8,
-          alignSelf: "center",
-          width: "100%",
-          maxWidth: 980,
-          paddingBottom: 8,
-        }}
-      >
-        {!identity ? (
-          <View style={[styles.emptyState, surfaceStyle]}>
-            <View style={[styles.emptyIcon, { backgroundColor: `${theme.colors.primary}14` }]}>
-              <Icon source="account-search-outline" size={28} color={theme.colors.primary} />
+      <View style={{ flex: 1, width: "100%", ...screenContentStyle }}>
+        <ScrollView
+          style={{ flex: 1, width: "100%" }}
+          contentContainerStyle={{
+            gap: 8,
+            paddingRight: SCROLLBAR_CONTENT_GAP,
+            alignSelf: "center",
+            width: "100%",
+            maxWidth: 980,
+          }}
+        >
+          {!identity ? (
+            <View style={[styles.emptyState, surfaceStyle]}>
+              <View
+                style={[
+                  styles.emptyIcon,
+                  { backgroundColor: `${theme.colors.primary}14` },
+                ]}
+              >
+                <Icon
+                  source="account-search-outline"
+                  size={28}
+                  color={theme.colors.primary}
+                />
+              </View>
+              <Text style={styles.emptyText}>
+                {t("identities:detailMissing")}
+              </Text>
             </View>
-            <Text style={styles.emptyText}>
-              {t("identities:detailMissing")}
-            </Text>
-          </View>
-        ) : (
-          <>
-            <View
-              style={[
-                styles.heroPanel,
-                surfaceStyle,
-              ]}
-            >
+          ) : (
+            <>
+            <View style={[styles.heroPanel, surfaceStyle]}>
               <View style={styles.heroTopRow}>
                 <View style={styles.heroLogoShell}>
                   <IdentityEmailLogo email={identity.email} size={56} />
                 </View>
                 <View style={{ flex: 1, minWidth: 0 }}>
-                  <Text variant="titleLarge" style={{ fontWeight: "900" }} numberOfLines={1}>
+                  <Text
+                    variant="titleLarge"
+                    style={{ fontWeight: "900" }}
+                    numberOfLines={1}
+                  >
                     {title}
                   </Text>
                   <Text style={{ opacity: 0.68 }} numberOfLines={1}>
@@ -257,15 +294,23 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
 
               <View style={styles.heroMetricRow}>
                 <View style={[styles.heroMetric, softSurfaceStyle]}>
-                  <Icon source="key-chain" size={19} color={theme.colors.primary} />
+                  <Icon
+                    source="key-chain"
+                    size={19}
+                    color={theme.colors.primary}
+                  />
                   <Text style={styles.heroMetricText}>
-                    {t("identities:accountsCount", { count: identity.entries.length })}
+                    {t("identities:accountsCount", {
+                      count: identity.entries.length,
+                    })}
                   </Text>
                 </View>
                 <View style={[styles.heroMetric, softSurfaceStyle]}>
                   <Icon source="web" size={19} color={theme.colors.primary} />
                   <Text style={styles.heroMetricText}>
-                    {t("identities:websitesCount", { count: identity.domains.length })}
+                    {t("identities:websitesCount", {
+                      count: identity.domains.length,
+                    })}
                   </Text>
                 </View>
                 <View
@@ -275,30 +320,216 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
                     { borderColor: `${theme.colors.error}30` },
                   ]}
                 >
-                  <Icon source="alert-circle-outline" size={19} color={theme.colors.error} />
-                  <Text style={[styles.heroMetricText, { color: theme.colors.error }]}>
+                  <Icon
+                    source="alert-circle-outline"
+                    size={19}
+                    color={theme.colors.error}
+                  />
+                  <Text
+                    style={[
+                      styles.heroMetricText,
+                      { color: theme.colors.error },
+                    ]}
+                  >
                     {t("identities:risksCount", { count: identity.riskCount })}
                   </Text>
                 </View>
               </View>
             </View>
 
-            {identity.usernames.length > 0 ? (
-              <View
-                style={[
-                  styles.panel,
-                  surfaceStyle,
-                ]}
-              >
-                <View style={styles.sectionHeader}>
-                  <View style={[styles.sectionIcon, { backgroundColor: `${theme.colors.primary}14` }]}>
-                    <Icon source="account-outline" size={20} color={theme.colors.primary} />
+            <View style={[styles.panel, surfaceStyle]}>
+              <View style={styles.sectionHeader}>
+                <View
+                  style={[
+                    styles.sectionIcon,
+                    { backgroundColor: `${theme.colors.primary}14` },
+                  ]}
+                >
+                  <Icon source="radar" size={20} color={theme.colors.primary} />
+                </View>
+                <Text style={styles.sectionTitle}>
+                  {t("identities:exposureTitle")}
+                </Text>
+              </View>
+              <View style={styles.exposureGrid}>
+                <View style={[styles.exposureCell, softSurfaceStyle]}>
+                  <Icon
+                    source="shield-search"
+                    size={18}
+                    color={theme.colors.primary}
+                  />
+                  <Text style={styles.exposureValue}>
+                    {t("identities:confidenceExactEmail")}
+                  </Text>
+                  <Text style={styles.exposureLabel}>
+                    {t("identities:likelySameIdentity")}
+                  </Text>
+                </View>
+                <View style={[styles.exposureCell, softSurfaceStyle]}>
+                  <Icon
+                    source={
+                      identity.riskCount > 0
+                        ? "alert-circle-outline"
+                        : "check-circle-outline"
+                    }
+                    size={18}
+                    color={
+                      identity.riskCount > 0
+                        ? theme.colors.error
+                        : theme.colors.primary
+                    }
+                  />
+                  <Text
+                    style={[
+                      styles.exposureValue,
+                      identity.riskCount > 0
+                        ? { color: theme.colors.error }
+                        : null,
+                    ]}
+                  >
+                    {identity.riskCount > 0
+                      ? t("identities:risksCount", {
+                          count: identity.riskCount,
+                        })
+                      : t("analysisDetail:riskOk")}
+                  </Text>
+                  <Text style={styles.exposureLabel}>
+                    {identity.riskCount > 0
+                      ? t("identities:exposureHint")
+                      : t("identities:noExposureHint")}
+                  </Text>
+                </View>
+                <View style={[styles.exposureCell, softSurfaceStyle]}>
+                  <Icon
+                    source="database-outline"
+                    size={18}
+                    color={theme.colors.primary}
+                  />
+                  <Text style={styles.exposureValue}>
+                    {t("identities:dataPointsCount", { count: dataPointCount })}
+                  </Text>
+                  <Text style={styles.exposureLabel}>
+                    {t("identities:dataSignalsTitle")}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={[styles.panel, surfaceStyle]}>
+              <View style={styles.sectionHeader}>
+                <View
+                  style={[
+                    styles.sectionIcon,
+                    { backgroundColor: `${theme.colors.primary}14` },
+                  ]}
+                >
+                  <Icon
+                    source="lightbulb-outline"
+                    size={20}
+                    color={theme.colors.primary}
+                  />
+                </View>
+                <Text style={styles.sectionTitle}>
+                  {t("identities:insightsTitle")}
+                </Text>
+              </View>
+              <View style={styles.insightList}>
+                <View style={styles.insightRow}>
+                  <Icon
+                    source="email-outline"
+                    size={17}
+                    color={theme.colors.primary}
+                  />
+                  <Text style={styles.insightText}>
+                    {t("identities:insightAccounts", {
+                      email: identity.email,
+                      count: identity.entries.length,
+                    })}
+                  </Text>
+                </View>
+                <View style={styles.insightRow}>
+                  <Icon source="web" size={17} color={theme.colors.primary} />
+                  <Text style={styles.insightText}>
+                    {identity.domains.length > 3
+                      ? t("identities:insightDomains", {
+                          count: identity.domains.length,
+                        })
+                      : t("identities:insightFocusedUse")}
+                  </Text>
+                </View>
+                <View style={styles.insightRow}>
+                  <Icon
+                    source={
+                      identity.riskCount > 0
+                        ? "alert-circle-outline"
+                        : "check-circle-outline"
+                    }
+                    size={17}
+                    color={
+                      identity.riskCount > 0
+                        ? theme.colors.error
+                        : theme.colors.primary
+                    }
+                  />
+                  <Text
+                    style={[
+                      styles.insightText,
+                      identity.riskCount > 0
+                        ? { color: theme.colors.error }
+                        : null,
+                    ]}
+                  >
+                    {identity.riskCount > 0
+                      ? t("identities:insightRisks", {
+                          count: identity.riskCount,
+                        })
+                      : t("identities:insightNoRisks")}
+                  </Text>
+                </View>
+                {identity.usernames.length > 0 ? (
+                  <View style={styles.insightRow}>
+                    <Icon
+                      source="account-outline"
+                      size={17}
+                      color={theme.colors.primary}
+                    />
+                    <Text style={styles.insightText}>
+                      {t("identities:insightAliases", {
+                        count: identity.usernames.length,
+                      })}
+                    </Text>
                   </View>
-                  <Text style={styles.sectionTitle}>{t("identities:usernamesTitle")}</Text>
+                ) : null}
+              </View>
+            </View>
+
+            {identity.usernames.length > 0 ? (
+              <View style={[styles.panel, surfaceStyle]}>
+                <View style={styles.sectionHeader}>
+                  <View
+                    style={[
+                      styles.sectionIcon,
+                      { backgroundColor: `${theme.colors.primary}14` },
+                    ]}
+                  >
+                    <Icon
+                      source="account-outline"
+                      size={20}
+                      color={theme.colors.primary}
+                    />
+                  </View>
+                  <Text style={styles.sectionTitle}>
+                    {t("identities:usernamesTitle")}
+                  </Text>
                 </View>
                 <View style={styles.chipWrap}>
                   {identity.usernames.map((username) => (
-                    <AppChip key={username} compact icon="account-outline" style={styles.chip}>
+                    <AppChip
+                      key={username}
+                      compact
+                      icon="account-outline"
+                      style={styles.chip}
+                    >
                       {username}
                     </AppChip>
                   ))}
@@ -306,17 +537,19 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
               </View>
             ) : null}
 
-            <View
-              style={[
-                styles.panel,
-                surfaceStyle,
-              ]}
-            >
+            <View style={[styles.panel, surfaceStyle]}>
               <View style={styles.sectionHeader}>
-                <View style={[styles.sectionIcon, { backgroundColor: `${theme.colors.primary}14` }]}>
+                <View
+                  style={[
+                    styles.sectionIcon,
+                    { backgroundColor: `${theme.colors.primary}14` },
+                  ]}
+                >
                   <Icon source="web" size={20} color={theme.colors.primary} />
                 </View>
-                <Text style={styles.sectionTitle}>{t("identities:websitesTitle")}</Text>
+                <Text style={styles.sectionTitle}>
+                  {t("identities:websitesTitle")}
+                </Text>
               </View>
               <View style={styles.chipWrap}>
                 {identity.domains.length > 0 ? (
@@ -324,7 +557,9 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
                     <WebsiteChip key={domain} domain={domain} />
                   ))
                 ) : (
-                  <Text style={styles.insightText}>{t("identities:noWebsites")}</Text>
+                  <Text style={styles.insightText}>
+                    {t("identities:noWebsites")}
+                  </Text>
                 )}
                 {hiddenDomainsCount > 0 ? (
                   <AppChip
@@ -337,7 +572,8 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
                   </AppChip>
                 ) : null}
               </View>
-              {websitesExpanded && identity.domains.length > WEBSITE_COLLAPSED_LIMIT ? (
+              {websitesExpanded &&
+              identity.domains.length > WEBSITE_COLLAPSED_LIMIT ? (
                 <Button
                   compact
                   icon="chevron-up"
@@ -351,18 +587,35 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
               ) : null}
             </View>
 
-            <View
-              style={[
-                styles.panel,
-                surfaceStyle,
-              ]}
-            >
+            <View style={[styles.panel, surfaceStyle]}>
               <View style={styles.linkedHeaderRow}>
                 <View style={styles.sectionHeader}>
-                  <View style={[styles.sectionIcon, { backgroundColor: `${theme.colors.primary}14` }]}>
-                    <Icon source="link-variant" size={20} color={theme.colors.primary} />
+                  <View
+                    style={[
+                      styles.sectionIcon,
+                      { backgroundColor: `${theme.colors.primary}14` },
+                    ]}
+                  >
+                    <Icon
+                      source="link-variant"
+                      size={20}
+                      color={theme.colors.primary}
+                    />
                   </View>
-                  <Text style={styles.sectionTitle}>{t("identities:linkedEntries")}</Text>
+                  <Text style={styles.sectionTitle}>
+                    {t("identities:linkedEntries")}
+                  </Text>
+                </View>
+              </View>
+              <View style={[styles.blastRadiusNote, softSurfaceStyle]}>
+                <Icon source="target" size={17} color={theme.colors.primary} />
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text style={styles.blastRadiusTitle}>
+                    {t("identities:blastRadiusTitle")}
+                  </Text>
+                  <Text style={styles.blastRadiusText}>
+                    {t("identities:blastRadiusHint")}
+                  </Text>
                 </View>
               </View>
               <View style={styles.entryList}>
@@ -371,32 +624,51 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
                     {index > 0 ? <Divider style={styles.entryDivider} /> : null}
                     <AnimatedPressable
                       onPress={() => openEntry(entry.id)}
-                      style={[
-                        styles.entryRow,
-                        surfaceStyle,
-                      ]}
+                      style={[styles.entryRow, surfaceStyle]}
                       hoverBackgroundColor={
-                        darkmode ? "rgba(120, 127, 246, 0.12)" : "rgba(120, 127, 246, 0.08)"
+                        darkmode
+                          ? "rgba(120, 127, 246, 0.12)"
+                          : "rgba(120, 127, 246, 0.08)"
                       }
                     >
                       <View style={styles.entryMainRow}>
-                        <View style={[styles.entryIcon, { backgroundColor: `${theme.colors.primary}12` }]}>
-                          <Icon source="card-account-details-outline" size={20} color={theme.colors.primary} />
+                        <View
+                          style={[
+                            styles.entryIcon,
+                            { backgroundColor: `${theme.colors.primary}12` },
+                          ]}
+                        >
+                          <Icon
+                            source="card-account-details-outline"
+                            size={20}
+                            color={theme.colors.primary}
+                          />
                         </View>
                         <View style={styles.entryTitleBlock}>
                           <Text style={styles.entryTitle} numberOfLines={1}>
                             {entry.title}
                           </Text>
                           <View style={styles.entryInlineMetaRow}>
-                          <View style={styles.entryMetaItem}>
-                              <Icon source="web" size={13} color={theme.colors.primary} />
-                              <Text style={styles.entryMetaText} numberOfLines={1}>
+                            <View style={styles.entryMetaItem}>
+                              <Icon
+                                source="web"
+                                size={13}
+                                color={theme.colors.primary}
+                              />
+                              <Text
+                                style={styles.entryMetaText}
+                                numberOfLines={1}
+                              >
                                 {entry.domains[0] ?? t("identities:noDomain")}
                               </Text>
                             </View>
-                          <View style={styles.entryMetaDot} />
-                          <View style={styles.entryMetaItem}>
-                              <Icon source="card-text-outline" size={13} color={theme.colors.primary} />
+                            <View style={styles.entryMetaDot} />
+                            <View style={styles.entryMetaItem}>
+                              <Icon
+                                source="card-text-outline"
+                                size={13}
+                                color={theme.colors.primary}
+                              />
                               <Text style={styles.entryMetaText}>
                                 {t("identities:entryInfoCount", {
                                   count: entry.moduleTypes.length,
@@ -404,19 +676,32 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
                               </Text>
                             </View>
                             {entry.hasRisk ? (
-                            <>
-                              <View style={styles.entryMetaDot} />
-                              <View style={styles.entryMetaItem}>
-                                <Icon source="alert-circle-outline" size={13} color={theme.colors.error} />
-                                <Text style={[styles.entryMetaText, { color: theme.colors.error }]}>
-                                  {t("identities:risksCount", { count: 1 })}
-                                </Text>
-                              </View>
-                            </>
+                              <>
+                                <View style={styles.entryMetaDot} />
+                                <View style={styles.entryMetaItem}>
+                                  <Icon
+                                    source="alert-circle-outline"
+                                    size={13}
+                                    color={theme.colors.error}
+                                  />
+                                  <Text
+                                    style={[
+                                      styles.entryMetaText,
+                                      { color: theme.colors.error },
+                                    ]}
+                                  >
+                                    {t("identities:risksCount", { count: 1 })}
+                                  </Text>
+                                </View>
+                              </>
                             ) : null}
                           </View>
                         </View>
-                        <Icon source="chevron-right" size={18} color={theme.colors.primary} />
+                        <Icon
+                          source="chevron-right"
+                          size={18}
+                          color={theme.colors.primary}
+                        />
                       </View>
                     </AnimatedPressable>
                   </React.Fragment>
@@ -432,7 +717,8 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
                   </AppChip>
                 ) : null}
               </View>
-              {entriesExpanded && identity.entries.length > ENTRIES_COLLAPSED_LIMIT ? (
+              {entriesExpanded &&
+              identity.entries.length > ENTRIES_COLLAPSED_LIMIT ? (
                 <View style={styles.showLessRow}>
                   <Button
                     compact
@@ -447,11 +733,13 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
                 </View>
               ) : null}
             </View>
-          </>
-        )}
-      </ScrollView>
+            </>
+          )}
+        </ScrollView>
+      </View>
       <Modal
         visible={renameModalVisible}
+        avoidKeyboard
         onDismiss={() => setRenameModalVisible(false)}
       >
         <ModalSurface
@@ -496,12 +784,12 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
 
 const styles = StyleSheet.create({
   heroPanel: {
-    borderRadius: 16,
+    borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
     padding: 8,
   },
   panel: {
-    borderRadius: 14,
+    borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
     padding: 8,
   },
@@ -512,11 +800,11 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     margin: 0,
-    borderRadius: 12,
+    borderRadius: 8,
     flexShrink: 0,
   },
   modalButton: {
-    borderRadius: 10,
+    borderRadius: 8,
   },
   moreChip: {
     backgroundColor: "transparent",
@@ -535,7 +823,7 @@ const styles = StyleSheet.create({
   heroLogoShell: {
     width: 68,
     height: 68,
-    borderRadius: 18,
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(255, 255, 255, 0.34)",
@@ -548,7 +836,7 @@ const styles = StyleSheet.create({
   },
   heroMetric: {
     minHeight: 38,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
     paddingHorizontal: 8,
     paddingVertical: 8,
@@ -569,7 +857,7 @@ const styles = StyleSheet.create({
   sectionIcon: {
     width: 34,
     height: 34,
-    borderRadius: 11,
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -581,6 +869,42 @@ const styles = StyleSheet.create({
   insightText: {
     opacity: 0.76,
     userSelect: "none",
+  },
+  exposureGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 8,
+  },
+  exposureCell: {
+    minHeight: 82,
+    minWidth: 170,
+    flexGrow: 1,
+    flexBasis: 0,
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    padding: 8,
+    gap: 5,
+  },
+  exposureValue: {
+    fontWeight: "900",
+    userSelect: "none",
+  },
+  exposureLabel: {
+    opacity: 0.66,
+    fontSize: 12,
+    lineHeight: 16,
+    userSelect: "none",
+  },
+  insightList: {
+    gap: 8,
+    marginTop: 8,
+  },
+  insightRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    minWidth: 0,
   },
   linkedHeaderRow: {
     flexDirection: "row",
@@ -597,10 +921,32 @@ const styles = StyleSheet.create({
     opacity: 0.5,
     marginHorizontal: 8,
   },
+  blastRadiusNote: {
+    minHeight: 54,
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    padding: 8,
+    marginTop: 8,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+  },
+  blastRadiusTitle: {
+    fontWeight: "900",
+    fontSize: 12,
+    lineHeight: 16,
+    userSelect: "none",
+  },
+  blastRadiusText: {
+    opacity: 0.68,
+    fontSize: 12,
+    lineHeight: 16,
+    userSelect: "none",
+  },
   entryRow: {
     minHeight: 64,
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 12,
+    borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 8,
     overflow: "hidden",
@@ -614,7 +960,7 @@ const styles = StyleSheet.create({
   entryIcon: {
     width: 38,
     height: 38,
-    borderRadius: 11,
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -663,7 +1009,7 @@ const styles = StyleSheet.create({
   },
   showLessButton: {
     minWidth: 0,
-    borderRadius: 12,
+    borderRadius: 8,
     alignSelf: "center",
     marginTop: 8,
   },
@@ -674,7 +1020,7 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     minHeight: 170,
-    borderRadius: 14,
+    borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
     alignItems: "center",
     justifyContent: "center",

@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
   toolbarLeft: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 2,
+    gap: 8,
     minWidth: 0,
     flexShrink: 1,
   },

@@ -40,8 +40,6 @@ const CardDetailsScreen: React.FC<CardDetailsScreenProps> = ({
   const { theme } = useTheme();
   const {
     globalStyles,
-    headerWhite,
-    setHeaderWhite,
     darkmode,
     setHeaderSpacing,
   } = useTheme();
@@ -68,7 +66,6 @@ const CardDetailsScreen: React.FC<CardDetailsScreenProps> = ({
     React.useCallback(() => {
       let task = InteractionManager.runAfterInteractions(() => {
         setHeaderSpacing(220);
-        setHeaderWhite(false);
       });
       return () => task?.cancel?.();
     }, [])
@@ -87,7 +84,7 @@ const CardDetailsScreen: React.FC<CardDetailsScreenProps> = ({
     <AnimatedContainer style={globalStyles.container}>
       <FocusAwareStatusBar
         animated={true}
-        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        style={darkmode ? "light" : "dark"}
         translucent={true}
       />
       <Header onPress={goBack} title={title}></Header>

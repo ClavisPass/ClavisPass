@@ -62,7 +62,7 @@ export default function ExpiryPickerModal({
   };
 
   return (
-    <Modal visible={visible} onDismiss={() => setVisible(false)}>
+    <Modal visible={visible} onDismiss={() => setVisible(false)} avoidKeyboard>
       <ModalSurface
         width={300}
         title={t("common:setExpiry")}

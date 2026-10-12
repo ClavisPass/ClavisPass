@@ -124,7 +124,7 @@ function EntryTagsModal(props: Props) {
   const modalMaxHeight = Math.max(300, Math.min(520, height - 112));
 
   return (
-    <Modal visible={props.visible} onDismiss={close}>
+    <Modal visible={props.visible} onDismiss={close} avoidKeyboard>
       <ModalSurface
         width={360}
         maxHeight={modalMaxHeight}

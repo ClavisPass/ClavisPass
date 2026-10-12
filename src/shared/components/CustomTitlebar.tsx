@@ -11,7 +11,12 @@ import {
   isTauriEnvironment,
   useIsTauriEnvironment,
 } from "../../infrastructure/platform/isTauri";
-import { TITLEBAR_CONTROLS_WIDTH, TITLEBAR_HEIGHT } from "./titlebarMetrics";
+import {
+  TITLEBAR_CONTROLS_WIDTH,
+  TITLEBAR_HEIGHT,
+  TITLEBAR_WINDOWS_CONTROL_BUTTON_WIDTH,
+  TITLEBAR_WINDOWS_CONTROLS_GAP,
+} from "./titlebarMetrics";
 import { resolveWindowControlsSide } from "../../infrastructure/platform/windowControls";
 import { isDemoDistribution } from "../utils/distribution";
 import { suppressNextSystemAuthAutoUnlock } from "../../features/auth/utils/systemAuthAutoUnlock";
@@ -50,8 +55,6 @@ type Props = {
 
 type WindowControlsProps = {
   closeWindow: () => void;
-  headerWhite: boolean;
-  onLightSurface: boolean;
   minimizeWindow: () => void;
 };
 
@@ -101,16 +104,8 @@ function WindowControls(props: WindowControlsProps) {
           styles.windowControlButton,
           {
             alignItems: "center",
-            backgroundColor: props.onLightSurface
-              ? "rgba(120,127,246,0.32)"
-              : props.headerWhite
-                ? "rgba(255,255,255,0.56)"
-                : "rgba(120,127,246,0.32)",
-            borderColor: props.onLightSurface
-              ? "rgba(120,127,246,0.24)"
-              : props.headerWhite
-                ? "rgba(255,255,255,0.52)"
-                : "rgba(120,127,246,0.24)",
+            backgroundColor: "rgba(120,127,246,0.32)",
+            borderColor: "rgba(120,127,246,0.24)",
             borderWidth: 1,
             justifyContent: "center",
           },
@@ -130,7 +125,7 @@ function WindowsWindowControls(props: WindowControlsProps) {
       style={{
         display: "flex",
         flexDirection: "row",
-        gap: 2,
+        gap: TITLEBAR_WINDOWS_CONTROLS_GAP,
         alignItems: "center",
         paddingLeft: 16,
         position: "relative",
@@ -146,7 +141,7 @@ function WindowsWindowControls(props: WindowControlsProps) {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "center",
-          width: 50,
+          width: TITLEBAR_WINDOWS_CONTROL_BUTTON_WIDTH,
           height: 40,
           borderRadius: 4,
         }}
@@ -154,7 +149,7 @@ function WindowsWindowControls(props: WindowControlsProps) {
         <Icon
           source={"window-minimize"}
           size={20}
-          color={props.headerWhite ? "white" : "#787FF6"}
+          color="#787FF6"
         />
       </AnimatedPressable>
       <AnimatedPressable
@@ -166,7 +161,7 @@ function WindowsWindowControls(props: WindowControlsProps) {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "center",
-          width: 50,
+          width: TITLEBAR_WINDOWS_CONTROL_BUTTON_WIDTH,
           height: 40,
           borderRadius: 4,
           borderBottomEndRadius: 12,
@@ -175,7 +170,7 @@ function WindowsWindowControls(props: WindowControlsProps) {
         <Icon
           source={"window-close"}
           size={20}
-          color={props.headerWhite ? "white" : "#787FF6"}
+          color="#787FF6"
         />
       </AnimatedPressable>
     </View>
@@ -202,10 +197,7 @@ export function TitlebarHeight(props: Props) {
 
 function CustomTitlebar() {
   const auth = useAuth();
-  const {
-    headerWhite,
-    headerSpacing,
-  } = useTheme();
+  const { headerSpacing } = useTheme();
   const { width } = useWindowDimensions();
 
   const { value: closeBehavior } = useSetting("CLOSE_BEHAVIOR");
@@ -216,7 +208,6 @@ function CustomTitlebar() {
   const controlsSide = resolveWindowControlsSide(windowControlsStyle);
   const controlsLeft = controlsSide === "left";
   const hasSidebarOffset = auth.isLoggedIn && width > 600;
-  const controlsOnSidebar = controlsLeft && hasSidebarOffset;
   const sidebarOffset = hasSidebarOffset ? 88 : 0;
   const layerOffset = controlsLeft ? 0 : headerSpacing + sidebarOffset;
   const leftDragOffset = controlsLeft
@@ -340,8 +331,6 @@ function CustomTitlebar() {
           {controlsLeft ? (
             <WindowControls
               closeWindow={closeWindow}
-              headerWhite={headerWhite}
-              onLightSurface={controlsOnSidebar}
               minimizeWindow={minimizeWindow}
             />
           ) : null}
@@ -366,8 +355,6 @@ function CustomTitlebar() {
             {!controlsLeft ? (
               <WindowsWindowControls
                 closeWindow={closeWindow}
-                headerWhite={headerWhite}
-                onLightSurface={false}
                 minimizeWindow={minimizeWindow}
               />
             ) : null}

@@ -95,7 +95,7 @@ function WifiModule(props: WifiModuleType & Props) {
       icon={MODULE_ICON[ModulesEnum.WIFI]}
       fastAccess={props.fastAccess}
     >
-      <View style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <View style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <View
           style={[
             globalStyles.moduleView,
@@ -131,6 +131,7 @@ function WifiModule(props: WifiModuleType & Props) {
             icon="tune-variant"
             iconColor={theme.colors.primary}
             size={20}
+            style={{ margin: 0, width: 40, height: 40 }}
             onPress={() => {
               Keyboard.dismiss();
               setSettingsVisible(true);

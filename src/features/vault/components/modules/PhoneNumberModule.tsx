@@ -91,12 +91,13 @@ function PhoneNumberModule(props: PhoneNumberModuleType & Props) {
           />
         </View>
         <CopyToClipboard value={value} />
-        <View style={{ width: 48 }}>
+        <View style={{ width: 40, height: 40, marginLeft: 8 }}>
           <TooltipIconButton
             tooltip={t("common:callPhoneNumber")}
             icon={"phone-outline"}
             iconColor={theme.colors.primary}
             size={20}
+            style={{ margin: 0, width: 40, height: 40 }}
             onPress={() => {
               const number = formattedNumber.replace(/\s/g, "");
               Linking.openURL(`tel:${number}`);

@@ -71,8 +71,6 @@ const DigitalCardScanScreen: React.FC<DigitalCardScanScreenProps> = ({
 }) => {
   const {
     globalStyles,
-    headerWhite,
-    setHeaderWhite,
     darkmode,
     setHeaderSpacing,
   } = useTheme();
@@ -87,7 +85,6 @@ const DigitalCardScanScreen: React.FC<DigitalCardScanScreenProps> = ({
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(40);
-      setHeaderWhite(false);
     }, [])
   );
 
@@ -131,7 +128,7 @@ const DigitalCardScanScreen: React.FC<DigitalCardScanScreenProps> = ({
     <AnimatedContainer style={globalStyles.container}>
       <FocusAwareStatusBar
         animated={true}
-        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        style={darkmode ? "light" : "dark"}
         translucent={true}
       />
       <Header

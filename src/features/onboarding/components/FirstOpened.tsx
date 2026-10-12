@@ -2,21 +2,26 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import * as Localization from "expo-localization";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Platform, ScrollView, View, useColorScheme } from "react-native";
+import {
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+  useColorScheme,
+  useWindowDimensions,
+} from "react-native";
 import { Button, Text } from "react-native-paper";
 
 import { LoginStackParamList } from "../../../app/navigation/model/types";
 import { useToken } from "../../../app/providers/CloudProvider";
-import { useOnline } from "../../../app/providers/OnlineProvider";
 import { useSetting } from "../../../app/providers/SettingsProvider";
 import { useTheme } from "../../../app/providers/ThemeProvider";
-import AppearanceSettingsSection from "../../settings/components/AppearanceSettingsSection";
 import SettingsDivider from "../../settings/components/SettingsDivider";
-import SettingsItem from "../../settings/components/SettingsItem";
 import ClavisPassHubLoginButton from "../../sync/components/ClavisPassHubLoginButton";
 import DropboxLoginButton from "../../sync/components/DropboxLoginButton";
 import GoogleDriveLoginButton from "../../sync/components/GoogleDriveLoginButton";
 import LocalFileLoginButton from "../../sync/components/LocalFileLoginButton";
+import Logo from "../../../shared/ui/Logo";
 
 type Props = {
   onFinish?: () => void;
@@ -28,21 +33,21 @@ type Props = {
 };
 type Step = 0 | 1;
 
-const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
+const FirstOpened: React.FC<Props> = ({ onFinish }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const { isOnline } = useOnline();
   const systemColorScheme = useColorScheme();
+  const { width } = useWindowDimensions();
+  const isWideLayout = width >= 600;
 
   const { provider } = useToken();
 
   const { value: onboardingDone, setValue: setOnboardingDone } =
     useSetting("ONBOARDING_DONE");
-  const { value: language, setValue: setLanguage } = useSetting("LANGUAGE");
-  const { value: dateFormat, setValue: setDateFormat } =
-    useSetting("DATE_FORMAT");
-  const { value: timeFormat, setValue: setTimeFormat } =
-    useSetting("TIME_FORMAT");
+  const { setValue: setLanguage } = useSetting("LANGUAGE");
+  const { setValue: setDateFormat } = useSetting("DATE_FORMAT");
+  const { setValue: setTimeFormat } = useSetting("TIME_FORMAT");
+  const { setValue: setThemePreference } = useSetting("THEME_PREFERENCE");
 
   const [step, setStep] = useState<Step>(0);
 
@@ -83,62 +88,65 @@ const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
     setLanguage(inferredLanguage as any);
     setDateFormat(inferredFormat as any);
     setTimeFormat(inferredFormat as any);
+    setThemePreference(systemColorScheme === "dark" ? "dark" : "light");
 
     appliedDefaultsRef.current = true;
   }, [
     step,
     onboardingDone,
-    language,
-    dateFormat,
-    timeFormat,
     setLanguage,
     setDateFormat,
     setTimeFormat,
+    setThemePreference,
     systemColorScheme,
   ]);
 
-  const renderStepIndicators = () => (
-    <View
-      style={{
-        flexDirection: "row",
-        gap: 8,
-        justifyContent: "center",
-        marginTop: 10,
-      }}
-    >
+  const ChoiceStep = () => (
+    <View style={{ width: "100%", gap: 8 }}>
+      <Button mode="contained" style={{ borderRadius: 12 }} onPress={finish}>
+        {t("login:createNewVault")}
+      </Button>
       <View
         style={{
-          width: 8,
-          height: 8,
-          borderRadius: 8,
-          backgroundColor:
-            step === 0 ? theme.colors.primary : theme.colors.outlineVariant,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 8,
+          paddingVertical: 2,
         }}
-      />
-      <View
-        style={{
-          width: 8,
-          height: 8,
-          borderRadius: 8,
-          backgroundColor:
-            step === 1 ? theme.colors.primary : theme.colors.outlineVariant,
-        }}
-      />
+      >
+        <View
+          style={{
+            flex: 1,
+            height: StyleSheet.hairlineWidth,
+            backgroundColor: theme.colors.outlineVariant,
+          }}
+        />
+        <Text
+          variant="labelMedium"
+          style={{
+            color: theme.colors.onSurfaceVariant,
+            userSelect: "none",
+          }}
+        >
+          {t("common:or")}
+        </Text>
+        <View
+          style={{
+            flex: 1,
+            height: StyleSheet.hairlineWidth,
+            backgroundColor: theme.colors.outlineVariant,
+          }}
+        />
+      </View>
+      <Button mode="outlined" style={{ borderRadius: 12 }} onPress={next}>
+        {t("login:loadVault")}
+      </Button>
     </View>
   );
 
-  const AppearanceStep = () => (
+  const ProviderStep = () => (
     <View style={{ width: "100%", gap: 8 }}>
       <View style={{ width: "100%" }}>
-        <AppearanceSettingsSection dropdownMaxWidth={160} size="small" />
-        <SettingsDivider />
-      </View>
-    </View>
-  );
-
-  const CloudStep = () => (
-    <View style={{ width: "100%", gap: 8 }}>
-      <View style={{ marginTop: 8, width: "100%" }}>
         <SettingsDivider />
         {Platform.OS === "web" ? (
           <>
@@ -146,41 +154,125 @@ const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
             <SettingsDivider />
           </>
         ) : null}
-        <View style={{ opacity: isOnline ? 1 : 0.5 }}>
-          <DropboxLoginButton />
-          <SettingsDivider />
-          <GoogleDriveLoginButton />
-          <SettingsDivider />
-          <ClavisPassHubLoginButton />
-          <SettingsDivider />
-          <SettingsItem
-            leadingIcon="qrcode-scan"
-            onPress={() => navigation.navigate("Scan")}
-          >
-            {t("settings:scanqrcode")}
-          </SettingsItem>
-          <SettingsDivider />
-        </View>
-
-        {!isOnline && (
-          <Text style={{ marginTop: 8, textAlign: "center" }}>
-            {t("common:offline")}
-          </Text>
-        )}
+        <DropboxLoginButton />
+        <SettingsDivider />
+        <GoogleDriveLoginButton />
+        <SettingsDivider />
+        <ClavisPassHubLoginButton />
+        <SettingsDivider />
       </View>
     </View>
   );
 
   const renderStep = (s: Step) => {
-    if (s === 0) return <AppearanceStep />;
-    return <CloudStep />;
+    if (s === 0) return <ChoiceStep />;
+    return <ProviderStep />;
   };
 
   const next = () => setStep(1);
   const back = () => setStep(0);
 
-  const canGoBack = step === 1;
-  const isLast = step === 1;
+  const brandingContent = (
+    <View
+      style={{
+        width: "100%",
+        maxWidth: isWideLayout ? 320 : 360,
+        gap: 10,
+        alignItems: "center",
+      }}
+    >
+      <Logo width={isWideLayout ? 76 : 44} height={isWideLayout ? 76 : 44} />
+      <Text
+        style={{
+          width: "100%",
+          textAlign: "center",
+          fontFamily: "LexendExa_400Regular",
+          fontSize: isWideLayout ? 18 : 15,
+          lineHeight: isWideLayout ? 24 : 21,
+          includeFontPadding: false,
+          paddingHorizontal: 6,
+        }}
+      >
+        ClavisPass
+      </Text>
+      <Text
+        style={{
+          opacity: 0.72,
+          textAlign: "center",
+          color: theme.colors.onSurfaceVariant,
+        }}
+      >
+        {step === 0
+          ? t("login:introFirstRun")
+          : t("login:cloudSaveSubtitle")}
+      </Text>
+    </View>
+  );
+
+  const stageContent = (
+    <View style={{ width: "100%", maxWidth: 380 }}>{renderStep(step)}</View>
+  );
+
+  if (isWideLayout) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "100%",
+          paddingHorizontal: 24,
+          paddingVertical: 24,
+          gap: 24,
+        }}
+      >
+        <View
+          style={{
+            flex: 0.95,
+            alignItems: "center",
+            justifyContent: "center",
+            alignSelf: "stretch",
+          }}
+        >
+          {brandingContent}
+        </View>
+
+        <View
+          style={{
+            width: StyleSheet.hairlineWidth,
+            alignSelf: "stretch",
+            backgroundColor: theme.colors.outlineVariant,
+            opacity: 0.85,
+          }}
+        />
+
+        <View
+          style={{
+            flex: 1.55,
+            alignItems: "center",
+            justifyContent: "center",
+            alignSelf: "stretch",
+            paddingLeft: 18,
+            paddingRight: 18,
+          }}
+        >
+          {stageContent}
+          {step === 1 ? (
+            <View style={{ width: "100%", maxWidth: 380, marginTop: 8 }}>
+              <Button
+                mode="outlined"
+                style={{ borderRadius: 12 }}
+                onPress={back}
+              >
+                {t("common:back")}
+              </Button>
+            </View>
+          ) : null}
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View
@@ -193,51 +285,27 @@ const FirstOpened: React.FC<Props> = ({ onFinish, navigation }) => {
     >
       <ScrollView
         style={{ width: "100%", flex: 1 }}
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 8 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingHorizontal: 6,
+          paddingVertical: 20,
+          gap: 14,
+        }}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={{ width: "100%" }}>{renderStep(step)}</View>
+        {brandingContent}
+        {stageContent}
       </ScrollView>
 
-      {renderStepIndicators()}
-
-      <View style={{ width: "100%", gap: 8, marginTop: 12 }}>
-        <View style={{ flexDirection: "row", gap: 8 }}>
-          <View style={{ flex: 1 }}>
-            {canGoBack ? (
-              <Button
-                mode="outlined"
-                style={{ borderRadius: 12 }}
-                onPress={back}
-              >
-                {t("common:back")}
-              </Button>
-            ) : (
-              <View />
-            )}
-          </View>
-
-          <View style={{ flex: 1 }}>
-            {isLast ? (
-              <Button
-                mode="contained"
-                style={{ borderRadius: 12 }}
-                onPress={finish}
-              >
-                {t("common:done")}
-              </Button>
-            ) : (
-              <Button
-                mode="outlined"
-                style={{ borderRadius: 12 }}
-                onPress={next}
-              >
-                {t("common:next")}
-              </Button>
-            )}
-          </View>
+      {step === 1 ? (
+        <View style={{ width: "100%", maxWidth: 380, marginTop: 8 }}>
+          <Button mode="outlined" style={{ borderRadius: 12 }} onPress={back}>
+            {t("common:back")}
+          </Button>
         </View>
-      </View>
+      ) : null}
     </View>
   );
 };

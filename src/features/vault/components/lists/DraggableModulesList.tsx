@@ -25,6 +25,7 @@ import {
   DraggableModulesListProps,
 } from "./DraggableModulesList.shared";
 import { NativeDragHandleScrollLockProvider } from "../EditRowControlsContainer";
+import { SCROLLBAR_CONTENT_GAP } from "../../../../shared/ui/glass";
 
 const dragDropAnimationConfig = {
   damping: 32,
@@ -186,6 +187,7 @@ function DraggableModulesList(props: DraggableModulesListProps) {
             keyboardDismissMode="on-drag"
             contentContainerStyle={{
               flexGrow: 1,
+              paddingRight: props.rightPadding ?? SCROLLBAR_CONTENT_GAP,
               paddingBottom: props.footer ? 0 : (props.bottomPadding ?? 12),
             }}
             onContentSizeChange={(_, height) => {

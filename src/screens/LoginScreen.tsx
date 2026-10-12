@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import Animated, { Easing, FadeIn, FadeOut } from "react-native-reanimated";
 import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
-import { BlurView } from "expo-blur";
 import Constants from "expo-constants";
 
 import { Icon, Text } from "react-native-paper";
@@ -71,8 +70,6 @@ const webDragRegionProps =
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { isOnline } = useOnline();
   const {
-    headerWhite,
-    setHeaderWhite,
     darkmode,
     theme,
     setHeaderSpacing,
@@ -107,12 +104,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(0);
-      setHeaderWhite(false);
       setTitlebarCenterGap(0);
       setTitlebarOverlayDragEnabled(false);
     }, [
       setHeaderSpacing,
-      setHeaderWhite,
       setTitlebarCenterGap,
       setTitlebarOverlayDragEnabled,
     ]),
@@ -299,7 +294,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       >
         <FocusAwareStatusBar
           animated={true}
-          style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+          style={darkmode ? "light" : "dark"}
           translucent={true}
         />
         <View
@@ -342,30 +337,26 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           style={{
             ...screenContentStyle,
             padding: 20,
+            marginLeft: 8,
+            marginRight: 8,
+            marginBottom: 8,
             flex: 1,
-            width: "100%",
+            alignSelf: "stretch",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <BlurView
-            intensity={80}
-            tint={darkmode ? "dark" : undefined}
+          <View
             style={{
               height: "80%",
               maxHeight: 500,
               width: loginCardWidth,
-              borderRadius: 12,
-              overflow: "hidden",
               margin: isWideLoginLayout ? 8 : 4,
               minWidth: isWideLoginLayout ? 560 : 300,
               maxWidth: loginCardWidth,
               display: "flex",
               justifyContent: "center",
-              boxShadow: theme.colors.shadow,
-              borderWidth: StyleSheet.hairlineWidth,
-              borderColor: darkmode ? theme.colors.outlineVariant : "white",
             }}
           >
             <Animated.View
@@ -392,7 +383,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 <Login userInfo={userInfo} />
               )}
             </Animated.View>
-          </BlurView>
+          </View>
           {provider === "device" ? (
             <AnimatedPressable
               onPress={handlePresentModalPress}
@@ -489,6 +480,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           <Modal
             visible={deviceSaveModalVisible}
             onDismiss={() => setDeviceSaveModalVisible(false)}
+            avoidKeyboard
           >
             <View
               style={{

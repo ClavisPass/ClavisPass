@@ -32,6 +32,7 @@ export type TranslationSchema = {
     save: string;
     undo: string;
     redo: string;
+    or: string;
     more: string;
     moreInfo: string;
     setExpiry: string;
@@ -134,6 +135,7 @@ export type TranslationSchema = {
     masterPasswordMismatch: string;
     login: string;
     setNewPassword: string;
+    createNewVault: string;
     noBackupFound: string;
     loadBackup: string;
     backupTitle: string;
@@ -160,6 +162,7 @@ export type TranslationSchema = {
     hubNetworkError: string;
     introCreateVault: string;
     introUnlockVault: string;
+    introFirstRun: string;
     deviceSaveConfirmTitle: string;
     deviceSaveConfirmText: string;
     deviceSaveConfirmAction: string;
@@ -536,8 +539,12 @@ export type TranslationSchema = {
     metricAccounts: string;
     metricWebsites: string;
     metricRisks: string;
+    metricAtRisk: string;
+    metricAliases: string;
     accountsCount: string;
     websitesCount: string;
+    aliasesCount: string;
+    dataPointsCount: string;
     identityUsageSummary: string;
     infoTypesCount: string;
     risksCount: string;
@@ -553,6 +560,19 @@ export type TranslationSchema = {
     insightDomains: string;
     insightInformation: string;
     insightRisks: string;
+    insightNoRisks: string;
+    insightAliases: string;
+    insightFocusedUse: string;
+    cardInsightRisk: string;
+    cardInsightAliases: string;
+    cardInsightDomains: string;
+    confidenceExactEmail: string;
+    exposureTitle: string;
+    exposureHint: string;
+    noExposureHint: string;
+    dataSignalsTitle: string;
+    blastRadiusTitle: string;
+    blastRadiusHint: string;
     linkedEntries: string;
     noDomain: string;
     noWebsites: string;

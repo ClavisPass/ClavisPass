@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Platform, StyleSheet, View, useWindowDimensions } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import type { RenderItemParams } from "react-native-draggable-flatlist";
@@ -16,7 +16,10 @@ import {
 import getModule from "../features/vault/utils/getModule";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import Header from "../shared/components/Header";
-import { getScreenContentStyle } from "../shared/ui/glass";
+import {
+  SCROLLBAR_CONTENT_GAP,
+  getScreenContentStyle,
+} from "../shared/ui/glass";
 
 type ModuleReorderScreenProps = NativeStackScreenProps<
   HomeStackParamList,
@@ -64,14 +67,13 @@ export default function ModuleReorderScreen({
 }: ModuleReorderScreenProps) {
   const {
     theme,
+    darkmode,
     globalStyles,
     setHeaderSpacing,
-    setHeaderWhite,
     setTitlebarCenterGap,
     setTitlebarOverlayDragEnabled,
   } = useTheme();
   const { t } = useTranslation();
-  const { width } = useWindowDimensions();
   const screenContentStyle = getScreenContentStyle(theme);
   const [items, setItems] = useState<ModulesType>(route.params.modules);
   const ignoreModuleChange = useCallback(() => {}, []);
@@ -80,12 +82,10 @@ export default function ModuleReorderScreen({
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(0);
-      setHeaderWhite(false);
       setTitlebarCenterGap(0);
       setTitlebarOverlayDragEnabled(false);
     }, [
       setHeaderSpacing,
-      setHeaderWhite,
       setTitlebarCenterGap,
       setTitlebarOverlayDragEnabled,
     ]),
@@ -151,7 +151,7 @@ export default function ModuleReorderScreen({
                 width: "100%",
                 overflow: "auto",
                 paddingTop: 4,
-                paddingRight: 0,
+                paddingRight: SCROLLBAR_CONTENT_GAP,
               }}
             >
               {items.map((item, index) => (
@@ -208,7 +208,10 @@ export default function ModuleReorderScreen({
           updateCellsBatchingPeriod={50}
           windowSize={7}
           removeClippedSubviews
-          contentContainerStyle={{ paddingTop: 4 }}
+          contentContainerStyle={{
+            paddingTop: 4,
+            paddingRight: SCROLLBAR_CONTENT_GAP,
+          }}
           renderItem={({ item, drag }: RenderItemParams<ModuleType>) =>
             renderModuleItem(item, drag)
           }
@@ -222,31 +225,51 @@ export default function ModuleReorderScreen({
     route.params.onApply(items);
     requestAnimationFrame(() => navigation.goBack());
   };
+  const headerButtonBaseStyle = {
+    margin: 0,
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: darkmode
+      ? "rgba(120, 127, 246, 0.28)"
+      : "rgba(120, 127, 246, 0.24)",
+    cursor: "pointer",
+  } as any;
+  const headerButtonLabelStyle = {
+    marginHorizontal: 10,
+    marginVertical: 4,
+    fontSize: 12,
+    lineHeight: 16,
+  };
+
+  const countBadge = (
+    <View
+      style={{
+        height: 24,
+        minWidth: 24,
+        marginLeft: 8,
+        paddingHorizontal: 8,
+        borderRadius: 12,
+        backgroundColor: `${theme.colors.primary}18`,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Text
+        variant="labelMedium"
+        style={{ color: theme.colors.primary, userSelect: "none" }}
+      >
+        {items.length}
+      </Text>
+    </View>
+  );
 
   return (
     <AnimatedContainer style={globalStyles.container}>
       <Header
         title={t("home:reorderChip")}
         onPress={() => navigation.goBack()}
+        leftNode={countBadge}
       >
-        <View
-          style={{
-            height: 24,
-            minWidth: 24,
-            paddingHorizontal: 8,
-            borderRadius: 12,
-            backgroundColor: `${theme.colors.primary}18`,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text
-            variant="labelMedium"
-            style={{ color: theme.colors.primary, userSelect: "none" }}
-          >
-            {items.length}
-          </Text>
-        </View>
         <View
           style={[
             {
@@ -259,21 +282,40 @@ export default function ModuleReorderScreen({
           ]}
         >
           <Button
+            accessibilityLabel={t("common:cancel")}
+            mode="contained-tonal"
+            compact
+            textColor={theme.colors.onSurfaceVariant}
+            buttonColor={
+              darkmode
+                ? "rgba(255, 255, 255, 0.06)"
+                : "rgba(248, 248, 248, 0.68)"
+            }
+            onPress={() => navigation.goBack()}
+            style={[headerButtonBaseStyle, webNoDragStyle]}
+            labelStyle={headerButtonLabelStyle}
+          >
+            {t("common:cancel")}
+          </Button>
+          <Button
             accessibilityLabel={t("common:apply")}
             mode="contained-tonal"
             compact
             textColor={theme.colors.primary}
+            buttonColor={
+              darkmode
+                ? "rgba(120, 127, 246, 0.16)"
+                : "rgba(120, 127, 246, 0.12)"
+            }
             onPress={applyChanges}
             style={[
+              headerButtonBaseStyle,
               {
-                margin: 0,
                 zIndex: 11,
-                borderRadius: 12,
-                cursor: "pointer",
               } as any,
               webNoDragStyle,
             ]}
-            labelStyle={{ marginHorizontal: 10, marginVertical: 4 }}
+            labelStyle={headerButtonLabelStyle}
           >
             {t("common:save")}
           </Button>
@@ -284,8 +326,6 @@ export default function ModuleReorderScreen({
           ...screenContentStyle,
           flex: 1,
           width: "100%",
-          paddingLeft: width > 600 ? 0 : 4,
-          paddingRight: 0,
         }}
       >
         {Platform.OS === "web" ? webList : nativeList}

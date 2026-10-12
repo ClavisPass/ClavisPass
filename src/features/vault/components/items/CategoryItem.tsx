@@ -3,6 +3,7 @@ import { View } from "react-native";
 import { Text } from "react-native-paper";
 import { useTheme } from "../../../../app/providers/ThemeProvider";
 import AnimatedPressable from "../../../../shared/components/AnimatedPressable";
+import { getAppChipSurfaceStyle } from "../../../../shared/components/chips/AppChip";
 import AppIcon from "../../../../shared/components/icons/AppIcon";
 
 type Props = {
@@ -11,14 +12,15 @@ type Props = {
   leadingIcon: string;
 };
 function CategoryItem(props: Props) {
-  const { theme } = useTheme();
+  const { darkmode, theme } = useTheme();
+  const contentColor = theme.colors.onSurfaceVariant;
   return (
     <View
       style={{
+        ...getAppChipSurfaceStyle({ darkmode }),
         borderRadius: 12,
         overflow: "hidden",
         flex: 1,
-        backgroundColor: theme.colors?.secondaryContainer,
       }}
     >
       <AnimatedPressable
@@ -44,7 +46,7 @@ function CategoryItem(props: Props) {
           />
           <Text
             variant="bodyLarge"
-            style={{ userSelect: "none" }}
+            style={{ color: contentColor, userSelect: "none" }}
             ellipsizeMode="tail"
             numberOfLines={1}
           >

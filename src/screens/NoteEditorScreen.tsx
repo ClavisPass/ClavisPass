@@ -54,8 +54,6 @@ const NoteEditorScreen: React.FC<NoteEditorScreenProps> = ({
   const {
     globalStyles,
     theme,
-    headerWhite,
-    setHeaderWhite,
     darkmode,
     setHeaderSpacing,
   } = useTheme();
@@ -83,8 +81,7 @@ const NoteEditorScreen: React.FC<NoteEditorScreenProps> = ({
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(40);
-      setHeaderWhite(false);
-    }, [setHeaderSpacing, setHeaderWhite]),
+    }, [setHeaderSpacing]),
   );
 
   const changeValue = useCallback(
@@ -302,7 +299,7 @@ const NoteEditorScreen: React.FC<NoteEditorScreenProps> = ({
     <AnimatedContainer style={globalStyles.container}>
       <FocusAwareStatusBar
         animated={true}
-        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        style={darkmode ? "light" : "dark"}
         translucent={true}
       />
       <Header onPress={() => navigation.goBack()} title={headerTitle} />

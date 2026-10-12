@@ -34,14 +34,13 @@ import type { DeviceUiStatus } from "../features/vault/utils/vaultDevices";
 import { getCurrentVaultDeviceId } from "../features/vault/utils/deviceInfo";
 import HintCard from "../shared/components/HintCard";
 import {
+  SCROLLBAR_CONTENT_GAP,
   getItemSurfaceStyle,
   getScreenContentStyle,
 } from "../shared/ui/glass";
 
 const GAP = 8;
 const ITEM_MIN_HEIGHT = 56;
-const H_PAD = 8;
-
 const styles = StyleSheet.create({
   chip: {
     borderRadius: 12,
@@ -69,9 +68,7 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
   const {
     theme,
     globalStyles,
-    headerWhite,
     darkmode,
-    setHeaderWhite,
     setHeaderSpacing,
   } = useTheme();
 
@@ -114,8 +111,7 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(40);
-      setHeaderWhite(false);
-    }, [setHeaderSpacing, setHeaderWhite])
+    }, [setHeaderSpacing])
   );
 
   const labelForStatus = React.useCallback(
@@ -365,7 +361,7 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
     <AnimatedContainer style={globalStyles.container}>
       <FocusAwareStatusBar
         animated
-        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        style={darkmode ? "light" : "dark"}
         translucent
       />
       <Header title={title} onPress={() => navigation.goBack()} />
@@ -373,7 +369,7 @@ const DevicesScreen: React.FC<DevicesScreenProps> = ({ navigation }) => {
       <ScrollView
         style={{ flex: 1, width: "100%", ...screenContentStyle }}
         contentContainerStyle={{
-          paddingHorizontal: H_PAD,
+          paddingRight: SCROLLBAR_CONTENT_GAP,
           paddingBottom: 8,
         }}
       >

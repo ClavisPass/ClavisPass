@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Platform, View, useWindowDimensions } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import type { RenderItemParams } from "react-native-draggable-flatlist";
@@ -13,7 +13,10 @@ import ValuesType from "../features/vault/model/ValuesType";
 import ListItem from "../features/vault/components/items/ListItem";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import Header from "../shared/components/Header";
-import { getScreenContentStyle } from "../shared/ui/glass";
+import {
+  SCROLLBAR_CONTENT_GAP,
+  getScreenContentStyle,
+} from "../shared/ui/glass";
 
 type ReorderScreenProps = NativeStackScreenProps<HomeStackParamList, "Reorder">;
 
@@ -77,12 +80,10 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
     darkmode,
     globalStyles,
     setHeaderSpacing,
-    setHeaderWhite,
     setTitlebarCenterGap,
     setTitlebarOverlayDragEnabled,
   } = useTheme();
   const { t } = useTranslation();
-  const { width } = useWindowDimensions();
   const screenContentStyle = getScreenContentStyle(theme);
   const vault = useVault();
   const [items, setItems] = useState<ValuesType[]>(route.params.values ?? []);
@@ -91,12 +92,10 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(0);
-      setHeaderWhite(false);
       setTitlebarCenterGap(0);
       setTitlebarOverlayDragEnabled(false);
     }, [
       setHeaderSpacing,
-      setHeaderWhite,
       setTitlebarCenterGap,
       setTitlebarOverlayDragEnabled,
     ]),
@@ -114,6 +113,7 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
         index={index}
         reorderMode
         denseSpacing
+        denseHorizontalInset={0}
         disableFastAccessPreview
         hideChevron
         pressDisabled
@@ -156,7 +156,7 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
                 flex: 1,
                 width: "100%",
                 overflow: "auto",
-                paddingRight: 4,
+                paddingRight: SCROLLBAR_CONTENT_GAP,
               }}
             >
               {items.map((item, index) => (
@@ -211,6 +211,7 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
         updateCellsBatchingPeriod={50}
         windowSize={7}
         removeClippedSubviews
+        contentContainerStyle={{ paddingRight: SCROLLBAR_CONTENT_GAP }}
         renderItem={({ item, getIndex, drag }: RenderItemParams<ValuesType>) =>
           renderReorderItem(item, getIndex?.() ?? 0, drag)
         }
@@ -225,31 +226,51 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
     });
     requestAnimationFrame(() => navigation.goBack());
   };
+  const headerButtonBaseStyle = {
+    margin: 0,
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: darkmode
+      ? "rgba(120, 127, 246, 0.28)"
+      : "rgba(120, 127, 246, 0.24)",
+    cursor: "pointer",
+  } as any;
+  const headerButtonLabelStyle = {
+    marginHorizontal: 10,
+    marginVertical: 4,
+    fontSize: 12,
+    lineHeight: 16,
+  };
+
+  const countBadge = (
+    <View
+      style={{
+        height: 24,
+        minWidth: 24,
+        marginLeft: 8,
+        paddingHorizontal: 8,
+        borderRadius: 12,
+        backgroundColor: `${theme.colors.primary}18`,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Text
+        variant="labelMedium"
+        style={{ color: theme.colors.primary, userSelect: "none" }}
+      >
+        {items.length}
+      </Text>
+    </View>
+  );
 
   return (
     <AnimatedContainer style={globalStyles.container}>
       <Header
         title={t("home:reorderChip")}
         onPress={() => navigation.goBack()}
+        leftNode={countBadge}
       >
-        <View
-          style={{
-            height: 24,
-            minWidth: 24,
-            paddingHorizontal: 8,
-            borderRadius: 12,
-            backgroundColor: `${theme.colors.primary}18`,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text
-            variant="labelMedium"
-            style={{ color: theme.colors.primary, userSelect: "none" }}
-          >
-            {items.length}
-          </Text>
-        </View>
         <View
           style={[
             {
@@ -262,21 +283,40 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
           ]}
         >
           <Button
+            accessibilityLabel={t("common:cancel")}
+            mode="contained-tonal"
+            compact
+            textColor={theme.colors.onSurfaceVariant}
+            buttonColor={
+              darkmode
+                ? "rgba(255, 255, 255, 0.06)"
+                : "rgba(248, 248, 248, 0.68)"
+            }
+            onPress={() => navigation.goBack()}
+            style={[headerButtonBaseStyle, webNoDragStyle]}
+            labelStyle={headerButtonLabelStyle}
+          >
+            {t("common:cancel")}
+          </Button>
+          <Button
             accessibilityLabel={t("common:apply")}
             mode="contained-tonal"
             compact
             textColor={theme.colors.primary}
+            buttonColor={
+              darkmode
+                ? "rgba(120, 127, 246, 0.16)"
+                : "rgba(120, 127, 246, 0.12)"
+            }
             onPress={applyChanges}
             style={[
+              headerButtonBaseStyle,
               {
-                margin: 0,
                 zIndex: 11,
-                borderRadius: 12,
-                cursor: "pointer",
               } as any,
               webNoDragStyle,
             ]}
-            labelStyle={{ marginHorizontal: 10, marginVertical: 4 }}
+            labelStyle={headerButtonLabelStyle}
           >
             {t("common:save")}
           </Button>
@@ -287,9 +327,6 @@ export default function ReorderScreen({ route, navigation }: ReorderScreenProps)
           ...screenContentStyle,
           flex: 1,
           width: "100%",
-          padding: 4,
-          paddingLeft: width > 600 ? 0 : 4,
-          paddingRight: 0,
         }}
       >
         {Platform.OS === "web" ? webList : nativeList}

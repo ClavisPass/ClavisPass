@@ -117,8 +117,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const {
     globalStyles,
     theme,
-    headerWhite,
-    setHeaderWhite,
     darkmode,
     setHeaderSpacing,
     setTitlebarCenterGap,
@@ -195,7 +193,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       setHeaderSpacing(260);
-      setHeaderWhite(false);
       setTitlebarCenterGap(0);
       setTitlebarOverlayDragEnabled(false);
 
@@ -204,7 +201,6 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       };
     }, [
       setHeaderSpacing,
-      setHeaderWhite,
       setTitlebarCenterGap,
       setTitlebarOverlayDragEnabled,
     ]),
@@ -704,10 +700,10 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
 
   const editSectionSpacing = 8;
   const editActionChipsHeight = 30 + editSectionSpacing * 2;
-  const editControlOverlayHeight = 40 + editSectionSpacing;
+  const editControlOverlayHeight = 40 + editSectionSpacing * 2;
   const editListTopFadeStart = 34;
   const editListTopFadeEnd = editControlOverlayHeight + 0;
-  const actionChipHorizontalPadding = 16;
+  const actionChipHorizontalPadding = 0;
   const moreActionKey = "__more";
 
   const recordActionChipWidth = React.useCallback(
@@ -936,9 +932,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       style={{
         flexGrow: 0,
         width: "100%",
-        paddingHorizontal: 8,
-        paddingTop: editSectionSpacing,
-        paddingBottom: editSectionSpacing,
+        paddingTop: 0,
+        paddingBottom: 0,
         overflow: "hidden",
       }}
     >
@@ -946,8 +941,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         pointerEvents="none"
         style={{
           position: "absolute",
-          left: 8,
-          top: editSectionSpacing,
+          left: 0,
+          top: 0,
           opacity: 0,
           flexDirection: "row",
           alignItems: "center",
@@ -1218,8 +1213,12 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     ColorValue,
     ColorValue,
   ] = darkmode
-    ? [theme.colors.background, theme.colors.background, "rgba(13, 13, 13, 0)"]
-    : ["#E8EAE8", "#E8EAE8", "rgba(232, 234, 232, 0)"];
+    ? [theme.colors.background, theme.colors.background, "rgba(26, 26, 26, 0)"]
+    : [
+        "rgba(248, 248, 248, 0.78)",
+        "rgba(248, 248, 248, 0.78)",
+        "rgba(248, 248, 248, 0)",
+      ];
 
   const modulesList = (
     <PerfProfiler id="EditScreen.ModulesList">
@@ -1292,7 +1291,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         <LinearGradient
           pointerEvents="none"
           colors={nativeEditListFadeColors}
-          locations={[0, 0.35, 1]}
+          locations={[0, 0.16, 0.58]}
           style={{
             position: "absolute",
             top: 0,
@@ -1309,7 +1308,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     <AnimatedContainer style={globalStyles.container}>
       <FocusAwareStatusBar
         animated={true}
-        style={headerWhite ? "light" : darkmode ? "light" : "dark"}
+        style={darkmode ? "light" : "dark"}
         translucent={true}
       />
       <Header
@@ -1340,9 +1339,9 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           <View
             style={{
               width: "100%",
-              paddingHorizontal: 8,
               paddingTop: 0,
-              paddingBottom: editSectionSpacing,
+              paddingBottom: 0,
+              paddingLeft: editSectionSpacing,
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
@@ -1364,7 +1363,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             {renderEditControlGroup()}
             {hasFastAccess ? (
               <AppTooltip title={t("common:fastAccess")}>
-                <View style={{ flexShrink: 0 }}>
+                <View style={{ flexShrink: 0, marginRight: editSectionSpacing }}>
                   <SquaredContainerButton onPress={openFastAccessFeature}>
                     <AppIcon
                       name={"tooltip-account"}

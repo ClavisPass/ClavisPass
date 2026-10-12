@@ -32,6 +32,7 @@ const de: TranslationSchema = {
     save: "Speichern",
     undo: "Rückgängig",
     redo: "Wiederholen",
+    or: "oder",
     more: "Mehr",
     moreInfo: "Mehr erfahren",
     setExpiry: "Ablauf festlegen",
@@ -140,6 +141,7 @@ const de: TranslationSchema = {
     masterPasswordMismatch: "Die Bestätigung stimmt nicht überein.",
     login: "Anmelden",
     setNewPassword: "Neues Passwort festlegen",
+    createNewVault: "Neuen Vault erstellen",
     noBackupFound: "Kein lokales Backup gefunden",
     loadBackup: "Backup laden",
     backupTitle: "Backup gefunden",
@@ -168,6 +170,8 @@ const de: TranslationSchema = {
     introCreateVault:
       "Erstelle deinen verschlüsselten Vault und starte mit einer sauberen Einrichtung.",
     introUnlockVault: "Entsperre deinen Vault und arbeite direkt weiter.",
+    introFirstRun:
+      "Erstelle einen neuen Vault oder lade einen bestehenden.",
     deviceSaveConfirmTitle: "Lokale Speicherung aktivieren?",
     deviceSaveConfirmText:
       "Möchtest du die Cloud-Speicherung wirklich trennen und wieder nur lokale Speicherung verwenden?",
@@ -609,8 +613,12 @@ const de: TranslationSchema = {
     metricAccounts: "Accounts",
     metricWebsites: "Webseiten",
     metricRisks: "Risiken",
+    metricAtRisk: "Mit Risiken",
+    metricAliases: "Aliase",
     accountsCount: "{{count}} Accounts",
     websitesCount: "{{count}} Webseiten",
+    aliasesCount: "{{count}} Aliase",
+    dataPointsCount: "{{count}} Datenpunkte",
     identityUsageSummary: "{{accounts}} Accounts auf {{websites}} Webseiten",
     infoTypesCount: "{{count}} Infoarten",
     risksCount: "{{count}} Risiken",
@@ -627,6 +635,23 @@ const de: TranslationSchema = {
     insightInformation:
       "{{count}} Arten gespeicherter Informationen sind damit verknüpft.",
     insightRisks: "{{count}} verknüpfte Accounts haben Sicherheitsprobleme.",
+    insightNoRisks:
+      "Kein verknüpfter Account zeigt aktuell ein einfaches Passwort-Risiko.",
+    insightAliases: "{{count}} Aliase erscheinen mit dieser Identität.",
+    insightFocusedUse:
+      "Diese Identität wird in einer überschaubaren Gruppe von Accounts genutzt.",
+    cardInsightRisk: "{{count}} verknüpfte Accounts brauchen Aufmerksamkeit.",
+    cardInsightAliases: "{{count}} Aliase sind mit dieser Identität verbunden.",
+    cardInsightDomains: "Auf {{count}} Webseiten genutzt.",
+    confidenceExactEmail: "Exakter E-Mail-Treffer",
+    exposureTitle: "Sichtbarkeit",
+    exposureHint:
+      "Wenn diese E-Mail kompromittiert ist, könnten diese Accounts betroffen sein.",
+    noExposureHint: "Diese Identität wirkt aktuell unauffällig.",
+    dataSignalsTitle: "Identitätssignale",
+    blastRadiusTitle: "Auswirkungsbereich",
+    blastRadiusHint:
+      "Diese Einträge teilen das primäre E-Mail-Signal und bilden diese Identität.",
     linkedEntries: "Verknüpfte Einträge",
     noDomain: "Keine Domain",
     noWebsites: "Für diese E-Mail sind noch keine Webseiten gespeichert.",

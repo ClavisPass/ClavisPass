@@ -4,7 +4,11 @@ import { IconButton, Text } from "react-native-paper";
 import Constants from "expo-constants";
 import FocusAwareStatusBar from "./FocusAwareStatusBar";
 import { useTheme } from "../../app/providers/ThemeProvider";
-import { TITLEBAR_CONTROLS_WIDTH, TITLEBAR_HEIGHT } from "./titlebarMetrics";
+import {
+  TITLEBAR_CONTROLS_WIDTH,
+  TITLEBAR_HEIGHT,
+  TITLEBAR_RIGHT_CONTROLS_WIDTH,
+} from "./titlebarMetrics";
 import { useSetting } from "../../app/providers/SettingsProvider";
 import { isTauriEnvironment } from "../../infrastructure/platform/isTauri";
 import { resolveWindowControlsSide } from "../../infrastructure/platform/windowControls";
@@ -14,6 +18,13 @@ import { getGlassChromeStyle } from "../ui/glass";
 const webDragRegionProps =
   Platform.OS === "web"
     ? ({ dataSet: { tauriDragRegion: "" } } as any)
+    : null;
+const webNoDragStyle =
+  Platform.OS === "web"
+    ? ({
+        WebkitAppRegion: "no-drag",
+        appRegion: "no-drag",
+      } as any)
     : null;
 
 type Props = {
@@ -40,8 +51,12 @@ function Header(props: Props) {
     TITLEBAR_HEIGHT > 0 &&
     width < 600 &&
     controlsLeft;
-  const contentDraggable =
-    props.leftContentDraggable ?? props.leftNode === undefined;
+  const reserveRightControlsSpace =
+    !isDemoDistribution() &&
+    isTauriEnvironment() &&
+    TITLEBAR_HEIGHT > 0 &&
+    !controlsLeft;
+  const contentDraggable = props.leftContentDraggable ?? true;
   const glassChromeStyle = getGlassChromeStyle(darkmode);
 
   return (
@@ -71,6 +86,9 @@ function Header(props: Props) {
           justifyContent: "space-between",
           minHeight: 34,
           paddingLeft: reserveMacControlsSpace ? TITLEBAR_CONTROLS_WIDTH : 0,
+          paddingRight: reserveRightControlsSpace
+            ? TITLEBAR_RIGHT_CONTROLS_WIDTH + 8
+            : 0,
         }}
       >
         <FocusAwareStatusBar
@@ -85,6 +103,7 @@ function Header(props: Props) {
             alignItems: "center",
             flex: 1,
             width: "100%",
+            minWidth: 0,
           }}
         >
           {props.onPress ? (
@@ -98,6 +117,7 @@ function Header(props: Props) {
               onPress={props.onPress}
               style={[
                 { margin: 0 },
+                webNoDragStyle,
                 Platform.OS === "web" ? ({ cursor: "pointer" } as any) : null,
               ]}
             />
@@ -135,6 +155,8 @@ function Header(props: Props) {
             gap: 2,
             alignItems: "center",
             paddingLeft: 16,
+            flexShrink: 0,
+            ...webNoDragStyle,
           }}
         >
           {props.children}

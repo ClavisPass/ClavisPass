@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, StyleSheet, Animated, Easing } from "react-native";
+import { View, StyleSheet, Animated, Easing, Platform } from "react-native";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Text } from "react-native-paper";
 import { Feather } from "@expo/vector-icons";
@@ -75,11 +75,18 @@ export default function LeftSideTabBar({
 
   const focusedKey = state.routes[state.index]?.key;
   const chipBackgroundColor = darkmode
-    ? "rgba(120, 127, 246, 0.16)"
-    : "rgba(248, 248, 248, 0.72)";
+    ? "rgba(255, 255, 255, 0.075)"
+    : "rgba(120, 127, 246, 0.09)";
   const chipBorderColor = darkmode
-    ? "rgba(120, 127, 246, 0.26)"
-    : "rgba(120, 127, 246, 0.24)";
+    ? "rgba(120, 127, 246, 0.32)"
+    : "rgba(120, 127, 246, 0.28)";
+  const glassChipStyle =
+    Platform.OS === "web"
+      ? ({
+          backdropFilter: "blur(14px) saturate(1.08)",
+          WebkitBackdropFilter: "blur(14px) saturate(1.08)",
+        } as any)
+      : null;
   const activeNavBackgroundColor = darkmode
     ? theme.colors.secondaryContainer
     : "rgba(120, 127, 246, 0.11)";
@@ -149,6 +156,7 @@ export default function LeftSideTabBar({
                   {
                     backgroundColor: chipBackgroundColor,
                     borderColor: chipBorderColor,
+                    ...glassChipStyle,
                   },
                 ]}
               >
