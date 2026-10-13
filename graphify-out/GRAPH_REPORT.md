@@ -1,7 +1,7 @@
 # Graph Report - ClavisPass  (2026-10-13)
 
 ## Corpus Check
-- 564 files · ~343,225 words
+- 564 files · ~343,238 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 37 file(s) not represented in the graph (top: .xml 11, (none) 8, .properties 2)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `08864ccd`
+- Built from commit: `e42cbada`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

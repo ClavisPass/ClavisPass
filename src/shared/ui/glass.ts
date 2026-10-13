@@ -1,4 +1,4 @@
-import { Platform, StyleSheet } from "react-native";
+import { Dimensions, Platform, StyleSheet } from "react-native";
 import type { ViewStyle } from "react-native";
 import type { AppTheme } from "./appTheme";
 
@@ -14,6 +14,8 @@ export function getGlassChromeStyle(_darkmode: boolean): ViewStyle {
 }
 
 export function getScreenContentStyle(theme: AppTheme): ViewStyle {
+  const compact = Dimensions.get("window").width < 600;
+
   return {
     backgroundColor: theme.dark
       ? theme.colors.background
@@ -23,6 +25,8 @@ export function getScreenContentStyle(theme: AppTheme): ViewStyle {
       ? theme.colors.outlineVariant
       : "rgba(118, 118, 118, 0.13)",
     borderRadius: 8,
+    borderBottomLeftRadius: compact ? 0 : 8,
+    borderBottomRightRadius: compact ? 0 : 8,
     paddingTop: 8,
     paddingLeft: 8,
     paddingRight: 0,

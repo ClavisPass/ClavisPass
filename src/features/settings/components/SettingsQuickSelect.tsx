@@ -29,18 +29,18 @@ function clampWidth(value: number, min: number, max: number) {
 
 const styles = StyleSheet.create({
   chip: {
-    height: 30,
     marginRight: 0,
     borderRadius: 12,
   },
   mobileChipShell: {
-    marginRight: 8,
     borderRadius: 12,
     overflow: "hidden",
   },
-  chipText: {
-    fontSize: 12,
-    lineHeight: 16,
+  mobileChipSeparator: {
+    width: 8,
+  },
+  mobileChipEndSpacer: {
+    width: 8,
   },
   narrowScrollContainer: {
     flexBasis: "auto",
@@ -49,7 +49,6 @@ const styles = StyleSheet.create({
   },
   narrowScrollContainerWeb: {
     flex: 1,
-    height: 30,
     minWidth: 0,
   },
   narrowList: {
@@ -57,7 +56,6 @@ const styles = StyleSheet.create({
   },
   narrowListWeb: {
     flex: 1,
-    height: 30,
     minWidth: 0,
   },
   narrowListContentWeb: {
@@ -319,10 +317,10 @@ function SettingsQuickSelect(props: Props) {
       ) : (
         <View
           style={{
-            paddingHorizontal: 8,
+            paddingLeft: 0,
+            paddingRight: 0,
             paddingTop: 0,
             paddingBottom: 8,
-            maxHeight: 36,
             width: "100%",
             display: "flex",
             flexDirection: "row",
@@ -352,6 +350,12 @@ function SettingsQuickSelect(props: Props) {
               contentContainerStyle={
                 Platform.OS === "web" ? styles.narrowListContentWeb : undefined
               }
+              ItemSeparatorComponent={() => (
+                <View style={styles.mobileChipSeparator} />
+              )}
+              ListFooterComponent={() => (
+                <View style={styles.mobileChipEndSpacer} />
+              )}
               onContentSizeChange={(contentWidth) => {
                 horizontalContentWidthRef.current = contentWidth;
               }}
@@ -370,6 +374,7 @@ function SettingsQuickSelect(props: Props) {
                 return (
                   <View style={mobileChipShellStyle}>
                     <AppChip
+                      compact
                       key={index}
                       icon={item.icon}
                       showSelectedOverlay={true}
@@ -377,7 +382,6 @@ function SettingsQuickSelect(props: Props) {
                         scrollToRef(item.ref);
                       }}
                       style={styles.chip}
-                      textStyle={styles.chipText}
                     >
                       {item.title}
                     </AppChip>

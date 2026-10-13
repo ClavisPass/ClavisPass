@@ -112,7 +112,7 @@ import {
 import { resolveWindowControlsSide } from "../infrastructure/platform/windowControls";
 import SearchInput from "../shared/components/SearchInput";
 
-const settingsQuickSelectOverlayHeight = 36;
+const settingsQuickSelectOverlayHeight = 40;
 const settingsWebListTopFadeStart = 0;
 const settingsWebListTopFadeEnd = settingsQuickSelectOverlayHeight + 22;
 const settingsNativeListTopFadeClear = settingsQuickSelectOverlayHeight + 16;
@@ -277,14 +277,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingTop: 12,
     paddingBottom: 10,
-  },
-  chip: {
-    height: 30,
-    borderRadius: 12,
-  },
-  chipText: {
-    fontSize: 12,
-    lineHeight: 16,
   },
 });
 
@@ -1882,35 +1874,32 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               }}
             >
               <AppChip
+                compact
                 icon={"web"}
                 showSelectedOverlay={true}
                 onPress={() => {
                   openURL("https://clavispass.arratel.dev/");
                 }}
-                style={styles.chip}
-                textStyle={styles.chipText}
               >
                 {t("settings:website")}
               </AppChip>
               <AppChip
+                compact
                 icon={"github"}
                 showSelectedOverlay={true}
                 onPress={() => {
                   openURL("https://github.com/ClavisPass/ClavisPass");
                 }}
-                style={styles.chip}
-                textStyle={styles.chipText}
               >
                 Github
               </AppChip>
               <AppChip
+                compact
                 icon={"email-outline"}
                 showSelectedOverlay={true}
                 onPress={() => {
                   openURL("mailto:clavispass@arratel.dev");
                 }}
-                style={styles.chip}
-                textStyle={styles.chipText}
               >
                 {t("settings:contact")}
               </AppChip>

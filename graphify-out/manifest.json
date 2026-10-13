@@ -1002,9 +1002,9 @@
     "semantic_hash": ""
   },
   "src/features/settings/components/SettingsQuickSelect.tsx": {
-    "mtime": 1791752819.605081,
-    "seen": 1791752865.393336,
-    "ast_hash": "c9b5d875d46e64b559165bb3144be4f6",
+    "mtime": 1791919214.1432836,
+    "seen": 1791919249.5432422,
+    "ast_hash": "4ed633c48fa8dec1911fd04c67d9e53d",
     "semantic_hash": ""
   },
   "src/features/settings/components/SettingsShortcutItem.tsx": {
@@ -2562,9 +2562,9 @@
     "semantic_hash": ""
   },
   "src/screens/SettingsScreen.tsx": {
-    "mtime": 1791839356.9367633,
-    "seen": 1791839405.2388453,
-    "ast_hash": "5b44e5c246d887915fa96002a7b633ed",
+    "mtime": 1791918974.2907069,
+    "seen": 1791919017.9652276,
+    "ast_hash": "693daf96bfacdabf4aada6e42d04a964",
     "semantic_hash": ""
   },
   "src/screens/TotpScanScreen.tsx": {
@@ -3006,9 +3006,9 @@
     "semantic_hash": "82c4c48308198edf36e3e360df4a3cac"
   },
   "src/shared/ui/glass.ts": {
-    "mtime": 1791890486.38798,
-    "seen": 1791890551.173527,
-    "ast_hash": "26c18663e91bddfb4f79974c54eee039",
+    "mtime": 1791918666.1705925,
+    "seen": 1791918706.1201577,
+    "ast_hash": "017e0790a51f6daed59e8e7f673ed63d",
     "semantic_hash": ""
   },
   "src/shared/ui/globalStyles.ts": {
