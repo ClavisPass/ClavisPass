@@ -336,10 +336,10 @@
     "semantic_hash": "6a94270ea57c61f33682126edead02be"
   },
   "eas.json": {
-    "mtime": 1789594228.5544684,
-    "seen": 1791564566.803268,
-    "ast_hash": "f723c083a531a864f5ff3cbc46d17074",
-    "semantic_hash": "f723c083a531a864f5ff3cbc46d17074"
+    "mtime": 1791913584.3656385,
+    "seen": 1791913616.7185116,
+    "ast_hash": "721eaf0bb9d98f4bfaa65a685dfc47f0",
+    "semantic_hash": ""
   },
   "env.d.ts": {
     "mtime": 1779191612.3157024,
@@ -3066,10 +3066,10 @@
     "semantic_hash": "ab68c4b016acf077d12373f2e88c78a2"
   },
   "src/shared/utils/distribution.ts": {
-    "mtime": 1789594185.076568,
-    "seen": 1791564566.8042684,
-    "ast_hash": "3820f4b0fc93c1704c20ba79ef66fb72",
-    "semantic_hash": "3820f4b0fc93c1704c20ba79ef66fb72"
+    "mtime": 1791913584.364638,
+    "seen": 1791913616.7195106,
+    "ast_hash": "873c817cb5c10ee175a6db86ddf2b57f",
+    "semantic_hash": ""
   },
   "src/shared/utils/isSessionQrPayload.ts": {
     "mtime": 1779215310.5327034,
@@ -3210,9 +3210,9 @@
     "semantic_hash": ""
   },
   ".github/workflows/release.yml": {
-    "mtime": 1788277891.0977132,
-    "seen": 1791564931.2506914,
-    "ast_hash": "272f6d7f6037f8136c6cdc72c8061c6c",
+    "mtime": 1791913823.0845604,
+    "seen": 1791913845.5914521,
+    "ast_hash": "fa93795ac2a3dd1a69a47183ae3a6b65",
     "semantic_hash": ""
   },
   "AGENTS.md": {

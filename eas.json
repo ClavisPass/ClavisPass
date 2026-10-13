@@ -19,7 +19,7 @@
       "environment": "production",
       "env": {
         "APP_VARIANT": "production",
-        "EXPO_PUBLIC_CLAVISPASS_MOBILE_BINARY_UPDATES": "false"
+        "EXPO_PUBLIC_CLAVISPASS_MOBILE_DISTRIBUTION": "playStore"
       }
     },
     "production-apk": {
@@ -29,7 +29,7 @@
       "environment": "production",
       "env": {
         "APP_VARIANT": "production",
-        "EXPO_PUBLIC_CLAVISPASS_MOBILE_BINARY_UPDATES": "true"
+        "EXPO_PUBLIC_CLAVISPASS_MOBILE_DISTRIBUTION": "apk"
       },
       "android": { "buildType": "apk" }
     }

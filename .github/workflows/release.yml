@@ -376,6 +376,35 @@ jobs:
           name: android
           path: ClavisPass_${{ env.VERSION_NO_V }}_android.apk
 
+  build-android-store-submit:
+    runs-on: ubuntu-latest
+    needs: validate-release
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install EAS CLI globally
+        run: npm install -g eas-cli@latest
+
+      - name: Verify EAS authentication
+        run: eas whoami
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Trigger Android store build and submit
+        run: |
+          eas build --platform android --profile production --non-interactive --wait --auto-submit
+
   build-updater:
     runs-on: ubuntu-24.04
     needs:
@@ -385,6 +414,7 @@ jobs:
         build-macos,
         expo-ota-update,
         build-android-apk,
+        build-android-store-submit,
       ]
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}

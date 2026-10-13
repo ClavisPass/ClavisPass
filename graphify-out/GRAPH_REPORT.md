@@ -1,45 +1,45 @@
 # Graph Report - ClavisPass  (2026-10-13)
 
 ## Corpus Check
-- 564 files · ~342,813 words
+- 564 files · ~342,855 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 37 file(s) not represented in the graph (top: .xml 11, (none) 8, .properties 2)
 
 ## Summary
-- 3773 nodes · 10466 edges · 190 communities (149 shown, 41 thin omitted)
+- 3776 nodes · 10471 edges · 189 communities (147 shown, 42 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 145 edges (avg confidence: 0.88)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `bdd1dc2e`
+- Built from commit: `1775415e`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- ModulesEnum
+- ModulesEnum.ts
 - dependencies
-- react-native
-- logger.ts
+- getModule.tsx
+- vault.rs
 - package.json
-- useTheme
+- DigitalCardModule.tsx
 - App.tsx
+- reactNative.ts
 - EditScreen.tsx
-- ListItem.tsx
-- vitest
-- BrowserExtensionsScreen.tsx
+- react-i18next
+- useTheme
 - content/index.ts
 - shared/types.ts
 - popup/App.tsx
-- useVault
+- IdentityDetailScreen.tsx
 - background/index.ts
 - shared/bridge.ts
-- AnalysisDetailScreen.tsx
-- AnimatedPressable
+- AnalysisScreen.tsx
+- react-native
 - FastAccess.ts
-- store.ts
+- AnalysisDetailScreen.tsx
 - expo
 - ClavisPassHubClient.ts
-- MenuItem
+- ref_react
 - write.rs
 - scripts
 - decryptVaultContent.ts
@@ -47,100 +47,101 @@
 - isTauri.ts
 - forms.ts
 - lib.rs
-- Header
+- LeftSideBar.tsx
 - UpdateManager.tsx
-- hotkeys.ts
+- store.ts
 - commands.rs
 - LoginScreen.tsx
-- Login.tsx
+- AnimatedLogo.tsx
 - mergeVaultData.ts
 - state.ts
-- react-native-reanimated
+- DraggableModulesList.shared.tsx
 - mapKdbxToClavisPass.ts
-- useAuth
+- NavigationContainer.tsx
 - host.rs
 - rnSodiumProvider.ts
 - GoogleDriveLoginButton.tsx
 - release.js
-- ClavisPass Browser Extension
+- native_host_registration.rs
 - CreditCardModule.tsx
 - screen_lock.rs
 - ClavisPass Website Marketing Brief
-- createUniqueID
+- ValuesType.ts
 - pairing.rs
-- triggerGlobalError
-- background/bridge.ts
-- vcardExport.ts
+- DeviceStorageClient.ts
+- ClavisPass Native Messaging Bridge
+- AddValueModal.tsx
 - BrowserBridgeWriteSync.tsx
 - vite.config.ts
 - devDependencies
 - prepare-msix.js
-- model/types.ts
+- AddTriggerStack.tsx
 - Vault V2 Key Envelope Roadmap
-- DeviceStorageClient.ts
+- riskModel.ts
 - ClavisPass
 - bridge_commands.rs
-- NoteModule.tsx
+- AppChip
 - compilerOptions
 - AttachmentModule.tsx
-- getTemplate.ts
-- AppChip
+- TemplateEnum
+- ModulesEnum
 - reactNativePaper.tsx
 - MainApplication.kt
 - i18n/index.ts
 - modulePolicy.ts
 - Datenschutzerklärung
 - autofill-preferences.ts
-- reactNative.ts
+- entropyUi.ts
 - Privacy Policy
-- AuthProvider.tsx
+- vaultDevices.ts
 - Nutzungsbedingungen
-- DevModeProvider.tsx
+- analysisEngine.ts
 - prepare-native-host-sidecar.js
-- CloudStorageClient.ts
-- AttachmentPreviewScreen.native.tsx
+- VaultV1.ts
+- mobileUpdater.ts
 - MainActivity.kt
 - session.rs
 - scripts
-- deriveIdentityClusters.ts
-- fill.ts
-- ScanScreen.tsx
+- PasswordStrengthLevel
+- Timestamp.ts
+- UI Patterns Context
 - ValueIconsEnum
 - Terms Of Use
 - protocol.rs
-- path.rs
+- ContentProtectionProvider.tsx
 - check-tauri-version-sync.js
-- errorBus.ts
+- ExpiryNotificationScheduler.tsx
 - ClavisPass Product Strategy Roadmap
-- Sync.tsx
+- SettingsScreen.tsx
 - bundle
-- Sync And Storage Context
-- Identity Management Concept
+- hibp.ts
+- deriveIdentityClusters.ts
 - withIosGoogleOAuthScheme.js
 - detectTauriEnvironment
 - tauri.conf.json
 - withAndroidApplicationId.js
 - build-web-demo.js
-- ref_react
+- ThemeProvider.tsx
 - plugins
-- autofill-cache.ts
+- domain.ts
 - ref_fs
 - container/AnimatedOpacityContainer.tsx
-- SettingsContainer.tsx
+- expiry.ts
 - editHistory.ts
-- brand.ts
-- DropboxLoginButton.tsx
+- Vault Modules Context
+- appScheme.test.ts
 - reactNativeReanimated.tsx
 - reactNavigationNative.ts
 - devDependencies
 - compilerOptions
-- generatePassword.ts
+- vitest
 - tsconfig.json
 - Store Release Roadmap
-- GoogleDriveClient.ts
+- pinnedEntries.ts
+- expoVectorIcons.tsx
 - CryptoProvider
 - TotpModule.tsx
-- AnimatedContainer
+- model/types.ts
 - macOS
 - windows
 - gorhomBottomSheet.tsx
@@ -149,7 +150,6 @@
 - vite-env.d.ts
 - tab-context.ts
 - BridgeStatusBadge.tsx
-- DocumentTypeEnum
 - linux
 - asyncStorage.ts
 - Crypto Context
@@ -164,10 +164,9 @@
 - ClavisPass
 - Screen Standardization Context
 - browser-extension/package.json
-- ClavisPassHubDiscoveryResult.ts
 - Firefox Store Release Notes
 - UI Context
-- useSetting
+- SettingsProvider.tsx
 - ClavisPass Firefox Add-on Reviewer Build
 - Bitwarden Import Roadmap
 - Agent Workflow Context
@@ -182,7 +181,7 @@
 - VaultProvider.tsx
 - GlobalClipboardSnackbar.tsx
 - CloudProvider.tsx
-- SettingsScreen.tsx
+- Modal
 
 ## God Nodes (most connected - your core abstractions)
 1. `useTheme()` - 266 edges
@@ -203,123 +202,123 @@
   README.md → src/app/providers/AuthProvider.tsx
 - `Tokens` --references--> `CloudProvider()`  [INFERRED]
   docs/context/sync-storage.md → src/app/providers/CloudProvider.tsx
-- `Chips` --references--> `AppChip()`  [INFERRED]
-  docs/context/ui-patterns.md → src/shared/components/chips/AppChip.tsx
-- `Core Mental Model` --references--> `AuthProvider()`  [INFERRED]
-  docs/project-context.md → src/app/providers/AuthProvider.tsx
+- `Edge verification` --references--> `getStatus()`  [INFERRED]
+  docs/browser-extension/native-messaging.md → src/features/vault/utils/expiry.ts
+- `Reorder Flows` --references--> `Header()`  [INFERRED]
+  docs/context/vault-modules.md → src/shared/components/Header.tsx
 
 ## Import Cycles
 - None detected.
 
-## Communities (190 total, 41 thin omitted)
+## Communities (189 total, 42 thin omitted)
 
-### Community 0 - "ModulesEnum"
-Cohesion: 0.03
-Nodes (97): zod, FastAccessType, FastAccessTypeSchema, AddressModuleType, AddressModuleTypeSchema, regex, AttachmentFileSchema, AttachmentModuleType (+89 more)
+### Community 0 - "ModulesEnum.ts"
+Cohesion: 0.06
+Nodes (54): zod, AttachmentFileSchema, AttachmentModuleTypeSchema, CreditCardModuleType, CreditCardModuleTypeSchema, regex, CustomFieldModuleTypeSchema, regex (+46 more)
 
 ### Community 1 - "dependencies"
 Cohesion: 0.02
 Nodes (105): dependencies, argon2-browser, @babel/plugin-proposal-export-namespace-from, base64-js, crypto-js, expo, expo-auth-session, expo-blur (+97 more)
 
-### Community 2 - "react-native"
-Cohesion: 0.12
-Nodes (26): expo-linking, react-i18next, react-native, ExpiryPickerModal(), Props, FILTERABLE_MODULES, Props, ModuleContainerProps (+18 more)
+### Community 2 - "getModule.tsx"
+Cohesion: 0.06
+Nodes (59): expo-linking, FastAccessType, FastAccessTypeSchema, ModuleContainer(), ModuleContainerProps, moduleStyles, AddressModule(), AddressState (+51 more)
 
-### Community 3 - "logger.ts"
-Cohesion: 0.19
-Nodes (11): papaparse, PendingKdbxFile, Props, styles, decrypt(), EntryExternalRefsSchema, ValuesListType, ValuesType (+3 more)
+### Community 3 - "vault.rs"
+Cohesion: 0.22
+Nodes (20): domain_contains(), fill_data_for_entry(), FillDataResult, first_string(), FolderRef, login_entry(), match_domain_score(), normalize_domain() (+12 more)
 
 ### Community 4 - "package.json"
 Cohesion: 0.03
-Nodes (72): react, react-dom, @types/react, @types/react-dom, typescript, main, name, private (+64 more)
+Nodes (74): react, react-dom, @types/react, @types/react-dom, typescript, main, name, private (+66 more)
 
-### Community 5 - "useTheme"
-Cohesion: 0.08
-Nodes (51): Item Surfaces, Shared Module UI, useTheme(), EditRowControlsContainer(), PasswordGeneratorModal(), ModuleContainer(), AddressModule(), CompanyModule() (+43 more)
+### Community 5 - "DigitalCardModule.tsx"
+Cohesion: 0.27
+Nodes (8): DigitalCardModule(), DigitalCardModuleProps, isDigitalCardType(), styles, DIGITAL_CARD_TYPES, DigitalCardModuleType, DigitalCardModuleTypeSchema, regex
 
 ### Community 6 - "App.tsx"
+Cohesion: 0.09
+Nodes (34): App(), AppShell(), AppWithNavigation(), DemoBootstrap(), getCurrentWindowSafe(), MainWindowReadySignal(), withAlpha(), @tauri-apps/plugin-deep-link (+26 more)
+
+### Community 7 - "reactNative.ts"
+Cohesion: 0.05
+Nodes (34): react-test-renderer, LogoutStackParamList, LogoutStack(), Stack, ClearCompletedTasksModal(), Props, ClearModulesModal(), Props (+26 more)
+
+### Community 8 - "EditScreen.tsx"
+Cohesion: 0.06
+Nodes (57): Interaction Polish, @hello-pangea/dnd, extractFastAccessObject(), ellipsize(), failedFaviconUrls, ListItem(), maskPassword(), Props (+49 more)
+
+### Community 9 - "react-i18next"
+Cohesion: 0.15
+Nodes (15): react-i18next, ExpiryPickerModal(), Props, PasswordGeneratorModal(), Props, styles, WifiQRCodeModal(), ExpiryModule() (+7 more)
+
+### Community 10 - "useTheme"
 Cohesion: 0.10
-Nodes (32): App(), AppShell(), AppWithNavigation(), DemoBootstrap(), getCurrentWindowSafe(), MainWindowReadySignal(), withAlpha(), DevModeProvider() (+24 more)
-
-### Community 7 - "EditScreen.tsx"
-Cohesion: 0.13
-Nodes (25): ClearCompletedTasksModal(), Props, ClearModulesModal(), Props, DeleteModal(), Props, DeleteModuleModal(), Props (+17 more)
-
-### Community 8 - "ListItem.tsx"
-Cohesion: 0.10
-Nodes (34): extractFastAccessObject(), ellipsize(), failedFaviconUrls, ListItem(), maskPassword(), Props, styles, dragDropAnimationConfig (+26 more)
-
-### Community 9 - "vitest"
-Cohesion: 0.37
-Nodes (5): vitest, update, devices, renderWithAppProviders(), textContent()
-
-### Community 10 - "BrowserExtensionsScreen.tsx"
-Cohesion: 0.14
-Nodes (23): SettingsStackParamList, SettingsStack(), Stack, subscribeBrowserExtensionPairingChanges(), deriveDeviceUiStatus(), sortByLastSeenDesc(), ActionButton(), BrowserClientCard() (+15 more)
+Nodes (35): @monaco-editor/react, SettingsStackParamList, Stack, useTheme(), Props, SettingsContainer(), styles, SubItem() (+27 more)
 
 ### Community 11 - "content/index.ts"
-Cohesion: 0.14
-Nodes (32): applyThemeToInlinePicker(), clearInlinePreview(), commitInlineAction(), createCloseIcon(), createInlineLogo(), createPickerLogo(), ensureInlineStyles(), fillSuggestionFromPicker() (+24 more)
+Cohesion: 0.09
+Nodes (49): applyTargets(), buildNoFieldsResult(), collectFillTargets(), emitInputEvents(), executeFill(), FillPreviewResult, FillSnapshot, FillTarget (+41 more)
 
 ### Community 12 - "shared/types.ts"
-Cohesion: 0.05
-Nodes (47): BackgroundHandler, BackgroundHandlerMap, BackgroundMessageContext, BackgroundMessageRouter, FillPreviewResult, FillStateCardProps, GetFillDataForEntryPayload, ContentMessage (+39 more)
+Cohesion: 0.06
+Nodes (39): BackgroundHandler, BackgroundHandlerMap, BackgroundMessageContext, BackgroundMessageRouter, FillStateCardProps, GetFillDataForEntryPayload, ExtensionMessage, isExtensionMessage() (+31 more)
 
 ### Community 13 - "popup/App.tsx"
-Cohesion: 0.09
-Nodes (33): registerContentFrame(), App(), handleFill(), handleOpenDesktopApp(), handlePromptResolution(), handleToggleSavePrompts(), handleUpdateAutofillMode(), refreshInlineAutofillPreference() (+25 more)
+Cohesion: 0.07
+Nodes (41): registerContentFrame(), setupSavePromptListener(), App(), handleFill(), handleOpenDesktopApp(), handlePromptResolution(), handleToggleSavePrompts(), handleUpdateAutofillMode() (+33 more)
 
-### Community 14 - "useVault"
-Cohesion: 0.10
-Nodes (33): @hello-pangea/dnd, react-native-draggable-flatlist, IdentityStackParamList, Stack, useVault(), IdentityEmailLogo(), getDefaultIdentityName(), ModulesType (+25 more)
+### Community 14 - "IdentityDetailScreen.tsx"
+Cohesion: 0.09
+Nodes (32): Standard Checklist, AppTabsParamList, IdentityStackParamList, Stack, IdentityEmailLogo(), IdentityEmailLogoProps, styles, getDefaultIdentityName() (+24 more)
 
 ### Community 15 - "background/index.ts"
-Cohesion: 0.12
-Nodes (34): buildCreatePayload(), buildUpdatePayload(), clearTabBadge(), delay(), desktopBridge, ensureContentScriptReady(), evaluateSavePromptCandidate(), fillFirstAvailableMatchInActiveTab() (+26 more)
+Cohesion: 0.10
+Nodes (45): clearAutofillDomainCache(), countPasswordSuggestions(), DomainAutofillCache, DomainAutofillCacheEntry, getAutofillEligibilityForUrl(), getCachedAutofillMatchCountForUrl(), getCachedMatchCount(), isFresh() (+37 more)
 
 ### Community 16 - "shared/bridge.ts"
-Cohesion: 0.14
-Nodes (22): NativeMessagingClient, NativeMessagingError, toBridgeError(), validateBridgeResponse(), withTimeout(), createInstanceId(), getBridgeClientInfo(), getBrowserDisplayName() (+14 more)
+Cohesion: 0.07
+Nodes (42): Architecture, Browser loading notes, ClavisPass Browser Extension, Current feature set, Desktop bridge, Development, Important note, Working from the repo root (+34 more)
 
-### Community 17 - "AnalysisDetailScreen.tsx"
-Cohesion: 0.05
-Nodes (77): expo-crypto, AnalysisStackParamList, Stack, useAuthMaster(), FiltersNarrow, FilterAnalysisModal(), Props, AnalysisFlags (+69 more)
+### Community 17 - "AnalysisScreen.tsx"
+Cohesion: 0.15
+Nodes (19): AnalysisStackParamList, Stack, FiltersNarrow, normalize(), AnalysisScreen(), AnalysisScreenProps, AnalysisTab, FilterItem (+11 more)
 
-### Community 18 - "AnimatedPressable"
-Cohesion: 0.09
-Nodes (27): CategoryItem(), Props, AddModuleModalCompactFav(), defineModules(), IdsOf, MissingIds, ModuleCategory, ModuleMeta (+19 more)
+### Community 18 - "react-native"
+Cohesion: 0.06
+Nodes (36): Item Surfaces, react-native, EditRowControlsContainer(), EditRowControlsContainerProps, NativeDragHandleScrollLockContext, WebDragHandlePropsContext, Props, ExpiryOverviewEntry (+28 more)
 
 ### Community 19 - "FastAccess.ts"
-Cohesion: 0.10
-Nodes (39): @tauri-apps/api, invokeTauriSystemAuthAvailable(), FastAccessSessionBridge(), MobileFastAccessOverlay(), FAST_ACCESS_NOTIFICATION_CATEGORY, FAST_ACCESS_POPUP_LABEL, FAST_ACCESS_POSITION_CHANGED_EVENT, FAST_ACCESS_READY_EVENT (+31 more)
-
-### Community 20 - "store.ts"
 Cohesion: 0.09
-Nodes (32): configureMobileFastAccess(), Corner, CornerOption(), FastAccessPosition, FastAccessPositionPicker(), Props, clampWidth(), Props (+24 more)
+Nodes (42): @tauri-apps/api, invokeTauriSystemAuth(), invokeTauriSystemAuthAvailable(), FastAccessSessionBridge(), MobileFastAccessOverlay(), FAST_ACCESS_NOTIFICATION_CATEGORY, FAST_ACCESS_POPUP_LABEL, FAST_ACCESS_POSITION_CHANGED_EVENT (+34 more)
+
+### Community 20 - "AnalysisDetailScreen.tsx"
+Cohesion: 0.16
+Nodes (20): useAuthMaster(), canonicalizeForVariants(), deriveAnalysisPepperFromMaster(), fingerprintPassword(), getPasswordStrengthIcon(), AnalysisDetailScreen(), AnalysisDetailScreenProps, analyzeCharacterComposition() (+12 more)
 
 ### Community 21 - "expo"
 Cohesion: 0.05
 Nodes (39): backgroundColor, foregroundImage, adaptiveIcon, blockedPermissions, package, permissions, versionCode, projectId (+31 more)
 
 ### Community 22 - "ClavisPassHubClient.ts"
-Cohesion: 0.13
-Nodes (34): calculateExpiresIn(), createHubError(), createHubErrorFromPayload(), DiscoveryResponse, ensureVaultEtagForUpload(), fetchFile(), fetchUserInfo(), fetchVaultMeta() (+26 more)
+Cohesion: 0.09
+Nodes (49): ClavisPassHubLoginButton(), calculateExpiresIn(), checkDiscovery(), createHubError(), createHubErrorFromPayload(), DiscoveryResponse, ensureVaultEtagForUpload(), fetchFile() (+41 more)
 
-### Community 23 - "MenuItem"
-Cohesion: 0.11
-Nodes (27): FilterItem, FiltersNarrowProps, FiltersWide, FiltersWideProps, styles, ExpiryOverviewEntry, HomeFilterMenu(), Props (+19 more)
+### Community 23 - "ref_react"
+Cohesion: 0.05
+Nodes (47): BrandHeaderProps, InlineNoticeProps, react-native-reanimated, Props, styles, FilterItem, FiltersNarrowProps, FiltersWide (+39 more)
 
 ### Community 24 - "write.rs"
 Cohesion: 0.12
-Nodes (29): as_io_error(), BrowserWriteKind, CreateEntryFromBrowser, UpdateEntryFromBrowser, BrowserWriteRequest, BrowserWriteRequestStore, BrowserWriteResult, BrowserWriteResultStore (+21 more)
+Nodes (31): write_request_store_path(), as_io_error(), BrowserWriteKind, CreateEntryFromBrowser, UpdateEntryFromBrowser, BrowserWriteRequest, BrowserWriteRequestStore, BrowserWriteResult (+23 more)
 
 ### Community 25 - "scripts"
 Cohesion: 0.05
 Nodes (37): scripts, android, android:build:apk, android:build:store, android:build:store-submit, android:submit:store, extension:build, extension:build:chrome (+29 more)
 
 ### Community 26 - "decryptVaultContent.ts"
-Cohesion: 0.15
-Nodes (15): getEmptyData(), decryptVaultContent(), DecryptVaultContentResult, getCryptoProvider(), makeV1AadBytes(), te, V1_AAD_OBJECT, assertPositiveSafeInteger() (+7 more)
+Cohesion: 0.20
+Nodes (10): VaultDataTypeSchema, DecryptVaultContentResult, DEFAULT_ENCRYPT_MODE, EncryptMode, EncryptVaultContentResult, getCryptoProvider(), VaultV2, VaultV2Schema (+2 more)
 
 ### Community 27 - "manifest.json"
 Cohesion: 0.06
@@ -327,27 +326,27 @@ Nodes (35): action, default_icon, default_popup, default_title, background, serv
 
 ### Community 28 - "isTauri.ts"
 Cohesion: 0.13
-Nodes (17): getClipboardText(), setClipboardText(), tryNavigatorReadText(), tryNavigatorWriteText(), ClipboardContentKind, clipboardOwnership, fingerprintValue(), OwnedClipboardRecord (+9 more)
+Nodes (18): getClipboardText(), setClipboardText(), tryNavigatorReadText(), tryNavigatorWriteText(), ClipboardContentKind, clipboardOwnership, fingerprintValue(), OwnedClipboardRecord (+10 more)
 
 ### Community 29 - "forms.ts"
 Cohesion: 0.11
-Nodes (33): setupSavePromptListener(), AutofillPlan, buildDetachedContainer(), buildFieldKey(), buildFieldText(), buildFormId(), chooseBestField(), ClassifiedField (+25 more)
+Nodes (33): AutofillPlan, buildAutofillPlan(), buildDetachedContainer(), buildFieldKey(), buildFieldText(), buildFormId(), chooseBestField(), ClassifiedField (+25 more)
 
 ### Community 30 - "lib.rs"
-Cohesion: 0.05
-Nodes (49): domain_contains(), fill_data_for_entry(), FillDataResult, first_string(), FolderRef, login_entry(), match_domain_score(), normalize_domain() (+41 more)
+Cohesion: 0.11
+Nodes (19): clamp_window_size(), clamp_window_size_to_monitor(), DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, emit_lock_vault(), emit_vault_file_open_request(), get_requested_vault_file_path(), get_window_size_file_path() (+11 more)
 
-### Community 31 - "Header"
-Cohesion: 0.08
-Nodes (33): Standard Checklist, Chips, Compact Search Behavior, Content Panels, Current Visual Direction, Headers, Standard Screen Structure, UI Patterns Context (+25 more)
+### Community 31 - "LeftSideBar.tsx"
+Cohesion: 0.22
+Nodes (13): @expo/vector-icons, @react-navigation/bottom-tabs, CustomBottomTab(), getActiveRouteName(), getActiveRouteName(), LeftSideTabBar(), sidebarWidth, styles (+5 more)
 
 ### Community 32 - "UpdateManager.tsx"
-Cohesion: 0.11
-Nodes (27): expo-constants, react-native-safe-area-context, @tauri-apps/plugin-process, @tauri-apps/plugin-updater, Listener, listeners, publishUpdateCheck(), subscribeUpdateCheck() (+19 more)
+Cohesion: 0.20
+Nodes (13): expo-updates, react-native-safe-area-context, @tauri-apps/plugin-process, @tauri-apps/plugin-updater, Listener, listeners, publishUpdateCheck(), subscribeUpdateCheck() (+5 more)
 
-### Community 33 - "hotkeys.ts"
-Cohesion: 0.13
-Nodes (21): HotkeyRecorderItem(), Props, beginHotkeyRecording(), emit(), Listener, listeners, ACTIONS, BLOCKED_HOTKEYS (+13 more)
+### Community 33 - "store.ts"
+Cohesion: 0.06
+Nodes (43): Core Files, Providers, Settings Schema, Storage Layers, Sync And Storage Context, Tokens, HotkeyRecorderItem(), Props (+35 more)
 
 ### Community 34 - "commands.rs"
 Cohesion: 0.05
@@ -355,31 +354,31 @@ Nodes (40): auth_reply(), AUTH_REPLY_DESCRIPTOR, AUTH_REPLY_SIGNATURE, authentic
 
 ### Community 35 - "LoginScreen.tsx"
 Cohesion: 0.13
-Nodes (30): expo-network, LoginStackParamList, Stack, useToken(), OnlineContext, OnlineContextType, Props, useOnline() (+22 more)
+Nodes (32): LoginStackParamList, Stack, useToken(), OnlineContext, OnlineContextType, Props, useOnline(), UseOnlineResult (+24 more)
 
-### Community 36 - "Login.tsx"
-Cohesion: 0.15
-Nodes (15): react-native-progress, react-native-svg, Login(), Props, isUsingAuthentication(), loadAuthentication(), consumeSystemAuthAutoUnlockSuppression(), entropyToProgress() (+7 more)
+### Community 36 - "AnimatedLogo.tsx"
+Cohesion: 0.25
+Nodes (5): react-native-svg, AnimatedLogo(), AnimatedRect, styles, Logo()
 
 ### Community 37 - "mergeVaultData.ts"
-Cohesion: 0.19
-Nodes (21): addLatestTombstones(), areSame(), clone(), conflictCopyMatchesBaseEntry(), conflictCopyWasDeleted(), entryContentFingerprint(), entryIsDeletedBy(), getConflictCopyBaseId() (+13 more)
+Cohesion: 0.17
+Nodes (23): VaultEntryTombstone, addLatestTombstones(), areSame(), areVaultDataEqual(), clone(), conflictCopyMatchesBaseEntry(), conflictCopyWasDeleted(), entryContentFingerprint() (+15 more)
 
 ### Community 38 - "state.ts"
-Cohesion: 0.13
-Nodes (14): buildPromptTitle(), ExtensionState, normalizeIdentity(), PreparedFillRecord, RegisteredFrameInfo, SavePromptEvaluation, SuggestionRowProps, FillDataResult (+6 more)
+Cohesion: 0.12
+Nodes (16): buildCreatePayload(), buildUpdatePayload(), resolvePromptWithDesktopWrite(), toAppliedResult(), buildPromptTitle(), ExtensionState, normalizeIdentity(), PreparedFillRecord (+8 more)
 
-### Community 39 - "react-native-reanimated"
-Cohesion: 0.13
-Nodes (24): react-native-reanimated, Props, styles, EditRowControlsContainerProps, NativeDragHandleScrollLockContext, NativeDragHandleScrollLockProvider(), WebDragHandlePropsContext, WebDragHandlePropsProvider() (+16 more)
+### Community 39 - "DraggableModulesList.shared.tsx"
+Cohesion: 0.20
+Nodes (17): dragDropAnimationConfig, DraggableModulesList(), DraggableModulesFooter(), DraggableModulesListProps, draggableModulesListStyles, FooterProps, reorderModules(), DraggableModulesListWeb() (+9 more)
 
 ### Community 40 - "mapKdbxToClavisPass.ts"
-Cohesion: 0.15
-Nodes (22): kdbxweb, configureKdbxArgon2(), importKdbx(), addCustomField(), addTotpModule(), addValueModule(), binaryToBytes(), binaryWithMetaToAttachment() (+14 more)
+Cohesion: 0.14
+Nodes (24): kdbxweb, configureKdbxArgon2(), importKdbx(), addCustomField(), addTotpModule(), addValueModule(), binaryToBytes(), binaryWithMetaToAttachment() (+16 more)
 
-### Community 41 - "useAuth"
-Cohesion: 0.13
-Nodes (22): ProtectedRoute(), getFocusedRouteName(), NavigationnContainer(), titlebarContentDragRoutes, LoginStack(), TabNavigator(), useAuth(), suppressNextSystemAuthAutoUnlock() (+14 more)
+### Community 41 - "NavigationContainer.tsx"
+Cohesion: 0.21
+Nodes (13): ProtectedRoute(), getFocusedRouteName(), NavigationnContainer(), titlebarContentDragRoutes, LoginStack(), TabNavigator(), Handler, handlers (+5 more)
 
 ### Community 42 - "host.rs"
 Cohesion: 0.16
@@ -390,20 +389,20 @@ Cohesion: 0.14
 Nodes (11): base64-js, libsodium-wrappers-sumo, react-native-sodium-jsi, getCryptoProvider(), rnSodiumProvider, td, te, verifyProviderInDev() (+3 more)
 
 ### Community 44 - "GoogleDriveLoginButton.tsx"
-Cohesion: 0.20
-Nodes (19): expo-auth-session, ANDROID_AUTH_PROMPT_OPTIONS, DESKTOP_OAUTH_PORTS, getMobileRedirectUri(), GoogleDriveLoginButtonContent(), randState(), readTokenResponse(), SCOPES (+11 more)
+Cohesion: 0.08
+Nodes (44): expo-auth-session, expo-random, expo-web-browser, @fabianlars/tauri-plugin-oauth, ANDROID_AUTH_PROMPT_OPTIONS, getMobileRedirectUri(), randState(), SCOPES (+36 more)
 
 ### Community 45 - "release.js"
 Cohesion: 0.12
 Nodes (19): androidGradleHasVersionCode(), androidGradleHasVersionName(), androidStringsHasRuntimeVersion(), cargoLockHasVersion(), cargoTomlHasVersion(), { execSync }, existingTags, filesToUpdate (+11 more)
 
-### Community 46 - "ClavisPass Browser Extension"
-Cohesion: 0.13
-Nodes (12): Architecture, Browser loading notes, ClavisPass Browser Extension, Current feature set, Development, Important note, Working from the repo root, Browser Extension Store Release (+4 more)
+### Community 46 - "native_host_registration.rs"
+Cohesion: 0.19
+Nodes (10): CHROME_EXTENSION_IDS, chromium_origins(), CREATE_NO_WINDOW, EDGE_EXTENSION_IDS, find_native_host_exe(), FIREFOX_EXTENSION_ID, native_host_candidates(), NATIVE_HOST_NAME (+2 more)
 
 ### Community 47 - "CreditCardModule.tsx"
-Cohesion: 0.20
-Nodes (14): BackupStateType, CreditCardModule(), CreditCardState, detectCardBrand(), digitsOnly(), formatCardNumber(), maskCardNumber(), passesLuhn() (+6 more)
+Cohesion: 0.26
+Nodes (13): CreditCardModule(), CreditCardState, detectCardBrand(), digitsOnly(), formatCardNumber(), maskCardNumber(), passesLuhn(), Props (+5 more)
 
 ### Community 48 - "screen_lock.rs"
 Cohesion: 0.11
@@ -413,29 +412,29 @@ Nodes (8): DeviceIdentity, get_device_identity(), CGSessionCopyCurrentDictionary
 Cohesion: 0.05
 Nodes (43): Attachments And Previews, Brand Details, Bring Your Own Sync, Browser Extension, Can I import my existing passwords?, Can my cloud provider read my passwords?, ClavisPass Website Marketing Brief, Conversion Priorities (+35 more)
 
-### Community 50 - "createUniqueID"
-Cohesion: 0.21
-Nodes (22): addCardModule(), addCustomField(), addExpiryModule(), addIdentityModules(), addLoginModules(), addNote(), addSshKeyModule(), addTotp() (+14 more)
+### Community 50 - "ValuesType.ts"
+Cohesion: 0.12
+Nodes (30): papaparse, addCardModule(), addCustomField(), addExpiryModule(), addIdentityModules(), addLoginModules(), addNote(), addSshKeyModule() (+22 more)
 
 ### Community 51 - "pairing.rs"
 Cohesion: 0.21
 Nodes (21): approve_pairing(), evaluate_pairing(), list_paired_clients(), list_pending_pairings(), list_rejected_clients(), load_pairing_store(), now_ms(), optional_identity_matches() (+13 more)
 
-### Community 52 - "triggerGlobalError"
-Cohesion: 0.20
-Nodes (14): @tauri-apps/plugin-fs, fetchFile(), fetchUserInfo(), refreshAccessToken(), uploadFile(), ensureDesktop(), fetchFile(), fetchUserInfo() (+6 more)
+### Community 52 - "DeviceStorageClient.ts"
+Cohesion: 0.11
+Nodes (31): @react-native-async-storage/async-storage, @tauri-apps/plugin-fs, Props, UserInfoProps, fetchFile(), getActiveLocalVaultIdKey(), getLocalSyncKey(), getLocalSyncMetadataKey() (+23 more)
 
-### Community 53 - "background/bridge.ts"
+### Community 53 - "ClavisPass Native Messaging Bridge"
 Cohesion: 0.08
-Nodes (33): Desktop bridge, deriveAppState(), DesktopBridgeService, getStoredPairingStatus(), normalizeDesktopStatus(), normalizeFillData(), normalizeSuggestions(), BrowserWriteResult (+25 more)
+Nodes (23): Chosen architecture, Chromium and Edge registration, ClavisPass Native Messaging Bridge, Edge verification, Example usage, Expected failure cases, Future hardening, Local development (+15 more)
 
-### Community 54 - "vcardExport.ts"
-Cohesion: 0.35
-Nodes (10): expo-sharing, buildFormattedName(), buildVCard(), canExportVCard(), clean(), escapeVCardText(), exportVCard(), firstModule() (+2 more)
+### Community 54 - "AddValueModal.tsx"
+Cohesion: 0.28
+Nodes (8): CategoryItem(), AddValueModal(), Props, getCustomField(), getModules(), getTemplate(), modules(), getDateTime()
 
 ### Community 55 - "BrowserBridgeWriteSync.tsx"
-Cohesion: 0.35
-Nodes (10): applyUpdateToEntry(), BrowserWriteKind, BrowserWriteRequest, createBrowserEntry(), CreatePayload, effectiveUrl(), normalizeText(), pickFolder() (+2 more)
+Cohesion: 0.33
+Nodes (11): applyUpdateToEntry(), BrowserBridgeWriteSync(), BrowserWriteKind, BrowserWriteRequest, createBrowserEntry(), CreatePayload, effectiveUrl(), normalizeText() (+3 more)
 
 ### Community 57 - "devDependencies"
 Cohesion: 0.09
@@ -445,17 +444,17 @@ Nodes (22): devDependencies, @babel/core, eslint, eslint-config-universe, patch-
 Cohesion: 0.10
 Nodes (16): appExe, appVersion, assetsOutputDir, createUnplatedTargetSizeIcons(), escapePowerShellSingleQuoted(), fs, manifest, manifestSource (+8 more)
 
-### Community 59 - "model/types.ts"
-Cohesion: 0.11
-Nodes (22): @react-navigation/native-stack, AddTriggerStackParamList, AppTabsParamList, LogoutStackParamList, RootStackParamList, AddTriggerStack(), Stack, HomeStack() (+14 more)
+### Community 59 - "AddTriggerStack.tsx"
+Cohesion: 0.38
+Nodes (5): AddTriggerStackParamList, AddTriggerStack(), Stack, AddTriggerScreen(), AddTriggerScreenProps
 
 ### Community 60 - "Vault V2 Key Envelope Roadmap"
 Cohesion: 0.06
-Nodes (29): Always Know, ClavisPass Agent Context, Context Routing, Fast Map, graphify, High-Risk Rules, Core Files, Master Password Lifetime (+21 more)
+Nodes (28): Always Know, ClavisPass Agent Context, Context Routing, Fast Map, graphify, High-Risk Rules, Core Files, Master Password Lifetime (+20 more)
 
-### Community 61 - "DeviceStorageClient.ts"
-Cohesion: 0.35
-Nodes (12): @react-native-async-storage/async-storage, fetchFile(), getActiveLocalVaultIdKey(), getLocalSyncKey(), getLocalSyncMetadataKey(), getVaultLocalSyncKey(), getVaultLocalSyncMetadataKey(), LocalSyncMetadata (+4 more)
+### Community 61 - "riskModel.ts"
+Cohesion: 0.31
+Nodes (10): buildAnalysisCache(), findSequentialTriples(), hasRepeatedChars(), strengthFromEntropyBits(), evaluatePasswordForDetail(), IssueKey, riskScoreFromCached(), Severity (+2 more)
 
 ### Community 62 - "ClavisPass"
 Cohesion: 0.07
@@ -465,100 +464,100 @@ Nodes (28): 1. VaultSession (Authoritative & Secret-Capable), 2. VaultProvider (
 Cohesion: 0.15
 Nodes (8): bridge_approve_pairing(), bridge_claim_pending_writes(), bridge_complete_write_request(), bridge_list_paired_clients(), bridge_list_pending_pairings(), bridge_list_rejected_clients(), bridge_publish_session(), bridge_reject_pairing()
 
-### Community 64 - "NoteModule.tsx"
-Cohesion: 0.08
-Nodes (29): Interaction Polish, Props, styles, JsonLine(), NoteCodePreview(), Props, styles, InlinePart (+21 more)
+### Community 64 - "AppChip"
+Cohesion: 0.05
+Nodes (49): AddModuleModalCompactFav(), defineModules(), IdsOf, MissingIds, ModuleCategory, ModuleMeta, ModuleTile(), Props (+41 more)
 
 ### Community 65 - "compilerOptions"
 Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, allowSyntheticDefaultImports, esModuleInterop, forceConsistentCasingInFileNames, isolatedModules, jsx, lib (+11 more)
 
 ### Community 66 - "AttachmentModule.tsx"
-Cohesion: 0.17
-Nodes (19): expo-document-picker, @tauri-apps/plugin-dialog, AttachmentModule(), canPreviewAttachment(), downloadBrowserAttachment(), formatBytes(), getAttachmentIcon(), getFileExtension() (+11 more)
+Cohesion: 0.12
+Nodes (28): expo-file-system, expo-sharing, AttachmentModule(), canPreviewAttachment(), downloadBrowserAttachment(), formatBytes(), getAttachmentIcon(), getFileExtension() (+20 more)
 
-### Community 67 - "getTemplate.ts"
-Cohesion: 0.14
-Nodes (18): TemplateEnum, BANK_ACCOUNT, BLANK, CREDIT_CARD, DIGITAL_CARD, DOCUMENT, IDENTITY, KEY (+10 more)
+### Community 67 - "TemplateEnum"
+Cohesion: 0.15
+Nodes (13): TemplateEnum, BANK_ACCOUNT, BLANK, CREDIT_CARD, DIGITAL_CARD, DOCUMENT, IDENTITY, KEY (+5 more)
 
-### Community 68 - "AppChip"
-Cohesion: 0.19
-Nodes (12): FolderFilter(), Props, styles, assertNever(), getModuleNameByEnum(), AppChip(), IconSource, normalizeIcon() (+4 more)
+### Community 68 - "ModulesEnum"
+Cohesion: 0.07
+Nodes (29): FILTERABLE_MODULES, ModuleFilterModal(), Props, ModulesEnum, ADDRESS, ATTACHMENT, COMPANY, CREDIT_CARD (+21 more)
 
 ### Community 69 - "reactNativePaper.tsx"
 Cohesion: 0.11
 Nodes (14): ActivityIndicator, baseColors, Button, Chip, Divider, Icon, IconButton, MD3DarkTheme (+6 more)
 
 ### Community 71 - "i18n/index.ts"
-Cohesion: 0.27
-Nodes (8): expo-clipboard, i18next, initI18n(), resources, de, en, DEFAULT_NS, TranslationSchema
+Cohesion: 0.31
+Nodes (7): expo-clipboard, i18next, resources, de, en, DEFAULT_NS, TranslationSchema
 
 ### Community 72 - "modulePolicy.ts"
 Cohesion: 0.19
-Nodes (12): buildEntryMeta(), firstModule(), firstValue(), getSecretFor(), isManagedModule(), MANAGED_MODULE_VALUES, ManagedModules, MetaExtractor (+4 more)
+Nodes (12): EntryMeta, firstModule(), firstValue(), getSecretFor(), isManagedModule(), MANAGED_MODULE_VALUES, ManagedModules, MetaExtractor (+4 more)
 
 ### Community 73 - "Datenschutzerklärung"
 Cohesion: 0.09
 Nodes (22): 10. Browser-Erweiterung, 11. Benachrichtigungen, 12. Kontaktaufnahme, 13. Webseite und Hosting, 14. Cookies, Tracking und Analytics, 15. App Stores und Download-Plattformen, 16. Rechtsgrundlagen, 17. Speicherdauer (+14 more)
 
 ### Community 74 - "autofill-preferences.ts"
-Cohesion: 0.36
-Nodes (11): buildPreferenceResult(), DEFAULT_POLICY, DomainPolicyStore, getInlineAutofillPreferenceForUrl(), normalizeHost(), normalizeMode(), normalizePolicy(), readPolicyStore() (+3 more)
+Cohesion: 0.32
+Nodes (12): buildPreferenceResult(), DEFAULT_POLICY, DomainPolicyStore, getInlineAutofillPreferenceForUrl(), normalizeHost(), normalizeMode(), normalizePolicy(), readPolicyStore() (+4 more)
 
-### Community 75 - "reactNative.ts"
-Cohesion: 0.11
-Nodes (13): Animated, AnimatedValue, Dimensions, InteractionManager, Platform, Pressable, ScrollView, setPlatform() (+5 more)
+### Community 75 - "entropyUi.ts"
+Cohesion: 0.27
+Nodes (9): CHARSET_SIZES, EntropyOptions, estimateCharsetSize(), hasUnicodeProps, log2(), passwordEntropy(), passwordEntropyBits(), computeEntropyBitsForUi() (+1 more)
 
 ### Community 76 - "Privacy Policy"
 Cohesion: 0.09
 Nodes (22): 10. Browser Extension, 11. Notifications, 12. Contact, 13. Website And Hosting, 14. Cookies, Tracking And Analytics, 15. App Stores And Download Platforms, 16. Legal Bases, 17. Retention (+14 more)
 
-### Community 77 - "AuthProvider.tsx"
-Cohesion: 0.20
-Nodes (10): AuthContext, AuthContextType, AuthMasterContext, AuthMasterContextType, AuthProvider(), Props, ScreenLockLogoutController, initScreenLockLogout() (+2 more)
+### Community 77 - "vaultDevices.ts"
+Cohesion: 0.24
+Nodes (9): daysBetween(), DEFAULT_DEVICE_UI_POLICY, deriveDeviceUiStatus(), DeviceUiPolicy, DeviceUiStatus, earliestIso(), hasSameDeviceIdentity(), normalizeDeviceIdentityPart() (+1 more)
 
 ### Community 78 - "Nutzungsbedingungen"
 Cohesion: 0.10
 Nodes (20): 10. Erlaubte Nutzung, 11. Open Source und Lizenzen, 12. Kosten, 13. Drittanbieter, 14. Updates, 15. Haftung, 16. Beendigung der Nutzung, 17. Änderungen (+12 more)
 
-### Community 79 - "DevModeProvider.tsx"
-Cohesion: 0.24
-Nodes (9): expo-linear-gradient, DevModeContext, DevModeContextType, Props, useDevMode(), AnalysisEntryGradient(), Props, SettingsFooter() (+1 more)
+### Community 79 - "analysisEngine.ts"
+Cohesion: 0.33
+Nodes (5): AnalysisFlags, AnalysisRef, CachedAnalysisItem, CacheResult, THRESH_BITS
 
 ### Community 80 - "prepare-native-host-sidecar.js"
 Cohesion: 0.14
 Nodes (12): cargoArgs, { copyFileSync, existsSync, mkdirSync, writeFileSync }, detectHostTriple(), { execFileSync }, { join, resolve }, manifestPath, outputDir, outputPath (+4 more)
 
-### Community 81 - "CloudStorageClient.ts"
-Cohesion: 0.38
-Nodes (6): TokenContextValue, FetchFileParams, TokenRefreshParams, Provider, RemoteFileContent, UploadFileParams
+### Community 81 - "VaultV1.ts"
+Cohesion: 0.29
+Nodes (6): makeV1AadBytes(), te, V1_AAD_OBJECT, VaultV1, VaultV1Schema, TEST_PAYLOAD
 
-### Community 82 - "AttachmentPreviewScreen.native.tsx"
-Cohesion: 0.16
-Nodes (17): expo-file-system, expo-image, react-native-pdf, getAttachmentPreview(), AttachmentPreviewScreen(), AttachmentPreviewScreenProps, getDataUri(), getExtension() (+9 more)
+### Community 82 - "mobileUpdater.ts"
+Cohesion: 0.33
+Nodes (9): shouldUseMobileBinaryUpdater(), checkMobileBinaryUpdate(), compareVersions(), getAppVersion(), getManifestDownloadUrl(), getMobileUpdateManifestUrl(), MobileBinaryUpdate, MobileUpdateManifest (+1 more)
 
 ### Community 84 - "session.rs"
-Cohesion: 0.27
-Nodes (8): session_store_path(), BridgeSessionSnapshot, clear_session(), load_session(), now_ms(), publish_session(), SESSION_TTL_MS, write_json_atomically()
+Cohesion: 0.16
+Nodes (14): bridge_dir(), BRIDGE_ENV_KEY, ensure_dir(), pairing_store_path(), platform_base_dir(), session_store_path(), write_result_store_path(), BridgeSessionSnapshot (+6 more)
 
 ### Community 85 - "scripts"
 Cohesion: 0.14
 Nodes (14): scripts, build, build:chrome, build:firefox, build:firefox-local, dev, package:chrome, package:firefox (+6 more)
 
-### Community 86 - "deriveIdentityClusters.ts"
-Cohesion: 0.35
-Nodes (11): buildPasswordUseCounts(), deriveIdentityClusters(), entryHasSimplePasswordRisk(), getEntryDomains(), getEntryModuleTypes(), getEntryPasswordValues(), getEntrySignals(), getModuleValue() (+3 more)
+### Community 86 - "PasswordStrengthLevel"
+Cohesion: 0.28
+Nodes (6): PasswordStrengthLevel, MEDIUM, STRONG, WEAK, getPasswordStrengthColor(), AppColors
 
-### Community 87 - "fill.ts"
-Cohesion: 0.35
-Nodes (10): applyTargets(), buildNoFieldsResult(), collectFillTargets(), emitInputEvents(), executeFill(), FillSnapshot, FillTarget, previewFill() (+2 more)
+### Community 87 - "Timestamp.ts"
+Cohesion: 0.28
+Nodes (7): ACTION_ICON, EditHistoryModal(), Props, styles, EditHistoryActionType, EditSessionLogEntry, formatAbsoluteTime()
 
-### Community 88 - "ScanScreen.tsx"
-Cohesion: 0.31
-Nodes (6): expo-camera, SessionQrPayload, ScanScreen(), ScanScreenProps, styles, isSessionQrPayload()
+### Community 88 - "UI Patterns Context"
+Cohesion: 0.25
+Nodes (7): Chips, Compact Search Behavior, Content Panels, Current Visual Direction, Headers, UI Patterns Context, Verification
 
 ### Community 89 - "ValueIconsEnum"
-Cohesion: 0.14
+Cohesion: 0.15
 Nodes (13): ValueIconsEnum, BANK_ACCOUNT, BLANK, CREDIT_CARD, DIGITAL_CARD, DOCUMENT, IDENTITY, KEY (+5 more)
 
 ### Community 90 - "Terms Of Use"
@@ -569,37 +568,37 @@ Nodes (20): 10. Permitted Use, 11. Open Source And Licenses, 12. Costs, 13. Thir
 Cohesion: 0.20
 Nodes (7): BridgeClientInfo, BridgeError, BridgePairingEnvelope, BridgeRequest, BridgeResponse, HOST_NAME, PROTOCOL_VERSION
 
-### Community 92 - "path.rs"
-Cohesion: 0.39
-Nodes (8): bridge_dir(), BRIDGE_ENV_KEY, ensure_dir(), pairing_store_path(), platform_base_dir(), write_request_store_path(), write_result_store_path(), complete_request()
+### Community 92 - "ContentProtectionProvider.tsx"
+Cohesion: 0.32
+Nodes (6): expo-screen-capture, applyNativeContentProtection(), applyTauriContentProtection(), ContentProtectionContext, ContentProtectionContextValue, ContentProtectionProvider()
 
 ### Community 93 - "check-tauri-version-sync.js"
 Cohesion: 0.24
 Nodes (11): collectMismatches(), fs, getMajorMinor(), getNpmLockVersion(), mismatches, parseCargoLockVersions(), path, readJson() (+3 more)
 
-### Community 94 - "errorBus.ts"
-Cohesion: 0.42
-Nodes (6): Listener, listeners, subscribeGlobalError(), unsubscribeGlobalError(), GlobalErrorPayload, GlobalErrorSnackbar()
+### Community 94 - "ExpiryNotificationScheduler.tsx"
+Cohesion: 0.39
+Nodes (7): expo-notifications, buildPendingExpiryReminders(), cancelScheduledExpiryReminders(), configureNotificationHandler(), ExpiryNotificationScheduler(), getReminderDate(), PendingExpiryReminder
 
 ### Community 95 - "ClavisPass Product Strategy Roadmap"
 Cohesion: 0.11
 Nodes (17): 1. Browser Extension Polish, 2. Passkeys, 3. Emergency Access / Trusted Contact, 4. Optional Web App, 5. Separate Secrets Sharing SaaS, Bitwarden Gaps To Treat As Strategic, ClavisPass Personal, ClavisPass Product Strategy Roadmap (+9 more)
 
-### Community 96 - "Sync.tsx"
-Cohesion: 0.10
-Nodes (34): ChangeMasterPasswordModal(), Props, styles, Props, Sync(), createVaultDeviceId(), DeviceIdentity, getCurrentVaultDeviceId() (+26 more)
+### Community 96 - "SettingsScreen.tsx"
+Cohesion: 0.06
+Nodes (71): Current Vault Format, Implementation Phases, @gorhom/bottom-sheet, simple-icons, @tauri-apps/plugin-shell, AuthContext, AuthContextType, AuthMasterContext (+63 more)
 
 ### Community 97 - "bundle"
 Cohesion: 0.17
 Nodes (12): bundle, active, category, copyright, createUpdaterArtifacts, externalBin, fileAssociations, icon (+4 more)
 
-### Community 98 - "Sync And Storage Context"
-Cohesion: 0.25
-Nodes (7): Core Files, Providers, Settings Schema, Storage Layers, Sync And Storage Context, Tokens, StoreSchema
+### Community 98 - "hibp.ts"
+Cohesion: 0.43
+Nodes (6): expo-crypto, fetchRange(), getPwnedCountForPassword(), getPwnedCountsForPasswords(), requestCache, sha1Upper()
 
-### Community 99 - "Identity Management Concept"
-Cohesion: 0.13
-Nodes (14): Confidence And Trust, Core Idea, Data Model Direction, Design Tone, Identity Detail View, Identity Management Concept, Identity Tab, Important Principle (+6 more)
+### Community 99 - "deriveIdentityClusters.ts"
+Cohesion: 0.11
+Nodes (25): Confidence And Trust, Core Idea, Data Model Direction, Design Tone, Identity Detail View, Identity Management Concept, Identity Tab, Important Principle (+17 more)
 
 ### Community 100 - "withIosGoogleOAuthScheme.js"
 Cohesion: 0.43
@@ -609,8 +608,8 @@ Nodes (5): ensureUrlScheme(), normalizeClientId(), {
 }, toReverseClientIdScheme(), { withInfoPlist }
 
 ### Community 101 - "detectTauriEnvironment"
-Cohesion: 0.16
-Nodes (18): applyNativeContentProtection(), applyTauriContentProtection(), ContentProtectionContext, ContentProtectionContextValue, ContentProtectionProvider(), BrowserBridgePairingPrompt(), PairingAction, PromptButton() (+10 more)
+Cohesion: 0.26
+Nodes (13): BrowserBridgePairingPrompt(), PairingAction, PromptButton(), styles, actOnBrowserExtensionPairing(), BrowserExtensionPairingChangeListener, buildBrowserClientKey(), listBrowserExtensionPairings() (+5 more)
 
 ### Community 102 - "tauri.conf.json"
 Cohesion: 0.18
@@ -624,37 +623,37 @@ Nodes (4): fs, path, { withDangerousMod }, { withXcodeProject }
 Cohesion: 0.20
 Nodes (8): demoDotenvPath, demoEnv, env, fs, path, result, rewriteDemoPublicPaths(), { spawnSync }
 
-### Community 105 - "ref_react"
-Cohesion: 0.03
-Nodes (69): BrandHeaderProps, InlineNoticeProps, @monaco-editor/react, react-native-gesture-handler, react-native-paper, CustomBottomTab(), getActiveRouteName(), Props (+61 more)
+### Community 105 - "ThemeProvider.tsx"
+Cohesion: 0.05
+Nodes (44): expo-constants, expo-linear-gradient, react-native-gesture-handler, react-native-paper, DevModeContext, DevModeContextType, Props, Props (+36 more)
 
 ### Community 106 - "plugins"
 Cohesion: 0.20
 Nodes (10): args, customProtocol, plugins, cli, deepLink, updater, endpoints, pubkey (+2 more)
 
-### Community 107 - "autofill-cache.ts"
-Cohesion: 0.17
-Nodes (21): clearAutofillDomainCache(), countPasswordSuggestions(), DomainAutofillCache, DomainAutofillCacheEntry, getAutofillEligibilityForUrl(), getCachedAutofillMatchCountForUrl(), getCachedMatchCount(), isFresh() (+13 more)
+### Community 107 - "domain.ts"
+Cohesion: 0.36
+Nodes (8): buildEntrySuggestions(), normalizeHost(), normalizeLookupHost(), safeUrl(), scoreUrlMatch(), searchEntries(), EntrySuggestion, VaultEntry
 
 ### Community 109 - "container/AnimatedOpacityContainer.tsx"
 Cohesion: 0.31
 Nodes (6): AnimatedOpacityContainer(), Props, AnimatedOpacityContainerWeb(), Props, Props, AnimatedOpacityContainer()
 
-### Community 110 - "SettingsContainer.tsx"
-Cohesion: 0.50
-Nodes (4): Props, SettingsContainer(), styles, SubItem()
+### Community 110 - "expiry.ts"
+Cohesion: 0.38
+Nodes (5): ExpiryStatus, formatRelative(), getRelativeInfo(), getStatus(), RelativeExpiryInfo
 
 ### Community 111 - "editHistory.ts"
-Cohesion: 0.23
-Nodes (12): appendLog(), areValuesEqual(), cloneValue(), createLogEntry(), EditHistoryActionType, EditHistoryMeta, EditSessionLogEntry, HistoryEntry (+4 more)
+Cohesion: 0.29
+Nodes (10): appendLog(), areValuesEqual(), cloneValue(), createLogEntry(), EditHistoryMeta, HistoryEntry, HistoryState, shouldCoalesce() (+2 more)
 
-### Community 112 - "brand.ts"
-Cohesion: 0.20
-Nodes (7): BrandLogo(), CLAVISPASS_BRAND_NAME, CLAVISPASS_EXTENSION_DESCRIPTION, CLAVISPASS_EXTENSION_NAME, CLAVISPASS_POPUP_DESCRIPTION, CLAVISPASS_POPUP_EYEBROW, CLAVISPASS_POPUP_TITLE
+### Community 112 - "Vault Modules Context"
+Cohesion: 0.33
+Nodes (5): Important Boundaries, Reorder Flows, Shared Module UI, Vault Modules Context, Verification
 
-### Community 113 - "DropboxLoginButton.tsx"
-Cohesion: 0.17
-Nodes (12): expo-random, expo-web-browser, @fabianlars/tauri-plugin-oauth, ANDROID_AUTH_PROMPT_OPTIONS, getMobileRedirectUri(), randState(), SCOPES, getAppRedirectUri() (+4 more)
+### Community 113 - "appScheme.test.ts"
+Cohesion: 0.43
+Nodes (5): getAppRedirectUri(), getAppScheme(), Constants, resetExpoConfig(), setExpoConfig()
 
 ### Community 114 - "reactNativeReanimated.tsx"
 Cohesion: 0.25
@@ -668,9 +667,9 @@ Nodes (7): devDependencies, @types/chrome, @types/react, @types/react-dom, types
 Cohesion: 0.29
 Nodes (6): compilerOptions, allowSyntheticDefaultImports, composite, module, moduleResolution, include
 
-### Community 118 - "generatePassword.ts"
-Cohesion: 0.29
-Nodes (5): generatePassword(), LOWERCASE_CHAR_CODES, NUMBER_CHAR_CODES, SYMBOL_CHAR_CODES, UPPERCASE_CHAR_CODES
+### Community 118 - "vitest"
+Cohesion: 0.18
+Nodes (7): vitest, generatePassword(), LOWERCASE_CHAR_CODES, NUMBER_CHAR_CODES, SYMBOL_CHAR_CODES, UPPERCASE_CHAR_CODES, devices
 
 ### Community 119 - "tsconfig.json"
 Cohesion: 0.29
@@ -680,21 +679,21 @@ Nodes (6): expo/tsconfig.base, compilerOptions, moduleResolution, strict, exclud
 Cohesion: 0.17
 Nodes (11): Apple Developer Program, Arratel Setup Plan, Chrome Web Store, Goals, Google Play, Microsoft Store, Publisher Naming, References (+3 more)
 
-### Community 122 - "GoogleDriveClient.ts"
-Cohesion: 0.13
-Nodes (20): buildMultipartBody(), escapeDriveQueryString(), fetchFile(), fetchUserInfo(), findFileIdByName(), GoogleTokenRefreshError, readJsonSafe(), readTextSafe() (+12 more)
+### Community 121 - "pinnedEntries.ts"
+Cohesion: 0.60
+Nodes (4): comparePinnedFirst(), isPinnedEntry(), orderPinnedFirst(), sortPinnedFirst()
 
 ### Community 123 - "CryptoProvider"
-Cohesion: 0.19
-Nodes (15): CryptoProvider, decryptVaultV1(), encryptVaultV1(), verifyVaultV1Provider(), makeV2KeywrapAadBytes(), makeV2PayloadAadBytes(), te, V2_KEYWRAP_AAD_OBJECT (+7 more)
+Cohesion: 0.18
+Nodes (16): CryptoProvider, assertPositiveSafeInteger(), decryptVaultV1(), encryptVaultV1(), verifyVaultV1Provider(), makeV2KeywrapAadBytes(), makeV2PayloadAadBytes(), te (+8 more)
 
 ### Community 124 - "TotpModule.tsx"
-Cohesion: 0.13
-Nodes (16): otpauth, react-native-circular-progress, AnalysisEntry(), Props, Props, styles, TotpItem(), styles (+8 more)
+Cohesion: 0.29
+Nodes (8): otpauth, styles, Totp(), TotpModule(), TotpModuleModuleProps, codeFromUri(), parseOtpauth(), TotpAlgo
 
-### Community 126 - "AnimatedContainer"
-Cohesion: 0.10
-Nodes (34): expo-blur, @kichiyaki/react-native-barcode-generator, @react-navigation/native, react-qr-code, HomeStackParamList, Stack, CardItem(), Props (+26 more)
+### Community 126 - "model/types.ts"
+Cohesion: 0.06
+Nodes (71): Standard Screen Structure, expo-camera, expo-image, @kichiyaki/react-native-barcode-generator, react-native-draggable-flatlist, react-native-pdf, @react-navigation/native, @react-navigation/native-stack (+63 more)
 
 ### Community 127 - "macOS"
 Cohesion: 0.33
@@ -724,17 +723,13 @@ Nodes (3): *.jpg, *.png, *.svg
 Cohesion: 0.60
 Nodes (5): getActiveDomainContext(), normalizeLookupHost(), parseActiveDomain(), sanitizeHost(), ActiveDomainContext
 
-### Community 141 - "DocumentTypeEnum"
-Cohesion: 0.33
-Nodes (6): DocumentTypeEnum, BITWARDEN, CHROME, FIREFOX, KDBX, PCLOUD
-
 ### Community 142 - "linux"
 Cohesion: 0.67
 Nodes (3): linux, depends, deb
 
 ### Community 144 - "Crypto Context"
-Cohesion: 0.33
-Nodes (5): Core Files, Critical Rules, Crypto Context, Current Vault Format, Verification
+Cohesion: 0.40
+Nodes (4): Core Files, Critical Rules, Crypto Context, Verification
 
 ### Community 171 - "Screen Standardization Context"
 Cohesion: 0.40
@@ -744,10 +739,6 @@ Nodes (4): Common Refactor Targets, Files To Check First, Known Custom Screens, 
 Cohesion: 0.18
 Nodes (10): react, react-dom, @types/react, @types/react-dom, typescript, name, private, type (+2 more)
 
-### Community 173 - "ClavisPassHubDiscoveryResult.ts"
-Cohesion: 0.29
-Nodes (6): ClavisPassHubDiscoveryResult, ClavisPassHubDiscoveryStatus, DiscoveryCheckingResult, DiscoveryErrorResult, DiscoveryIdleResult, DiscoverySuccessResult
-
 ### Community 175 - "Firefox Store Release Notes"
 Cohesion: 0.25
 Nodes (7): Extension Identity, Firefox Store Release Notes, Listing, Pre-Submit Check, Privacy Policy Draft, Release Artifacts, Reviewer Notes
@@ -756,9 +747,9 @@ Nodes (7): Extension Identity, Firefox Store Release Notes, Listing, Pre-Submit 
 Cohesion: 0.25
 Nodes (7): i18n, Important Files, Menus And Dropdowns, Platform Model, Related UI Context, Titlebar And Chrome, UI Context
 
-### Community 177 - "useSetting"
-Cohesion: 0.10
-Nodes (20): expo-notifications, DEFAULT_KEYS, loadSettingWithTimeout(), SettingsContext, SettingsContextValue, SettingsState, useSetting(), buildPendingExpiryReminders() (+12 more)
+### Community 177 - "SettingsProvider.tsx"
+Cohesion: 0.14
+Nodes (12): DEFAULT_KEYS, loadSettingWithTimeout(), SettingsContext, SettingsContextValue, SettingsState, DataKey, StoreValueMap, I18nBridge() (+4 more)
 
 ### Community 178 - "ClavisPass Firefox Add-on Reviewer Build"
 Cohesion: 0.33
@@ -781,56 +772,56 @@ Cohesion: 0.33
 Nodes (5): Core Files, Current Product Direction, Identity Context, UI Rules, Verification
 
 ### Community 184 - "HomeScreen.tsx"
-Cohesion: 0.09
-Nodes (31): @gorhom/bottom-sheet, @react-native-masked-view/masked-view, @shopify/flash-list, TokenQRCodeModal(), AddValueModal(), ACTION_ICON, EditHistoryModal(), Props (+23 more)
+Cohesion: 0.12
+Nodes (20): isSystemAuthenticationAvailable(), extractUrlFromEntry(), buildEntryMeta(), resolveWindowControlsSide(), WindowControlsSide, WindowControlsStyle, headerSearchTransition, HomeScreen() (+12 more)
 
 ### Community 185 - "dependencies"
 Cohesion: 0.67
 Nodes (3): dependencies, react, react-dom
 
 ### Community 189 - "CustomTitlebar.tsx"
-Cohesion: 0.12
-Nodes (18): Chrome And Drag Regions, Core Files, Desktop And Tauri Context, Fast Access, Runtime Model, Tauri Responsibilities, showMainWindow(), StartBehavior (+10 more)
+Cohesion: 0.08
+Nodes (29): Chrome And Drag Regions, Core Files, Desktop And Tauri Context, Fast Access, Runtime Model, Tauri Responsibilities, showMainWindow(), StartBehavior (+21 more)
 
 ### Community 190 - "pkce.web.ts"
 Cohesion: 0.80
 Nodes (4): base64Url(), createPkcePair(), randomBytes(), toCodeChallenge()
 
 ### Community 195 - "VaultProvider.tsx"
-Cohesion: 0.11
-Nodes (20): VaultContext, VaultContextType, VaultData, FolderSchema, ValuesListTypeSchema, VaultDataType, VaultDataTypeSchema, VaultEntryTombstone (+12 more)
+Cohesion: 0.14
+Nodes (16): VaultContext, VaultData, FolderSchema, ValuesListTypeSchema, VaultDataType, VaultEntryTombstoneSchema, VaultDeviceSchema, VaultDeviceType (+8 more)
 
 ### Community 196 - "GlobalClipboardSnackbar.tsx"
 Cohesion: 0.25
 Nodes (8): clipboardClearScheduler, Handler, handlers, subscribeClipboardCopied(), unsubscribeClipboardCopied(), ClipboardCopyPayload, GlobalClipboardSnackbar(), msToSecCeil()
 
 ### Community 197 - "CloudProvider.tsx"
-Cohesion: 0.26
-Nodes (15): CloudProvider(), isInvalidGrant(), OAuthRefreshError, Props, StoredAuth, TokenContext, logout(), clearClavisPassHubVaultEtag() (+7 more)
+Cohesion: 0.12
+Nodes (24): expo-local-authentication, CloudProvider(), isInvalidGrant(), OAuthRefreshError, Props, StoredAuth, TokenContext, TokenContextValue (+16 more)
 
-### Community 204 - "SettingsScreen.tsx"
-Cohesion: 0.08
-Nodes (41): expo-local-authentication, expo-updates, simple-icons, useContentProtection(), Auth(), Props, authenticateUser(), invokeTauriSystemAuth() (+33 more)
+### Community 204 - "Modal"
+Cohesion: 0.07
+Nodes (35): expo-document-picker, @tauri-apps/plugin-dialog, useContentProtection(), VaultContextType, FilterAnalysisModal(), Props, AppearanceSettingsSection(), Props (+27 more)
 
 ## Knowledge Gaps
 - **128 isolated node(s):** `react`, `react-dom`, `@types/chrome`, `@types/react`, `@types/react-dom` (+123 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1626 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **41 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1627 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **42 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `vitest` connect `vitest` to `react-native`, `logger.ts`, `package.json`, `store.ts`, `ClavisPassHubClient.ts`, `decryptVaultContent.ts`, `hotkeys.ts`, `react-native-reanimated`, `GoogleDriveLoginButton.tsx`, `createUniqueID`, `triggerGlobalError`, `HomeScreen.tsx`, `vite.config.ts`, `model/types.ts`, `DeviceStorageClient.ts`, `getTemplate.ts`, `VaultProvider.tsx`, `modulePolicy.ts`, `Sync.tsx`, `withIosGoogleOAuthScheme.js`, `DropboxLoginButton.tsx`, `generatePassword.ts`, `GoogleDriveClient.ts`?**
-  _High betweenness centrality (0.096) - this node is a cross-community bridge._
+- **Why does `vitest` connect `vitest` to `store.ts`, `getModule.tsx`, `LoginScreen.tsx`, `withIosGoogleOAuthScheme.js`, `package.json`, `VaultProvider.tsx`, `reactNative.ts`, `DraggableModulesList.shared.tsx`, `GoogleDriveLoginButton.tsx`, `appScheme.test.ts`, `ValuesType.ts`, `DeviceStorageClient.ts`, `AddValueModal.tsx`, `ClavisPassHubClient.ts`, `vite.config.ts`, `pinnedEntries.ts`, `decryptVaultContent.ts`?**
+  _High betweenness centrality (0.095) - this node is a cross-community bridge._
 - **What connects `react`, `react-dom`, `@types/chrome` to the rest of the system?**
   _128 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `ModulesEnum` be split into smaller, more focused modules?**
-  _Cohesion score 0.0318385042677144 - nodes in this community are weakly interconnected._
-- **Why does `react-native` connect `react-native` to `logger.ts`, `package.json`, `useTheme`, `App.tsx`, `EditScreen.tsx`, `ListItem.tsx`, `BrowserExtensionsScreen.tsx`, `useVault`, `AnalysisDetailScreen.tsx`, `AnimatedPressable`, `FastAccess.ts`, `store.ts`, `MenuItem`, `isTauri.ts`, `Header`, `UpdateManager.tsx`, `hotkeys.ts`, `LoginScreen.tsx`, `Login.tsx`, `react-native-reanimated`, `useAuth`, `GoogleDriveLoginButton.tsx`, `CreditCardModule.tsx`, `useSetting`, `vcardExport.ts`, `HomeScreen.tsx`, `model/types.ts`, `CustomTitlebar.tsx`, `NoteModule.tsx`, `AttachmentModule.tsx`, `AppChip`, `CloudProvider.tsx`, `GlobalClipboardSnackbar.tsx`, `SettingsScreen.tsx`, `AuthProvider.tsx`, `DevModeProvider.tsx`, `AttachmentPreviewScreen.native.tsx`, `ScanScreen.tsx`, `errorBus.ts`, `Sync.tsx`, `detectTauriEnvironment`, `ref_react`, `container/AnimatedOpacityContainer.tsx`, `SettingsContainer.tsx`, `DropboxLoginButton.tsx`, `TotpModule.tsx`, `AnimatedContainer`?**
-  _High betweenness centrality (0.049) - this node is a cross-community bridge._
+- **Should `ModulesEnum.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.05741626794258373 - nodes in this community are weakly interconnected._
+- **Why does `react-native` connect `react-native` to `ModulesEnum.ts`, `getModule.tsx`, `package.json`, `DigitalCardModule.tsx`, `App.tsx`, `EditScreen.tsx`, `react-i18next`, `useTheme`, `IdentityDetailScreen.tsx`, `AnalysisScreen.tsx`, `FastAccess.ts`, `AnalysisDetailScreen.tsx`, `ClavisPassHubClient.ts`, `ref_react`, `isTauri.ts`, `LeftSideBar.tsx`, `UpdateManager.tsx`, `store.ts`, `LoginScreen.tsx`, `AnimatedLogo.tsx`, `DraggableModulesList.shared.tsx`, `GoogleDriveLoginButton.tsx`, `CreditCardModule.tsx`, `AddValueModal.tsx`, `HomeScreen.tsx`, `CustomTitlebar.tsx`, `AppChip`, `AttachmentModule.tsx`, `ModulesEnum`, `CloudProvider.tsx`, `GlobalClipboardSnackbar.tsx`, `Modal`, `mobileUpdater.ts`, `Timestamp.ts`, `ContentProtectionProvider.tsx`, `ExpiryNotificationScheduler.tsx`, `SettingsScreen.tsx`, `detectTauriEnvironment`, `ThemeProvider.tsx`, `container/AnimatedOpacityContainer.tsx`, `TotpModule.tsx`, `model/types.ts`?**
+  _High betweenness centrality (0.048) - this node is a cross-community bridge._
 - **Should `dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.01904761904761905 - nodes in this community are weakly interconnected._
 - **Why does `dependencies` connect `dependencies` to `package.json`?**
-  _High betweenness centrality (0.038) - this node is a cross-community bridge._
-- **Should `react-native` be split into smaller, more focused modules?**
-  _Cohesion score 0.11842105263157894 - nodes in this community are weakly interconnected._
+  _High betweenness centrality (0.037) - this node is a cross-community bridge._
+- **Should `getModule.tsx` be split into smaller, more focused modules?**
+  _Cohesion score 0.06374085684430512 - nodes in this community are weakly interconnected._
