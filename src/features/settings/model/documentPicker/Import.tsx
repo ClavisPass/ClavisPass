@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import * as DocumentPicker from "expo-document-picker";
 import { Button, Icon, Text, TextInput } from "react-native-paper";
-import { Platform, StyleSheet, View } from "react-native";
+import { Keyboard, Platform, StyleSheet, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { ValuesListType } from "../../../vault/model/ValuesType";
@@ -211,6 +211,7 @@ function Import(props: Props) {
   const importSelectedKdbxFile = async () => {
     if (!pendingKdbxFile) return;
 
+    Keyboard.dismiss();
     try {
       const { importKdbx } = await import("./keepass/importKdbx");
       const imported = await importKdbx(pendingKdbxFile.data, value);
@@ -407,6 +408,7 @@ function Import(props: Props) {
                 <Button
                   style={styles.passwordModalButton}
                   onPress={() => {
+                    Keyboard.dismiss();
                     setPendingKdbxFile(null);
                     setModalVisible(false);
                   }}
@@ -427,6 +429,7 @@ function Import(props: Props) {
             ) : (
               <Button
                 onPress={() => {
+                  Keyboard.dismiss();
                   pickDocument();
                   setModalVisible(false);
                 }}

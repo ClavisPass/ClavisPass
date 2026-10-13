@@ -1316,7 +1316,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         gap: homeSpacing.sm,
         justifyContent: "flex-start",
         paddingLeft: 0,
-        paddingRight: 0,
+        paddingRight: homeSpacing.sm,
         paddingTop: 0,
         paddingBottom: homeSpacing.xs,
       }}
@@ -1513,7 +1513,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
 
   const syncBar = (
     <Sync
-      bottomPadding={isCompactHeader ? 0 : undefined}
+      bottomPadding={isCompactHeader ? homeSpacing.sm : undefined}
+      leftPadding={isCompactHeader ? 0 : undefined}
+      rightPadding={isCompactHeader ? homeSpacing.sm : undefined}
       refreshData={refreshData}
       refreshing={refreshing}
       setRefreshing={setRefreshing}
@@ -1779,25 +1781,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               width: "100%",
               display: "flex",
               flexDirection: "column",
-              justifyContent: "space-between",
+              justifyContent: isCompactHeader ? "center" : "space-between",
+              minHeight: isCompactHeader
+                ? 37 + Constants.statusBarHeight
+                : undefined,
               paddingHorizontal:
                 isCompactHeader && searchHeaderVisible
                   ? TITLEBAR_HEIGHT > 0
                     ? homeSpacing.xs
                     : homeSpacing.sm
                   : homeGutter,
-              paddingTop:
-                Constants.statusBarHeight +
-                (!isCompactHeader
-                  ? homeSpacing.xs
-                  : TITLEBAR_HEIGHT > 0
-                    ? homeSpacing.xs
-                    : homeSpacing.sm),
-              paddingBottom: !isCompactHeader
-                ? 2
-                : TITLEBAR_HEIGHT > 0
-                  ? homeSpacing.xs
-                  : homeSpacing.sm,
+              paddingTop: Constants.statusBarHeight + homeSpacing.xs,
+              paddingBottom: isCompactHeader ? 3 : 2,
               marginBottom: 0,
               borderBottomLeftRadius: 0,
               borderBottomRightRadius: 0,
@@ -1817,7 +1812,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                 marginTop: 0,
                 marginBottom: 0,
                 width: "100%",
-                minHeight: isCompactHeader ? undefined : 34,
+                minHeight: 34,
                 gap: homeSpacing.sm,
                 position: "relative",
                 zIndex: 4,
@@ -1897,15 +1892,19 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                       minWidth: 0,
                       position: "relative",
                       zIndex: 5,
+                      paddingLeft: isCompactHeader ? homeSpacing.sm : 0,
                     },
                     isFocused && !searchHeaderVisible ? webDragStyle : null,
                   ]}
                 >
-                  <Logo width={20} height={20} />
+                  <Logo
+                    width={isCompactHeader ? 18 : 20}
+                    height={isCompactHeader ? 18 : 20}
+                  />
                   <Text
                     style={{
                       fontFamily: "LexendExa_400Regular",
-                      fontSize: 16,
+                      fontSize: isCompactHeader ? 15 : 16,
                       lineHeight: 16,
                       color: theme.colors.onSurfaceVariant,
                       userSelect: "none",
@@ -1953,7 +1952,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                     onPress={openHeaderSearch}
                     style={{
                       margin: 0,
-                      marginRight: 2,
+                      marginRight: 0,
                       width: 36,
                       height: 32,
                       position: "relative",

@@ -701,8 +701,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const editSectionSpacing = 8;
   const editActionChipsHeight = 30 + editSectionSpacing * 2;
   const editControlOverlayHeight = 40 + editSectionSpacing * 2;
-  const editListTopFadeStart = 34;
-  const editListTopFadeEnd = editControlOverlayHeight + 0;
+  const editListTopFadeStart = 0;
+  const editListTopFadeSolidEnd = editControlOverlayHeight / 2;
+  const editListTopFadeEnd = editControlOverlayHeight + editSectionSpacing;
+  const editListTopFadeSolidLocation =
+    editListTopFadeSolidEnd / editListTopFadeEnd;
   const actionChipHorizontalPadding = 0;
   const moreActionKey = "__more";
 
@@ -1204,8 +1207,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   const webEditListFadeMaskStyle =
     Platform.OS === "web"
       ? ({
-          WebkitMaskImage: `linear-gradient(to bottom, transparent 0px, transparent ${editListTopFadeStart}px, black ${editListTopFadeEnd}px, black 100%)`,
-          maskImage: `linear-gradient(to bottom, transparent 0px, transparent ${editListTopFadeStart}px, black ${editListTopFadeEnd}px, black 100%)`,
+          WebkitMaskImage: `linear-gradient(to bottom, transparent ${editListTopFadeStart}px, transparent ${editListTopFadeSolidEnd}px, black ${editListTopFadeEnd}px, black 100%)`,
+          maskImage: `linear-gradient(to bottom, transparent ${editListTopFadeStart}px, transparent ${editListTopFadeSolidEnd}px, black ${editListTopFadeEnd}px, black 100%)`,
         } as any)
       : null;
   const nativeEditListFadeColors: readonly [
@@ -1215,8 +1218,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   ] = darkmode
     ? [theme.colors.background, theme.colors.background, "rgba(26, 26, 26, 0)"]
     : [
-        "rgba(248, 248, 248, 0.78)",
-        "rgba(248, 248, 248, 0.78)",
+        "rgb(248, 248, 248)",
+        "rgb(248, 248, 248)",
         "rgba(248, 248, 248, 0)",
       ];
 
@@ -1242,7 +1245,8 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
           width > 600 || !canUndo ? undefined : (
             <View
               style={{
-                paddingHorizontal: 8,
+                paddingHorizontal: 0,
+                paddingRight: editSectionSpacing,
                 paddingBottom: editSectionSpacing,
                 width: "100%",
               }}
@@ -1291,7 +1295,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         <LinearGradient
           pointerEvents="none"
           colors={nativeEditListFadeColors}
-          locations={[0, 0.16, 0.58]}
+          locations={[0, editListTopFadeSolidLocation, 1]}
           style={{
             position: "absolute",
             top: 0,
@@ -1342,6 +1346,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
               paddingTop: 0,
               paddingBottom: 0,
               paddingLeft: editSectionSpacing,
+              paddingRight: editSectionSpacing,
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
@@ -1363,11 +1368,11 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             {renderEditControlGroup()}
             {hasFastAccess ? (
               <AppTooltip title={t("common:fastAccess")}>
-                <View style={{ flexShrink: 0, marginRight: editSectionSpacing }}>
+                <View style={{ flexShrink: 0 }}>
                   <SquaredContainerButton onPress={openFastAccessFeature}>
                     <AppIcon
                       name={"tooltip-account"}
-                      color={editControlContentColor}
+                      color={theme.colors.primary}
                       size={20}
                     />
                   </SquaredContainerButton>

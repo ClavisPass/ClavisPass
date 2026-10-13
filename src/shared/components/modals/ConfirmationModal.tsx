@@ -34,10 +34,8 @@ function ConfirmationModal({
     <Modal visible={visible} onDismiss={onDismiss} avoidKeyboard>
       <ModalSurface
         width={300}
-        minHeight={170}
         title={title}
         description={message}
-        contentStyle={{ flex: 1 }}
         footer={
           <ModalActions>
             <Button

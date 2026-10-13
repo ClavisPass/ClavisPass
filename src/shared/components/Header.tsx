@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Platform, View, useWindowDimensions } from "react-native";
+import { Platform, StyleSheet, View, useWindowDimensions } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import Constants from "expo-constants";
 import FocusAwareStatusBar from "./FocusAwareStatusBar";
@@ -69,13 +69,17 @@ function Header(props: Props) {
         flexDirection: "column",
         marginBottom: props.marginBottom ?? 0,
         paddingTop: Constants.statusBarHeight + 4,
-        paddingBottom: 2,
+        paddingBottom: 3,
         borderRadius: 12,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
-        borderBottomLeftRadius: 12,
-        borderBottomRightRadius: 12,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
         justifyContent: "center",
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderTopWidth: 0,
+        borderLeftWidth: 0,
+        borderRightWidth: 0,
       }}
     >
       <View

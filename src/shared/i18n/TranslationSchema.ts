@@ -704,6 +704,7 @@ export type TranslationSchema = {
     key: string;
     note: string;
     password: string;
+    passwordStrength: string;
     person: string;
     personDisplayName: string;
     personFirstName: string;

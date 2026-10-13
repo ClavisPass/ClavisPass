@@ -1,7 +1,7 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Platform, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { Button, Divider, Text } from "react-native-paper";
 
@@ -33,9 +33,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    gap: 8,
+    paddingHorizontal: 0,
+    paddingTop: 0,
+    paddingBottom: 8,
   },
   headerLeft: {
     flex: 1,
@@ -43,21 +44,21 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   progressWrap: {
-    width: 58,
-    height: 58,
+    width: 54,
+    height: 54,
     alignItems: "center",
     justifyContent: "center",
   },
   body: {
-    paddingHorizontal: 14,
-    paddingTop: 14,
-    paddingBottom: 14,
+    paddingHorizontal: 0,
+    paddingTop: 8,
+    paddingBottom: 0,
   },
   codeSurface: {
     borderRadius: 12,
-    paddingLeft: 14,
+    paddingLeft: 16,
     paddingRight: 8,
-    paddingVertical: 12,
+    paddingVertical: 8,
     borderWidth: StyleSheet.hairlineWidth,
     flexDirection: "row",
     alignItems: "center",
@@ -75,11 +76,10 @@ const styles = StyleSheet.create({
   scanButton: {
     borderRadius: 12,
     minWidth: 170,
-    transform: [{ translateX: -14 }],
   },
 });
 
-export function Totp(props: { value: string; variant?: "module" | "list" }) {
+export function Totp(props: { value: string }) {
   const { theme, darkmode } = useTheme();
 
   const [code, setCode] = useState<string>("------");
@@ -114,30 +114,19 @@ export function Totp(props: { value: string; variant?: "module" | "list" }) {
     info?.issuer && info?.account
       ? info.account
       : (info?.issuer ?? info?.account ?? "");
-  const isListVariant = props.variant === "list";
-  const useTransparentListShell = isListVariant && Platform.OS === "web";
-  const headerPaddingVertical = isListVariant ? 12 : 8;
-  const bodyPaddingTop = isListVariant ? 14 : 8;
-  const bodyPaddingBottom = isListVariant ? 14 : 8;
 
   return (
     <View
       style={[
         styles.card,
         {
-          backgroundColor: useTransparentListShell
-            ? "transparent"
-            : theme.colors.background,
-          borderColor: useTransparentListShell
-            ? "transparent"
-            : darkmode
-              ? theme.colors.outlineVariant
-              : "white",
-          borderWidth: useTransparentListShell ? 0 : StyleSheet.hairlineWidth,
+          backgroundColor: "transparent",
+          borderColor: "transparent",
+          borderWidth: 0,
         },
       ]}
     >
-      <View style={[styles.header, { paddingVertical: headerPaddingVertical }]}>
+      <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Text
             variant="labelMedium"
@@ -181,12 +170,7 @@ export function Totp(props: { value: string; variant?: "module" | "list" }) {
         </View>
       </View>
       <Divider />
-      <View
-        style={[
-          styles.body,
-          { paddingTop: bodyPaddingTop, paddingBottom: bodyPaddingBottom },
-        ]}
-      >
+      <View style={styles.body}>
         <View
           style={[
             styles.codeSurface,
@@ -214,7 +198,7 @@ type TotpModuleModuleProps = {
 
 function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
   const didMount = useRef(false);
-  const { globalStyles, theme } = useTheme();
+  const { theme } = useTheme();
   const { t } = useTranslation();
 
   const [value, setValue] = useState(props.value);
@@ -245,7 +229,7 @@ function TotpModule(props: TotpModuleType & Props & TotpModuleModuleProps) {
       icon={MODULE_ICON[ModulesEnum.TOTP]}
       fastAccess={props.fastAccess}
     >
-      <View style={[globalStyles.moduleView, styles.content]}>
+      <View style={styles.content}>
         {value !== "" ? (
           <Totp value={value} />
         ) : (

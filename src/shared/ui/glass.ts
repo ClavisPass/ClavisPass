@@ -41,12 +41,10 @@ export function getItemSurfaceStyle(theme: AppTheme): ViewStyle {
   const shadowColor = theme.dark ? "#000000" : "#20263A";
 
   return {
-    backgroundColor: theme.dark
-      ? "rgba(255, 255, 255, 0.075)"
-      : "rgba(255, 255, 255, 0.98)",
+    backgroundColor: theme.dark ? "#2B2B2B" : "#FFFFFF",
     borderColor: theme.dark
-      ? "rgba(255, 255, 255, 0.075)"
-      : "rgba(118, 118, 118, 0.1)",
+      ? "#2B2B2B"
+      : "#F1F1F1",
     shadowColor,
     shadowOffset: { width: 0, height: theme.dark ? 2 : 3 },
     shadowOpacity: 0,

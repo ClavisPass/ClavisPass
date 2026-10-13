@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Keyboard,
   StyleProp,
   StyleSheet,
   useWindowDimensions,
@@ -61,67 +62,92 @@ function ModalSurface({
       : Math.min(minHeight, resolvedMaxHeight);
   const hasHeader = Boolean(title || description);
 
-  return (
-    <View
-      style={[
-        styles.surface,
-        {
-          width: resolvedWidth,
-          height: resolvedHeight,
-          minHeight: resolvedMinHeight,
-          maxHeight: resolvedMaxHeight,
-          borderColor: theme.colors.outlineVariant,
-          backgroundColor: theme.colors.background,
-        },
-        style,
-      ]}
-    >
-      {hasHeader ? (
-        <>
-          <View style={styles.header}>
-            {title ? (
-              <Text variant="headlineSmall" style={styles.unselectable}>
-                {title}
-              </Text>
-            ) : null}
-            {description ? (
-              <Text
-                variant="bodyMedium"
-                style={[styles.unselectable, styles.description]}
-              >
-                {description}
-              </Text>
-            ) : null}
-          </View>
-          {separatedHeader ? <Divider /> : null}
-        </>
-      ) : null}
+  const layoutStyle = {
+    width: resolvedWidth,
+    height: resolvedHeight,
+    minHeight: resolvedMinHeight,
+  };
+  const surfaceLayoutStyle = {
+    ...layoutStyle,
+    maxHeight: resolvedMaxHeight,
+  };
 
+  return (
+    <View style={[styles.surfaceFrame, layoutStyle, style]}>
       <View
         style={[
-          styles.content,
-          padded ? styles.paddedContent : null,
-          contentStyle,
+          styles.surface,
+          surfaceLayoutStyle,
+          {
+            borderColor: theme.colors.outlineVariant,
+            backgroundColor: theme.colors.background,
+          },
         ]}
       >
-        {children}
-      </View>
+        {hasHeader ? (
+          <>
+            <View style={styles.header}>
+              {title ? (
+                <Text variant="headlineSmall" style={styles.unselectable}>
+                  {title}
+                </Text>
+              ) : null}
+              {description ? (
+                <Text
+                  variant="bodyMedium"
+                  style={[styles.unselectable, styles.description]}
+                >
+                  {description}
+                </Text>
+              ) : null}
+            </View>
+            {separatedHeader ? <Divider /> : null}
+          </>
+        ) : null}
 
-      {footer ? (
-        <>
-          {separatedHeader ? <Divider /> : null}
-          {footer}
-        </>
-      ) : null}
+        <View
+          style={[
+            styles.content,
+            padded ? styles.paddedContent : null,
+            contentStyle,
+          ]}
+        >
+          {children}
+        </View>
+
+        {footer ? (
+          <>
+            {separatedHeader ? <Divider /> : null}
+            {footer}
+          </>
+        ) : null}
+      </View>
     </View>
   );
 }
 
 function ModalActions({ children, style }: ModalActionsProps) {
-  return <View style={[styles.actions, style]}>{children}</View>;
+  const dismissingChildren = React.Children.map(children, (child) => {
+    if (!React.isValidElement(child)) return child;
+
+    const props = child.props as { onPress?: (...args: any[]) => void };
+    if (typeof props.onPress !== "function") return child;
+
+    return React.cloneElement(child as React.ReactElement<any>, {
+      onPress: (...args: any[]) => {
+        Keyboard.dismiss();
+        props.onPress?.(...args);
+      },
+    });
+  });
+
+  return <View style={[styles.actions, style]}>{dismissingChildren}</View>;
 }
 
 const styles = StyleSheet.create({
+  surfaceFrame: {
+    borderRadius: 12,
+  },
   surface: {
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,

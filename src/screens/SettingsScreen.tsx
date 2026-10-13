@@ -1126,6 +1126,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     closeCompactSearchIfEmpty();
   }, [closeCompactSearchIfEmpty]);
 
+  const handleSettingsContentResponderCapture = useCallback(() => {
+    closeCompactSearchIfEmpty();
+    return false;
+  }, [closeCompactSearchIfEmpty]);
+
   useEffect(() => {
     if (Platform.OS !== "web") return;
 
@@ -1371,6 +1376,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         />
         {settingsHeader}
         <View
+          onStartShouldSetResponderCapture={handleSettingsContentResponderCapture}
           style={{
             flex: 1,
             width: "100%",
@@ -1390,6 +1396,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             ref={scrollRef}
             style={[styles.scrollView, settingsWebListFadeMaskStyle]}
             contentContainerStyle={settingsScrollContentStyle}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
+            onScrollBeginDrag={closeCompactSearchIfEmpty}
           >
             {visibleSettingsSections.sync ? (
               <SettingsContainer

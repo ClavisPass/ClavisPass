@@ -108,11 +108,6 @@ function TokenQRCodeModal(props: Props) {
               borderRadius: 12,
               borderWidth: StyleSheet.hairlineWidth,
               borderColor: theme.colors.outlineVariant,
-              shadowColor: "#000",
-              shadowOpacity: 0.12,
-              shadowRadius: 14,
-              shadowOffset: { width: 0, height: 6 },
-              elevation: 5,
             }}
           >
             <QRCode

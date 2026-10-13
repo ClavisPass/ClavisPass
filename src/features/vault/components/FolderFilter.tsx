@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   mobileListContent: {
     alignItems: "center",
     paddingLeft: 0,
-    paddingRight: 8,
+    paddingRight: 0,
   },
 });
 

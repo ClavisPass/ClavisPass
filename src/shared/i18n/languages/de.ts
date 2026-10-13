@@ -788,6 +788,7 @@ const de: TranslationSchema = {
     key: "Schlüssel",
     note: "Notiz",
     password: "Passwort",
+    passwordStrength: "Stärke",
     person: "Person",
     personDisplayName: "Anzeigename",
     personFirstName: "Vorname",

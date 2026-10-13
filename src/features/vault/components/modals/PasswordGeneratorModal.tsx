@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Keyboard, StyleSheet, View } from "react-native";
 import {
   Divider,
   IconButton,
@@ -165,6 +165,7 @@ function PasswordGeneratorModal(props: Props) {
           maxWidth={300}
           text={t("common:use")}
           onPress={() => {
+            Keyboard.dismiss();
             props.changePassword(genPassword);
             hideModal();
           }}

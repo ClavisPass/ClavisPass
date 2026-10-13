@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Keyboard,
   Platform,
+  StyleSheet,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -111,6 +112,7 @@ type SearchHeaderProps = {
   onBack?: () => void;
   resetLabel?: string;
   marginBottom?: number;
+  dismissCompactSearchSignal?: number;
 };
 
 export default function SearchHeader({
@@ -122,6 +124,7 @@ export default function SearchHeader({
   onBack,
   resetLabel = "Reset",
   marginBottom = 0,
+  dismissCompactSearchSignal = 0,
 }: SearchHeaderProps) {
   const { theme, darkmode } = useTheme();
   const { width } = useWindowDimensions();
@@ -199,6 +202,15 @@ export default function SearchHeader({
     setSearchHeaderVisible(false);
   }, [isCompactHeader, isFocused, searchHeaderVisible, value]);
 
+  const lastDismissSignalRef = useRef(dismissCompactSearchSignal);
+
+  useEffect(() => {
+    if (lastDismissSignalRef.current === dismissCompactSearchSignal) return;
+
+    lastDismissSignalRef.current = dismissCompactSearchSignal;
+    closeCompactSearchIfEmpty();
+  }, [closeCompactSearchIfEmpty, dismissCompactSearchSignal]);
+
   const openHeaderSearch = useCallback(() => {
     if (suppressNextCompactSearchOpenRef.current) {
       suppressNextCompactSearchOpenRef.current = false;
@@ -272,14 +284,17 @@ export default function SearchHeader({
         flexDirection: "column",
         marginBottom,
         paddingTop: Constants.statusBarHeight + 4,
-        paddingBottom: 2,
+        paddingBottom: 3,
         borderRadius: 12,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
-        borderBottomLeftRadius: 12,
-        borderBottomRightRadius: 12,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
         justifyContent: "center",
+        borderBottomWidth: StyleSheet.hairlineWidth,
         borderTopWidth: 0,
+        borderLeftWidth: 0,
+        borderRightWidth: 0,
       }}
     >
       <View

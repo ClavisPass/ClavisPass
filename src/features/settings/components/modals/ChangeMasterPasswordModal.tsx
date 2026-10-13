@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { Keyboard, View, StyleSheet } from "react-native";
 import { useEffect, useRef, useState } from "react";
 import { Text } from "react-native-paper";
 import { useTranslation } from "react-i18next";
@@ -91,6 +91,8 @@ function ChangeMasterPasswordModal(props: Props) {
   };
 
   const verifyCurrentPassword = async () => {
+    Keyboard.dismiss();
+
     if (!currentPassword) {
       flashError();
       textInputRef.current?.focus?.();
@@ -113,6 +115,7 @@ function ChangeMasterPasswordModal(props: Props) {
   const applyNewPassword = async () => {
     if (passwordNotEqual || !newPassword || !confirmPassword) return;
 
+    Keyboard.dismiss();
     setProcessing(true);
     try {
       const data = vault.exportFullData();

@@ -22,7 +22,6 @@ export default function HomeStack() {
         headerShown: false,
         animation: "fade",
         freezeOnBlur: true,
-        contentStyle: { backgroundColor: "transparent" },
       }}
     >
       <Stack.Screen name="Home" component={HomeScreen} />

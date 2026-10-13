@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   ripple: {
+    padding: 8,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -74,7 +75,7 @@ function TotpItem(props: Props) {
           style={styles.ripple}
           onPress={props.onPress}
         >
-          <Totp value={props.value} variant="list" />
+          <Totp value={props.value} />
         </AnimatedPressable>
       </Animated.View>
     </Animated.View>

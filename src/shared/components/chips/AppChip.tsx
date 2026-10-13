@@ -55,14 +55,14 @@ export function getAppChipSurfaceStyle({
   selected?: boolean;
 }) {
   const chipBackgroundColor = darkmode
-    ? "rgba(255, 255, 255, 0.075)"
-    : "rgba(120, 127, 246, 0.09)";
+    ? "#2B2B2B"
+    : "#ECEDF8";
   const selectedChipBackgroundColor = darkmode
-    ? "rgba(120, 127, 246, 0.18)"
-    : "rgba(120, 127, 246, 0.16)";
+    ? "#2B2C42"
+    : "#E4E5F8";
   const chipBorderColor = darkmode
-    ? "rgba(120, 127, 246, 0.32)"
-    : "rgba(120, 127, 246, 0.28)";
+    ? "#383A60"
+    : "#D4D5F7";
   const glassChipStyle =
     Platform.OS === "web"
       ? ({

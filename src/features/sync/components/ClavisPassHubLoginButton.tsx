@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Platform, View } from "react-native";
+import { Keyboard, Platform, View } from "react-native";
 import {
   ActivityIndicator,
   Icon,
@@ -123,6 +123,8 @@ function ClavisPassHubLoginButton() {
   }, [hostUrl, visible]);
 
   const handleConnect = useCallback(async () => {
+    Keyboard.dismiss();
+
     const normalizedHostUrl = normalizeClavisPassHubHostUrl(hostUrl);
     const normalizedUsername = username.trim();
 

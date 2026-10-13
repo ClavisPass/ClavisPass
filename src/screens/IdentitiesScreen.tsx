@@ -66,6 +66,8 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
     setTitlebarOverlayDragEnabled,
   } = useTheme();
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [dismissCompactSearchSignal, setDismissCompactSearchSignal] =
+    React.useState(0);
   const screenContentStyle = getScreenContentStyle(theme);
   const surfaceStyle = getItemSurfaceStyle(theme);
   const subtleSurfaceStyle = {
@@ -128,6 +130,11 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
       ),
     [identities],
   );
+
+  const dismissCompactSearchIfEmpty = React.useCallback(() => {
+    setDismissCompactSearchSignal((current) => current + 1);
+    return false;
+  }, []);
 
   const renderIdentityCard = (identity: IdentityCluster, index: number) => (
     <Animated.View
@@ -214,9 +221,11 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
         value={searchQuery}
         onChangeText={setSearchQuery}
         resetLabel={t("common:reset")}
+        dismissCompactSearchSignal={dismissCompactSearchSignal}
       />
 
       <View
+        onStartShouldSetResponderCapture={dismissCompactSearchIfEmpty}
         style={{
           flex: 1,
           width: "100%",
@@ -225,6 +234,9 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
       >
         <ScrollView
           style={{ flex: 1, width: "100%" }}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
+          onScrollBeginDrag={dismissCompactSearchIfEmpty}
           contentContainerStyle={{
             gap: 8,
             paddingRight: SCROLLBAR_CONTENT_GAP,

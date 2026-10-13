@@ -40,12 +40,23 @@ type Props = {
   setRefreshing: (refreshing: boolean) => void;
   refreshData: () => void;
   bottomPadding?: number;
+  horizontalPadding?: number;
+  leftPadding?: number;
+  rightPadding?: number;
 };
 
 const Sync = (props: Props) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const { refreshing, setRefreshing, refreshData, bottomPadding = 4 } = props;
+  const {
+    refreshing,
+    setRefreshing,
+    refreshData,
+    bottomPadding = 4,
+    horizontalPadding = 8,
+    leftPadding,
+    rightPadding,
+  } = props;
 
   const auth = useAuth();
   const vault = useVault();
@@ -327,8 +338,8 @@ const Sync = (props: Props) => {
             width: "100%",
             paddingTop: 0,
             paddingBottom: bottomPadding,
-            paddingLeft: 8,
-            paddingRight: 8,
+            paddingLeft: leftPadding ?? horizontalPadding,
+            paddingRight: rightPadding ?? horizontalPadding,
           }}
         >
           <LinearGradient

@@ -45,8 +45,8 @@ Typical order:
 ## Item Surfaces
 
 - Standard repeated items should use `getItemSurfaceStyle(theme)`.
-- Light mode item surfaces are near-white frosted surfaces over the cool blue content panel.
-- Dark mode item surfaces are subtle translucent surfaces.
+- Light mode item surfaces are solid near-white surfaces over the cool blue content panel.
+- Dark mode item surfaces are solid flattened surfaces that visually match the former translucent look over the dark content panel.
 - Borders should be relaxed; separation primarily comes from a very soft, low-contrast shared shadow.
 - Keep item overflow visible when shadows need to render. Clip only the inner ripple/content layer when needed.
 
@@ -61,7 +61,7 @@ Current expected users of item surfaces:
 ## Chips
 
 - Chips use `AppChip`.
-- Chips should stay close to React Native Paper defaults: Paper container colors, compact local height/radius, and a subtle primary-tinted hairline border like the sidebar add button.
+- Chips should stay close to React Native Paper defaults: solid flattened Paper-like container colors, compact local height/radius, and a subtle primary-tinted hairline border like the sidebar add button.
 - Horizontal chip rows should scroll naturally on web/mobile; avoid extra left/right buttons unless a screen has a specific reason.
 - Compact chip containers should use `8px` side padding.
 - Labels should usually be neutral text, not primary, unless the chip is selected or a primary action.

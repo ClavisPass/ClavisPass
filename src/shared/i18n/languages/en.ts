@@ -770,6 +770,7 @@ const en: TranslationSchema = {
     key: "Key",
     note: "Note",
     password: "Password",
+    passwordStrength: "Strength",
     person: "Person",
     personDisplayName: "Display name",
     personFirstName: "First name",

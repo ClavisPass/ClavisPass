@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  Keyboard,
   Platform,
   Pressable,
   ScrollView,
@@ -91,6 +92,7 @@ function FolderModal(props: Props) {
     const name = searchQuery.trim();
     if (!name) return;
 
+    Keyboard.dismiss();
     const next = [
       ...props.folder,
       {

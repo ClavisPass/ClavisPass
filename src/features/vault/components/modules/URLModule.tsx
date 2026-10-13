@@ -65,16 +65,24 @@ function URLModule(props: URLModuleType & Props) {
       fastAccess={props.fastAccess}
     >
       <View style={globalStyles.moduleView}>
-        <View style={{ width: 30, alignItems: "center", marginRight: 4 }}>
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            alignItems: "center",
+            justifyContent: "center",
+            marginRight: 8,
+          }}
+        >
           {faviconUrl && isValid ? (
             <Image
-              style={{ width: 30, height: 30, margin: 0, borderRadius: 8 }}
+              style={{ width: 40, height: 40, margin: 0, borderRadius: 8 }}
               source={faviconUrl}
               contentFit="cover"
               transition={250}
             />
           ) : (
-            <Icon color={"lightgray"} source={"web-remove"} size={20} />
+            <Icon color={"lightgray"} source={"web-remove"} size={24} />
           )}
         </View>
         <View style={{ height: 40, flex: 1 }}>
