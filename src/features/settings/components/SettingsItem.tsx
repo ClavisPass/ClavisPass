@@ -132,7 +132,7 @@ function SettingsItem(props: Props) {
       style={[
         {
           marginVertical: 4,
-          borderRadius: 14,
+          borderRadius: 12,
           overflow: "visible",
         },
         surface
@@ -148,14 +148,14 @@ function SettingsItem(props: Props) {
           onPress={props.onPress}
           style={{
             cursor: "pointer",
-            borderRadius: 14,
+            borderRadius: 12,
             overflow: "hidden",
           }}
         >
           {content}
         </AnimatedPressable>
       ) : (
-        <View style={{ borderRadius: 14, overflow: "hidden" }}>{content}</View>
+        <View style={{ borderRadius: 12, overflow: "hidden" }}>{content}</View>
       )}
     </View>
   );

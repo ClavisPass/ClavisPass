@@ -687,7 +687,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
     emptyLabel: string;
     renderItem: (item: any, index: number) => React.ReactNode;
   }) => (
-    <View style={{ gap: 10 }}>
+    <View style={{ gap: 10, paddingBottom: GAP }}>
       <FiltersNarrow
         filterItems={filters}
         bucket={bucket}
@@ -778,6 +778,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
         style={{ width: "100%", ...screenContentStyle }}
         contentContainerStyle={{
           paddingRight: SCROLLBAR_CONTENT_GAP,
+          paddingBottom: 8,
           gap: GAP,
           alignSelf: "center",
           width: "100%",

@@ -24,10 +24,10 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     marginRight: 4,
     marginBottom: 8,
-    borderRadius: 14,
+    borderRadius: 12,
   },
   cardClip: {
-    borderRadius: 14,
+    borderRadius: 12,
     overflow: "hidden",
   },
   ripple: {

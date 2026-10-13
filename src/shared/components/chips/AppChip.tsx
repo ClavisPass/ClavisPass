@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
   },
   iconOnlyTouchable: {
     ...StyleSheet.absoluteFillObject,
+    borderRadius: 12,
   },
   iconOnlyContent: {
     flex: 1,

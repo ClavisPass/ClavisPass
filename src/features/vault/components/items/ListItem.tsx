@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     marginRight: 4,
     marginBottom: 4,
-    borderRadius: 14,
+    borderRadius: 12,
     overflow: "visible",
     height: 44,
     flexDirection: "row",
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   },
   rippleClip: {
     flex: 1,
-    borderRadius: 14,
+    borderRadius: 12,
     overflow: "hidden",
   },
   ripple: {
@@ -168,14 +168,14 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   swipeContainer: {
-    borderRadius: 14,
+    borderRadius: 12,
     overflow: "visible",
   },
   nativeSwipeFrame: {
     marginLeft: 4,
     marginRight: 4,
     marginBottom: 4,
-    borderRadius: 14,
+    borderRadius: 12,
     overflow: "visible",
   },
   swipeAction: {

@@ -148,20 +148,6 @@ function PasswordModule(props: PasswordModuleType & Props) {
           </View>
 
           <View style={styles.strengthHeader}>
-            <View style={styles.strengthLabelGroup}>
-              <Text
-                variant="bodySmall"
-                style={{ color: theme.colors.onSurfaceVariant }}
-              >
-                {t("modules:passwordStrength")}
-              </Text>
-              <Text
-                variant="bodySmall"
-                style={{ color: progressbarColor, fontWeight: "600" }}
-              >
-                {strengthLabel}
-              </Text>
-            </View>
             <View style={styles.strengthActions}>
               <AppChip
                 compact
@@ -177,6 +163,20 @@ function PasswordModule(props: PasswordModuleType & Props) {
               >
                 {t("common:generatePassword")}
               </AppChip>
+            </View>
+            <View style={styles.strengthLabelGroup}>
+              <Text
+                variant="bodySmall"
+                style={{ color: theme.colors.onSurfaceVariant }}
+              >
+                {t("modules:passwordStrength")}
+              </Text>
+              <Text
+                variant="bodySmall"
+                style={{ color: progressbarColor, fontWeight: "600" }}
+              >
+                {strengthLabel}
+              </Text>
             </View>
           </View>
         </View>

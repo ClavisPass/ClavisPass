@@ -117,12 +117,7 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
   const vault = useVault();
   const tabNav = useNavigation<BottomTabNavigationProp<AppTabsParamList>>();
   const { t } = useTranslation();
-  const {
-    globalStyles,
-    theme,
-    darkmode,
-    setHeaderSpacing,
-  } = useTheme();
+  const { globalStyles, theme, darkmode, setHeaderSpacing } = useTheme();
   const screenContentStyle = getScreenContentStyle(theme);
   const [displayName, setDisplayName] = useState("");
   const [draftDisplayName, setDraftDisplayName] = useState("");
@@ -237,6 +232,7 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
           contentContainerStyle={{
             gap: 8,
             paddingRight: SCROLLBAR_CONTENT_GAP,
+            paddingBottom: 8,
             alignSelf: "center",
             width: "100%",
             maxWidth: 980,
@@ -262,248 +258,83 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
             </View>
           ) : (
             <>
-            <View style={[styles.heroPanel, surfaceStyle]}>
-              <View style={styles.heroTopRow}>
-                <View style={styles.heroLogoShell}>
-                  <IdentityEmailLogo email={identity.email} size={56} />
-                </View>
-                <View style={{ flex: 1, minWidth: 0 }}>
-                  <Text
-                    variant="titleLarge"
-                    style={{ fontWeight: "900" }}
-                    numberOfLines={1}
-                  >
-                    {title}
-                  </Text>
-                  <Text style={{ opacity: 0.68 }} numberOfLines={1}>
-                    {identity.email}
-                  </Text>
-                </View>
-                <IconButton
-                  icon="pencil-outline"
-                  size={19}
-                  onPress={openRenameModal}
-                  accessibilityLabel={t("common:edit")}
-                  style={[
-                    styles.renameButton,
-                    { backgroundColor: `${theme.colors.primary}10` },
-                  ]}
-                  iconColor={theme.colors.primary}
-                />
-              </View>
-
-              <View style={styles.heroMetricRow}>
-                <View style={[styles.heroMetric, softSurfaceStyle]}>
-                  <Icon
-                    source="key-chain"
+              <View style={[styles.heroPanel, surfaceStyle]}>
+                <View style={styles.heroTopRow}>
+                  <View style={styles.heroLogoShell}>
+                    <IdentityEmailLogo email={identity.email} size={56} />
+                  </View>
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text
+                      variant="titleLarge"
+                      style={{ fontWeight: "900" }}
+                      numberOfLines={1}
+                    >
+                      {title}
+                    </Text>
+                    <Text style={{ opacity: 0.68 }} numberOfLines={1}>
+                      {identity.email}
+                    </Text>
+                  </View>
+                  <IconButton
+                    icon="pencil-outline"
                     size={19}
-                    color={theme.colors.primary}
-                  />
-                  <Text style={styles.heroMetricText}>
-                    {t("identities:accountsCount", {
-                      count: identity.entries.length,
-                    })}
-                  </Text>
-                </View>
-                <View style={[styles.heroMetric, softSurfaceStyle]}>
-                  <Icon source="web" size={19} color={theme.colors.primary} />
-                  <Text style={styles.heroMetricText}>
-                    {t("identities:websitesCount", {
-                      count: identity.domains.length,
-                    })}
-                  </Text>
-                </View>
-                <View
-                  style={[
-                    styles.heroMetric,
-                    styles.entryRiskPill,
-                    { borderColor: `${theme.colors.error}30` },
-                  ]}
-                >
-                  <Icon
-                    source="alert-circle-outline"
-                    size={19}
-                    color={theme.colors.error}
-                  />
-                  <Text
+                    onPress={openRenameModal}
+                    accessibilityLabel={t("common:edit")}
                     style={[
-                      styles.heroMetricText,
-                      { color: theme.colors.error },
+                      styles.renameButton,
+                      { backgroundColor: `${theme.colors.primary}10` },
                     ]}
-                  >
-                    {t("identities:risksCount", { count: identity.riskCount })}
-                  </Text>
+                    iconColor={theme.colors.primary}
+                  />
                 </View>
-              </View>
-            </View>
 
-            <View style={[styles.panel, surfaceStyle]}>
-              <View style={styles.sectionHeader}>
-                <View
-                  style={[
-                    styles.sectionIcon,
-                    { backgroundColor: `${theme.colors.primary}14` },
-                  ]}
-                >
-                  <Icon source="radar" size={20} color={theme.colors.primary} />
-                </View>
-                <Text style={styles.sectionTitle}>
-                  {t("identities:exposureTitle")}
-                </Text>
-              </View>
-              <View style={styles.exposureGrid}>
-                <View style={[styles.exposureCell, softSurfaceStyle]}>
-                  <Icon
-                    source="shield-search"
-                    size={18}
-                    color={theme.colors.primary}
-                  />
-                  <Text style={styles.exposureValue}>
-                    {t("identities:confidenceExactEmail")}
-                  </Text>
-                  <Text style={styles.exposureLabel}>
-                    {t("identities:likelySameIdentity")}
-                  </Text>
-                </View>
-                <View style={[styles.exposureCell, softSurfaceStyle]}>
-                  <Icon
-                    source={
-                      identity.riskCount > 0
-                        ? "alert-circle-outline"
-                        : "check-circle-outline"
-                    }
-                    size={18}
-                    color={
-                      identity.riskCount > 0
-                        ? theme.colors.error
-                        : theme.colors.primary
-                    }
-                  />
-                  <Text
-                    style={[
-                      styles.exposureValue,
-                      identity.riskCount > 0
-                        ? { color: theme.colors.error }
-                        : null,
-                    ]}
-                  >
-                    {identity.riskCount > 0
-                      ? t("identities:risksCount", {
-                          count: identity.riskCount,
-                        })
-                      : t("analysisDetail:riskOk")}
-                  </Text>
-                  <Text style={styles.exposureLabel}>
-                    {identity.riskCount > 0
-                      ? t("identities:exposureHint")
-                      : t("identities:noExposureHint")}
-                  </Text>
-                </View>
-                <View style={[styles.exposureCell, softSurfaceStyle]}>
-                  <Icon
-                    source="database-outline"
-                    size={18}
-                    color={theme.colors.primary}
-                  />
-                  <Text style={styles.exposureValue}>
-                    {t("identities:dataPointsCount", { count: dataPointCount })}
-                  </Text>
-                  <Text style={styles.exposureLabel}>
-                    {t("identities:dataSignalsTitle")}
-                  </Text>
-                </View>
-              </View>
-            </View>
-
-            <View style={[styles.panel, surfaceStyle]}>
-              <View style={styles.sectionHeader}>
-                <View
-                  style={[
-                    styles.sectionIcon,
-                    { backgroundColor: `${theme.colors.primary}14` },
-                  ]}
-                >
-                  <Icon
-                    source="lightbulb-outline"
-                    size={20}
-                    color={theme.colors.primary}
-                  />
-                </View>
-                <Text style={styles.sectionTitle}>
-                  {t("identities:insightsTitle")}
-                </Text>
-              </View>
-              <View style={styles.insightList}>
-                <View style={styles.insightRow}>
-                  <Icon
-                    source="email-outline"
-                    size={17}
-                    color={theme.colors.primary}
-                  />
-                  <Text style={styles.insightText}>
-                    {t("identities:insightAccounts", {
-                      email: identity.email,
-                      count: identity.entries.length,
-                    })}
-                  </Text>
-                </View>
-                <View style={styles.insightRow}>
-                  <Icon source="web" size={17} color={theme.colors.primary} />
-                  <Text style={styles.insightText}>
-                    {identity.domains.length > 3
-                      ? t("identities:insightDomains", {
-                          count: identity.domains.length,
-                        })
-                      : t("identities:insightFocusedUse")}
-                  </Text>
-                </View>
-                <View style={styles.insightRow}>
-                  <Icon
-                    source={
-                      identity.riskCount > 0
-                        ? "alert-circle-outline"
-                        : "check-circle-outline"
-                    }
-                    size={17}
-                    color={
-                      identity.riskCount > 0
-                        ? theme.colors.error
-                        : theme.colors.primary
-                    }
-                  />
-                  <Text
-                    style={[
-                      styles.insightText,
-                      identity.riskCount > 0
-                        ? { color: theme.colors.error }
-                        : null,
-                    ]}
-                  >
-                    {identity.riskCount > 0
-                      ? t("identities:insightRisks", {
-                          count: identity.riskCount,
-                        })
-                      : t("identities:insightNoRisks")}
-                  </Text>
-                </View>
-                {identity.usernames.length > 0 ? (
-                  <View style={styles.insightRow}>
+                <View style={styles.heroMetricRow}>
+                  <View style={[styles.heroMetric, softSurfaceStyle]}>
                     <Icon
-                      source="account-outline"
-                      size={17}
+                      source="key-chain"
+                      size={19}
                       color={theme.colors.primary}
                     />
-                    <Text style={styles.insightText}>
-                      {t("identities:insightAliases", {
-                        count: identity.usernames.length,
+                    <Text style={styles.heroMetricText}>
+                      {t("identities:accountsCount", {
+                        count: identity.entries.length,
                       })}
                     </Text>
                   </View>
-                ) : null}
+                  <View style={[styles.heroMetric, softSurfaceStyle]}>
+                    <Icon source="web" size={19} color={theme.colors.primary} />
+                    <Text style={styles.heroMetricText}>
+                      {t("identities:websitesCount", {
+                        count: identity.domains.length,
+                      })}
+                    </Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.heroMetric,
+                      styles.entryRiskPill,
+                      { borderColor: `${theme.colors.error}30` },
+                    ]}
+                  >
+                    <Icon
+                      source="alert-circle-outline"
+                      size={19}
+                      color={theme.colors.error}
+                    />
+                    <Text
+                      style={[
+                        styles.heroMetricText,
+                        { color: theme.colors.error },
+                      ]}
+                    >
+                      {t("identities:risksCount", {
+                        count: identity.riskCount,
+                      })}
+                    </Text>
+                  </View>
+                </View>
               </View>
-            </View>
 
-            {identity.usernames.length > 0 ? (
               <View style={[styles.panel, surfaceStyle]}>
                 <View style={styles.sectionHeader}>
                   <View
@@ -513,82 +344,82 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
                     ]}
                   >
                     <Icon
-                      source="account-outline"
+                      source="radar"
                       size={20}
                       color={theme.colors.primary}
                     />
                   </View>
                   <Text style={styles.sectionTitle}>
-                    {t("identities:usernamesTitle")}
+                    {t("identities:exposureTitle")}
                   </Text>
                 </View>
-                <View style={styles.chipWrap}>
-                  {identity.usernames.map((username) => (
-                    <AppChip
-                      key={username}
-                      compact
-                      icon="account-outline"
-                      style={styles.chip}
+                <View style={styles.exposureGrid}>
+                  <View style={[styles.exposureCell, softSurfaceStyle]}>
+                    <Icon
+                      source="shield-search"
+                      size={18}
+                      color={theme.colors.primary}
+                    />
+                    <Text style={styles.exposureValue}>
+                      {t("identities:confidenceExactEmail")}
+                    </Text>
+                    <Text style={styles.exposureLabel}>
+                      {t("identities:likelySameIdentity")}
+                    </Text>
+                  </View>
+                  <View style={[styles.exposureCell, softSurfaceStyle]}>
+                    <Icon
+                      source={
+                        identity.riskCount > 0
+                          ? "alert-circle-outline"
+                          : "check-circle-outline"
+                      }
+                      size={18}
+                      color={
+                        identity.riskCount > 0
+                          ? theme.colors.error
+                          : theme.colors.primary
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.exposureValue,
+                        identity.riskCount > 0
+                          ? { color: theme.colors.error }
+                          : null,
+                      ]}
                     >
-                      {username}
-                    </AppChip>
-                  ))}
+                      {identity.riskCount > 0
+                        ? t("identities:risksCount", {
+                            count: identity.riskCount,
+                          })
+                        : t("analysisDetail:riskOk")}
+                    </Text>
+                    <Text style={styles.exposureLabel}>
+                      {identity.riskCount > 0
+                        ? t("identities:exposureHint")
+                        : t("identities:noExposureHint")}
+                    </Text>
+                  </View>
+                  <View style={[styles.exposureCell, softSurfaceStyle]}>
+                    <Icon
+                      source="database-outline"
+                      size={18}
+                      color={theme.colors.primary}
+                    />
+                    <Text style={styles.exposureValue}>
+                      {t("identities:dataPointsCount", {
+                        count: dataPointCount,
+                      })}
+                    </Text>
+                    <Text style={styles.exposureLabel}>
+                      {t("identities:dataSignalsTitle")}
+                    </Text>
+                  </View>
                 </View>
               </View>
-            ) : null}
 
-            <View style={[styles.panel, surfaceStyle]}>
-              <View style={styles.sectionHeader}>
-                <View
-                  style={[
-                    styles.sectionIcon,
-                    { backgroundColor: `${theme.colors.primary}14` },
-                  ]}
-                >
-                  <Icon source="web" size={20} color={theme.colors.primary} />
-                </View>
-                <Text style={styles.sectionTitle}>
-                  {t("identities:websitesTitle")}
-                </Text>
-              </View>
-              <View style={styles.chipWrap}>
-                {identity.domains.length > 0 ? (
-                  visibleDomains.map((domain) => (
-                    <WebsiteChip key={domain} domain={domain} />
-                  ))
-                ) : (
-                  <Text style={styles.insightText}>
-                    {t("identities:noWebsites")}
-                  </Text>
-                )}
-                {hiddenDomainsCount > 0 ? (
-                  <AppChip
-                    compact
-                    icon="chevron-down"
-                    style={[styles.chip, styles.moreChip]}
-                    onPress={() => setWebsitesExpanded(true)}
-                  >
-                    {t("identities:showMore", { count: hiddenDomainsCount })}
-                  </AppChip>
-                ) : null}
-              </View>
-              {websitesExpanded &&
-              identity.domains.length > WEBSITE_COLLAPSED_LIMIT ? (
-                <Button
-                  compact
-                  icon="chevron-up"
-                  mode="text"
-                  onPress={() => setWebsitesExpanded(false)}
-                  labelStyle={styles.showLessText}
-                  style={styles.showLessButton}
-                >
-                  {t("identities:showLess")}
-                </Button>
-              ) : null}
-            </View>
-
-            <View style={[styles.panel, surfaceStyle]}>
-              <View style={styles.linkedHeaderRow}>
+              <View style={[styles.panel, surfaceStyle]}>
                 <View style={styles.sectionHeader}>
                   <View
                     style={[
@@ -597,142 +428,321 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
                     ]}
                   >
                     <Icon
-                      source="link-variant"
+                      source="lightbulb-outline"
                       size={20}
                       color={theme.colors.primary}
                     />
                   </View>
                   <Text style={styles.sectionTitle}>
-                    {t("identities:linkedEntries")}
+                    {t("identities:insightsTitle")}
                   </Text>
                 </View>
-              </View>
-              <View style={[styles.blastRadiusNote, softSurfaceStyle]}>
-                <Icon source="target" size={17} color={theme.colors.primary} />
-                <View style={{ flex: 1, minWidth: 0 }}>
-                  <Text style={styles.blastRadiusTitle}>
-                    {t("identities:blastRadiusTitle")}
-                  </Text>
-                  <Text style={styles.blastRadiusText}>
-                    {t("identities:blastRadiusHint")}
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.entryList}>
-                {visibleEntries.map((entry, index) => (
-                  <React.Fragment key={entry.id}>
-                    {index > 0 ? <Divider style={styles.entryDivider} /> : null}
-                    <AnimatedPressable
-                      onPress={() => openEntry(entry.id)}
-                      style={[styles.entryRow, surfaceStyle]}
-                      hoverBackgroundColor={
-                        darkmode
-                          ? "rgba(120, 127, 246, 0.12)"
-                          : "rgba(120, 127, 246, 0.08)"
+                <View style={styles.insightList}>
+                  <View style={styles.insightRow}>
+                    <Icon
+                      source="email-outline"
+                      size={17}
+                      color={theme.colors.primary}
+                    />
+                    <Text style={styles.insightText}>
+                      {t("identities:insightAccounts", {
+                        email: identity.email,
+                        count: identity.entries.length,
+                      })}
+                    </Text>
+                  </View>
+                  <View style={styles.insightRow}>
+                    <Icon source="web" size={17} color={theme.colors.primary} />
+                    <Text style={styles.insightText}>
+                      {identity.domains.length > 3
+                        ? t("identities:insightDomains", {
+                            count: identity.domains.length,
+                          })
+                        : t("identities:insightFocusedUse")}
+                    </Text>
+                  </View>
+                  <View style={styles.insightRow}>
+                    <Icon
+                      source={
+                        identity.riskCount > 0
+                          ? "alert-circle-outline"
+                          : "check-circle-outline"
                       }
+                      size={17}
+                      color={
+                        identity.riskCount > 0
+                          ? theme.colors.error
+                          : theme.colors.primary
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.insightText,
+                        identity.riskCount > 0
+                          ? { color: theme.colors.error }
+                          : null,
+                      ]}
                     >
-                      <View style={styles.entryMainRow}>
-                        <View
-                          style={[
-                            styles.entryIcon,
-                            { backgroundColor: `${theme.colors.primary}12` },
-                          ]}
-                        >
-                          <Icon
-                            source="card-account-details-outline"
-                            size={20}
-                            color={theme.colors.primary}
-                          />
-                        </View>
-                        <View style={styles.entryTitleBlock}>
-                          <Text style={styles.entryTitle} numberOfLines={1}>
-                            {entry.title}
-                          </Text>
-                          <View style={styles.entryInlineMetaRow}>
-                            <View style={styles.entryMetaItem}>
-                              <Icon
-                                source="web"
-                                size={13}
-                                color={theme.colors.primary}
-                              />
-                              <Text
-                                style={styles.entryMetaText}
-                                numberOfLines={1}
-                              >
-                                {entry.domains[0] ?? t("identities:noDomain")}
-                              </Text>
-                            </View>
-                            <View style={styles.entryMetaDot} />
-                            <View style={styles.entryMetaItem}>
-                              <Icon
-                                source="card-text-outline"
-                                size={13}
-                                color={theme.colors.primary}
-                              />
-                              <Text style={styles.entryMetaText}>
-                                {t("identities:entryInfoCount", {
-                                  count: entry.moduleTypes.length,
-                                })}
-                              </Text>
-                            </View>
-                            {entry.hasRisk ? (
-                              <>
-                                <View style={styles.entryMetaDot} />
-                                <View style={styles.entryMetaItem}>
-                                  <Icon
-                                    source="alert-circle-outline"
-                                    size={13}
-                                    color={theme.colors.error}
-                                  />
-                                  <Text
-                                    style={[
-                                      styles.entryMetaText,
-                                      { color: theme.colors.error },
-                                    ]}
-                                  >
-                                    {t("identities:risksCount", { count: 1 })}
-                                  </Text>
-                                </View>
-                              </>
-                            ) : null}
-                          </View>
-                        </View>
-                        <Icon
-                          source="chevron-right"
-                          size={18}
-                          color={theme.colors.primary}
-                        />
-                      </View>
-                    </AnimatedPressable>
-                  </React.Fragment>
-                ))}
-                {hiddenEntriesCount > 0 ? (
-                  <AppChip
-                    compact
-                    icon="chevron-down"
-                    style={[styles.chip, styles.moreChip]}
-                    onPress={() => setEntriesExpanded(true)}
-                  >
-                    {t("identities:showMore", { count: hiddenEntriesCount })}
-                  </AppChip>
-                ) : null}
+                      {identity.riskCount > 0
+                        ? t("identities:insightRisks", {
+                            count: identity.riskCount,
+                          })
+                        : t("identities:insightNoRisks")}
+                    </Text>
+                  </View>
+                  {identity.usernames.length > 0 ? (
+                    <View style={styles.insightRow}>
+                      <Icon
+                        source="account-outline"
+                        size={17}
+                        color={theme.colors.primary}
+                      />
+                      <Text style={styles.insightText}>
+                        {t("identities:insightAliases", {
+                          count: identity.usernames.length,
+                        })}
+                      </Text>
+                    </View>
+                  ) : null}
+                </View>
               </View>
-              {entriesExpanded &&
-              identity.entries.length > ENTRIES_COLLAPSED_LIMIT ? (
-                <View style={styles.showLessRow}>
+
+              {identity.usernames.length > 0 ? (
+                <View style={[styles.panel, surfaceStyle]}>
+                  <View style={styles.sectionHeader}>
+                    <View
+                      style={[
+                        styles.sectionIcon,
+                        { backgroundColor: `${theme.colors.primary}14` },
+                      ]}
+                    >
+                      <Icon
+                        source="account-outline"
+                        size={20}
+                        color={theme.colors.primary}
+                      />
+                    </View>
+                    <Text style={styles.sectionTitle}>
+                      {t("identities:usernamesTitle")}
+                    </Text>
+                  </View>
+                  <View style={styles.chipWrap}>
+                    {identity.usernames.map((username) => (
+                      <AppChip
+                        key={username}
+                        compact
+                        icon="account-outline"
+                        style={styles.chip}
+                      >
+                        {username}
+                      </AppChip>
+                    ))}
+                  </View>
+                </View>
+              ) : null}
+
+              <View style={[styles.panel, surfaceStyle]}>
+                <View style={styles.sectionHeader}>
+                  <View
+                    style={[
+                      styles.sectionIcon,
+                      { backgroundColor: `${theme.colors.primary}14` },
+                    ]}
+                  >
+                    <Icon source="web" size={20} color={theme.colors.primary} />
+                  </View>
+                  <Text style={styles.sectionTitle}>
+                    {t("identities:websitesTitle")}
+                  </Text>
+                </View>
+                <View style={styles.chipWrap}>
+                  {identity.domains.length > 0 ? (
+                    visibleDomains.map((domain) => (
+                      <WebsiteChip key={domain} domain={domain} />
+                    ))
+                  ) : (
+                    <Text style={styles.insightText}>
+                      {t("identities:noWebsites")}
+                    </Text>
+                  )}
+                  {hiddenDomainsCount > 0 ? (
+                    <AppChip
+                      compact
+                      icon="chevron-down"
+                      style={[styles.chip, styles.moreChip]}
+                      onPress={() => setWebsitesExpanded(true)}
+                    >
+                      {t("identities:showMore", { count: hiddenDomainsCount })}
+                    </AppChip>
+                  ) : null}
+                </View>
+                {websitesExpanded &&
+                identity.domains.length > WEBSITE_COLLAPSED_LIMIT ? (
                   <Button
                     compact
                     icon="chevron-up"
                     mode="text"
-                    onPress={() => setEntriesExpanded(false)}
+                    onPress={() => setWebsitesExpanded(false)}
                     labelStyle={styles.showLessText}
                     style={styles.showLessButton}
                   >
                     {t("identities:showLess")}
                   </Button>
+                ) : null}
+              </View>
+
+              <View style={[styles.panel, surfaceStyle]}>
+                <View style={styles.linkedHeaderRow}>
+                  <View style={styles.sectionHeader}>
+                    <View
+                      style={[
+                        styles.sectionIcon,
+                        { backgroundColor: `${theme.colors.primary}14` },
+                      ]}
+                    >
+                      <Icon
+                        source="link-variant"
+                        size={20}
+                        color={theme.colors.primary}
+                      />
+                    </View>
+                    <Text style={styles.sectionTitle}>
+                      {t("identities:linkedEntries")}
+                    </Text>
+                  </View>
                 </View>
-              ) : null}
-            </View>
+                <View style={[styles.blastRadiusNote, softSurfaceStyle]}>
+                  <Icon
+                    source="target"
+                    size={17}
+                    color={theme.colors.primary}
+                  />
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text style={styles.blastRadiusTitle}>
+                      {t("identities:blastRadiusTitle")}
+                    </Text>
+                    <Text style={styles.blastRadiusText}>
+                      {t("identities:blastRadiusHint")}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.entryList}>
+                  {visibleEntries.map((entry, index) => (
+                    <React.Fragment key={entry.id}>
+                      {index > 0 ? (
+                        <Divider style={styles.entryDivider} />
+                      ) : null}
+                      <AnimatedPressable
+                        onPress={() => openEntry(entry.id)}
+                        style={[styles.entryRow, surfaceStyle]}
+                        hoverBackgroundColor={
+                          darkmode
+                            ? "rgba(120, 127, 246, 0.12)"
+                            : "rgba(120, 127, 246, 0.08)"
+                        }
+                      >
+                        <View style={styles.entryMainRow}>
+                          <View
+                            style={[
+                              styles.entryIcon,
+                              { backgroundColor: `${theme.colors.primary}12` },
+                            ]}
+                          >
+                            <Icon
+                              source="card-account-details-outline"
+                              size={20}
+                              color={theme.colors.primary}
+                            />
+                          </View>
+                          <View style={styles.entryTitleBlock}>
+                            <Text style={styles.entryTitle} numberOfLines={1}>
+                              {entry.title}
+                            </Text>
+                            <View style={styles.entryInlineMetaRow}>
+                              <View style={styles.entryMetaItem}>
+                                <Icon
+                                  source="web"
+                                  size={13}
+                                  color={theme.colors.primary}
+                                />
+                                <Text
+                                  style={styles.entryMetaText}
+                                  numberOfLines={1}
+                                >
+                                  {entry.domains[0] ?? t("identities:noDomain")}
+                                </Text>
+                              </View>
+                              <View style={styles.entryMetaDot} />
+                              <View style={styles.entryMetaItem}>
+                                <Icon
+                                  source="card-text-outline"
+                                  size={13}
+                                  color={theme.colors.primary}
+                                />
+                                <Text style={styles.entryMetaText}>
+                                  {t("identities:entryInfoCount", {
+                                    count: entry.moduleTypes.length,
+                                  })}
+                                </Text>
+                              </View>
+                              {entry.hasRisk ? (
+                                <>
+                                  <View style={styles.entryMetaDot} />
+                                  <View style={styles.entryMetaItem}>
+                                    <Icon
+                                      source="alert-circle-outline"
+                                      size={13}
+                                      color={theme.colors.error}
+                                    />
+                                    <Text
+                                      style={[
+                                        styles.entryMetaText,
+                                        { color: theme.colors.error },
+                                      ]}
+                                    >
+                                      {t("identities:risksCount", { count: 1 })}
+                                    </Text>
+                                  </View>
+                                </>
+                              ) : null}
+                            </View>
+                          </View>
+                          <Icon
+                            source="chevron-right"
+                            size={18}
+                            color={theme.colors.primary}
+                          />
+                        </View>
+                      </AnimatedPressable>
+                    </React.Fragment>
+                  ))}
+                  {hiddenEntriesCount > 0 ? (
+                    <AppChip
+                      compact
+                      icon="chevron-down"
+                      style={[styles.chip, styles.moreChip]}
+                      onPress={() => setEntriesExpanded(true)}
+                    >
+                      {t("identities:showMore", { count: hiddenEntriesCount })}
+                    </AppChip>
+                  ) : null}
+                </View>
+                {entriesExpanded &&
+                identity.entries.length > ENTRIES_COLLAPSED_LIMIT ? (
+                  <View style={styles.showLessRow}>
+                    <Button
+                      compact
+                      icon="chevron-up"
+                      mode="text"
+                      onPress={() => setEntriesExpanded(false)}
+                      labelStyle={styles.showLessText}
+                      style={styles.showLessButton}
+                    >
+                      {t("identities:showLess")}
+                    </Button>
+                  </View>
+                ) : null}
+              </View>
             </>
           )}
         </ScrollView>
@@ -784,27 +794,27 @@ const IdentityDetailScreen: React.FC<IdentityDetailScreenProps> = ({
 
 const styles = StyleSheet.create({
   heroPanel: {
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
     padding: 8,
   },
   panel: {
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
     padding: 8,
   },
   chip: {
-    borderRadius: 10,
+    borderRadius: 12,
   },
   renameButton: {
     width: 36,
     height: 36,
     margin: 0,
-    borderRadius: 8,
+    borderRadius: 12,
     flexShrink: 0,
   },
   modalButton: {
-    borderRadius: 8,
+    borderRadius: 12,
   },
   moreChip: {
     backgroundColor: "transparent",
@@ -823,7 +833,7 @@ const styles = StyleSheet.create({
   heroLogoShell: {
     width: 68,
     height: 68,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(255, 255, 255, 0.34)",
@@ -836,7 +846,7 @@ const styles = StyleSheet.create({
   },
   heroMetric: {
     minHeight: 38,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
     paddingHorizontal: 8,
     paddingVertical: 8,
@@ -857,7 +867,7 @@ const styles = StyleSheet.create({
   sectionIcon: {
     width: 34,
     height: 34,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -881,7 +891,7 @@ const styles = StyleSheet.create({
     minWidth: 170,
     flexGrow: 1,
     flexBasis: 0,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
     padding: 8,
     gap: 5,
@@ -923,7 +933,7 @@ const styles = StyleSheet.create({
   },
   blastRadiusNote: {
     minHeight: 54,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
     padding: 8,
     marginTop: 8,
@@ -946,7 +956,7 @@ const styles = StyleSheet.create({
   entryRow: {
     minHeight: 64,
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 8,
+    borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 8,
     overflow: "hidden",
@@ -960,7 +970,7 @@ const styles = StyleSheet.create({
   entryIcon: {
     width: 38,
     height: 38,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -1009,7 +1019,7 @@ const styles = StyleSheet.create({
   },
   showLessButton: {
     minWidth: 0,
-    borderRadius: 8,
+    borderRadius: 12,
     alignSelf: "center",
     marginTop: 8,
   },
@@ -1020,7 +1030,7 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     minHeight: 170,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
     alignItems: "center",
     justifyContent: "center",

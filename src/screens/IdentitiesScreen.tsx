@@ -1,7 +1,15 @@
 import React, { useMemo } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { ScrollView, StyleSheet, View } from "react-native";
+import {
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from "react-native";
+import MaskedView from "@react-native-masked-view/masked-view";
+import { LinearGradient } from "expo-linear-gradient";
 import { Icon, Text } from "react-native-paper";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
@@ -13,6 +21,7 @@ import AnimatedContainer from "../shared/components/container/AnimatedContainer"
 import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import AnimatedPressable from "../shared/components/AnimatedPressable";
 import SearchHeader from "../shared/components/SearchHeader";
+import { getAppChipSurfaceStyle } from "../shared/components/chips/AppChip";
 import { deriveIdentityClusters } from "../features/identity/utils/deriveIdentityClusters";
 import type { IdentityCluster } from "../features/identity/utils/deriveIdentityClusters";
 import IdentityEmailLogo from "../features/identity/components/IdentityEmailLogo";
@@ -22,6 +31,13 @@ import {
   getItemSurfaceStyle,
   getScreenContentStyle,
 } from "../shared/ui/glass";
+
+const identityMetricRowHeight = 42;
+const identityMetricOverlayGap = 8;
+const identityMetricOverlayInset = 8;
+const identityWideMetricOverlayHeight = identityMetricRowHeight;
+const identityCompactMetricOverlayHeight =
+  identityMetricRowHeight * 2 + identityMetricOverlayGap;
 
 type IdentitiesScreenProps = NativeStackScreenProps<
   IdentityStackParamList,
@@ -65,19 +81,31 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
     setTitlebarCenterGap,
     setTitlebarOverlayDragEnabled,
   } = useTheme();
+  const { width } = useWindowDimensions();
+  const isCompactLayout = width < 600;
   const [searchQuery, setSearchQuery] = React.useState("");
   const [dismissCompactSearchSignal, setDismissCompactSearchSignal] =
     React.useState(0);
   const screenContentStyle = getScreenContentStyle(theme);
   const surfaceStyle = getItemSurfaceStyle(theme);
-  const subtleSurfaceStyle = {
-    backgroundColor: darkmode
-      ? "rgba(255, 255, 255, 0.04)"
-      : "rgba(255, 255, 255, 0.48)",
-    borderColor: darkmode
-      ? "rgba(255, 255, 255, 0.07)"
-      : "rgba(255, 255, 255, 0.72)",
-  };
+  const metricSurfaceStyle = getAppChipSurfaceStyle({ darkmode });
+  const metricOverlayHeight = isCompactLayout
+    ? identityCompactMetricOverlayHeight
+    : identityWideMetricOverlayHeight;
+  const identityMetricOverlayTotalHeight =
+    identityMetricOverlayInset + metricOverlayHeight;
+  const identityListTopFadeStart = Math.max(
+    0,
+    identityMetricOverlayTotalHeight - 22,
+  );
+  const identityListTopFadeEnd = identityMetricOverlayTotalHeight + 8;
+  const webIdentityListFadeMaskStyle =
+    Platform.OS === "web"
+      ? ({
+          WebkitMaskImage: `linear-gradient(to bottom, transparent 0px, transparent ${identityListTopFadeStart}px, black ${identityListTopFadeEnd}px, black 100%)`,
+          maskImage: `linear-gradient(to bottom, transparent 0px, transparent ${identityListTopFadeStart}px, black ${identityListTopFadeEnd}px, black 100%)`,
+        } as any)
+      : null;
 
   useFocusEffect(
     React.useCallback(() => {
@@ -88,11 +116,7 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
       return () => {
         setTitlebarCenterGap(0);
       };
-    }, [
-      setHeaderSpacing,
-      setTitlebarCenterGap,
-      setTitlebarOverlayDragEnabled,
-    ]),
+    }, [setHeaderSpacing, setTitlebarCenterGap, setTitlebarOverlayDragEnabled]),
   );
 
   const values = useMemo(() => {
@@ -140,10 +164,7 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
     <Animated.View
       key={identity.id}
       entering={FadeInDown.delay(Math.min(index, 8) * 35).duration(220)}
-      style={[
-        styles.identityCard,
-        surfaceStyle,
-      ]}
+      style={[styles.identityCard, surfaceStyle]}
     >
       <AnimatedPressable
         onPress={() =>
@@ -206,6 +227,199 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
     </Animated.View>
   );
 
+  const metricCardStyle = [
+    styles.metric,
+    isCompactLayout ? styles.metricCompact : null,
+    metricSurfaceStyle,
+  ];
+
+  const metrics = (
+    <View style={styles.metricRow}>
+      <View style={metricCardStyle}>
+        <Icon
+          source="email-multiple-outline"
+          size={16}
+          color={theme.colors.primary}
+        />
+        <View style={styles.identityStatTextBlock}>
+          <Text
+            style={[
+              styles.identityStatValue,
+              { color: theme.colors.onSurface },
+            ]}
+          >
+            {identities.length}
+          </Text>
+          <Text
+            style={[
+              styles.metricLabel,
+              { color: theme.colors.onSurfaceVariant },
+            ]}
+          >
+            {t("identities:metricIdentities")}
+          </Text>
+        </View>
+      </View>
+      <View style={metricCardStyle}>
+        <Icon source="key-chain" size={16} color={theme.colors.primary} />
+        <View style={styles.identityStatTextBlock}>
+          <Text
+            style={[
+              styles.identityStatValue,
+              { color: theme.colors.onSurface },
+            ]}
+          >
+            {totalAccounts}
+          </Text>
+          <Text
+            style={[
+              styles.metricLabel,
+              { color: theme.colors.onSurfaceVariant },
+            ]}
+          >
+            {t("identities:metricAccounts")}
+          </Text>
+        </View>
+      </View>
+      <View style={metricCardStyle}>
+        <Icon source="web" size={16} color={theme.colors.primary} />
+        <View style={styles.identityStatTextBlock}>
+          <Text
+            style={[
+              styles.identityStatValue,
+              { color: theme.colors.onSurface },
+            ]}
+          >
+            {totalWebsites}
+          </Text>
+          <Text
+            style={[
+              styles.metricLabel,
+              { color: theme.colors.onSurfaceVariant },
+            ]}
+          >
+            {t("identities:metricWebsites")}
+          </Text>
+        </View>
+      </View>
+      <View style={metricCardStyle}>
+        <Icon
+          source="alert-circle-outline"
+          size={16}
+          color={
+            identitiesWithRisks > 0 ? theme.colors.error : theme.colors.primary
+          }
+        />
+        <View style={styles.identityStatTextBlock}>
+          <Text
+            style={[
+              styles.identityStatValue,
+              { color: theme.colors.onSurface },
+              identitiesWithRisks > 0 ? { color: theme.colors.error } : null,
+            ]}
+          >
+            {identitiesWithRisks}
+          </Text>
+          <Text
+            style={[
+              styles.metricLabel,
+              { color: theme.colors.onSurfaceVariant },
+            ]}
+          >
+            {t("identities:metricAtRisk")}
+          </Text>
+        </View>
+      </View>
+      <View style={metricCardStyle}>
+        <Icon source="account-outline" size={16} color={theme.colors.primary} />
+        <View style={styles.identityStatTextBlock}>
+          <Text
+            style={[
+              styles.identityStatValue,
+              { color: theme.colors.onSurface },
+            ]}
+          >
+            {totalAliases}
+          </Text>
+          <Text
+            style={[
+              styles.metricLabel,
+              { color: theme.colors.onSurfaceVariant },
+            ]}
+          >
+            {t("identities:metricAliases")}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+
+  const list = (
+    <ScrollView
+      style={{ flex: 1, width: "100%" }}
+      keyboardDismissMode="on-drag"
+      keyboardShouldPersistTaps="handled"
+      onScrollBeginDrag={dismissCompactSearchIfEmpty}
+      contentContainerStyle={{
+        gap: 8,
+        paddingTop: identityMetricOverlayTotalHeight,
+        paddingRight: SCROLLBAR_CONTENT_GAP,
+        paddingBottom: 8,
+        alignSelf: "center",
+        width: "100%",
+        maxWidth: 920,
+      }}
+    >
+      {visibleIdentities.length === 0 ? (
+        <View style={[styles.emptyState, surfaceStyle]}>
+          <View
+            style={[
+              styles.emptyIcon,
+              { backgroundColor: `${theme.colors.primary}14` },
+            ]}
+          >
+            <Icon
+              source="account-search-outline"
+              size={28}
+              color={theme.colors.primary}
+            />
+          </View>
+          <Text style={styles.emptyText}>{t("identities:noMatches")}</Text>
+        </View>
+      ) : (
+        <View style={{ gap: 8 }}>
+          {visibleIdentities.map(renderIdentityCard)}
+        </View>
+      )}
+    </ScrollView>
+  );
+
+  const fadedList =
+    Platform.OS === "web" ? (
+      <View style={[{ flex: 1, width: "100%" }, webIdentityListFadeMaskStyle]}>
+        {list}
+      </View>
+    ) : (
+      <MaskedView
+        style={{ flex: 1, width: "100%" }}
+        maskElement={
+          <View style={styles.nativeListMask}>
+            <LinearGradient
+              colors={["transparent", "transparent", "black"]}
+              locations={[0, 0.42, 1]}
+              style={[
+                styles.nativeListMaskTop,
+                { height: identityListTopFadeEnd },
+              ]}
+            />
+            <View style={styles.nativeListMaskMiddle} />
+          </View>
+        }
+      >
+        {list}
+      </MaskedView>
+    );
+
   return (
     <AnimatedContainer style={globalStyles.container}>
       <FocusAwareStatusBar
@@ -232,116 +446,10 @@ const IdentitiesScreen: React.FC<IdentitiesScreenProps> = ({ navigation }) => {
           ...screenContentStyle,
         }}
       >
-        <ScrollView
-          style={{ flex: 1, width: "100%" }}
-          keyboardDismissMode="on-drag"
-          keyboardShouldPersistTaps="handled"
-          onScrollBeginDrag={dismissCompactSearchIfEmpty}
-          contentContainerStyle={{
-            gap: 8,
-            paddingRight: SCROLLBAR_CONTENT_GAP,
-            alignSelf: "center",
-            width: "100%",
-            maxWidth: 920,
-          }}
-        >
-          <View style={styles.metricRow}>
-            <View style={[styles.metric, subtleSurfaceStyle]}>
-              <Icon
-                source="email-multiple-outline"
-                size={16}
-                color={theme.colors.primary}
-              />
-              <View style={styles.identityStatTextBlock}>
-                <Text style={styles.identityStatValue}>
-                  {identities.length}
-                </Text>
-                <Text style={styles.metricLabel}>
-                  {t("identities:metricIdentities")}
-                </Text>
-              </View>
-            </View>
-            <View style={[styles.metric, subtleSurfaceStyle]}>
-              <Icon source="key-chain" size={16} color={theme.colors.primary} />
-              <View style={styles.identityStatTextBlock}>
-                <Text style={styles.identityStatValue}>{totalAccounts}</Text>
-                <Text style={styles.metricLabel}>
-                  {t("identities:metricAccounts")}
-                </Text>
-              </View>
-            </View>
-            <View style={[styles.metric, subtleSurfaceStyle]}>
-              <Icon source="web" size={16} color={theme.colors.primary} />
-              <View style={styles.identityStatTextBlock}>
-                <Text style={styles.identityStatValue}>{totalWebsites}</Text>
-                <Text style={styles.metricLabel}>
-                  {t("identities:metricWebsites")}
-                </Text>
-              </View>
-            </View>
-            <View style={[styles.metric, subtleSurfaceStyle]}>
-              <Icon
-                source="alert-circle-outline"
-                size={16}
-                color={
-                  identitiesWithRisks > 0
-                    ? theme.colors.error
-                    : theme.colors.primary
-                }
-              />
-              <View style={styles.identityStatTextBlock}>
-                <Text
-                  style={[
-                    styles.identityStatValue,
-                    identitiesWithRisks > 0
-                      ? { color: theme.colors.error }
-                      : null,
-                  ]}
-                >
-                  {identitiesWithRisks}
-                </Text>
-                <Text style={styles.metricLabel}>
-                  {t("identities:metricAtRisk")}
-                </Text>
-              </View>
-            </View>
-            <View style={[styles.metric, subtleSurfaceStyle]}>
-              <Icon
-                source="account-outline"
-                size={16}
-                color={theme.colors.primary}
-              />
-              <View style={styles.identityStatTextBlock}>
-                <Text style={styles.identityStatValue}>{totalAliases}</Text>
-                <Text style={styles.metricLabel}>
-                  {t("identities:metricAliases")}
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {visibleIdentities.length === 0 ? (
-            <View style={[styles.emptyState, surfaceStyle]}>
-              <View
-                style={[
-                  styles.emptyIcon,
-                  { backgroundColor: `${theme.colors.primary}14` },
-                ]}
-              >
-                <Icon
-                  source="account-search-outline"
-                  size={28}
-                  color={theme.colors.primary}
-                />
-              </View>
-              <Text style={styles.emptyText}>{t("identities:noMatches")}</Text>
-            </View>
-          ) : (
-            <View style={{ gap: 8 }}>
-              {visibleIdentities.map(renderIdentityCard)}
-            </View>
-          )}
-        </ScrollView>
+        {fadedList}
+        <View pointerEvents="box-none" style={styles.metricOverlay}>
+          {metrics}
+        </View>
       </View>
     </AnimatedContainer>
   );
@@ -425,8 +533,15 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 8,
   },
+  metricOverlay: {
+    position: "absolute",
+    top: identityMetricOverlayInset,
+    left: identityMetricOverlayInset,
+    right: SCROLLBAR_CONTENT_GAP,
+    zIndex: 5,
+  },
   metric: {
-    minHeight: 42,
+    height: identityMetricRowHeight,
     minWidth: 120,
     flexGrow: 1,
     flexBasis: 0,
@@ -438,6 +553,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
   },
+  metricCompact: {
+    minWidth: 0,
+    flexBasis: "31%",
+  },
   metricLabel: {
     opacity: 0.68,
     fontSize: 12,
@@ -445,7 +564,7 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     minHeight: 150,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
     alignItems: "center",
     justifyContent: "center",
@@ -463,6 +582,17 @@ const styles = StyleSheet.create({
     opacity: 0.72,
     textAlign: "center",
     userSelect: "none",
+  },
+  nativeListMask: {
+    flex: 1,
+    width: "100%",
+  },
+  nativeListMaskTop: {
+    width: "100%",
+  },
+  nativeListMaskMiddle: {
+    flex: 1,
+    backgroundColor: "black",
   },
 });
 
