@@ -10,7 +10,7 @@ index 762f913..e6b9a53 100644
  set (PACKAGE_NAME "react-native-sodium-jsi")
  set (BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
  
-@@ -44,18 +46,21 @@ add_library(reactnativesodiumjsi
+@@ -44,18 +46,27 @@ add_library(reactnativesodiumjsi
          )
  set_target_properties(
          reactnativesodiumjsi PROPERTIES
@@ -20,6 +20,12 @@ index 762f913..e6b9a53 100644
          POSITION_INDEPENDENT_CODE ON
  )
  
++target_link_options(
++        reactnativesodiumjsi PRIVATE
++        "-Wl,-z,max-page-size=16384"
++        "-Wl,-z,common-page-size=16384"
++)
++
 -file (GLOB LIBRN_DIR "${PREBUILT_DIR}/${ANDROID_ABI}")
 +set(LIBRN_DIR "${PREBUILT_DIR}/${ANDROID_ABI}")
 +
@@ -34,7 +40,7 @@ index 762f913..e6b9a53 100644
  find_library(
          REACT_NATIVE_JNI_LIB
          reactnativejni
-@@ -63,6 +68,40 @@ find_library(
+@@ -63,6 +74,40 @@ find_library(
          NO_CMAKE_FIND_ROOT_PATH
  )
  

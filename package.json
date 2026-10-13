@@ -38,7 +38,7 @@
     "android:build:apk": "eas build --platform android --profile production-apk",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package && node scripts/prepare-sodium-16kb.js"
   },
   "dependencies": {
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
