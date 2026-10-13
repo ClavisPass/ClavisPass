@@ -66104,6 +66104,18 @@
     },
     {
       "source": "src_shared_components_header_header",
+      "target": "src_shared_components_focusawarestatusbar_focusawarestatusbar",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/shared/components/Header.tsx",
+      "source_location": "L101",
+      "weight": 1.0
+    },
+    {
+      "source": "src_shared_components_header_header",
       "target": "src_app_providers_themeprovider_usetheme",
       "relation": "calls",
       "_origin": "ast",
@@ -66171,19 +66183,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/shared/components/Header.tsx",
-      "source_location": "L60",
-      "weight": 1.0
-    },
-    {
-      "source": "src_shared_components_header_header",
-      "target": "src_shared_components_focusawarestatusbar_focusawarestatusbar",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "src/shared/components/Header.tsx",
-      "source_location": "L98",
+      "source_location": "L63",
       "weight": 1.0
     },
     {
@@ -166794,5 +166794,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "fbf4051fcd79a7586fd4c96034cdd9f213c2b28e"
+  "built_at_commit": "bdd1dc2e7edd562563a9a80f8ef2880e7a59d47d"
 }

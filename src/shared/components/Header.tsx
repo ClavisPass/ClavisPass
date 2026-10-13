@@ -56,6 +56,9 @@ function Header(props: Props) {
     isTauriEnvironment() &&
     TITLEBAR_HEIGHT > 0 &&
     !controlsLeft;
+  const headerLeftPadding =
+    (reserveMacControlsSpace ? TITLEBAR_CONTROLS_WIDTH : 0) +
+    (props.onPress ? 8 : 0);
   const contentDraggable = props.leftContentDraggable ?? true;
   const glassChromeStyle = getGlassChromeStyle(darkmode);
 
@@ -89,7 +92,7 @@ function Header(props: Props) {
           flexDirection: "row",
           justifyContent: "space-between",
           minHeight: 34,
-          paddingLeft: reserveMacControlsSpace ? TITLEBAR_CONTROLS_WIDTH : 0,
+          paddingLeft: headerLeftPadding,
           paddingRight: reserveRightControlsSpace
             ? TITLEBAR_RIGHT_CONTROLS_WIDTH + 8
             : 0,

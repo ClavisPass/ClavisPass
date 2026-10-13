@@ -2658,9 +2658,9 @@
     "semantic_hash": "66520285978f761c342edefb8a64666f"
   },
   "src/shared/components/Header.tsx": {
-    "mtime": 1791838311.611264,
-    "seen": 1791838372.8697646,
-    "ast_hash": "fb856524352ad1d1844fb7be606df444",
+    "mtime": 1791913155.495141,
+    "seen": 1791913191.5643644,
+    "ast_hash": "f664adbf22d172d0b6057ecfbd7921e6",
     "semantic_hash": ""
   },
   "src/shared/components/HintCard.tsx": {
