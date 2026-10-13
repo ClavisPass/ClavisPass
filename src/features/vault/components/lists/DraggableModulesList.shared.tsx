@@ -21,6 +21,7 @@ export type DraggableModulesListProps = {
   navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>;
   topPadding?: number;
   bottomPadding?: number;
+  footerBottomPadding?: number;
   rightPadding?: number;
   moduleAutoFocus?: boolean;
   footer?: React.ReactNode;
@@ -33,7 +34,6 @@ export const draggableModulesListStyles = StyleSheet.create({
     display: "flex",
     alignItems: "flex-start",
     width: "100%",
-    paddingBottom: 4,
     position: "relative",
   },
   predictionChip: {

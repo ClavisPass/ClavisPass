@@ -38,6 +38,8 @@ const dragDropAnimationConfig = {
 
 function DraggableModulesList(props: DraggableModulesListProps) {
   const { t } = useTranslation();
+  const footerBottomPadding =
+    props.footerBottomPadding ?? props.bottomPadding ?? 12;
 
   const listRef = useRef<any>(null);
   const contentHeightRef = useRef(0);
@@ -205,7 +207,13 @@ function DraggableModulesList(props: DraggableModulesListProps) {
                   t={t}
                 />
                 {props.footer ? (
-                  <View style={{ marginTop: "auto" as any, paddingTop: 8 }}>
+                  <View
+                    style={{
+                      marginTop: "auto" as any,
+                      paddingTop: 8,
+                      paddingBottom: footerBottomPadding,
+                    }}
+                  >
                     {props.footer}
                   </View>
                 ) : null}

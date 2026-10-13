@@ -32,6 +32,8 @@ const getItemStyle = (draggableStyle: any) => ({
 });
 
 function DraggableModulesListWeb(props: DraggableModulesListProps) {
+  const footerBottomPadding =
+    props.footerBottomPadding ?? props.bottomPadding ?? 12;
   const { t } = useTranslation();
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -129,7 +131,13 @@ function DraggableModulesListWeb(props: DraggableModulesListProps) {
                 t={t}
               />
               {props.footer ? (
-                <div style={{ marginTop: "auto", paddingTop: 8 }}>
+                <div
+                  style={{
+                    marginTop: "auto",
+                    paddingTop: 8,
+                    paddingBottom: footerBottomPadding,
+                  }}
+                >
                   {props.footer}
                 </div>
               ) : null}

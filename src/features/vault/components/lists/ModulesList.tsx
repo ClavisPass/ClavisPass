@@ -66,6 +66,8 @@ function measureInWindow(
 function ModulesList(props: Props) {
   const { t } = useTranslation();
   const stickyFooterClearance = props.stickyFooter ? 56 : 0;
+  const footerBottomPadding =
+    props.footerBottomPadding ?? props.bottomPadding ?? 12;
 
   const scrollRef = useRef<ScrollView>(null);
   const previousLengthRef = useRef(props.value.modules.length);
@@ -119,11 +121,7 @@ function ModulesList(props: Props) {
         easing: Easing.out(Easing.cubic),
       },
     );
-  }, [
-    props.stickyFooterBottomInset,
-    stickyFooterBottom,
-    visibleFooterHeight,
-  ]);
+  }, [props.stickyFooterBottomInset, stickyFooterBottom, visibleFooterHeight]);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -164,7 +162,10 @@ function ModulesList(props: Props) {
 
             if (inputTop < visibleTop) {
               scrollRef.current?.scrollTo({
-                y: Math.max(0, scrollOffsetRef.current - (visibleTop - inputTop)),
+                y: Math.max(
+                  0,
+                  scrollOffsetRef.current - (visibleTop - inputTop),
+                ),
                 animated: true,
               });
             }
@@ -311,7 +312,11 @@ function ModulesList(props: Props) {
               footerHeightRef.current = event.nativeEvent.layout.height;
               updateVisibleFooterHeight();
             }}
-            style={{ marginTop: "auto" as any, paddingTop: 8 }}
+            style={{
+              marginTop: "auto" as any,
+              paddingTop: 8,
+              paddingBottom: footerBottomPadding,
+            }}
           >
             {props.footer}
           </View>

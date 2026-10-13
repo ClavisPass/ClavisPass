@@ -199,11 +199,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       return () => {
         Keyboard.dismiss();
       };
-    }, [
-      setHeaderSpacing,
-      setTitlebarCenterGap,
-      setTitlebarOverlayDragEnabled,
-    ]),
+    }, [setHeaderSpacing, setTitlebarCenterGap, setTitlebarOverlayDragEnabled]),
   );
 
   useEffect(() => {
@@ -1217,11 +1213,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
     ColorValue,
   ] = darkmode
     ? [theme.colors.background, theme.colors.background, "rgba(26, 26, 26, 0)"]
-    : [
-        "rgb(248, 248, 248)",
-        "rgb(248, 248, 248)",
-        "rgba(248, 248, 248, 0)",
-      ];
+    : ["rgb(248, 248, 248)", "rgb(248, 248, 248)", "rgba(248, 248, 248, 0)"];
 
   const modulesList = (
     <PerfProfiler id="EditScreen.ModulesList">
@@ -1234,6 +1226,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
         navigation={navigation}
         topPadding={editControlOverlayHeight}
         bottomPadding={width > 600 ? 12 : 96}
+        footerBottomPadding={8}
         moduleAutoFocus={moduleAutoFocus}
         footer={
           <MetaInformationModule
