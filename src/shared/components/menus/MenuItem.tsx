@@ -25,7 +25,13 @@ export function MenuItem(props: Props) {
   const selectedBackgroundColor = "rgba(120, 127, 246, 0.18)";
 
   return (
-    <View style={{ height: 44 }}>
+    <View
+      style={{
+        height: 44,
+        borderRadius: props.rounded ? 12 : 0,
+        overflow: "hidden",
+      }}
+    >
       <Ripple onPress={props.onPress} rounded={props.rounded}>
         <View
           style={{
@@ -45,7 +51,7 @@ export function MenuItem(props: Props) {
             borderLeftWidth: props.selected ? 3 : 0,
             borderLeftColor: props.selectedColor ?? theme.colors.primary,
             borderRadius: props.rounded ? 12 : 0,
-            overflow: props.rounded ? "hidden" : "visible",
+            overflow: "hidden",
           }}
         >
           <View
@@ -57,18 +63,22 @@ export function MenuItem(props: Props) {
               minWidth: 0,
             }}
           >
-            {props.leading ?? (props.leadingIcon && (
-              <AppIcon
-                size={20}
-                color={props.leadingIconColor ?? theme.colors.primary}
-                name={props.leadingIcon}
-              />
-            ))}
+            {props.leading ??
+              (props.leadingIcon && (
+                <AppIcon
+                  size={20}
+                  color={props.leadingIconColor ?? theme.colors.primary}
+                  name={props.leadingIcon}
+                />
+              ))}
             {props.label ? (
               <View style={{ display: "flex", flexDirection: "column" }}>
                 <Text
                   variant="labelSmall"
-                  style={{ userSelect: "none", color: theme.colors.primary }}
+                  style={{
+                    userSelect: "none",
+                    color: theme.colors.onSurfaceVariant,
+                  }}
                   ellipsizeMode="tail"
                   numberOfLines={1}
                 >
@@ -76,7 +86,7 @@ export function MenuItem(props: Props) {
                 </Text>
                 <Text
                   variant="bodyMedium"
-                  style={{ userSelect: "none" }}
+                  style={{ userSelect: "none", color: theme.colors.onSurface }}
                   ellipsizeMode="tail"
                   numberOfLines={1}
                 >
@@ -86,7 +96,11 @@ export function MenuItem(props: Props) {
             ) : (
               <Text
                 variant="bodyLarge"
-                style={{ userSelect: "none", flexShrink: 1 }}
+                style={{
+                  userSelect: "none",
+                  flexShrink: 1,
+                  color: theme.colors.onSurface,
+                }}
                 ellipsizeMode="tail"
                 numberOfLines={1}
               >
@@ -106,7 +120,10 @@ export function MenuItem(props: Props) {
             {props.rightText && (
               <Text
                 variant="bodyLarge"
-                style={{ userSelect: "none", color: theme.colors.primary }}
+                style={{
+                  userSelect: "none",
+                  color: theme.colors.onSurfaceVariant,
+                }}
                 ellipsizeMode="tail"
                 numberOfLines={1}
               >
@@ -132,16 +149,24 @@ function Ripple(props: {
   children: ReactNode;
   rounded?: boolean;
 }) {
+  const { darkmode } = useTheme();
+  const rippleColor = darkmode
+    ? "rgba(255, 255, 255, 0.16)"
+    : "rgba(17, 24, 39, 0.12)";
+
   if (props.onPress) {
     return (
       <AnimatedPressable
         onPress={props.onPress}
-        borderless={!props.rounded}
+        borderless={false}
+        rippleColor={rippleColor}
+        // Paper otherwise puts bounded Android ripples behind the row content.
+        background={{ color: rippleColor, borderless: false, foreground: true }}
         style={{
           cursor: "pointer",
           flex: 1,
           borderRadius: props.rounded ? 12 : 0,
-          overflow: props.rounded ? "hidden" : "visible",
+          overflow: "hidden",
         }}
       >
         {props.children}

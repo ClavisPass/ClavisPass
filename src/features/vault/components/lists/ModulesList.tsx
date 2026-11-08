@@ -40,11 +40,7 @@ const LAYOUT_SETTLE_DELAY = 80;
 
 function getFocusedInput() {
   const textInputState = (TextInput as any).State;
-  return (
-    textInputState?.currentlyFocusedInput?.() ??
-    textInputState?.currentlyFocusedField?.() ??
-    null
-  );
+  return textInputState?.currentlyFocusedInput?.() ?? null;
 }
 
 function measureInWindow(

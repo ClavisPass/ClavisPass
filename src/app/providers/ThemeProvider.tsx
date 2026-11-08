@@ -118,9 +118,9 @@ export const ThemeProvider = ({ children }: Props) => {
         setTitlebarOverlayDragEnabled,
       }}
     >
-      <BottomSheetModalProvider>
-        <PaperProvider theme={theme}>{children}</PaperProvider>
-      </BottomSheetModalProvider>
+      <PaperProvider theme={theme}>
+        <BottomSheetModalProvider>{children}</BottomSheetModalProvider>
+      </PaperProvider>
     </ThemeContext.Provider>
   );
 };
