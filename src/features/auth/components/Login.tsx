@@ -6,8 +6,6 @@ import React, {
   useState,
 } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   StyleSheet,
   useWindowDimensions,
@@ -667,61 +665,55 @@ function Login(props: Props) {
   }
 
   return (
-    <KeyboardAvoidingView
+    <ScrollView
       style={{ flex: 1, width: "100%" }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={24}
+      contentContainerStyle={{
+        flexGrow: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "transparent",
+        paddingHorizontal: 6,
+        paddingVertical: 20,
+        gap: 14,
+      }}
+      keyboardDismissMode="on-drag"
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
     >
-      <ScrollView
-        style={{ flex: 1, width: "100%" }}
-        contentContainerStyle={{
-          flexGrow: 1,
+      <Animated.View
+        entering={FadeInDown.delay(50).duration(340).easing(transitionEasing)}
+        style={{
+          width: "100%",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "transparent",
-          paddingHorizontal: 6,
-          paddingVertical: 20,
-          gap: 14,
+          marginBottom: 8,
         }}
-        keyboardDismissMode="on-drag"
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
       >
-        <Animated.View
-          entering={FadeInDown.delay(50).duration(340).easing(transitionEasing)}
-          style={{
-            width: "100%",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 8,
-          }}
-        >
-          {brandingContent}
-        </Animated.View>
+        {brandingContent}
+      </Animated.View>
 
-        <Animated.View
-          entering={FadeInDown.delay(110)
-            .duration(360)
-            .easing(transitionEasing)}
-          layout={contentTransition}
+      <Animated.View
+        entering={FadeInDown.delay(110)
+          .duration(360)
+          .easing(transitionEasing)}
+        layout={contentTransition}
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          width: "100%",
+        }}
+      >
+        <View
           style={{
-            alignItems: "center",
-            justifyContent: "center",
-            width: "100%",
+            width: "92%",
+            maxWidth: 380,
+            alignSelf: "center",
           }}
         >
-          <View
-            style={{
-              width: "92%",
-              maxWidth: 380,
-              alignSelf: "center",
-            }}
-          >
-            {renderStageContent()}
-          </View>
-        </Animated.View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          {renderStageContent()}
+        </View>
+      </Animated.View>
+    </ScrollView>
   );
 }
 

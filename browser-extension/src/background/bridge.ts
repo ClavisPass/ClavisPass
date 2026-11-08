@@ -4,6 +4,11 @@ import type {
   CreateEntryFromBrowserPayload,
   FillDataResult,
   GetStatusResult,
+  AssertPasskeyForBrowserPayload,
+  AssertionPublicKeyCredential,
+  MatchPasskeysForRequestPayload,
+  MatchPasskeysForRequestResult,
+  PasskeyMetadataResult,
   SearchEntrySuggestion,
   UpdateEntryFromBrowserPayload
 } from "../shared/bridge";
@@ -35,6 +40,7 @@ function normalizeSuggestions(items: unknown): SearchEntrySuggestion[] {
       email: typeof item.email === "string" ? item.email : undefined,
       hasPassword: Boolean(item.hasPassword),
       hasTotp: Boolean(item.hasTotp),
+      hasPasskey: Boolean(item.hasPasskey),
       matchedHost: typeof item.matchedHost === "string" ? item.matchedHost : undefined
     }))
     .filter((item) => item.entryId.length > 0);
@@ -47,6 +53,71 @@ function normalizeFillData(result: FillDataResult): FillDataResult {
     username: result.username,
     password: result.password,
     totp: result.totp
+  };
+}
+
+function normalizePasskeyMetadata(result: PasskeyMetadataResult): PasskeyMetadataResult {
+  return {
+    entryId: result.entryId,
+    title: result.title,
+    passkeys: Array.isArray(result.passkeys)
+      ? result.passkeys
+          .filter((item) => item && typeof item === "object" && typeof item.relyingPartyId === "string")
+          .map((item) => ({
+            moduleId: typeof item.moduleId === "string" ? item.moduleId : undefined,
+            relyingPartyId: item.relyingPartyId,
+            relyingPartyName: typeof item.relyingPartyName === "string" ? item.relyingPartyName : undefined,
+            userName: typeof item.userName === "string" ? item.userName : undefined,
+            userDisplayName: typeof item.userDisplayName === "string" ? item.userDisplayName : undefined,
+            transports: Array.isArray(item.transports)
+              ? item.transports.filter((transport): transport is string => typeof transport === "string")
+              : undefined,
+            backupEligible: typeof item.backupEligible === "boolean" ? item.backupEligible : undefined,
+            backupState: typeof item.backupState === "boolean" ? item.backupState : undefined,
+            createdAt: typeof item.createdAt === "string" ? item.createdAt : undefined,
+            lastUsedAt: typeof item.lastUsedAt === "string" ? item.lastUsedAt : undefined,
+            source: typeof item.source === "string" ? item.source : undefined
+          }))
+      : []
+  };
+}
+
+function normalizePasskeyRequestCandidates(
+  result: MatchPasskeysForRequestResult
+): MatchPasskeysForRequestResult {
+  return {
+    passkeys: Array.isArray(result.passkeys)
+      ? result.passkeys
+          .filter((item) => item && typeof item === "object" && typeof item.entryId === "string")
+          .map((item) => ({
+            entryId: item.entryId,
+            entryTitle: typeof item.entryTitle === "string" ? item.entryTitle : "Untitled entry",
+            moduleId: typeof item.moduleId === "string" ? item.moduleId : undefined,
+            relyingPartyId: typeof item.relyingPartyId === "string" ? item.relyingPartyId : "",
+            relyingPartyName: typeof item.relyingPartyName === "string" ? item.relyingPartyName : undefined,
+            userName: typeof item.userName === "string" ? item.userName : undefined,
+            userDisplayName: typeof item.userDisplayName === "string" ? item.userDisplayName : undefined
+          }))
+          .filter((item) => item.relyingPartyId.length > 0)
+      : []
+  };
+}
+
+function normalizeAssertionCredential(result: AssertionPublicKeyCredential): AssertionPublicKeyCredential {
+  return {
+    id: result.id,
+    rawId: result.rawId,
+    type: "public-key",
+    response: {
+      authenticatorData: result.response.authenticatorData,
+      clientDataJSON: result.response.clientDataJSON,
+      signature: result.response.signature,
+      userHandle: result.response.userHandle
+    },
+    clientExtensionResults:
+      result.clientExtensionResults && typeof result.clientExtensionResults === "object"
+        ? result.clientExtensionResults
+        : {}
   };
 }
 
@@ -147,6 +218,24 @@ export class DesktopBridgeService {
     const pairingStatus = await getStoredPairingStatus();
     const result = await this.client.request("getFillDataForEntry", { entryId }, { status: pairingStatus });
     return normalizeFillData(result);
+  }
+
+  async getPasskeyMetadataForEntry(entryId: string): Promise<PasskeyMetadataResult> {
+    const pairingStatus = await getStoredPairingStatus();
+    const result = await this.client.request("getPasskeyMetadataForEntry", { entryId }, { status: pairingStatus });
+    return normalizePasskeyMetadata(result);
+  }
+
+  async matchPasskeysForRequest(payload: MatchPasskeysForRequestPayload): Promise<MatchPasskeysForRequestResult> {
+    const pairingStatus = await getStoredPairingStatus();
+    const result = await this.client.request("matchPasskeysForRequest", payload, { status: pairingStatus });
+    return normalizePasskeyRequestCandidates(result);
+  }
+
+  async assertPasskeyForBrowser(payload: AssertPasskeyForBrowserPayload): Promise<AssertionPublicKeyCredential> {
+    const pairingStatus = await getStoredPairingStatus();
+    const result = await this.client.request("assertPasskeyForBrowser", payload, { status: pairingStatus });
+    return normalizeAssertionCredential(result);
   }
 
   async createEntryFromBrowser(payload: CreateEntryFromBrowserPayload): Promise<BrowserWriteResult> {

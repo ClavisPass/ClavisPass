@@ -4,9 +4,13 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     pairing::{self, PairingStatus},
-    protocol::{BridgeRequest, BridgeResponse, HOST_NAME, PROTOCOL_VERSION},
+    protocol::{BridgeClientInfo, BridgeRequest, BridgeResponse, HOST_NAME, PROTOCOL_VERSION},
     session,
-    vault::{self, FillDataResult, SearchEntrySuggestion},
+    vault::{
+        self, FillDataResult, MatchPasskeysForRequestResult, PasskeyMetadataResult,
+        SearchEntrySuggestion,
+    },
+    webauthn,
     write::{self, CreateEntryFromBrowserPayload, UpdateEntryFromBrowserPayload},
 };
 
@@ -47,6 +51,29 @@ struct SearchPayload {
 #[serde(rename_all = "camelCase")]
 struct FillPayload {
     entry_id: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct MatchPasskeysPayload {
+    rp_id: String,
+    #[serde(default)]
+    allowed_credential_ids: Vec<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct AssertPasskeyPayload {
+    entry_id: String,
+    #[serde(default)]
+    module_id: Option<String>,
+    rp_id: String,
+    challenge: String,
+    origin: String,
+    #[serde(default)]
+    allowed_credential_ids: Vec<String>,
+    #[serde(default)]
+    user_verified: bool,
 }
 
 pub fn run_native_host() -> io::Result<()> {
@@ -108,6 +135,24 @@ fn handle_request(request: BridgeRequest) -> BridgeResponse {
                 return pairing_required(request.id);
             }
             respond_fill(request.id, request.payload)
+        }
+        "getPasskeyMetadataForEntry" => {
+            if pairing_status != PairingStatus::Paired {
+                return pairing_required(request.id);
+            }
+            respond_passkey_metadata(request.id, request.payload)
+        }
+        "matchPasskeysForRequest" => {
+            if pairing_status != PairingStatus::Paired {
+                return pairing_required(request.id);
+            }
+            respond_match_passkeys(request.id, request.payload)
+        }
+        "assertPasskeyForBrowser" => {
+            if pairing_status != PairingStatus::Paired {
+                return pairing_required(request.id);
+            }
+            respond_assert_passkey(request.id, request.payload, request.client)
         }
         "createEntryFromBrowser" => {
             if pairing_status != PairingStatus::Paired {
@@ -279,6 +324,220 @@ fn respond_fill(id: String, payload: serde_json::Value) -> BridgeResponse {
     };
 
     BridgeResponse::success(id, result)
+}
+
+fn respond_passkey_metadata(id: String, payload: serde_json::Value) -> BridgeResponse {
+    let payload = match serde_json::from_value::<FillPayload>(payload) {
+        Ok(value) => value,
+        Err(error) => {
+            return BridgeResponse::error(
+                id,
+                "INVALID_PAYLOAD",
+                format!("getPasskeyMetadataForEntry payload is invalid: {error}"),
+            )
+        }
+    };
+
+    let session_snapshot = match session::load_session() {
+        Ok(Some(snapshot)) => snapshot,
+        Ok(None) => {
+            return BridgeResponse::error(
+                id,
+                "APP_LOCKED",
+                "Desktop app has no published unlocked bridge session.",
+            )
+        }
+        Err(error) => {
+            return BridgeResponse::error(
+                id,
+                "SESSION_STORE_ERROR",
+                format!("Failed to load bridge session: {error}"),
+            )
+        }
+    };
+
+    let Some(result): Option<PasskeyMetadataResult> =
+        vault::passkey_metadata_for_entry(&session_snapshot.vault, &payload.entry_id)
+    else {
+        return BridgeResponse::error(id, "ENTRY_NOT_FOUND", "Entry could not be resolved.");
+    };
+
+    BridgeResponse::success(id, result)
+}
+
+fn respond_match_passkeys(id: String, payload: serde_json::Value) -> BridgeResponse {
+    let payload = match serde_json::from_value::<MatchPasskeysPayload>(payload) {
+        Ok(value) => value,
+        Err(error) => {
+            return BridgeResponse::error(
+                id,
+                "INVALID_PAYLOAD",
+                format!("matchPasskeysForRequest payload is invalid: {error}"),
+            )
+        }
+    };
+
+    let session_snapshot = match session::load_session() {
+        Ok(Some(snapshot)) => snapshot,
+        Ok(None) => {
+            return BridgeResponse::error(
+                id,
+                "APP_LOCKED",
+                "Desktop app has no published unlocked bridge session.",
+            )
+        }
+        Err(error) => {
+            return BridgeResponse::error(
+                id,
+                "SESSION_STORE_ERROR",
+                format!("Failed to load bridge session: {error}"),
+            )
+        }
+    };
+
+    let result: MatchPasskeysForRequestResult = vault::match_passkeys_for_request(
+        &session_snapshot.vault,
+        &payload.rp_id,
+        &payload.allowed_credential_ids,
+    );
+
+    BridgeResponse::success(id, result)
+}
+
+fn respond_assert_passkey(
+    id: String,
+    payload: serde_json::Value,
+    client: BridgeClientInfo,
+) -> BridgeResponse {
+    let payload = match serde_json::from_value::<AssertPasskeyPayload>(payload) {
+        Ok(value) => value,
+        Err(error) => {
+            return BridgeResponse::error(
+                id,
+                "INVALID_PAYLOAD",
+                format!("assertPasskeyForBrowser payload is invalid: {error}"),
+            )
+        }
+    };
+
+    let session_snapshot = match session::load_session() {
+        Ok(Some(snapshot)) => snapshot,
+        Ok(None) => {
+            return BridgeResponse::error(
+                id,
+                "APP_LOCKED",
+                "Desktop app has no published unlocked bridge session.",
+            )
+        }
+        Err(error) => {
+            return BridgeResponse::error(
+                id,
+                "SESSION_STORE_ERROR",
+                format!("Failed to load bridge session: {error}"),
+            )
+        }
+    };
+
+    let Some(material) = vault::passkey_assertion_material_for_request(
+        &session_snapshot.vault,
+        &payload.entry_id,
+        payload.module_id.as_deref(),
+        &payload.rp_id,
+        &payload.allowed_credential_ids,
+    ) else {
+        return BridgeResponse::error(
+            id,
+            "PASSKEY_NOT_FOUND",
+            "No matching passkey could be resolved for this request.",
+        );
+    };
+
+    if !is_es256_algorithm(material.algorithm.as_deref()) {
+        return BridgeResponse::error(
+            id,
+            "UNSUPPORTED_PASSKEY_ALGORITHM",
+            "Only ES256 P-256 passkeys are supported for browser assertions right now.",
+        );
+    }
+
+    if payload.user_verified {
+        return BridgeResponse::error(
+            id,
+            "USER_VERIFICATION_UNSUPPORTED",
+            "Passkey assertions with user verification are not supported yet.",
+        );
+    }
+
+    let mut context = match webauthn::build_assertion_signing_context(
+        &material.credential_id,
+        material.user_handle.as_deref(),
+        &material.relying_party_id,
+        &payload.challenge,
+        &payload.origin,
+        payload.user_verified,
+        material.backup_eligible,
+        material.backup_state,
+        material.sign_count,
+    ) {
+        Ok(value) => value,
+        Err(error) => return BridgeResponse::error(id, "INVALID_WEBAUTHN_REQUEST", error),
+    };
+
+    // Validate request bytes and key before allocating a counter in the app.
+    if let Err(error) =
+        webauthn::build_signed_assertion_public_key_credential(&material.private_key, &context)
+    {
+        return BridgeResponse::error(id, "PASSKEY_ASSERTION_FAILED", error);
+    }
+    let reservation = match write::reserve_passkey_assertion(
+        id.clone(),
+        client,
+        write::ReservePasskeyAssertionPayload {
+            entry_id: material.entry_id.clone(),
+            module_id: material.module_id.clone(),
+            relying_party_id: material.relying_party_id.clone(),
+            credential_id: material.credential_id.clone(),
+            minimum_sign_count: material.sign_count,
+        },
+    ) {
+        Ok(value) if value.ok => value,
+        Ok(value) => return bridge_result_to_response(id, value),
+        Err(error) => {
+            return BridgeResponse::error(id, "PASSKEY_RESERVATION_FAILED", error.to_string())
+        }
+    };
+    let count = reservation
+        .result
+        .as_ref()
+        .and_then(|value| value.get("signCount"))
+        .and_then(serde_json::Value::as_u64)
+        .and_then(|value| u32::try_from(value).ok());
+    let Some(count) = count
+        .filter(|count| (*count == 0 && material.sign_count == 0) || *count > material.sign_count)
+    else {
+        return BridgeResponse::error(
+            id,
+            "PASSKEY_RESERVATION_FAILED",
+            "Desktop app returned an invalid signature counter.",
+        );
+    };
+    if let Err(error) = webauthn::set_assertion_sign_count(&mut context, count) {
+        return BridgeResponse::error(id, "PASSKEY_ASSERTION_FAILED", error);
+    }
+    match webauthn::build_signed_assertion_public_key_credential(&material.private_key, &context) {
+        Ok(result) => BridgeResponse::success(id, result),
+        Err(error) => BridgeResponse::error(id, "PASSKEY_ASSERTION_FAILED", error),
+    }
+}
+
+fn is_es256_algorithm(algorithm: Option<&str>) -> bool {
+    let Some(algorithm) = algorithm.map(|value| value.to_lowercase()) else {
+        return true;
+    };
+
+    algorithm.trim().is_empty()
+        || algorithm.contains("es256")
+        || (algorithm.contains("ecdsa") && algorithm.contains("p-256"))
 }
 
 fn respond_create(request: BridgeRequest) -> BridgeResponse {

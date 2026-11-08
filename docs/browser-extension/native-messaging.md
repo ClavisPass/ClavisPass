@@ -20,15 +20,47 @@ This keeps browser IPC out of the Tauri UI layer and is safer and easier to exte
 - There is no always-on local HTTP server.
 - Pairing state is explicit and modeled separately from transport.
 
-## Current V1 behavior
+## Current V4 behavior
 
 Implemented Native Messaging commands:
 
 - `getStatus`
 - `searchEntriesByDomain`
 - `getFillDataForEntry`
+- `getPasskeyMetadataForEntry`
+- `matchPasskeysForRequest`
+- `assertPasskeyForBrowser`
 - `createEntryFromBrowser`
 - `updateEntryFromBrowser`
+
+Passkey assertion status:
+
+- `matchPasskeysForRequest` returns metadata-only candidates for a WebAuthn RP ID
+  and optional `allowCredentials` list.
+- `assertPasskeyForBrowser` is V4-only. It accepts a selected entry/module,
+  RP ID, challenge, origin, optional allowed credential IDs, and a user
+  verification flag. The native host resolves key material and the stored
+  sign-count from the unlocked vault snapshot, signs ES256/P-256 assertions
+  natively, and returns a WebAuthn-shaped assertion credential envelope.
+- Before returning a signature, the native host queues an internal
+  `reservePasskeyAssertion` write. The unlocked app matches the entry, module,
+  RP ID and credential ID again, keeps counterless credentials at zero, and
+  reserves the next positive counter otherwise. It updates `lastUsedAt` and
+  marks the vault dirty through `VaultProvider.update`. The reservation result
+  supplies the counter used in the signed authenticator data. The extension
+  allows 16 seconds for this command; the app write timeout is 12 seconds.
+  Queue mutations are protected by a cross-process file lock. This is an
+  in-session reservation, not a durable-storage acknowledgement; crash/restart
+  handling for positive counters still needs verification.
+- Both the extension and native assertion boundary validate RP scope using a
+  bundled Public Suffix List (including private suffixes). The native boundary
+  rejects insecure origins except HTTP `localhost`, malformed serialized
+  origins, IP-address RP IDs, and unrelated origin/RP pairs before signing.
+- `assertPasskeyForBrowser` rejects `userVerified: true` until ClavisPass has a
+  real local verification step. The host must not claim WebAuthn UV based only
+  on extension UI interaction.
+- The extension still requires an explicit popup selection before calling the
+  assertion command. It does not auto-sign detected requests.
 
 Pairing states:
 
@@ -45,7 +77,7 @@ Current flow:
    - approve the browser
    - reject the browser
    - remove an already paired browser
-5. Only `paired` extensions can call `searchEntriesByDomain`, `getFillDataForEntry`, `createEntryFromBrowser`, or `updateEntryFromBrowser`.
+5. Only `paired` extensions can call `searchEntriesByDomain`, `getFillDataForEntry`, `getPasskeyMetadataForEntry`, `matchPasskeysForRequest`, `assertPasskeyForBrowser`, `createEntryFromBrowser`, or `updateEntryFromBrowser`.
 
 ## Pairing persistence
 
@@ -106,7 +138,7 @@ Request shape:
 ```json
 {
   "id": "req-1",
-  "version": 1,
+  "version": 4,
   "command": "getStatus",
   "payload": {},
   "client": {

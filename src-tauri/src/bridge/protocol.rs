@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-pub const PROTOCOL_VERSION: u32 = 1;
+pub const PROTOCOL_VERSION: u32 = 4;
 pub const HOST_NAME: &str = "com.clavispass.native_host";
 
 fn default_protocol_version() -> u32 {

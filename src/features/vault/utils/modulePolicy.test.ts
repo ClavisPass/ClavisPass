@@ -78,6 +78,44 @@ describe("modulePolicy", () => {
     ]);
   });
 
+  it("keeps passkey key material out of metadata and returns it only as a secret", () => {
+    const value = entry({
+      modules: [
+        {
+          id: "passkey-1",
+          module: ModulesEnum.PASSKEY,
+          relyingPartyId: "example.com",
+          relyingPartyName: "Example",
+          userName: "alice",
+          userHandle: "secret-user-handle",
+          credentialId: "secret-credential-id",
+          publicKey: "public-key",
+          privateKey: "private-key",
+          algorithm: "ES256",
+          transports: ["internal"],
+          backupEligible: true,
+          backupState: true,
+          signCount: 7,
+        },
+      ] as any,
+    });
+
+    expect(buildEntryMeta(value)).toMatchObject({
+      passkey: "Example\nexample.com\nalice",
+    });
+    expect(JSON.stringify(buildEntryMeta(value))).not.toContain("private-key");
+    expect(JSON.stringify(buildEntryMeta(value))).not.toContain(
+      "secret-credential-id",
+    );
+    expect(getSecretFor(value, ModulesEnum.PASSKEY)).toEqual([
+      expect.objectContaining({
+        privateKey: "private-key",
+        credentialId: "secret-credential-id",
+        signCount: 7,
+      }),
+    ]);
+  });
+
   it("uses null as the secure default for unknown modules", () => {
     expect(getSecretFor(entry(), ModulesEnum.UNKNOWN)).toBeNull();
   });

@@ -9,6 +9,7 @@ enum ModulesEnum {
   KEY = "KEY",
   NOTE = "NOTE",
   PASSWORD = "PASSWORD",
+  PASSKEY = "PASSKEY",
   PERSON = "PERSON",
   PIN = "PIN",
   TITLE = "TITLE",

@@ -205,12 +205,12 @@ This note captures the planned direction for Bitwarden import support. The goal 
     - Map attachments to the existing `ATTACHMENT` module.
     - Keep the same practical ClavisPass attachment limits and show warnings for skipped files.
 
-16. [ ] Decide passkey handling.
+16. [x] Decide passkey handling.
     - Bitwarden JSON can include stored passkeys.
     - Real passkey support is a larger feature because it touches browser/app integration and credential flows.
-    - For the first import, either:
-      - report passkeys as unsupported,
-      - or preserve basic metadata in hidden compatibility metadata without pretending they are usable.
+    - Decision: JSON import maps `login.fido2Credentials` into dedicated `PASSKEY` modules.
+    - The browser extension may show matching passkey entries for the active domain, but real WebAuthn ceremony support remains a later milestone.
+    - Imported private-key material stays in the vault module secret surface; search and extension suggestions expose only relying party and account metadata.
 
 ## Compatibility Notes
 

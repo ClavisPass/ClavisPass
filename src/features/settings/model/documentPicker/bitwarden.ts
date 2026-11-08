@@ -20,6 +20,22 @@ type BitwardenUri = {
   uri?: string | null;
 };
 
+type BitwardenFido2Credential = {
+  credentialId?: string | null;
+  keyType?: string | null;
+  keyAlgorithm?: string | null;
+  keyCurve?: string | null;
+  keyValue?: string | null;
+  rpId?: string | null;
+  userHandle?: string | null;
+  userName?: string | null;
+  rpName?: string | null;
+  userDisplayName?: string | null;
+  discoverable?: string | boolean | null;
+  creationDate?: string | null;
+  counter?: string | number | null;
+};
+
 type BitwardenItem = {
   id?: string | null;
   folderId?: string | null;
@@ -35,6 +51,7 @@ type BitwardenItem = {
     password?: string | null;
     totp?: string | null;
     uris?: BitwardenUri[] | null;
+    fido2Credentials?: BitwardenFido2Credential[] | null;
   } | null;
   secureNote?: Record<string, unknown> | null;
   card?: {
@@ -157,6 +174,52 @@ function addTotp(modules: ModuleType[], value: unknown) {
   } as ModuleType);
 }
 
+function addPasskeyModules(modules: ModuleType[], credentials: BitwardenFido2Credential[] | null | undefined) {
+  (credentials ?? []).forEach((credential) => {
+    const relyingPartyId = clean(credential.rpId);
+    const credentialId = clean(credential.credentialId);
+    const privateKey = clean(credential.keyValue);
+    if (!relyingPartyId || !credentialId || !privateKey) return;
+
+    const rawCounter = credential.counter ?? 0;
+    const signCount = typeof rawCounter === "string" && /^\d+$/.test(rawCounter)
+      ? Number(rawCounter)
+      : rawCounter;
+    if (typeof signCount !== "number" || !Number.isInteger(signCount) || signCount < 0 || signCount > 0xffffffff) {
+      throw new Error("Invalid Bitwarden passkey counter");
+    }
+
+    const algorithm = [
+      credential.keyType,
+      credential.keyAlgorithm,
+      credential.keyCurve,
+    ]
+      .map(clean)
+      .filter(Boolean)
+      .join(" / ");
+
+    modules.push({
+      id: createUniqueID(),
+      module: ModulesEnum.PASSKEY,
+      relyingPartyId,
+      relyingPartyName: clean(credential.rpName),
+      userName: clean(credential.userName),
+      userDisplayName: clean(credential.userDisplayName),
+      userHandle: clean(credential.userHandle),
+      credentialId,
+      publicKey: "",
+      privateKey,
+      algorithm,
+      transports: [],
+      backupEligible: false,
+      backupState: false,
+      signCount,
+      createdAt: toIso(credential.creationDate, new Date().toISOString()),
+      source: "Bitwarden JSON",
+    } as ModuleType);
+  });
+}
+
 function addExpiryModule(modules: ModuleType[], value: unknown) {
   const text = clean(value);
   if (!text) return;
@@ -183,6 +246,7 @@ function addLoginModules(modules: ModuleType[], item: BitwardenItem) {
   });
 
   addTotp(modules, login.totp);
+  addPasskeyModules(modules, login.fido2Credentials);
 }
 
 function addCardModule(modules: ModuleType[], item: BitwardenItem) {

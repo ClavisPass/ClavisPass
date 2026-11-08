@@ -11,6 +11,7 @@ import { EmnailModuleTypeSchema } from "./modules/EmailModuleType";
 import { KeyModuleTypeSchema } from "./modules/KeyModuleType";
 import { NoteModuleTypeSchema } from "./modules/NoteModuleType";
 import { PasswordModuleTypeSchema } from "./modules/PasswordModuleType";
+import { PasskeyModuleTypeSchema } from "./modules/PasskeyModuleType";
 import { PersonModuleTypeSchema } from "./modules/PersonModuleType";
 import { PinModuleTypeSchema } from "./modules/PinModuleType";
 import { TitleModuleTypeSchema } from "./modules/TitleModuleType";
@@ -36,6 +37,7 @@ const MODULE_SCHEMA_BY_ENUM = {
   [ModulesEnum.KEY]: KeyModuleTypeSchema,
   [ModulesEnum.NOTE]: NoteModuleTypeSchema,
   [ModulesEnum.PASSWORD]: PasswordModuleTypeSchema,
+  [ModulesEnum.PASSKEY]: PasskeyModuleTypeSchema,
   [ModulesEnum.PERSON]: PersonModuleTypeSchema,
   [ModulesEnum.PIN]: PinModuleTypeSchema,
   [ModulesEnum.TITLE]: TitleModuleTypeSchema,

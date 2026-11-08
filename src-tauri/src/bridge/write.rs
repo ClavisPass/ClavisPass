@@ -1,3 +1,4 @@
+use fs2::FileExt;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{
@@ -76,6 +77,30 @@ pub struct UpdateEntryFromBrowserResult {
 pub enum BrowserWriteKind {
     CreateEntryFromBrowser,
     UpdateEntryFromBrowser,
+    ReservePasskeyAssertion,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ReservePasskeyAssertionPayload {
+    pub entry_id: String,
+    pub module_id: Option<String>,
+    pub relying_party_id: String,
+    pub credential_id: String,
+    pub minimum_sign_count: u32,
+}
+
+pub fn reserve_passkey_assertion(
+    id: String,
+    client: BridgeClientInfo,
+    payload: ReservePasskeyAssertionPayload,
+) -> io::Result<BrowserWriteResult> {
+    queue_request(
+        id,
+        BrowserWriteKind::ReservePasskeyAssertion,
+        client,
+        payload,
+    )
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -154,7 +179,12 @@ pub fn queue_create_request(
     payload: CreateEntryFromBrowserPayload,
 ) -> io::Result<BrowserWriteResult> {
     validate_create_payload(&payload).map_err(as_io_error)?;
-    queue_request(id, BrowserWriteKind::CreateEntryFromBrowser, client, payload)
+    queue_request(
+        id,
+        BrowserWriteKind::CreateEntryFromBrowser,
+        client,
+        payload,
+    )
 }
 
 pub fn queue_update_request(
@@ -163,11 +193,17 @@ pub fn queue_update_request(
     payload: UpdateEntryFromBrowserPayload,
 ) -> io::Result<BrowserWriteResult> {
     validate_update_payload(&payload).map_err(as_io_error)?;
-    queue_request(id, BrowserWriteKind::UpdateEntryFromBrowser, client, payload)
+    queue_request(
+        id,
+        BrowserWriteKind::UpdateEntryFromBrowser,
+        client,
+        payload,
+    )
 }
 
 pub fn claim_pending_requests() -> io::Result<Vec<BrowserWriteRequest>> {
     let path = write_request_store_path()?;
+    let _lock = lock_write_store(&path)?;
     let mut store = load_request_store(&path)?;
     let now = now_ms();
     let mut claimed = Vec::new();
@@ -199,13 +235,18 @@ pub fn complete_request(
 ) -> io::Result<()> {
     let requests_path = write_request_store_path()?;
     let results_path = write_result_store_path()?;
+    let _lock = lock_write_store(&requests_path)?;
 
     let mut request_store = load_request_store(&requests_path)?;
-    request_store.requests.retain(|request| request.id != request_id);
+    request_store
+        .requests
+        .retain(|request| request.id != request_id);
     write_json_atomically(&requests_path, &request_store)?;
 
     let mut result_store = load_result_store(&results_path)?;
-    result_store.results.retain(|item| item.request_id != request_id);
+    result_store
+        .results
+        .retain(|item| item.request_id != request_id);
     result_store.results.push(BrowserWriteResult {
         request_id: request_id.to_string(),
         completed_at_ms: now_ms(),
@@ -248,6 +289,7 @@ fn queue_request<T: Serialize>(
     payload: T,
 ) -> io::Result<BrowserWriteResult> {
     let path = write_request_store_path()?;
+    let lock = lock_write_store(&path)?;
     let mut store = load_request_store(&path)?;
 
     store.requests.retain(|request| request.id != id);
@@ -262,16 +304,29 @@ fn queue_request<T: Serialize>(
     });
 
     write_json_atomically(&path, &store)?;
+    drop(lock);
     wait_for_result(&id)
 }
 
 fn find_result(request_id: &str) -> io::Result<Option<BrowserWriteResult>> {
     let path = write_result_store_path()?;
+    let _lock = lock_write_store(&path)?;
     let store = load_result_store(&path)?;
     Ok(store
         .results
         .into_iter()
         .find(|result| result.request_id == request_id))
+}
+
+fn lock_write_store(path: &PathBuf) -> io::Result<fs::File> {
+    let lock = fs::OpenOptions::new()
+        .create(true)
+        .truncate(false)
+        .read(true)
+        .write(true)
+        .open(path.with_file_name("browser-writes.lock"))?;
+    lock.lock_exclusive()?;
+    Ok(lock)
 }
 
 fn load_request_store(path: &PathBuf) -> io::Result<BrowserWriteRequestStore> {
@@ -339,6 +394,39 @@ mod tests {
         effective_url, validate_create_payload, validate_update_payload,
         CreateEntryFromBrowserPayload, UpdateEntryFromBrowserPayload,
     };
+
+    #[test]
+    fn write_store_lock_serializes_independent_writers() {
+        let directory = std::env::temp_dir().join(format!(
+            "clavispass-write-lock-{}-{}",
+            std::process::id(),
+            super::now_ms()
+        ));
+        std::fs::create_dir(&directory).unwrap();
+        let counter = directory.join("counter.json");
+        std::fs::write(&counter, "0").unwrap();
+        let threads: Vec<_> = (0..4)
+            .map(|_| {
+                let counter = counter.clone();
+                std::thread::spawn(move || {
+                    for _ in 0..10 {
+                        let _lock = super::lock_write_store(&counter).unwrap();
+                        let current: u32 =
+                            std::fs::read_to_string(&counter).unwrap().parse().unwrap();
+                        std::thread::yield_now();
+                        std::fs::write(&counter, (current + 1).to_string()).unwrap();
+                    }
+                })
+            })
+            .collect();
+        for thread in threads {
+            thread.join().unwrap();
+        }
+        assert_eq!(std::fs::read_to_string(&counter).unwrap(), "40");
+        std::fs::remove_file(&counter).unwrap();
+        std::fs::remove_file(directory.join("browser-writes.lock")).unwrap();
+        std::fs::remove_dir(directory).unwrap();
+    }
 
     #[test]
     fn create_payload_requires_password() {

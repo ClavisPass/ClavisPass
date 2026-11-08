@@ -273,6 +273,22 @@ export default function AddModuleModalCompactFav(props: Props) {
       keywords: ["passwort", "password", "credential", "login", "secret"],
     },
     {
+      id: ModulesEnum.PASSKEY,
+      label: t("modules:passkey"),
+      icon: MODULE_ICON[ModulesEnum.PASSKEY],
+      category: "SecurityCodes",
+      keywords: [
+        "passkey",
+        "webauthn",
+        "fido",
+        "credential",
+        "login",
+        "public",
+        "private",
+        "schlüssel",
+      ],
+    },
+    {
       id: ModulesEnum.PERSON,
       label: t("modules:person"),
       icon: MODULE_ICON[ModulesEnum.PERSON],

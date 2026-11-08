@@ -13,6 +13,7 @@ export const MODULE_ICON = {
   [ModulesEnum.KEY]: "key-variant",
   [ModulesEnum.NOTE]: "note-outline",
   [ModulesEnum.PASSWORD]: "form-textbox-password",
+  [ModulesEnum.PASSKEY]: "key-chain-variant",
   [ModulesEnum.PERSON]: "account-details-outline",
   [ModulesEnum.PIN]: "dialpad",
   [ModulesEnum.URL]: "web",

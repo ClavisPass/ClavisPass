@@ -12,6 +12,7 @@ import ExpiryModuleType from "../model/modules/ExpiryModuleType";
 import KeyModuleType from "../model/modules/KeyModuleType";
 import NoteModuleType from "../model/modules/NoteModuleType";
 import PasswordModuleType from "../model/modules/PasswordModuleType";
+import PasskeyModuleType from "../model/modules/PasskeyModuleType";
 import PersonModuleType from "../model/modules/PersonModuleType";
 import PinModuleType from "../model/modules/PinModuleType";
 import PhoneNumberModuleType from "../model/modules/PhoneNumberModuleType";
@@ -116,6 +117,25 @@ const MODULE_DEFAULTS = {
       module: ModulesEnum.PASSWORD,
       value: "",
     }) satisfies PasswordModuleType,
+
+  [ModulesEnum.PASSKEY]: (id: string): ModuleType =>
+    ({
+      id,
+      module: ModulesEnum.PASSKEY,
+      relyingPartyId: "",
+      relyingPartyName: "",
+      userName: "",
+      userDisplayName: "",
+      userHandle: "",
+      credentialId: "",
+      publicKey: "",
+      privateKey: "",
+      algorithm: "",
+      transports: [],
+      backupEligible: false,
+      backupState: false,
+      signCount: 0,
+    }) satisfies PasskeyModuleType,
 
   [ModulesEnum.PERSON]: (id: string): ModuleType =>
     ({

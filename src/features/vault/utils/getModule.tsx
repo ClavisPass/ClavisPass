@@ -31,6 +31,8 @@ import NoteModule from "../components/modules/NoteModule";
 
 import PasswordModuleType from "../model/modules/PasswordModuleType";
 import PasswordModule from "../components/modules/PasswordModule";
+import PasskeyModuleType from "../model/modules/PasskeyModuleType";
+import PasskeyModule from "../components/modules/PasskeyModule";
 import PersonModuleType from "../model/modules/PersonModuleType";
 import PersonModule from "../components/modules/PersonModule";
 import PinModuleType from "../model/modules/PinModuleType";
@@ -265,6 +267,37 @@ const MODULE_RENDERERS = {
         id={m.id}
         module={m.module}
         value={m.value}
+        onDragStart={args.onDragStart}
+        deleteModule={args.deleteModule}
+        changeModule={args.changeModule}
+        fastAccess={args.fastAccess}
+        autoFocus={args.autoFocus}
+      />
+    );
+  },
+
+  [ModulesEnum.PASSKEY]: (module, args) => {
+    const m = module as PasskeyModuleType;
+    return (
+      <PasskeyModule
+        id={m.id}
+        module={m.module}
+        relyingPartyId={m.relyingPartyId}
+        relyingPartyName={m.relyingPartyName}
+        userName={m.userName}
+        userDisplayName={m.userDisplayName}
+        userHandle={m.userHandle}
+        credentialId={m.credentialId}
+        publicKey={m.publicKey}
+        privateKey={m.privateKey}
+        algorithm={m.algorithm}
+        transports={m.transports}
+        backupEligible={m.backupEligible}
+        backupState={m.backupState}
+        signCount={m.signCount}
+        createdAt={m.createdAt}
+        lastUsedAt={m.lastUsedAt}
+        source={m.source}
         onDragStart={args.onDragStart}
         deleteModule={args.deleteModule}
         changeModule={args.changeModule}

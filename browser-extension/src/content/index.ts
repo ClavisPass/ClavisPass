@@ -10,6 +10,7 @@ declare global {
   interface Window {
     __clavispassContentScriptLoaded?: boolean;
     __clavispassInlineRefresh?: () => void;
+    __clavispassWebAuthnProbeLoaded?: boolean;
   }
 }
 
@@ -18,6 +19,8 @@ const INLINE_PICKER_ID = "clavispass-inline-picker";
 const INLINE_STYLE_ID = "clavispass-inline-style";
 const INLINE_BUTTON_TITLE = "Fill with ClavisPass";
 const INLINE_ELIGIBILITY_REFRESH_MS = 3000;
+const WEBAUTHN_PROBE_SOURCE = "clavispass-webauthn-probe";
+const WEBAUTHN_RESPONSE_SOURCE = "clavispass-webauthn-response";
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 const INLINE_LOGO_PATHS = [
   {
@@ -67,6 +70,304 @@ let inlineEligibility = {
   appScheme: undefined as string | undefined
 };
 
+function setupWebAuthnProbe(): void {
+  if (window.__clavispassWebAuthnProbeLoaded) {
+    return;
+  }
+
+  window.__clavispassWebAuthnProbeLoaded = true;
+
+  window.addEventListener("message", (event) => {
+    if (event.source !== window || !event.data || event.data.source !== WEBAUTHN_PROBE_SOURCE) {
+      return;
+    }
+
+    const data = event.data;
+    if (data.kind !== "create" && data.kind !== "get") {
+      return;
+    }
+
+    void sendRuntimeMessage("webauthn:requestDetected", {
+      requestId: typeof data.requestId === "string" ? data.requestId : undefined,
+      kind: data.kind,
+      pageUrl: typeof data.pageUrl === "string" ? data.pageUrl : window.location.href,
+      origin: typeof data.origin === "string" ? data.origin : window.location.origin,
+      rpId: typeof data.rpId === "string" ? data.rpId : undefined,
+      challenge: typeof data.challenge === "string" ? data.challenge : undefined,
+      userVerification: typeof data.userVerification === "string" ? data.userVerification : undefined,
+      mediation: typeof data.mediation === "string" ? data.mediation : undefined,
+      hasChallenge: data.hasChallenge === true,
+      allowCredentialCount: typeof data.allowCredentialCount === "number" ? data.allowCredentialCount : undefined,
+      allowedCredentialIds: Array.isArray(data.allowedCredentialIds)
+        ? data.allowedCredentialIds.filter((item: unknown): item is string => typeof item === "string")
+        : undefined,
+      detectedAt: typeof data.detectedAt === "number" ? data.detectedAt : Date.now()
+    }).catch(() => {
+      if (typeof data.requestId === "string") {
+        window.postMessage({
+          source: WEBAUTHN_RESPONSE_SOURCE,
+          requestId: data.requestId,
+          fallback: true
+        }, window.location.origin);
+      }
+    });
+  });
+
+  const script = document.createElement("script");
+  script.textContent = `(${function webAuthnProbe(source: string, responseSource: string) {
+    const globalWindow = window as Window & {
+      __clavispassPageWebAuthnProbeLoaded?: boolean;
+      __clavispassPageWebAuthnRequestCounter?: number;
+      CredentialsContainer?: {
+        prototype?: {
+          create?: (options?: CredentialCreationOptions) => Promise<Credential | null>;
+          get?: (options?: CredentialRequestOptions) => Promise<Credential | null>;
+        };
+      };
+    };
+
+    if (globalWindow.__clavispassPageWebAuthnProbeLoaded) {
+      return;
+    }
+    globalWindow.__clavispassPageWebAuthnProbeLoaded = true;
+    globalWindow.__clavispassPageWebAuthnRequestCounter = globalWindow.__clavispassPageWebAuthnRequestCounter ?? 0;
+
+    const containerPrototype = globalWindow.CredentialsContainer?.prototype;
+    if (!containerPrototype) {
+      return;
+    }
+
+    type PendingRequest = {
+      resolve: (value: Credential | null) => void;
+      reject: (reason?: unknown) => void;
+      fallback: () => Promise<Credential | null>;
+      timeoutId: number;
+    };
+
+    const pendingRequests = new Map<string, PendingRequest>();
+    const requestTimeoutMs = 120000;
+
+    const describeOptions = (
+      kind: "create" | "get",
+      options?: CredentialCreationOptions | CredentialRequestOptions | null,
+      requestId?: string
+    ) => {
+      const publicKey = options?.publicKey;
+      const rp = kind === "create" ? (publicKey as PublicKeyCredentialCreationOptions | undefined)?.rp : undefined;
+      const allowCredentials = kind === "get"
+        ? (publicKey as PublicKeyCredentialRequestOptions | undefined)?.allowCredentials
+        : undefined;
+      const toBase64Url = (value: BufferSource): string | undefined => {
+        try {
+          const bytes = value instanceof ArrayBuffer
+            ? new Uint8Array(value)
+            : new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
+          let binary = "";
+          bytes.forEach((byte) => {
+            binary += String.fromCharCode(byte);
+          });
+          return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+        } catch {
+          return undefined;
+        }
+      };
+      const allowedCredentialIds = Array.isArray(allowCredentials)
+        ? allowCredentials
+            .map((credential) => toBase64Url(credential.id))
+            .filter((value): value is string => typeof value === "string" && value.length > 0)
+        : undefined;
+      const challenge = publicKey?.challenge ? toBase64Url(publicKey.challenge) : undefined;
+
+      return {
+        source,
+        requestId,
+        kind,
+        pageUrl: location.href,
+        origin: location.origin,
+        rpId:
+          kind === "create"
+            ? rp?.id
+            : (publicKey as PublicKeyCredentialRequestOptions | undefined)?.rpId,
+        challenge,
+        userVerification:
+          kind === "create"
+            ? (publicKey as PublicKeyCredentialCreationOptions | undefined)?.authenticatorSelection?.userVerification
+            : (publicKey as PublicKeyCredentialRequestOptions | undefined)?.userVerification,
+        mediation: (options as CredentialRequestOptions | undefined)?.mediation,
+        hasChallenge: Boolean(publicKey?.challenge),
+        allowCredentialCount: Array.isArray(allowCredentials) ? allowCredentials.length : undefined,
+        allowedCredentialIds,
+        detectedAt: Date.now()
+      };
+    };
+
+    const notify = (
+      kind: "create" | "get",
+      options?: CredentialCreationOptions | CredentialRequestOptions | null,
+      requestId?: string
+    ) => {
+      try {
+        window.postMessage(describeOptions(kind, options, requestId), location.origin);
+      } catch {
+      }
+    };
+
+    const fromBase64Url = (value: string): ArrayBuffer => {
+      const padded = `${value.replace(/-/g, "+").replace(/_/g, "/")}${"=".repeat((4 - value.length % 4) % 4)}`;
+      const binary = atob(padded);
+      const bytes = new Uint8Array(binary.length);
+      for (let index = 0; index < binary.length; index += 1) {
+        bytes[index] = binary.charCodeAt(index);
+      }
+      return bytes.buffer;
+    };
+
+    const withPrototype = <T extends object>(value: T, prototype: object | undefined): T => {
+      if (prototype) {
+        try {
+          Object.setPrototypeOf(value, prototype);
+        } catch {
+        }
+      }
+
+      return value;
+    };
+
+    const createCredentialLikeObject = (credential: {
+      id: string;
+      rawId: string;
+      type: "public-key";
+      response: {
+        authenticatorData: string;
+        clientDataJSON: string;
+        signature: string;
+        userHandle?: string;
+      };
+      clientExtensionResults?: Record<string, unknown>;
+    }) => {
+      const response = withPrototype({
+        authenticatorData: fromBase64Url(credential.response.authenticatorData),
+        clientDataJSON: fromBase64Url(credential.response.clientDataJSON),
+        signature: fromBase64Url(credential.response.signature),
+        userHandle: credential.response.userHandle ? fromBase64Url(credential.response.userHandle) : null
+      }, (window as unknown as { AuthenticatorAssertionResponse?: { prototype: object } }).AuthenticatorAssertionResponse?.prototype);
+
+      const publicKeyCredential = withPrototype({
+        id: credential.id,
+        rawId: fromBase64Url(credential.rawId),
+        type: credential.type,
+        response,
+        authenticatorAttachment: null,
+        getClientExtensionResults() {
+          return credential.clientExtensionResults ?? {};
+        },
+        toJSON() {
+          return {
+            id: credential.id,
+            rawId: credential.rawId,
+            type: credential.type,
+            authenticatorAttachment: null,
+            response: {
+              authenticatorData: credential.response.authenticatorData,
+              clientDataJSON: credential.response.clientDataJSON,
+              signature: credential.response.signature,
+              userHandle: credential.response.userHandle ?? null
+            },
+            clientExtensionResults: credential.clientExtensionResults ?? {}
+          };
+        }
+      }, (window as unknown as { PublicKeyCredential?: { prototype: object } }).PublicKeyCredential?.prototype);
+
+      return publicKeyCredential as unknown as PublicKeyCredential;
+    };
+
+    window.addEventListener("message", (event) => {
+      if (event.source !== window || !event.data || event.data.source !== responseSource) {
+        return;
+      }
+
+      const requestId = typeof event.data.requestId === "string" ? event.data.requestId : "";
+      const pending = pendingRequests.get(requestId);
+      if (!pending) {
+        return;
+      }
+
+      pendingRequests.delete(requestId);
+      window.clearTimeout(pending.timeoutId);
+
+      if (event.data.fallback === true) {
+        pending.fallback().then(pending.resolve, pending.reject);
+        return;
+      }
+
+      if (event.data.ok && event.data.credential) {
+        try {
+          pending.resolve(createCredentialLikeObject(event.data.credential));
+        } catch (error) {
+          pending.reject(error);
+        }
+        return;
+      }
+
+      pending.reject(new DOMException(
+        typeof event.data.error === "string" ? event.data.error : "ClavisPass could not complete the passkey request.",
+        "NotAllowedError"
+      ));
+    });
+
+    const nativeCreate = containerPrototype.create;
+    if (typeof nativeCreate === "function") {
+      Object.defineProperty(containerPrototype, "create", {
+        configurable: true,
+        value(this: CredentialsContainer, options?: CredentialCreationOptions) {
+          notify("create", options);
+          return nativeCreate.apply(this, arguments as unknown as [CredentialCreationOptions?]);
+        }
+      });
+    }
+
+    const nativeGet = containerPrototype.get;
+    if (typeof nativeGet === "function") {
+      Object.defineProperty(containerPrototype, "get", {
+        configurable: true,
+        value(this: CredentialsContainer, options?: CredentialRequestOptions) {
+          if (!options?.publicKey?.challenge) {
+            notify("get", options);
+            return nativeGet.apply(this, arguments as unknown as [CredentialRequestOptions?]);
+          }
+
+          const requestId = `clavispass-${Date.now()}-${++globalWindow.__clavispassPageWebAuthnRequestCounter!}`;
+          const args = arguments as unknown as [CredentialRequestOptions?];
+          const fallback = () => nativeGet.apply(this, args);
+          notify("get", options, requestId);
+
+          return new Promise<Credential | null>((resolve, reject) => {
+            const timeoutId = window.setTimeout(() => {
+              const pending = pendingRequests.get(requestId);
+              if (!pending) {
+                return;
+              }
+
+              pendingRequests.delete(requestId);
+              pending.fallback().then(resolve, reject);
+            }, requestTimeoutMs);
+
+            pendingRequests.set(requestId, {
+              resolve,
+              reject,
+              fallback,
+              timeoutId
+            });
+          });
+        }
+      });
+    }
+  }.toString()})(${JSON.stringify(WEBAUTHN_PROBE_SOURCE)}, ${JSON.stringify(WEBAUTHN_RESPONSE_SOURCE)});`;
+
+  (document.head || document.documentElement).appendChild(script);
+  script.remove();
+}
+
 function registerContentFrame(): void {
   void sendRuntimeMessage("content:ready", {
     url: window.location.href
@@ -115,6 +416,8 @@ function getDebugInfo(): ContentDebugInfo {
     iframeCount: document.querySelectorAll("iframe").length,
     formsCount: document.querySelectorAll("form").length,
     inlineButtonVisible: Boolean(document.getElementById(INLINE_ROOT_ID))
+    ,
+    webAuthnProbeLoaded: Boolean(window.__clavispassWebAuthnProbeLoaded)
   };
 }
 
@@ -149,12 +452,38 @@ function setupFillListener(): void {
       return true;
     }
 
+    if (rawMessage.type === "content:webauthnAssertionResult") {
+      const payload = rawMessage.payload as {
+        requestId: string;
+        credential?: import("../shared/bridge").AssertionPublicKeyCredential;
+        error?: string;
+      } | undefined;
+      if (!payload?.requestId) {
+        sendResponse({
+          delivered: false
+        });
+        return true;
+      }
+
+      window.postMessage({
+        source: WEBAUTHN_RESPONSE_SOURCE,
+        requestId: payload.requestId,
+        ok: Boolean(payload.credential),
+        credential: payload.credential,
+        error: payload.error
+      }, window.location.origin);
+      sendResponse({
+        delivered: true
+      });
+      return true;
+    }
+
     if (rawMessage.type !== "content:fillData") {
       return false;
     }
 
     try {
-      const fillPayload = rawMessage.payload;
+      const fillPayload = rawMessage.payload as { fillData: FillDataResult } | undefined;
       if (!fillPayload) {
         sendResponse({
           status: "failed",
@@ -1002,6 +1331,7 @@ if (!window.__clavispassContentScriptLoaded) {
   setupExtensionThemeSync();
   setupFillListener();
   setupSavePromptListener();
+  setupWebAuthnProbe();
   setupInlineTrigger();
 } else {
   window.__clavispassInlineRefresh?.();

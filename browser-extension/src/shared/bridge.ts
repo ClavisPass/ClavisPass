@@ -47,11 +47,31 @@ export interface SearchEntrySuggestion {
   email?: string;
   hasPassword: boolean;
   hasTotp: boolean;
+  hasPasskey: boolean;
   matchedHost?: string;
 }
 
 export interface GetFillDataForEntryPayload {
   entryId: string;
+}
+
+export interface GetPasskeyMetadataForEntryPayload {
+  entryId: string;
+}
+
+export interface MatchPasskeysForRequestPayload {
+  rpId: string;
+  allowedCredentialIds?: string[];
+}
+
+export interface AssertPasskeyForBrowserPayload {
+  entryId: string;
+  moduleId?: string;
+  rpId: string;
+  challenge: string;
+  origin: string;
+  allowedCredentialIds?: string[];
+  userVerified?: boolean;
 }
 
 export interface FillDataResult {
@@ -60,6 +80,55 @@ export interface FillDataResult {
   username?: string;
   password: string;
   totp?: string;
+}
+
+export interface PasskeyCredentialMetadata {
+  moduleId?: string;
+  relyingPartyId: string;
+  relyingPartyName?: string;
+  userName?: string;
+  userDisplayName?: string;
+  transports?: string[];
+  backupEligible?: boolean;
+  backupState?: boolean;
+  createdAt?: string;
+  lastUsedAt?: string;
+  source?: string;
+}
+
+export interface PasskeyMetadataResult {
+  entryId: string;
+  title: string;
+  passkeys: PasskeyCredentialMetadata[];
+}
+
+export interface PasskeyRequestCandidate {
+  entryId: string;
+  entryTitle: string;
+  moduleId?: string;
+  relyingPartyId: string;
+  relyingPartyName?: string;
+  userName?: string;
+  userDisplayName?: string;
+}
+
+export interface MatchPasskeysForRequestResult {
+  passkeys: PasskeyRequestCandidate[];
+}
+
+export interface AssertionAuthenticatorResponse {
+  authenticatorData: string;
+  clientDataJSON: string;
+  signature: string;
+  userHandle?: string;
+}
+
+export interface AssertionPublicKeyCredential {
+  id: string;
+  rawId: string;
+  type: "public-key";
+  response: AssertionAuthenticatorResponse;
+  clientExtensionResults: Record<string, unknown>;
 }
 
 export interface CreateEntryFromBrowserPayload {
@@ -95,6 +164,9 @@ export type BridgeCommand =
   | "getStatus"
   | "searchEntriesByDomain"
   | "getFillDataForEntry"
+  | "getPasskeyMetadataForEntry"
+  | "matchPasskeysForRequest"
+  | "assertPasskeyForBrowser"
   | "createEntryFromBrowser"
   | "updateEntryFromBrowser";
 
@@ -106,6 +178,9 @@ export interface BridgeRequestPayloadMap {
   getStatus: undefined;
   searchEntriesByDomain: SearchEntriesByDomainPayload;
   getFillDataForEntry: GetFillDataForEntryPayload;
+  getPasskeyMetadataForEntry: GetPasskeyMetadataForEntryPayload;
+  matchPasskeysForRequest: MatchPasskeysForRequestPayload;
+  assertPasskeyForBrowser: AssertPasskeyForBrowserPayload;
   createEntryFromBrowser: CreateEntryFromBrowserPayload;
   updateEntryFromBrowser: UpdateEntryFromBrowserPayload;
 }
@@ -114,6 +189,9 @@ export interface BridgeResultMap {
   getStatus: GetStatusResult;
   searchEntriesByDomain: SearchEntrySuggestion[];
   getFillDataForEntry: FillDataResult;
+  getPasskeyMetadataForEntry: PasskeyMetadataResult;
+  matchPasskeysForRequest: MatchPasskeysForRequestResult;
+  assertPasskeyForBrowser: AssertionPublicKeyCredential;
   createEntryFromBrowser: BrowserWriteResult;
   updateEntryFromBrowser: BrowserWriteResult;
 }

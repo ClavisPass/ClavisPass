@@ -119,7 +119,7 @@ export class NativeMessagingClient {
     try {
       const rawResponse = await withTimeout(
         chrome.runtime.sendNativeMessage(this.hostName, request),
-        this.timeoutMs
+        command === "assertPasskeyForBrowser" ? Math.max(this.timeoutMs, 16_000) : this.timeoutMs
       );
 
       const response = validateBridgeResponse(command, requestId, rawResponse);

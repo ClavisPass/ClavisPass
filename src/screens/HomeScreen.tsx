@@ -935,6 +935,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
               scoreField(meta.username, normalizedQuery, 44, 50),
               scoreField(meta.email, normalizedQuery, 44, 50),
               scoreField(meta.url, normalizedQuery, 62, 68),
+              scoreField(meta.passkey, normalizedQuery, 70, 76),
               scoreField(meta.phone, normalizedQuery, 80, 86),
               scoreField(meta.wifiName, normalizedQuery, 80, 86),
               scoreField(meta.wifiType, normalizedQuery, 90, 96),

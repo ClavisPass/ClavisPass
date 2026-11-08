@@ -5,7 +5,8 @@ import { getActiveDomainContext } from "./tab-context";
 import { isExtensionMessage } from "../shared/messages";
 import {
   clearAutofillDomainCache,
-  getCachedAutofillMatchCountForUrl,
+  countVisibleSuggestions,
+  getCachedVisibleMatchCountForUrl,
   getAutofillEligibilityForUrl,
   rememberAutofillSuggestions
 } from "./autofill-cache";
@@ -15,13 +16,22 @@ import {
   updateAutofillPolicyForHost
 } from "./autofill-preferences";
 import type { ContentMessage } from "../shared/content-messages";
-import type { FillDataResult, SearchEntrySuggestion } from "../shared/bridge";
+import type { AssertionPublicKeyCredential, FillDataResult, SearchEntrySuggestion } from "../shared/bridge";
 import type { BrowserWriteResult, CreateEntryFromBrowserPayload, UpdateEntryFromBrowserPayload } from "../shared/bridge";
-import type { ContentDebugResponse, FillExecutionResult, OpenDesktopAppPayload, PromptResolutionResult, SavePromptCandidate } from "../shared/types";
-import { getNormalizedDomainFromUrl } from "../shared/domain";
+import type {
+  ContentDebugResponse,
+  FillExecutionResult,
+  OpenDesktopAppPayload,
+  PromptResolutionResult,
+  SavePromptCandidate,
+  WebAuthnPasskeyCandidate,
+  WebAuthnRequestDetectedPayload
+} from "../shared/types";
+import { getNormalizedDomainFromUrl, validateWebAuthnRpId } from "../shared/domain";
 
 const desktopBridge = new DesktopBridgeService();
 const state = new ExtensionState();
+const activeWebAuthnRequests = new Map<number, WebAuthnRequestDetectedPayload>();
 
 const BADGE_BACKGROUND_COLOR = "#787ff6";
 const BADGE_TEXT_COLOR = "#ffffff";
@@ -38,6 +48,18 @@ function isScriptablePageUrl(url: string | undefined): boolean {
     return parsed.protocol === "http:" || parsed.protocol === "https:";
   } catch {
     return false;
+  }
+}
+
+function getOriginFromUrl(url: string | undefined): string | undefined {
+  if (!url) {
+    return undefined;
+  }
+
+  try {
+    return new URL(url).origin;
+  } catch {
+    return undefined;
   }
 }
 
@@ -121,7 +143,7 @@ async function refreshBadgeForTab(tabId: number, url?: string): Promise<void> {
     return;
   }
 
-  const cachedCount = await getCachedAutofillMatchCountForUrl(pageUrl);
+  const cachedCount = await getCachedVisibleMatchCountForUrl(pageUrl);
 
   try {
     const status = await desktopBridge.getDesktopBridgeStatus();
@@ -134,7 +156,7 @@ async function refreshBadgeForTab(tabId: number, url?: string): Promise<void> {
     if (status.state === "ready") {
       const suggestions = await loadSuggestionsForDomain(domain);
       await rememberAutofillSuggestions(domain, suggestions);
-      await setTabBadge(tabId, suggestions.filter((item) => item.hasPassword).length);
+      await setTabBadge(tabId, countVisibleSuggestions(suggestions));
       return;
     }
   } catch {
@@ -462,7 +484,7 @@ async function fillFirstAvailableMatchInActiveTab(): Promise<FillExecutionResult
 
   const suggestions = await loadSuggestionsForDomain(domain);
   await rememberAutofillSuggestions(domain, suggestions);
-  await setTabBadge(tabId, suggestions.filter((item) => item.hasPassword).length);
+  await setTabBadge(tabId, countVisibleSuggestions(suggestions));
 
   const passwordSuggestions = suggestions.filter((item) => item.hasPassword);
   if (passwordSuggestions.length > 1) {
@@ -487,6 +509,119 @@ async function fillFirstAvailableMatchInActiveTab(): Promise<FillExecutionResult
 
 async function loadSuggestionsForDomain(domain: string): Promise<SearchEntrySuggestion[]> {
   return desktopBridge.searchDesktopEntriesByDomain(domain);
+}
+
+async function loadPasskeyCandidatesForWebAuthnRequest(
+  request: WebAuthnRequestDetectedPayload
+): Promise<WebAuthnPasskeyCandidate[]> {
+  const validation = validateWebAuthnRpId(request.origin, request.rpId);
+  if (validation.status !== "valid" || !validation.effectiveRpId) {
+    return [];
+  }
+
+  const result = await desktopBridge.matchPasskeysForRequest({
+    rpId: validation.effectiveRpId,
+    allowedCredentialIds: request.allowedCredentialIds
+  });
+
+  return result.passkeys;
+}
+
+async function deliverWebAuthnAssertionToTab(
+  tabId: number,
+  requestId: string,
+  credential?: AssertionPublicKeyCredential,
+  error?: string
+): Promise<void> {
+  await ensureContentScriptReady(tabId);
+  await sendMessageToRegisteredFrames(tabId, {
+    type: "content:webauthnAssertionResult",
+    payload: {
+      requestId,
+      credential,
+      error
+    }
+  });
+}
+
+async function assertActiveWebAuthnRequest(
+  payload: import("../shared/types").WebAuthnAssertActiveRequestPayload
+): Promise<import("../shared/types").WebAuthnAssertActiveRequestResult> {
+  const tabId = await getActiveTabId();
+  if (typeof tabId !== "number") {
+    return {
+      status: "failed",
+      detail: "No active browser tab is available for the passkey request."
+    };
+  }
+
+  const request = activeWebAuthnRequests.get(tabId);
+  if (!request || Date.now() - request.detectedAt > 2 * 60 * 1000) {
+    activeWebAuthnRequests.delete(tabId);
+    return {
+      status: "failed",
+      detail: "The passkey request is no longer active."
+    };
+  }
+
+  const activeTabOrigin = getOriginFromUrl((await getActiveTab())?.url);
+  if (!activeTabOrigin || activeTabOrigin !== request.origin) {
+    return {
+      status: "failed",
+      detail: "The active tab no longer matches the original passkey request origin."
+    };
+  }
+
+  if (request.kind !== "get" || !request.requestId || !request.challenge) {
+    return {
+      status: "failed",
+      detail: "Only active passkey sign-in requests can be completed right now."
+    };
+  }
+
+  if (request.userVerification === "required") {
+    return {
+      status: "failed",
+      detail: "This passkey request requires user verification, which ClavisPass does not support yet."
+    };
+  }
+
+  const rpValidation = validateWebAuthnRpId(request.origin, request.rpId);
+  if (rpValidation.status !== "valid" || !rpValidation.effectiveRpId) {
+    return {
+      status: "failed",
+      detail: rpValidation.detail
+    };
+  }
+
+  try {
+    const credential = await desktopBridge.assertPasskeyForBrowser({
+      entryId: payload.entryId,
+      moduleId: payload.moduleId,
+      rpId: rpValidation.effectiveRpId,
+      challenge: request.challenge,
+      origin: request.origin,
+      allowedCredentialIds: request.allowedCredentialIds,
+      userVerified: false
+    });
+
+    await deliverWebAuthnAssertionToTab(tabId, request.requestId, credential);
+    activeWebAuthnRequests.delete(tabId);
+
+    return {
+      status: "completed",
+      detail: "Passkey assertion sent to the active page."
+    };
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : "ClavisPass could not complete the passkey assertion.";
+    await deliverWebAuthnAssertionToTab(tabId, request.requestId, undefined, detail).catch(() => {
+    });
+
+    return {
+      status: "failed",
+      detail
+    };
+  }
 }
 
 async function evaluateSavePromptCandidate(candidate: SavePromptCandidate) {
@@ -649,7 +784,7 @@ const router = new BackgroundMessageRouter({
       await rememberAutofillSuggestions(domain.normalizedHost, items);
       const tabId = await getActiveTabId();
       if (typeof tabId === "number") {
-        await setTabBadge(tabId, items.filter((item) => item.hasPassword).length);
+        await setTabBadge(tabId, countVisibleSuggestions(items));
       }
 
       return {
@@ -724,6 +859,8 @@ const router = new BackgroundMessageRouter({
     }
   },
   "bridge:getFillDataForEntry": async (payload) => desktopBridge.getDesktopFillData(payload.entryId),
+  "bridge:getPasskeyMetadataForEntry": async (payload) =>
+    desktopBridge.getPasskeyMetadataForEntry(payload.entryId),
   "bridge:getContentDebug": async () => {
     const activeTab = await getActiveTab();
     const tabId = typeof activeTab?.id === "number" ? activeTab.id : undefined;
@@ -756,6 +893,34 @@ const router = new BackgroundMessageRouter({
       };
     }
   },
+  "webauthn:requestDetected": (payload, context) => {
+    const tabId = context.sender.tab?.id;
+    if (typeof tabId === "number") {
+      activeWebAuthnRequests.set(tabId, payload);
+    }
+
+    return {
+      accepted: typeof tabId === "number"
+    };
+  },
+  "webauthn:getActiveRequest": async () => {
+    const tabId = await getActiveTabId();
+    if (typeof tabId !== "number") {
+      return {};
+    }
+
+    const request = activeWebAuthnRequests.get(tabId);
+    if (!request || Date.now() - request.detectedAt > 2 * 60 * 1000) {
+      activeWebAuthnRequests.delete(tabId);
+      return {};
+    }
+
+    const rpValidation = validateWebAuthnRpId(request.origin, request.rpId);
+    const passkeys = await loadPasskeyCandidatesForWebAuthnRequest(request);
+
+    return { request, rpValidation, passkeys };
+  },
+  "webauthn:assertActiveRequest": async (payload) => assertActiveWebAuthnRequest(payload),
   "bridge:openDesktopApp": async (payload) => openDesktopApp(payload),
   "prompt:getPending": async () => ({
     prompt: state.getPendingPrompt()
@@ -827,12 +992,14 @@ chrome.tabs.onActivated.addListener(() => {
 chrome.tabs.onRemoved.addListener((tabId) => {
   state.clearPreparedFill(tabId);
   state.clearFramesForTab(tabId);
+  activeWebAuthnRequests.delete(tabId);
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   if (changeInfo.status === "loading") {
     state.clearPreparedFill(tabId);
     state.clearFramesForTab(tabId);
+    activeWebAuthnRequests.delete(tabId);
     void clearTabBadge(tabId);
   }
 

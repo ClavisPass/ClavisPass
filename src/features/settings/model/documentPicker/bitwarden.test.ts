@@ -23,6 +23,22 @@ describe("importBitwarden", () => {
               password: "secret",
               totp: "JBSWY3DPEHPK3PXP",
               uris: [{ uri: "https://example.com" }, { uri: "https://app.example.com" }],
+              fido2Credentials: [
+                {
+                  credentialId: "credential-id",
+                  keyType: "public-key",
+                  keyAlgorithm: "ECDSA",
+                  keyCurve: "P-256",
+                  keyValue: "private-key-material",
+                  rpId: "example.com",
+                  rpName: "Example",
+                  userHandle: "user-handle",
+                  userName: "alice",
+                  userDisplayName: "Alice Example",
+                  creationDate: "2026-01-01T11:00:00.000Z",
+                  counter: "42",
+                },
+              ],
             },
             fields: [{ name: "Customer", value: "ACME", type: 0 }],
           },
@@ -65,11 +81,41 @@ describe("importBitwarden", () => {
       result.values[0].modules.filter((m) => m.module === ModulesEnum.URL),
     ).toHaveLength(2);
     expect(result.values[0].modules.some((m) => m.module === ModulesEnum.TOTP)).toBe(true);
+    expect(result.values[0].modules).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          module: ModulesEnum.PASSKEY,
+          relyingPartyId: "example.com",
+          relyingPartyName: "Example",
+          userName: "alice",
+          userDisplayName: "Alice Example",
+          userHandle: "user-handle",
+          credentialId: "credential-id",
+          privateKey: "private-key-material",
+          algorithm: "public-key / ECDSA / P-256",
+          signCount: 42,
+          source: "Bitwarden JSON",
+        }),
+      ]),
+    );
     expect(result.values[1].modules.some((m) => m.module === ModulesEnum.PERSON)).toBe(true);
     expect(result.values[1].modules.some((m) => m.module === ModulesEnum.ADDRESS)).toBe(true);
     expect(result.values[1].modules.some((m) => m.module === ModulesEnum.COMPANY)).toBe(true);
     expect(result.values[1].modules.some((m) => m.module === ModulesEnum.DOCUMENT)).toBe(true);
     expect(result.values[1].modules.some((m) => m.module === ModulesEnum.EXPIRY)).toBe(true);
     expect(result.values[2].modules.some((m) => m.module === ModulesEnum.CREDIT_CARD)).toBe(true);
+  });
+
+  it.each([undefined, 0, "0", "4294967295"])("imports passkey counters without resetting them: %s", (counter) => {
+    const result = importBitwarden(JSON.stringify({ items: [{ type: 1, name: "Passkey", login: {
+      fido2Credentials: [{ rpId: "example.com", credentialId: "cred", keyValue: "key", counter }],
+    } }] }));
+    expect(result.values[0].modules[0]).toMatchObject({ signCount: Number(counter ?? 0) });
+  });
+
+  it.each(["bad", "", -1, 1.5, "4294967296"])("rejects invalid passkey counters: %s", (counter) => {
+    expect(() => importBitwarden(JSON.stringify({ items: [{ type: 1, name: "Passkey", login: {
+      fido2Credentials: [{ rpId: "example.com", credentialId: "cred", keyValue: "key", counter }],
+    } }] }))).toThrow("Invalid Bitwarden passkey counter");
   });
 });

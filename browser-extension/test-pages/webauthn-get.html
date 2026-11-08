@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ClavisPass WebAuthn Get Test</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family:
+          Segoe UI,
+          system-ui,
+          -apple-system,
+          sans-serif;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: Canvas;
+        color: CanvasText;
+      }
+
+      main {
+        box-sizing: border-box;
+        margin: 0 auto;
+        max-width: 760px;
+        padding: 32px 18px;
+      }
+
+      h1 {
+        font-size: 24px;
+        letter-spacing: 0;
+        margin: 0 0 8px;
+      }
+
+      p {
+        line-height: 1.5;
+      }
+
+      form {
+        display: grid;
+        gap: 14px;
+        margin-top: 24px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      input,
+      select,
+      button,
+      textarea {
+        box-sizing: border-box;
+        font: inherit;
+      }
+
+      input,
+      select,
+      textarea {
+        border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+        border-radius: 8px;
+        padding: 10px 12px;
+      }
+
+      textarea {
+        min-height: 170px;
+        resize: vertical;
+      }
+
+      button {
+        align-items: center;
+        background: #787ff6;
+        border: 0;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+        display: inline-flex;
+        font-weight: 700;
+        justify-content: center;
+        min-height: 42px;
+        padding: 0 16px;
+        width: fit-content;
+      }
+
+      button:disabled {
+        cursor: wait;
+        opacity: 0.65;
+      }
+
+      .hint {
+        color: color-mix(in srgb, CanvasText 68%, transparent);
+        font-size: 13px;
+        margin: 0;
+      }
+
+      .result {
+        margin-top: 22px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>ClavisPass WebAuthn Get Test</h1>
+      <p class="hint">
+        Use this page on <code>http://localhost</code>. Create or import a ClavisPass
+        passkey with RP ID <code>localhost</code>, unlock the desktop app, then press
+        the button and choose the passkey in the extension popup.
+      </p>
+
+      <form id="request-form">
+        <label>
+          RP ID
+          <input id="rp-id" value="localhost" autocomplete="off" />
+        </label>
+
+        <label>
+          User verification
+          <select id="user-verification">
+            <option value="preferred">preferred</option>
+            <option value="required">required</option>
+            <option value="discouraged">discouraged</option>
+          </select>
+        </label>
+
+        <label>
+          Optional allowed credential ID, base64url
+          <input id="credential-id" autocomplete="off" placeholder="Leave empty for discoverable passkey matching" />
+        </label>
+
+        <button id="submit-button" type="submit">Call navigator.credentials.get()</button>
+      </form>
+
+      <section class="result" aria-live="polite">
+        <label>
+          Result
+          <textarea id="result" readonly>Waiting for a request.</textarea>
+        </label>
+      </section>
+    </main>
+
+    <script>
+      const form = document.querySelector("#request-form");
+      const button = document.querySelector("#submit-button");
+      const result = document.querySelector("#result");
+
+      function toBase64Url(bytes) {
+        let binary = "";
+        bytes.forEach((byte) => {
+          binary += String.fromCharCode(byte);
+        });
+        return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+      }
+
+      function fromBase64Url(value) {
+        const normalized = value.trim().replace(/\-/g, "+").replace(/_/g, "/");
+        const padded = `${normalized}${"=".repeat((4 - normalized.length % 4) % 4)}`;
+        const binary = atob(padded);
+        const bytes = new Uint8Array(binary.length);
+        for (let index = 0; index < binary.length; index += 1) {
+          bytes[index] = binary.charCodeAt(index);
+        }
+        return bytes.buffer;
+      }
+
+      function describeCredential(credential) {
+        if (!credential) {
+          return "navigator.credentials.get() returned null.";
+        }
+
+        const response = credential.response;
+        return JSON.stringify(
+          {
+            id: credential.id,
+            type: credential.type,
+            rawId: toBase64Url(new Uint8Array(credential.rawId)),
+            response: {
+              authenticatorDataBytes: response?.authenticatorData?.byteLength,
+              clientDataJSON: response?.clientDataJSON
+                ? JSON.parse(new TextDecoder().decode(response.clientDataJSON))
+                : undefined,
+              signatureBytes: response?.signature?.byteLength,
+              userHandle: response?.userHandle
+                ? toBase64Url(new Uint8Array(response.userHandle))
+                : null,
+            },
+            clientExtensionResults:
+              typeof credential.getClientExtensionResults === "function"
+                ? credential.getClientExtensionResults()
+                : {},
+          },
+          null,
+          2,
+        );
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        button.disabled = true;
+        result.value = "Waiting for navigator.credentials.get()...";
+
+        const challenge = crypto.getRandomValues(new Uint8Array(32));
+        const rpId = document.querySelector("#rp-id").value.trim() || "localhost";
+        const userVerification = document.querySelector("#user-verification").value;
+        const credentialId = document.querySelector("#credential-id").value.trim();
+
+        try {
+          const publicKey = {
+            challenge,
+            rpId,
+            userVerification,
+            timeout: 120000,
+          };
+
+          if (credentialId) {
+            publicKey.allowCredentials = [
+              {
+                id: fromBase64Url(credentialId),
+                type: "public-key",
+                transports: ["internal", "hybrid", "usb", "nfc", "ble"],
+              },
+            ];
+          }
+
+          const credential = await navigator.credentials.get({
+            publicKey,
+            mediation: "optional",
+          });
+
+          result.value = describeCredential(credential);
+        } catch (error) {
+          result.value = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+        } finally {
+          button.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

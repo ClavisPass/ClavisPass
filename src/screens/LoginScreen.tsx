@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import {
+  KeyboardAvoidingView,
   View,
   Pressable,
   StyleSheet,
@@ -286,7 +287,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
   return (
     <BottomSheetModalProvider>
-      <View
+      <KeyboardAvoidingView
+        // Keep keyboard coordinates relative to the full screen, not the centered card.
+        enabled={Platform.OS !== "web"}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{
           flex: 1,
           width: "100%",
@@ -596,7 +600,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             </BottomSheetModal>
           )}
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </BottomSheetModalProvider>
   );
 };

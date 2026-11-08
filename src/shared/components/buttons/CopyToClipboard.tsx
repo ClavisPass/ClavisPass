@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { Alert, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import theme from "../../ui/theme";
@@ -15,6 +15,8 @@ type Props = {
   kind?: ClipboardContentKind;
   sensitive?: boolean;
   compact?: boolean;
+  confirmTitle?: string;
+  confirmMessage?: string;
 };
 
 function CopyToClipboard({
@@ -24,6 +26,8 @@ function CopyToClipboard({
   kind,
   sensitive,
   compact,
+  confirmTitle,
+  confirmMessage,
 }: Props) {
   const { t } = useTranslation();
   const [icon, setIcon] = React.useState<"content-copy" | "check">(
@@ -39,7 +43,7 @@ function CopyToClipboard({
     };
   }, []);
 
-  const copyToClipboard = async () => {
+  const performCopy = async () => {
     if (iconTimerRef.current) clearTimeout(iconTimerRef.current);
 
     const { durationMs } = await copy(value, { kind, sensitive });
@@ -51,6 +55,24 @@ function CopyToClipboard({
       durationMs,
       createdAt: Date.now(),
     });
+  };
+
+  const copyToClipboard = async () => {
+    if (!confirmMessage) {
+      await performCopy();
+      return;
+    }
+
+    Alert.alert(confirmTitle ?? t("common:copy"), confirmMessage, [
+      { text: t("common:cancel"), style: "cancel" },
+      {
+        text: t("common:copy"),
+        style: "destructive",
+        onPress: () => {
+          void performCopy();
+        },
+      },
+    ]);
   };
 
   const buttonSize = compact ? 32 : 40;

@@ -31,6 +31,9 @@ Current desktop commands used by the extension:
 - `getStatus`
 - `searchEntriesByDomain`
 - `getFillDataForEntry`
+- `getPasskeyMetadataForEntry`
+- `matchPasskeysForRequest`
+- `assertPasskeyForBrowser`
 - `createEntryFromBrowser`
 - `updateEntryFromBrowser`
 
@@ -66,6 +69,21 @@ Run type checking:
 ```bash
 npm run typecheck
 ```
+
+Serve the local WebAuthn sign-in test page:
+
+```bash
+npm run test-page:webauthn
+```
+
+Generate an ES256 test passkey module for RP ID `localhost`:
+
+```bash
+npm run test-fixture:webauthn
+```
+
+Open `http://localhost:8787/` with the extension loaded, unlock ClavisPass
+desktop, and use a passkey whose RP ID is `localhost`.
 
 Create a production build:
 

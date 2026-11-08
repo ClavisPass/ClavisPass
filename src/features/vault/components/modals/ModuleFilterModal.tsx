@@ -24,6 +24,7 @@ export const FILTERABLE_MODULES: ModulesEnum[] = [
   ModulesEnum.DOCUMENT,
   ModulesEnum.USERNAME,
   ModulesEnum.PASSWORD,
+  ModulesEnum.PASSKEY,
   ModulesEnum.PERSON,
   ModulesEnum.URL,
   ModulesEnum.E_MAIL,

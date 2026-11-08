@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "vite build && vite build --config vite.content.config.ts",
     "preview": "vite preview",
+    "test-page:webauthn": "node scripts/serve-webauthn-test-page.js",
+    "test-fixture:webauthn": "node scripts/generate-webauthn-test-passkey.js",
     "typecheck": "tsc --noEmit",
     "package:chrome": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/package-chrome.ps1",
     "package:firefox": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/package-firefox.ps1",
@@ -20,7 +22,8 @@
   },
   "dependencies": {
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "tldts": "^7.4.18"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.280",

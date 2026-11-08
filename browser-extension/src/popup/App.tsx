@@ -9,7 +9,10 @@ import type {
   DomainAutofillMode,
   FillExecutionResult,
   SavePromptDecision,
-  SavePromptResolution
+  SavePromptResolution,
+  WebAuthnPasskeyCandidate,
+  WebAuthnRpValidation,
+  WebAuthnRequestDetectedPayload
 } from "../shared/types";
 import {
   CLAVISPASS_BRAND_NAME
@@ -72,6 +75,7 @@ const translations = {
     searchMatches: "Search matches",
     diagnostics: "Diagnostics",
     matchedPasswords: "{{count}} matches",
+    matchedPasskeys: "{{count}} passkeys",
     cachedMatches: "Cached matches",
     opening: "Opening...",
     details: "Details",
@@ -109,6 +113,25 @@ const translations = {
     favourite: "Fav",
     matchedVia: "Matched via {{host}}",
     password: "Password",
+    passkey: "Passkey",
+    passkeyRequestDetected: "Passkey request detected",
+    passkeyRequestDetail:
+      "This site asked the browser for a passkey. ClavisPass can detect this now, but signing is not enabled yet.",
+    passkeyRequestValid: "RP ID verified",
+    passkeyRequestInvalid: "RP ID blocked",
+    passkeyRequestUnsupported: "Unsupported origin",
+    passkeyRequestNoMatches: "No matching ClavisPass passkey for this RP ID.",
+    passkeyRequestMatches: "Matching ClavisPass passkeys",
+    passkeyRequestSelectDisabled: "Selection is available only for passkey sign-in requests.",
+    passkeyRequestUse: "Use passkey",
+    passkeyRequestSigning: "Signing...",
+    passkeyRequestCompleted: "Passkey sent to this page.",
+    passkeyRequestUserVerificationUnsupported:
+      "This request requires user verification. ClavisPass will support that after local verification is implemented.",
+    passkeyRequestKindCreate: "Create passkey",
+    passkeyRequestKindGet: "Use passkey",
+    passkeyRequestRp: "RP ID: {{rpId}}",
+    passkeyRequestOrigin: "Origin: {{origin}}",
     totp: "TOTP",
     filling: "Filling...",
     fill: "Fill",
@@ -169,6 +192,7 @@ const translations = {
     searchMatches: "Treffer suchen",
     diagnostics: "Diagnose",
     matchedPasswords: "{{count}} Treffer",
+    matchedPasskeys: "{{count}} Passkeys",
     cachedMatches: "Gecachte Treffer",
     opening: "\u00d6ffne...",
     details: "Details",
@@ -206,6 +230,25 @@ const translations = {
     favourite: "Fav",
     matchedVia: "Treffer \u00fcber {{host}}",
     password: "Passwort",
+    passkey: "Passkey",
+    passkeyRequestDetected: "Passkey-Anfrage erkannt",
+    passkeyRequestDetail:
+      "Diese Website hat den Browser nach einem Passkey gefragt. ClavisPass erkennt das jetzt, Signieren ist aber noch nicht aktiviert.",
+    passkeyRequestValid: "RP-ID geprüft",
+    passkeyRequestInvalid: "RP-ID blockiert",
+    passkeyRequestUnsupported: "Origin nicht unterstützt",
+    passkeyRequestNoMatches: "Kein passender ClavisPass-Passkey für diese RP-ID.",
+    passkeyRequestMatches: "Passende ClavisPass-Passkeys",
+    passkeyRequestSelectDisabled: "Auswahl ist nur für Passkey-Anmeldeanfragen verfügbar.",
+    passkeyRequestUse: "Passkey nutzen",
+    passkeyRequestSigning: "Signiere...",
+    passkeyRequestCompleted: "Passkey wurde an diese Seite gesendet.",
+    passkeyRequestUserVerificationUnsupported:
+      "Diese Anfrage verlangt Benutzerverifikation. ClavisPass unterstützt das nach der lokalen Verifikation.",
+    passkeyRequestKindCreate: "Passkey erstellen",
+    passkeyRequestKindGet: "Passkey verwenden",
+    passkeyRequestRp: "RP-ID: {{rpId}}",
+    passkeyRequestOrigin: "Origin: {{origin}}",
     totp: "TOTP",
     filling: "F\u00fclle aus...",
     fill: "Ausf\u00fcllen",
@@ -390,6 +433,11 @@ export function App() {
   const [selectedEntryId, setSelectedEntryId] = useState<string>();
   const [fillResult, setFillResult] = useState<FillExecutionResult>();
   const [pendingPrompt, setPendingPrompt] = useState<SavePromptDecision>();
+  const [webAuthnRequest, setWebAuthnRequest] = useState<WebAuthnRequestDetectedPayload>();
+  const [webAuthnRpValidation, setWebAuthnRpValidation] = useState<WebAuthnRpValidation>();
+  const [webAuthnPasskeys, setWebAuthnPasskeys] = useState<WebAuthnPasskeyCandidate[]>([]);
+  const [signingPasskeyId, setSigningPasskeyId] = useState<string>();
+  const [webAuthnAssertionMessage, setWebAuthnAssertionMessage] = useState<string>();
   const [isRefreshing, setIsRefreshing] = useState(true);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [isFilling, setIsFilling] = useState(false);
@@ -417,6 +465,15 @@ export function App() {
   async function refreshPendingPrompt(): Promise<void> {
     const response = await sendRuntimeMessage("prompt:getPending", undefined);
     setPendingPrompt(response.prompt);
+  }
+
+  async function refreshWebAuthnRequest(): Promise<void> {
+    const response = await sendRuntimeMessage("webauthn:getActiveRequest", undefined);
+    setWebAuthnRequest(response.request);
+    setWebAuthnRpValidation(response.rpValidation);
+    setWebAuthnPasskeys(response.passkeys ?? []);
+    setSigningPasskeyId(undefined);
+    setWebAuthnAssertionMessage(undefined);
   }
 
   async function refreshSuggestions(nextStatus: DesktopBridgeStatusView): Promise<void> {
@@ -477,6 +534,7 @@ export function App() {
       await Promise.all([
         reloadSuggestions ? refreshSuggestions(nextStatus) : Promise.resolve(),
         refreshPendingPrompt(),
+        refreshWebAuthnRequest(),
         refreshInlineAutofillPreference()
       ]);
     } catch (statusError) {
@@ -487,6 +545,9 @@ export function App() {
         detail: t("statusFailedDetail")
       });
       setSuggestions(initialSuggestions);
+      setWebAuthnRequest(undefined);
+      setWebAuthnRpValidation(undefined);
+      setWebAuthnPasskeys([]);
       setError(statusError instanceof Error ? statusError.message : t("unknownPopupError"));
     } finally {
       if (!options.silent) {
@@ -596,6 +657,35 @@ export function App() {
     }
   }
 
+  async function handlePasskeyAssertion(passkey: WebAuthnPasskeyCandidate): Promise<void> {
+    const requestKey = `${passkey.entryId}:${passkey.moduleId ?? passkey.relyingPartyId}`;
+    setSigningPasskeyId(requestKey);
+    setWebAuthnAssertionMessage(undefined);
+
+    try {
+      const result = await sendRuntimeMessage("webauthn:assertActiveRequest", {
+        entryId: passkey.entryId,
+        moduleId: passkey.moduleId
+      });
+
+      setWebAuthnAssertionMessage(
+        result.status === "completed" ? t("passkeyRequestCompleted") : result.detail
+      );
+
+      if (result.status === "completed") {
+        setWebAuthnRequest(undefined);
+        setWebAuthnRpValidation(undefined);
+        setWebAuthnPasskeys([]);
+      }
+    } catch (error) {
+      setWebAuthnAssertionMessage(
+        error instanceof Error ? error.message : t("unknownPopupError")
+      );
+    } finally {
+      setSigningPasskeyId(undefined);
+    }
+  }
+
   useEffect(() => {
     let cancelled = false;
 
@@ -650,6 +740,7 @@ export function App() {
     isLoadingSuggestions ||
     isFilling ||
     isResolvingPrompt ||
+    Boolean(signingPasskeyId) ||
     isOpeningDesktopApp ||
     isUpdatingInlinePreference;
   const normalizedSuggestionQuery = suggestionQuery.trim().toLowerCase();
@@ -666,6 +757,7 @@ export function App() {
       )
     : suggestions.items;
   const passwordMatchCount = suggestions.items.filter((item) => item.hasPassword).length;
+  const passkeyMatchCount = suggestions.items.filter((item) => item.hasPasskey).length;
   const showNativeHostInstallHint = status.state === "host_unreachable";
 
   return (
@@ -845,6 +937,95 @@ export function App() {
         </section>
       ) : null}
 
+      {webAuthnRequest ? (
+        <section className="prompt-card">
+          <div className="section-header-row">
+            <div>
+              <p className="meta-label">
+                {webAuthnRequest.kind === "create"
+                  ? t("passkeyRequestKindCreate")
+                  : t("passkeyRequestKindGet")}
+              </p>
+              <p className="section-title">{t("passkeyRequestDetected")}</p>
+            </div>
+            <span
+              className={`status-badge status-${
+                webAuthnRpValidation?.status === "valid"
+                  ? "ready"
+                  : webAuthnRpValidation?.status === "invalid"
+                    ? "protocol_error"
+                    : "pending"
+              }`}
+            >
+              {webAuthnRpValidation?.status === "valid"
+                ? t("passkeyRequestValid")
+                : webAuthnRpValidation?.status === "invalid"
+                  ? t("passkeyRequestInvalid")
+                  : t("passkeyRequestUnsupported")}
+            </span>
+          </div>
+          <p className="subtle">{t("passkeyRequestDetail")}</p>
+          <p className="subtle">{t("passkeyRequestOrigin", { origin: webAuthnRequest.origin })}</p>
+          {webAuthnRequest.rpId ? (
+            <p className="subtle">{t("passkeyRequestRp", { rpId: webAuthnRequest.rpId })}</p>
+          ) : null}
+          {webAuthnRpValidation ? (
+            <p className="subtle">{webAuthnRpValidation.detail}</p>
+          ) : null}
+          {webAuthnRequest.userVerification === "required" ? (
+            <p className="subtle">{t("passkeyRequestUserVerificationUnsupported")}</p>
+          ) : null}
+          {webAuthnAssertionMessage ? (
+            <p className="subtle">{webAuthnAssertionMessage}</p>
+          ) : null}
+          {webAuthnRpValidation?.status === "valid" ? (
+            webAuthnPasskeys.length > 0 ? (
+              <div className="suggestion-list">
+                <p className="meta-label">{t("passkeyRequestMatches")}</p>
+                {webAuthnPasskeys.map((passkey) => {
+                  const requestKey = `${passkey.entryId}:${passkey.moduleId ?? passkey.relyingPartyId}`;
+                  const canAssertPasskey =
+                    webAuthnRequest.kind === "get" &&
+                    webAuthnRequest.userVerification !== "required" &&
+                    Boolean(webAuthnRequest.requestId && webAuthnRequest.challenge);
+
+                  return (
+                    <article
+                      className="suggestion-row"
+                      key={`${passkey.entryId}:${passkey.moduleId ?? passkey.relyingPartyId}:${passkey.userName ?? ""}`}
+                    >
+                      <div className="suggestion-main">
+                        <div className="suggestion-copy">
+                          <div className="suggestion-title-row">
+                            <p className="suggestion-title">{passkey.entryTitle}</p>
+                            <span className="hint-pill">{t("passkey")}</span>
+                          </div>
+                          <p className="suggestion-identity">
+                            {passkey.userDisplayName || passkey.userName || passkey.relyingPartyName || passkey.relyingPartyId}
+                          </p>
+                          <p className="suggestion-host">{passkey.relyingPartyId}</p>
+                        </div>
+                        <button
+                          className="suggestion-fill-button"
+                          type="button"
+                          disabled={!canAssertPasskey || Boolean(signingPasskeyId)}
+                          title={canAssertPasskey ? t("passkeyRequestUse") : t("passkeyRequestSelectDisabled")}
+                          onClick={() => void handlePasskeyAssertion(passkey)}
+                        >
+                          {signingPasskeyId === requestKey ? t("passkeyRequestSigning") : t("passkeyRequestUse")}
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="subtle">{t("passkeyRequestNoMatches")}</p>
+            )
+          ) : null}
+        </section>
+      ) : null}
+
       {status.state === "ready" ? (
         <section className="suggestions-card">
           <div className="suggestions-toolbar">
@@ -872,6 +1053,11 @@ export function App() {
             <span className="diagnostic-pill diagnostic-pill-ok">
               {t("matchedPasswords", { count: String(passwordMatchCount) })}
             </span>
+            {passkeyMatchCount > 0 ? (
+              <span className="diagnostic-pill diagnostic-pill-ok">
+                {t("matchedPasskeys", { count: String(passkeyMatchCount) })}
+              </span>
+            ) : null}
           </div>
 
           {!suggestions.domain.isSupported ? (
@@ -935,6 +1121,7 @@ export function App() {
                         <div className="suggestion-side">
                           <div className="hint-row">
                             {item.hasTotp ? <span className="hint-pill">{t("totp")}</span> : null}
+                            {item.hasPasskey ? <span className="hint-pill">{t("passkey")}</span> : null}
                           </div>
                           <button
                             className={

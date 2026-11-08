@@ -12,13 +12,18 @@ import type {
   PromptResolutionResult,
   SavePromptCaptureResult,
   SavePromptCandidate,
-  ContentDebugResponse
+  ContentDebugResponse,
+  ActiveWebAuthnRequestResult,
+  WebAuthnRequestDetectedPayload,
+  WebAuthnRequestDetectedResult,
+  WebAuthnAssertActiveRequestPayload,
+  WebAuthnAssertActiveRequestResult
   ,
   OpenDesktopAppResult
   ,
   OpenDesktopAppPayload
 } from "./types";
-import type { GetFillDataForEntryPayload } from "./bridge";
+import type { GetFillDataForEntryPayload, GetPasskeyMetadataForEntryPayload } from "./bridge";
 
 export type MessageMap = {
   "bridge:getStatus": {
@@ -57,9 +62,25 @@ export type MessageMap = {
     request: GetFillDataForEntryPayload;
     response: import("./bridge").FillDataResult;
   };
+  "bridge:getPasskeyMetadataForEntry": {
+    request: GetPasskeyMetadataForEntryPayload;
+    response: import("./bridge").PasskeyMetadataResult;
+  };
   "bridge:getContentDebug": {
     request: undefined;
     response: ContentDebugResponse;
+  };
+  "webauthn:requestDetected": {
+    request: WebAuthnRequestDetectedPayload;
+    response: WebAuthnRequestDetectedResult;
+  };
+  "webauthn:getActiveRequest": {
+    request: undefined;
+    response: ActiveWebAuthnRequestResult;
+  };
+  "webauthn:assertActiveRequest": {
+    request: WebAuthnAssertActiveRequestPayload;
+    response: WebAuthnAssertActiveRequestResult;
   };
   "bridge:openDesktopApp": {
     request: OpenDesktopAppPayload | undefined;

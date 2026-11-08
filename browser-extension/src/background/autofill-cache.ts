@@ -11,6 +11,7 @@ interface DomainAutofillCacheEntry {
   normalizedHost: string;
   hasMatches: boolean;
   matchCount?: number;
+  visibleMatchCount?: number;
   checkedAt: number;
 }
 
@@ -35,12 +36,28 @@ function countPasswordSuggestions(suggestions: SearchEntrySuggestion[]): number 
   return suggestions.filter((item) => item.hasPassword).length;
 }
 
+export function countVisibleSuggestions(suggestions: SearchEntrySuggestion[]): number {
+  return suggestions.filter((item) => item.hasPassword || item.hasPasskey).length;
+}
+
 function getCachedMatchCount(entry: DomainAutofillCacheEntry | undefined): number {
   if (!entry?.hasMatches) {
     return 0;
   }
 
   return typeof entry.matchCount === "number" ? entry.matchCount : 1;
+}
+
+function getCachedVisibleMatchCount(entry: DomainAutofillCacheEntry | undefined): number {
+  if (!entry) {
+    return 0;
+  }
+
+  if (typeof entry.visibleMatchCount === "number") {
+    return entry.visibleMatchCount;
+  }
+
+  return getCachedMatchCount(entry);
 }
 
 export async function clearAutofillDomainCache(): Promise<void> {
@@ -53,10 +70,12 @@ export async function rememberAutofillSuggestions(
 ): Promise<void> {
   const cache = await readCache();
   const matchCount = countPasswordSuggestions(suggestions);
+  const visibleMatchCount = countVisibleSuggestions(suggestions);
   cache[normalizedHost] = {
     normalizedHost,
     hasMatches: matchCount > 0,
     matchCount,
+    visibleMatchCount,
     checkedAt: Date.now()
   };
 
@@ -77,6 +96,22 @@ export async function getCachedAutofillMatchCountForUrl(url: string): Promise<nu
   }
 
   return getCachedMatchCount(cachedEntry);
+}
+
+export async function getCachedVisibleMatchCountForUrl(url: string): Promise<number | undefined> {
+  const normalizedHost = getNormalizedDomainFromUrl(url);
+  if (!normalizedHost) {
+    return undefined;
+  }
+
+  const cache = await readCache();
+  const cachedEntry = cache[normalizedHost];
+
+  if (!cachedEntry) {
+    return undefined;
+  }
+
+  return getCachedVisibleMatchCount(cachedEntry);
 }
 
 export async function getAutofillEligibilityForUrl(

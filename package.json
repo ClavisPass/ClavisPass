@@ -16,6 +16,8 @@
     "msix:pack:unsigned": "npm run msix:prepare && winapp pack .\\dist-msix --manifest .\\dist-msix\\Package.appxmanifest --output .\\dist-msix\\ClavisPass.msix",
     "msix:run": "npm run msix:prepare && winapp run .\\dist-msix --manifest .\\dist-msix\\Package.appxmanifest",
     "extension:dev": "npm run dev --prefix browser-extension",
+    "extension:test-page:webauthn": "npm run test-page:webauthn --prefix browser-extension",
+    "extension:test-fixture:webauthn": "npm run test-fixture:webauthn --prefix browser-extension",
     "extension:build": "npm run build --prefix browser-extension",
     "extension:build:chrome": "npm run build:chrome --prefix browser-extension",
     "extension:build:firefox": "npm run build:firefox --prefix browser-extension",

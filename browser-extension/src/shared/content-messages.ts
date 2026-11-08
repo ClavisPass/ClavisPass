@@ -1,4 +1,4 @@
-import type { FillDataResult } from "./bridge";
+import type { AssertionPublicKeyCredential, FillDataResult } from "./bridge";
 import type { FillExecutionResult, ContentDebugInfo } from "./types";
 
 export type ContentMessageMap = {
@@ -19,6 +19,14 @@ export type ContentMessageMap = {
   "content:showAutofillPicker": {
     request: undefined;
     response: { shown: boolean };
+  };
+  "content:webauthnAssertionResult": {
+    request: {
+      requestId: string;
+      credential?: AssertionPublicKeyCredential;
+      error?: string;
+    };
+    response: { delivered: boolean };
   };
 };
 

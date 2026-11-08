@@ -10,11 +10,13 @@ import createUniqueID from "../../../shared/utils/createUniqueID";
 import { getDateTime } from "../../../shared/utils/Timestamp";
 import { logger } from "../../../infrastructure/logging/logger";
 import { detectTauriEnvironment } from "../../../infrastructure/platform/isTauri";
+import { reservePasskeyAssertion, type ReservePasskeyAssertionPayload } from "../utils/reservePasskeyAssertion";
 
-type BrowserWriteKind = "createEntryFromBrowser" | "updateEntryFromBrowser";
+type BrowserWriteKind = "createEntryFromBrowser" | "updateEntryFromBrowser" | "reservePasskeyAssertion";
 
 type BrowserWriteRequest = {
   id: string;
+  createdAtMs: number;
   kind: BrowserWriteKind;
   payload: Record<string, unknown>;
 };
@@ -160,6 +162,27 @@ function BrowserBridgeWriteSync() {
 
         for (const request of requests) {
           try {
+            if (request.kind === "reservePasskeyAssertion") {
+              if (!Number.isFinite(request.createdAtMs) || Date.now() - request.createdAtMs >= 12_000) {
+                throw new Error("WRITE_TIMEOUT");
+              }
+              const payload = request.payload as unknown as ReservePasskeyAssertionPayload;
+              let result: { signCount: number } | null = null;
+              vault.update((draft) => {
+                const index = draft.values.findIndex((entry) => entry.id === payload.entryId);
+                if (index < 0) throw new Error("ENTRY_NOT_FOUND");
+                const reserved = reservePasskeyAssertion(draft.values[index], payload, getDateTime());
+                draft.values[index] = reserved.entry;
+                result = { signCount: reserved.signCount };
+              });
+              if (!result) throw new Error("WRITE_FAILED");
+              await invoke("bridge_complete_write_request", {
+                requestId: request.id,
+                ok: true,
+                result,
+              });
+              continue;
+            }
             if (request.kind === "createEntryFromBrowser") {
               const entry = createBrowserEntry(
                 request.payload as unknown as CreatePayload,
@@ -215,10 +238,10 @@ function BrowserBridgeWriteSync() {
               });
             }
           } catch (error) {
-            const code =
-              error instanceof Error && error.message === "ENTRY_NOT_FOUND"
-                ? "ENTRY_NOT_FOUND"
-                : "WRITE_FAILED";
+            const knownErrors = ["ENTRY_NOT_FOUND", "PASSKEY_NOT_FOUND", "INVALID_PAYLOAD", "INVALID_SIGN_COUNT", "SIGN_COUNT_EXHAUSTED", "WRITE_TIMEOUT"];
+            const code = error instanceof Error && knownErrors.includes(error.message)
+              ? error.message
+              : "WRITE_FAILED";
             const message =
               code === "ENTRY_NOT_FOUND"
                 ? "Entry could not be resolved for browser update."

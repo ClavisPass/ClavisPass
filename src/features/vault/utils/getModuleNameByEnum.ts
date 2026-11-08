@@ -26,6 +26,8 @@ const getModuleNameByEnum = (moduleEnum: ModulesEnum, t: any): string => {
       return t("modules:note");
     case ModulesEnum.PASSWORD:
       return t("modules:password");
+    case ModulesEnum.PASSKEY:
+      return t("modules:passkey");
     case ModulesEnum.PERSON:
       return t("modules:person");
     case ModulesEnum.PIN:

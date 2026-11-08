@@ -70,6 +70,14 @@ function predictNextModule(modules: ModulesType) {
       return ModulesEnum.URL;
     }
   }
+  if (moduleValue === ModulesEnum.PASSKEY) {
+    const urlResult = modules.filter(
+      (module) => module.module === ModulesEnum.URL
+    );
+    if (urlResult.length == 0) {
+      return ModulesEnum.URL;
+    }
+  }
   if (moduleValue === ModulesEnum.PERSON) {
     if (!hasModule(ModulesEnum.ADDRESS)) {
       return ModulesEnum.ADDRESS;

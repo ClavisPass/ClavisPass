@@ -24,6 +24,7 @@ export type EntryMeta = {
   company?: string | null;
   creditCard?: string | null;
   document?: string | null;
+  passkey?: string | null;
 
   wifiName?: string | null;
   wifiType?: "WEP" | "WPA" | "blank" | null;
@@ -155,6 +156,43 @@ export const MODULE_POLICY: Record<ManagedModules, ModulePolicy> = {
   [ModulesEnum.PHONE_NUMBER]: { kind: "meta", metaKey: "phone" },
 
   [ModulesEnum.PASSWORD]: { kind: "secret" },
+  [ModulesEnum.PASSKEY]: {
+    kind: "hybrid",
+    extractMeta: (entry, meta) => {
+      const passkey = firstModule(entry, ModulesEnum.PASSKEY);
+      if (!passkey) return meta;
+      const value = [passkey.relyingPartyName, passkey.relyingPartyId, passkey.userName]
+        .map((part) => (typeof part === "string" ? part.trim() : ""))
+        .filter(Boolean)
+        .join("\n");
+      return {
+        ...meta,
+        passkey: value || null,
+      };
+    },
+    getSecret: (entry) =>
+      entry.modules
+        .filter((m) => (m as any).module === ModulesEnum.PASSKEY)
+        .map((m) => ({
+          id: (m as any).id,
+          relyingPartyId: (m as any).relyingPartyId,
+          relyingPartyName: (m as any).relyingPartyName,
+          userName: (m as any).userName,
+          userDisplayName: (m as any).userDisplayName,
+          userHandle: (m as any).userHandle,
+          credentialId: (m as any).credentialId,
+          publicKey: (m as any).publicKey,
+          privateKey: (m as any).privateKey,
+          algorithm: (m as any).algorithm,
+          transports: (m as any).transports ?? [],
+          backupEligible: (m as any).backupEligible ?? false,
+          backupState: (m as any).backupState ?? false,
+          signCount: (m as any).signCount ?? 0,
+          createdAt: (m as any).createdAt,
+          lastUsedAt: (m as any).lastUsedAt,
+          source: (m as any).source,
+        })),
+  },
   [ModulesEnum.PERSON]: {
     kind: "meta",
     extractMeta: (entry, meta) => {

@@ -1,4 +1,5 @@
 import type { EntrySuggestion, VaultEntry } from "./types";
+import { getDomain, parse } from "tldts";
 
 export function normalizeLookupHost(hostname: string): string {
   return hostname.toLowerCase().replace(/^www\d*\./, "").replace(/\.+$/, "");
@@ -23,6 +24,63 @@ export function getNormalizedDomainFromUrl(input: string): string | undefined {
   }
 
   return normalizeLookupHost(parsed.hostname);
+}
+
+function normalizeRpHost(hostname: string): string {
+  return hostname.trim().toLowerCase().replace(/\.+$/, "");
+}
+
+export function validateWebAuthnRpId(
+  originRaw: string,
+  rpIdRaw?: string
+): import("./types").WebAuthnRpValidation {
+  let origin: URL;
+
+  try {
+    origin = new URL(originRaw);
+  } catch {
+    return {
+      status: "unsupported",
+      detail: "The WebAuthn request origin could not be parsed."
+    };
+  }
+
+  const originHost = normalizeRpHost(origin.hostname);
+  const isLocalhost = originHost === "localhost";
+
+  if (origin.origin !== originRaw ||
+      (origin.protocol !== "https:" && !(origin.protocol === "http:" && isLocalhost))) {
+    return {
+      status: "unsupported",
+      originHost,
+      detail: "Passkey requests are only accepted from secure origins."
+    };
+  }
+
+  const effectiveRpId = normalizeRpHost(rpIdRaw ?? origin.hostname);
+  const validLabels = effectiveRpId.length <= 253 && effectiveRpId.split(".").every(
+    (label) => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label)
+  );
+  const validDomain = effectiveRpId === "localhost" || (
+    !parse(effectiveRpId).isIp && getDomain(effectiveRpId, { allowPrivateDomains: true }) !== null
+  );
+  if (!effectiveRpId || !validLabels || !validDomain) {
+    return {
+      status: "invalid",
+      originHost,
+      detail: "The WebAuthn request did not provide a usable RP ID."
+    };
+  }
+
+  const matches = originHost === effectiveRpId || originHost.endsWith(`.${effectiveRpId}`);
+  return {
+    status: matches ? "valid" : "invalid",
+    originHost,
+    effectiveRpId,
+    detail: matches
+      ? "The RP ID matches the current page origin."
+      : "The RP ID does not match the current page origin."
+  };
 }
 
 function scoreUrlMatch(pageUrl: URL, candidateUrl: URL): number {

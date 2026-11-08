@@ -14,6 +14,9 @@ export function getValueIcon(value: Pick<ValuesType, "modules">): string {
   if (modules.some((m) => m.module === ModulesEnum.KEY)) {
     return MODULE_ICON[ModulesEnum.KEY];
   }
+  if (modules.some((m) => m.module === ModulesEnum.PASSKEY)) {
+    return MODULE_ICON[ModulesEnum.PASSKEY];
+  }
   if (modules.some((m) => m.module === ModulesEnum.TASK)) {
     return "checkbox-multiple-outline";
   }

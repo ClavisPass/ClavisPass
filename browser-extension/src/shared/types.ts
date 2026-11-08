@@ -124,6 +124,7 @@ export interface ContentDebugInfo {
   iframeCount: number;
   formsCount: number;
   inlineButtonVisible: boolean;
+  webAuthnProbeLoaded: boolean;
 }
 
 export interface ContentDebugResponse {
@@ -139,6 +140,62 @@ export interface OpenDesktopAppResult {
 
 export interface OpenDesktopAppPayload {
   appScheme?: string;
+}
+
+export type WebAuthnRequestKind = "create" | "get";
+
+export interface WebAuthnRequestDetectedPayload {
+  requestId?: string;
+  kind: WebAuthnRequestKind;
+  pageUrl: string;
+  origin: string;
+  rpId?: string;
+  challenge?: string;
+  userVerification?: string;
+  mediation?: string;
+  hasChallenge: boolean;
+  allowCredentialCount?: number;
+  allowedCredentialIds?: string[];
+  detectedAt: number;
+}
+
+export interface WebAuthnRequestDetectedResult {
+  accepted: boolean;
+}
+
+export type WebAuthnRpValidationStatus = "valid" | "invalid" | "unsupported";
+
+export interface WebAuthnRpValidation {
+  status: WebAuthnRpValidationStatus;
+  effectiveRpId?: string;
+  originHost?: string;
+  detail: string;
+}
+
+export interface WebAuthnPasskeyCandidate {
+  entryId: string;
+  entryTitle: string;
+  moduleId?: string;
+  relyingPartyId: string;
+  relyingPartyName?: string;
+  userName?: string;
+  userDisplayName?: string;
+}
+
+export interface ActiveWebAuthnRequestResult {
+  request?: WebAuthnRequestDetectedPayload;
+  rpValidation?: WebAuthnRpValidation;
+  passkeys?: WebAuthnPasskeyCandidate[];
+}
+
+export interface WebAuthnAssertActiveRequestPayload {
+  entryId: string;
+  moduleId?: string;
+}
+
+export interface WebAuthnAssertActiveRequestResult {
+  status: "completed" | "failed";
+  detail: string;
 }
 
 export type EntryActionType = "autofill" | "copy-username" | "copy-password" | "copy-totp";
