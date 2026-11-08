@@ -1266,9 +1266,9 @@
     "semantic_hash": "70ac3ecedab065751c4c388b8ea9d15e"
   },
   "src/features/vault/components/lists/DraggableModulesList.shared.tsx": {
-    "mtime": 1791912836.208945,
-    "seen": 1791912862.5376716,
-    "ast_hash": "040859944ac2d8ab95fd8da5a2c894dd",
+    "mtime": 1794179438.5285401,
+    "seen": 1794179518.8861713,
+    "ast_hash": "4daba4db8b51e2af7025da45b79aa538",
     "semantic_hash": ""
   },
   "src/features/vault/components/lists/DraggableModulesList.tsx": {
@@ -1284,9 +1284,9 @@
     "semantic_hash": ""
   },
   "src/features/vault/components/lists/ModulesList.tsx": {
-    "mtime": 1791911630.4881198,
-    "seen": 1791911657.843698,
-    "ast_hash": "b0cecdbb1c457ca4e94a7e61ec325633",
+    "mtime": 1794180402.4398274,
+    "seen": 1794180446.8671348,
+    "ast_hash": "9908645c548119c94d888a06013b2dc4",
     "semantic_hash": ""
   },
   "src/features/vault/components/menus/HomeFilterMenu.tsx": {
@@ -2490,9 +2490,9 @@
     "semantic_hash": ""
   },
   "src/screens/EditScreen.tsx": {
-    "mtime": 1794177845.6784418,
-    "seen": 1794177875.6916099,
-    "ast_hash": "81d35faaeeaa4894a01dda9be8c9d3a7",
+    "mtime": 1794179438.5285401,
+    "seen": 1794179518.8861713,
+    "ast_hash": "d9efc1c37d8ad0ec86215e7de094d195",
     "semantic_hash": ""
   },
   "src/screens/FastAccessScreen.tsx": {
@@ -3342,9 +3342,9 @@
     "semantic_hash": ""
   },
   "docs/context/vault-modules.md": {
-    "mtime": 1791564877.0016758,
-    "seen": 1791564931.2506914,
-    "ast_hash": "deef190decfeebf179cdd8b6c2c8639a",
+    "mtime": 1794180146.0859685,
+    "seen": 1794180178.5737653,
+    "ast_hash": "c152c10b9918eb0c3c9ed87190138791",
     "semantic_hash": ""
   },
   "docs/identity-management-concept.md": {
@@ -3885,6 +3885,24 @@
     "mtime": 1794178665.250865,
     "seen": 1794178752.6245284,
     "ast_hash": "a50b4fce1da14bf67e83905cdb25e71f",
+    "semantic_hash": ""
+  },
+  "src/features/vault/components/lists/ModulesList.render.test.tsx": {
+    "mtime": 1794180402.5074742,
+    "seen": 1794180446.8671348,
+    "ast_hash": "fe6dc6f9fecc63e9c9d917baa75751f0",
+    "semantic_hash": ""
+  },
+  "src/features/vault/utils/moduleScrollVisibility.test.ts": {
+    "mtime": 1794180117.3619647,
+    "seen": 1794180178.5737653,
+    "ast_hash": "60c9f626e79d3708351aca948ea01c88",
+    "semantic_hash": ""
+  },
+  "src/features/vault/utils/moduleScrollVisibility.ts": {
+    "mtime": 1794180051.7265174,
+    "seen": 1794180178.5737653,
+    "ast_hash": "6d57ff2983fd61d0ec62911115a9abad",
     "semantic_hash": ""
   }
 }

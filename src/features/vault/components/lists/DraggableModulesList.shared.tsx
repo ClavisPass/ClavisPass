@@ -16,7 +16,7 @@ export type DraggableModulesListProps = {
   changeModules: (data: ModulesType) => void;
   deleteModule: (id: string) => void;
   changeModule: (module: ModuleType) => void;
-  addModule: (module: ModulesEnum) => void;
+  addModule: (module: ModulesEnum) => string | void;
   fastAccess: FastAccessType | null;
   navigation: NativeStackNavigationProp<HomeStackParamList, "Edit", undefined>;
   topPadding?: number;

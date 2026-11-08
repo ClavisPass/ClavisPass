@@ -32,9 +32,11 @@ import {
   DraggableModulesListProps,
 } from "./DraggableModulesList.shared";
 import { SCROLLBAR_CONTENT_GAP } from "../../../../shared/ui/glass";
+import { moduleScrollOffset } from "../../utils/moduleScrollVisibility";
 
 type Props = Omit<DraggableModulesListProps, "changeModules">;
-const KEYBOARD_FOCUSED_INPUT_CLEARANCE = 96;
+const INPUT_SPACING = 8;
+const LAYOUT_SETTLE_DELAY = 80;
 
 function getFocusedInput() {
   const textInputState = (TextInput as any).State;
@@ -71,16 +73,22 @@ function ModulesList(props: Props) {
 
   const scrollRef = useRef<ScrollView>(null);
   const previousLengthRef = useRef(props.value.modules.length);
+  const requestedFocusIdRef = useRef<string | null>(null);
+  const lastModuleRef = useRef<View>(null);
+  const predictionRef = useRef<View>(null);
   const footerHeightRef = useRef(0);
   const viewportHeightRef = useRef(0);
   const contentHeightRef = useRef(0);
   const scrollOffsetRef = useRef(0);
   const keyboardTopRef = useRef<number | null>(null);
-  const keyboardRetryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
+  const revealTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const revealGenerationRef = useRef(0);
+  const lastScrollTargetRef = useRef<number | null>(null);
   const [visibleFooterHeight, setVisibleFooterHeight] = useState(0);
-  const [keyboardBottomInset, setKeyboardBottomInset] = useState(0);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [keyboardOverlap, setKeyboardOverlap] = useState(0);
+  // Keep Save above the keyboard rather than moving it up with the metadata.
+  const footerLift = keyboardVisible ? 0 : visibleFooterHeight;
   const stickyFooterBottom = useSharedValue(0);
   const stickyFooterAnimatedStyle = useAnimatedStyle(() => ({
     bottom: stickyFooterBottom.value,
@@ -94,8 +102,12 @@ function ModulesList(props: Props) {
     const contentHeight = contentHeightRef.current;
     if (footerHeight <= 0 || viewportHeight <= 0 || contentHeight <= 0) return;
 
-    const footerTop = Math.max(0, contentHeight - footerHeight);
-    const visibleBottom = scrollOffsetRef.current + viewportHeight;
+    const footerTop = Math.max(
+      0,
+      contentHeight - keyboardOverlap - footerHeight,
+    );
+    const visibleBottom =
+      scrollOffsetRef.current + viewportHeight - keyboardOverlap;
     const nextVisibleFooterHeight = Math.max(
       0,
       Math.min(footerHeight, visibleBottom - footerTop - 8),
@@ -106,7 +118,7 @@ function ModulesList(props: Props) {
         ? current
         : nextVisibleFooterHeight,
     );
-  }, [props.footer, props.stickyFooter]);
+  }, [props.footer, props.stickyFooter, keyboardOverlap]);
 
   const modulePrediction = useMemo(
     () => predictNextModule(props.value.modules),
@@ -115,13 +127,30 @@ function ModulesList(props: Props) {
 
   useEffect(() => {
     stickyFooterBottom.value = withTiming(
-      (props.stickyFooterBottomInset ?? 0) + visibleFooterHeight,
+      (props.stickyFooterBottomInset ?? 0) + keyboardOverlap + footerLift,
       {
         duration: 80,
         easing: Easing.out(Easing.cubic),
       },
     );
-  }, [props.stickyFooterBottomInset, stickyFooterBottom, visibleFooterHeight]);
+  }, [
+    props.stickyFooterBottomInset,
+    keyboardOverlap,
+    stickyFooterBottom,
+    footerLift,
+  ]);
+
+  const updateKeyboardOverlap = useCallback(() => {
+    if (Platform.OS === "web") return;
+    measureInWindow(scrollRef.current, (_x, y, _width, height) => {
+      const keyboardTop = keyboardTopRef.current;
+      const overlap =
+        keyboardTop === null ? 0 : Math.max(0, y + height - keyboardTop);
+      setKeyboardOverlap((current) =>
+        Math.abs(current - overlap) < 1 ? current : overlap,
+      );
+    });
+  }, []);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -133,85 +162,159 @@ function ModulesList(props: Props) {
 
   const ensureFocusedInputVisible = useCallback(() => {
     if (Platform.OS === "web") return;
+    const generation = revealGenerationRef.current;
 
     requestAnimationFrame(() => {
       InteractionManager.runAfterInteractions(() => {
+        if (generation !== revealGenerationRef.current) return;
         const focusedInput = getFocusedInput();
         const scrollView = scrollRef.current as any;
         if (!focusedInput || !scrollView) return;
+        const measuredOffset = scrollOffsetRef.current;
 
         measureInWindow(scrollView, (_sx, scrollY, _sw, scrollHeight) => {
           measureInWindow(focusedInput, (_ix, inputY, _iw, inputHeight) => {
             const keyboardTop = keyboardTopRef.current;
-            const visibleTop = scrollY + 8;
+            const visibleTop =
+              scrollY + (props.topPadding ?? 0) + INPUT_SPACING;
             const visibleBottom =
               (keyboardTop === null
                 ? scrollY + scrollHeight
                 : Math.min(scrollY + scrollHeight, keyboardTop)) -
-              KEYBOARD_FOCUSED_INPUT_CLEARANCE;
-            const inputTop = inputY;
-            const inputBottom = inputY + inputHeight;
+              stickyFooterClearance -
+              footerLift -
+              (props.stickyFooterBottomInset ?? 0) -
+              INPUT_SPACING;
 
-            if (inputBottom > visibleBottom) {
-              scrollRef.current?.scrollTo({
-                y: scrollOffsetRef.current + inputBottom - visibleBottom,
-                animated: true,
+            const reveal = (trailingBottom?: number) => {
+              if (
+                generation !== revealGenerationRef.current ||
+                Math.abs(scrollOffsetRef.current - measuredOffset) >= 1
+              )
+                return;
+              const nextOffset = moduleScrollOffset({
+                viewport: { top: visibleTop, bottom: visibleBottom },
+                input: { top: inputY, bottom: inputY + inputHeight },
+                trailingBottom,
+                offset: measuredOffset,
+                maxOffset: contentHeightRef.current - viewportHeightRef.current,
               });
+              if (Math.abs(nextOffset - scrollOffsetRef.current) < 1) return;
+              if (
+                lastScrollTargetRef.current !== null &&
+                Math.abs(nextOffset - lastScrollTargetRef.current) < 1
+              )
+                return;
+              lastScrollTargetRef.current = nextOffset;
+              scrollRef.current?.scrollTo({ y: nextOffset, animated: true });
+            };
+
+            if (
+              !modulePrediction ||
+              !lastModuleRef.current ||
+              !predictionRef.current
+            ) {
+              reveal();
               return;
             }
-
-            if (inputTop < visibleTop) {
-              scrollRef.current?.scrollTo({
-                y: Math.max(
-                  0,
-                  scrollOffsetRef.current - (visibleTop - inputTop),
-                ),
-                animated: true,
-              });
-            }
+            measureInWindow(
+              lastModuleRef.current,
+              (_x, lastY, _w, lastHeight) => {
+                if (
+                  inputY < lastY - 1 ||
+                  inputY + inputHeight > lastY + lastHeight + 1
+                ) {
+                  reveal();
+                  return;
+                }
+                measureInWindow(
+                  predictionRef.current,
+                  (_px, predictionY, _pw, predictionHeight) => {
+                    reveal(predictionY + predictionHeight);
+                  },
+                );
+              },
+            );
           });
         });
       });
     });
-  }, []);
+  }, [
+    modulePrediction,
+    props.topPadding,
+    props.stickyFooterBottomInset,
+    stickyFooterClearance,
+    footerLift,
+  ]);
 
   const scheduleFocusedInputVisibilityCheck = useCallback(() => {
-    ensureFocusedInputVisible();
+    if (Platform.OS === "web") return;
+    revealGenerationRef.current += 1;
 
-    if (keyboardRetryTimeoutRef.current) {
-      clearTimeout(keyboardRetryTimeoutRef.current);
+    if (revealTimeoutRef.current) {
+      clearTimeout(revealTimeoutRef.current);
     }
 
-    keyboardRetryTimeoutRef.current = setTimeout(() => {
+    revealTimeoutRef.current = setTimeout(() => {
+      revealTimeoutRef.current = null;
       ensureFocusedInputVisible();
-      keyboardRetryTimeoutRef.current = null;
-    }, 180);
+    }, LAYOUT_SETTLE_DELAY);
   }, [ensureFocusedInputVisible]);
+
+  const cancelPendingReveal = useCallback(() => {
+    revealGenerationRef.current += 1;
+    lastScrollTargetRef.current = null;
+    if (revealTimeoutRef.current) {
+      clearTimeout(revealTimeoutRef.current);
+      revealTimeoutRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => cancelPendingReveal, [cancelPendingReveal]);
+
+  useEffect(() => {
+    if (keyboardVisible) scheduleFocusedInputVisibilityCheck();
+  }, [keyboardVisible, scheduleFocusedInputVisibilityCheck]);
 
   useEffect(() => {
     const nextLength = props.value.modules.length;
     if (nextLength > previousLengthRef.current) {
-      scrollToBottom();
+      if (Platform.OS === "web") scrollToBottom();
+      else scheduleFocusedInputVisibilityCheck();
     }
     previousLengthRef.current = nextLength;
-  }, [props.value.modules.length, scrollToBottom]);
+  }, [
+    props.value.modules.length,
+    scrollToBottom,
+    scheduleFocusedInputVisibilityCheck,
+  ]);
+
+  useEffect(() => {
+    const requestedId = requestedFocusIdRef.current;
+    if (
+      !requestedId ||
+      !props.value.modules.some((module) => module.id === requestedId)
+    )
+      return;
+    requestedFocusIdRef.current = null;
+    scheduleFocusedInputVisibilityCheck();
+  }, [props.value.modules, scheduleFocusedInputVisibilityCheck]);
 
   useEffect(() => {
     if (Platform.OS === "web") return undefined;
 
     const handleKeyboardShown = (event: any) => {
       keyboardTopRef.current = event.endCoordinates?.screenY ?? null;
-      setKeyboardBottomInset(Math.max(0, event.endCoordinates?.height ?? 0));
+      setKeyboardVisible(true);
+      updateKeyboardOverlap();
       scheduleFocusedInputVisibilityCheck();
     };
 
     const handleKeyboardHidden = () => {
       keyboardTopRef.current = null;
-      setKeyboardBottomInset(0);
-      if (keyboardRetryTimeoutRef.current) {
-        clearTimeout(keyboardRetryTimeoutRef.current);
-        keyboardRetryTimeoutRef.current = null;
-      }
+      setKeyboardVisible(false);
+      setKeyboardOverlap(0);
+      cancelPendingReveal();
     };
 
     const showSubscription = Keyboard.addListener(
@@ -226,11 +329,12 @@ function ModulesList(props: Props) {
     return () => {
       showSubscription.remove();
       hideSubscription.remove();
-      if (keyboardRetryTimeoutRef.current) {
-        clearTimeout(keyboardRetryTimeoutRef.current);
-      }
     };
-  }, [scheduleFocusedInputVisibilityCheck]);
+  }, [
+    scheduleFocusedInputVisibilityCheck,
+    updateKeyboardOverlap,
+    cancelPendingReveal,
+  ]);
 
   const renderModule = useCallback(
     (item: ModuleType) =>
@@ -242,7 +346,8 @@ function ModulesList(props: Props) {
         props.fastAccess,
         props.navigation,
         props.value.title,
-        props.moduleAutoFocus ?? true,
+        item.id === requestedFocusIdRef.current ||
+          (props.moduleAutoFocus ?? true),
       ),
     [
       props.changeModule,
@@ -264,22 +369,28 @@ function ModulesList(props: Props) {
         ref={scrollRef}
         style={{ flex: 1, width: "100%" }}
         onLayout={(event) => {
-          viewportHeightRef.current = event.nativeEvent.layout.height;
+          const height = event.nativeEvent.layout.height;
+          const heightChanged =
+            Math.abs(viewportHeightRef.current - height) >= 1;
+          viewportHeightRef.current = height;
           updateVisibleFooterHeight();
+          updateKeyboardOverlap();
+          if (heightChanged && keyboardTopRef.current !== null)
+            scheduleFocusedInputVisibilityCheck();
         }}
         contentContainerStyle={{
           flexGrow: 1,
           paddingRight: props.rightPadding ?? SCROLLBAR_CONTENT_GAP,
           paddingTop: props.topPadding ?? 0,
           paddingBottom:
-            (props.footer ? 0 : (props.bottomPadding ?? 12)) +
-            keyboardBottomInset +
-            (keyboardBottomInset > 0 ? KEYBOARD_FOCUSED_INPUT_CLEARANCE : 0),
+            (props.footer ? 0 : (props.bottomPadding ?? 12)) + keyboardOverlap,
         }}
         onContentSizeChange={(_, height) => {
+          const heightChanged =
+            Math.abs(contentHeightRef.current - height) >= 1;
           contentHeightRef.current = height;
           updateVisibleFooterHeight();
-          if (keyboardTopRef.current !== null) {
+          if (heightChanged && keyboardTopRef.current !== null) {
             scheduleFocusedInputVisibilityCheck();
           }
         }}
@@ -287,24 +398,37 @@ function ModulesList(props: Props) {
           scrollOffsetRef.current = event.nativeEvent.contentOffset.y;
           updateVisibleFooterHeight();
         }}
+        onScrollBeginDrag={cancelPendingReveal}
         scrollEventThrottle={16}
         keyboardShouldPersistTaps="always"
         keyboardDismissMode="on-drag"
       >
-        {props.value.modules.map((item) => (
-          <View key={item.id}>{renderModule(item)}</View>
+        {props.value.modules.map((item, index) => (
+          <View
+            key={item.id}
+            ref={
+              index === props.value.modules.length - 1
+                ? lastModuleRef
+                : undefined
+            }
+            collapsable={false}
+          >
+            {renderModule(item)}
+          </View>
         ))}
-        <DraggableModulesFooter
-          modulePrediction={modulePrediction}
-          onAddPredictedModule={() => {
-            if (!modulePrediction) return;
-            props.addModule(modulePrediction);
-            setTimeout(scrollToBottom, 0);
-          }}
-          t={t}
-        />
+        <View ref={predictionRef} collapsable={false}>
+          <DraggableModulesFooter
+            modulePrediction={modulePrediction}
+            onAddPredictedModule={() => {
+              if (!modulePrediction) return;
+              requestedFocusIdRef.current =
+                props.addModule(modulePrediction) ?? null;
+            }}
+            t={t}
+          />
+        </View>
         {stickyFooterClearance > 0 ? (
-          <View style={{ height: stickyFooterClearance }} />
+          <View style={{ height: stickyFooterClearance + INPUT_SPACING }} />
         ) : null}
         {props.footer ? (
           <View
@@ -315,7 +439,9 @@ function ModulesList(props: Props) {
             style={{
               marginTop: "auto" as any,
               paddingTop: 8,
-              paddingBottom: footerBottomPadding,
+              paddingBottom:
+                footerBottomPadding +
+                (keyboardVisible ? stickyFooterClearance : 0),
             }}
           >
             {props.footer}

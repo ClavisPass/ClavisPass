@@ -431,6 +431,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       newElement as ModuleType,
     ];
     changeModules(newModules);
+    return newElement.id;
   };
 
   const changeModules = (modules: ModulesType) => {
