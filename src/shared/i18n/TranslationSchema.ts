@@ -257,6 +257,12 @@ export type TranslationSchema = {
     windowControlsLeft: string;
     windowControlsRight: string;
     windowCornerStyle: string;
+    glassAppearance: string;
+    glassAppearanceSubtitle: string;
+    glassTransparency: string;
+    glassTransparencySubtitle: string;
+    glassTintStrength: string;
+    glassTintStrengthSubtitle: string;
     windowCornerRounded: string;
     windowCornerSoft: string;
     windowCornerSquare: string;

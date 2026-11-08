@@ -499,6 +499,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         ]),
       appearance: matchesSettingsSearch([
         t("settings:appearance"),
+        t("settings:glassAppearance"),
+        t("settings:glassTransparency"),
+        t("settings:glassTintStrength"),
+        "glass",
+        "transparency",
         "appearance",
         "design",
         "theme",

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import DarkModeSwitch from "./DarkModeSwitch";
+import GlassAppearanceSettings from "./GlassAppearanceSettings";
 import SettingsDivider from "./SettingsDivider";
 import SettingsDropdownItem from "./SettingsDropdownItem";
 
@@ -69,6 +70,8 @@ const AppearanceSettingsSection: React.FC<Props> = ({
 
       {isTauri ? (
         <>
+          <SettingsDivider />
+          <GlassAppearanceSettings />
           <SettingsDivider />
 
           <SettingsDropdownItem

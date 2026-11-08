@@ -70,6 +70,14 @@ export const storeSchema = {
     values: ["light", "dark"] as const,
     default: "light",
   },
+  GLASS_TRANSPARENCY: {
+    type: "number",
+    default: 50,
+  },
+  GLASS_TINT_STRENGTH: {
+    type: "number",
+    default: 100,
+  },
   CLOSE_BEHAVIOR: {
     type: "enum",
     values: ["hide", "exit"] as const,
@@ -236,6 +244,8 @@ export function subscribe<K extends DataKey>(
 
 const SETTINGS_RESET_KEYS = [
   "THEME_PREFERENCE",
+  "GLASS_TRANSPARENCY",
+  "GLASS_TINT_STRENGTH",
   "CLOSE_BEHAVIOR",
   "BLUR_ON_UNFOCUS",
   "HOTKEYS",

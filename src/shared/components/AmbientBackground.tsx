@@ -7,6 +7,7 @@ import {
 import type { StyleProp, ViewStyle } from "react-native";
 import { useTheme } from "../../app/providers/ThemeProvider";
 import { useIsTauriEnvironment } from "../../infrastructure/platform/isTauri";
+import { glassLayerOpacity } from "../ui/glassAppearance";
 
 function withAlpha(color: string, alpha: number) {
   const hex = color.trim().replace("#", "");
@@ -73,16 +74,20 @@ function AmbientWash({
 }
 
 function AmbientBackground({}: Props) {
-  const { darkmode, theme } = useTheme();
+  const { darkmode, theme, glassAppearance } = useTheme();
   const isTauri = useIsTauriEnvironment();
   const primary = theme.colors.primary;
   const secondary = theme.colors.secondary;
   const appBackground = isTauri
-    ? withAlpha(darkmode ? theme.colors.background : "#FFFFFF", darkmode ? 0.24 : 0.34)
+    ? withAlpha(
+        darkmode ? theme.colors.background : "#FFFFFF",
+        glassLayerOpacity(darkmode ? 0.24 : 0.34, glassAppearance.transparency),
+      )
     : darkmode
       ? theme.colors.background
       : "#F7F7F7";
   const mobileBackground = darkmode ? theme.colors.background : "#F6F6F6";
+  const tintScale = isTauri ? glassAppearance.tintStrength / 100 : 1;
 
   if (Platform.OS !== "web") {
     return (
@@ -143,28 +148,28 @@ function AmbientBackground({}: Props) {
         style={styles.topRight}
         backgroundColor={withAlpha(
           primary,
-          darkmode ? 0.05 : 0.01,
+          (darkmode ? 0.05 : 0.01) * tintScale,
         )}
       />
       <AmbientWash
         style={styles.left}
         backgroundColor={withAlpha(
           secondary,
-          darkmode ? 0.045 : 0.012,
+          (darkmode ? 0.045 : 0.012) * tintScale,
         )}
       />
       <AmbientWash
         style={styles.bottom}
         backgroundColor={withAlpha(
           primary,
-          darkmode ? 0.03 : 0.008,
+          (darkmode ? 0.03 : 0.008) * tintScale,
         )}
       />
       <AmbientWash
         style={styles.lowerLeft}
         backgroundColor={withAlpha(
           secondary,
-          darkmode ? 0.028 : 0.01,
+          (darkmode ? 0.028 : 0.01) * tintScale,
         )}
       />
     </View>

@@ -5,6 +5,7 @@ Use this for visual consistency, spacing, glass/background structure, item surfa
 ## Current Visual Direction
 
 - App-level ambient/glass background lives globally.
+- Desktop glass transparency and color intensity are configurable in Appearance settings. Persisted values live in `GLASS_TRANSPARENCY` / `GLASS_TINT_STRENGTH`; `ThemeProvider` supplies a temporary live preview while dragging. Defaults preserve the original look. This controls app background layers, while native window blur remains OS-managed.
 - Header/sidebar areas are glassy/transparent.
 - Page content below the header uses a real background panel. In light mode this panel is a cool frosted blue rather than pure white.
 - Standard spacing is `8px` unless a component has a clear density reason.

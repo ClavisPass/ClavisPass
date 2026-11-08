@@ -20,8 +20,14 @@ import StartupScreen from "../../shared/components/StartupScreen";
 import { useIsTauriEnvironment } from "../../infrastructure/platform/isTauri";
 
 import { useSetting } from "./SettingsProvider";
+import {
+  normalizeGlassAppearance,
+  type GlassAppearance,
+} from "../../shared/ui/glassAppearance";
 
 interface ThemeContextType {
+  glassAppearance: GlassAppearance;
+  setGlassAppearancePreview: React.Dispatch<React.SetStateAction<Partial<GlassAppearance>>>;
   darkmode: boolean;
   setDarkmode: (darkmode: boolean) => void;
   theme: AppTheme;
@@ -47,6 +53,14 @@ export const ThemeProvider = ({ children }: Props) => {
     setValue: setThemePref,
     isReady,
   } = useSetting("THEME_PREFERENCE");
+  const { value: glassTransparency } = useSetting("GLASS_TRANSPARENCY");
+  const { value: glassTintStrength } = useSetting("GLASS_TINT_STRENGTH");
+  const [glassAppearancePreview, setGlassAppearancePreview] =
+    useState<Partial<GlassAppearance>>({});
+  const glassAppearance = normalizeGlassAppearance({
+    transparency: glassAppearancePreview.transparency ?? glassTransparency,
+    tintStrength: glassAppearancePreview.tintStrength ?? glassTintStrength,
+  });
 
   const [headerSpacing, setHeaderSpacing] = useState(0);
   const [titlebarCenterGap, setTitlebarCenterGap] = useState(0);
@@ -89,6 +103,8 @@ export const ThemeProvider = ({ children }: Props) => {
   return (
     <ThemeContext.Provider
       value={{
+        glassAppearance,
+        setGlassAppearancePreview,
         darkmode,
         setDarkmode,
         theme,

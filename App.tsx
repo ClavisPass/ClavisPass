@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { glassLayerOpacity } from "./src/shared/ui/glassAppearance";
 import "react-native-gesture-handler";
 import {
   useFonts,
@@ -263,7 +264,7 @@ export default function App() {
 }
 
 function AppShell() {
-  const { theme, darkmode } = useTheme();
+  const { theme, darkmode, glassAppearance } = useTheme();
   const isTauri = useIsTauriEnvironment();
   const { value: windowCornerStyle } = useSetting("WINDOW_CORNER_STYLE");
   const windowCornerRadius = isTauri
@@ -272,7 +273,7 @@ function AppShell() {
   const shellBackgroundColor = isTauri
     ? withAlpha(
         darkmode ? theme.colors.background : "#FAFCFF",
-        darkmode ? 0.54 : 0.78,
+        glassLayerOpacity(darkmode ? 0.54 : 0.78, glassAppearance.transparency),
       )
     : theme.colors.background;
 
