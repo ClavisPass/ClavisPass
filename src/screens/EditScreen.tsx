@@ -20,6 +20,12 @@ import getModuleData from "../features/vault/utils/getModuleData";
 import AddModuleModal from "../features/vault/components/modals/AddModuleModal";
 import { getDateTime } from "../shared/utils/Timestamp";
 import TitleModule from "../features/vault/components/modules/TitleModule";
+import WebsitePresetSuggestions from "../features/vault/components/WebsitePresetSuggestions";
+import {
+  applyWebsitePreset,
+  findWebsitePresets,
+  type WebsitePreset,
+} from "../features/vault/utils/websitePresets";
 import AnimatedContainer from "../shared/components/container/AnimatedContainer";
 import FolderSelectModal from "../features/vault/components/modals/FolderSelectModal";
 import { useTheme } from "../app/providers/ThemeProvider";
@@ -181,6 +187,46 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
       extractFastAccessObject(value.modules, value.title),
     );
   const moduleAutoFocus = useRef(routeValue.title.trim().length > 0).current;
+  const isNewEntry = useRef(
+    !vault.entries.some((entry) => entry.id === routeValue.id),
+  ).current;
+  const [titleFocused, setTitleFocused] = useState(false);
+  const [presetsDismissed, setPresetsDismissed] = useState(false);
+  const titleBlurTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const websiteSuggestions = React.useMemo(
+    () =>
+      isNewEntry && isFocused && titleFocused && !presetsDismissed
+        ? findWebsitePresets(value.title)
+        : [],
+    [isNewEntry, isFocused, titleFocused, presetsDismissed, value.title],
+  );
+
+  useEffect(
+    () => () => {
+      if (titleBlurTimeout.current) clearTimeout(titleBlurTimeout.current);
+    },
+    [],
+  );
+
+  const handleTitleFocus = () => {
+    if (titleBlurTimeout.current) clearTimeout(titleBlurTimeout.current);
+    setTitleFocused(true);
+  };
+
+  const handleTitleBlur = () => {
+    if (titleBlurTimeout.current) clearTimeout(titleBlurTimeout.current);
+    // Let a suggestion receive its click after the title loses focus on web.
+    titleBlurTimeout.current = setTimeout(() => setTitleFocused(false), 150);
+  };
+
+  const selectWebsitePreset = (preset: WebsitePreset) => {
+    applyChange((current) => applyWebsitePreset(current, preset), {
+      action: "modules",
+      label: t("common:editHistoryWebsitePresetApplied", { name: preset.name }),
+    });
+    setPresetsDismissed(true);
+    Keyboard.dismiss();
+  };
 
   const currentFolder = React.useMemo(() => {
     if (!value.folder) return null;
@@ -544,6 +590,7 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
   };
 
   const changeTitle = (title: string) => {
+    setPresetsDismissed(false);
     applyChange(
       (current) => ({
         ...current,
@@ -1323,8 +1370,15 @@ const EditScreen: React.FC<EditScreenProps> = ({ route, navigation }) => {
             value={value}
             changeTitle={changeTitle}
             initialTitle={routeSearchstring ?? null}
+            onFocus={handleTitleFocus}
+            onBlur={handleTitleBlur}
           />
         }
+      />
+      <WebsitePresetSuggestions
+        presets={websiteSuggestions}
+        onSelect={selectWebsitePreset}
+        onDismiss={() => setPresetsDismissed(true)}
       />
       <View style={[styles.editListWrap, screenContentStyle]}>
         {renderEditActionChips()}

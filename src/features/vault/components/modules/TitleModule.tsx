@@ -1,4 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { HomeStackParamList } from "../../../../app/navigation/model/types";
 
 import { Icon, TextInput } from "react-native-paper";
 import ValuesType from "../../model/ValuesType";
@@ -10,13 +13,19 @@ type Props = {
   value: ValuesType;
   changeTitle: (title: string) => void;
   initialTitle: string | null;
+  onFocus?: () => void;
+  onBlur?: () => void;
 };
 
 function TitleModule(props: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<HomeStackParamList, "Edit">>();
 
   const textInputRef = useRef<any>(null);
+  const shouldFocusTitle = useRef(props.value.title === "").current;
+  const didFocusTitle = useRef(false);
 
   const changeTitle = (text: string) => {
     props.changeTitle(text);
@@ -27,9 +36,37 @@ function TitleModule(props: Props) {
       if (props.initialTitle !== null) {
         changeTitle(props.initialTitle);
       }
-      textInputRef.current.focus();
     }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!shouldFocusTitle || didFocusTitle.current) return;
+
+      const focusTitle = () => {
+        if (didFocusTitle.current || !textInputRef.current) return;
+        textInputRef.current.focus();
+        didFocusTitle.current = true;
+      };
+
+      if (Platform.OS === "web") {
+        focusTitle();
+        return;
+      }
+
+      // Native stack transitions can dismiss a keyboard opened during mount.
+      const unsubscribe = navigation.addListener("transitionEnd", (event) => {
+        if (!event.data.closing) focusTitle();
+      });
+      // Also handle entry without an animated transition.
+      const fallback = setTimeout(focusTitle, 500);
+
+      return () => {
+        unsubscribe();
+        clearTimeout(fallback);
+      };
+    }, [navigation, shouldFocusTitle]),
+  );
 
   return (
     <View
@@ -45,7 +82,8 @@ function TitleModule(props: Props) {
       }}
     >
       <TextInput
-        autoFocus={props.value.title === "" ? true : false}
+        onFocus={props.onFocus}
+        onBlur={props.onBlur}
         ref={textInputRef}
         {...(Platform.OS === "web"
           ? ({ className: "clavispass-cursor-text" } as any)

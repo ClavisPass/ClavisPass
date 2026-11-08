@@ -88,6 +88,9 @@ export type TranslationSchema = {
     editHistoryDescription: string;
     editHistoryEmpty: string;
     editHistoryTitleUpdated: string;
+    applyWebsitePreset: string;
+    dismissWebsitePresets: string;
+    editHistoryWebsitePresetApplied: string;
     editHistoryModuleUpdated: string;
     editHistoryModulesUpdated: string;
     editHistoryModulesReordered: string;
