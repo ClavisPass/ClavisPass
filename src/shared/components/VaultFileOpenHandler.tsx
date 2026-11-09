@@ -13,8 +13,10 @@ import { useAuth } from "../../app/providers/AuthProvider";
 import { useToken } from "../../app/providers/CloudProvider";
 import { useTheme } from "../../app/providers/ThemeProvider";
 import { useVault } from "../../app/providers/VaultProvider";
-import { uploadRemoteVaultFile } from "../../infrastructure/cloud/clients/CloudStorageClient";
+import { fetchRemoteVaultFile, runVaultOperation, uploadRemoteVaultFile } from "../../infrastructure/cloud/clients/CloudStorageClient";
+import { decryptVaultContent } from "../../infrastructure/crypto/decryptVaultContent";
 import { encryptVaultContent } from "../../infrastructure/crypto/encryptVaultContent";
+import { mergeVaultData } from "../../features/vault/utils/mergeVaultData";
 import { logger } from "../../infrastructure/logging/logger";
 import { getDateTime } from "../utils/Timestamp";
 import {
@@ -182,7 +184,20 @@ function VaultFileOpenHandler() {
       );
     });
 
-    const payload = vault.exportFullData();
+    const target = { provider, accessToken: tokenToUse, remotePath: "clavispass.lock" };
+    const saved = await fetchRemoteVaultFile(target);
+    if (saved.status === "error" || auth.getMaster() !== master) {
+      throw new Error("Could not check the saved vault");
+    }
+    let payload = vault.exportFullData();
+    if (saved.status === "ok") {
+      const existing = await decryptVaultContent(saved.content, master);
+      if (!existing.ok || auth.getMaster() !== master) throw new Error("Could not verify the saved vault");
+      payload = mergeVaultData(vault.exportFullData(), existing.payload, {
+        sameTimestampConflictStrategy: "keepRemote",
+      }).vault;
+    }
+    const revision = vault.getRevision();
     const encrypted = await encryptVaultContent(payload, master, {
       lastUpdated: iso,
     });
@@ -190,15 +205,20 @@ function VaultFileOpenHandler() {
     if (!encrypted.ok) {
       throw encrypted.error;
     }
+    if (auth.getMaster() !== master || vault.getRevision() !== revision) {
+      throw new Error("The active vault changed before saving");
+    }
 
     await uploadRemoteVaultFile({
-      provider,
-      accessToken: tokenToUse,
-      remotePath: "clavispass.lock",
+      ...target,
       content: encrypted.content,
       vaultId: payload.vaultId,
+      expected: saved,
     });
 
+    if (auth.getMaster() !== master || vault.getRevision() !== revision) {
+      throw new Error("The active vault changed during saving");
+    }
     vault.markSaved();
   }, [accessToken, auth, ensureFreshAccessToken, provider, vault]);
 
@@ -225,7 +245,7 @@ function VaultFileOpenHandler() {
 
     setSaving(true);
     try {
-      await saveCurrentVault();
+      await runVaultOperation(saveCurrentVault);
       await switchToPendingVaultFile();
     } catch (error) {
       logger.error(

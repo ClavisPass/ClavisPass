@@ -169,11 +169,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     loadUserInfo();
   }, [loadUserInfo]);
 
+  const showOfflineBackup = !isOnline && provider !== "device";
   const currentKey = useMemo(() => {
-    if (!isOnline) return "offline";
+    if (showOfflineBackup) return "offline";
     if (isInitializing || loadingUserInfo) return "loading";
     return "online";
-  }, [isOnline, isInitializing, loadingUserInfo]);
+  }, [showOfflineBackup, isInitializing, loadingUserInfo]);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -384,7 +385,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 alignItems: "center",
               }}
             >
-              {!isOnline ? (
+              {showOfflineBackup ? (
                 <Backup />
               ) : isInitializing || loadingUserInfo ? (
                 <ActivityIndicator size="large" />

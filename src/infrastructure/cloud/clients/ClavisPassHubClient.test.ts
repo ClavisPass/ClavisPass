@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
-  clearClavisPassHubVaultEtag,
   getClavisPassHubVaultEtag,
   setClavisPassHubHostUrl,
   setClavisPassHubVaultEtag,
@@ -89,7 +88,7 @@ describe("ClavisPassHubClient", () => {
     });
   });
 
-  it("uploads a first Hub vault without If-Match after fetchFile returned not_found", async () => {
+  it("creates a first Hub vault with a missing-file precondition", async () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(
@@ -115,7 +114,7 @@ describe("ClavisPassHubClient", () => {
     await expect(fetchFile("access-token", "clavispass.lock")).resolves.toEqual({
       status: "not_found",
     });
-    await uploadFile("access-token", "encrypted-content", "clavispass.lock");
+    await uploadFile("access-token", "encrypted-content", "clavispass.lock", undefined, null);
 
     expect(fetchMock.mock.calls[1][0]).toBe("https://hub.example.com/api/vault");
     expect(fetchMock.mock.calls[1][1]).toMatchObject({
@@ -126,11 +125,11 @@ describe("ClavisPassHubClient", () => {
       "text/plain; charset=utf-8",
     );
     expect(fetchMock.mock.calls[1][1].headers["If-Match"]).toBeUndefined();
+    expect(fetchMock.mock.calls[1][1].headers["If-None-Match"]).toBe("*");
     await expect(getClavisPassHubVaultEtag()).resolves.toBe("created-etag");
   });
 
-  it("uses the stored ETag on later Hub uploads", async () => {
-    await setClavisPassHubVaultEtag("current-etag");
+  it("uses the ETag from the downloaded content even if another request stored a newer one", async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       response({
         ok: true,
@@ -138,30 +137,38 @@ describe("ClavisPassHubClient", () => {
         body: "",
         headers: { etag: "next-etag" },
       }),
+    ).mockResolvedValueOnce(
+      response({ ok: true, status: 200, body: "read-content", headers: { etag: "read-etag" } }),
     );
     vi.stubGlobal("fetch", fetchMock);
 
-    await uploadFile("access-token", "encrypted-content", "clavispass.lock");
+    const snapshot = await fetchFile("access-token", "clavispass.lock");
+    expect(snapshot).toMatchObject({ content: "read-content", revision: "read-etag" });
+    if (snapshot.status !== "ok") throw new Error("Expected a vault snapshot");
+    await setClavisPassHubVaultEtag("newer-etag");
+    await uploadFile("access-token", "encrypted-content", "clavispass.lock", undefined, snapshot.revision);
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock.mock.calls[0][1].headers["If-Match"]).toBe("current-etag");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls[1][1].headers["If-Match"]).toBe("read-etag");
     await expect(getClavisPassHubVaultEtag()).resolves.toBe("next-etag");
   });
 
   it("does not blind-overwrite an existing Hub vault when no ETag is available", async () => {
-    await clearClavisPassHubVaultEtag();
-    const fetchMock = vi.fn().mockResolvedValue(
-      response({
-        ok: true,
-        status: 200,
-        body: { etag: null },
-      }),
-    );
+    const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(
       uploadFile("access-token", "encrypted-content", "clavispass.lock"),
     ).rejects.toMatchObject({ code: "ETAG_MISSING" });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("does not retry or cache a rejected stale Hub write", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response({ ok: false, status: 412 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(uploadFile("token", "stale", "clavispass.lock", undefined, "stale-etag"))
+      .rejects.toMatchObject({ code: "ETAG_MISMATCH" });
     expect(fetchMock).toHaveBeenCalledTimes(1);
+    await expect(AsyncStorage.getItem("LOCAL_SYNC")).resolves.toBeNull();
   });
 });

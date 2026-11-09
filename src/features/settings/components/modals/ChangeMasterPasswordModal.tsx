@@ -11,9 +11,13 @@ import { useAuth } from "../../../../app/providers/AuthProvider";
 import { useToken } from "../../../../app/providers/CloudProvider";
 
 import { logger } from "../../../../infrastructure/logging/logger";
-import { uploadRemoteVaultFile } from "../../../../infrastructure/cloud/clients/CloudStorageClient";
+import { fetchRemoteVaultFile, runVaultOperation, uploadRemoteVaultFile } from "../../../../infrastructure/cloud/clients/CloudStorageClient";
 import { useVault } from "../../../../app/providers/VaultProvider";
 import { encryptVaultContent } from "../../../../infrastructure/crypto/encryptVaultContent";
+import { decryptVaultContent } from "../../../../infrastructure/crypto/decryptVaultContent";
+import { areVaultDataEqual, mergeVaultData } from "../../../vault/utils/mergeVaultData";
+import { persistPreparedRecoveryVault, prepareV3VaultPasswordChange } from "../../../../infrastructure/crypto/vault/vaultRecovery";
+import { removeAuthentication } from "../../../auth/utils/authenticateUser";
 
 type Props = {
   visible: boolean;
@@ -113,23 +117,11 @@ function ChangeMasterPasswordModal(props: Props) {
   };
 
   const applyNewPassword = async () => {
-    if (passwordNotEqual || !newPassword || !confirmPassword) return;
+    if (processing || passwordNotEqual || !newPassword || !confirmPassword) return;
 
     Keyboard.dismiss();
     setProcessing(true);
-    try {
-      const data = vault.exportFullData();
-
-      const enc = await encryptVaultContent(data, newPassword, {
-        forceRewrap: true,
-      });
-
-      if (!enc.ok) {
-        throw enc.error;
-      }
-
-      const content = enc.content;
-
+    const change = async () => {
       if (!provider) {
         logger.warn(
           "[ChangeMasterPassword] No provider configured; cannot persist.",
@@ -144,19 +136,55 @@ function ChangeMasterPasswordModal(props: Props) {
         if (!tokenToUse) throw new Error("No access token available");
       }
 
-      await uploadRemoteVaultFile({
-        provider,
-        accessToken: tokenToUse ?? "",
-        remotePath: "clavispass.lock",
-        content,
-        onCompleted: undefined,
-        vaultId: data.vaultId,
-      });
+      const master = auth.getMaster();
+      if (!master || master !== currentPassword) throw new Error("Session changed");
+      const data = vault.exportFullData();
+      const revision = vault.getRevision();
+      const isCurrent = () => auth.getMaster() === master && vault.getRevision() === revision;
+      const target = { provider, accessToken: tokenToUse ?? "", remotePath: "clavispass.lock" };
+      const saved = await fetchRemoteVaultFile(target);
+      if (saved.status !== "ok") throw new Error("Could not read saved vault");
+      const existing = await decryptVaultContent(saved.content, master, { commitSession: false });
+      if (!existing.ok) throw new Error("Could not verify saved vault");
+      const merged = mergeVaultData(data, existing.payload, {
+        sameTimestampConflictStrategy: "keepRemote",
+      }).vault;
+      let content: string;
+      if (existing.format === "v3") {
+        content = await prepareV3VaultPasswordChange(saved.content, master, newPassword, merged);
+      } else {
+        const enc = await encryptVaultContent(merged, newPassword, {
+          forceRewrap: true,
+          commitSession: false,
+          newVault: true,
+        });
+        if (!enc.ok) throw enc.error;
+        content = enc.content;
+      }
+      const persisted = await persistPreparedRecoveryVault(content, newPassword, async (vaultId) => {
+        if (!isCurrent()) throw new Error("Vault changed during password preparation");
+        await uploadRemoteVaultFile({
+          ...target,
+          content,
+          vaultId,
+          expected: saved,
+        });
+        await removeAuthentication().catch(() => {
+          logger.warn("[ChangeMasterPassword] Could not clear system authentication");
+        });
+      }, () => auth.getMaster() === master);
+      if (!persisted) return;
 
       auth.login(newPassword);
-      vault.markSaved();
+      if (vault.getRevision() === revision) {
+        if (areVaultDataEqual(data, persisted)) vault.markSaved();
+        else vault.unlockWithDecryptedVault(persisted);
+      }
 
       hideModal();
+    };
+    try {
+      await runVaultOperation(change);
     } catch (e) {
       logger.error(
         "[ChangeMasterPassword] Failed to change master password:",

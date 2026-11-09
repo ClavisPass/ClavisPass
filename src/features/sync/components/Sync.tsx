@@ -12,6 +12,7 @@ import { useToken } from "../../../app/providers/CloudProvider";
 import { getDateTime } from "../../../shared/utils/Timestamp";
 import {
   fetchRemoteVaultFile,
+  runVaultOperation,
   uploadRemoteVaultFile,
 } from "../../../infrastructure/cloud/clients/CloudStorageClient";
 import { logger } from "../../../infrastructure/logging/logger";
@@ -155,8 +156,6 @@ const Sync = (props: Props) => {
       );
     });
 
-    let payloadRevision = vault.getRevision();
-    let payload = vault.exportFullData();
     const master = auth.getMaster();
     if (!master)
       throw new Error("[Sync] Missing master password in auth context");
@@ -170,16 +169,25 @@ const Sync = (props: Props) => {
     if (remote.status === "error") {
       throw new Error(`[Sync] Failed to fetch remote vault: ${remote.message}`);
     }
+    if (auth.getMaster() !== master) throw new Error("Vault session changed");
+    let payloadRevision = vault.getRevision();
+    let payload = vault.exportFullData();
 
     if (remote.status === "ok") {
       const decryptedRemote = await decryptVaultContent(remote.content, master);
 
       if (!decryptedRemote.ok) {
+        if (decryptedRemote.reason === "UPDATE_REQUIRED") {
+          triggerGlobalError({ message: t("login:vaultUpdateRequired"), code: "VAULT_UPDATE_REQUIRED" });
+        }
         throw new Error(
           `[Sync] Failed to decrypt remote vault before merge: ${decryptedRemote.reason}`,
         );
       }
 
+      if (auth.getMaster() !== master) throw new Error("Vault session changed");
+      payloadRevision = vault.getRevision();
+      payload = vault.exportFullData();
       const mergeResult = mergeVaultData(payload, decryptedRemote.payload, {
         sameTimestampConflictStrategy: "keepRemote",
       });
@@ -205,6 +213,7 @@ const Sync = (props: Props) => {
       const failure = result;
       throw failure.error;
     }
+    if (auth.getMaster() !== master) throw new Error("Vault session changed");
 
     await uploadRemoteVaultFile({
       provider,
@@ -212,6 +221,7 @@ const Sync = (props: Props) => {
       remotePath: "clavispass.lock",
       content: result.content,
       vaultId: payload.vaultId,
+      expected: remote,
     });
 
     logger.info("[Sync] Remote vault upload completed.");
@@ -242,7 +252,7 @@ const Sync = (props: Props) => {
       do {
         saveAgainAfterCurrentRef.current = false;
 
-        const savedRevision = await saveOnce();
+        const savedRevision = await runVaultOperation(saveOnce);
         const changedDuringSave = vault.getRevision() !== savedRevision;
 
         if (changedDuringSave) {
@@ -264,7 +274,7 @@ const Sync = (props: Props) => {
       saveInFlightRef.current = false;
       setRefreshing(false);
     }
-  }, [cancelAutosaveCountdown, saveOnce, setRefreshing, t, vault]);
+  }, [cancelAutosaveCountdown, provider, saveOnce, setRefreshing, t, vault]);
 
   useEffect(() => {
     requestSaveRef.current = requestSave;

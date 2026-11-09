@@ -17,6 +17,9 @@ export const encryptVaultContent = async (
     mode?: EncryptMode;
     lastUpdated?: string;
     forceRewrap?: boolean;
+    recoveryKey?: string;
+    commitSession?: boolean;
+    newVault?: boolean;
   },
 ): Promise<EncryptVaultContentResult> => {
   try {
@@ -28,6 +31,9 @@ export const encryptVaultContent = async (
         ? await encryptVaultV1(cryptoProvider, masterPassword, payload)
         : await encryptVaultV2(cryptoProvider, masterPassword, payload, {
             forceRewrap: options?.forceRewrap,
+            recoveryChange: options?.recoveryKey,
+            commitSession: options?.commitSession,
+            session: options?.newVault ? null : undefined,
           });
 
     return {

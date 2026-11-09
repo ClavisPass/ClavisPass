@@ -76,8 +76,14 @@ export const fetchFile = async (
     );
 
     if (response.ok) {
+      const metadata = response.headers.get("Dropbox-API-Result");
+      const revision: unknown = metadata ? JSON.parse(metadata).rev : undefined;
       const content = await response.text();
-      return { status: "ok", content };
+      return {
+        status: "ok",
+        content,
+        revision: typeof revision === "string" && revision.length > 0 ? revision : undefined,
+      };
     }
 
     // Dropbox: Not found kommt oft als 409 + JSON error payload
@@ -119,11 +125,11 @@ export const uploadFile = async (
   filePath: string,
   onCompleted?: () => void,
   vaultId?: string,
+  expectedRevision?: string | null,
+  previous?: string | null,
 ): Promise<void> => {
-  try {
-    await DeviceStorageClient.uploadFile(content, undefined, vaultId);
-  } catch (error) {
-    logger.error("[Dropbox] DeviceStorage save failed (continuing):", error);
+  if (expectedRevision !== null && !expectedRevision) {
+    throw new Error("Cannot save a Dropbox vault without its downloaded revision");
   }
 
   const uploadEndpoint = "https://content.dropboxapi.com/2/files/upload";
@@ -138,7 +144,8 @@ export const uploadFile = async (
       Authorization: `Bearer ${accessToken}`,
       "Dropbox-API-Arg": JSON.stringify({
         path: normalizedPath,
-        mode: "overwrite",
+        mode: expectedRevision === null ? "add" : { ".tag": "update", update: expectedRevision },
+        strict_conflict: true,
         autorename: false,
         mute: false,
       }),
@@ -163,6 +170,7 @@ export const uploadFile = async (
     throw new Error("Error uploading the file to Dropbox");
   }
 
+  await DeviceStorageClient.cacheSyncedVault(content, vaultId, previous);
   onCompleted?.();
 };
 

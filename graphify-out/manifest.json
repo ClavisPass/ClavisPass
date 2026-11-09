@@ -804,9 +804,9 @@
     "semantic_hash": "b18c005154696b758d73359a31d7bcfd"
   },
   "src/features/auth/components/Login.tsx": {
-    "mtime": 1794215159.366741,
-    "seen": 1794215183.9668567,
-    "ast_hash": "41a9a4dee7381750a08f8dd5f4d17e36",
+    "mtime": 1794220820.0292602,
+    "seen": 1794220876.9318829,
+    "ast_hash": "64e0ee7009f4755aa14aa7ec554a9540",
     "semantic_hash": ""
   },
   "src/features/auth/model/ScreenLockLogoutController.ts": {
@@ -1020,16 +1020,16 @@
     "semantic_hash": "5dfad298827fe65ef9cb60917d17d542"
   },
   "src/features/settings/components/buttons/BackupExportButton.tsx": {
-    "mtime": 1790104125.0953526,
-    "seen": 1791564566.803268,
-    "ast_hash": "5879f2365d5b8bc87cd3c0bcd7f96186",
-    "semantic_hash": "5879f2365d5b8bc87cd3c0bcd7f96186"
+    "mtime": 1794220713.6767778,
+    "seen": 1794220817.632496,
+    "ast_hash": "a154939df58f0786aa71deb76460e41b",
+    "semantic_hash": ""
   },
   "src/features/settings/components/buttons/BackupImportButton.tsx": {
-    "mtime": 1790104117.009044,
-    "seen": 1791564566.803268,
-    "ast_hash": "4a1898506313c524e8855b7cd270a70e",
-    "semantic_hash": "4a1898506313c524e8855b7cd270a70e"
+    "mtime": 1794220585.2444491,
+    "seen": 1794220817.632496,
+    "ast_hash": "fc15c68b0d3018af33f1153e806ef794",
+    "semantic_hash": ""
   },
   "src/features/settings/components/buttons/ShowQRCodeButton.tsx": {
     "mtime": 1791044143.167755,
@@ -1044,9 +1044,9 @@
     "semantic_hash": "a555b7b3b0a6af4b0bc85333f44eb3ff"
   },
   "src/features/settings/components/modals/ChangeMasterPasswordModal.tsx": {
-    "mtime": 1791899325.7133358,
-    "seen": 1791900506.8064785,
-    "ast_hash": "d8f6a1282df394262d5f65a95d163090",
+    "mtime": 1794220713.6798239,
+    "seen": 1794220817.632496,
+    "ast_hash": "844a33923134dcaf0776b4b6e19e0c8f",
     "semantic_hash": ""
   },
   "src/features/settings/components/modals/TokenQRCodeModal.render.test.tsx": {
@@ -1128,10 +1128,10 @@
     "semantic_hash": "6176ce80ecb9b26899c78b234c1157f3"
   },
   "src/features/sync/components/Backup.tsx": {
-    "mtime": 1782724388.8216884,
-    "seen": 1791564566.803268,
-    "ast_hash": "5f08c62950ab5333055e56744444c40b",
-    "semantic_hash": "5f08c62950ab5333055e56744444c40b"
+    "mtime": 1794220713.3096154,
+    "seen": 1794220817.632496,
+    "ast_hash": "f66aa63588db0fe8eba9a1de42282433",
+    "semantic_hash": ""
   },
   "src/features/sync/components/ClavisPassHubLoginButton.tsx": {
     "mtime": 1791899336.681002,
@@ -1158,9 +1158,9 @@
     "semantic_hash": "88940b67af8e7a0e36b496cde4f7c982"
   },
   "src/features/sync/components/Sync.tsx": {
-    "mtime": 1791886923.208873,
-    "seen": 1791886972.6301646,
-    "ast_hash": "a407a4ef3f9d86669e73752789dcde1d",
+    "mtime": 1794220713.680346,
+    "seen": 1794220817.632496,
+    "ast_hash": "9b264dfb70c3477fa593da1d3a7c1351",
     "semantic_hash": ""
   },
   "src/features/sync/components/UserInformation.tsx": {
@@ -2052,16 +2052,16 @@
     "semantic_hash": "f638db42a22f04f80c1469c284c72228"
   },
   "src/infrastructure/cloud/clients/ClavisPassHubClient.test.ts": {
-    "mtime": 1789412046.5947325,
-    "seen": 1791564566.803268,
-    "ast_hash": "63541f99829a19248e20998725f21c61",
-    "semantic_hash": "63541f99829a19248e20998725f21c61"
+    "mtime": 1794220645.5523105,
+    "seen": 1794220817.632496,
+    "ast_hash": "19bbe8a914fbe80c6800dd78010e6683",
+    "semantic_hash": ""
   },
   "src/infrastructure/cloud/clients/ClavisPassHubClient.ts": {
-    "mtime": 1789412028.484894,
-    "seen": 1791564566.803268,
-    "ast_hash": "f3a6a8bad358822ec40af0692ea87cc2",
-    "semantic_hash": "f3a6a8bad358822ec40af0692ea87cc2"
+    "mtime": 1794220747.0892596,
+    "seen": 1794220817.632496,
+    "ast_hash": "7ed49ac3bb3d5e377fe660f94f90e1dc",
+    "semantic_hash": ""
   },
   "src/infrastructure/cloud/clients/ClavisPassHubConfig.ts": {
     "mtime": 1773952197.9360275,
@@ -2070,34 +2070,34 @@
     "semantic_hash": "7abb1a48886d8aa78b8c7ded15faebe4"
   },
   "src/infrastructure/cloud/clients/CloudStorageClient.ts": {
-    "mtime": 1788984073.18121,
-    "seen": 1791564566.803268,
-    "ast_hash": "30264a392ab55f90d6a728f0e3831f10",
-    "semantic_hash": "30264a392ab55f90d6a728f0e3831f10"
+    "mtime": 1794220820.0277271,
+    "seen": 1794220876.9318829,
+    "ast_hash": "1177bdc4383def7f86751ad437b1b854",
+    "semantic_hash": ""
   },
   "src/infrastructure/cloud/clients/DeviceStorageClient.test.ts": {
-    "mtime": 1788984039.4244885,
-    "seen": 1791564566.803268,
-    "ast_hash": "9326a9c0e3563215021e29270585705c",
-    "semantic_hash": "9326a9c0e3563215021e29270585705c"
+    "mtime": 1794217209.258458,
+    "seen": 1794217528.7462025,
+    "ast_hash": "5c6bc1f57dbf8b560a5d345dc9936591",
+    "semantic_hash": ""
   },
   "src/infrastructure/cloud/clients/DeviceStorageClient.ts": {
-    "mtime": 1788984098.3827703,
-    "seen": 1791564566.803268,
-    "ast_hash": "2a24d7c327751d5bde8872d5a68110bc",
-    "semantic_hash": "2a24d7c327751d5bde8872d5a68110bc"
+    "mtime": 1794220820.0277271,
+    "seen": 1794220876.9318829,
+    "ast_hash": "6f614e8822bb85dc948bcb39fdf38808",
+    "semantic_hash": ""
   },
   "src/infrastructure/cloud/clients/DropboxClient.test.ts": {
-    "mtime": 1779389795.8520973,
-    "seen": 1791564566.803268,
-    "ast_hash": "8dbf5def64a18ac3d29ef83272d919db",
-    "semantic_hash": "8dbf5def64a18ac3d29ef83272d919db"
+    "mtime": 1794220645.5461726,
+    "seen": 1794220817.632496,
+    "ast_hash": "c8739ac7b5892479eabba885fce14f8e",
+    "semantic_hash": ""
   },
   "src/infrastructure/cloud/clients/DropboxClient.ts": {
-    "mtime": 1788984073.2027404,
-    "seen": 1791564566.803268,
-    "ast_hash": "3d134aaa57f64da31a3fe9b111576fc1",
-    "semantic_hash": "3d134aaa57f64da31a3fe9b111576fc1"
+    "mtime": 1794220747.0877495,
+    "seen": 1794220817.632496,
+    "ast_hash": "b9f9afa273c5cd317d421b854d8de99a",
+    "semantic_hash": ""
   },
   "src/infrastructure/cloud/clients/GoogleDriveClient.test.ts": {
     "mtime": 1789150346.1997507,
@@ -2106,10 +2106,10 @@
     "semantic_hash": "94b9f95874d76ce7b2ee08f9d9021686"
   },
   "src/infrastructure/cloud/clients/GoogleDriveClient.ts": {
-    "mtime": 1789150346.1987445,
-    "seen": 1791564566.803268,
-    "ast_hash": "9d53be772e123f29bd3f036058cb6d9e",
-    "semantic_hash": "9d53be772e123f29bd3f036058cb6d9e"
+    "mtime": 1794220399.8508477,
+    "seen": 1794220817.632496,
+    "ast_hash": "999e2b5a289ab9c1f55cff6451fa54a1",
+    "semantic_hash": ""
   },
   "src/infrastructure/cloud/clients/LocalFileClient.ts": {
     "mtime": 1788120909.3042,
@@ -2148,16 +2148,16 @@
     "semantic_hash": "e5878324aed50f2740856d92719109d3"
   },
   "src/infrastructure/cloud/model/UploadFileParams.ts": {
-    "mtime": 1788984073.139632,
-    "seen": 1791564566.803268,
-    "ast_hash": "28f5172988849b0f73c648abd0085a5d",
-    "semantic_hash": "28f5172988849b0f73c648abd0085a5d"
+    "mtime": 1794220377.6749816,
+    "seen": 1794220817.632496,
+    "ast_hash": "9cc7d1f449680e2c625ae033f8e9fbbb",
+    "semantic_hash": ""
   },
   "src/infrastructure/cloud/model/VaultFetchResult.ts": {
-    "mtime": 1782724347.2695673,
-    "seen": 1791564566.803268,
-    "ast_hash": "e15adcd375e512a8f5d67feafaab30c1",
-    "semantic_hash": "e15adcd375e512a8f5d67feafaab30c1"
+    "mtime": 1794220377.6749816,
+    "seen": 1794220817.632496,
+    "ast_hash": "2327804dc994870366ef3b920eb96774",
+    "semantic_hash": ""
   },
   "src/infrastructure/cloud/model/oauth/TokenRefreshParams.ts": {
     "mtime": 1779215310.3057451,
@@ -2184,16 +2184,16 @@
     "semantic_hash": "191bf1f4d34d1e4dace4479b5e493560"
   },
   "src/infrastructure/crypto/decryptVaultContent.ts": {
-    "mtime": 1789400579.6745596,
-    "seen": 1791564566.803268,
-    "ast_hash": "1f543401228e84473febb10a21594e5e",
-    "semantic_hash": "1f543401228e84473febb10a21594e5e"
+    "mtime": 1794220820.0261943,
+    "seen": 1794220876.9318829,
+    "ast_hash": "f4bcf79b9b3d9b7a3665b7a7962fa135",
+    "semantic_hash": ""
   },
   "src/infrastructure/crypto/encryptVaultContent.ts": {
-    "mtime": 1789400408.7225304,
-    "seen": 1791564566.803268,
-    "ast_hash": "1f86ed7481869c6490b40a8b6cd7e42f",
-    "semantic_hash": "1f86ed7481869c6490b40a8b6cd7e42f"
+    "mtime": 1794217447.8782797,
+    "seen": 1794217528.7462025,
+    "ast_hash": "8a472b987305906324aa8856c16e0933",
+    "semantic_hash": ""
   },
   "src/infrastructure/crypto/provider/CryptoProvider.ts": {
     "mtime": 1769893861.7828898,
@@ -2238,10 +2238,10 @@
     "semantic_hash": "7bc97d8ea58408c9a161f55e23c09eab"
   },
   "src/infrastructure/crypto/vault/VaultCryptoSession.ts": {
-    "mtime": 1789402384.1962879,
-    "seen": 1791564566.803268,
-    "ast_hash": "5c48748f111c3a4a3ee81eff5b7074c0",
-    "semantic_hash": "5c48748f111c3a4a3ee81eff5b7074c0"
+    "mtime": 1794216620.4694023,
+    "seen": 1794217528.7462025,
+    "ast_hash": "0b9b04816a15f29af63332fa9aa4f2fd",
+    "semantic_hash": ""
   },
   "src/infrastructure/crypto/vault/v1/VaultV1.ts": {
     "mtime": 1775505963.7556436,
@@ -2280,10 +2280,10 @@
     "semantic_hash": "92d1bff93647e976ef7f8d9b903ba9c6"
   },
   "src/infrastructure/crypto/vault/v2/VaultV2.ts": {
-    "mtime": 1789402386.9950743,
-    "seen": 1791564566.803268,
-    "ast_hash": "3fb800c54ef43c10d58af20356d66f6f",
-    "semantic_hash": "3fb800c54ef43c10d58af20356d66f6f"
+    "mtime": 1794220535.533087,
+    "seen": 1794220817.632496,
+    "ast_hash": "3ddc73c6bf6f8a863c4409bcaae06a0f",
+    "semantic_hash": ""
   },
   "src/infrastructure/crypto/vault/v2/VaultV2Schema.ts": {
     "mtime": 1789400379.2532327,
@@ -2502,9 +2502,9 @@
     "semantic_hash": ""
   },
   "src/screens/HomeScreen.tsx": {
-    "mtime": 1794214948.543,
-    "seen": 1794214977.7920694,
-    "ast_hash": "f9b049765dc68738faee83f408ce409d",
+    "mtime": 1794220713.6818578,
+    "seen": 1794220817.632496,
+    "ast_hash": "e252b9906717d3d46b190fff132a496c",
     "semantic_hash": ""
   },
   "src/screens/IdentitiesScreen.tsx": {
@@ -2520,9 +2520,9 @@
     "semantic_hash": ""
   },
   "src/screens/LoginScreen.tsx": {
-    "mtime": 1794215159.3677466,
-    "seen": 1794215183.9678571,
-    "ast_hash": "5ae824e38c6d0b79937d632160043b37",
+    "mtime": 1794216999.095181,
+    "seen": 1794217528.7462025,
+    "ast_hash": "1a72374633a9aaea98e9dbbc640d1e8d",
     "semantic_hash": ""
   },
   "src/screens/LogoutScreen.render.test.tsx": {
@@ -2562,9 +2562,9 @@
     "semantic_hash": ""
   },
   "src/screens/SettingsScreen.tsx": {
-    "mtime": 1794178661.8025882,
-    "seen": 1794178752.6235294,
-    "ast_hash": "1bfedf4697be518665f8fcbdf7b88e61",
+    "mtime": 1794217046.3128605,
+    "seen": 1794217528.7462025,
+    "ast_hash": "96391464d84c64534e4ba77a185f63c0",
     "semantic_hash": ""
   },
   "src/screens/TotpScanScreen.tsx": {
@@ -2718,10 +2718,10 @@
     "semantic_hash": "2ce7c244625a626d0a432df466fdb38f"
   },
   "src/shared/components/VaultFileOpenHandler.tsx": {
-    "mtime": 1788986837.5633266,
-    "seen": 1791564566.803268,
-    "ast_hash": "38aa54a4a31b43302142021dfb09bddd",
-    "semantic_hash": "38aa54a4a31b43302142021dfb09bddd"
+    "mtime": 1794220713.6828794,
+    "seen": 1794220817.632496,
+    "ast_hash": "5b67e4b60b013e9ba244dc50700a9297",
+    "semantic_hash": ""
   },
   "src/shared/components/buttons/Button.tsx": {
     "mtime": 1789327725.2755501,
@@ -2928,9 +2928,9 @@
     "semantic_hash": "f8ba37e05d95b36f88857664ece74d7d"
   },
   "src/shared/i18n/TranslationSchema.ts": {
-    "mtime": 1794178661.800585,
-    "seen": 1794178752.6245284,
-    "ast_hash": "d7f999f6baa8b354582dd7dc877d28c5",
+    "mtime": 1794220585.217936,
+    "seen": 1794220817.632496,
+    "ast_hash": "d3ba4c84e916ed53b5f3c4259ed094c5",
     "semantic_hash": ""
   },
   "src/shared/i18n/index.ts": {
@@ -2940,15 +2940,15 @@
     "semantic_hash": "3693d0d683a802ea042ec3f67e634914"
   },
   "src/shared/i18n/languages/de.ts": {
-    "mtime": 1794178661.8015857,
-    "seen": 1794178752.6245284,
-    "ast_hash": "ba93b75e9238fb798aa7ce8050322bbe",
+    "mtime": 1794220585.2312353,
+    "seen": 1794220817.632496,
+    "ast_hash": "b019a5d4940e2f7a6c282af91f33454c",
     "semantic_hash": ""
   },
   "src/shared/i18n/languages/en.ts": {
-    "mtime": 1794178661.800585,
-    "seen": 1794178752.6245284,
-    "ast_hash": "f6c753130c0258648ef855da7004912a",
+    "mtime": 1794220585.2312353,
+    "seen": 1794220817.632496,
+    "ast_hash": "fdd8c2fe8659d089743a52ea813cf541",
     "semantic_hash": ""
   },
   "src/shared/i18n/types.ts": {
@@ -3294,9 +3294,9 @@
     "semantic_hash": ""
   },
   "docs/context/crypto.md": {
-    "mtime": 1789741516.3058777,
-    "seen": 1791564931.2506914,
-    "ast_hash": "6a8325355b04a4d2fcab3307c80628b7",
+    "mtime": 1794220747.0973938,
+    "seen": 1794220817.632496,
+    "ast_hash": "56e9cd3e9e22f60742633c104b482e57",
     "semantic_hash": ""
   },
   "docs/context/desktop.md": {
@@ -3915,6 +3915,66 @@
     "mtime": 1794214948.1329198,
     "seen": 1794214977.7920694,
     "ast_hash": "bd78da689e7071ac34e0f2f10421cd51",
+    "semantic_hash": ""
+  },
+  "src/features/auth/components/VaultRecoveryDialog.render.test.tsx": {
+    "mtime": 1794220586.540701,
+    "seen": 1794220817.632496,
+    "ast_hash": "5496c6f40de54f3d26deaa7b0a3b1d6d",
+    "semantic_hash": ""
+  },
+  "src/features/auth/components/VaultRecoveryDialog.tsx": {
+    "mtime": 1794220456.683799,
+    "seen": 1794220817.632496,
+    "ast_hash": "cecc01c5a4504c9630d8176e3a44cf7f",
+    "semantic_hash": ""
+  },
+  "src/features/auth/components/VaultRecoverySetupDialog.tsx": {
+    "mtime": 1794221032.1852036,
+    "seen": 1794221061.4387238,
+    "ast_hash": "b75238d524b9ff4d7950e5518e597786",
+    "semantic_hash": ""
+  },
+  "src/features/settings/components/RecoveryKeySettingsItem.tsx": {
+    "mtime": 1794220713.6782866,
+    "seen": 1794220817.632496,
+    "ast_hash": "99f122021cd1df67a96cb49ef99edaff",
+    "semantic_hash": ""
+  },
+  "src/infrastructure/crypto/vault/VaultV3Schema.ts": {
+    "mtime": 1794217370.7253456,
+    "seen": 1794217528.7462025,
+    "ast_hash": "506702f7b4d94dd718992b1b69f80279",
+    "semantic_hash": ""
+  },
+  "src/infrastructure/crypto/vault/recoveryKey.ts": {
+    "mtime": 1794217370.7429144,
+    "seen": 1794217528.7462025,
+    "ast_hash": "067957b1e444fd50586a4d0c3d21b1ea",
+    "semantic_hash": ""
+  },
+  "src/infrastructure/crypto/vault/vaultRecovery.test.ts": {
+    "mtime": 1794220586.512032,
+    "seen": 1794220817.632496,
+    "ast_hash": "9098e4b53c655f1109ad0dd4371119e3",
+    "semantic_hash": ""
+  },
+  "src/infrastructure/crypto/vault/vaultRecovery.ts": {
+    "mtime": 1794220479.138373,
+    "seen": 1794220817.632496,
+    "ast_hash": "eb3fcba618a31baade36bdda61fdab2d",
+    "semantic_hash": ""
+  },
+  "src/infrastructure/cloud/clients/CloudStorageClient.test.ts": {
+    "mtime": 1794220776.4875445,
+    "seen": 1794220817.632496,
+    "ast_hash": "b1ecd20a18addfc5c65b8c1e97d9af44",
+    "semantic_hash": ""
+  },
+  "src/infrastructure/crypto/vault/vaultFormatVersion.ts": {
+    "mtime": 1794220820.024665,
+    "seen": 1794220876.9318829,
+    "ast_hash": "a074020f7d7cdb35dfb60e1c2d19d1b6",
     "semantic_hash": ""
   }
 }

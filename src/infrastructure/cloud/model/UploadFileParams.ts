@@ -1,4 +1,5 @@
 import Provider from "./Provider";
+import { VaultSnapshot } from "./VaultFetchResult";
 
 export type UploadContent = string;
 
@@ -9,4 +10,6 @@ export interface UploadFileParams {
   content: UploadContent;
   onCompleted?: () => void;
   vaultId?: string;
+  expected: VaultSnapshot;
+  allowRecoveryRemoval?: boolean;
 }

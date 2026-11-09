@@ -33,6 +33,7 @@ function BackupExportButton() {
 
       const encResult = await encryptVaultContent(fullData, master, {
         lastUpdated: iso,
+        commitSession: false,
       });
 
       if (!encResult.ok) {

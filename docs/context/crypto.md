@@ -20,8 +20,11 @@ The active write format is V2 key-envelope.
 - V2 encrypts vault payloads with XChaCha20-Poly1305.
 - `VaultCryptoSession` holds the unwrapped V2 vault data key during an unlocked session.
 - `encryptVaultContent` writes V2 by default.
-- `decryptVaultContent` reads V1 and V2.
+- `decryptVaultContent` reads V1, V2 and V3.
 - V1 remains readable for migration; the next normal save after a V1 unlock writes V2.
+- Opt-in recovery writes V3 on device, Dropbox and ClavisPass Hub. V3 adds a second data-key wrap under a random 256-bit recovery key, with a separate AEAD purpose. The encrypted payload authenticates the version and recovery slot. Ordinary saves and master password changes preserve the slot.
+- Recovery, replacement and removal rotate the data key. Explicit removal returns to V2. Earlier backups remain unchanged. Setup and reset prepare an envelope without changing the live session and activate it after a checked write.
+- Checked writes use the exact snapshot read for the operation. Device compares ciphertext under a write queue, Dropbox uses the download revision, and Hub uses the download ETag. Google Drive recovery is gated until a server-enforced write precondition is verified. All synced devices must update before V3 activation because previously released clients can still issue unguarded uploads.
 
 ## Critical Rules
 

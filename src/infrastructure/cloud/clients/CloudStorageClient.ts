@@ -1,5 +1,3 @@
-import FetchFileParams from "../model/FetchFileParams";
-import RemoteFileContent from "../model/RemoteFileContent";
 import { UploadFileParams } from "../model/UploadFileParams";
 import TokenRefreshParams from "../model/oauth/TokenRefreshParams";
 import TokenRefreshResult from "../model/oauth/TokenRefreshResult";
@@ -13,7 +11,28 @@ import { logger } from "../../logging/logger";
 import Provider from "../model/Provider";
 import UserInfoType from "../../../features/sync/model/UserInfoType";
 import { triggerGlobalError } from "../../events/errorBus";
-import { VaultFetchResult } from "../model/VaultFetchResult";
+import { VaultFetchResult, VaultSnapshot } from "../model/VaultFetchResult";
+import { getVaultFormatVersion, LATEST_VAULT_FORMAT } from "../../crypto/vault/vaultFormatVersion";
+
+let pendingVaultOperation: Promise<unknown> = Promise.resolve();
+
+/** Serialize operations that can change the active vault's crypto session. */
+export function runVaultOperation<T>(operation: () => Promise<T>): Promise<T> {
+  const next = pendingVaultOperation.then(operation);
+  pendingVaultOperation = next.catch(() => {});
+  return next;
+}
+
+export function canWriteRecoveryVault(provider: Provider | null | undefined) {
+  return provider === "device" || provider === "dropbox" || provider === "clavispassHub";
+}
+
+function assertUnchangedVault(current: VaultFetchResult, expected: VaultSnapshot) {
+  if (current.status === "not_found" && expected.status === "not_found") return;
+  if (current.status === "ok" && expected.status === "ok" &&
+      current.content === expected.content && current.revision === expected.revision) return;
+  throw new Error("The saved vault changed or could not be checked before writing");
+}
 
 export const fetchUserInfo = async (
   token: string,
@@ -95,8 +114,21 @@ export const fetchRemoteVaultFile = async (params: {
 export const uploadRemoteVaultFile = async (
   params: UploadFileParams,
 ): Promise<void> => {
-  const { provider, accessToken, remotePath, content, onCompleted, vaultId } =
+  const { provider, accessToken, remotePath, content, onCompleted, vaultId, expected, allowRecoveryRemoval } =
     params;
+  const previous = expected.status === "ok" ? expected.content : null;
+  const previousVersion = previous === null ? null : getVaultFormatVersion(previous);
+  const nextVersion = getVaultFormatVersion(content);
+  if (previousVersion !== null && previousVersion > LATEST_VAULT_FORMAT) {
+    throw new Error("The saved vault requires a newer app version");
+  }
+  if (provider === "googleDrive" && (previousVersion === 3 || nextVersion === 3)) {
+    throw new Error("This provider does not support checked recovery vault writes");
+  }
+  if (previousVersion === 3 && nextVersion !== 3 &&
+      !(allowRecoveryRemoval && nextVersion === 2)) {
+    throw new Error("A recovery vault cannot be silently downgraded");
+  }
 
   switch (provider) {
     case "dropbox":
@@ -106,9 +138,13 @@ export const uploadRemoteVaultFile = async (
         remotePath,
         onCompleted,
         vaultId,
+        expected.status === "not_found" ? null : expected.revision,
+        previous,
       );
 
     case "googleDrive":
+      // Drive does not document an atomic precondition for this upload API.
+      assertUnchangedVault(await GoogleDriveClient.fetchFile(accessToken, remotePath), expected);
       return GoogleDriveClient.uploadFile(
         accessToken,
         content,
@@ -117,15 +153,19 @@ export const uploadRemoteVaultFile = async (
         vaultId,
       );
     case "device":
-      return DeviceStorageClient.uploadFile(content, onCompleted, vaultId);
+      return DeviceStorageClient.uploadFile(content, onCompleted, vaultId, previous, allowRecoveryRemoval);
     case "clavispassHub":
       return ClavisPassHubClient.uploadFile(
         accessToken,
         content,
         remotePath,
         onCompleted,
+        expected.status === "not_found" ? null : expected.revision,
+        previous,
+        vaultId,
       );
     case "localFile":
+      assertUnchangedVault(await LocalFileClient.fetchFile(accessToken), expected);
       return LocalFileClient.uploadFile(accessToken, content, onCompleted);
     default: {
       logger.error("[CloudStorage] Unsupported provider for upload:", provider);

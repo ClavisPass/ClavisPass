@@ -23,7 +23,7 @@ function BackupImportButton() {
     // TODO bleibt: echtes Master-PW abfragen
     const masterPassword = "test";
 
-    const decrypted = await decryptVaultContent(fileData, masterPassword);
+    const decrypted = await decryptVaultContent(fileData, masterPassword, { commitSession: false });
 
     if (!decrypted.ok) {
       logger.error(

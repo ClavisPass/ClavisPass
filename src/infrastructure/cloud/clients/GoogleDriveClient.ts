@@ -245,15 +245,6 @@ export const uploadFile = async (
   onCompleted?: () => void,
   vaultId?: string,
 ): Promise<void> => {
-  try {
-    await DeviceStorageClient.uploadFile(content, undefined, vaultId);
-  } catch (error) {
-    logger.error(
-      "[GoogleDrive] DeviceStorage save failed (continuing):",
-      error,
-    );
-  }
-
   const name = filePath;
 
   const payload =
@@ -261,6 +252,7 @@ export const uploadFile = async (
 
   try {
     await upsertByName(accessToken, name, payload);
+    await DeviceStorageClient.cacheSyncedVault(content, vaultId);
     onCompleted?.();
   } catch (error) {
     logger.error(`[GoogleDrive] Error uploading file "${name}":`, error);

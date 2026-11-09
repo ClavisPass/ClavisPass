@@ -10,7 +10,6 @@ import * as DeviceStorageClient from "./DeviceStorageClient";
 import {
   clearClavisPassHubVaultEtag,
   getClavisPassHubHostUrl,
-  getClavisPassHubVaultEtag,
   setClavisPassHubHostUrl,
   setClavisPassHubLastUsername,
   setClavisPassHubVaultEtag,
@@ -29,13 +28,6 @@ type HubApiErrorPayload = {
   code?: string;
   message?: string;
   error?: string;
-};
-
-type VaultMetaResponse = {
-  etag?: string | null;
-  size?: number;
-  updatedAt?: number;
-  contentType?: string;
 };
 
 type DiscoveryResponse = {
@@ -57,8 +49,6 @@ type LoginParams = {
   password: string;
   deviceId?: string;
 };
-
-let lastVaultFetchState: "ok" | "not_found" | null = null;
 
 function createHubError(
   message: string,
@@ -242,86 +232,6 @@ export async function checkDiscovery(
   };
 }
 
-async function fetchVaultMeta(
-  accessToken: string
-): Promise<{ exists: boolean; etag: string | null }> {
-  const hostUrl = await getConfiguredHostUrl();
-  const response = await fetch(`${hostUrl}/api/vault/meta`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      Accept: "application/json",
-    },
-  });
-
-  if (response.status === 404) {
-    const payload = await readJsonSafe<HubApiErrorPayload>(response);
-    if (!isVaultNotFoundPayload(payload)) {
-      throw createHubErrorFromPayload(
-        response,
-        payload,
-        "Failed to load vault metadata from ClavisPass Hub."
-      );
-    }
-
-    await clearClavisPassHubVaultEtag();
-    logger.info("[ClavisPassHub] fetchVaultMeta: vault not found.");
-    return { exists: false, etag: null };
-  }
-
-  if (!response.ok) {
-    throw await parseHubError(
-      response,
-      "Failed to load vault metadata from ClavisPass Hub."
-    );
-  }
-
-  const data = ((await response.json()) ?? {}) as VaultMetaResponse;
-  const etag =
-    typeof data.etag === "string" && data.etag.length > 0 ? data.etag : null;
-
-  if (etag) {
-    await setClavisPassHubVaultEtag(etag);
-  } else {
-    await clearClavisPassHubVaultEtag();
-  }
-
-  logger.info("[ClavisPassHub] fetchVaultMeta:", {
-    exists: true,
-    etag,
-    size: data.size,
-    updatedAt: data.updatedAt,
-    contentType: data.contentType,
-  });
-
-  return { exists: true, etag };
-}
-
-async function ensureVaultEtagForUpload(
-  accessToken: string
-): Promise<{ exists: boolean; etag: string | null }> {
-  const storedEtag = await getClavisPassHubVaultEtag();
-
-  if (storedEtag) {
-    logger.info("[ClavisPassHub] Using stored ETag for upload.", {
-      etag: storedEtag,
-    });
-    return { exists: true, etag: storedEtag };
-  }
-
-  if (lastVaultFetchState === "not_found") {
-    logger.info(
-      "[ClavisPassHub] Previous vault fetch returned not_found; uploading initial vault without If-Match."
-    );
-    return { exists: false, etag: null };
-  }
-
-  logger.info(
-    "[ClavisPassHub] No stored ETag before upload, loading remote vault metadata."
-  );
-  return await fetchVaultMeta(accessToken);
-}
-
 export async function login(
   params: LoginParams
 ): Promise<HubTokenResponse> {
@@ -364,7 +274,6 @@ export async function login(
   await setClavisPassHubHostUrl(normalizedHostUrl);
   await setClavisPassHubLastUsername(params.username);
   await clearClavisPassHubVaultEtag();
-  lastVaultFetchState = null;
 
   return data;
 }
@@ -387,7 +296,6 @@ export const logout = async (
     logger.warn("[ClavisPassHub] Logout request failed:", error);
   } finally {
     await clearClavisPassHubVaultEtag();
-    lastVaultFetchState = null;
   }
 };
 
@@ -457,6 +365,7 @@ export const fetchFile = async (
     const hostUrl = await getConfiguredHostUrl();
     const response = await fetch(`${hostUrl}/api/vault`, {
       method: "GET",
+      cache: "no-store",
       headers: {
         Authorization: `Bearer ${accessToken}`,
         Accept: "text/plain",
@@ -476,8 +385,7 @@ export const fetchFile = async (
         etag,
         ...summarizeVaultText(content),
       });
-      lastVaultFetchState = "ok";
-      return { status: "ok", content };
+      return { status: "ok", content, revision: etag ?? undefined };
     }
 
     if (response.status === 404) {
@@ -503,7 +411,6 @@ export const fetchFile = async (
       }
 
       await clearClavisPassHubVaultEtag();
-      lastVaultFetchState = "not_found";
       logger.info("[ClavisPassHub] fetchFile: vault not found, cleared ETag.");
       return { status: "not_found" };
     }
@@ -547,26 +454,22 @@ export const uploadFile = async (
   accessToken: string,
   content: UploadContent,
   _filePath: string,
-  onCompleted?: () => void
+  onCompleted?: () => void,
+  expectedRevision?: string | null,
+  previous?: string | null,
+  vaultId?: string,
 ): Promise<void> => {
-  try {
-    await DeviceStorageClient.uploadFile(content);
-  } catch (error) {
-    logger.error("[ClavisPassHub] DeviceStorage save failed (continuing):", error);
-  }
-
   try {
     const payload =
       typeof content === "string" ? content : JSON.stringify(content);
     const hostUrl = await getConfiguredHostUrl();
-    const remoteState = await ensureVaultEtagForUpload(accessToken);
-    const etag = remoteState.etag;
+    const etag = expectedRevision;
     const contentType =
       typeof content === "string"
         ? "text/plain; charset=utf-8"
         : "application/json; charset=utf-8";
 
-    if (remoteState.exists && !etag) {
+    if (etag !== null && !etag) {
       throw createHubError(
         "Cannot upload to an existing ClavisPass Hub vault without an ETag.",
         {
@@ -582,11 +485,13 @@ export const uploadFile = async (
 
     if (etag) {
       headers["If-Match"] = etag;
+    } else {
+      headers["If-None-Match"] = "*";
     }
 
     logger.info("[ClavisPassHub] uploadFile payload summary:", {
       contentType,
-      remoteExists: remoteState.exists,
+      remoteExists: etag !== null,
       hasEtag: !!etag,
       etag,
       payloadType: typeof content,
@@ -609,13 +514,6 @@ export const uploadFile = async (
         hubError.code === "IF_MATCH_REQUIRED" ||
         response.status === 428 ||
         hubError.message.includes("If-Match header is required");
-
-      if (requiresIfMatch) {
-        logger.warn(
-          "[ClavisPassHub] Upload failed because If-Match was required. Refreshing remote metadata."
-        );
-        await fetchVaultMeta(accessToken);
-      }
 
       if (
         response.status === 409 ||
@@ -661,17 +559,17 @@ export const uploadFile = async (
     if (nextEtag) {
       await setClavisPassHubVaultEtag(nextEtag);
     }
-    lastVaultFetchState = "ok";
 
     logger.info("[ClavisPassHub] uploadFile completed:", {
       status: response.status,
       responseContentType: response.headers.get("content-type"),
       previousEtag: etag,
       nextEtag,
-      remoteExists: remoteState.exists,
+      remoteExists: etag !== null,
       ...summarizeVaultText(payload),
     });
 
+    await DeviceStorageClient.cacheSyncedVault(content, vaultId, previous);
     onCompleted?.();
   } catch (error) {
     const hubError = error as HubClientError;

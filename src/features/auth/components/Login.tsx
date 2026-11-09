@@ -11,7 +11,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { ActivityIndicator, Text } from "react-native-paper";
+import { ActivityIndicator, Button as PaperButton, Text } from "react-native-paper";
 import * as Progress from "react-native-progress";
 import { useTranslation } from "react-i18next";
 import Animated, {
@@ -45,17 +45,28 @@ import {
   authenticateUser,
   isUsingAuthentication,
   loadAuthentication,
+  removeAuthentication,
 } from "../utils/authenticateUser";
 import { consumeSystemAuthAutoUnlockSuppression } from "../utils/systemAuthAutoUnlock";
 
 import {
   fetchRemoteVaultFile,
+  runVaultOperation,
   uploadRemoteVaultFile,
+  canWriteRecoveryVault,
 } from "../../../infrastructure/cloud/clients/CloudStorageClient";
+import type { VaultSnapshot } from "../../../infrastructure/cloud/model/VaultFetchResult";
 import * as DeviceStorageClient from "../../../infrastructure/cloud/clients/DeviceStorageClient";
 
 import { decryptVaultContent } from "../../../infrastructure/crypto/decryptVaultContent";
+import { getVaultFormatVersion, LATEST_VAULT_FORMAT } from "../../../infrastructure/crypto/vault/vaultFormatVersion";
 import { encryptVaultContent } from "../../../infrastructure/crypto/encryptVaultContent";
+import {
+  persistPreparedRecoveryVault,
+  prepareVaultPasswordRecovery,
+} from "../../../infrastructure/crypto/vault/vaultRecovery";
+import VaultRecoveryDialog from "./VaultRecoveryDialog";
+import VaultRecoverySetupDialog from "./VaultRecoverySetupDialog";
 
 type Props = { userInfo: UserInfoType };
 
@@ -74,6 +85,21 @@ function Login(props: Props) {
 
   const [fetchError, setFetchError] = useState<string | null>(null);
   const uploadLocalVaultAfterUnlockRef = useRef(false);
+  const [recoveryVisible, setRecoveryVisible] = useState(false);
+  const [recoverySetupVisible, setRecoverySetupVisible] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState(false);
+  const creatingRef = useRef(false);
+  const mounted = useRef(true);
+  const activeProvider = useRef(provider);
+  activeProvider.current = provider;
+  const activeContent = useRef(vaultFileContent);
+  activeContent.current = vaultFileContent;
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; };
+  }, []);
 
   const [capsLock, setCapsLock] = useState(false);
   const [error, setError] = useState(false);
@@ -135,18 +161,17 @@ function Login(props: Props) {
   }, [provider, accessToken, ensureFreshAccessToken]);
 
   const writeVaultJson = useCallback(
-    async (vaultJson: string, vaultId?: string) => {
-      if (!provider) return;
-
-      const token = await resolveAccessToken();
+    async (vaultJson: string, expected: VaultSnapshot, vaultId?: string, token?: string) => {
+      if (!provider) throw new Error("No vault provider configured");
 
       await uploadRemoteVaultFile({
         provider,
-        accessToken: token,
+        accessToken: token ?? (await resolveAccessToken()),
         remotePath: "clavispass.lock",
         content: vaultJson,
         onCompleted: undefined,
         vaultId,
+        expected,
       });
     },
     [provider, resolveAccessToken],
@@ -160,6 +185,10 @@ function Login(props: Props) {
         const result = await decryptVaultContent(content, masterPasswordToUse);
 
         if (!result.ok) {
+          if (result.reason === "UPDATE_REQUIRED") {
+            setFetchError(t("login:vaultUpdateRequired"));
+            return;
+          }
           const failure = result;
           throw failure.error ?? new Error(failure.reason);
         }
@@ -169,7 +198,7 @@ function Login(props: Props) {
           provider === "clavispassHub"
         ) {
           try {
-            await writeVaultJson(content, result.payload.vaultId);
+            await writeVaultJson(content, { status: "not_found" }, result.payload.vaultId);
             uploadLocalVaultAfterUnlockRef.current = false;
           } catch (uploadError) {
             logger.error(
@@ -191,7 +220,7 @@ function Login(props: Props) {
         setTimeout(() => setError(false), 1000);
       }
     },
-    [auth, provider, vault, writeVaultJson],
+    [auth, provider, t, vault, writeVaultJson],
   );
 
   const authenticate = useCallback(async () => {
@@ -275,6 +304,11 @@ function Login(props: Props) {
         return;
       }
 
+      if ((getVaultFormatVersion(res.content) ?? 0) > LATEST_VAULT_FORMAT) {
+        setFetchError(t("login:vaultUpdateRequired"));
+        setLoading(false);
+        return;
+      }
       setVaultFileContent(res.content);
       setLoading(false);
 
@@ -307,55 +341,77 @@ function Login(props: Props) {
     void loginWithMasterPassword(masterPassword, vaultFileContent);
   };
 
-  const newMasterPassword = useCallback(async () => {
+  const newMasterPassword = async (recoveryKey?: string, dialogCurrent = () => true) => {
+    if (!canCreateVault || creatingRef.current) return;
+    if (!provider || (recoveryKey && !canWriteRecoveryVault(provider))) {
+      throw new Error("Recovery is unavailable for this provider");
+    }
+    const isCurrent = () => mounted.current && activeProvider.current === provider && dialogCurrent();
+    creatingRef.current = true;
+    setCreating(true);
+    setCreateError(false);
     try {
-      if (!canCreateVault) {
-        return;
-      }
-
-      if (
-        !(
-          masterPassword === newPasswordConfirm &&
-          masterPassword &&
-          newPasswordConfirm
-        )
-      ) {
-        logger.error("[Login] Master password confirmation does not match.");
-        return;
-      }
-
-      // 1) create empty vault payload
       const empty = getEmptyData();
-
-      const encrypted = await encryptVaultContent(empty, masterPassword);
+      const encrypted = await encryptVaultContent(empty, masterPassword, {
+        recoveryKey,
+        commitSession: false,
+        newVault: true,
+      });
       if (!encrypted.ok) {
-        const failure = encrypted;
-        throw failure.error;
+        throw encrypted.error;
       }
-
-      const vaultJson = encrypted.content;
-
-      // 3) write to provider
-      if (provider) {
-        await writeVaultJson(vaultJson, empty.vaultId);
-      }
-
-      // 4) unlock
+      if (!isCurrent()) return;
+      const saved = await persistPreparedRecoveryVault(
+        encrypted.content, masterPassword,
+        (id) => writeVaultJson(encrypted.content, { status: "not_found" }, id),
+        isCurrent,
+      );
+      if (!saved) return;
+      if (!isCurrent()) return;
       vault.unlockWithDecryptedVault(empty);
       auth.login(masterPassword);
-    } catch (e) {
-      logger.error("[Login] Failed to create new vault:", e);
-      setFetchError("Failed to create vault.");
+    } finally {
+      creatingRef.current = false;
+      if (mounted.current) setCreating(false);
     }
-  }, [
-    auth,
-    masterPassword,
-    newPasswordConfirm,
-    canCreateVault,
-    provider,
-    vault,
-    writeVaultJson,
-  ]);
+  };
+
+  const createWithoutRecovery = () => {
+    void newMasterPassword().catch(() => {
+      if (mounted.current) setCreateError(true);
+    });
+  };
+
+  const recoverWithNewPassword = async (key: string, password: string, dialogCurrent: () => boolean) => {
+    const source = vaultFileContent;
+    if (!provider || !canWriteRecoveryVault(provider) || !source ||
+        uploadLocalVaultAfterUnlockRef.current) {
+      throw new Error("Recovery requires a saved vault");
+    }
+    const isCurrent = () => mounted.current && activeProvider.current === provider &&
+      activeContent.current === source && dialogCurrent();
+    await runVaultOperation(async () => {
+      const token = await resolveAccessToken();
+      const saved = await fetchRemoteVaultFile({
+        provider,
+        accessToken: token,
+        remotePath: "clavispass.lock",
+      });
+      if (saved.status !== "ok" || saved.content !== source || !isCurrent()) {
+        throw new Error("The saved vault changed before password recovery");
+      }
+      const content = await prepareVaultPasswordRecovery(saved.content, key, password);
+      const payload = await persistPreparedRecoveryVault(content, password, async (id) => {
+        await writeVaultJson(content, saved, id, token);
+        await removeAuthentication().catch(() => {
+          logger.warn("[Login] Could not clear system authentication after recovery");
+        });
+      }, isCurrent);
+      if (!payload) return;
+      vault.unlockWithDecryptedVault(payload);
+      auth.login(password);
+    });
+  };
 
   const stageKey = loading
     ? "loading"
@@ -492,7 +548,7 @@ function Login(props: Props) {
                 value={newPasswordConfirm}
                 placeholder={t("login:confirmMasterPassword")}
                 onSubmitEditing={() => {
-                  if (canCreateVault) void newMasterPassword();
+                  if (canCreateVault) createWithoutRecovery();
                 }}
               />
               {masterPasswordConfirmMismatch ? (
@@ -508,9 +564,23 @@ function Login(props: Props) {
             </Animated.View>
             <Button
               text={t("login:setNewPassword")}
-              onPress={newMasterPassword}
-              disabled={!canCreateVault}
+              onPress={createWithoutRecovery}
+              disabled={!canCreateVault || creating}
+              loading={creating}
             />
+            {canWriteRecoveryVault(provider) ? (
+              <PaperButton disabled={!canCreateVault || creating} onPress={() => setRecoverySetupVisible(true)}>
+                {t("login:recoveryCreateOption")}
+              </PaperButton>
+            ) : null}
+            {createError ? <Text style={{ color: theme.colors.error }}>{t("login:recoveryFailed")}</Text> : null}
+            {recoverySetupVisible && canWriteRecoveryVault(provider) ? (
+              <VaultRecoverySetupDialog
+                cloudVault={provider !== "device"}
+                onDismiss={() => setRecoverySetupVisible(false)}
+                onSave={(key, isCurrent) => newMasterPassword(key ?? undefined, isCurrent)}
+              />
+            ) : null}
           </>
         ) : !fetchError ? (
           <>
@@ -527,6 +597,17 @@ function Login(props: Props) {
               />
             </Animated.View>
             <Button text={t("login:login")} onPress={handlePasswordLogin} />
+            {vaultFileContent ? (
+              <PaperButton onPress={() => setRecoveryVisible(true)}>{t("login:forgotMasterPassword")}</PaperButton>
+            ) : null}
+            {recoveryVisible && vaultFileContent ? (
+              <VaultRecoveryDialog
+                content={vaultFileContent}
+                recoverySupported={canWriteRecoveryVault(provider) && !uploadLocalVaultAfterUnlockRef.current}
+                onDismiss={() => setRecoveryVisible(false)}
+                onRecover={recoverWithNewPassword}
+              />
+            ) : null}
           </>
         ) : null}
 

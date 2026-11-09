@@ -6,6 +6,7 @@ import { VaultFetchResult } from "../model/VaultFetchResult";
 import type { UploadContent } from "../model/UploadFileParams";
 import { getDateTime } from "../../../shared/utils/Timestamp";
 import { getDesktopDistributionStorageKey } from "../../storage/distributionStorage";
+import { getVaultFormatVersion } from "../../crypto/vault/vaultFormatVersion";
 
 const LOCAL_SYNC_KEY = "LOCAL_SYNC";
 const LOCAL_SYNC_METADATA_KEY = "LOCAL_SYNC_METADATA";
@@ -101,7 +102,56 @@ export const fetchFile = async (): Promise<VaultFetchResult> => {
   }
 };
 
-export const uploadFile = async (
+export function isVersionedRecoveryVault(content: string): boolean {
+  return getVaultFormatVersion(content) === 3;
+}
+
+let pendingWrite: Promise<unknown> = Promise.resolve();
+
+/** Refresh the local copy only after the provider has accepted the write. */
+export async function cacheSyncedVault(
+  content: string,
+  vaultId: string | undefined,
+  previous?: string | null,
+): Promise<void> {
+  try {
+    const current = await fetchFile();
+    if (current.status === "error") return;
+    const cached = current.status === "ok" ? current.content : null;
+    if (cached === content) return;
+    if (cached !== null && isVersionedRecoveryVault(cached) && cached !== previous) return;
+    await uploadFile(content, undefined, vaultId, cached, cached === previous);
+  } catch (error) {
+    logger.warn("[LocalSync] Could not update the synced vault cache", error);
+  }
+}
+
+export function uploadFile(
+  content: UploadContent,
+  onCompleted?: () => void,
+  vaultId?: string,
+  expectedContent?: string | null,
+  allowRecoveryRemoval = false,
+): Promise<void> {
+  const next = pendingWrite.then(async () => {
+    const current = await fetchFile();
+    if (current.status === "error") throw new Error("Cannot check the saved vault");
+    const saved = current.status === "ok" ? current.content : null;
+    if (expectedContent !== undefined && saved !== expectedContent) {
+      throw new Error("The saved vault changed before the write");
+    }
+    if (saved !== null && isVersionedRecoveryVault(saved) &&
+        (expectedContent === undefined ||
+          (!allowRecoveryRemoval && !isVersionedRecoveryVault(content)))) {
+      throw new Error("A recovery vault requires a checked write and cannot be downgraded");
+    }
+    await writeFile(content, onCompleted, vaultId);
+  });
+  pendingWrite = next.catch(() => {});
+  return next;
+}
+
+const writeFile = async (
   content: UploadContent,
   onCompleted?: () => void,
   vaultId?: string,

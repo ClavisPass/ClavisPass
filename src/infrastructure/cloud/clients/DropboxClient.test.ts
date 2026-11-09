@@ -12,17 +12,20 @@ function response({
   status,
   statusText = "",
   body = "",
+  revision,
 }: {
   ok: boolean;
   status: number;
   statusText?: string;
   body?: unknown;
+  revision?: string;
 }) {
   const text = typeof body === "string" ? body : JSON.stringify(body);
   return {
     ok,
     status,
     statusText,
+    headers: new Headers(revision ? { "Dropbox-API-Result": JSON.stringify({ rev: revision }) } : {}),
     text: vi.fn().mockResolvedValue(text),
     json: vi.fn().mockImplementation(async () => {
       if (typeof body !== "string") return body;
@@ -89,13 +92,14 @@ describe("DropboxClient", () => {
 
   it("normalizes download paths before calling Dropbox", async () => {
     const fetchMock = vi.fn().mockResolvedValue(
-      response({ ok: true, status: 200, body: "vault-content" }),
+      response({ ok: true, status: 200, body: "vault-content", revision: "downloaded-revision" }),
     );
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(fetchFile("access-token", "clavispass.lock")).resolves.toEqual({
       status: "ok",
       content: "vault-content",
+      revision: "downloaded-revision",
     });
 
     expect(fetchMock.mock.calls[0][1].headers["Dropbox-API-Arg"]).toBe(
@@ -103,7 +107,7 @@ describe("DropboxClient", () => {
     );
   });
 
-  it("uploads with overwrite mode and stores a local backup copy", async () => {
+  it("updates only the downloaded revision and caches the accepted write", async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       response({ ok: true, status: 200, body: { id: "file-id" } }),
     );
@@ -115,6 +119,8 @@ describe("DropboxClient", () => {
       "encrypted-content",
       "clavispass.lock",
       onCompleted,
+      undefined,
+      "downloaded-revision",
     );
 
     expect(fetchMock).toHaveBeenCalledWith(
@@ -127,7 +133,8 @@ describe("DropboxClient", () => {
     expect(fetchMock.mock.calls[0][1].headers["Dropbox-API-Arg"]).toBe(
       JSON.stringify({
         path: "/clavispass.lock",
-        mode: "overwrite",
+        mode: { ".tag": "update", update: "downloaded-revision" },
+        strict_conflict: true,
         autorename: false,
         mute: false,
       }),
@@ -136,5 +143,19 @@ describe("DropboxClient", () => {
       "encrypted-content",
     );
     expect(onCompleted).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not retry or cache an upload rejected for a stale revision", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      response({ ok: false, status: 409, body: { error_summary: "path/conflict/file" } }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const onCompleted = vi.fn();
+
+    await expect(uploadFile("token", "stale", "clavispass.lock", onCompleted, undefined, "stale-revision"))
+      .rejects.toThrow();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(onCompleted).not.toHaveBeenCalled();
+    await expect(AsyncStorage.getItem("LOCAL_SYNC")).resolves.toBeNull();
   });
 });

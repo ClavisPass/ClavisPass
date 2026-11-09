@@ -74,7 +74,7 @@ import DigitalCardModuleType from "../features/vault/model/modules/DigitalCardMo
 import { useToken } from "../app/providers/CloudProvider";
 import { useOnline } from "../app/providers/OnlineProvider";
 import { logger } from "../infrastructure/logging/logger";
-import { fetchRemoteVaultFile } from "../infrastructure/cloud/clients/CloudStorageClient";
+import { fetchRemoteVaultFile, runVaultOperation } from "../infrastructure/cloud/clients/CloudStorageClient";
 import { useSetting } from "../app/providers/SettingsProvider";
 import Sync from "../features/sync/components/Sync";
 import { useVault } from "../app/providers/VaultProvider";
@@ -1108,7 +1108,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     [expiryEntries, openEditScreen],
   );
 
-  const refreshData = useCallback(async () => {
+  const refreshData = useCallback(() => runVaultOperation(async () => {
     const master = auth.getMaster();
 
     if (!master || !provider) {
@@ -1149,9 +1149,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         return;
       }
 
+      if (auth.getMaster() !== master) return;
       const decrypted = await decryptVaultContent(result.content, master);
 
       if (!decrypted.ok) {
+        if (decrypted.reason === "UPDATE_REQUIRED") {
+          triggerGlobalError({ message: t("login:vaultUpdateRequired"), code: "VAULT_UPDATE_REQUIRED" });
+        }
         logger.warn(
           "[Home] refreshData decrypt failed:",
           decrypted.reason,
@@ -1160,14 +1164,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
         return;
       }
 
+      if (auth.getMaster() !== master) return;
       const localVault = vault.exportFullData();
       const mergeResult = mergeVaultData(localVault, decrypted.payload, {
         sameTimestampConflictStrategy: "keepRemote",
       });
 
-      if (areVaultDataEqual(mergeResult.vault, localVault)) {
-        vault.markSaved();
-      } else {
+      if (!areVaultDataEqual(mergeResult.vault, localVault)) {
         vault.update((draft) => {
           draft.vaultId = mergeResult.vault.vaultId;
           draft.version = mergeResult.vault.version;
@@ -1177,9 +1180,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
           draft.deletedEntries = mergeResult.vault.deletedEntries ?? [];
         });
 
-        if (areVaultDataEqual(mergeResult.vault, decrypted.payload)) {
-          vault.markSaved();
-        }
+      }
+      if (areVaultDataEqual(mergeResult.vault, decrypted.payload)) {
+        vault.markSaved();
       }
 
       if (mergeResult.summary.conflicts.length > 0) {
@@ -1206,7 +1209,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
     } finally {
       setRefreshing(false);
     }
-  }, [
+  }), [
     accessToken,
     auth,
     ensureFreshAccessToken,

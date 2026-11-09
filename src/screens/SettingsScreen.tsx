@@ -36,6 +36,7 @@ import {
 } from "../features/auth/utils/authenticateUser";
 import { useAuth } from "../app/providers/AuthProvider";
 import ChangeMasterPasswordModal from "../features/settings/components/modals/ChangeMasterPasswordModal";
+import RecoveryKeySettingsItem from "../features/settings/components/RecoveryKeySettingsItem";
 import BrowserExtensionsModal from "../features/settings/components/modals/BrowserExtensionsModal";
 import SettingsDivider from "../features/settings/components/SettingsDivider";
 import SettingsContainer from "../features/settings/components/SettingsContainer";
@@ -516,6 +517,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
       security: matchesSettingsSearch([
         t("settings:security"),
         t("settings:changeMasterPassword"),
+        t("login:recoveryTitle"),
         t("settings:useSystemAuth"),
         t("settings:contentProtection"),
         t("settings:blurOnUnfocus"),
@@ -1431,6 +1433,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 >
                   {t("settings:changeMasterPassword")}
                 </SettingsItem>
+                <SettingsDivider />
+                <RecoveryKeySettingsItem />
                 {systemAuthenticationAvailable ? (
                   <>
                     <SettingsDivider />
