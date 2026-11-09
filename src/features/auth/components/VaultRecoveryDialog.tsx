@@ -15,10 +15,13 @@ import {
 } from "../../vault/utils/entropyUi";
 import PasswordStrengthLevel from "../../analysis/model/PasswordStrengthLevel";
 
+const actionStyle = { borderRadius: 12 };
+
 type Props = {
   content: string;
   recoverySupported: boolean;
   onDismiss: () => void;
+  onReplace: (password: string, isCurrent: () => boolean) => Promise<void>;
   onRecover: (
     key: string,
     password: string,
@@ -31,6 +34,7 @@ export default function VaultRecoveryDialog({
   recoverySupported,
   onDismiss,
   onRecover,
+  onReplace,
 }: Props) {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -39,7 +43,7 @@ export default function VaultRecoveryDialog({
   const confirmationRef = useRef("");
   const mounted = useRef(true);
   const inFlight = useRef(false);
-  const [verified, setVerified] = useState(false);
+  const [step, setStep] = useState<"options" | "recover" | "replace">("options");
   const [busy, setBusy] = useState(false);
   const [hasKey, setHasKey] = useState(false);
   const [strong, setStrong] = useState(false);
@@ -78,18 +82,16 @@ export default function VaultRecoveryDialog({
     if (!available || !keyRef.current.trim()) return;
     void run(async () => {
       await verifyVaultRecoveryKey(content, keyRef.current);
-      if (mounted.current) setVerified(true);
+      if (mounted.current) setStep("recover");
     }, "key");
   };
 
   const save = () => {
-    if (!verified || !strong || !matches) return;
+    if (step === "options" || !strong || !matches) return;
     void run(async () => {
-      await onRecover(
-        keyRef.current,
-        passwordRef.current,
-        () => mounted.current,
-      );
+      const isCurrent = () => mounted.current;
+      if (step === "replace") await onReplace(passwordRef.current, isCurrent);
+      else await onRecover(keyRef.current, passwordRef.current, isCurrent);
     }, "save");
   };
 
@@ -108,12 +110,17 @@ export default function VaultRecoveryDialog({
 
   return (
     <Modal visible onDismiss={dismiss} avoidKeyboard>
-      <ModalSurface width={420} title={t("login:forgotMasterPassword")}>
+      <ModalSurface
+        width={420}
+        title={t("login:forgotMasterPassword")}
+        contentStyle={{ flexShrink: 1 }}
+      >
         <ScrollView
           keyboardShouldPersistTaps="handled"
+          style={{ flexShrink: 1 }}
           contentContainerStyle={{ gap: 8 }}
         >
-          {!available ? (
+          {step === "options" && !available ? (
             <Text>
               {t(
                 recoverySupported
@@ -121,7 +128,7 @@ export default function VaultRecoveryDialog({
                   : "login:recoveryProviderUnsupported",
               )}
             </Text>
-          ) : !verified ? (
+          ) : step === "options" ? (
             <>
               <TextInput
                 {...secretInputProps}
@@ -136,6 +143,7 @@ export default function VaultRecoveryDialog({
               />
               <Button
                 mode="contained"
+                style={actionStyle}
                 loading={busy}
                 disabled={busy || !hasKey}
                 onPress={verify}
@@ -145,6 +153,11 @@ export default function VaultRecoveryDialog({
             </>
           ) : (
             <>
+              {step === "replace" ? (
+                <Text style={{ color: theme.colors.error }}>
+                  {t("login:recoveryReplaceVaultWarning")}
+                </Text>
+              ) : null}
               <TextInput
                 {...secretInputProps}
                 key="new-password"
@@ -169,21 +182,43 @@ export default function VaultRecoveryDialog({
                   confirmationRef.current = value;
                   setMatches(Boolean(value) && value === passwordRef.current);
                 }}
-                onSubmitEditing={save}
+                onSubmitEditing={step === "recover" ? save : undefined}
               />
               {!strong ? (
                 <Text>{t("login:masterPasswordWeakHint")}</Text>
               ) : null}
               <Button
                 mode="contained"
+                style={actionStyle}
+                buttonColor={step === "replace" ? theme.colors.error : undefined}
+                textColor={step === "replace" ? theme.colors.onError : undefined}
                 loading={busy}
                 disabled={busy || !strong || !matches}
                 onPress={save}
               >
-                {t("login:recoverySetPassword")}
+                {t(
+                  step === "replace"
+                    ? "login:recoveryReplaceVault"
+                    : "login:recoverySetPassword",
+                )}
               </Button>
             </>
           )}
+          {step === "options" ? (
+            <Button
+              mode="outlined"
+              style={actionStyle}
+              disabled={busy}
+              onPress={() => {
+                if (inFlight.current) return;
+                keyRef.current = "";
+                setError(null);
+                setStep("replace");
+              }}
+            >
+              {t("login:createNewVault")}
+            </Button>
+          ) : null}
           {error ? (
             <Text
               accessibilityRole="alert"
@@ -196,7 +231,7 @@ export default function VaultRecoveryDialog({
               )}
             </Text>
           ) : null}
-          <Button disabled={busy} onPress={dismiss}>
+          <Button style={actionStyle} disabled={busy} onPress={dismiss}>
             {t("common:cancel")}
           </Button>
         </ScrollView>

@@ -9,26 +9,28 @@ import {
   KeyboardAvoidingView,
   View,
   Pressable,
+  ScrollView,
   StyleSheet,
   useWindowDimensions,
   Platform,
 } from "react-native";
 import Animated, { Easing, FadeIn, FadeOut } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import AppHeaderBrand from "../shared/components/AppHeaderBrand";
 import Constants from "expo-constants";
 
-import { ActivityIndicator, Icon, Text } from "react-native-paper";
-import { Button } from "react-native-paper";
+import { ActivityIndicator, Button, Icon, Text } from "react-native-paper";
 
 import Login from "../features/auth/components/Login";
+import AnimatedLoginVisual from "../features/auth/components/AnimatedLoginVisual";
 import Backup from "../features/sync/components/Backup";
 
 import UserInfoType from "../features/sync/model/UserInfoType";
 
 import { useOnline } from "../app/providers/OnlineProvider";
 import { useTheme } from "../app/providers/ThemeProvider";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useToken } from "../app/providers/CloudProvider";
 import { fetchUserInfo } from "../infrastructure/cloud/clients/CloudStorageClient";
@@ -83,12 +85,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   } = useTheme();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
+  const isFocused = useIsFocused();
+  const insets = useSafeAreaInsets();
   const { value: onboardingDone } = useSetting("ONBOARDING_DONE");
   const { value: windowControlsStyle } = useSetting("WINDOW_CONTROLS_STYLE");
   const controlsLeft =
     resolveWindowControlsSide(windowControlsStyle) === "left";
   const isWideLoginLayout = width >= 600;
-  const loginCardWidth = isWideLoginLayout ? Math.min(width - 220, 760) : 300;
+  const showSplitLayout = width >= 720;
   const glassChromeStyle = getGlassChromeStyle(darkmode);
   const screenContentStyle = getScreenContentStyle(theme);
 
@@ -101,6 +105,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   } = useToken();
 
   const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
+  const [isCreatingVault, setIsCreatingVault] = useState(false);
   const [loadingUserInfo, setLoadingUserInfo] = useState(true);
   const [deviceSaveModalVisible, setDeviceSaveModalVisible] = useState(false);
   const [cloudProviderModalVisible, setCloudProviderModalVisible] =
@@ -346,109 +351,63 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         </View>
         <View
           id="clavispass-login-page"
-          style={{
-            ...screenContentStyle,
-            padding: 20,
-            marginLeft: 8,
-            marginRight: 8,
-            marginBottom: 8,
-            flex: 1,
-            alignSelf: "stretch",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          style={[screenContentStyle, styles.page, showSplitLayout && styles.splitPage]}
         >
-          <View
-            style={{
-              height: "80%",
-              maxHeight: 500,
-              width: loginCardWidth,
-              margin: isWideLoginLayout ? 8 : 4,
-              minWidth: isWideLoginLayout ? 560 : 300,
-              maxWidth: loginCardWidth,
-              display: "flex",
-              justifyContent: "center",
-            }}
+          {showSplitLayout ? (
+            <AnimatedLoginVisual
+              active={isFocused}
+              caption={
+                currentKey === "online" && onboardingDone
+                  ? t(
+                      isCreatingVault
+                        ? "login:introCreateVault"
+                        : "login:introUnlockVault",
+                    )
+                  : undefined
+              }
+            />
+          ) : null}
+          <ScrollView
+            style={styles.formPane}
+            contentContainerStyle={[
+              styles.scrollContent,
+              showSplitLayout && styles.splitScrollContent,
+              insets.bottom > 0 && { paddingBottom: insets.bottom + 8 },
+            ]}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
           >
-            <Animated.View
-              key={currentKey}
-              entering={FadeIn.duration(500).easing(
-                Easing.bezier(0.4, 0, 0.2, 1),
-              )}
-              exiting={FadeOut.duration(500).easing(
-                Easing.bezier(0.4, 0, 0.2, 1),
-              )}
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {showOfflineBackup ? (
-                <Backup />
-              ) : isInitializing || loadingUserInfo ? (
-                <ActivityIndicator size="large" />
-              ) : !onboardingDone ? (
-                <FirstOpened navigation={navigation} />
-              ) : (
-                <Login userInfo={userInfo} />
-              )}
-            </Animated.View>
-          </View>
-          {provider === "device" ? (
-            <AnimatedPressable
-              onPress={handlePresentModalPress}
-              style={{
-                marginTop: 8,
-                minHeight: 36,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-                paddingLeft: 12,
-                paddingRight: 14,
-                borderRadius: 12,
-                backgroundColor: theme.colors.secondaryContainer,
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 8,
-                }}
+            {!showSplitLayout ? <AnimatedLoginVisual compact active={isFocused} /> : null}
+            <View style={styles.formStack}>
+              <Animated.View
+                key={currentKey}
+                entering={FadeIn.duration(500).easing(
+                  Easing.bezier(0.4, 0, 0.2, 1),
+                )}
+                exiting={FadeOut.duration(500).easing(
+                  Easing.bezier(0.4, 0, 0.2, 1),
+                )}
+                style={styles.stage}
               >
-                <Icon
-                  source="folder-outline"
-                  size={18}
-                  color={theme.colors.primary}
-                />
-                <Text style={{ color: theme.colors.primary }}>
-                  {t("login:cloudSave")}
-                </Text>
-              </View>
-            </AnimatedPressable>
-          ) : (
-            <View
-              style={{
-                marginTop: 8,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 0,
-              }}
-            >
-              <View
-                style={{
-                  minHeight: 36,
-                  flexDirection: "row",
-                  alignItems: "stretch",
-                  overflow: "hidden",
-                  borderRadius: 12,
-                  backgroundColor: theme.colors.secondaryContainer,
-                }}
-              >
-                <View
+                {showOfflineBackup ? (
+                  <Backup />
+                ) : isInitializing || loadingUserInfo ? (
+                  <ActivityIndicator size="large" />
+                ) : !onboardingDone ? (
+                  <FirstOpened navigation={navigation} />
+                ) : (
+                  <Login
+                    userInfo={userInfo}
+                    onIntroModeChange={
+                      showSplitLayout ? setIsCreatingVault : undefined
+                    }
+                  />
+                )}
+              </Animated.View>
+              {provider === "device" ? (
+                <AnimatedPressable
+                  onPress={handlePresentModalPress}
                   style={{
                     minHeight: 36,
                     flexDirection: "row",
@@ -456,38 +415,91 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                     gap: 8,
                     paddingLeft: 12,
                     paddingRight: 14,
+                    borderRadius: 12,
+                    maxWidth: "100%",
+                    backgroundColor: theme.colors.secondaryContainer,
                   }}
                 >
-                  <Icon
-                    source={connectedProviderIcon}
-                    size={18}
-                    color={theme.colors.primary}
-                  />
-                  <Text style={{ color: theme.colors.primary }}>
-                    {connectedProviderLabel}
-                  </Text>
-                </View>
-                <AnimatedPressable
-                  onPress={() => setDeviceSaveModalVisible(true)}
-                  accessibilityLabel="Logout"
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <Icon
+                      source="folder-outline"
+                      size={18}
+                      color={theme.colors.primary}
+                    />
+                    <Text style={{ color: theme.colors.primary, flexShrink: 1 }}>
+                      {t("login:cloudSave")}
+                    </Text>
+                  </View>
+                </AnimatedPressable>
+              ) : (
+                <View
                   style={{
-                    width: 42,
-                    minHeight: 36,
+                    flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "center",
-                    borderLeftWidth: StyleSheet.hairlineWidth,
-                    borderLeftColor: theme.colors.outlineVariant,
+                    gap: 0,
                   }}
                 >
-                  <Icon
-                    source="logout"
-                    size={18}
-                    color={theme.colors.primary}
-                  />
-                </AnimatedPressable>
-              </View>
+                  <View
+                    style={{
+                      minHeight: 36,
+                      flexDirection: "row",
+                      alignItems: "stretch",
+                      overflow: "hidden",
+                      borderRadius: 12,
+                      maxWidth: "100%",
+                      backgroundColor: theme.colors.secondaryContainer,
+                    }}
+                  >
+                    <View
+                      style={{
+                        minHeight: 36,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 8,
+                        paddingLeft: 12,
+                        paddingRight: 14,
+                        flexShrink: 1,
+                      }}
+                    >
+                      <Icon
+                        source={connectedProviderIcon}
+                        size={18}
+                        color={theme.colors.primary}
+                      />
+                      <Text style={{ color: theme.colors.primary, flexShrink: 1 }}>
+                        {connectedProviderLabel}
+                      </Text>
+                    </View>
+                    <AnimatedPressable
+                      onPress={() => setDeviceSaveModalVisible(true)}
+                      accessibilityLabel="Logout"
+                      style={{
+                        width: 42,
+                        minHeight: 36,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderLeftWidth: StyleSheet.hairlineWidth,
+                        borderLeftColor: theme.colors.outlineVariant,
+                      }}
+                    >
+                      <Icon
+                        source="logout"
+                        size={18}
+                        color={theme.colors.primary}
+                      />
+                    </AnimatedPressable>
+                  </View>
+                </View>
+              )}
             </View>
-          )}
+          </ScrollView>
 
           <Modal
             visible={deviceSaveModalVisible}
@@ -612,5 +624,50 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     </BottomSheetModalProvider>
   );
 };
+
+const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    minHeight: 0,
+    marginHorizontal: 8,
+    marginBottom: 8,
+    paddingTop: 0,
+    paddingLeft: 0,
+    paddingRight: 0,
+    paddingBottom: 0,
+  },
+  splitPage: {
+    flexDirection: "row",
+  },
+  formPane: {
+    flexGrow: 60,
+    flexBasis: 0,
+    minWidth: 0,
+    minHeight: 0,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    gap: 8,
+  },
+  splitScrollContent: {
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+  },
+  formStack: {
+    width: "100%",
+    maxWidth: 480,
+    alignItems: "center",
+    gap: 16,
+  },
+  stage: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
 
 export default LoginScreen;

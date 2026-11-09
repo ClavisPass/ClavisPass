@@ -147,6 +147,8 @@ export type TranslationSchema = {
     recoveryVerify: string;
     recoveryInvalidKey: string;
     recoverySetPassword: string;
+    recoveryReplaceVault: string;
+    recoveryReplaceVaultWarning: string;
     recoveryFailed: string;
     recoveryEnabled: string;
     recoveryDisabled: string;

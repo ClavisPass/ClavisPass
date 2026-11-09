@@ -153,6 +153,8 @@ const de: TranslationSchema = {
     recoveryInvalidKey: "Der Schlüssel passt nicht zu diesem Tresor.",
     recoverySetPassword: "Tresor wiederherstellen",
     recoveryFailed: "Die Änderung konnte nicht abgeschlossen werden. Öffne den Tresor erneut und versuche es noch einmal.",
+    recoveryReplaceVault: "Tresor ersetzen",
+    recoveryReplaceVaultWarning: "Beim Speichern ersetzt der neue, leere Tresor den bisherigen am ausgewählten Speicherort. Deine bisherigen Einträge sind danach im neuen Tresor nicht verfügbar.",
     recoveryEnabled: "Wiederherstellung eingerichtet",
     recoveryDisabled: "Wiederherstellung optional einrichten",
     recoveryInvalidPassword: "Das Masterpasswort stimmt nicht.",

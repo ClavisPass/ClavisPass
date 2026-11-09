@@ -152,6 +152,8 @@ const en: TranslationSchema = {
     recoveryInvalidKey: "This key does not match the vault.",
     recoverySetPassword: "Recover vault",
     recoveryFailed: "The change could not be completed. Reopen the vault and try again.",
+    recoveryReplaceVault: "Replace vault",
+    recoveryReplaceVaultWarning: "Saving replaces the existing vault at this storage location with a new, empty vault. Your previous entries will no longer be available in the new vault.",
     recoveryEnabled: "Recovery is set up",
     recoveryDisabled: "Set up optional recovery",
     recoveryInvalidPassword: "The master password does not match.",

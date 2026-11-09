@@ -804,9 +804,9 @@
     "semantic_hash": "b18c005154696b758d73359a31d7bcfd"
   },
   "src/features/auth/components/Login.tsx": {
-    "mtime": 1794220820.0292602,
-    "seen": 1794220876.9318829,
-    "ast_hash": "64e0ee7009f4755aa14aa7ec554a9540",
+    "mtime": 1794223094.2433665,
+    "seen": 1794223151.3604798,
+    "ast_hash": "5edae184415675ed7f43e2e01019d197",
     "semantic_hash": ""
   },
   "src/features/auth/model/ScreenLockLogoutController.ts": {
@@ -930,9 +930,9 @@
     "semantic_hash": "095dacbf3b2dc1d9a9b1f428a76eeacb"
   },
   "src/features/onboarding/components/FirstOpened.tsx": {
-    "mtime": 1794215159.366741,
-    "seen": 1794215183.9668567,
-    "ast_hash": "1a14a018202e3dff3ee796b079571448",
+    "mtime": 1794221535.0734987,
+    "seen": 1794221728.1398613,
+    "ast_hash": "26ad8ce2e811936a3c0080778667b0d4",
     "semantic_hash": ""
   },
   "src/features/settings/components/AppearanceSettingsSection.tsx": {
@@ -2520,9 +2520,9 @@
     "semantic_hash": ""
   },
   "src/screens/LoginScreen.tsx": {
-    "mtime": 1794216999.095181,
-    "seen": 1794217528.7462025,
-    "ast_hash": "1a72374633a9aaea98e9dbbc640d1e8d",
+    "mtime": 1794222752.6326292,
+    "seen": 1794222787.469137,
+    "ast_hash": "962339dd0b70412d61fabf9526003c08",
     "semantic_hash": ""
   },
   "src/screens/LogoutScreen.render.test.tsx": {
@@ -2928,9 +2928,9 @@
     "semantic_hash": "f8ba37e05d95b36f88857664ece74d7d"
   },
   "src/shared/i18n/TranslationSchema.ts": {
-    "mtime": 1794220585.217936,
-    "seen": 1794220817.632496,
-    "ast_hash": "d3ba4c84e916ed53b5f3c4259ed094c5",
+    "mtime": 1794223066.5785737,
+    "seen": 1794223151.3609974,
+    "ast_hash": "0a5062434553b967e1e1fbded75167de",
     "semantic_hash": ""
   },
   "src/shared/i18n/index.ts": {
@@ -2940,15 +2940,15 @@
     "semantic_hash": "3693d0d683a802ea042ec3f67e634914"
   },
   "src/shared/i18n/languages/de.ts": {
-    "mtime": 1794220585.2312353,
-    "seen": 1794220817.632496,
-    "ast_hash": "b019a5d4940e2f7a6c282af91f33454c",
+    "mtime": 1794223066.5800898,
+    "seen": 1794223151.3609974,
+    "ast_hash": "efe87b6a1eef07a4233735212f1d1b33",
     "semantic_hash": ""
   },
   "src/shared/i18n/languages/en.ts": {
-    "mtime": 1794220585.2312353,
-    "seen": 1794220817.632496,
-    "ast_hash": "fdd8c2fe8659d089743a52ea813cf541",
+    "mtime": 1794223066.5800898,
+    "seen": 1794223151.3609974,
+    "ast_hash": "39fddf3b800f682844c62b9aec92c298",
     "semantic_hash": ""
   },
   "src/shared/i18n/types.ts": {
@@ -3918,15 +3918,15 @@
     "semantic_hash": ""
   },
   "src/features/auth/components/VaultRecoveryDialog.render.test.tsx": {
-    "mtime": 1794220586.540701,
-    "seen": 1794220817.632496,
-    "ast_hash": "5496c6f40de54f3d26deaa7b0a3b1d6d",
+    "mtime": 1794223122.2982929,
+    "seen": 1794223151.3604798,
+    "ast_hash": "d76fd6c4733bfb7ed070cfc746dd5edd",
     "semantic_hash": ""
   },
   "src/features/auth/components/VaultRecoveryDialog.tsx": {
-    "mtime": 1794220456.683799,
-    "seen": 1794220817.632496,
-    "ast_hash": "cecc01c5a4504c9630d8176e3a44cf7f",
+    "mtime": 1794223869.0272045,
+    "seen": 1794223894.0704603,
+    "ast_hash": "45c27cff2dfd00f3456a8e71fc5fd24c",
     "semantic_hash": ""
   },
   "src/features/auth/components/VaultRecoverySetupDialog.tsx": {
@@ -3975,6 +3975,12 @@
     "mtime": 1794220820.024665,
     "seen": 1794220876.9318829,
     "ast_hash": "a074020f7d7cdb35dfb60e1c2d19d1b6",
+    "semantic_hash": ""
+  },
+  "src/features/auth/components/AnimatedLoginVisual.tsx": {
+    "mtime": 1794222732.102826,
+    "seen": 1794222787.467598,
+    "ast_hash": "7d65e5631f6aaeee1388ae4a5cbcd93f",
     "semantic_hash": ""
   }
 }

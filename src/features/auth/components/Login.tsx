@@ -6,8 +6,6 @@ import React, {
   useState,
 } from "react";
 import {
-  ScrollView,
-  StyleSheet,
   useWindowDimensions,
   View,
 } from "react-native";
@@ -68,7 +66,10 @@ import {
 import VaultRecoveryDialog from "./VaultRecoveryDialog";
 import VaultRecoverySetupDialog from "./VaultRecoverySetupDialog";
 
-type Props = { userInfo: UserInfoType };
+type Props = {
+  userInfo: UserInfoType;
+  onIntroModeChange?: (isCreating: boolean) => void;
+};
 
 function Login(props: Props) {
   const auth = useAuth();
@@ -82,6 +83,10 @@ function Login(props: Props) {
   const [vaultFileContent, setVaultFileContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showNewData, setShowNewData] = useState(false);
+  const { onIntroModeChange } = props;
+  useEffect(() => {
+    onIntroModeChange?.(showNewData);
+  }, [onIntroModeChange, showNewData]);
 
   const [fetchError, setFetchError] = useState<string | null>(null);
   const uploadLocalVaultAfterUnlockRef = useRef(false);
@@ -161,7 +166,13 @@ function Login(props: Props) {
   }, [provider, accessToken, ensureFreshAccessToken]);
 
   const writeVaultJson = useCallback(
-    async (vaultJson: string, expected: VaultSnapshot, vaultId?: string, token?: string) => {
+    async (
+      vaultJson: string,
+      expected: VaultSnapshot,
+      vaultId?: string,
+      token?: string,
+      allowRecoveryRemoval = false,
+    ) => {
       if (!provider) throw new Error("No vault provider configured");
 
       await uploadRemoteVaultFile({
@@ -172,6 +183,7 @@ function Login(props: Props) {
         onCompleted: undefined,
         vaultId,
         expected,
+        allowRecoveryRemoval,
       });
     },
     [provider, resolveAccessToken],
@@ -229,6 +241,7 @@ function Login(props: Props) {
       setFetchError(null);
       setShowNewData(false);
       setVaultFileContent(null);
+      setRecoveryVisible(false);
       uploadLocalVaultAfterUnlockRef.current = false;
 
       const hasAuthentication = await isUsingAuthentication();
@@ -341,6 +354,30 @@ function Login(props: Props) {
     void loginWithMasterPassword(masterPassword, vaultFileContent);
   };
 
+  const createVault = async (
+    password: string,
+    persist: (content: string, vaultId: string | undefined) => Promise<void>,
+    isCurrent: () => boolean,
+    recoveryKey?: string,
+  ) => {
+    const encrypted = await encryptVaultContent(getEmptyData(), password, {
+      recoveryKey,
+      commitSession: false,
+      newVault: true,
+    });
+    if (!encrypted.ok) throw encrypted.error;
+
+    const saved = await persistPreparedRecoveryVault(
+      encrypted.content,
+      password,
+      (id) => persist(encrypted.content, id),
+      isCurrent,
+    );
+    if (!saved || !isCurrent()) return;
+    vault.unlockWithDecryptedVault(saved);
+    auth.login(password);
+  };
+
   const newMasterPassword = async (recoveryKey?: string, dialogCurrent = () => true) => {
     if (!canCreateVault || creatingRef.current) return;
     if (!provider || (recoveryKey && !canWriteRecoveryVault(provider))) {
@@ -351,25 +388,12 @@ function Login(props: Props) {
     setCreating(true);
     setCreateError(false);
     try {
-      const empty = getEmptyData();
-      const encrypted = await encryptVaultContent(empty, masterPassword, {
-        recoveryKey,
-        commitSession: false,
-        newVault: true,
-      });
-      if (!encrypted.ok) {
-        throw encrypted.error;
-      }
-      if (!isCurrent()) return;
-      const saved = await persistPreparedRecoveryVault(
-        encrypted.content, masterPassword,
-        (id) => writeVaultJson(encrypted.content, { status: "not_found" }, id),
+      await createVault(
+        masterPassword,
+        (content, id) => writeVaultJson(content, { status: "not_found" }, id),
         isCurrent,
+        recoveryKey,
       );
-      if (!saved) return;
-      if (!isCurrent()) return;
-      vault.unlockWithDecryptedVault(empty);
-      auth.login(masterPassword);
     } finally {
       creatingRef.current = false;
       if (mounted.current) setCreating(false);
@@ -379,6 +403,45 @@ function Login(props: Props) {
   const createWithoutRecovery = () => {
     void newMasterPassword().catch(() => {
       if (mounted.current) setCreateError(true);
+    });
+  };
+
+  const replaceVault = async (password: string, dialogCurrent: () => boolean) => {
+    const source = vaultFileContent;
+    if (!provider || !source) throw new Error("Replacement requires a saved vault");
+    const fromLocalBackup = uploadLocalVaultAfterUnlockRef.current;
+    const isCurrent = () =>
+      mounted.current && activeProvider.current === provider &&
+      activeContent.current === source &&
+      uploadLocalVaultAfterUnlockRef.current === fromLocalBackup &&
+      dialogCurrent();
+
+    await runVaultOperation(async () => {
+      if (!isCurrent()) throw new Error("Vault selection changed");
+      const token = await resolveAccessToken();
+      const saved = await fetchRemoteVaultFile({
+        provider,
+        accessToken: token,
+        remotePath: "clavispass.lock",
+      });
+      if (saved.status === "error") throw new Error("Could not check the saved vault");
+
+      if (fromLocalBackup) {
+        const backup = await DeviceStorageClient.fetchFile();
+        if (saved.status !== "not_found" || backup.status !== "ok" || backup.content !== source) {
+          throw new Error("The vault or backup changed before replacement");
+        }
+      } else if (saved.status !== "ok" || saved.content !== source) {
+        throw new Error("The saved vault changed before replacement");
+      }
+      if (!isCurrent()) throw new Error("Vault selection changed");
+
+      await createVault(password, async (content, id) => {
+        await writeVaultJson(content, saved, id, token, true);
+        await removeAuthentication().catch(() => {
+          logger.warn("[Login] Could not clear system authentication after replacement");
+        });
+      }, isCurrent);
     });
   };
 
@@ -597,17 +660,6 @@ function Login(props: Props) {
               />
             </Animated.View>
             <Button text={t("login:login")} onPress={handlePasswordLogin} />
-            {vaultFileContent ? (
-              <PaperButton onPress={() => setRecoveryVisible(true)}>{t("login:forgotMasterPassword")}</PaperButton>
-            ) : null}
-            {recoveryVisible && vaultFileContent ? (
-              <VaultRecoveryDialog
-                content={vaultFileContent}
-                recoverySupported={canWriteRecoveryVault(provider) && !uploadLocalVaultAfterUnlockRef.current}
-                onDismiss={() => setRecoveryVisible(false)}
-                onRecover={recoverWithNewPassword}
-              />
-            ) : null}
           </>
         ) : null}
 
@@ -629,126 +681,58 @@ function Login(props: Props) {
             />
           </Animated.View>
         )}
+
+        {!showNewData && !fetchError && vaultFileContent ? (
+          <>
+            <PaperButton
+              style={{ borderRadius: 12 }}
+              onPress={() => setRecoveryVisible(true)}
+            >
+              {t("login:forgotMasterPassword")}
+            </PaperButton>
+            {recoveryVisible ? (
+              <VaultRecoveryDialog
+                content={vaultFileContent}
+                recoverySupported={
+                  canWriteRecoveryVault(provider) &&
+                  !uploadLocalVaultAfterUnlockRef.current
+                }
+                onDismiss={() => setRecoveryVisible(false)}
+                onRecover={recoverWithNewPassword}
+                onReplace={replaceVault}
+              />
+            ) : null}
+          </>
+        ) : null}
       </Animated.View>
     );
   };
 
-  if (isWideLayout) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-          paddingHorizontal: 24,
-          paddingVertical: 24,
-          gap: 24,
-          backgroundColor: "transparent",
-        }}
-      >
-        <Animated.View
-          entering={FadeInDown.delay(60).duration(360).easing(transitionEasing)}
-          style={{
-            flex: 0.95,
-            alignItems: "center",
-            justifyContent: "center",
-            alignSelf: "stretch",
-          }}
-        >
-          <Animated.View
-            key={showNewData ? "intro-create" : "intro-unlock"}
-            entering={FadeIn.duration(280).easing(transitionEasing)}
-            exiting={FadeOut.duration(180).easing(transitionEasing)}
-            layout={contentTransition}
-            style={{ maxWidth: 320 }}
-          >
-            <Text
-              style={{ textAlign: "center", color: theme.colors.onSurfaceVariant }}
-            >
-              {showNewData
-                ? t("login:introCreateVault")
-                : t("login:introUnlockVault")}
-            </Text>
-          </Animated.View>
-        </Animated.View>
-
-        <View
-          style={{
-            width: StyleSheet.hairlineWidth,
-            alignSelf: "stretch",
-            backgroundColor: theme.colors.outlineVariant,
-            opacity: 0.85,
-          }}
-        />
-
-        <Animated.View
-          entering={FadeInDown.delay(120)
-            .duration(360)
-            .easing(transitionEasing)}
-          layout={contentTransition}
-          style={{
-            flex: 1.55,
-            alignItems: "center",
-            justifyContent: "center",
-            alignSelf: "stretch",
-            paddingLeft: 18,
-            paddingRight: 18,
-          }}
-        >
-          <View
-            style={{
-              width: "100%",
-              maxWidth: "100%",
-              alignSelf: "center",
-            }}
-          >
-            {renderStageContent()}
-          </View>
-        </Animated.View>
-      </View>
-    );
-  }
-
   return (
-    <ScrollView
-      style={{ flex: 1, width: "100%" }}
-      contentContainerStyle={{
-        flexGrow: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "transparent",
-        paddingHorizontal: 6,
-        paddingVertical: 20,
-        gap: 14,
-      }}
-      keyboardDismissMode="on-drag"
-      keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={false}
+    <Animated.View
+      entering={FadeInDown.delay(110).duration(360).easing(transitionEasing)}
+      layout={contentTransition}
+      style={{ width: "100%", gap: 16 }}
     >
-      <Animated.View
-        entering={FadeInDown.delay(110)
-          .duration(360)
-          .easing(transitionEasing)}
-        layout={contentTransition}
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-        }}
-      >
-        <View
-          style={{
-            width: "92%",
-            maxWidth: 380,
-            alignSelf: "center",
-          }}
+      {isWideLayout && !onIntroModeChange ? (
+        <Animated.View
+          key={showNewData ? "intro-create" : "intro-unlock"}
+          entering={FadeIn.duration(280).easing(transitionEasing)}
+          exiting={FadeOut.duration(180).easing(transitionEasing)}
+          layout={contentTransition}
         >
-          {renderStageContent()}
-        </View>
-      </Animated.View>
-    </ScrollView>
+          <Text
+            variant="bodyMedium"
+            style={{ textAlign: "center", color: theme.colors.onSurfaceVariant }}
+          >
+            {showNewData
+              ? t("login:introCreateVault")
+              : t("login:introUnlockVault")}
+          </Text>
+        </Animated.View>
+      ) : null}
+      {renderStageContent()}
+    </Animated.View>
   );
 }
 

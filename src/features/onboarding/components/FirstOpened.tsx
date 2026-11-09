@@ -4,11 +4,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Platform,
-  ScrollView,
   StyleSheet,
   View,
   useColorScheme,
-  useWindowDimensions,
 } from "react-native";
 import { Button, Text } from "react-native-paper";
 
@@ -36,8 +34,6 @@ const FirstOpened: React.FC<Props> = ({ onFinish }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const systemColorScheme = useColorScheme();
-  const { width } = useWindowDimensions();
-  const isWideLayout = width >= 600;
 
   const { provider } = useToken();
 
@@ -171,115 +167,19 @@ const FirstOpened: React.FC<Props> = ({ onFinish }) => {
   const next = () => setStep(1);
   const back = () => setStep(0);
 
-  const introContent = (
-    <Text
-      style={{
-        width: "100%",
-        maxWidth: isWideLayout ? 320 : 360,
-        textAlign: "center",
-        color: theme.colors.onSurfaceVariant,
-      }}
-    >
-      {step === 0 ? t("login:introFirstRun") : t("login:cloudSaveSubtitle")}
-    </Text>
-  );
-
-  const stageContent = (
-    <View style={{ width: "100%", maxWidth: 380 }}>{renderStep(step)}</View>
-  );
-
-  if (isWideLayout) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-          paddingHorizontal: 24,
-          paddingVertical: 24,
-          gap: 24,
-        }}
-      >
-        <View
-          style={{
-            flex: 0.95,
-            alignItems: "center",
-            justifyContent: "center",
-            alignSelf: "stretch",
-          }}
-        >
-          {introContent}
-        </View>
-
-        <View
-          style={{
-            width: StyleSheet.hairlineWidth,
-            alignSelf: "stretch",
-            backgroundColor: theme.colors.outlineVariant,
-            opacity: 0.85,
-          }}
-        />
-
-        <View
-          style={{
-            flex: 1.55,
-            alignItems: "center",
-            justifyContent: "center",
-            alignSelf: "stretch",
-            paddingLeft: 18,
-            paddingRight: 18,
-          }}
-        >
-          {stageContent}
-          {step === 1 ? (
-            <View style={{ width: "100%", maxWidth: 380, marginTop: 8 }}>
-              <Button
-                mode="outlined"
-                style={{ borderRadius: 12 }}
-                onPress={back}
-              >
-                {t("common:back")}
-              </Button>
-            </View>
-          ) : null}
-        </View>
-      </View>
-    );
-  }
-
   return (
-    <View
-      style={{
-        flex: 1,
-        width: "100%",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
-      <ScrollView
-        style={{ width: "100%", flex: 1 }}
-        contentContainerStyle={{
-          flexGrow: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          paddingHorizontal: 6,
-          paddingVertical: 20,
-          gap: 14,
-        }}
-        keyboardShouldPersistTaps="handled"
+    <View style={{ width: "100%", gap: 14 }}>
+      <Text
+        variant="bodyMedium"
+        style={{ textAlign: "center", color: theme.colors.onSurfaceVariant }}
       >
-        {introContent}
-        {stageContent}
-      </ScrollView>
-
+        {step === 0 ? t("login:introFirstRun") : t("login:cloudSaveSubtitle")}
+      </Text>
+      {renderStep(step)}
       {step === 1 ? (
-        <View style={{ width: "100%", maxWidth: 380, marginTop: 8 }}>
-          <Button mode="outlined" style={{ borderRadius: 12 }} onPress={back}>
-            {t("common:back")}
-          </Button>
-        </View>
+        <Button mode="outlined" style={{ borderRadius: 12 }} onPress={back}>
+          {t("common:back")}
+        </Button>
       ) : null}
     </View>
   );
