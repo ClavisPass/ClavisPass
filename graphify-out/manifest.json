@@ -24,9 +24,9 @@
     "semantic_hash": ""
   },
   "android/app/build.gradle": {
-    "mtime": 1791925712.1269052,
-    "seen": 1791925739.2487812,
-    "ast_hash": "eb6faffa5a4ed503c39d70080d47a690",
+    "mtime": 1794250421.7089822,
+    "seen": 1794250960.1453707,
+    "ast_hash": "09086293046a1a2fddf786b5cee2d9ac",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/clavispass/app/dev/MainActivity.kt": {
@@ -66,9 +66,9 @@
     "semantic_hash": "10dd3bd4339547244795c1f22d47fb08"
   },
   "app.json": {
-    "mtime": 1791925712.125904,
-    "seen": 1791925739.2487812,
-    "ast_hash": "f5799e505d0803e799e618281de944e9",
+    "mtime": 1794250421.662261,
+    "seen": 1794250960.1453707,
+    "ast_hash": "bd03caa6d95e7cdc9ac3f2d40a7939e7",
     "semantic_hash": ""
   },
   "babel.config.js": {
@@ -348,9 +348,9 @@
     "semantic_hash": "a2706e6d0ad37eeac667c2f51124451c"
   },
   "package.json": {
-    "mtime": 1791985268.3816364,
-    "seen": 1791985331.6228845,
-    "ast_hash": "3477136ef297c4ef12ef3e66c78052bf",
+    "mtime": 1794250820.0673995,
+    "seen": 1794250960.1453707,
+    "ast_hash": "29d582c0fbc671e53a272cb4ad4d92b2",
     "semantic_hash": ""
   },
   "plugins/withAndroidApplicationId.js": {
@@ -420,9 +420,9 @@
     "semantic_hash": "885f4c11e934508a30eb4632f05fb3cd"
   },
   "src-tauri/Cargo.toml": {
-    "mtime": 1792170991.7620313,
-    "seen": 1792171115.6857293,
-    "ast_hash": "315a8d04e689123822eea6d3672e170a",
+    "mtime": 1794250421.6824226,
+    "seen": 1794250960.1453707,
+    "ast_hash": "ecb1674c166199101dd9c68cf434fe7f",
     "semantic_hash": ""
   },
   "src-tauri/build.rs": {
@@ -564,9 +564,9 @@
     "semantic_hash": "1e81aa389c93e45a2c7ebe55da44bbc2"
   },
   "src-tauri/tauri.conf.json": {
-    "mtime": 1791919577.220091,
-    "seen": 1791924673.4922147,
-    "ast_hash": "27d9f367b85a5eb649d580e249b4ddda",
+    "mtime": 1794250421.68091,
+    "seen": 1794250960.1453707,
+    "ast_hash": "763d16b73b4cbf6448b4206937f1f4f5",
     "semantic_hash": ""
   },
   "src/app/auth/ProtectedRoute.tsx": {
@@ -3180,9 +3180,9 @@
     "semantic_hash": "807abc3d57ccbace3e7141c8abd12374"
   },
   "version.json": {
-    "mtime": 1791925712.125904,
-    "seen": 1791925739.2487812,
-    "ast_hash": "871af9e26dd4d9122f109530ed3b64e0",
+    "mtime": 1794250399.8716335,
+    "seen": 1794250960.1575944,
+    "ast_hash": "2c11cef119d7d011e5e168891cd24c41",
     "semantic_hash": ""
   },
   "vitest.config.ts": {
