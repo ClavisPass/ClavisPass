@@ -515,6 +515,7 @@ const en: TranslationSchema = {
       "Passwords are currently being evaluated for quality and risk.",
 
     qualityTitle: "Password quality",
+    untitledEntry: "Untitled entry",
     qualityHint: "This shows how hard passwords are to guess.",
     riskTitle: "Security risks",
     riskHint: "This highlights entries that need attention.",

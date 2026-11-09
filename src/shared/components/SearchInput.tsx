@@ -17,6 +17,7 @@ type SearchInputProps = {
   height?: number;
   fontSize?: number;
   compact?: boolean;
+  autoFocus?: boolean;
   onBlur?: () => void;
   onSubmitEditing?: () => void;
   style?: StyleProp<ViewStyle>;
@@ -47,6 +48,7 @@ const SearchInput = forwardRef<any, SearchInputProps>(
       height = 40,
       fontSize = 14,
       compact = false,
+      autoFocus,
       onBlur,
       onSubmitEditing,
       style,
@@ -95,6 +97,7 @@ const SearchInput = forwardRef<any, SearchInputProps>(
         <View style={fieldStyle}>
           <NativeTextInput
             ref={inputRef}
+            autoFocus={autoFocus}
             placeholder={placeholder}
             placeholderTextColor={theme.colors.onSurfaceVariant}
             value={value}
@@ -142,6 +145,7 @@ const SearchInput = forwardRef<any, SearchInputProps>(
     return (
       <Searchbar
         ref={inputRef}
+        autoFocus={autoFocus}
         inputStyle={[
           {
             height,

@@ -5,6 +5,7 @@ import PasswordStrengthLevel from "./PasswordStrengthLevel";
 type CachedAnalysisItem = {
   ref: AnalysisRef;
   title: string;
+  secondaryTitle?: string;
   normalizedTitle: string;
   entropyBits: number;
   strength: PasswordStrengthLevel;

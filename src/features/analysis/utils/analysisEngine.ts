@@ -110,7 +110,7 @@ export async function buildAnalysisCache(
   }> = [];
 
   for (const value of values) {
-    const normalizedValueTitle = normalize(value.title);
+    const entryTitle = value.title.trim();
 
     for (const mod of value.modules) {
       const isPwd = mod.module === ModulesEnum.PASSWORD;
@@ -120,10 +120,12 @@ export async function buildAnalysisCache(
       const pwd = isPwd
         ? String((mod as any).value)
         : (mod as WifiModuleType).value;
-      const title = isPwd
-        ? value.title
-        : ((mod as WifiModuleType).wifiName ?? value.title);
-      const normalizedTitle = isPwd ? normalizedValueTitle : normalize(title);
+      const wifiName = isWifi ? (mod as WifiModuleType).wifiName?.trim() : "";
+      const title = entryTitle || wifiName || "";
+      const secondaryTitle = wifiName && wifiName !== title ? wifiName : undefined;
+      const normalizedTitle = normalize(
+        secondaryTitle ? `${title} ${secondaryTitle}` : title,
+      );
 
       const isShort = pwd.length < MIN_LENGTH;
       const hasSeq = findSequentialTriples(pwd).length > 0;
@@ -154,6 +156,7 @@ export async function buildAnalysisCache(
             type: isPwd ? ModulesEnum.PASSWORD : ModulesEnum.WIFI,
           },
           title,
+          secondaryTitle,
           normalizedTitle,
           entropyBits,
           strength,

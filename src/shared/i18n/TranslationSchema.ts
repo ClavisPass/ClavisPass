@@ -463,6 +463,7 @@ export type TranslationSchema = {
     loadingHint: string;
 
     qualityTitle: string;
+    untitledEntry: string;
     qualityHint: string;
     riskTitle: string;
     riskHint: string;

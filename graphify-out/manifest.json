@@ -714,10 +714,10 @@
     "semantic_hash": "af0d2274b90d41dab10114c1bce15864"
   },
   "src/features/analysis/components/Filter.tsx": {
-    "mtime": 1791045687.6257207,
-    "seen": 1791564566.803268,
-    "ast_hash": "50e31ff4345adfd7f3ce7feccf88007b",
-    "semantic_hash": "50e31ff4345adfd7f3ce7feccf88007b"
+    "mtime": 1794248255.0916715,
+    "seen": 1794248285.957477,
+    "ast_hash": "e9dd9e231ac90e2d603bf78d2c32f5c4",
+    "semantic_hash": ""
   },
   "src/features/analysis/components/Pattern.tsx": {
     "mtime": 1790874071.1966324,
@@ -750,10 +750,10 @@
     "semantic_hash": "37367e197c7259c915a2e74a58ef6a5b"
   },
   "src/features/analysis/model/CachedAnalysisItem.ts": {
-    "mtime": 1765820342.756705,
-    "seen": 1791564566.803268,
-    "ast_hash": "24cc0532ae5946e597c447fd21e517d8",
-    "semantic_hash": "24cc0532ae5946e597c447fd21e517d8"
+    "mtime": 1794230147.7361417,
+    "seen": 1794230260.8537939,
+    "ast_hash": "b15218c21482cb92158c348abd66ecae",
+    "semantic_hash": ""
   },
   "src/features/analysis/model/PasswordStrengthLevel.ts": {
     "mtime": 1765820256.2201726,
@@ -768,10 +768,10 @@
     "semantic_hash": "6e0b31981cec7a6dabb53778aaa67f0b"
   },
   "src/features/analysis/utils/analysisEngine.ts": {
-    "mtime": 1774884316.9793766,
-    "seen": 1791564566.803268,
-    "ast_hash": "93821ea4a9f8cebf94c4ae414cd4b705",
-    "semantic_hash": "93821ea4a9f8cebf94c4ae414cd4b705"
+    "mtime": 1794230147.7427347,
+    "seen": 1794230260.8537939,
+    "ast_hash": "c7213d7745161f2dca35058950da899c",
+    "semantic_hash": ""
   },
   "src/features/analysis/utils/getPasswordStrengthColor.ts": {
     "mtime": 1774901732.6320684,
@@ -2442,9 +2442,9 @@
     "semantic_hash": ""
   },
   "src/screens/AnalysisScreen.tsx": {
-    "mtime": 1791917962.2909544,
-    "seen": 1791918002.2843487,
-    "ast_hash": "ae030a38846985894424484309d6d34d",
+    "mtime": 1794248255.0916715,
+    "seen": 1794248285.957477,
+    "ast_hash": "521370a702b932065af8eade6e08eb04",
     "semantic_hash": ""
   },
   "src/screens/AttachmentPreviewScreen.native.tsx": {
@@ -2562,9 +2562,9 @@
     "semantic_hash": ""
   },
   "src/screens/SettingsScreen.tsx": {
-    "mtime": 1794217046.3128605,
-    "seen": 1794217528.7462025,
-    "ast_hash": "96391464d84c64534e4ba77a185f63c0",
+    "mtime": 1794224102.6959708,
+    "seen": 1794224128.5436764,
+    "ast_hash": "11f8ac9cf176684dd14e049a1e424bdd",
     "semantic_hash": ""
   },
   "src/screens/TotpScanScreen.tsx": {
@@ -2688,9 +2688,9 @@
     "semantic_hash": ""
   },
   "src/shared/components/SearchInput.tsx": {
-    "mtime": 1791568620.0268636,
-    "seen": 1791568671.7260613,
-    "ast_hash": "01e52a46094b953ea83f3246f7b1c3d6",
+    "mtime": 1794224102.6827435,
+    "seen": 1794224128.5436764,
+    "ast_hash": "76963079498efe3c8a77049587ef9dad",
     "semantic_hash": ""
   },
   "src/shared/components/StartupScreen.tsx": {
@@ -2928,9 +2928,9 @@
     "semantic_hash": "f8ba37e05d95b36f88857664ece74d7d"
   },
   "src/shared/i18n/TranslationSchema.ts": {
-    "mtime": 1794223066.5785737,
-    "seen": 1794223151.3609974,
-    "ast_hash": "0a5062434553b967e1e1fbded75167de",
+    "mtime": 1794230147.74984,
+    "seen": 1794230260.8537939,
+    "ast_hash": "6efae8db663e225a4eccf09b1fc01b08",
     "semantic_hash": ""
   },
   "src/shared/i18n/index.ts": {
@@ -2940,15 +2940,15 @@
     "semantic_hash": "3693d0d683a802ea042ec3f67e634914"
   },
   "src/shared/i18n/languages/de.ts": {
-    "mtime": 1794223066.5800898,
-    "seen": 1794223151.3609974,
-    "ast_hash": "efe87b6a1eef07a4233735212f1d1b33",
+    "mtime": 1794230147.7514117,
+    "seen": 1794230260.8537939,
+    "ast_hash": "3a7a1e5b45cca5beed6eae2791cac0bc",
     "semantic_hash": ""
   },
   "src/shared/i18n/languages/en.ts": {
-    "mtime": 1794223066.5800898,
-    "seen": 1794223151.3609974,
-    "ast_hash": "39fddf3b800f682844c62b9aec92c298",
+    "mtime": 1794230147.7526762,
+    "seen": 1794230260.8537939,
+    "ast_hash": "ab6b45c0579a156160a3d1610bbdbeb7",
     "semantic_hash": ""
   },
   "src/shared/i18n/types.ts": {

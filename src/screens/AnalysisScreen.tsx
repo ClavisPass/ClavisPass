@@ -18,6 +18,8 @@ import {
 import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import MaskedView from "@react-native-masked-view/masked-view";
+import { LinearGradient } from "expo-linear-gradient";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import {
   ActivityIndicator,
@@ -54,6 +56,7 @@ import {
 import getPasswordStrengthColor from "../features/analysis/utils/getPasswordStrengthColor";
 import getPasswordStrengthIcon from "../features/analysis/utils/getPasswordStrengthIcon";
 import PasswordStrengthLevel from "../features/analysis/model/PasswordStrengthLevel";
+import type CachedAnalysisItem from "../features/analysis/model/CachedAnalysisItem";
 import ModulesEnum from "../features/vault/model/ModulesEnum";
 import WifiModuleType from "../features/vault/model/modules/WifiModuleType";
 import { HomeStackParamList } from "../app/navigation/model/types";
@@ -199,9 +202,14 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
   const [riskBucket, setRiskBucket] = useState<RiskBucket>("itemsToFix");
   const [searchQuery, setSearchQuery] = useState("");
   const [appliedQuery, setAppliedQuery] = useState("");
+  const [filterHeight, setFilterHeight] = useState(32);
 
   const deferredAppliedQuery = useDeferredValue(appliedQuery.trim());
   const scrollRef = React.useRef<ScrollView>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }, [activeTab, qualityBucket, riskBucket, deferredAppliedQuery]);
 
   useScrollToTop(
     React.useRef({
@@ -427,7 +435,44 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
     return `${theme.colors.success}16`;
   };
 
-  const renderQualityItem = (item: any, index: number) => {
+  const renderEntryTitle = (item: CachedAnalysisItem, index: number) => (
+    <View
+      style={{
+        flex: isWide ? 1 : undefined,
+        alignSelf: isWide ? undefined : "stretch",
+        minWidth: 0,
+        flexDirection: "row",
+        gap: 6,
+      }}
+    >
+      <Text
+        variant="titleSmall"
+        style={{ color: theme.colors.primary, userSelect: "none" }}
+      >
+        {index + 1}.
+      </Text>
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <Text
+          variant="titleSmall"
+          style={{ userSelect: "none" }}
+          numberOfLines={1}
+        >
+          {item.title || t("analysis:untitledEntry")}
+        </Text>
+        {item.secondaryTitle ? (
+          <Text
+            variant="bodySmall"
+            style={{ color: theme.colors.onSurfaceVariant }}
+            numberOfLines={1}
+          >
+            {item.secondaryTitle}
+          </Text>
+        ) : null}
+      </View>
+    </View>
+  );
+
+  const renderQualityItem = (item: CachedAnalysisItem, index: number) => {
     const strength = item.strength as PasswordStrengthLevel;
     const strengthColor = getPasswordStrengthColor(strength, theme.colors);
     const strengthIcon = getPasswordStrengthIcon(strength);
@@ -457,28 +502,14 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                 paddingHorizontal: 8,
               }}
             >
-              <View
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 6,
-                }}
-              >
-                <Text style={{ color: theme.colors.primary, userSelect: "none" }}>
-                  {index + 1}.
-                </Text>
-                <Text style={{ userSelect: "none", flex: 1 }} numberOfLines={1}>
-                  {item.title}
-                </Text>
-              </View>
+              {renderEntryTitle(item, index)}
 
               <View
                 style={{
                   flexDirection: "row",
                   flexWrap: "wrap",
                   gap: 6,
+                  maxWidth: isWide ? "60%" : "100%",
                   justifyContent: "flex-end",
                 }}
               >
@@ -535,7 +566,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
     );
   };
 
-  const renderRiskItem = (item: any, index: number) => {
+  const renderRiskItem = (item: CachedAnalysisItem, index: number) => {
     const risk = getItemRisk(item);
     const severity = severityForRiskScore(risk.weight);
     const pct = riskProgress(risk.weight);
@@ -565,28 +596,14 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
                 paddingHorizontal: 8,
               }}
             >
-              <View
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 6,
-                }}
-              >
-                <Text style={{ color: theme.colors.primary, userSelect: "none" }}>
-                  {index + 1}.
-                </Text>
-                <Text style={{ userSelect: "none", flex: 1 }} numberOfLines={1}>
-                  {item.title}
-                </Text>
-              </View>
+              {renderEntryTitle(item, index)}
 
               <View
                 style={{
                   flexDirection: "row",
                   flexWrap: "wrap",
                   gap: 6,
+                  maxWidth: isWide ? "60%" : "100%",
                   justifyContent: "flex-end",
                 }}
               >
@@ -672,43 +689,37 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
     );
   };
 
-  const SectionCard = ({
-    filters,
-    bucket,
-    setBucket,
-    data,
-    emptyLabel,
-    renderItem,
-  }: {
-    filters: FilterItem[];
-    bucket: string;
-    setBucket: (value: string) => void;
-    data: any[];
-    emptyLabel: string;
-    renderItem: (item: any, index: number) => React.ReactNode;
-  }) => (
-    <View style={{ gap: 10, paddingBottom: GAP }}>
-      <FiltersNarrow
-        filterItems={filters}
-        bucket={bucket}
-        setBucket={setBucket}
-      />
-
-      <View style={{ gap: 4 }}>
-        {data.length > 0 ? (
-          data.map((item, index) => renderItem(item, index))
-        ) : (
-          <View
-            style={{
-              paddingVertical: 14,
-              paddingHorizontal: 6,
-            }}
-          >
-            <Text style={{ opacity: 0.7, userSelect: "none" }}>{emptyLabel}</Text>
-          </View>
-        )}
-      </View>
-    </View>
+  const isQualityTab = activeTab === "quality";
+  const visibleEntries = isQualityTab ? qualityValues : riskValues;
+  const listTopInset = filterHeight + GAP;
+  const fadeStart = Math.max(0, filterHeight - 12);
+  const webFade = `linear-gradient(to bottom, transparent ${fadeStart}px, black ${listTopInset}px, black 100%)`;
+  const entryList = (
+    <ScrollView
+      ref={scrollRef}
+      style={styles.listArea}
+      scrollIndicatorInsets={{ top: listTopInset }}
+      contentContainerStyle={{
+        paddingTop: listTopInset,
+        paddingRight: SCROLLBAR_CONTENT_GAP,
+        paddingBottom: GAP,
+        gap: 4,
+      }}
+    >
+      {visibleEntries.length ? (
+        visibleEntries.map(isQualityTab ? renderQualityItem : renderRiskItem)
+      ) : (
+        <View style={{ paddingVertical: 14, paddingHorizontal: 6 }}>
+          <Text style={{ opacity: 0.7, userSelect: "none" }}>
+            {t(
+              isQualityTab
+                ? "analysis:noQualityMatches"
+                : "analysis:noRiskMatches",
+            )}
+          </Text>
+        </View>
+      )}
+    </ScrollView>
   );
 
   const LoadingCard = () => (
@@ -773,84 +784,133 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({ navigation }) => {
         }}
       />
 
-      <ScrollView
-        ref={scrollRef}
-        style={{ width: "100%", ...screenContentStyle }}
-        contentContainerStyle={{
-          paddingRight: SCROLLBAR_CONTENT_GAP,
-          paddingBottom: 8,
-          gap: GAP,
-          alignSelf: "center",
-          width: "100%",
-          maxWidth: 1100,
-        }}
-      >
-        {isLoading ? (
-          <LoadingCard />
-        ) : (
-          <>
-            <View style={{ flexDirection: "row", gap: 8, marginTop: 2, marginBottom: 2 }}>
-              {tabItems.map((tab) => (
-                <AnimatedPressable
-                  key={tab.key}
-                  onPress={() => setActiveTab(tab.key)}
-                  borderless={false}
-                  hoverBackgroundColor={
-                    activeTab === tab.key ? null : undefined
-                  }
-                  style={[
-                    pillCardStyle(activeTab === tab.key) as any,
-                    {
-                      flex: 1,
-                      minWidth: 0,
-                      overflow: "hidden",
-                    },
-                  ]}
-                >
-                  <View
-                    style={{
-                      paddingVertical: 4,
-                      paddingHorizontal: 10,
-                      gap: 0,
-                      minHeight: 40,
-                      justifyContent: "center",
-                    }}
+      <View style={[screenContentStyle, { flex: 1, minHeight: 0, width: "100%" }]}>
+        <View style={styles.panelContent}>
+          {isLoading ? (
+            <LoadingCard />
+          ) : (
+            <>
+              <View style={styles.tabs}>
+                {tabItems.map((tab) => (
+                  <AnimatedPressable
+                    key={tab.key}
+                    onPress={() => setActiveTab(tab.key)}
+                    borderless={false}
+                    hoverBackgroundColor={
+                      activeTab === tab.key ? null : undefined
+                    }
+                    style={[
+                      pillCardStyle(activeTab === tab.key) as any,
+                      {
+                        flex: 1,
+                        minWidth: 0,
+                        overflow: "hidden",
+                      },
+                    ]}
                   >
-                    <Text style={{ fontWeight: "800", userSelect: "none" }}>
-                      {tab.title}
-                    </Text>
-                    <Text style={{ opacity: 0.72, userSelect: "none" }}>
-                      {tab.count}
-                    </Text>
-                  </View>
-                </AnimatedPressable>
-              ))}
-            </View>
+                    <View
+                      style={{
+                        paddingVertical: 4,
+                        paddingHorizontal: 10,
+                        gap: 0,
+                        minHeight: 40,
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text style={{ fontWeight: "800", userSelect: "none" }}>
+                        {tab.title}
+                      </Text>
+                      <Text style={{ opacity: 0.72, userSelect: "none" }}>
+                        {tab.count}
+                      </Text>
+                    </View>
+                  </AnimatedPressable>
+                ))}
+              </View>
 
-            {activeTab === "quality" ? (
-              <SectionCard
-                filters={qualityFilters}
-                bucket={qualityBucket}
-                setBucket={(value) => setQualityBucket(value as QualityBucket)}
-                data={qualityValues}
-                emptyLabel={t("analysis:noQualityMatches")}
-                renderItem={renderQualityItem}
-              />
-            ) : (
-              <SectionCard
-                filters={riskFilters}
-                bucket={riskBucket}
-                setBucket={(value) => setRiskBucket(value as RiskBucket)}
-                data={riskValues}
-                emptyLabel={t("analysis:noRiskMatches")}
-                renderItem={renderRiskItem}
-              />
-            )}
-          </>
-        )}
-      </ScrollView>
+              <View style={styles.listArea}>
+                {Platform.OS === "web" ? (
+                  <View
+                    style={[
+                      styles.listArea,
+                      { maskImage: webFade, WebkitMaskImage: webFade } as ViewStyle,
+                    ]}
+                  >
+                    {entryList}
+                  </View>
+                ) : (
+                  <MaskedView
+                    style={styles.listArea}
+                    maskElement={
+                      <View style={styles.listArea}>
+                        <LinearGradient
+                          colors={["transparent", "transparent", "black"]}
+                          locations={[0, fadeStart / listTopInset, 1]}
+                          style={{ height: listTopInset }}
+                        />
+                        <View style={styles.opaqueMask} />
+                      </View>
+                    }
+                  >
+                    {entryList}
+                  </MaskedView>
+                )}
+                <View
+                  pointerEvents="box-none"
+                  style={styles.filterOverlay}
+                  onLayout={(event) => setFilterHeight(event.nativeEvent.layout.height)}
+                >
+                  <FiltersNarrow
+                    key={activeTab}
+                    filterItems={isQualityTab ? qualityFilters : riskFilters}
+                    bucket={isQualityTab ? qualityBucket : riskBucket}
+                    setBucket={(value) => {
+                      if (isQualityTab) setQualityBucket(value as QualityBucket);
+                      else setRiskBucket(value as RiskBucket);
+                    }}
+                  />
+                </View>
+              </View>
+            </>
+          )}
+        </View>
+      </View>
     </AnimatedContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  panelContent: {
+    flex: 1,
+    minHeight: 0,
+    width: "100%",
+    maxWidth: 1100,
+    alignSelf: "center",
+    gap: GAP,
+  },
+  tabs: {
+    flexDirection: "row",
+    gap: GAP,
+    marginTop: 2,
+    marginRight: SCROLLBAR_CONTENT_GAP,
+    marginBottom: 2,
+  },
+  listArea: {
+    flex: 1,
+    minHeight: 0,
+    width: "100%",
+  },
+  opaqueMask: {
+    flex: 1,
+    backgroundColor: "black",
+  },
+  filterOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: SCROLLBAR_CONTENT_GAP,
+    zIndex: 1,
+  },
+});
 
 export default AnalysisScreen;

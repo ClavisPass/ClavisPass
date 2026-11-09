@@ -522,6 +522,7 @@ const de: TranslationSchema = {
     loadingHint: "Passwörter werden gerade bewertet und auf Risiken geprüft.",
 
     qualityTitle: "Passwortqualität",
+    untitledEntry: "Eintrag ohne Titel",
     qualityHint: "Hier siehst du, wie schwer Passwörter zu erraten sind.",
     riskTitle: "Sicherheitsrisiken",
     riskHint: "Hier stehen Einträge mit konkretem Handlungsbedarf.",

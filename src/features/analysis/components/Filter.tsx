@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { View, FlatList, StyleSheet, Platform } from "react-native";
+import { View, FlatList, Platform, StyleSheet } from "react-native";
 import { Divider } from "react-native-paper";
 import { MenuItem } from "../../../shared/components/menus/MenuItem";
 import AppChip from "../../../shared/components/chips/AppChip";
@@ -31,6 +31,19 @@ type FiltersNarrowProps = {
   setBucket: (b: string) => void;
 };
 
+const webFilterWheelProps =
+  Platform.OS === "web"
+    ? {
+        onWheel: (event: React.WheelEvent<HTMLElement>) => {
+          const { currentTarget, deltaX, deltaY, deltaMode, shiftKey } = event;
+          if (shiftKey || Math.abs(deltaX) >= Math.abs(deltaY)) return;
+          const unit =
+            deltaMode === 1 ? 16 : deltaMode === 2 ? currentTarget.clientWidth : 1;
+          currentTarget.scrollLeft += deltaY * unit;
+        },
+      }
+    : {};
+
 export const FiltersNarrow = memo(function FiltersNarrow({
   filterItems,
   bucket,
@@ -43,10 +56,11 @@ export const FiltersNarrow = memo(function FiltersNarrow({
       }}
     >
       <FlatList
+        {...webFilterWheelProps}
         data={filterItems}
         horizontal
         keyExtractor={(it) => it.key}
-        showsHorizontalScrollIndicator={Platform.OS === "web"}
+        showsHorizontalScrollIndicator={false}
         style={styles.filterList}
         contentContainerStyle={styles.filterListContent}
         ItemSeparatorComponent={() => <View style={styles.filterSeparator} />}

@@ -1116,9 +1116,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     }
 
     setSearchHeaderVisible(true);
-    requestAnimationFrame(() => {
-      searchRef.current?.focus?.();
-    });
+    if (Platform.OS === "web") {
+      requestAnimationFrame(() => {
+        searchRef.current?.focus?.();
+      });
+    }
   }, []);
 
   const handleCompactSearchBlur = useCallback(() => {
@@ -1266,6 +1268,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 resetLabel={t("common:reset")}
                 height={32}
                 fontSize={16}
+                autoFocus={Platform.OS !== "web" && searchQuery.trim() === ""}
                 compact
               />
             </View>
