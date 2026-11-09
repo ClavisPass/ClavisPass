@@ -15,14 +15,14 @@ import {
 } from "react-native";
 import Animated, { Easing, FadeIn, FadeOut } from "react-native-reanimated";
 import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
+import AppHeaderBrand from "../shared/components/AppHeaderBrand";
 import Constants from "expo-constants";
 
-import { Icon, Text } from "react-native-paper";
+import { ActivityIndicator, Icon, Text } from "react-native-paper";
 import { Button } from "react-native-paper";
 
 import Login from "../features/auth/components/Login";
 import Backup from "../features/sync/components/Backup";
-import AnimatedLogo from "../shared/ui/AnimatedLogo";
 
 import UserInfoType from "../features/sync/model/UserInfoType";
 
@@ -67,6 +67,10 @@ const webDragRegionProps =
   Platform.OS === "web"
     ? ({ dataSet: { tauriDragRegion: "" } } as any)
     : null;
+const webDragStyle =
+  Platform.OS === "web"
+    ? ({ WebkitAppRegion: "drag", appRegion: "drag", cursor: "default" } as const)
+    : undefined;
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { isOnline } = useOnline();
@@ -304,26 +308,23 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         <View
           style={{
             ...glassChromeStyle,
-            minHeight: 37 + Constants.statusBarHeight,
+            minHeight: isWideLoginLayout ? undefined : 37 + Constants.statusBarHeight,
             width: "100%",
             display: "flex",
             flexDirection: "column",
             marginBottom: 0,
+            paddingHorizontal: isWideLoginLayout ? 12 : 8,
             paddingTop: Constants.statusBarHeight + 4,
-            paddingBottom: 3,
-            borderRadius: 12,
-            borderTopLeftRadius: 0,
-            borderTopRightRadius: 0,
-            borderBottomLeftRadius: 12,
-            borderBottomRightRadius: 12,
+            paddingBottom: isWideLoginLayout ? 2 : 3,
+            borderBottomWidth: StyleSheet.hairlineWidth,
             justifyContent: "center",
           }}
         >
           <View
-            {...webDragRegionProps}
             style={{
               minHeight: 34,
               width: "100%",
+              flexDirection: "row",
               paddingLeft:
                 Platform.OS === "web" && TITLEBAR_HEIGHT > 0 && controlsLeft
                   ? TITLEBAR_CONTROLS_WIDTH
@@ -332,9 +333,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 Platform.OS === "web" && TITLEBAR_HEIGHT > 0 && !controlsLeft
                   ? 104
                   : 0,
-              cursor: Platform.OS === "web" ? "default" : undefined,
-            } as any}
-          />
+            }}
+          >
+            <View
+              {...webDragRegionProps}
+              style={{ flex: 1, minWidth: 0, justifyContent: "center", ...webDragStyle }}
+            >
+              <AppHeaderBrand compact={!isWideLoginLayout} />
+            </View>
+          </View>
         </View>
         <View
           id="clavispass-login-page"
@@ -380,7 +387,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               {!isOnline ? (
                 <Backup />
               ) : isInitializing || loadingUserInfo ? (
-                <AnimatedLogo />
+                <ActivityIndicator size="large" />
               ) : !onboardingDone ? (
                 <FirstOpened navigation={navigation} />
               ) : (

@@ -61,7 +61,7 @@ import {
   getScreenContentStyle,
 } from "../shared/ui/glass";
 
-import Logo from "../shared/ui/Logo";
+import AppHeaderBrand from "../shared/components/AppHeaderBrand";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import FolderType from "../features/vault/model/FolderType";
 import ValuesType from "../features/vault/model/ValuesType";
@@ -1888,34 +1888,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
                       display: "flex",
                       flexDirection: "row",
                       alignItems: "center",
-                      gap: homeSpacing.sm,
                       flex: 1,
                       minWidth: 0,
                       position: "relative",
                       zIndex: 5,
-                      paddingLeft: isCompactHeader ? homeSpacing.sm : 0,
                     },
                     isFocused && !searchHeaderVisible ? webDragStyle : null,
                   ]}
                 >
-                  <Logo
-                    width={isCompactHeader ? 18 : 20}
-                    height={isCompactHeader ? 18 : 20}
-                  />
-                  <Text
-                    style={{
-                      fontFamily: "LexendExa_400Regular",
-                      fontSize: isCompactHeader ? 15 : 16,
-                      lineHeight: 16,
-                      color: theme.colors.onSurfaceVariant,
-                      userSelect: "none",
-                      includeFontPadding: false,
-                      paddingRight: homeSpacing.sm,
-                    }}
-                    numberOfLines={1}
-                  >
-                    ClavisPass
-                  </Text>
+                  <AppHeaderBrand compact={isCompactHeader} />
                 </Animated.View>
               )}
               {!isCompactHeader ? (

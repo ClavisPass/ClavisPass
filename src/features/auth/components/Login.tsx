@@ -31,7 +31,6 @@ import UserInfoType from "../../sync/model/UserInfoType";
 import Button from "../../../shared/components/buttons/Button";
 import TypeWriterComponent from "../../../shared/components/TypeWriter";
 import PasswordTextbox from "../../../shared/components/PasswordTextbox";
-import Logo from "../../../shared/ui/Logo";
 
 import getEmptyData from "../../vault/utils/getEmptyData";
 import { logger } from "../../../infrastructure/logging/logger";
@@ -553,53 +552,6 @@ function Login(props: Props) {
     );
   };
 
-  const brandingContent = (
-    <Animated.View
-      layout={contentTransition}
-      entering={FadeIn.duration(360).easing(transitionEasing)}
-      style={{
-        width: "100%",
-        maxWidth: isWideLayout ? 320 : 360,
-        gap: 10,
-        alignItems: "center",
-      }}
-    >
-      <Logo width={isWideLayout ? 76 : 44} height={isWideLayout ? 76 : 44} />
-      <Text
-        style={{
-          width: "100%",
-          textAlign: "center",
-          fontFamily: "LexendExa_400Regular",
-          fontSize: isWideLayout ? 18 : 15,
-          lineHeight: isWideLayout ? 24 : 21,
-          includeFontPadding: false,
-          paddingHorizontal: 6,
-        }}
-      >
-        ClavisPass
-      </Text>
-      {isWideLayout ? (
-        <Animated.View
-          key={`intro-${showNewData ? "create" : "unlock"}`}
-          entering={FadeIn.duration(280).easing(transitionEasing)}
-          exiting={FadeOut.duration(180).easing(transitionEasing)}
-          layout={contentTransition}
-        >
-          <Text
-            style={{
-              opacity: 0.72,
-              textAlign: "center",
-            }}
-          >
-            {showNewData
-              ? t("login:introCreateVault")
-              : t("login:introUnlockVault")}
-          </Text>
-        </Animated.View>
-      ) : null}
-    </Animated.View>
-  );
-
   if (isWideLayout) {
     return (
       <View
@@ -624,7 +576,21 @@ function Login(props: Props) {
             alignSelf: "stretch",
           }}
         >
-          {brandingContent}
+          <Animated.View
+            key={showNewData ? "intro-create" : "intro-unlock"}
+            entering={FadeIn.duration(280).easing(transitionEasing)}
+            exiting={FadeOut.duration(180).easing(transitionEasing)}
+            layout={contentTransition}
+            style={{ maxWidth: 320 }}
+          >
+            <Text
+              style={{ textAlign: "center", color: theme.colors.onSurfaceVariant }}
+            >
+              {showNewData
+                ? t("login:introCreateVault")
+                : t("login:introUnlockVault")}
+            </Text>
+          </Animated.View>
         </Animated.View>
 
         <View
@@ -680,18 +646,6 @@ function Login(props: Props) {
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
-      <Animated.View
-        entering={FadeInDown.delay(50).duration(340).easing(transitionEasing)}
-        style={{
-          width: "100%",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: 8,
-        }}
-      >
-        {brandingContent}
-      </Animated.View>
-
       <Animated.View
         entering={FadeInDown.delay(110)
           .duration(360)

@@ -21,7 +21,6 @@ import ClavisPassHubLoginButton from "../../sync/components/ClavisPassHubLoginBu
 import DropboxLoginButton from "../../sync/components/DropboxLoginButton";
 import GoogleDriveLoginButton from "../../sync/components/GoogleDriveLoginButton";
 import LocalFileLoginButton from "../../sync/components/LocalFileLoginButton";
-import Logo from "../../../shared/ui/Logo";
 
 type Props = {
   onFinish?: () => void;
@@ -172,41 +171,17 @@ const FirstOpened: React.FC<Props> = ({ onFinish }) => {
   const next = () => setStep(1);
   const back = () => setStep(0);
 
-  const brandingContent = (
-    <View
+  const introContent = (
+    <Text
       style={{
         width: "100%",
         maxWidth: isWideLayout ? 320 : 360,
-        gap: 10,
-        alignItems: "center",
+        textAlign: "center",
+        color: theme.colors.onSurfaceVariant,
       }}
     >
-      <Logo width={isWideLayout ? 76 : 44} height={isWideLayout ? 76 : 44} />
-      <Text
-        style={{
-          width: "100%",
-          textAlign: "center",
-          fontFamily: "LexendExa_400Regular",
-          fontSize: isWideLayout ? 18 : 15,
-          lineHeight: isWideLayout ? 24 : 21,
-          includeFontPadding: false,
-          paddingHorizontal: 6,
-        }}
-      >
-        ClavisPass
-      </Text>
-      <Text
-        style={{
-          opacity: 0.72,
-          textAlign: "center",
-          color: theme.colors.onSurfaceVariant,
-        }}
-      >
-        {step === 0
-          ? t("login:introFirstRun")
-          : t("login:cloudSaveSubtitle")}
-      </Text>
-    </View>
+      {step === 0 ? t("login:introFirstRun") : t("login:cloudSaveSubtitle")}
+    </Text>
   );
 
   const stageContent = (
@@ -235,7 +210,7 @@ const FirstOpened: React.FC<Props> = ({ onFinish }) => {
             alignSelf: "stretch",
           }}
         >
-          {brandingContent}
+          {introContent}
         </View>
 
         <View
@@ -295,7 +270,7 @@ const FirstOpened: React.FC<Props> = ({ onFinish }) => {
         }}
         keyboardShouldPersistTaps="handled"
       >
-        {brandingContent}
+        {introContent}
         {stageContent}
       </ScrollView>
 

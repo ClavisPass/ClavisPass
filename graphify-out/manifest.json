@@ -804,9 +804,9 @@
     "semantic_hash": "b18c005154696b758d73359a31d7bcfd"
   },
   "src/features/auth/components/Login.tsx": {
-    "mtime": 1792952653.5774138,
-    "seen": 1792952660.5288923,
-    "ast_hash": "51752672d87df116dc17ee3194c2f7e4",
+    "mtime": 1794215159.366741,
+    "seen": 1794215183.9668567,
+    "ast_hash": "41a9a4dee7381750a08f8dd5f4d17e36",
     "semantic_hash": ""
   },
   "src/features/auth/model/ScreenLockLogoutController.ts": {
@@ -930,9 +930,9 @@
     "semantic_hash": "095dacbf3b2dc1d9a9b1f428a76eeacb"
   },
   "src/features/onboarding/components/FirstOpened.tsx": {
-    "mtime": 1791803102.206752,
-    "seen": 1791803171.4381115,
-    "ast_hash": "67c9dcff337cb7924b2c6fe459611aae",
+    "mtime": 1794215159.366741,
+    "seen": 1794215183.9668567,
+    "ast_hash": "1a14a018202e3dff3ee796b079571448",
     "semantic_hash": ""
   },
   "src/features/settings/components/AppearanceSettingsSection.tsx": {
@@ -2502,9 +2502,9 @@
     "semantic_hash": ""
   },
   "src/screens/HomeScreen.tsx": {
-    "mtime": 1791978751.2477443,
-    "seen": 1791978880.779225,
-    "ast_hash": "f09f515af586c6eef2f9d3c901779962",
+    "mtime": 1794214948.543,
+    "seen": 1794214977.7920694,
+    "ast_hash": "f9b049765dc68738faee83f408ce409d",
     "semantic_hash": ""
   },
   "src/screens/IdentitiesScreen.tsx": {
@@ -2520,9 +2520,9 @@
     "semantic_hash": ""
   },
   "src/screens/LoginScreen.tsx": {
-    "mtime": 1792952616.3733358,
-    "seen": 1792952660.529891,
-    "ast_hash": "cddbb58aca47448168e82c1728f8b58b",
+    "mtime": 1794215159.3677466,
+    "seen": 1794215183.9678571,
+    "ast_hash": "5ae824e38c6d0b79937d632160043b37",
     "semantic_hash": ""
   },
   "src/screens/LogoutScreen.render.test.tsx": {
@@ -3909,6 +3909,12 @@
     "mtime": 1794180802.886869,
     "seen": 1794180831.2623992,
     "ast_hash": "1d7fead5d6355baec2e0eb3b97665916",
+    "semantic_hash": ""
+  },
+  "src/shared/components/AppHeaderBrand.tsx": {
+    "mtime": 1794214948.1329198,
+    "seen": 1794214977.7920694,
+    "ast_hash": "bd78da689e7071ac34e0f2f10421cd51",
     "semantic_hash": ""
   }
 }
