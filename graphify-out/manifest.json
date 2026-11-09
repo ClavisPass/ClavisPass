@@ -804,8 +804,8 @@
     "semantic_hash": "b18c005154696b758d73359a31d7bcfd"
   },
   "src/features/auth/components/Login.tsx": {
-    "mtime": 1794223094.2433665,
-    "seen": 1794223151.3604798,
+    "mtime": 1794249885.37717,
+    "seen": 1794249893.7993824,
     "ast_hash": "5edae184415675ed7f43e2e01019d197",
     "semantic_hash": ""
   },
@@ -1128,9 +1128,9 @@
     "semantic_hash": "6176ce80ecb9b26899c78b234c1157f3"
   },
   "src/features/sync/components/Backup.tsx": {
-    "mtime": 1794220713.3096154,
-    "seen": 1794220817.632496,
-    "ast_hash": "f66aa63588db0fe8eba9a1de42282433",
+    "mtime": 1794249885.5150518,
+    "seen": 1794249893.7993824,
+    "ast_hash": "267b744e40b992fa59b9ff0782689302",
     "semantic_hash": ""
   },
   "src/features/sync/components/ClavisPassHubLoginButton.tsx": {
@@ -2520,9 +2520,9 @@
     "semantic_hash": ""
   },
   "src/screens/LoginScreen.tsx": {
-    "mtime": 1794222752.6326292,
-    "seen": 1794222787.469137,
-    "ast_hash": "962339dd0b70412d61fabf9526003c08",
+    "mtime": 1794249906.6048882,
+    "seen": 1794249964.1633406,
+    "ast_hash": "fc042a2317c05f976595252f701746cb",
     "semantic_hash": ""
   },
   "src/screens/LogoutScreen.render.test.tsx": {
@@ -2970,10 +2970,10 @@
     "semantic_hash": "479553b81485da669ef16e3eb8f83d51"
   },
   "src/shared/ui/AnimatedLogo.tsx": {
-    "mtime": 1759753845.6675558,
-    "seen": 1791564566.803268,
-    "ast_hash": "e304deeb9144c384513a54fdd2be52e3",
-    "semantic_hash": "e304deeb9144c384513a54fdd2be52e3"
+    "mtime": 1794249747.7452333,
+    "seen": 1794249893.8003886,
+    "ast_hash": "5a44b46f78b076abf9581ac05fff35d4",
+    "semantic_hash": ""
   },
   "src/shared/ui/Blob1.tsx": {
     "mtime": 1751204005.3347886,

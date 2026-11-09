@@ -20,10 +20,11 @@ import FocusAwareStatusBar from "../shared/components/FocusAwareStatusBar";
 import AppHeaderBrand from "../shared/components/AppHeaderBrand";
 import Constants from "expo-constants";
 
-import { ActivityIndicator, Button, Icon, Text } from "react-native-paper";
+import { Button, Icon, Text } from "react-native-paper";
 
 import Login from "../features/auth/components/Login";
 import AnimatedLoginVisual from "../features/auth/components/AnimatedLoginVisual";
+import AnimatedLogo from "../shared/ui/AnimatedLogo";
 import Backup from "../features/sync/components/Backup";
 
 import UserInfoType from "../features/sync/model/UserInfoType";
@@ -180,6 +181,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     if (isInitializing || loadingUserInfo) return "loading";
     return "online";
   }, [showOfflineBackup, isInitializing, loadingUserInfo]);
+  const showStartupLogo = currentKey === "loading";
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -353,7 +355,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           id="clavispass-login-page"
           style={[screenContentStyle, styles.page, showSplitLayout && styles.splitPage]}
         >
-          {showSplitLayout ? (
+          {showSplitLayout && !showStartupLogo ? (
             <AnimatedLoginVisual
               active={isFocused}
               caption={
@@ -378,7 +380,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            {!showSplitLayout ? <AnimatedLoginVisual compact active={isFocused} /> : null}
+            {!showSplitLayout && !showStartupLogo ? (
+              <AnimatedLoginVisual compact active={isFocused} />
+            ) : null}
             <View style={styles.formStack}>
               <Animated.View
                 key={currentKey}
@@ -392,8 +396,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               >
                 {showOfflineBackup ? (
                   <Backup />
-                ) : isInitializing || loadingUserInfo ? (
-                  <ActivityIndicator size="large" />
+                ) : showStartupLogo ? (
+                  <View
+                    testID="login-loading-logo"
+                    accessibilityRole="progressbar"
+                    style={styles.loadingLogo}
+                  >
+                    <AnimatedLogo />
+                  </View>
                 ) : !onboardingDone ? (
                   <FirstOpened navigation={navigation} />
                 ) : (
@@ -405,7 +415,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                   />
                 )}
               </Animated.View>
-              {provider === "device" ? (
+              {showStartupLogo ? null : provider === "device" ? (
                 <AnimatedPressable
                   onPress={handlePresentModalPress}
                   style={{
@@ -667,6 +677,10 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
+  },
+  loadingLogo: {
+    width: 100,
+    height: 100,
   },
 });
 

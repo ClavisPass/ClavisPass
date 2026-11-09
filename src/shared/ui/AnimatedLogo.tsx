@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import Svg, { Defs, LinearGradient, Stop, Rect, Mask } from "react-native-svg";
 import Animated, {
+  cancelAnimation,
   useSharedValue,
   useAnimatedProps,
   withRepeat,
@@ -20,7 +21,8 @@ export default function AnimatedLogo() {
       -1,
       false
     );
-  }, []);
+    return () => cancelAnimation(x);
+  }, [x]);
 
   const animatedProps = useAnimatedProps(() => ({
     x: x.value,
